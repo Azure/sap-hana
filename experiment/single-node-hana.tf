@@ -173,8 +173,8 @@ resource "azurerm_storage_account" "mystorageaccount" {
 }
 
 # Create virtual machine
-resource "azurerm_virtual_machine" "db0" {
-  name                  = "db0"
+resource "azurerm_virtual_machine" "db" {
+  name                  = "db${var.db_num}"
   location              = "${var.az_region}"
   resource_group_name   = "${azurerm_resource_group.hana-resource-group.name}"
   network_interface_ids = ["${azurerm_network_interface.pv1-db0-nic.id}"]
@@ -289,10 +289,3 @@ resource "azurerm_virtual_machine" "db0" {
   }
 }
 
-// -------------------------------------------------------------------------
-// Print out login information
-// -------------------------------------------------------------------------
-output "ip" {
-  value = "Created vm ${azurerm_virtual_machine.db0.id}"
-  value = "Connect using ${var.vm_user}@${local.vmFqdn}"
-}
