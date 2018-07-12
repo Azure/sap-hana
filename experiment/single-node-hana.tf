@@ -288,11 +288,3 @@ resource "azurerm_virtual_machine" "db" {
     environment = "Terraform SAP HANA single node deployment"
   }
 }
-
-// -------------------------------------------------------------------------
-// Print out login information
-// -------------------------------------------------------------------------
-output "ip" {
-  value = "Created vm ${azurerm_virtual_machine.db.id}"
-  value = "Connect using ${var.vm_user}@${local.vm_fqdn}"
-}
