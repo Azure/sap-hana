@@ -2,11 +2,11 @@
 provider "azurerm" {} #TODO(pabowers): add ability to specify subscription
 
 locals {
-  vmFqdn         = "${azurerm_public_ip.hana-db-pip.fqdn}"
-  vmName         = "${var.sap_sid}-db${var.db_num}"
-  hanaDataSize   = 512
-  hanaLogSize    = 512
-  hanaSharedSize = 512
+  vm_fqdn              = "${azurerm_public_ip.hana-db-pip.fqdn}"
+  vm_name              = "${var.sap_sid}-db${var.db_num}"
+  disksize_hana_data   = 512
+  disksize_hana_log    = 512
+  disksize_hana_shared = 512
 }
 
 data "http" "local_ip" {
@@ -131,7 +131,7 @@ resource "azurerm_network_security_group" "pv1-nsg" {
 
 # Create network interface
 resource "azurerm_network_interface" "pv1-db0-nic" {
-  name                      = "${var.sap_sid}-db0-nic"
+  name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
   resource_group_name       = "${azurerm_resource_group.hana-resource-group.name}"
   network_security_group_id = "${azurerm_network_security_group.pv1-nsg.id}"
@@ -198,7 +198,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-data-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.hanaDataSize}"
+    disk_size_gb      = "${local.disksize_hana_data}"
     lun               = 0
   }
 
@@ -206,7 +206,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-log-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.hanaLogSize}"
+    disk_size_gb      = "${local.disksize_hana_log}"
     lun               = 1
   }
 
@@ -214,12 +214,12 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-shared-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.hanaSharedSize}"
+    disk_size_gb      = "${local.disksize_hana_shared}"
     lun               = 2
   }
 
   os_profile {
-    computer_name  = "${local.vmName}"
+    computer_name  = "${local.vm_name}"
     admin_username = "${var.vm_user}"
   }
 
@@ -242,7 +242,7 @@ resource "azurerm_virtual_machine" "db" {
     user        = "${var.vm_user}"
     private_key = "${file("${var.sshkey_path_private}")}"
     timeout     = "20m"
-    host        = "${local.vmFqdn}"
+    host        = "${local.vm_fqdn}"
   }
 
   provisioner "file" {
@@ -280,7 +280,7 @@ resource "azurerm_virtual_machine" "db" {
       "chmod +x /tmp/provision_hardware.sh",
       "sudo /tmp/provision_hardware.sh ${var.sap_sid}",
       "chmod +x /tmp/install_HANA.sh",
-      "sudo /tmp/install_HANA.sh \"${var.url_sap_sapcar}\" \"${var.url_sap_hostagent}\" \"${var.url_sap_hdbserver}\" \"${var.sap_sid}\" \"${local.vmName}\" \"${var.sap_instancenum}\" \"${var.pw_os_sapadm}\" \"${var.pw_os_sidadm}\" \"${var.pw_db_system}\"",
+      "sudo /tmp/install_HANA.sh \"${var.url_sap_sapcar}\" \"${var.url_sap_hostagent}\" \"${var.url_sap_hdbserver}\" \"${var.sap_sid}\" \"${local.vm_name}\" \"${var.sap_instancenum}\" \"${var.pw_os_sapadm}\" \"${var.pw_os_sidadm}\" \"${var.pw_db_system}\"",
     ]
   }
 
@@ -288,4 +288,3 @@ resource "azurerm_virtual_machine" "db" {
     environment = "Terraform SAP HANA single node deployment"
   }
 }
-
