@@ -129,7 +129,6 @@ resource "azurerm_network_security_group" "hdb-nsg" {
   }
 }
 
-# Create network interface
 resource "azurerm_network_interface" "db-nic" {
   name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
