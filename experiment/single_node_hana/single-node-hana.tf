@@ -58,77 +58,8 @@ resource "azurerm_public_ip" "hana-db-pip" {
   }
 }
 
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "hdb-nsg" {
-  name                = "${var.sap_sid}-nsg"
-  location            = "${var.az_region}"
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
 
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "local-ip-allow-vnet"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "${chomp(data.http.local_ip.body)}"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "open-hana-db-ports"
-    priority                   = 1020
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3${var.sap_instancenum}00-3${var.sap_instancenum}99"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "HTTP"
-    priority                   = 1030
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80${var.sap_instancenum}"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "HTTPS"
-    priority                   = 1040
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "43${var.sap_instancenum}"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags {
-    environment = "Terraform SAP HANA single node deployment"
-  }
-}
-
+# Create network interface
 resource "azurerm_network_interface" "db-nic" {
   name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
