@@ -9,20 +9,6 @@ locals {
   disksize_gb_hana_shared = 512
 }
 
-data "http" "local_ip" {
-  url = "http://v4.ifconfig.co"
-}
-
-# Create a resource group if it doesn’t exist
-resource "azurerm_resource_group" "hana-resource-group" {
-  name     = "${var.az_resource_group}"
-  location = "${var.az_region}"
-
-  tags {
-    environment = "Terraform SAP HANA single node deployment"
-  }
-}
-
 # Create virtual network
 resource "azurerm_virtual_network" "hana-vnet" {
   name                = "${var.sap_sid}-vnet"
