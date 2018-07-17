@@ -1,3 +1,6 @@
+data "http" "local_ip" {
+  url = "http://v4.ifconfig.co"
+}
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "sap-nsg" {
