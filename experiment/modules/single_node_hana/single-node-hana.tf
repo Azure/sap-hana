@@ -162,32 +162,32 @@ resource "azurerm_virtual_machine" "db" {
   }
 
   provisioner "file" {
-    source      = "provision_hardware.sh"
+    source      = "${path.module}/provision_hardware.sh"
     destination = "/tmp/provision_hardware.sh"
   }
 
   provisioner "file" {
-    source      = "sid_config_template.txt"
+    source      = "${path.module}/sid_config_template.txt"
     destination = "/tmp/sid_config_template.txt"
   }
 
   provisioner "file" {
-    source      = "sid_passwords_template.txt"
+    source      = "${path.module}/sid_passwords_template.txt"
     destination = "/tmp/sid_passwords_template.txt"
   }
 
   provisioner "file" {
-    source      = "install_HANA.sh"
+    source      = "${path.module}/install_HANA.sh"
     destination = "/tmp/install_HANA.sh"
   }
 
   provisioner "file" {
-    source      = "machine_setup_tests.sh"
+    source      = "${path.module}/machine_setup_tests.sh"
     destination = "/tmp/machine_setup_tests.sh"
   }
 
   provisioner "file" {
-    source      = "shunit2"
+    source      = "${path.module}/shunit2"
     destination = "/tmp/shunit2"
   }
 
