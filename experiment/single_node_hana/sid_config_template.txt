@@ -10,7 +10,7 @@ checkmnt=
 sapmnt=/hana/shared
 
 # Local Host Name ( Default: pv1-db0 )
-hostname=<SAP_HOST_NAME>
+hostname=<SAP_HOSTNAME>
 
 # Install SSH Key ( Default: y )
 install_ssh_key=y
@@ -31,7 +31,7 @@ internal_network=
 sid=<SAP_SID>
 
 # Instance Number
-number=<SAP_INSTANCE_NUM>
+number=<SAP_INSTANCENUM>
 
 # Database Mode ( Default: single_container; Valid values: single_container | multiple_containers )
 db_mode=single_container
