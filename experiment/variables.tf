@@ -62,7 +62,3 @@ variable "pw_os_sidadm" {
 variable "pw_db_system" {
   description = "Password for the database user SYSTEM"
 }
-
-variable "nsg_id" {
-  description = "The nsg id for the nsg that will control this vm."
-}
