@@ -6,7 +6,7 @@ data "http" "local_ip" {
 resource "azurerm_network_security_group" "sap-nsg" {
   name                = "${var.sap_sid}-nsg"
   location            = "${var.az_region}"
-  resource_group_name = "${var.resource_group_name}"
+  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
 
   security_rule {
     name                       = "SSH"
