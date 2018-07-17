@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "hana-resource-group" {
 
 module "nsg" {
   source = "./modules/nsg_for_hana"
-  resource_group_name = "${az_resource_group.hana-resource-group.name}"
+  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
   az_region = "${var.az_region}"
   sap_instancenum = "${var.sap_instancenum}"
   sap_sid = "${var.sap_sid}"
@@ -21,8 +21,10 @@ module "nsg" {
 
 module "single_node_hana" {
   source = "./modules/single_node_hana"
+
   sshkey_path_private = "${var.sshkey_path_private}"
-  az_resource_group = "${az_resource_group.hana-resource-group.name}"
+  sshkey_path_public = "${var.sshkey_path_public}"
+  az_resource_group = "${azurerm_resource_group.hana-resource-group.name}"
   az_region = "${var.az_region}"
   sap_instancenum = "${var.sap_instancenum}"
   az_domain_name = "${var.az_domain_name}"
