@@ -1,5 +1,6 @@
 # Create bastion and single HANA node by calling the modules
 provider "azurerm" {}
+<<<<<<< 2df36d78b162197f1a0b176c6253f11c07026b37
 
 # Create a resource group
 resource "azurerm_resource_group" "hana-resource-group" {
@@ -66,3 +67,6 @@ module "single_node_hana" {
   pw_db_system        = "${var.pw_db_system}"
   hana_subnet_id      = "${module.vnet.vnet_subnets[0]}"
 }
+=======
+module "single_node_hana"
+>>>>>>> splitting up terraform to separate files
