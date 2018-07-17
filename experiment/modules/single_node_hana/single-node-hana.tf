@@ -4,9 +4,9 @@ provider "azurerm" {} #TODO(pabowers): add ability to specify subscription
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hana-db-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
-  disksize_gb_hana_data   = 512
-  disksize_gb_hana_log    = 512
-  disksize_gb_hana_shared = 512
+  disksize_hana_data_gb   = 512
+  disksize_hana_log_gb    = 512
+  disksize_hana_shared_gb = 512
 }
 
 # Create public IPs
