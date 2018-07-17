@@ -10,4 +10,16 @@ resource "azurerm_resource_group" "hana-resource-group" {
     environment = "Terraform SAP HANA single node deployment"
   }
 }
-module "single_node_hana"
+
+module "nsg" {
+  source = "/nsg_for_hana"
+  resource_group_name = "${az_resource_group.hana-resource-group.name}"
+  az_region = "${var.az_region}"
+  sap_instancenum = "00"
+}
+
+module "single_node_hana" {
+  source = "/single_node_hana"
+  sshkey_path_private = "${var.sshkey_path_private}"
+  az_resource_group = "${az_resource_group.hana-resource-group.name}"
+}

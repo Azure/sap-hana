@@ -14,7 +14,7 @@ resource "azurerm_virtual_network" "hana-vnet" {
   name                = "${var.sap_sid}-vnet"
   address_space       = ["10.0.0.0/21"]
   location            = "${var.az_region}"
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name = "${var.az_resource_group}"
 
   tags {
     environment = "Terraform SAP HANA single node deployment"
@@ -24,9 +24,9 @@ resource "azurerm_virtual_network" "hana-vnet" {
 # Create subnet
 resource "azurerm_subnet" "hana-subnet" {
   name                      = "${var.sap_sid}-subnet"
-  resource_group_name       = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name       = "${var.az_resource_group}"
   virtual_network_name      = "${azurerm_virtual_network.hana-vnet.name}"
-  network_security_group_id = "${azurerm_network_security_group.sap-nsg.id}"
+  network_security_group_id = "${var.nsg_id}"
   address_prefix            = "10.0.1.0/24"
 }
 
@@ -34,7 +34,7 @@ resource "azurerm_subnet" "hana-subnet" {
 resource "azurerm_public_ip" "hana-db-pip" {
   name                         = "${var.sap_sid}-db${var.db_num}-pip"
   location                     = "${var.az_region}"
-  resource_group_name          = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name          = "${var.az_resource_group}"
   public_ip_address_allocation = "dynamic"
   idle_timeout_in_minutes      = 30
   domain_name_label            = "${var.az_domain_name}"
@@ -48,8 +48,8 @@ resource "azurerm_public_ip" "hana-db-pip" {
 resource "azurerm_network_interface" "db-nic" {
   name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
-  resource_group_name       = "${azurerm_resource_group.hana-resource-group.name}"
-  network_security_group_id = "${azurerm_network_security_group.sap-nsg.id}"
+  resource_group_name       = "${var.az_resource_group}"
+  network_security_group_id = "${var.nsg_id}"
 
   ip_configuration {
     name      = "myNicConfiguration"
@@ -68,7 +68,7 @@ resource "azurerm_network_interface" "db-nic" {
 resource "random_id" "randomId" {
   keepers = {
     # Generate a new ID only when a new resource group is defined
-    resource_group = "${azurerm_resource_group.hana-resource-group.name}"
+    resource_group = "${var.az_resource_group}"
   }
 
   byte_length = 8
@@ -77,7 +77,7 @@ resource "random_id" "randomId" {
 # Create storage account for boot diagnostics
 resource "azurerm_storage_account" "mystorageaccount" {
   name                     = "diag${random_id.randomId.hex}"
-  resource_group_name      = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name      = "${var.az_resource_group}"
   location                 = "${var.az_region}"
   account_tier             = "Standard"
   account_replication_type = "LRS"
@@ -91,7 +91,7 @@ resource "azurerm_storage_account" "mystorageaccount" {
 resource "azurerm_virtual_machine" "db" {
   name                  = "db${var.db_num}"
   location              = "${var.az_region}"
-  resource_group_name   = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name   = "${var.az_resource_group}"
   network_interface_ids = ["${azurerm_network_interface.db-nic.id}"]
   vm_size               = "${var.vm_size}"
 
