@@ -7,18 +7,18 @@
     /dev/disk/azure/scsi1/lun1 : vg_hana_log_PV1
     /dev/disk/azure/scsi1/lun2 : vg_hana_shared_PV1
   
-  logvols:
-    hana_shared:
-      size: 512G
-      vol: vg_hana_shared_PV1
-      mountpoint: /hana/shared
-    hana_data:
-      size: 512G
-      vol: vg_hana_data_PV1
-      mountpoint: /hana/data
-    hana_logs:
-      size: 512G
-      vol: vg_hana_log_PV1
-      mountpoint: /hana/log
+    logvols:
+      hana_shared:
+        size: 512G
+        vol: vg_hana_shared_PV1
+        mountpoint: /hana/shared
+      hana_data:
+        size: 512G
+        vol: vg_hana_data_PV1
+        mountpoint: /hana/data
+      hana_logs:
+        size: 512G
+        vol: vg_hana_log_PV1
+        mountpoint: /hana/log
   roles:
     - { role: mk-ansible-roles.disk-init }
