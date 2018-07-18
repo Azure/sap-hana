@@ -9,26 +9,6 @@ locals {
   disksize_gb_hana_shared = 512
 }
 
-# Create virtual network
-resource "azurerm_virtual_network" "hana-vnet" {
-  name                = "${var.sap_sid}-vnet"
-  address_space       = ["10.0.0.0/21"]
-  location            = "${var.az_region}"
-  resource_group_name = "${var.az_resource_group}"
-
-  tags {
-    environment = "Terraform SAP HANA single node deployment"
-  }
-}
-
-# Create subnet
-resource "azurerm_subnet" "hana-subnet" {
-  name                      = "${var.sap_sid}-subnet"
-  resource_group_name       = "${var.az_resource_group}"
-  virtual_network_name      = "${azurerm_virtual_network.hana-vnet.name}"
-  network_security_group_id = "${var.nsg_id}"
-  address_prefix            = "10.0.1.0/24"
-}
 
 # Create public IPs
 resource "azurerm_public_ip" "hana-db-pip" {
@@ -53,7 +33,7 @@ resource "azurerm_network_interface" "db-nic" {
 
   ip_configuration {
     name      = "myNicConfiguration"
-    subnet_id = "${azurerm_subnet.hana-subnet.id}"
+    subnet_id = "${var.hana_subnet_id}"
 
     private_ip_address_allocation = "dynamic"
     public_ip_address_id          = "${azurerm_public_ip.hana-db-pip.id}"
