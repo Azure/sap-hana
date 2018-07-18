@@ -4,37 +4,11 @@ provider "azurerm" {} #TODO(pabowers): add ability to specify subscription
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
-<<<<<<< d7409fb3edf3b28cf71980d63b961ae93ff6356a:experiment/modules/single_node_hana/single-node-hana.tf
   disksize_hana_data_gb   = 512
   disksize_hana_log_gb    = 512
   disksize_hana_shared_gb = 512
-=======
-  disksize_gb_hana_data   = 512
-  disksize_gb_hana_log    = 512
-  disksize_gb_hana_shared = 512
 }
 
-# Create virtual network
-resource "azurerm_virtual_network" "hana-vnet" {
-  name                = "${var.sap_sid}-vnet"
-  address_space       = ["10.0.0.0/21"]
-  location            = "${var.az_region}"
-  resource_group_name = "${var.az_resource_group}"
-
-  tags {
-    environment = "Terraform SAP HANA single node deployment"
-  }
-}
-
-# Create subnet
-resource "azurerm_subnet" "hana-subnet" {
-  name                      = "${var.sap_sid}-subnet"
-  resource_group_name       = "${var.az_resource_group}"
-  virtual_network_name      = "${azurerm_virtual_network.hana-vnet.name}"
-  network_security_group_id = "${var.nsg_id}"
-  address_prefix            = "10.0.1.0/24"
->>>>>>> testing modular composition:experiment/single_node_hana/single-node-hana.tf
-}
 
 # Create public IPs
 resource "azurerm_public_ip" "hdb-pip" {

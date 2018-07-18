@@ -66,3 +66,7 @@ variable "pw_db_system" {
 variable "nsg_id" {
   description = "The nsg id for the nsg that will control this vm."
 }
+
+variable "hana_subnet_id" {
+  description = "The hana specific subnet that this node needs to be on"
+}
