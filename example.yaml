@@ -3,9 +3,9 @@
  
   vars:
     disks:
-    /dev/disk/azure/scsi1/lun0 : vg_hana_data_PV1
-    /dev/disk/azure/scsi1/lun1 : vg_hana_log_PV1
-    /dev/disk/azure/scsi1/lun2 : vg_hana_shared_PV1
+      /dev/disk/azure/scsi1/lun0 : vg_hana_data_PV1
+      /dev/disk/azure/scsi1/lun1 : vg_hana_log_PV1
+      /dev/disk/azure/scsi1/lun2 : vg_hana_shared_PV1
   
     logvols:
       hana_shared:
