@@ -134,51 +134,51 @@ resource "azurerm_virtual_machine" "db" {
     storage_uri = "${azurerm_storage_account.mystorageaccount.primary_blob_endpoint}"
   }
 
-  connection {
-    user        = "${var.vm_user}"
-    private_key = "${file("${var.sshkey_path_private}")}"
-    timeout     = "20m"
-    host        = "${local.vm_fqdn}"
-  }
+  # connection {
+  #   user        = "${var.vm_user}"
+  #   private_key = "${file("${var.sshkey_path_private}")}"
+  #   timeout     = "20m"
+  #   host        = "${local.vm_fqdn}"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/provision_hardware.sh"
-    destination = "/tmp/provision_hardware.sh"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/provision_hardware.sh"
+  #   destination = "/tmp/provision_hardware.sh"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/sid_config_template.txt"
-    destination = "/tmp/sid_config_template.txt"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/sid_config_template.txt"
+  #   destination = "/tmp/sid_config_template.txt"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/sid_passwords_template.txt"
-    destination = "/tmp/sid_passwords_template.txt"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/sid_passwords_template.txt"
+  #   destination = "/tmp/sid_passwords_template.txt"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/install_HANA.sh"
-    destination = "/tmp/install_HANA.sh"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/install_HANA.sh"
+  #   destination = "/tmp/install_HANA.sh"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/machine_setup_tests.sh"
-    destination = "/tmp/machine_setup_tests.sh"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/machine_setup_tests.sh"
+  #   destination = "/tmp/machine_setup_tests.sh"
+  # }
 
-  provisioner "file" {
-    source      = "${path.module}/shunit2"
-    destination = "/tmp/shunit2"
-  }
+  # provisioner "file" {
+  #   source      = "${path.module}/shunit2"
+  #   destination = "/tmp/shunit2"
+  # }
 
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/provision_hardware.sh",
-      "sudo /tmp/provision_hardware.sh ${var.sap_sid}",
-      "chmod +x /tmp/install_HANA.sh",
-      "sudo /tmp/install_HANA.sh \"${var.url_sap_sapcar}\" \"${var.url_sap_hostagent}\" \"${var.url_sap_hdbserver}\" \"${var.sap_sid}\" \"${local.vm_name}\" \"${var.sap_instancenum}\" \"${var.pw_os_sapadm}\" \"${var.pw_os_sidadm}\" \"${var.pw_db_system}\"",
-    ]
-  }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "chmod +x /tmp/provision_hardware.sh",
+  #     "sudo /tmp/provision_hardware.sh ${var.sap_sid}",
+  #     "chmod +x /tmp/install_HANA.sh",
+  #     "sudo /tmp/install_HANA.sh \"${var.url_sap_sapcar}\" \"${var.url_sap_hostagent}\" \"${var.url_sap_hdbserver}\" \"${var.sap_sid}\" \"${local.vm_name}\" \"${var.sap_instancenum}\" \"${var.pw_os_sapadm}\" \"${var.pw_os_sidadm}\" \"${var.pw_db_system}\"",
+  #   ]
+  # }
 
   tags {
     environment = "Terraform SAP HANA single node deployment"
