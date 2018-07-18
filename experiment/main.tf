@@ -15,7 +15,7 @@ module "vnet" {
   source  = "Azure/vnet/azurerm"
   version = "1.0.0"
   
-  address_space       = ["10.0.0.0/21"]
+  address_space       = "10.0.0.0/21"
   location            = "${var.az_region}"
   resource_group_name = "${var.az_resource_group}"
   subnet_names        = ["hana-subnet"]
