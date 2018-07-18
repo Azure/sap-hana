@@ -21,4 +21,4 @@
       vol: vg_hana_log_PV1
       mountpoint: /hana/log
   roles:
-	- { role: mk-ansible-roles.disk-init }
+    - { role: mk-ansible-roles.disk-init }
