@@ -36,6 +36,7 @@ module "nsg" {
 
 # TODO: see if can do this in a better way than in this file
 resource "azurerm_subnet" "subnet" {
+  depends_on = ["module.vnet"]
   name  = "hana-subnet"
   address_prefix = "10.0.1.0/24"
   resource_group_name = "${var.az_resource_group}"
