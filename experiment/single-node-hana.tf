@@ -67,7 +67,7 @@ variable "pw_db_system" {
 }
 
 locals {
-  vm_fqdn                 = "${azurerm_public_ip.hana-db-pip.fqdn}"
+  vm_fqdn                 = "${azurerm_public_ip.hana-hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
   disksize_hana_data_gb   = 512
   disksize_hana_log_gb    = 512
@@ -110,7 +110,7 @@ resource "azurerm_subnet" "hana-subnet" {
 }
 
 # Create public IPs
-resource "azurerm_public_ip" "hana-db-pip" {
+resource "azurerm_public_ip" "hana-hdb-pip" {
   name                         = "${var.sap_sid}-db${var.db_num}-pip"
   location                     = "${var.az_region}"
   resource_group_name          = "${azurerm_resource_group.hana-resource-group.name}"
@@ -206,7 +206,7 @@ resource "azurerm_network_interface" "hdb-nic" {
     subnet_id = "${azurerm_subnet.hana-subnet.id}"
 
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.hana-db-pip.id}"
+    public_ip_address_id          = "${azurerm_public_ip.hana-hdb-pip.id}"
   }
 
   tags {
