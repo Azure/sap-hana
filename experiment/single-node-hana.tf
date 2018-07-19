@@ -195,7 +195,7 @@ resource "azurerm_network_security_group" "hdb-nsg" {
 }
 
 # Create network interface
-resource "azurerm_network_interface" "db-nic" {
+resource "azurerm_network_interface" "hdb-nic" {
   name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
   resource_group_name       = "${azurerm_resource_group.hana-resource-group.name}"
@@ -242,7 +242,7 @@ resource "azurerm_virtual_machine" "db" {
   name                  = "${var.sap_sid}-db${var.db_num}"
   location              = "${var.az_region}"
   resource_group_name   = "${azurerm_resource_group.hana-resource-group.name}"
-  network_interface_ids = ["${azurerm_network_interface.db-nic.id}"]
+  network_interface_ids = ["${azurerm_network_interface.hdb-nic.id}"]
   vm_size               = "${var.vm_size}"
 
   storage_os_disk {
