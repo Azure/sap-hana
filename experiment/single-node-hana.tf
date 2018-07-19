@@ -69,9 +69,9 @@ variable "pw_db_system" {
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hana-db-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
-  disksize_gb_hana_data   = 512
-  disksize_gb_hana_log    = 512
-  disksize_gb_hana_shared = 512
+  disksize_hana_data_gb   = 512
+  disksize_hana_log_gb    = 512
+  disksize_hana_shared_gb = 512
 }
 
 data "http" "local_ip" {
@@ -263,7 +263,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-data-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_data}"
+    disk_size_gb      = "${local.disksize_hana_data_gb}"
     lun               = 0
   }
 
@@ -271,7 +271,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-log-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_log}"
+    disk_size_gb      = "${local.disksize_hana_log_gb}"
     lun               = 1
   }
 
@@ -279,7 +279,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "hana-shared-disk"
     managed_disk_type = "Standard_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_shared}"
+    disk_size_gb      = "${local.disksize_hana_shared_gb}"
     lun               = 2
   }
 
