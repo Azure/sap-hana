@@ -2,16 +2,16 @@
 provider "azurerm" {} #TODO(pabowers): add ability to specify subscription
 
 locals {
-  vm_fqdn                 = "${azurerm_public_ip.hana-db-pip.fqdn}"
+  vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
-  disksize_gb_hana_data   = 512
-  disksize_gb_hana_log    = 512
-  disksize_gb_hana_shared = 512
+  disksize_hana_data_gb   = 512
+  disksize_hana_log_gb    = 512
+  disksize_hana_shared_gb = 512
 }
 
 
 # Create public IPs
-resource "azurerm_public_ip" "hana-db-pip" {
+resource "azurerm_public_ip" "hdb-pip" {
   name                         = "${var.sap_sid}-db${var.db_num}-pip"
   location                     = "${var.az_region}"
   resource_group_name          = "${var.az_resource_group}"
@@ -25,7 +25,7 @@ resource "azurerm_public_ip" "hana-db-pip" {
 }
 
 # Create network interface
-resource "azurerm_network_interface" "db-nic" {
+resource "azurerm_network_interface" "hdb-nic" {
   name                      = "${var.sap_sid}-db${var.db_num}-nic"
   location                  = "${var.az_region}"
   resource_group_name       = "${var.az_resource_group}"
@@ -36,7 +36,7 @@ resource "azurerm_network_interface" "db-nic" {
     subnet_id = "${var.hana_subnet_id}"
 
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.hana-db-pip.id}"
+    public_ip_address_id          = "${azurerm_public_ip.hdb-pip.id}"
   }
 
   tags {
@@ -71,15 +71,15 @@ resource "azurerm_storage_account" "mystorageaccount" {
 resource "azurerm_virtual_machine" "db" {
   name                  = "db${var.db_num}"
   location              = "${var.az_region}"
-  resource_group_name   = "${var.az_resource_group}"
-  network_interface_ids = ["${azurerm_network_interface.db-nic.id}"]
+  resource_group_name   = "${azurerm_resource_group.hana-resource-group.name}"
+  network_interface_ids = ["${azurerm_network_interface.hdb-nic.id}"]
   vm_size               = "${var.vm_size}"
 
   storage_os_disk {
     name              = "myOsDisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
   }
 
   storage_image_reference {
@@ -91,25 +91,25 @@ resource "azurerm_virtual_machine" "db" {
 
   storage_data_disk {
     name              = "hana-data-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_data}"
+    disk_size_gb      = "${local.disksize_hana_data_gb}"
     lun               = 0
   }
 
   storage_data_disk {
     name              = "hana-log-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_log}"
+    disk_size_gb      = "${local.disksize_hana_log_gb}"
     lun               = 1
   }
 
   storage_data_disk {
     name              = "hana-shared-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_gb_hana_shared}"
+    disk_size_gb      = "${local.disksize_hana_shared_gb}"
     lun               = 2
   }
 
