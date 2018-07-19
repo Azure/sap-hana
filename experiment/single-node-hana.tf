@@ -249,7 +249,7 @@ resource "azurerm_virtual_machine" "db" {
     name              = "myOsDisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
   }
 
   storage_image_reference {
@@ -261,7 +261,7 @@ resource "azurerm_virtual_machine" "db" {
 
   storage_data_disk {
     name              = "hana-data-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
     disk_size_gb      = "${local.disksize_hana_data_gb}"
     lun               = 0
@@ -269,7 +269,7 @@ resource "azurerm_virtual_machine" "db" {
 
   storage_data_disk {
     name              = "hana-log-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
     disk_size_gb      = "${local.disksize_hana_log_gb}"
     lun               = 1
@@ -277,7 +277,7 @@ resource "azurerm_virtual_machine" "db" {
 
   storage_data_disk {
     name              = "hana-shared-disk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "Premium_LRS"
     create_option     = "Empty"
     disk_size_gb      = "${local.disksize_hana_shared_gb}"
     lun               = 2
