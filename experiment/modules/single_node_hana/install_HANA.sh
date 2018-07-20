@@ -33,8 +33,6 @@ chmod 755 ./SAPCAR_LINUX.EXE
 # Generate the config and passwords
 awk -v sap_sid="$param_sap_sid" -v sap_instancenum="$param_sap_instancenum" -v sap_hostname="$param_sap_hostname" '{gsub("<SAP_SID>", sap_sid); gsub("<SAP_HOSTNAME>", sap_hostname); gsub("<SAP_INSTANCENUM>", sap_instancenum);}1' /tmp/sid_config_template.txt > ${param_sap_sid}_configfile
 temp=`awk -v pw_sapadm="$param_pw_os_sapadm" -v pw_sidadm="$param_pw_os_sidadm" -v pw_system="$param_pw_db_system" '{gsub("<PW_SAPADM>", pw_sapadm); gsub("<PW_SIDADM>", pw_sidadm); gsub("<PW_SYSTEM>", pw_system);}1' /tmp/sid_passwords_template.txt`
-# Verify passwords file
-echo $temp
 
 # Pass the configs into the HANA install
 echo $temp | $hana_path/SAP_HANA_DATABASE/hdblcm --batch --action=install --configfile=${param_sap_sid}_configfile --read_password_from_stdin=xml
