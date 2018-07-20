@@ -34,8 +34,6 @@ chmod 755 ./SAPCAR_LINUX.EXE
 <<<<<<< 2df36d78b162197f1a0b176c6253f11c07026b37:experiment/modules/single_node_hana/install_HANA.sh
 awk -v sap_sid="$param_sap_sid" -v sap_instancenum="$param_sap_instancenum" -v sap_hostname="$param_sap_hostname" '{gsub("<SAP_SID>", sap_sid); gsub("<SAP_HOSTNAME>", sap_hostname); gsub("<SAP_INSTANCENUM>", sap_instancenum);}1' /tmp/sid_config_template.txt > ${param_sap_sid}_configfile
 temp=`awk -v pw_sapadm="$param_pw_os_sapadm" -v pw_sidadm="$param_pw_os_sidadm" -v pw_system="$param_pw_db_system" '{gsub("<PW_SAPADM>", pw_sapadm); gsub("<PW_SIDADM>", pw_sidadm); gsub("<PW_SYSTEM>", pw_system);}1' /tmp/sid_passwords_template.txt`
-# Verify passwords file
-echo $temp
 
 =======
 awk -v sap_sid="$param_sap_sid" -v sap_instance_num="$param_sap_instancenum" -v sap_host_name="$sap_host_name" '{gsub("<SAP_SID>", sap_sid); gsub("<SAP_HOST_NAME>", sap_host_name); gsub("<SAP_INSTANCE_NUM>", sap_instance_num);}1' /tmp/sid_config_template.txt > ${param_sap_sid}_configfile
