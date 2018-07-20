@@ -9,7 +9,6 @@ locals {
   disksize_hana_shared_gb = 512
 }
 
-
 # Create public IPs
 resource "azurerm_public_ip" "hdb-pip" {
   name                         = "${var.sap_sid}-hdb${var.db_num}-pip"
