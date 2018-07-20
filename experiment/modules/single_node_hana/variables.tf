@@ -70,6 +70,7 @@ variable "nsg_id" {
 variable "hana_subnet_id" {
   description = "The hana specific subnet that this node needs to be on"
 }
+
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"

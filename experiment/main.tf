@@ -11,9 +11,9 @@ resource "azurerm_resource_group" "hana-resource-group" {
   }
 }
 
+# TODO(pabowers): switch to use the Terraform registry version when release for nsg support becomes available
 module "vnet" {
-  source  = "Azure/vnet/azurerm"
-  version = "1.0.0"
+  source  = "github.com/Azure/terraform-azurerm-vnet"
 
   address_space       = "10.0.0.0/21"
   location            = "${var.az_region}"
@@ -21,6 +21,10 @@ module "vnet" {
   subnet_names        = ["hdb-subnet"]
   subnet_prefixes     = ["10.0.1.0/24"]
   vnet_name           = "${var.sap_sid}-vnet"
+
+  nsg_ids = {
+    "hdb-subnet" = "${module.nsg.nsg-id}"
+  }
 
   tags {
     environment = "Terraform HANA vnet and subnet creation"
@@ -33,16 +37,6 @@ module "nsg" {
   az_region           = "${var.az_region}"
   sap_instancenum     = "${var.sap_instancenum}"
   sap_sid             = "${var.sap_sid}"
-}
-
-# TODO: see if can do this in a better way than in this file
-resource "azurerm_subnet" "subnet" {
-  depends_on                = ["module.vnet"]
-  name                      = "hdb-subnet"
-  address_prefix            = "10.0.1.0/24"
-  resource_group_name       = "${var.az_resource_group}"
-  virtual_network_name      = "${var.sap_sid}-vnet"
-  network_security_group_id = "${module.nsg.nsg-id}"
 }
 
 module "single_node_hana" {
