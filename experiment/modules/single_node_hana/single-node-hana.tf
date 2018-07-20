@@ -9,10 +9,9 @@ locals {
   disksize_gb_hana_shared = 512
 }
 
-
 # Create public IPs
-resource "azurerm_public_ip" "hana-db-pip" {
-  name                         = "${var.sap_sid}-db${var.db_num}-pip"
+resource "azurerm_public_ip" "hdb-pip" {
+  name                         = "${var.sap_sid}-hdb${var.db_num}-pip"
   location                     = "${var.az_region}"
   resource_group_name          = "${var.az_resource_group}"
   public_ip_address_allocation = "dynamic"
@@ -73,7 +72,7 @@ resource "azurerm_virtual_machine" "db" {
   name                  = "${var.sap_sid}-db${var.db_num}"
   location              = "${var.az_region}"
   resource_group_name   = "${var.az_resource_group}"
-  network_interface_ids = ["${azurerm_network_interface.db-nic.id}"]
+  network_interface_ids = ["${azurerm_network_interface.hdb-nic.id}"]
   vm_size               = "${var.vm_size}"
 
   storage_os_disk {
