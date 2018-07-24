@@ -158,6 +158,10 @@ resource "azurerm_virtual_machine" "db" {
     ]
   }
 
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ${var.vm_user} --private-key '${var.sshkey_path_private}' -i '${local.vm_fqdn},' ansible/download.yml"
+  }
+
   tags {
     environment = "Terraform SAP HANA single node deployment"
   }
