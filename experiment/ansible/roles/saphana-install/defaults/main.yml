@@ -1,0 +1,14 @@
+---
+# replace with download URL for SAPCAR
+url_sapcar: 
+
+# replace with download URL for HDB server
+url_hdbserver: 
+
+sap_sid: 
+sap_instancenum: 
+sap_hostname: 
+
+pwd_os_sapadm: 
+pwd_os_sidadm: 
+pwd_db_system: 
