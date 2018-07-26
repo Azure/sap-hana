@@ -1,5 +1,5 @@
 data "http" "local_ip" {
-  url = "http://v4.ifconfig.co"
+  url = "http://api.ipify.org"
 }
 
 # Create Network Security Group and rule
