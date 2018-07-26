@@ -32,6 +32,6 @@
     creates: /hana/shared/install/SAP_HANA_DATABASE/hdblcm
 
 - name: run hdblcm
-  shell: "< '../hdbserver_{{ sap_sid }}_passwords.xml' ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
+  shell: "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   args:
     chdir: /hana/shared/install/SAP_HANA_DATABASE
