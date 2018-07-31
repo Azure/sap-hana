@@ -58,13 +58,47 @@ resource "azurerm_storage_account" "mystorageaccount" {
   }
 }
 
+/*
+module "attached_disk" "disk" {
+  source = "../disk_create"
+  #count                = "${length(var.storage_disk_sizes_gb)}"
+  disk_name                 = "db${var.db_num}-disk${0}"
+  az_region            = "${var.az_region}"
+  storage_account_type = "Premium_LRS"
+  resource_group_name  = "${var.az_resource_group}"
+  create_option        = "Empty"
+  disk_size_gb         = "${var.storage_disk_sizes_gb[0]}"
+  virtual_machine_id = "${azurerm_virtual_machine.db.id}"
+  lun                = "${0}"
+  caching            = "ReadWrite"
+}
+*/
+resource "azurerm_managed_disk" "disk" {
+  count                = "${length(var.storage_disk_sizes_gb)}"
+  name                 = "db${var.db_num}-disk${count.index}"
+  location             = "${var.az_region}"
+  storage_account_type = "Premium_LRS"
+  resource_group_name  = "${var.az_resource_group}"
+  disk_size_gb         = "${var.storage_disk_sizes_gb[count.index]}"
+  create_option        = "Empty"
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "disk" {
+  count              = "${length(var.storage_disk_sizes_gb)}"
+  virtual_machine_id = "${azurerm_virtual_machine.db.id}"
+  managed_disk_id    = "${element(azurerm_managed_disk.disk.*.id, count.index)}"
+  lun                = "${count.index}"
+  caching            = "ReadWrite"
+}
+
 # Create virtual machine
 resource "azurerm_virtual_machine" "db" {
-  name                  = "${var.sap_sid}-db${var.db_num}"
-  location              = "${var.az_region}"
-  resource_group_name   = "${var.az_resource_group}"
-  network_interface_ids = ["${azurerm_network_interface.hdb-nic.id}"]
-  vm_size               = "${var.vm_size}"
+  name                          = "${var.sap_sid}-db${var.db_num}"
+  location                      = "${var.az_region}"
+  resource_group_name           = "${var.az_resource_group}"
+  network_interface_ids         = ["${azurerm_network_interface.hdb-nic.id}"]
+  vm_size                       = "${var.vm_size}"
+  delete_os_disk_on_termination = "true"
 
   storage_os_disk {
     name              = "myOsDisk"
@@ -78,30 +112,6 @@ resource "azurerm_virtual_machine" "db" {
     offer     = "SLES-SAP"
     sku       = "12-SP3"
     version   = "latest"
-  }
-
-  storage_data_disk {
-    name              = "hana-data-disk"
-    managed_disk_type = "Premium_LRS"
-    create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_hana_data_gb}"
-    lun               = 0
-  }
-
-  storage_data_disk {
-    name              = "hana-log-disk"
-    managed_disk_type = "Premium_LRS"
-    create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_hana_log_gb}"
-    lun               = 1
-  }
-
-  storage_data_disk {
-    name              = "hana-shared-disk"
-    managed_disk_type = "Premium_LRS"
-    create_option     = "Empty"
-    disk_size_gb      = "${local.disksize_hana_shared_gb}"
-    lun               = 2
   }
 
   os_profile {
@@ -123,6 +133,14 @@ resource "azurerm_virtual_machine" "db" {
 
     storage_uri = "${azurerm_storage_account.mystorageaccount.primary_blob_endpoint}"
   }
+
+  tags {
+    environment = "Terraform SAP HANA single node deployment"
+  }
+}
+
+resource null_resource "mount-disks-and-configure-hana" {
+  depends_on = ["azurerm_virtual_machine.db"]
 
   connection {
     user        = "${var.vm_user}"

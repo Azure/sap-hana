@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "hana-resource-group" {
 
 # TODO(pabowers): switch to use the Terraform registry version when release for nsg support becomes available
 module "vnet" {
-  source  = "github.com/Azure/terraform-azurerm-vnet"
+  source = "github.com/Azure/terraform-azurerm-vnet"
 
   address_space       = "10.0.0.0/21"
   location            = "${var.az_region}"
@@ -59,4 +59,8 @@ module "single_node_hana" {
   pw_os_sidadm        = "${var.pw_os_sidadm}"
   pw_db_system        = "${var.pw_db_system}"
   hana_subnet_id      = "${module.vnet.vnet_subnets[0]}"
+}
+
+output "ip" {
+  value = "${module.single_node_hana.ip}"
 }

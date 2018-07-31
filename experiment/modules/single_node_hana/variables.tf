@@ -71,6 +71,11 @@ variable "hana_subnet_id" {
   description = "The hana specific subnet that this node needs to be on"
 }
 
+variable "storage_disk_sizes_gb" {
+  description = "List disk sizes in GB for all disks this VM will need"
+  default     = [512, 512, 512]
+}
+
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
