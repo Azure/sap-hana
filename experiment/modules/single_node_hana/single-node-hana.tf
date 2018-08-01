@@ -58,21 +58,6 @@ resource "azurerm_storage_account" "mystorageaccount" {
   }
 }
 
-/*
-module "attached_disk" "disk" {
-  source = "../disk_create"
-  #count                = "${length(var.storage_disk_sizes_gb)}"
-  disk_name                 = "db${var.db_num}-disk${0}"
-  az_region            = "${var.az_region}"
-  storage_account_type = "Premium_LRS"
-  resource_group_name  = "${var.az_resource_group}"
-  create_option        = "Empty"
-  disk_size_gb         = "${var.storage_disk_sizes_gb[0]}"
-  virtual_machine_id = "${azurerm_virtual_machine.db.id}"
-  lun                = "${0}"
-  caching            = "ReadWrite"
-}
-*/
 resource "azurerm_managed_disk" "disk" {
   count                = "${length(var.storage_disk_sizes_gb)}"
   name                 = "db${var.db_num}-disk${count.index}"

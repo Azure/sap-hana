@@ -79,7 +79,4 @@ variable "storage_disk_sizes_gb" {
 locals {
   vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name                 = "${var.sap_sid}-db${var.db_num}"
-  disksize_hana_data_gb   = 512
-  disksize_hana_log_gb    = 512
-  disksize_hana_shared_gb = 512
 }
