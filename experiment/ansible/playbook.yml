@@ -1,5 +1,26 @@
 ---
 - hosts: all
   become: true
+
+  vars:
+    disks:
+      /dev/disk/azure/scsi1/lun0 : vg_hana_data_PV1
+      /dev/disk/azure/scsi1/lun1 : vg_hana_log_PV1
+      /dev/disk/azure/scsi1/lun2 : vg_hana_shared_PV1
+
+    logvols:
+      hana_shared:
+        size: 100%FREE
+        vol: vg_hana_shared_PV1
+        mountpoint: /hana/shared/PV1
+      hana_data:
+        size: 100%FREE
+        vol: vg_hana_data_PV1
+        mountpoint: /hana/data/PV1
+      hana_logs:
+        size: 100%FREE
+        vol: vg_hana_log_PV1
+        mountpoint: /hana/log/PV1
   roles:
+    - disk-setup
     - saphana-install

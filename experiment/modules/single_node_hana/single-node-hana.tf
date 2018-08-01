@@ -134,23 +134,6 @@ resource null_resource "mount-disks-and-configure-hana" {
     host        = "${local.vm_fqdn}"
   }
 
-  provisioner "file" {
-    source      = "${path.module}/provision_hardware.sh"
-    destination = "/tmp/provision_hardware.sh"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/shunit2"
-    destination = "/tmp/shunit2"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /tmp/provision_hardware.sh",
-      "sudo /tmp/provision_hardware.sh ${var.sap_sid}",
-    ]
-  }
-
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=\"False\" ansible-playbook -u ${var.vm_user} --private-key '${var.sshkey_path_private}' --extra-vars='{\"url_sapcar\": \"${var.url_sap_sapcar}\", \"url_hdbserver\": \"${var.url_sap_hdbserver}\", \"sap_sid\": \"${var.sap_sid}\", \"sap_instance_num\": \"${var.sap_instancenum}\", \"sap_hostname\": \"${local.vm_name}\", \"pwd_os_sapadm\": \"${var.pw_os_sapadm}\", \"pwd_os_sidadm\": \"${var.pw_os_sidadm}\", \"pwd_db_system\": \"${var.pw_db_system}\" }' -i '${local.vm_fqdn},' ansible/playbook.yml"
   }
