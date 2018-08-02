@@ -77,6 +77,6 @@ variable "storage_disk_sizes_gb" {
 }
 
 locals {
-  vm_fqdn                 = "${azurerm_public_ip.hdb-pip.fqdn}"
-  vm_name                 = "${var.sap_sid}-db${var.db_num}"
+  vm_fqdn = "${azurerm_public_ip.hdb-pip.fqdn}"
+  vm_name = "${var.sap_sid}-db${var.db_num}"
 }

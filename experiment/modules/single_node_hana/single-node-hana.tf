@@ -125,28 +125,18 @@ resource "azurerm_virtual_machine" "db" {
 }
 
 resource null_resource "mount-disks-and-configure-hana" {
-  depends_on = ["azurerm_virtual_machine.db"]
+  depends_on = ["azurerm_virtual_machine.db", "azurerm_virtual_machine_data_disk_attachment.disk"]
 
   connection {
     user        = "${var.vm_user}"
     private_key = "${file("${var.sshkey_path_private}")}"
-    timeout     = "20m"
+    timeout     = "5m"
     host        = "${local.vm_fqdn}"
   }
 
   provisioner "file" {
     source      = "${path.module}/provision_hardware.sh"
     destination = "/tmp/provision_hardware.sh"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/sid_config_template.txt"
-    destination = "/tmp/sid_config_template.txt"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/sid_passwords_template.txt"
-    destination = "/tmp/sid_passwords_template.txt"
   }
 
   provisioner "file" {
@@ -163,9 +153,5 @@ resource null_resource "mount-disks-and-configure-hana" {
 
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ${var.vm_user} --private-key '${var.sshkey_path_private}' -i '${local.vm_fqdn},' ansible/playbook.yml"
-  }
-
-  tags {
-    environment = "Terraform SAP HANA single node deployment"
   }
 }
