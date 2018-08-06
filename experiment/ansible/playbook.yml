@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: database-{{ resource_group }}
   become: true
 
   vars:

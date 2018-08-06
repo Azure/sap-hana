@@ -4,10 +4,6 @@ variable "vm_user" {
   description = "The username of your HANA db vm."
 }
 
-variable "az_domain_name" {
-  description = "A name that is used to access your HANA vm"
-}
-
 variable "sshkey_path_private" {
   description = "The path on the local machine to where the private key is"
 }
@@ -41,11 +37,6 @@ variable "url_sap_sapcar" {
   description = "The url that points to the SAPCAR bits"
 }
 
-variable "url_sap_hostagent" {
-  type        = "string"
-  description = "The url that points to the sap host agent 36 bits"
-}
-
 variable "url_sap_hdbserver" {
   type        = "string"
   description = "The url that points to the HDB server 122.17 bits"
@@ -66,4 +57,9 @@ variable "pw_db_system" {
 variable "useHana2" {
   description = "A boolean that will choose between HANA 1.0 and 2.0"
   default     = false
+}
+
+variable "storage_disk_sizes_gb" {
+  description = "List disk sizes in GB for all disks this VM will need"
+  default     = [512, 512, 512]
 }
