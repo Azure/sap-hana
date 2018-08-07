@@ -86,7 +86,7 @@ resource "azurerm_virtual_machine" "db" {
   delete_os_disk_on_termination = "true"
 
   storage_os_disk {
-    name              = "myOsDisk"
+    name              = "${var.sap_sid}-OsDisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Premium_LRS"
