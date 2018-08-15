@@ -4,23 +4,23 @@
 
   vars:
     disks:
-      /dev/disk/azure/scsi1/lun0 : vg_hana_data_PV1
-      /dev/disk/azure/scsi1/lun1 : vg_hana_log_PV1
-      /dev/disk/azure/scsi1/lun2 : vg_hana_shared_PV1
+      /dev/disk/azure/scsi1/lun0 : vg_hana_data_{{ sap_sid }}
+      /dev/disk/azure/scsi1/lun1 : vg_hana_log_{{ sap_sid }}
+      /dev/disk/azure/scsi1/lun2 : vg_hana_shared_{{ sap_sid }}
 
     logvols:
       hana_shared:
         size: 100%FREE
-        vol: vg_hana_shared_PV1
-        mountpoint: /hana/shared/PV1
+        vol: vg_hana_shared_{{ sap_sid }}
+        mountpoint: /hana/shared/{{ sap_sid }}
       hana_data:
         size: 100%FREE
-        vol: vg_hana_data_PV1
-        mountpoint: /hana/data/PV1
+        vol: vg_hana_data_{{ sap_sid }}
+        mountpoint: /hana/data/{{ sap_sid }}
       hana_logs:
         size: 100%FREE
-        vol: vg_hana_log_PV1
-        mountpoint: /hana/log/PV1
+        vol: vg_hana_log_{{ sap_sid }}
+        mountpoint: /hana/log/{{ sap_sid }}
   roles:
     - disk-setup
     - saphana-install
