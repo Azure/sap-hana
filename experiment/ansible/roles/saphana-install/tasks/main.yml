@@ -6,7 +6,7 @@
 
 - name: deploy hdblcm install template
   template:
-    src: hdbserver_install.j2
+    src: "{{ 'hdbserver_hana2.j2' if use_hana2 else 'hdbserver_install.j2'}}"
     dest: /hana/shared/install/hdbserver_{{ sap_sid }}_install.cfg
 
 - name: deploy hdblcm password file

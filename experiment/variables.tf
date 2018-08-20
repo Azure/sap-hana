@@ -62,3 +62,8 @@ variable "pw_os_sidadm" {
 variable "pw_db_system" {
   description = "Password for the database user SYSTEM"
 }
+
+variable "useHana2" {
+  description = "A boolean that will choose between HANA 1.0 and 2.0"
+  default     = false
+}

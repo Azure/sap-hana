@@ -76,6 +76,11 @@ variable "storage_disk_sizes_gb" {
   default     = [512, 512, 512]
 }
 
+variable "useHana2" {
+  description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
+  default     = false
+}
+
 locals {
   vm_fqdn = "${azurerm_public_ip.hdb-pip.fqdn}"
   vm_name = "${var.sap_sid}-db${var.db_num}"

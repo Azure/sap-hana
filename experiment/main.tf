@@ -37,6 +37,7 @@ module "nsg" {
   az_region           = "${var.az_region}"
   sap_instancenum     = "${var.sap_instancenum}"
   sap_sid             = "${var.sap_sid}"
+  useHana2            = "${var.useHana2}"
 }
 
 module "single_node_hana" {
@@ -59,6 +60,7 @@ module "single_node_hana" {
   pw_os_sidadm        = "${var.pw_os_sidadm}"
   pw_db_system        = "${var.pw_db_system}"
   hana_subnet_id      = "${module.vnet.vnet_subnets[0]}"
+  useHana2            = "${var.useHana2}"
 }
 
 output "ip" {

@@ -12,3 +12,4 @@ sap_hostname:
 pwd_os_sapadm: 
 pwd_os_sidadm: 
 pwd_db_system: 
+use_hana2:
