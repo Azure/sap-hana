@@ -9,7 +9,7 @@ resource "random_id" "randomId" {
 }
 
 # Create storage account for boot diagnostics
-resource "azurerm_storage_account" "mystorageaccount" {
+resource "azurerm_storage_account" "bootdiagstorageaccount" {
   name                     = "diag${random_id.randomId.hex}"
   resource_group_name      = "${var.az_resource_group}"
   location                 = "${var.az_region}"
@@ -80,7 +80,7 @@ resource "azurerm_virtual_machine" "vm" {
   boot_diagnostics {
     enabled = "true"
 
-    storage_uri = "${azurerm_storage_account.mystorageaccount.primary_blob_endpoint}"
+    storage_uri = "${azurerm_storage_account.bootdiagstorageaccount.primary_blob_endpoint}"
   }
 
   tags = "${merge(map(var.machine_type, ""), var.tags)}"

@@ -42,6 +42,23 @@ variable "url_sap_hdbserver" {
   description = "The url that points to the HDB server 122.17 bits"
 }
 
+variable "private_ip_address_db0" {
+  default = "10.0.0.6"
+}
+
+variable "private_ip_address_db1" {
+  default = "10.0.0.7"
+}
+
+variable "private_ip_address_iscsi" {
+  default = "10.0.0.17"
+}
+
+variable "public_ip_allocation_type" {
+  description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
+  default     = "dynamic"
+}
+
 variable "pw_os_sapadm" {
   description = "Password for the SAP admin, which is an OS user"
 }
@@ -62,4 +79,21 @@ variable "useHana2" {
 variable "storage_disk_sizes_gb" {
   description = "List disk sizes in GB for all disks this VM will need"
   default     = [512, 512, 512]
+}
+
+locals {
+  # These are the load balancing ports specifically for HANA1 pacemaker. DO NOT ALTER
+  hana1_lb_ports = [
+    "3${var.sap_instancenum}15",
+    "3${var.sap_instancenum}17",
+  ]
+
+  # These are the load balancing ports specifically for HANA2 pacemaker. DO NOT ALTER
+  hana2_lb_ports = [
+    "3${var.sap_instancenum}13",
+    "3${var.sap_instancenum}14",
+    "3${var.sap_instancenum}40",
+    "3${var.sap_instancenum}41",
+    "3${var.sap_instancenum}42",
+  ]
 }

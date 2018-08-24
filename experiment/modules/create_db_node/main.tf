@@ -1,13 +1,14 @@
 module "nic_and_pip_setup" {
   source = "../generic_nic_and_pip"
 
-  az_resource_group   = "${var.az_resource_group}"
-  az_region           = "${var.az_region}"
-  name                = "${var.sap_sid}-db${var.db_num}"
-  nsg_id              = "${var.nsg_id}"
-  subnet_id           = "${var.hana_subnet_id}"
-  private_ip_address  = "${var.private_ip_address}"
-  backend_ip_pool_ids = "${var.backend_ip_pool_ids}"
+  az_resource_group         = "${var.az_resource_group}"
+  az_region                 = "${var.az_region}"
+  name                      = "${var.sap_sid}-db${var.db_num}"
+  nsg_id                    = "${var.nsg_id}"
+  subnet_id                 = "${var.hana_subnet_id}"
+  private_ip_address        = "${var.private_ip_address}"
+  public_ip_allocation_type = "${var.public_ip_allocation_type}"
+  backend_ip_pool_ids       = "${var.backend_ip_pool_ids}"
 }
 
 module "vm_and_disk_creation" {

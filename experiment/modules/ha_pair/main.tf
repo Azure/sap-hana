@@ -1,38 +1,21 @@
 # Create bastion and single HANA node by calling the modules
 provider "azurerm" {}
 
-# Create a resource group
-resource "azurerm_resource_group" "hana-resource-group" {
-  name     = "${var.az_resource_group}"
-  location = "${var.az_region}"
+module "common_setup" {
+  source = "../common_setup"
 
-  tags {
-    environment = "Terraform SAP HANA HA-pair deployment"
-  }
-}
-
-# TODO(pabowers): switch to use the Terraform registry version when release for nsg support becomes available
-module "vnet" {
-  source  = "Azure/vnet/azurerm"
-  version = "1.2.0"
-
-  address_space       = "10.0.0.0/21"
-  location            = "${var.az_region}"
-  resource_group_name = "${var.az_resource_group}"
-  subnet_names        = ["hdb-subnet"]
-  subnet_prefixes     = ["10.0.0.0/24"]
-  vnet_name           = "${var.sap_sid}-vnet"
-
-  tags {
-    environment = "Terraform HANA vnet and subnet creation"
-  }
+  az_region         = "${var.az_region}"
+  az_resource_group = "${var.az_resource_group}"
+  sap_instancenum   = "${var.sap_instancenum}"
+  sap_sid           = "${var.sap_sid}"
+  useHana2          = "${var.useHana2}"
 }
 
 resource "azurerm_availability_set" "ha-pair-availset" {
   name                         = "hanaHAPairAvailabilitySet"
-  location                     = "${azurerm_resource_group.hana-resource-group.location}"
-  resource_group_name          = "${azurerm_resource_group.hana-resource-group.name}"
-  platform_update_domain_count = 20                                                       # got these values from Tobias' deployment automatically created template.json
+  location                     = "${module.common_setup.resource_group_location}"
+  resource_group_name          = "${module.common_setup.resource_group_name}"
+  platform_update_domain_count = 20                                               # got these values from Tobias' deployment automatically created template.json
   platform_fault_domain_count  = 2
   managed                      = true
 
@@ -41,29 +24,21 @@ resource "azurerm_availability_set" "ha-pair-availset" {
   }
 }
 
-module "nsg" {
-  source              = "../nsg_for_hana"
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
-  az_region           = "${var.az_region}"
-  sap_instancenum     = "${var.sap_instancenum}"
-  sap_sid             = "${var.sap_sid}"
-}
-
 resource "azurerm_lb" "ha-pair-lb" {
   name                = "ha-pair-lb"
   location            = "${var.az_region}"
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name = "${module.common_setup.resource_group_name}"
 
   frontend_ip_configuration {
     name                          = "hsr-front"
-    subnet_id                     = "${module.vnet.vnet_subnets[0]}"
+    subnet_id                     = "${module.common_setup.vnet_subnets[0]}"
     private_ip_address_allocation = "Static"
     private_ip_address            = "10.0.0.13"
   }
 }
 
 resource "azurerm_lb_probe" "health-probe" {
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name = "${module.common_setup.resource_group_name}"
   loadbalancer_id     = "${azurerm_lb.ha-pair-lb.id}"
   name                = "health-probe"
   port                = "625${var.sap_instancenum}"
@@ -72,30 +47,34 @@ resource "azurerm_lb_probe" "health-probe" {
 }
 
 resource "azurerm_lb_backend_address_pool" "availability-back-pool" {
-  resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
+  resource_group_name = "${module.common_setup.resource_group_name}"
   loadbalancer_id     = "${azurerm_lb.ha-pair-lb.id}"
   name                = "BackEndAddressPool-HA"
 }
 
-resource "azurerm_lb_rule" "lb-rule0" {
-  resource_group_name            = "${azurerm_resource_group.hana-resource-group.name}"
+# These are the load balancing rules specifically for HANA1's HA pair pacemaker
+resource "azurerm_lb_rule" "lb-hana1-rule" {
+  count                          = "${var.useHana2 ? 0 : length(local.hana1_lb_ports)}"
+  name                           = "lb-rule-${count.index}"
+  resource_group_name            = "${module.common_setup.resource_group_name}"
   loadbalancer_id                = "${azurerm_lb.ha-pair-lb.id}"
-  name                           = "lb-rule-0"
   protocol                       = "Tcp"
-  frontend_port                  = "3${var.sap_instancenum}15"
-  backend_port                   = "3${var.sap_instancenum}15"
+  frontend_port                  = "${local.hana1_lb_ports[count.index]}"
+  backend_port                   = "${local.hana1_lb_ports[count.index]}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
 }
 
-resource "azurerm_lb_rule" "lb-rule1" {
-  resource_group_name            = "${azurerm_resource_group.hana-resource-group.name}"
+# These are the load balancing rules specifically for HANA2's HA pair pacemaker
+resource "azurerm_lb_rule" "lb-hana2-rule" {
+  count                          = "${var.useHana2 ? length(local.hana2_lb_ports) : 0}"
+  name                           = "lb-rule-${count.index}"
+  resource_group_name            = "${module.common_setup.resource_group_name}"
   loadbalancer_id                = "${azurerm_lb.ha-pair-lb.id}"
-  name                           = "lb-rule-1"
   protocol                       = "Tcp"
-  frontend_port                  = "3${var.sap_instancenum}17"
-  backend_port                   = "3${var.sap_instancenum}17"
+  frontend_port                  = "${local.hana2_lb_ports[count.index]}"
+  backend_port                   = "${local.hana2_lb_ports[count.index]}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
@@ -104,69 +83,72 @@ resource "azurerm_lb_rule" "lb-rule1" {
 module "create_db0" {
   source = "../create_db_node"
 
-  availability_set_id   = "${azurerm_availability_set.ha-pair-availset.id}"
-  az_resource_group     = "${azurerm_resource_group.hana-resource-group.name}"
-  az_region             = "${var.az_region}"
-  backend_ip_pool_ids   = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
-  db_num                = "0"
-  hana_subnet_id        = "${module.vnet.vnet_subnets[0]}"
-  nsg_id                = "${module.nsg.nsg-id}"
-  private_ip_address    = "10.0.0.6"
-  sap_sid               = "${var.sap_sid}"
-  sshkey_path_public    = "${var.sshkey_path_public}"
-  storage_disk_sizes_gb = "${var.storage_disk_sizes_gb}"
-  vm_user               = "${var.vm_user}"
-  vm_size               = "${var.vm_size}"
+  availability_set_id       = "${azurerm_availability_set.ha-pair-availset.id}"
+  az_resource_group         = "${module.common_setup.resource_group_name}"
+  az_region                 = "${module.common_setup.resource_group_location}"
+  backend_ip_pool_ids       = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
+  db_num                    = "0"
+  hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
+  nsg_id                    = "${module.common_setup.nsg_id}"
+  private_ip_address        = "${var.private_ip_address_db0}"
+  public_ip_allocation_type = "${var.public_ip_allocation_type}"
+  sap_sid                   = "${var.sap_sid}"
+  sshkey_path_public        = "${var.sshkey_path_public}"
+  storage_disk_sizes_gb     = "${var.storage_disk_sizes_gb}"
+  vm_user                   = "${var.vm_user}"
+  vm_size                   = "${var.vm_size}"
 }
 
 module "create_db1" {
   source = "../create_db_node"
 
-  availability_set_id   = "${azurerm_availability_set.ha-pair-availset.id}"
-  az_resource_group     = "${azurerm_resource_group.hana-resource-group.name}"
-  az_region             = "${var.az_region}"
-  backend_ip_pool_ids   = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
-  db_num                = "1"
-  hana_subnet_id        = "${module.vnet.vnet_subnets[0]}"
-  nsg_id                = "${module.nsg.nsg-id}"
-  private_ip_address    = "10.0.0.7"
-  sap_sid               = "${var.sap_sid}"
-  sshkey_path_public    = "${var.sshkey_path_public}"
-  storage_disk_sizes_gb = "${var.storage_disk_sizes_gb}"
-  vm_user               = "${var.vm_user}"
-  vm_size               = "${var.vm_size}"
+  availability_set_id       = "${azurerm_availability_set.ha-pair-availset.id}"
+  az_resource_group         = "${module.common_setup.resource_group_name}"
+  az_region                 = "${module.common_setup.resource_group_location}"
+  backend_ip_pool_ids       = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
+  db_num                    = "1"
+  hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
+  nsg_id                    = "${module.common_setup.nsg_id}"
+  private_ip_address        = "${var.private_ip_address_db1}"
+  public_ip_allocation_type = "${var.public_ip_allocation_type}"
+  sap_sid                   = "${var.sap_sid}"
+  sshkey_path_public        = "${var.sshkey_path_public}"
+  storage_disk_sizes_gb     = "${var.storage_disk_sizes_gb}"
+  vm_user                   = "${var.vm_user}"
+  vm_size                   = "${var.vm_size}"
 }
 
 module "nic_and_pip_setup_iscsi" {
   source = "../generic_nic_and_pip"
 
-  az_region          = "${var.az_region}"
-  az_resource_group  = "${azurerm_resource_group.hana-resource-group.name}"
-  name               = "iscsi"
-  nsg_id             = "${module.nsg.nsg-id}"
-  private_ip_address = "10.0.0.17"
-  subnet_id          = "${module.vnet.vnet_subnets[0]}"
+  az_region                 = "${module.common_setup.resource_group_location}"
+  az_resource_group         = "${module.common_setup.resource_group_name}"
+  name                      = "iscsi"
+  nsg_id                    = "${module.common_setup.nsg_id}"
+  private_ip_address        = "${var.private_ip_address_iscsi}"
+  public_ip_allocation_type = "${var.public_ip_allocation_type}"
+  subnet_id                 = "${module.common_setup.vnet_subnets[0]}"
 }
 
 module "vm_and_disk_creation_iscsi" {
   source = "../generic_vm_and_disk_creation"
 
   sshkey_path_public    = "${var.sshkey_path_public}"
-  az_resource_group     = "${azurerm_resource_group.hana-resource-group.name}"
-  az_region             = "${var.az_region}"
+  az_resource_group     = "${module.common_setup.resource_group_name}"
+  az_region             = "${module.common_setup.resource_group_location}"
   storage_disk_sizes_gb = [16]
   machine_name          = "iscsi"
   vm_user               = "${var.vm_user}"
   vm_size               = "Standard_D2s_v3"
   nic_id                = "${module.nic_and_pip_setup_iscsi.nic_id}"
   availability_set_id   = "${azurerm_availability_set.ha-pair-availset.id}"
-  machine_type          = "iscsi-${azurerm_resource_group.hana-resource-group.name}"
+  machine_type          = "iscsi-${module.common_setup.resource_group_name}"
 }
 
 module "configure_vm" {
   source = "../playbook-execution"
 
-  az_resource_group   = "${azurerm_resource_group.hana-resource-group.name}"
+  az_resource_group   = "${module.common_setup.resource_group_name}"
   sshkey_path_private = "${var.sshkey_path_private}"
   sap_instancenum     = "${var.sap_instancenum}"
   sap_sid             = "${var.sap_sid}"

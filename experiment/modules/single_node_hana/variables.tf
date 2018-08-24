@@ -46,6 +46,11 @@ variable "url_sap_hdbserver" {
   description = "The url that points to the HDB server 122.17 bits"
 }
 
+variable "public_ip_allocation_type" {
+  description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
+  default     = "dynamic"
+}
+
 variable "pw_os_sapadm" {
   description = "Password for the SAP admin, which is an OS user"
 }

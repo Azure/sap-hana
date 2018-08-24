@@ -53,6 +53,10 @@ variable "private_ip_address" {
   default     = ""
 }
 
+variable "public_ip_allocation_type" {
+  description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
+}
+
 locals {
   vm_db_name = "db${var.db_num}"
 }
