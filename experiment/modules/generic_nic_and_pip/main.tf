@@ -4,7 +4,7 @@ resource "azurerm_public_ip" "pip" {
   location                     = "${var.az_region}"
   resource_group_name          = "${var.az_resource_group}"
   public_ip_address_allocation = "${var.public_ip_allocation_type}"
-  domain_name_label            = "${lower(var.name)}"
+  domain_name_label            = "${lower(var.name)}-${var.az_resource_group}"
 
   idle_timeout_in_minutes = 30
 
