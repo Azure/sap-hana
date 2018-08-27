@@ -1,3 +1,7 @@
+variable "ansible_playbook_path" {
+  description = "Path from this module to the playbook"
+}
+
 variable "az_resource_group" {
   description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }

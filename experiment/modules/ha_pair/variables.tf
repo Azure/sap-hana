@@ -1,3 +1,8 @@
+variable "ansible_playbook_path" {
+  description = "Path from this module to the playbook"
+  default     = "../../ansible/playbook.yml"
+}
+
 variable "az_region" {}
 
 variable "vm_user" {

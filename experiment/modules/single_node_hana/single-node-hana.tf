@@ -28,18 +28,18 @@ module "create_db" {
 }
 
 module "configure_vm" {
-  source = "../playbook-execution"
-
-  az_resource_group   = "${module.common_setup.resource_group_name}"
-  sshkey_path_private = "${var.sshkey_path_private}"
-  sap_instancenum     = "${var.sap_instancenum}"
-  sap_sid             = "${var.sap_sid}"
-  vm_user             = "${var.vm_user}"
-  url_sap_sapcar      = "${var.url_sap_sapcar}"
-  url_sap_hdbserver   = "${var.url_sap_hdbserver}"
-  pw_os_sapadm        = "${var.pw_os_sapadm}"
-  pw_os_sidadm        = "${var.pw_os_sidadm}"
-  pw_db_system        = "${var.pw_db_system}"
-  useHana2            = "${var.useHana2}"
-  vms_configured      = "${module.create_db.machine_hostname}"
+  source                = "../playbook-execution"
+  ansible_playbook_path = "${var.ansible_playbook_path}"
+  az_resource_group     = "${module.common_setup.resource_group_name}"
+  sshkey_path_private   = "${var.sshkey_path_private}"
+  sap_instancenum       = "${var.sap_instancenum}"
+  sap_sid               = "${var.sap_sid}"
+  vm_user               = "${var.vm_user}"
+  url_sap_sapcar        = "${var.url_sap_sapcar}"
+  url_sap_hdbserver     = "${var.url_sap_hdbserver}"
+  pw_os_sapadm          = "${var.pw_os_sapadm}"
+  pw_os_sidadm          = "${var.pw_os_sidadm}"
+  pw_db_system          = "${var.pw_db_system}"
+  useHana2              = "${var.useHana2}"
+  vms_configured        = "${module.create_db.machine_hostname}"
 }

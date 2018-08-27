@@ -13,7 +13,7 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"pwd_db_system\": \"${var.pw_db_system}\", \
      \"use_hana2\": \"${var.useHana2}\", \
      \"resource_group\": \"${var.az_resource_group}\" }" \
-     -i '../../ansible/azure_rm.py' ../../ansible/playbook.yml
+     -i '../../ansible/azure_rm.py' ${var.ansible_playbook_path}
      EOT
 
     environment {
