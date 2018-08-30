@@ -1,6 +1,6 @@
 variable "ansible_playbook_path" {
   description = "Path from this module to the playbook"
-  default     = "../../ansible/playbook.yml"
+  default     = "../../ansible/ha_pair_playbook.yml"
 }
 
 variable "az_region" {}
