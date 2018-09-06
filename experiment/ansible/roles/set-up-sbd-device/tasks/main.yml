@@ -29,17 +29,32 @@
     discover: yes
     portal: "{{ iscsi_ip }}"
     port: "{{ iscsi_port }}"
+  register: discover_iscsi_device
+
+- debug:
+    msg: "{{ discover_iscsi_device }}"
+  when: discover_iscsi_device
 
 - open_iscsi:
     target: "{{ iscsi_object }}.{{ cluster_name }}.local:{{ cluster_name }}"
     login: yes
     portal: "{{ iscsi_ip }}"
     port: "{{ iscsi_port }}"
+  register: login_iscsi_device
+
+- debug:
+    msg: "{{ login_iscsi_device }}"
+  when: login_iscsi_device
 
 - open_iscsi:
     auto_node_startup: yes
     portal: "{{ iscsi_ip }}"
     port: "{{ iscsi_port }}"
+  register: set_update_iscsi_device
+
+- debug:
+    msg: "{{ set_update_iscsi_device }}"
+  when: set_update_iscsi_device
 
 - name: Call lsscsi and get location
   shell: lsscsi -l | grep {{ cluster_name }} | awk '{ print $6; }' | grep -oP "^/dev/\K.*"
@@ -72,7 +87,7 @@
   lineinfile:
     dest: '/etc/sysconfig/sbd'
     regexp: 'SBD_PACEMAKER='
-    line: "SBD_PACEMAKER=\"yes\""
+    line: "SBD_PACEMAKER=yes"
     state: 'present'
   register: pacemaker_enabled
 
@@ -80,24 +95,29 @@
   lineinfile:
     dest: '/etc/sysconfig/sbd'
     regexp: 'SBD_STARTMODE='
-    line: "SBD_STARTMODE=\"always\""
+    line: "SBD_STARTMODE=always"
     state: 'present'
   register: startmode_set
   
 - name: Create softdog config
-  command: echo softdog | sudo tee /etc/modules-load.d/softdog.conf
+  shell: echo softdog | sudo tee /etc/modules-load.d/softdog.conf
+  register: softdog_config
+
+- debug:
+    msg: "{{ softdog_config }}"
+  when: softdog_config
 
 - name: Load the softdog module
-  command: modprobe -v softdog
+  shell: modprobe -v softdog
+  register: load_softdog
 
-- name: Update SLES
-  zypper:
-    name: '*'
-    state: latest
-    disable_recommends: no
+- debug:
+    msg: "{{ load_softdog }}"
+  when: load_softdog
 
 - name: Install fence agents
   package:
     name: fence-agents
     state: present
     disable_recommends: no
+

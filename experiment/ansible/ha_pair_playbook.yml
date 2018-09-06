@@ -17,3 +17,5 @@
     db_num: "{{ ansible_hostname[-1] }}"
   roles:
     - set-up-sbd-device
+    - host-name-resolution
+    - ssh-key-distribute

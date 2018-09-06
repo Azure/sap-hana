@@ -137,7 +137,7 @@ module "vm_and_disk_creation_iscsi" {
   az_resource_group     = "${module.common_setup.resource_group_name}"
   az_region             = "${module.common_setup.resource_group_location}"
   storage_disk_sizes_gb = [16]
-  machine_name          = "iscsi"
+  machine_name          = "${module.common_setup.resource_group_name}-iscsi"
   vm_user               = "${var.vm_user}"
   vm_size               = "Standard_D2s_v3"
   nic_id                = "${module.nic_and_pip_setup_iscsi.nic_id}"

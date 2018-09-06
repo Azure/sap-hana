@@ -48,10 +48,17 @@
     msg: "{{ backstore_status }}"
   when: backstore_status
 
+- name: Get disk with correct disk-id
+  shell: ls -l /dev/disk/by-id/scsi-* | grep sdc | grep scsi-3 | awk '{ print $9; }'
+  register: scsi_disk_path
 
 - name: Create a new backstore
-  command: targetcli backstores/block create {{ cluster_name }} /dev/disk/azure/scsi1/lun{{ iscsi_lun }}
+  command: targetcli backstores/block create {{ cluster_name }} {{ scsi_disk_path.stdout }}
   register: backstore_create
+
+# - name: Create a new backstore
+#   command: targetcli backstores/block create {{ cluster_name }} /dev/disk/azure/scsi1/lun{{ iscsi_lun }}
+#   register: backstore_create
 
 - debug:
     msg: "{{ backstore_create }}"

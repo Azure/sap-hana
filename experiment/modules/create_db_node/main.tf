@@ -18,7 +18,7 @@ module "vm_and_disk_creation" {
   az_resource_group     = "${var.az_resource_group}"
   az_region             = "${var.az_region}"
   storage_disk_sizes_gb = "${var.storage_disk_sizes_gb}"
-  machine_name          = "${var.sap_sid}-db${var.db_num}"
+  machine_name          = "${var.az_resource_group}-${lower(var.sap_sid)}-db${var.db_num}"
   vm_user               = "${var.vm_user}"
   vm_size               = "${var.vm_size}"
   nic_id                = "${module.nic_and_pip_setup.nic_id}"
