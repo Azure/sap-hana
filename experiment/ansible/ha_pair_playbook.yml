@@ -19,3 +19,13 @@
     - set-up-sbd-device
     - host-name-resolution
     - ssh-key-distribute
+
+- hosts: db0
+  become: true
+  roles:
+    - ha-cluster-init
+
+- hosts: db1
+  become: true
+  roles:
+    - ha-cluster-join

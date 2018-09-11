@@ -1,0 +1,4 @@
+- name: HA cluster join csync2
+  shell: ha-cluster-join -y -c 10.0.0.6 csync2
+- name: HA cluster join cluster
+  shell: ha-cluster-join -y cluster
