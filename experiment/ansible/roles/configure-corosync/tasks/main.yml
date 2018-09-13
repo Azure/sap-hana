@@ -7,6 +7,3 @@
   template:
     src: corosyncconf.j2
     dest: /etc/corosync/corosync.conf
-
-- name: Restart corosync
-  service: name=corosync state=restarted
