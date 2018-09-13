@@ -64,6 +64,11 @@ variable "public_ip_allocation_type" {
   default     = "dynamic"
 }
 
+variable "pw_hacluster" {
+  type        = "string"
+  description = "Password for the HA cluster nodes"
+}
+
 variable "pw_os_sapadm" {
   description = "Password for the SAP admin, which is an OS user"
 }

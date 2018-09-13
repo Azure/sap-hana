@@ -14,3 +14,11 @@
     state: present
     key: "{{ lookup('file', 'tmp/keys/{{ item }}_rsa.pub')}}"
   with_items: "{{ play_hosts }}"
+
+- name: tell the host about our servers it might want to ssh to with hostnames
+  shell: ssh-keyscan {{ hostvars[item]['ansible_fqdn'].split('.')[0] }} >> ~/.ssh/known_hosts
+  with_items: "{{ play_hosts }}"
+
+- name: tell the host about our servers it might want to ssh to with ip addresses
+  shell: ssh-keyscan {{ hostvars[item]['ansible_default_ipv4']['address'] }} >> ~/.ssh/known_hosts
+  with_items: "{{ play_hosts }}"

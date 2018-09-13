@@ -1,5 +1,5 @@
 ---
-- hosts: database-{{ resource_group }}
+- hosts: db0,db1
   become: true
 
   roles:
@@ -11,7 +11,7 @@
   roles:
     - iscsi-setup
 
-- hosts: database-{{ resource_group }}
+- hosts: db0,db1
   become: true
   vars:
     db_num: "{{ ansible_hostname[-1] }}"
@@ -29,3 +29,14 @@
   become: true
   roles:
     - ha-cluster-join
+
+- hosts: db0,db1
+  become: true
+  roles:
+    - configure-corosync
+
+- hosts: db0
+  become: true
+  tasks:
+    - name: Change pacemaker default settings
+      shell: crm configure rsc_defaults resource-stickiness="1"

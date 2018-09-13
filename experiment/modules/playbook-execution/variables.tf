@@ -32,6 +32,22 @@ variable "url_sap_hdbserver" {
   description = "The url that points to the HDB server 122.17 bits"
 }
 
+variable "private_ip_address_db0" {
+  description = "Private ip address of db0 in HA pair"
+  default     = ""                                     # not needed in single node case
+}
+
+variable "private_ip_address_db1" {
+  description = "Private ip address of db1 in HA pair"
+  default     = ""                                     # not needed in single node case
+}
+
+variable "pw_hacluster" {
+  type        = "string"
+  description = "Password for the HA cluster nodes"
+  default     = ""                                  #single node case doesn't need one
+}
+
 variable "pw_os_sapadm" {
   description = "Password for the SAP admin, which is an OS user"
 }
