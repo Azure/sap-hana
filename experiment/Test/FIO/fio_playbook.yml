@@ -1,0 +1,25 @@
+---
+- name: Test with FIO
+  hosts: all
+  tasks:
+          - zypper_repository:
+                repo: https://download.opensuse.org/repositories/benchmark/SLE_12_SP3_Backports/benchmark.repo
+            become: yes
+            become_method: sudo
+          - zypper:
+                name: fio
+                update_cache: yes
+            become: yes
+            become_method: sudo
+          - name: Copy FIO config
+            copy:
+                src: config.fio
+                dest: fio_test/config.fio
+          - name: Run FIO to test
+            shell: fio config.fio > fio_out.log
+            args:
+                chdir: fio_test
+          - fetch:
+                src: fio_test/fio_out.log
+                dest: /tmp/
+...
