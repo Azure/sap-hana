@@ -45,4 +45,3 @@
   shell: "pwd=$(<hdblcm_xsa.passwords); rm hdblcm_xsa.passwords; echo $pwd | SAP_HANA_DATABASE/hdblcm --component_root=/hana/shared/install/EXTAPPSER00P_87 --configfile=hdblcm_xsa.cfg --batch --read_password_from_stdin=xml"
   args:
     chdir: /hana/shared/install
-  
