@@ -15,7 +15,13 @@ url_portal_services:
 url_xs_services:
 
 # Password for <SID>adm
-pwd_sidadm:
+pwd_os_sidadm:
 
 # Password for SYSTEM user (SYSTEMDB)
-pwd_systemdb:
+pwd_db_system:
+
+# Password for XSAADMIN user
+pwd_db_xsaadmin:
+
+# Password for SYSTEM user (tenant DB)
+pwd_db_tenant:
