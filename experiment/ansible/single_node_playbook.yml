@@ -1,7 +1,13 @@
 ---
-- hosts: database-{{ resource_group }}
+- hosts: db0
   become: true
-
   roles:
     - disk-setup
     - saphana-install
+    - xsa-install
+
+- hosts: db0
+  become: true
+  become_user: "{{ sap_sid|lower }}adm"
+  roles:
+    - shine-install

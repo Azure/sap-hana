@@ -42,4 +42,15 @@ module "configure_vm" {
   pw_db_system          = "${var.pw_db_system}"
   useHana2              = "${var.useHana2}"
   vms_configured        = "${module.create_db.machine_hostname}"
+
+  url_xsa_runtime     = "${var.url_xsa_runtime}"
+  url_di_core         = "${var.url_di_core}"
+  url_sapui5          = "${var.url_sapui5}"
+  url_portal_services = "${var.url_portal_services}"
+  url_xs_services     = "${var.url_xs_services}"
+  url_shine_xsa       = "${var.url_shine_xsa}"
+  pwd_db_xsaadmin     = "${var.pwd_db_xsaadmin}"
+  pwd_db_tenant       = "${var.pwd_db_tenant}"
+  pwd_db_shine        = "${var.pwd_db_shine}"
+  email_shine         = "${var.email_shine}"
 }

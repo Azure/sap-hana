@@ -77,3 +77,43 @@ variable "useHana2" {
   description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
   default     = false
 }
+
+variable "url_xsa_runtime" {
+  description = "URL for XSA runtime"
+}
+
+variable "url_di_core" {
+  description = "URL for DI Core"
+}
+
+variable "url_sapui5" {
+  description = "URL for SAPUI5"
+}
+
+variable "url_portal_services" {
+  description = "URL for Portal Services"
+}
+
+variable "url_xs_services" {
+  description = "URL for XS Services"
+}
+
+variable "url_shine_xsa" {
+  description = "URL for SHINE XSA"
+}
+
+variable "pwd_db_xsaadmin" {
+  description = "Password for XSAADMIN user"
+}
+
+variable "pwd_db_tenant" {
+  description = "Password for SYSTEM user (tenant DB)"
+}
+
+variable "pwd_db_shine" {
+  description = "Password for SHINE user"
+}
+
+variable "email_shine" {
+  description = "e-mail address for SHINE user"
+}
