@@ -117,3 +117,7 @@ variable "pwd_db_shine" {
 variable "email_shine" {
   description = "e-mail address for SHINE user"
 }
+
+variable "install_xsa_shine" {
+  description = "Flag that determines whether to install SHINE on the host"
+}

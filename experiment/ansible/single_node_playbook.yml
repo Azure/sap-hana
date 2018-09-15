@@ -4,10 +4,10 @@
   roles:
     - disk-setup
     - saphana-install
-    - xsa-install
+    - { role: xsa-install, when: install_xsa_shine == true }
 
 - hosts: db0
   become: true
   become_user: "{{ sap_sid|lower }}adm"
   roles:
-    - shine-install
+    - { role: shine-install, when: install_xsa_shine == true }

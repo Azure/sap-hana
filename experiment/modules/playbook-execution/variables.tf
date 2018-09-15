@@ -118,3 +118,8 @@ variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = ""
 }
+
+variable "install_xsa_shine" {
+  description = "Flag to determine whether to install SHINE on the host VM"
+  default     = false
+}

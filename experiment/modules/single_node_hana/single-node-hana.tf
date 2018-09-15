@@ -53,4 +53,5 @@ module "configure_vm" {
   pwd_db_tenant       = "${var.pwd_db_tenant}"
   pwd_db_shine        = "${var.pwd_db_shine}"
   email_shine         = "${var.email_shine}"
+  install_xsa_shine   = "${var.install_xsa_shine}"
 }
