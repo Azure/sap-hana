@@ -15,7 +15,7 @@ resource "azurerm_availability_set" "ha-pair-availset" {
   name                         = "hanaHAPairAvailabilitySet"
   location                     = "${module.common_setup.resource_group_location}"
   resource_group_name          = "${module.common_setup.resource_group_name}"
-  platform_update_domain_count = 20                                               # got these values from Tobias' deployment automatically created template.json
+  platform_update_domain_count = 20
   platform_fault_domain_count  = 2
   managed                      = true
 
@@ -142,7 +142,7 @@ module "vm_and_disk_creation_iscsi" {
   vm_size               = "Standard_D2s_v3"
   nic_id                = "${module.nic_and_pip_setup_iscsi.nic_id}"
   availability_set_id   = "${azurerm_availability_set.ha-pair-availset.id}"
-  machine_type          = "iscsi-${module.common_setup.resource_group_name}"
+  machine_type          = "iscsi"
 }
 
 module "configure_vm" {
