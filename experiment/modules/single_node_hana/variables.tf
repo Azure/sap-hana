@@ -100,6 +100,7 @@ variable "url_portal_services" {
 
 variable "url_xs_services" {
   description = "URL for XS Services"
+  default     = ""
 }
 
 variable "url_shine_xsa" {
@@ -132,6 +133,17 @@ variable "url_cockpit" {
   default     = ""
 }
 
-variable "install_xsa_shine" {
+variable "install_xsa" {
+  description = "Flag that determines whether to install XSA on the host"
+  default     = false
+}
+
+variable "install_shine" {
   description = "Flag that determines whether to install SHINE on the host"
+  default     = false
+}
+
+variable "install_cockpit" {
+  description = "Flag that determine whether to install Cockpit on the host"
+  default     = false
 }

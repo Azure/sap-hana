@@ -91,6 +91,21 @@ variable "storage_disk_sizes_gb" {
   default     = [512, 512, 512]
 }
 
+variable "install_xsa" {
+  description = "Flag that determines whether to install XSA on the host"
+  default     = false
+}
+
+variable "install_shine" {
+  description = "Flag that determines whether to install SHINE on the host"
+  default     = false
+}
+
+variable "install_cockpit" {
+  description = "Flag that determine whether to install Cockpit on the host"
+  default     = false
+}
+
 locals {
   # These are the load balancing ports specifically for HANA1 pacemaker. DO NOT ALTER
   hana1_lb_ports = [

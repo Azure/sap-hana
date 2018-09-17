@@ -4,13 +4,13 @@
   roles:
     - disk-setup
     - saphana-install
-    - { role: xsa-install, when: install_xsa_shine == true }
-    - { role: cockpit-download, when: install_xsa_shine == true }    
+    - { role: xsa-install, when: install_xsa == true }
+    - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }
 
 - hosts: db0
   become: true
   become_user: "{{ sap_sid|lower }}adm"
   roles:
-    - { role: shine-install, when: install_xsa_shine == true }
-    - { role: cockpit-install, when: install_xsa_shine == true }    
+    - { role: shine-install, when: install_xsa == true and install_shine == true }
+    - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
