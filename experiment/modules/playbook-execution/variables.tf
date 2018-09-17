@@ -124,7 +124,17 @@ variable "url_cockpit" {
   default     = ""
 }
 
-variable "install_xsa_shine" {
+variable "install_xsa" {
+  description = "Flag to determine whether to install XSA on the host VM"
+  default     = false
+}
+
+variable "install_shine" {
   description = "Flag to determine whether to install SHINE on the host VM"
+  default     = false
+}
+
+variable "install_cockpit" {
+  description = "Flag to determine whether to install Cockpit on the host VM"
   default     = false
 }

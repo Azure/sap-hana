@@ -27,7 +27,9 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"pwd_db_tenant\": \"${var.pwd_db_tenant}\", \
      \"pwd_db_shine\": \"${var.pwd_db_shine}\", \
      \"email_shine\": \"${var.email_shine}\", \
-     \"install_xsa_shine\": ${var.install_xsa_shine}, \
+     \"install_xsa\": ${var.install_xsa}, \
+     \"install_shine\": ${var.install_shine}, \
+     \"install_cockpit\": ${var.install_cockpit}, \
      \"url_cockpit\": \"${var.url_cockpit}\" }" \
      -i '../../ansible/azure_rm.py' ${var.ansible_playbook_path}
      EOT
