@@ -164,4 +164,7 @@ module "configure_vm" {
   pw_db_system           = "${var.pw_db_system}"
   useHana2               = "${var.useHana2}"
   vms_configured         = "${module.create_db0.machine_hostname}, ${module.create_db1.machine_hostname}, ${module.vm_and_disk_creation_iscsi.machine_hostname}"
+  install_xsa            = "${var.install_xsa}"
+  install_shine          = "${var.install_shine}"
+  install_cockpit        = "${var.install_cockpit}"
 }
