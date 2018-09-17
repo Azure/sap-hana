@@ -80,18 +80,22 @@ variable "useHana2" {
 
 variable "url_xsa_runtime" {
   description = "URL for XSA runtime"
+  default     = ""
 }
 
 variable "url_di_core" {
   description = "URL for DI Core"
+  default     = ""
 }
 
 variable "url_sapui5" {
   description = "URL for SAPUI5"
+  default     = ""
 }
 
 variable "url_portal_services" {
   description = "URL for Portal Services"
+  default     = ""
 }
 
 variable "url_xs_services" {
@@ -100,22 +104,32 @@ variable "url_xs_services" {
 
 variable "url_shine_xsa" {
   description = "URL for SHINE XSA"
+  default     = ""
 }
 
 variable "pwd_db_xsaadmin" {
   description = "Password for XSAADMIN user"
+  default     = ""
 }
 
 variable "pwd_db_tenant" {
   description = "Password for SYSTEM user (tenant DB)"
+  default     = ""
 }
 
 variable "pwd_db_shine" {
   description = "Password for SHINE user"
+  default     = ""
 }
 
 variable "email_shine" {
   description = "e-mail address for SHINE user"
+  default     = "shinedemo@microsoft.com"
+}
+
+variable "url_cockpit" {
+  description = "URL for HANA Cockpit"
+  default     = ""
 }
 
 variable "install_xsa_shine" {

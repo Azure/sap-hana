@@ -116,6 +116,11 @@ variable "pwd_db_shine" {
 
 variable "email_shine" {
   description = "e-mail address for SHINE user"
+  default     = "shinedemo@microsoft.com"
+}
+
+variable "url_cockpit" {
+  description = "URL for HANA Cockpit"
   default     = ""
 }
 
