@@ -56,4 +56,3 @@ module "configure_vm" {
   install_xsa_shine   = "${var.install_xsa_shine}"
   url_cockpit         = "${var.url_cockpit}"
 }
-
