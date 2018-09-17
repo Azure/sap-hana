@@ -100,6 +100,7 @@ variable "url_portal_services" {
 
 variable "url_xs_services" {
   description = "URL for XS Services"
+  default     = ""
 }
 
 variable "url_shine_xsa" {
