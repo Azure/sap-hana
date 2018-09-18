@@ -1,5 +1,3 @@
-# ensure logged in as <sid>adm
-
 - name: Backup the database
   shell: |
     . ~/.bashrc
@@ -12,7 +10,7 @@
 - debug:
     msg: "{{ check_hdbsql }}"
 
-- name: SCP files to db1
+- name: Copy SSFS key storage to db1
   shell: |
       . ~/.bashrc
       scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['db1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
@@ -22,15 +20,14 @@
   become: true
   become_user: root
 
-- name: Configure HSR site1
+- name: Use hdbnsutil to enable primary site
   shell: |
     . ~/.bashrc
     hdbnsutil -sr_enable --name=SITE1
   args: 
     executable: '/bin/bash'
 
-# TODO: add job that runs from HSR site2, i.e. db1
-- name: Run sapcontrol on db1
+- name: Stop HDB on db1 and use hdbnsutil to register secondary site
   shell: |
       . ~/.bashrc
       sapcontrol -nr {{ sap_instancenum }} -function StopWait 600 10

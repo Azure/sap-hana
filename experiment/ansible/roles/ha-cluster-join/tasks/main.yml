@@ -3,10 +3,3 @@
 
 - name: HA cluster join cluster
   shell: ha-cluster-join -y cluster
-
-- name: cib status
-  shell: crm cib cibstatus show
-  register: cib_status
-- name: cib status debug
-  debug:
-    var: cib_status
