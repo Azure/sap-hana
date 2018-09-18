@@ -113,6 +113,10 @@ variable "private_ip_address_iscsi" {
   default = "10.0.0.17"
 }
 
+variable "private_ip_address_lb_frontend" {
+  default = "10.0.0.13"
+}
+
 variable "public_ip_allocation_type" {
   description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
   default     = "dynamic"

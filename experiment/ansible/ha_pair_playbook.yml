@@ -34,34 +34,15 @@
   become: true
   roles:
     - configure-corosync
-  tasks:
-    - name: cib status
-      shell: crm cib cibstatus show
-      register: cib_status
-    - name: cib status debug
-      debug:
-        var: cib_status
 
 - hosts: db0
   become: true
   tasks:
   - name: Restart corosync
     service: name=corosync state=restarted
-  - name: cib status
-    shell: crm cib cibstatus show
-    register: cib_status
-  - name: cib status debug
-    debug:
-      var: cib_status
   - name: Sleep to fix cib sync issue
     pause:
       seconds: 15
-  - name: cib status
-    shell: crm cib cibstatus show
-    register: cib_status
-  - name: cib status debug
-    debug:
-      var: cib_status
 
 # Corosync has to restart on db0 before it can on db1
 - hosts: db1
@@ -69,26 +50,14 @@
   tasks:
   - name: Restart corosync
     service: name=corosync state=restarted
-  - name: cib status
-    shell: crm cib cibstatus show
-    register: cib_status
-  - name: cib status debug
-    debug:
-      var: cib_status
   - name: Sleep to fix cib sync issue
     pause:
       seconds: 15
-  - name: cib status
-    shell: crm cib cibstatus show
-    register: cib_status
-  - name: cib status debug
-    debug:
-      var: cib_status
 
 - hosts: db0
   become: true
   roles:
-    - cleanup-pacemaker
+    - salvage-corrupted-cib
 
 - hosts: db0
   become: true
@@ -114,13 +83,6 @@
 
 - hosts: db0,db1
   become: true
-  tasks:
-  - name: cib status
-    shell: crm cib cibstatus show
-    register: cib_status
-  - name: cib status debug
-    debug:
-      var: cib_status
   roles:
     - saphana-install
     - { role: xsa-install, when: install_xsa == true }
