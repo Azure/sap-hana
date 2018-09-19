@@ -1,0 +1,65 @@
+---
+- hosts: db0,db1
+  become: true
+
+  roles:
+    - disk-setup
+
+- hosts: iscsi-{{ resource_group }}
+  become: true
+
+  roles:
+    - iscsi-setup
+
+- hosts: db0,db1
+  become: true
+  vars:
+    db_num: "{{ ansible_hostname[-1] }}"
+  roles:
+    - set-up-sbd-device
+    - host-name-resolution
+    - ssh-key-distribute
+
+- hosts: db0
+  become: true
+  roles:
+    - ha-cluster-init
+
+- hosts: db1
+  become: true
+  roles:
+    - ha-cluster-join
+
+- hosts: db0,db1
+  become: true
+  roles:
+    - configure-corosync
+
+- hosts: db0
+  become: true
+  tasks:
+  - name: Restart corosync
+    service: name=corosync state=restarted
+
+# Corosync has to restart on db0 before it can on db1
+- hosts: db1
+  become: true
+  tasks:
+  - name: Restart corosync
+    service: name=corosync state=restarted
+
+- hosts: db0
+  become: true
+  tasks:
+    - name: Change pacemaker default settings
+      shell: crm configure rsc_defaults resource-stickiness="1"
+
+- hosts: localhost
+  roles:
+    - stonith-device-creation
+
+- hosts: db0,db1
+  become: true
+
+  roles:
+    - saphana-install

@@ -1,0 +1,57 @@
+- name: Create service principal
+  shell: az ad sp create-for-rbac
+  register: sp_create_output
+
+- set_fact:
+    json_output: "{{ sp_create_output.stdout|from_json }}"
+
+- debug:
+    msg: "{{ json_output }}"
+  when: json_output
+
+- set_fact:
+    app_id:  "{{ json_output.appId }}"
+
+- debug:
+    msg: "{{ app_id }}"
+
+- set_fact:
+    tenant: "{{ json_output.tenant }}"
+
+- set_fact:
+    password: "{{ json_output.password }}"
+
+- name: Get subscriptionid
+  shell: az account show
+  register: subscription_info
+
+- set_fact:
+    json_subscription_info: "{{ subscription_info.stdout|from_json }}"
+
+- set_fact:
+    Subscription_ID: "{{ json_subscription_info.id }}"
+
+# TODO: Figure out custom role: "Role definition limit exceeded. No more role definitions can be created."
+
+- name: Assign custom role to the service principal
+  shell: az role assignment create --assignee {{ app_id }} --role Owner
+
+- name: Configure STONITH timeout
+  shell: crm configure property stonith-timeout=900
+  delegate_to: "{{ groups['db0'][0] }}"
+  become: true
+
+- name: Configure Fence parameters
+  shell: crm configure primitive rsc_st_azure stonith:fence_azure_arm params subscriptionId={{ Subscription_ID }} resourceGroup={{ resource_group}} tenantId={{ tenant }} login={{ app_id }} passwd={{ password }}
+  delegate_to: "{{ groups['db0'][0] }}"
+  become: true
+
+- name: Create fence topology for SBD fencing
+  shell: crm configure fencing_topology stonith-sbd rsc_st_azure
+  delegate_to: "{{ groups['db0'][0] }}"
+  become: true
+
+- name: Enable use of STONITH device
+  shell: crm configure property stonith-enabled=true
+  delegate_to: "{{ groups['db0'][0] }}"
+  become: true

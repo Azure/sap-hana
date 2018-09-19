@@ -1,0 +1,37 @@
+---
+- name: create install dir
+  file:
+    path: /hana/shared/install
+    state: directory
+
+- name: deploy hdblcm install template
+  template:
+    src: "{{ 'hdbserver_hana2.j2' if use_hana2 else 'hdbserver_install.j2'}}"
+    dest: /hana/shared/install/hdbserver_{{ sap_sid }}_install.cfg
+
+- name: deploy hdblcm password file
+  template:
+    src: hdbserver_passwords.j2
+    dest: /hana/shared/install/hdbserver_{{ sap_sid }}_passwords.xml
+
+- name: download sapcar
+  get_url:
+    url: "{{ url_sapcar }}"
+    dest: /hana/shared/install/SAPCAR_LINUX.EXE
+    mode: 0755
+
+- name: download hdbserver
+  get_url:
+    url: "{{ url_hdbserver }}"
+    dest: /hana/shared/install/IMDB_SERVER_LINUX.SAR
+
+- name: extract hdbserver
+  command: ./SAPCAR_LINUX.EXE -manifest SIGNATURE.SMF -xvf IMDB_SERVER_LINUX.SAR
+  args:
+    chdir: /hana/shared/install
+    creates: /hana/shared/install/SAP_HANA_DATABASE/hdblcm
+
+- name: run hdblcm
+  shell: "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
+  args:
+    chdir: /hana/shared/install/SAP_HANA_DATABASE

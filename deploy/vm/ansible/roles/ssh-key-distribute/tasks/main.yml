@@ -1,0 +1,24 @@
+- name: Generate SSH keys
+  shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
+  args:
+    creates: /root/.ssh/id_rsa
+
+- fetch:
+    src: /root/.ssh/id_rsa.pub
+    dest: tmp/keys/{{ ansible_hostname }}_rsa.pub
+    flat: yes
+
+- name: Add authorized key to remote
+  authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', 'tmp/keys/{{ item }}_rsa.pub')}}"
+  with_items: "{{ play_hosts }}"
+
+- name: tell the host about our servers it might want to ssh to with hostnames
+  shell: ssh-keyscan {{ hostvars[item]['ansible_fqdn'].split('.')[0] }} >> ~/.ssh/known_hosts
+  with_items: "{{ play_hosts }}"
+
+- name: tell the host about our servers it might want to ssh to with ip addresses
+  shell: ssh-keyscan {{ hostvars[item]['ansible_default_ipv4']['address'] }} >> ~/.ssh/known_hosts
+  with_items: "{{ play_hosts }}"
