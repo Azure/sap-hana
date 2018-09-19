@@ -1,0 +1,36 @@
+- name: Backup the database
+  shell: |
+    . ~/.bashrc
+    hdbsql -d SYSTEMDB -u SYSTEM -p "{{ pwd_db_system }}" -i {{ sap_instancenum }} "BACKUP DATA USING FILE ('initialbackupSYS')"
+    hdbsql -d {{ sap_sid|upper }} -u SYSTEM -p "{{ pwd_db_system }}" -i {{ sap_instancenum }} "BACKUP DATA USING FILE ('initialbackup{{ sap_sid|upper }}')"
+  args: 
+    executable: '/bin/bash'
+  register: check_hdbsql
+
+- debug:
+    msg: "{{ check_hdbsql }}"
+
+- name: Copy SSFS key storage to db1
+  shell: |
+      . ~/.bashrc
+      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['db1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
+      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/SSFS_{{ sap_sid }}.KEY "{{ groups['db1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/
+  args: 
+    executable: '/bin/bash'
+  become: true
+  become_user: root
+
+- name: Use hdbnsutil to enable primary site
+  shell: |
+    . ~/.bashrc
+    hdbnsutil -sr_enable --name=SITE1
+  args: 
+    executable: '/bin/bash'
+
+- name: Stop HDB on db1 and use hdbnsutil to register secondary site
+  shell: |
+      . ~/.bashrc
+      sapcontrol -nr {{ sap_instancenum }} -function StopWait 600 10
+      hdbnsutil -sr_register --remoteHost={{ groups['db0'][0] }} --remoteInstance={{ sap_instancenum }} --replicationMode=sync --name=SITE2
+  delegate_to: "{{ groups['db1'][0] }}"
+  become: true

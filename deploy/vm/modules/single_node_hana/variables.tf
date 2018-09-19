@@ -9,10 +9,6 @@ variable "vm_user" {
   description = "The username of your HANA db vm."
 }
 
-variable "az_domain_name" {
-  description = "A name that is used to access your HANA vm"
-}
-
 variable "sshkey_path_private" {
   description = "The path on the local machine to where the private key is"
 }
