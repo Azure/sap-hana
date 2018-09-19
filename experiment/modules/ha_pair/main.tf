@@ -61,6 +61,8 @@ resource "azurerm_lb_rule" "lb-hana1-rule" {
   protocol                       = "Tcp"
   frontend_port                  = "${local.hana1_lb_ports[count.index]}"
   backend_port                   = "${local.hana1_lb_ports[count.index]}"
+  backend_address_pool_id        = "${azurerm_lb_backend_address_pool.availability-back-pool.id}"
+  probe_id                       = "${azurerm_lb_probe.health-probe.id}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
@@ -75,6 +77,8 @@ resource "azurerm_lb_rule" "lb-hana2-rule" {
   protocol                       = "Tcp"
   frontend_port                  = "${local.hana2_lb_ports[count.index]}"
   backend_port                   = "${local.hana2_lb_ports[count.index]}"
+  backend_address_pool_id        = "${azurerm_lb_backend_address_pool.availability-back-pool.id}"
+  probe_id                       = "${azurerm_lb_probe.health-probe.id}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
