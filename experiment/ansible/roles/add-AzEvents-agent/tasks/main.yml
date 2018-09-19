@@ -1,0 +1,11 @@
+- name: Turn on maintenence mode
+  shell: crm configure property maintenance-mode=true
+
+- name:  Configure primitive resource AzEvents
+  shell: crm configure primitive rsc_AzEvents ocf:heartbeat:AzEvents op monitor interval=10s
+
+- name: Configure clone resource AzEvents
+  shell: crm configure clone cln_AzEvents rsc_AzEvents
+
+- name: Turn off maintenence mode
+  shell: crm configure property maintenance-mode=false

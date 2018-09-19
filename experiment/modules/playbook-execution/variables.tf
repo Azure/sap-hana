@@ -42,6 +42,11 @@ variable "private_ip_address_db1" {
   default     = ""                                     # not needed in single node case
 }
 
+variable "private_ip_address_lb_frontend" {
+  description = "Private ip address of the load balancer front end in HA pair"
+  default     = ""                                                             # not needed in single node case
+}
+
 variable "pw_hacluster" {
   type        = "string"
   description = "Password for the HA cluster nodes"

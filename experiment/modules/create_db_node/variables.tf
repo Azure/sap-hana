@@ -58,5 +58,6 @@ variable "public_ip_allocation_type" {
 }
 
 locals {
-  vm_db_name = "db${var.db_num}"
+  vm_db_name   = "db${var.db_num}"
+  machine_name = "${lower(var.sap_sid)}-db${var.db_num}"
 }

@@ -16,6 +16,7 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"use_hana2\": \"${var.useHana2}\", \
      \"db0_ip\": \"${var.private_ip_address_db0}\", \
      \"db1_ip\": \"${var.private_ip_address_db1}\", \
+     \"lb_frontend_ip\": \"${var.private_ip_address_lb_frontend}\", \
      \"resource_group\": \"${var.az_resource_group}\", \
      \"url_xsa_runtime\": \"${var.url_xsa_runtime}\", \
      \"url_di_core\": \"${var.url_di_core}\", \

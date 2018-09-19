@@ -15,7 +15,7 @@ resource "azurerm_availability_set" "ha-pair-availset" {
   name                         = "hanaHAPairAvailabilitySet"
   location                     = "${module.common_setup.resource_group_location}"
   resource_group_name          = "${module.common_setup.resource_group_name}"
-  platform_update_domain_count = 20                                               # got these values from Tobias' deployment automatically created template.json
+  platform_update_domain_count = 20
   platform_fault_domain_count  = 2
   managed                      = true
 
@@ -33,7 +33,7 @@ resource "azurerm_lb" "ha-pair-lb" {
     name                          = "hsr-front"
     subnet_id                     = "${module.common_setup.vnet_subnets[0]}"
     private_ip_address_allocation = "Static"
-    private_ip_address            = "10.0.0.13"
+    private_ip_address            = "${var.private_ip_address_lb_frontend}"
   }
 }
 
@@ -61,6 +61,8 @@ resource "azurerm_lb_rule" "lb-hana1-rule" {
   protocol                       = "Tcp"
   frontend_port                  = "${local.hana1_lb_ports[count.index]}"
   backend_port                   = "${local.hana1_lb_ports[count.index]}"
+  backend_address_pool_id        = "${azurerm_lb_backend_address_pool.availability-back-pool.id}"
+  probe_id                       = "${azurerm_lb_probe.health-probe.id}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
@@ -75,6 +77,8 @@ resource "azurerm_lb_rule" "lb-hana2-rule" {
   protocol                       = "Tcp"
   frontend_port                  = "${local.hana2_lb_ports[count.index]}"
   backend_port                   = "${local.hana2_lb_ports[count.index]}"
+  backend_address_pool_id        = "${azurerm_lb_backend_address_pool.availability-back-pool.id}"
+  probe_id                       = "${azurerm_lb_probe.health-probe.id}"
   idle_timeout_in_minutes        = 30
   enable_floating_ip             = true
   frontend_ip_configuration_name = "hsr-front"
@@ -142,29 +146,41 @@ module "vm_and_disk_creation_iscsi" {
   vm_size               = "Standard_D2s_v3"
   nic_id                = "${module.nic_and_pip_setup_iscsi.nic_id}"
   availability_set_id   = "${azurerm_availability_set.ha-pair-availset.id}"
-  machine_type          = "iscsi-${module.common_setup.resource_group_name}"
+  machine_type          = "iscsi"
 }
 
 module "configure_vm" {
   source = "../playbook-execution"
 
-  ansible_playbook_path  = "${var.ansible_playbook_path}"
-  az_resource_group      = "${module.common_setup.resource_group_name}"
-  sshkey_path_private    = "${var.sshkey_path_private}"
-  sap_instancenum        = "${var.sap_instancenum}"
-  sap_sid                = "${var.sap_sid}"
-  vm_user                = "${var.vm_user}"
-  url_sap_sapcar         = "${var.url_sap_sapcar}"
-  url_sap_hdbserver      = "${var.url_sap_hdbserver}"
-  private_ip_address_db0 = "${var.private_ip_address_db0}"
-  private_ip_address_db1 = "${var.private_ip_address_db1}"
-  pw_hacluster           = "${var.pw_hacluster}"
-  pw_os_sapadm           = "${var.pw_os_sapadm}"
-  pw_os_sidadm           = "${var.pw_os_sidadm}"
-  pw_db_system           = "${var.pw_db_system}"
-  useHana2               = "${var.useHana2}"
-  vms_configured         = "${module.create_db0.machine_hostname}, ${module.create_db1.machine_hostname}, ${module.vm_and_disk_creation_iscsi.machine_hostname}"
-  install_xsa            = "${var.install_xsa}"
-  install_shine          = "${var.install_shine}"
-  install_cockpit        = "${var.install_cockpit}"
+  ansible_playbook_path          = "${var.ansible_playbook_path}"
+  az_resource_group              = "${module.common_setup.resource_group_name}"
+  sshkey_path_private            = "${var.sshkey_path_private}"
+  sap_instancenum                = "${var.sap_instancenum}"
+  sap_sid                        = "${var.sap_sid}"
+  vm_user                        = "${var.vm_user}"
+  url_sap_sapcar                 = "${var.url_sap_sapcar}"
+  url_sap_hdbserver              = "${var.url_sap_hdbserver}"
+  private_ip_address_db0         = "${var.private_ip_address_db0}"
+  private_ip_address_db1         = "${var.private_ip_address_db1}"
+  private_ip_address_lb_frontend = "${var.private_ip_address_lb_frontend}"
+  pw_hacluster                   = "${var.pw_hacluster}"
+  pw_os_sapadm                   = "${var.pw_os_sapadm}"
+  pw_os_sidadm                   = "${var.pw_os_sidadm}"
+  pw_db_system                   = "${var.pw_db_system}"
+  useHana2                       = "${var.useHana2}"
+  vms_configured                 = "${module.create_db0.machine_hostname}, ${module.create_db1.machine_hostname}, ${module.vm_and_disk_creation_iscsi.machine_hostname}"
+  url_xsa_runtime                = "${var.url_xsa_runtime}"
+  url_di_core                    = "${var.url_di_core}"
+  url_sapui5                     = "${var.url_sapui5}"
+  url_portal_services            = "${var.url_portal_services}"
+  url_xs_services                = "${var.url_xs_services}"
+  url_shine_xsa                  = "${var.url_shine_xsa}"
+  pwd_db_xsaadmin                = "${var.pwd_db_xsaadmin}"
+  pwd_db_tenant                  = "${var.pwd_db_tenant}"
+  pwd_db_shine                   = "${var.pwd_db_shine}"
+  email_shine                    = "${var.email_shine}"
+  url_cockpit                    = "${var.url_cockpit}"
+  install_xsa                    = "${var.install_xsa}"
+  install_shine                  = "${var.install_shine}"
+  install_cockpit                = "${var.install_cockpit}"
 }

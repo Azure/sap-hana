@@ -5,7 +5,7 @@
   roles:
     - disk-setup
 
-- hosts: iscsi-{{ resource_group }}
+- hosts: iscsi
   become: true
 
   roles:
@@ -40,6 +40,9 @@
   tasks:
   - name: Restart corosync
     service: name=corosync state=restarted
+  - name: Sleep to fix cib sync issue
+    pause:
+      seconds: 15
 
 # Corosync has to restart on db0 before it can on db1
 - hosts: db1
@@ -47,12 +50,32 @@
   tasks:
   - name: Restart corosync
     service: name=corosync state=restarted
+  - name: Sleep to fix cib sync issue
+    pause:
+      seconds: 15
+
+- hosts: db0
+  become: true
+  roles:
+    - salvage-corrupted-cib
 
 - hosts: db0
   become: true
   tasks:
+    - name: cib status
+      shell: crm cib cibstatus show
+      register: cib_status
+    - name: cib status debug
+      debug:
+        var: cib_status
     - name: Change pacemaker default settings
       shell: crm configure rsc_defaults resource-stickiness="1"
+    - name: cib status
+      shell: crm cib cibstatus show
+      register: cib_status
+    - name: cib status debug
+      debug:
+        var: cib_status
 
 - hosts: localhost
   roles:
@@ -60,6 +83,34 @@
 
 - hosts: db0,db1
   become: true
-
   roles:
     - saphana-install
+    - { role: xsa-install, when: install_xsa == true }
+    - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }
+
+- hosts: db0
+  become: true
+  become_user: "{{ sap_sid|lower }}adm"
+  roles:
+    - configure-hsr-hana2
+    - { role: shine-install, when: install_xsa == true and install_shine == true }
+    - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
+
+- hosts: db0
+  become: true
+  roles:
+    - set-up-hana-pacemaker-resources
+
+- hosts: db0,db1
+  become: true
+  tasks:
+    - name: Download AzEvents into /usr/lib/ocf/resource.d/heartbeat
+      get_url:
+        url: "https://tnieksap.blob.core.windows.net/tools/azevents/AzEvents"
+        dest: /usr/lib/ocf/resource.d/heartbeat
+        mode: 0755
+
+- hosts: db0
+  become: true
+  roles:
+    - add-AzEvents-agent
