@@ -31,6 +31,10 @@
 - set_fact:
     Subscription_ID: "{{ json_subscription_info.id }}"
 
+- name: Sleep to let service principal be created before accessing
+  pause:
+    seconds: 30
+
 # TODO: Figure out custom role: "Role definition limit exceeded. No more role definitions can be created."
 
 - name: Assign custom role to the service principal
