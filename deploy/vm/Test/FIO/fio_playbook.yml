@@ -21,7 +21,7 @@
                 src: config.fio
                 dest: fio_output/config.fio
           - name: Run FIO to test
-            shell: fio config.fio > fio_out.log
+            shell: fio config.fio --output-format=json> fio_out.log
             args:
                 chdir: fio_output
           - fetch:
