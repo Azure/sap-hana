@@ -1,5 +1,10 @@
 # Configure the Microsoft Azure Provider
-provider "azurerm" {} #TODO(pabowers): add ability to specify subscription
+provider "azurerm" {
+  subscription_id = "c4106f40-4f28-442e-b67f-a24d892bf7ad"
+  client_id       = "52a63a75-7e16-4bf4-9fb9-632db9171b02"
+  client_secret   = "c02a67c5-4468-4543-9f1b-0618f42dd657"
+  tenant_id       = "72f988bf-86f1-41af-91ab-2d7cd011db47"
+}
 
 module "common_setup" {
   source = "../common_setup"
@@ -25,6 +30,16 @@ module "create_db" {
   storage_disk_sizes_gb     = "${var.storage_disk_sizes_gb}"
   vm_user                   = "${var.vm_user}"
   vm_size                   = "${var.vm_size}"
+}
+
+module "bastion_host" {
+  source            = "../bastion_host"
+  az_resource_group = "${module.common_setup.resource_group_name}"
+  az_region         = "${var.az_region}"
+  sap_sid           = "${var.sap_sid}"
+  subnet_id         = "${module.common_setup.vnet_subnets[1]}"
+  bastion_username  = "${var.bastion_username}"
+  pw_bastion        = "${var.pw_bastion}"
 }
 
 module "configure_vm" {

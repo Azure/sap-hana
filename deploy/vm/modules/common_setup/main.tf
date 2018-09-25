@@ -15,8 +15,8 @@ module "vnet" {
   address_space       = "10.0.0.0/21"
   location            = "${var.az_region}"
   resource_group_name = "${var.az_resource_group}"
-  subnet_names        = ["hdb-subnet"]
-  subnet_prefixes     = ["10.0.0.0/24"]
+  subnet_names        = ["hdb-subnet", "bastion-subnet"]
+  subnet_prefixes     = ["10.0.0.0/24", "10.0.1.0/24"]
   vnet_name           = "${var.sap_sid}-vnet"
 
   tags {

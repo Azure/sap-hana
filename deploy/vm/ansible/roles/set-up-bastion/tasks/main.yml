@@ -1,0 +1,9 @@
+- name: download sapcar
+  win_get_url:
+    url: "{{ url_sapcar }}"
+    dest: C:\Users\landscape\Downloads\SAPCAR_WINDOWS.EXE
+
+# - name: download HANA Studio
+#   win_get_url:
+#     url: "{{ url_sapcar }}"
+#     dest: C:\Users\landscape\Downloads\HANA_STUDIO_WINDOWS.EXE

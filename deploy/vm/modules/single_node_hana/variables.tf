@@ -153,4 +153,14 @@ variable "azure_service_principal_id" {
 variable "azure_service_principal_pw" {
   description = "Service principal password"
   default     = ""
+
+variable "bastion_username" {
+  description = "The username for the bastion host"
+  default     = "landscape"
+}
+
+variable "pw_bastion" {
+  description = "The password for the bastion host"
+  default     = "LandScape123"
+
 }

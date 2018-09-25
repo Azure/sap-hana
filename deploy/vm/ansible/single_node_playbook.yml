@@ -14,3 +14,10 @@
     - { role: shine-install, when: install_xsa == true and install_shine == true }
     - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
+- hosts: bastion
+  remote_user: landscape
+  connection: winrm
+  vars:
+    ansible_password: LandScape123
+  roles:
+    - set-up-bastion
