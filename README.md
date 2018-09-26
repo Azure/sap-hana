@@ -1,5 +1,6 @@
 SAP HANA on Azure
 =================
+Master Branch's status: [![Build Status](https://travis-ci.org/Azure/sap-hana.svg?branch=master)](https://travis-ci.org/Azure/sap-hana)
 
 This repository contains terraform templates to install a single node HANA instance and HANA high-availability pair. The different pieces of infrastructure are split into modules.
 
@@ -7,12 +8,18 @@ This repository contains terraform templates to install a single node HANA insta
    Terraform will need to be run from the ` deploy/vm/modules/single_node_hana` directory. The `terraform.tfvars` files with the required configuration needs to be put in this folder. An example tfvars file can be found below. 
 
 2. HANA high-availability pair:
-   To create the infrastructure for the HA pair, terraform will be run from the `deploy/vm/modules/ha_pair` directory.  This will allow us to have new modules for each configuration of the HANA database. Currently, both of the databases, `db0` and `db1` have HANA installed. The `terraform.tfvars` files with the required configuration needs to be put in this folder. An example tfvars file can be found below.
+   To create the infrastructure for the HA pair, terraform will be run from the `deploy/vm/modules/ha_pair` directory.  This will allow us to have new modules for each configuration of the HANA database. Currently, both of the databases, `db0` and `db1` have HANA installed with HSR and failover capabilities. The `terraform.tfvars` files with the required configuration needs to be put in this folder. An example tfvars file can be found below.
+
+Getting Started
+-------------------------
+You will need to have the following installed on your machine:
+- Azure CLI
+- Terraform
+- Ansible
+
 
 Example terraform.tfvars:
 -------------------------
-
- #Example tfvars file  
  az_region =  
  az_resource_group =  
  az_domain_name =  
@@ -42,3 +49,7 @@ Example terraform.tfvars:
  pw_db_system =  
  useHana2 =  
  install_xsa =  
+
+Additional steps
+-------------------------------------
+You will need to get the urls from SAP as we are not licensed to provide these bits.

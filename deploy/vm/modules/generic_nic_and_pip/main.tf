@@ -9,7 +9,7 @@ resource "azurerm_public_ip" "pip" {
   idle_timeout_in_minutes = 30
 
   tags {
-    environment = "Terraform SAP HANA single node deployment"
+    environment = "Terraform SAP HANA deployment"
   }
 }
 
@@ -32,6 +32,6 @@ resource "azurerm_network_interface" "nic" {
   }
 
   tags {
-    environment = "Terraform SAP HANA single node deployment"
+    environment = "Terraform SAP HANA deployment"
   }
 }
