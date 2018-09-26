@@ -15,9 +15,12 @@
     - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
 - hosts: bastion
-  remote_user: landscape
   connection: winrm
   vars:
+    ansible_user: landscape
     ansible_password: LandScape123
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
   roles:
     - set-up-bastion

@@ -12,10 +12,6 @@ variable "pw_bastion" {
   description = "The password for the bastion host"
 }
 
-variable "isLinux" {
-  default = false
-}
-
 variable "vm_size" {
   default = "Standard_D2s_v3"
 }

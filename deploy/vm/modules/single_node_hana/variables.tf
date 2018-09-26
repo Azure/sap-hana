@@ -156,11 +156,19 @@ variable "azure_service_principal_pw" {
 
 variable "bastion_username" {
   description = "The username for the bastion host"
-  default     = "landscape"
 }
 
 variable "pw_bastion" {
   description = "The password for the bastion host"
+
   default     = "LandScape123"
 
+}
+
+variable "url_sapcar_windows" {
+  description = "URL for SAPCAR for Windows to run on the bastion host"
+}
+
+variable "url_hana_studio" {
+  description = "URL for the Windows version of HANA Studio to install on the bastion host"
 }

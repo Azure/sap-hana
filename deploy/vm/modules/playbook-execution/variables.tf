@@ -149,10 +149,18 @@ variable "vms_configured" {
   description = "The hostnames of the machines that need to be configured in order to correctly run this playbook."
 }
 
+
 variable "azure_service_principal_id" {
   description = "Service principal Id"
 }
 
 variable "azure_service_principal_pw" {
   description = "service principal password"
+
+variable "url_sapcar_windows" {
+  description = "URL for SAPCAR for Windows to run on the bastion host"
+}
+
+variable "url_hana_studio" {
+  description = "URL for the Windows version of HANA Studio to install on the bastion host"
 }

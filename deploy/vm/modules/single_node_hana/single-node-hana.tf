@@ -1,10 +1,5 @@
 # Configure the Microsoft Azure Provider
-provider "azurerm" {
-  subscription_id = "c4106f40-4f28-442e-b67f-a24d892bf7ad"
-  client_id       = "52a63a75-7e16-4bf4-9fb9-632db9171b02"
-  client_secret   = "c02a67c5-4468-4543-9f1b-0618f42dd657"
-  tenant_id       = "72f988bf-86f1-41af-91ab-2d7cd011db47"
-}
+provider "azurerm" {}
 
 module "common_setup" {
   source = "../common_setup"
@@ -57,7 +52,7 @@ module "configure_vm" {
   pw_os_sidadm               = "${var.pw_os_sidadm}"
   pw_db_system               = "${var.pw_db_system}"
   useHana2                   = "${var.useHana2}"
-  vms_configured             = "${module.create_db.machine_hostname}"
+  vms_configured             = "${module.create_db.machine_hostname}, ${module.bastion_host.machine_hostname}"
   url_xsa_runtime            = "${var.url_xsa_runtime}"
   url_di_core                = "${var.url_di_core}"
   url_sapui5                 = "${var.url_sapui5}"
@@ -72,6 +67,8 @@ module "configure_vm" {
   install_shine              = "${var.install_shine}"
   install_cockpit            = "${var.install_cockpit}"
   url_cockpit                = "${var.url_cockpit}"
+  url_sapcar_windows         = "${var.url_sapcar_windows}"
+  url_hana_studio            = "${var.url_hana_studio}"
   azure_service_principal_id = "${var.azure_service_principal_id}"
   azure_service_principal_pw = "${var.azure_service_principal_pw}"
 }

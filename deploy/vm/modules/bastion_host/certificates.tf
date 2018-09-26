@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "main" {
-  name                = "bastion-keyvault"
+  name                = "${var.az_resource_group}-keyvault"
   location            = "${var.az_region}"
   resource_group_name = "${var.az_resource_group}"
   tenant_id           = "${data.azurerm_client_config.current.tenant_id}"

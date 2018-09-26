@@ -1,8 +1,36 @@
-module "bastion_nsg" {
-  source            = "../bastion_nsg"
-  az_region         = "${var.az_region}"
-  az_resource_group = "${var.az_resource_group}"
-  isLinux           = "${var.isLinux}"
+
+resource "azurerm_network_security_group" "linux_bastion_nsg" {
+  name                = "linux_bastion_nsg"
+  location            = "${var.az_region}"
+  resource_group_name = "${var.az_resource_group}"
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "VNC"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags {
+    environment = "linux_bastion"
+  }
 }
 
 module "nic_and_pip_setup" {
@@ -11,7 +39,7 @@ module "nic_and_pip_setup" {
   az_resource_group         = "${var.az_resource_group}"
   az_region                 = "${var.az_region}"
   name                      = "${local.machine_name}"
-  nsg_id                    = "${module.bastion_nsg.nsg_id}"
+  nsg_id                    = "${azurerm_network_security_group.linux_bastion_nsg.id}"
   subnet_id                 = "${var.subnet_id}"
   public_ip_allocation_type = "dynamic"
 }
@@ -63,33 +91,24 @@ resource "azurerm_virtual_machine" "windows_bastion" {
       protocol = "Https"
       certificate_url   = "${azurerm_key_vault_certificate.main.secret_id}"
     }
+    # Auto-Login's required to configure WinRM
+    additional_unattend_config {
+      pass         = "oobeSystem"
+      component    = "Microsoft-Windows-Shell-Setup"
+      setting_name = "AutoLogon"
+      content      = "<AutoLogon><Password><Value>${var.pw_bastion}</Value></Password><Enabled>true</Enabled><LogonCount>1</LogonCount><Username>${var.bastion_username}</Username></AutoLogon>"
+    }
+
+    # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
+    additional_unattend_config {
+      pass         = "oobeSystem"
+      component    = "Microsoft-Windows-Shell-Setup"
+      setting_name = "FirstLogonCommands"
+      content      = "${file("${path.module}/files/FirstLogonCommands.xml")}"
+    }
   }
 
   tags {
     bastion = ""
   }
 }
-
-# resource "azurerm_virtual_machine_extension" "winrm_extension" {
-#   name                 = "winrm_extension"
-#   location             = "${var.az_region}"
-#   resource_group_name  = "${var.az_resource_group}"
-#   virtual_machine_name = "${azurerm_virtual_machine.windows_bastion.name}"
-#   publisher            = "Microsoft.Azure.Extensions"
-#   type                 = "CustomScript"
-#   type_handler_version = "1.4"
-
-#   settings = <<SETTINGS
-#     {
-#         "fileUris": [
-#                 "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/ConfigureWinRM.ps1",
-#                 "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/201-vm-winrm-windows/makecert.exe"
-#               ],
-#         "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ConfigureWinRM.ps1 ',variables('hostDNSNameScriptArgument'))]"
-#     }
-# SETTINGS
-
-#   tags {
-#     environment = "winrm_extension"
-#   }
-# }

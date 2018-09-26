@@ -2,6 +2,7 @@
 resource null_resource "mount-disks-and-configure-hana" {
   provisioner "local-exec" {
     command = <<EOT
+    OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES \
     AZURE_RESOURCE_GROUPS="${var.az_resource_group}" \
     ANSIBLE_HOST_KEY_CHECKING="False" \
     ansible-playbook -u ${var.vm_user} \
@@ -26,6 +27,8 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"url_portal_services\": \"${var.url_portal_services}\", \
      \"url_xs_services\": \"${var.url_xs_services}\", \
      \"url_shine_xsa\": \"${var.url_shine_xsa}\", \
+     \"url_sapcar_windows\": \"${var.url_sapcar_windows}\", \
+     \"url_hana_studio\": \"${var.url_hana_studio}\", \
      \"pwd_db_xsaadmin\": \"${var.pwd_db_xsaadmin}\", \
      \"pwd_db_tenant\": \"${var.pwd_db_tenant}\", \
      \"pwd_db_shine\": \"${var.pwd_db_shine}\", \
