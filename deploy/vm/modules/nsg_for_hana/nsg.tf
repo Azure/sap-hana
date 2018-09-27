@@ -1,4 +1,4 @@
-# This gets the ip address of the machine you deploy fromß
+# This gets the IP address of the machine you deploy from.
 data "http" "local_ip" {
   url = "http://api.ipify.org"
 }
@@ -9,7 +9,7 @@ resource "azurerm_network_security_group" "sap-nsg" {
   location            = "${var.az_region}"
   resource_group_name = "${var.resource_group_name}"
 
-  # This rule lets you ssh to the Database Vms
+  # This rule lets you ssh to the Database VMs
   security_rule {
     name                       = "SSH"
     priority                   = 1001
@@ -22,7 +22,7 @@ resource "azurerm_network_security_group" "sap-nsg" {
     destination_address_prefix = "*"
   }
 
-  # This rule specifically allows the machine you use to deploy to access the vms
+  # This rule specifically allows the machine you use to deploy to access the VMs
   security_rule {
     name                       = "local-ip-allow-vnet"
     priority                   = 100

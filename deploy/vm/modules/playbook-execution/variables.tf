@@ -6,30 +6,24 @@ variable "az_resource_group" {
   description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
-variable "vm_user" {
-  description = "The username of your HANA db vm."
+variable "email_shine" {
+  description = "e-mail address for SHINE user"
+  default     = "shinedemo@microsoft.com"
 }
 
-variable "sshkey_path_private" {
-  description = "The path on the local machine to where the private key is"
+variable "install_cockpit" {
+  description = "Flag to determine whether to install Cockpit on the host VM"
+  default     = false
 }
 
-variable "sap_sid" {
-  default = "PV1"
+variable "install_shine" {
+  description = "Flag to determine whether to install SHINE on the host VM"
+  default     = false
 }
 
-variable "sap_instancenum" {
-  description = "The sap instance number which is in range 00-99"
-}
-
-variable "url_sap_sapcar" {
-  type        = "string"
-  description = "The url that points to the SAPCAR bits"
-}
-
-variable "url_sap_hdbserver" {
-  type        = "string"
-  description = "The url that points to the HDB server 122.17 bits"
+variable "install_xsa" {
+  description = "Flag to determine whether to install XSA on the host VM"
+  default     = false
 }
 
 variable "private_ip_address_db0" {
@@ -47,6 +41,10 @@ variable "private_ip_address_lb_frontend" {
   default     = ""                                                             # not needed in single node case
 }
 
+variable "pw_db_system" {
+  description = "Password for the database user SYSTEM"
+}
+
 variable "pw_hacluster" {
   type        = "string"
   description = "Password for the HA cluster nodes"
@@ -61,51 +59,8 @@ variable "pw_os_sidadm" {
   description = "Password for this specific sidadm, which is an OS user"
 }
 
-variable "pw_db_system" {
-  description = "Password for the database user SYSTEM"
-}
-
-variable "useHana2" {
-  description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
-  default     = false
-}
-
-variable "vms_configured" {
-  description = "The hostnames of the machines that need to be configured in order to correctly run this playbook."
-}
-
-variable "url_xsa_runtime" {
-  description = "URL for XSA runtime"
-  default     = ""
-}
-
-variable "url_di_core" {
-  description = "URL for DI Core"
-  default     = ""
-}
-
-variable "url_sapui5" {
-  description = "URL for SAPUI5"
-  default     = ""
-}
-
-variable "url_portal_services" {
-  description = "URL for Portal Services"
-  default     = ""
-}
-
-variable "url_xs_services" {
-  description = "URL for XS Services"
-  default     = ""
-}
-
-variable "url_shine_xsa" {
-  description = "URL for SHINE XSA"
-  default     = ""
-}
-
-variable "pwd_db_xsaadmin" {
-  description = "Password for XSAADMIN user"
+variable "pwd_db_shine" {
+  description = "Password for SHINE user"
   default     = ""
 }
 
@@ -114,14 +69,21 @@ variable "pwd_db_tenant" {
   default     = ""
 }
 
-variable "pwd_db_shine" {
-  description = "Password for SHINE user"
+variable "pwd_db_xsaadmin" {
+  description = "Password for XSAADMIN user"
   default     = ""
 }
 
-variable "email_shine" {
-  description = "e-mail address for SHINE user"
-  default     = "shinedemo@microsoft.com"
+variable "sap_instancenum" {
+  description = "The SAP instance number which is in range 00-99"
+}
+
+variable "sap_sid" {
+  default = "PV1"
+}
+
+variable "sshkey_path_private" {
+  description = "The path on the local machine to where the private key is"
 }
 
 variable "url_cockpit" {
@@ -129,17 +91,55 @@ variable "url_cockpit" {
   default     = ""
 }
 
-variable "install_xsa" {
-  description = "Flag to determine whether to install XSA on the host VM"
+variable "url_di_core" {
+  description = "URL for DI Core"
+  default     = ""
+}
+
+variable "url_portal_services" {
+  description = "URL for Portal Services"
+  default     = ""
+}
+
+variable "url_sap_hdbserver" {
+  type        = "string"
+  description = "The URL that points to the HDB server 122.17 bits"
+}
+
+variable "url_sap_sapcar" {
+  type        = "string"
+  description = "The URL that points to the SAPCAR bits"
+}
+
+variable "url_sapui5" {
+  description = "URL for SAPUI5"
+  default     = ""
+}
+
+variable "url_shine_xsa" {
+  description = "URL for SHINE XSA"
+  default     = ""
+}
+
+variable "url_xs_services" {
+  description = "URL for XS Services"
+  default     = ""
+}
+
+variable "url_xsa_runtime" {
+  description = "URL for XSA runtime"
+  default     = ""
+}
+
+variable "useHana2" {
+  description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
   default     = false
 }
 
-variable "install_shine" {
-  description = "Flag to determine whether to install SHINE on the host VM"
-  default     = false
+variable "vm_user" {
+  description = "The username of your HANA database VM."
 }
 
-variable "install_cockpit" {
-  description = "Flag to determine whether to install Cockpit on the host VM"
-  default     = false
+variable "vms_configured" {
+  description = "The hostnames of the machines that need to be configured in order to correctly run this playbook."
 }

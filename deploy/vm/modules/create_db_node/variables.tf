@@ -1,17 +1,17 @@
 variable "availability_set_id" {
-  description = "The if associated with the availability set to put this vm into."
-  default     = ""                                                                 # empty string denotes that this VM is not in a 
+  description = "The id associated with the availability set to put this VM into."
+  default     = ""                                                                 # Empty string denotes that this VM is not in an availability set.
 }
 
 variable "az_region" {}
 
 variable "az_resource_group" {
-  description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
+  description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
 variable "backend_ip_pool_ids" {
   type        = "list"
-  description = "The ids that associate the load balancer's back end ip pool with this vm's nic."
+  description = "The ids that associate the load balancer's back end IP pool with this VM's NIC."
   default     = []
 }
 
@@ -24,11 +24,11 @@ variable "hana_subnet_id" {
 }
 
 variable "nsg_id" {
-  description = "The nsg id for the nsg that will control this vm."
+  description = "The NSG id for the NSG that will control this VM."
 }
 
 variable "private_ip_address" {
-  description = "The desired private ip address of this nic.  If it isn't specified, a dynamic ip will be allocated."
+  description = "The desired private IP address of this NIC.  If it isn't specified, a dynamic IP will be allocated."
   default     = ""
 }
 
@@ -54,7 +54,7 @@ variable "vm_size" {
 }
 
 variable "vm_user" {
-  description = "The username of your HANA db vm."
+  description = "The username of your HANA database VM."
 }
 
 locals {

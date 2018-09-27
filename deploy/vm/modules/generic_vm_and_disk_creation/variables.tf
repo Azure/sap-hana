@@ -1,24 +1,24 @@
 variable "availability_set_id" {
-  description = "The if associated with the availability set to put this vm into."
+  description = "The id associated with the availability set to put this VM into."
   default     = ""
 }
 
 variable "az_region" {}
 
 variable "az_resource_group" {
-  description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
+  description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
 variable "machine_name" {
-  description = "The name for the vm that is being created."
+  description = "The name for the VM that is being created."
 }
 
 variable "machine_type" {
-  description = "The use of the vm to help later with configurations."
+  description = "The use of the VM to help later with configurations."
 }
 
 variable "nic_id" {
-  description = "The id of the network interface that should be associated with this vm."
+  description = "The id of the network interface that should be associated with this VM."
 }
 
 variable "sshkey_path_public" {
@@ -41,5 +41,5 @@ variable "vm_size" {
 }
 
 variable "vm_user" {
-  description = "The username of your vm."
+  description = "The username of your VM."
 }

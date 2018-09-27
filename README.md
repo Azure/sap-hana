@@ -13,9 +13,9 @@ This repository contains terraform templates to install a single node HANA insta
 Getting Started
 -------------------------
 You will need to have the following installed on your machine:
-- Azure CLI
-- Terraform
-- Ansible
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+- [Terraform](https://www.terraform.io/intro/getting-started/install.html)
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#latest-releases-via-pip)
 
 
 Example terraform.tfvars:

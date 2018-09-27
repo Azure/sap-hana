@@ -1,4 +1,4 @@
-# Create a resource group
+# Create a resource group.
 resource "azurerm_resource_group" "hana-resource-group" {
   name     = "${var.az_resource_group}"
   location = "${var.az_region}"
@@ -24,7 +24,7 @@ module "vnet" {
   }
 }
 
-# This module creates a network security group with the ports opened that are needed for HANA
+# This module creates a network security group with the ports opened that are needed for HANA.
 module "nsg" {
   source              = "../nsg_for_hana"
   resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"

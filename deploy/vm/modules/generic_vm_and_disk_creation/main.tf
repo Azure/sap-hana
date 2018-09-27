@@ -1,7 +1,7 @@
-# Generate random text for a unique storage account name
+# Generate random text for a unique storage account name.
 resource "random_id" "randomId" {
   keepers = {
-    # Generate a new ID only when a new resource group is defined
+    # Generate a new id only when a new resource group is defined.
     resource_group = "${var.az_resource_group}"
   }
 
@@ -21,7 +21,7 @@ resource "azurerm_storage_account" "bootdiagstorageaccount" {
   }
 }
 
-# All disks that are in the storage_disk_sises_gb list will be created
+# All disks that are in the storage_disk_sizes_gb list will be created
 resource "azurerm_managed_disk" "disk" {
   count                = "${length(var.storage_disk_sizes_gb)}"
   name                 = "${var.machine_name}-disk${count.index}"
@@ -32,7 +32,7 @@ resource "azurerm_managed_disk" "disk" {
   create_option        = "Empty"
 }
 
-# All of the disks created above will now be attached to the vm
+# All of the disks created above will now be attached to the VM
 resource "azurerm_virtual_machine_data_disk_attachment" "disk" {
   count              = "${length(var.storage_disk_sizes_gb)}"
   virtual_machine_id = "${azurerm_virtual_machine.vm.id}"

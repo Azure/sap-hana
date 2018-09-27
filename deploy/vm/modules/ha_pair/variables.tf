@@ -4,7 +4,7 @@ variable "ansible_playbook_path" {
 }
 
 variable "az_resource_group" {
-  description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
+  description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
 variable "db_num" {
@@ -17,7 +17,7 @@ variable "email_shine" {
 }
 
 variable "install_cockpit" {
-  description = "Flag that determine whether to install Cockpit on the host"
+  description = "Flag that determines whether to install Cockpit on the host"
   default     = false
 }
 
@@ -49,7 +49,7 @@ variable "private_ip_address_lb_frontend" {
 
 variable "public_ip_allocation_type" {
   description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
-  default     = "dynamic"
+  default     = "Dynamic"
 }
 
 variable "pw_db_system" {
@@ -85,7 +85,7 @@ variable "pwd_db_xsaadmin" {
 }
 
 variable "sap_instancenum" {
-  description = "The sap instance number which is in range 00-99"
+  description = "The SAP instance number which is in range 00-99"
 }
 
 variable "sap_sid" {
@@ -159,7 +159,7 @@ variable "vm_size" {
 }
 
 variable "vm_user" {
-  description = "The username of your HANA db vm."
+  description = "The username of your HANA database VM."
 }
 
 locals {
