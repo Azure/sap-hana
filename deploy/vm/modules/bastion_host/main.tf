@@ -1,35 +1,35 @@
 
-resource "azurerm_network_security_group" "linux_bastion_nsg" {
-  name                = "linux_bastion_nsg"
+resource "azurerm_network_security_group" "windows_bastion_nsg" {
+  name                = "windows_bastion_nsg"
   location            = "${var.az_region}"
   resource_group_name = "${var.az_resource_group}"
 
   security_rule {
-    name                       = "SSH"
+    name                       = "RDP"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "22"
+    destination_port_range     = "3389"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
-  security_rule {
-    name                       = "VNC"
+    security_rule {
+    name                       = "winrm"
     priority                   = 110
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "22"
+    destination_port_range     = "5986"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
   tags {
-    environment = "linux_bastion"
+    environment = "windows_bastion"
   }
 }
 
@@ -39,7 +39,7 @@ module "nic_and_pip_setup" {
   az_resource_group         = "${var.az_resource_group}"
   az_region                 = "${var.az_region}"
   name                      = "${local.machine_name}"
-  nsg_id                    = "${azurerm_network_security_group.linux_bastion_nsg.id}"
+  nsg_id                    = "${azurerm_network_security_group.windows_bastion_nsg.id}"
   subnet_id                 = "${var.subnet_id}"
   public_ip_allocation_type = "dynamic"
 }

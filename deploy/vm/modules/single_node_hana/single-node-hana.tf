@@ -71,4 +71,6 @@ module "configure_vm" {
   url_hana_studio            = "${var.url_hana_studio}"
   azure_service_principal_id = "${var.azure_service_principal_id}"
   azure_service_principal_pw = "${var.azure_service_principal_pw}"
+  bastion_username           = "${var.bastion_username}"
+  pw_bastion                 = "${var.pw_bastion}"
 }

@@ -164,3 +164,11 @@ variable "url_sapcar_windows" {
 variable "url_hana_studio" {
   description = "URL for the Windows version of HANA Studio to install on the bastion host"
 }
+
+variable "bastion_username" {
+  description = "The username for the bastion host"
+}
+
+variable "pw_bastion" {
+  description = "The password for the bastion host"
+}
