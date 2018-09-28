@@ -52,4 +52,4 @@ Example terraform.tfvars:
 
 Additional steps
 -------------------------------------
-You will need to get the urls from SAP as we are not licensed to provide these bits.
+Please download the relevant SAP installers and store them in accessible blobs, and use SAS urls to those blobs for installation.
