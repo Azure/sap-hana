@@ -144,6 +144,7 @@ variable "url_shine_xsa" {
 
 variable "url_xs_services" {
   description = "URL for XS Services"
+  default     = ""
 }
 
 variable "url_xsa_runtime" {
