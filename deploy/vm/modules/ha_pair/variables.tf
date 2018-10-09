@@ -3,6 +3,8 @@ variable "ansible_playbook_path" {
   default     = "../../ansible/ha_pair_playbook.yml"
 }
 
+variable "az_region" {}
+
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
