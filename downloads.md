@@ -1,5 +1,9 @@
 # Required SAP packages
+<<<<<<< HEAD
 This document contains a list of SAP packages used by the automated deployment templates. Before you can run the Terraform modules and Ansible playbooks/roles, you will need to do the following steps:
+=======
+This document contains a "laundry list" of SAP packages ("bits") used by the automated deployment templates. Before you can run the Terraform modules and Ansible playbooks/roles, you'll need to:
+>>>>>>> Added required SAP downloads, adjusted README
 * use the table below to identify which bits are required for your scenario;
 * download all required bits from [SAP's Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter);
 * upload the bits to an Azure Blob (or any accessible HTTP server) and obtain a download URL;
