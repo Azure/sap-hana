@@ -1,7 +1,11 @@
 # Automated Deployments of SAP Landscapes in Microsoft Azure
 
 This repository contains a set of highly customizable templates that can be used to automatically deploy complex SAP landscapes in the Azure Cloud.
-The templates are 
+The templates are split into:
+* **Terraform modules**
+which deploy the infrastructure components (such as VMs, network, storage) in Azure and then call the:
+* **Ansible playbooks**
+which run different roles to install and configure SAP HANA and required applications on the already deployed infrastructure.
 
  ![image](https://raw.githubusercontent.com/Azure/sap-hana/7494c4d66cd8aa222e453326261d50bd72e25a8d/template-hapair.png)
  ![image](https://raw.githubusercontent.com/Azure/sap-hana/61374fa02c7951ffd8cc949d0af5d2b154ed119d/shine-dashboard.png)
@@ -9,7 +13,7 @@ The templates are
 ## Table of contents
 
 - [Usage](#usage)
-- [Getting started](#getting-started)
+- [Getting Started](#getting-started)
 - [Scenarios](#scenarios)
 - [Supported Applications](#supported-applications)
 
@@ -23,10 +27,9 @@ A typical deployment lifecycle will require the following steps:
 * [**Verifying the deployment**](#verifying-the-deployment)
 * [**Deleting the deployment**](#deleting-the-deployment) (optional)
 
-## Getting started
+## Getting Started
 
-In this simple example, we'll deploy a simple single-node HANA instance.
-*(**Note:** If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.)*
+In this simple example, we'll deploy a simple single-node SAP HANA instance (specifically, HANA DB 1.0 SPS12 PL17).
 
 #### Preparing your Azure Cloud Shell
 1. From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
@@ -139,7 +142,7 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     ```
 
 
-##### Running the deployment
+#### Running the deployment
 
 11. Log into your Azure subscription:
 
@@ -182,7 +185,7 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     ```
 
 
-##### Deleting the deployment
+#### Deleting the deployment
 
 18. If you don't need the deployment anymore, you can remove it just as easily.
 In your Azure Cloud Shell, run the following command to remove all deployed resources:
@@ -203,6 +206,7 @@ In your Azure Cloud Shell, run the following command to remove all deployed reso
 
 ## Supported Applications
 
+Currently, the templates are capable of deploying the following applications on top of the HANA base install:
 #### XSA
 - [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html)
 - [SHINE Demo Model](https://blogs.saphana.com/2014/03/10/shine-sap-hana-interactive-education/)
