@@ -12,34 +12,50 @@ The templates are
 - [Scenarios](#scenarios)
 - [Applications](#applications)
 
+## Usage
+
+A typical deployment lifecycle will require the following steps:
+* [Preparing your Azure Cloud Shell](#preparing-your-azure-cloud-shell) (this has to be done only once)
+* [Getting the SAP packages](#getting-the-sap-packages)
+* [Adjusting the templates](#adjusting-the-templates)
+* [Running the deployment](#running-the-deployment)
+* [Verifying the deployment](#verifying-the-deployment)
+* [Deleting the deployment](#deleting-the-deployment) (optional)
+
 ## Getting started
 
-In this simple example, we'll deploy a simple single-node HANA instance. *(**Note:** If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.)*
+In this simple example, we'll deploy a simple single-node HANA instance.
+*(**Note:** If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.)*
 
-1. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
+##### Preparing your Azure Cloud Shell
+1. From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
 
-2. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
+2. Clone this repository:
+
+    ```sh
+    git clone https://github.com/Azure/sap-hana.git
+    ```
+
+##### Getting the SAP packages
+3. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
+
+4. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
 | SAPCAR_1110-80000935.EXE | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
 | IMDB_SERVER100_122_17-10009569.SAR | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
 
-3. In the Azure Portal, create a **Storage Account** named. *(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
+5. In the Azure Portal, create a **Storage Account**.
+*(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
 
-4. In the storage account you just created, create a new **Blob Storage**.
+6. In the storage account you just created, create a new **Blob Storage**.
 
-5. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
+7. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
 
-6. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
+8. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
 
-7. From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
-
-8. Clone this repository:
-
-    ```sh
-    git clone https://github.com/Azure/sap-hana.git
-    ```
+##### Adjusting the templates
 
 9. Change into the directory for the HANA single-node scenario:
 
@@ -119,6 +135,8 @@ In this simple example, we'll deploy a simple single-node HANA instance. *(**Not
     install_cockpit = false
     ```
 
+##### Running the deployment
+
 11. Log into your Azure subscription:
 
     ```sh
@@ -126,6 +144,7 @@ In this simple example, we'll deploy a simple single-node HANA instance. *(**Not
     ```
 
 12. Trigger the deployment:
+
     ```sh
     terraform apply
     ```
@@ -139,6 +158,8 @@ In this simple example, we'll deploy a simple single-node HANA instance. *(**Not
     Outputs:
     ip = Connect using tniek@xs1-db0-tniek-xs1.westus2.cloudapp.azure.com
     ```
+
+##### Verifying the installation
 
 15. Connect to your newly deployed HANA instance via SSH:
 
@@ -155,7 +176,13 @@ In this simple example, we'll deploy a simple single-node HANA instance. *(**Not
     hdbsql -i 01 -u SYSTEM -p Initial1 "SELECT CURRENT_TIME FROM DUMMY"
     ```
 
-You should see the current system time displayed on the screen.
+##### Deleting the deployment
+
+18. In your Azure Cloud Shell, run the following command to remove all deployed resources:
+
+    ```sh
+    terraform destroy
+    ```
 
 ## Scenarios
 
