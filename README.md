@@ -14,17 +14,18 @@ The templates are
 
 ## Getting started
 
-In this simple example, we'll deploy a simple single-node HANA instance. (*Note: If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 7.*)
+In this simple example, we'll deploy a simple single-node HANA instance. *(**Note:** If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.)*
+
 1. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
 
 2. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
-| `SAPCAR_1110-80000935.EXE` | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
-| `IMDB_SERVER100_122_17-10009569.SAR` | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
+| SAPCAR_1110-80000935.EXE | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
+| IMDB_SERVER100_122_17-10009569.SAR | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
 
-3. In the Azure Portal, create a **Storage Account** named.
+3. In the Azure Portal, create a **Storage Account** named. *(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
 
 4. In the storage account you just created, create a new **Blob Storage**.
 
@@ -49,41 +50,73 @@ In this simple example, we'll deploy a simple single-node HANA instance. (*Note:
 10. Use a text editor to create a Terraform variables file `terraform.tfvars`, adapting the download URLs accordingly:
 
     ```python
+    # Azure region to deploy resource in; please choose the same region as your storage from step 3 (example: "westus2")
     az_region = "westus2"
-    az_resource_group = "demo-xs1"
-    az_domain_name = "demo-xs1"
-    vm_size      = "Standard_E8s_v3"
-    sshkey_path_private = "~/.ssh/id_rsa"
+
+    # Name of resource group to deploy (example: "demo1")
+    az_resource_group = "demo1"
+
+    # Unique domain name for easy VM access (example: "hana-on-azure1")
+    az_domain_name = "hana-on-azure1"
+
+    # Size of the VM to be deployed (example: "Standard_E8s_v3")
+    # For HANA platform edition, a minimum of 32 GB of RAM is recommended
+    vm_size = "Standard_E8s_v3"
+
+    # Path to the public SSH key to be used for authentication (e.g. "~/.ssh/id_rsa.pub")
     sshkey_path_public = "~/.ssh/id_rsa.pub"
+
+    # Path to the corresponding private SSH key (e.g. "~/.ssh/id_rsa")
+    sshkey_path_private = "~/.ssh/id_rsa"
+
+    # OS user with sudo privileges to be deployed on VM (e.g. "demo")
     vm_user = "demo"
 
-    sap_sid = "XS1"
-    db_num = "0"
+    # SAP system ID (SID) to be used for HANA installation (example: "HN1")
+    sap_sid = "HN1"
+
+    # SAP instance number to be used for HANA installation (example: "01")
     sap_instancenum = "01"
 
+    # URL to download SAPCAR binary from (see step 6)
     url_sap_sapcar = "https://XXX"
-    url_sap_hostagent = "https://XXX"
-    url_sap_hdbserver   = "https://XXX"
-    url_xsa_runtime = "https://XXX"
-    url_di_core = "https://XXX"
-    url_sapui5 = "https://XXX"
-    url_portal_services = "https://XXX"
-    url_xs_services = "https://XXX"
-    url_shine_xsa = "https://XXX"
-    url_cockpit = "https://XXX"
 
+    # URL to download HANA DB server package from (see step 6)
+    url_sap_hdbserver = "https://XXX"
+
+    # Password for the OS sapadm user
     pw_os_sapadm = "XXX"
+
+    # Password for the OS <sid>adm user
     pw_os_sidadm = "XXX"
+
+    # Password for the DB SYSTEM user
+    # (In MDC installations, this will be for SYSTEMDB tenant only)
     pw_db_system = "XXX"
+
+    # Password for the DB XSA_ADMIN user
     pwd_db_xsaadmin = "XXX"
+
+    # Password for the DB SYSTEM user for the tenant DB (MDC installations only)
     pwd_db_tenant = "XXX"
+
+    # Password for the DB SHINE_USER user (SHINE demo content only)
     pwd_db_shine = "XXX"
+
+    # e-mail address used for the DB SHINE_USER user (SHINE demo content only)
     email_shine = "shine@myemailaddress.com"
 
-    useHana2    = true
-    install_xsa = true
-    install_shine = true
-    install_cockpit = true
+    # Set this flag to true when installing HANA 2.0 (or false for HANA 1.0)
+    useHana2 = false
+
+    # Set this flag to true when installing the XSA application server
+    install_xsa = false
+
+    # Set this flag to true when installing SHINE demo content (requires XSA)
+    install_shine = false
+
+    # Set this flag to true when installing Cockpit (requires XSA)
+    install_cockpit = false
     ```
 
 11. Log into your Azure subscription:
