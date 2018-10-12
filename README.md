@@ -3,6 +3,7 @@
 This repository contains a set of highly customizable templates that can be used to automatically deploy complex SAP landscapes in the Azure Cloud.
 The templates are 
 
+ ![image](https://raw.githubusercontent.com/Azure/sap-hana/7494c4d66cd8aa222e453326261d50bd72e25a8d/template-hapair.png)
  ![image](https://raw.githubusercontent.com/Azure/sap-hana/61374fa02c7951ffd8cc949d0af5d2b154ed119d/shine-dashboard.png)
 
 ## Table of contents
