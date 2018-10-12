@@ -14,15 +14,15 @@ The templates are
 
 ## Getting started
 
-In this simple example, we'll deploy a simple single-node HANA instance. (*Note: If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.*)
+In this simple example, we'll deploy a simple single-node HANA instance. (*Note: If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 7.*)
 1. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
 
 2. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
-| SAPCAR_1110-80000935.EXE | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
-| IMDB_SERVER100_122_17-10009569.SAR | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
+| `SAPCAR_1110-80000935.EXE` | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
+| `IMDB_SERVER100_122_17-10009569.SAR` | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
 
 3. In the Azure Portal, create a **Storage Account** named.
 
