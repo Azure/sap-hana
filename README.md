@@ -8,26 +8,27 @@ The templates are
 
 ## Table of contents
 
+- [Usage](#usage)
 - [Getting started](#getting-started)
 - [Scenarios](#scenarios)
-- [Applications](#applications)
+- [Supported Applications](#supported-applications)
 
 ## Usage
 
 A typical deployment lifecycle will require the following steps:
-* [Preparing your Azure Cloud Shell](#preparing-your-azure-cloud-shell) (this has to be done only once)
-* [Getting the SAP packages](#getting-the-sap-packages)
-* [Adjusting the templates](#adjusting-the-templates)
-* [Running the deployment](#running-the-deployment)
-* [Verifying the deployment](#verifying-the-deployment)
-* [Deleting the deployment](#deleting-the-deployment) (optional)
+* [**Preparing your Azure Cloud Shell**](#preparing-your-azure-cloud-shell) (this has to be done only once)
+* [**Getting the SAP packages**](#getting-the-sap-packages)
+* [**Adjusting the templates**](#adjusting-the-templates)
+* [**Running the deployment**](#running-the-deployment)
+* [**Verifying the deployment**](#verifying-the-deployment)
+* [**Deleting the deployment**](#deleting-the-deployment) (optional)
 
 ## Getting started
 
 In this simple example, we'll deploy a simple single-node HANA instance.
 *(**Note:** If you already have access to the required SAP packages via a direct HTTP link, you can skip to step 10.)*
 
-##### Preparing your Azure Cloud Shell
+#### Preparing your Azure Cloud Shell
 1. From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
 
 2. Clone this repository:
@@ -36,7 +37,8 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     git clone https://github.com/Azure/sap-hana.git
     ```
 
-##### Getting the SAP packages
+
+#### Getting the SAP packages
 3. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
 
 4. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
@@ -55,7 +57,8 @@ In this simple example, we'll deploy a simple single-node HANA instance.
 
 8. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
 
-##### Adjusting the templates
+
+#### Adjusting the templates
 
 9. Change into the directory for the HANA single-node scenario:
 
@@ -135,6 +138,7 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     install_cockpit = false
     ```
 
+
 ##### Running the deployment
 
 11. Log into your Azure subscription:
@@ -159,7 +163,8 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     ip = Connect using tniek@xs1-db0-tniek-xs1.westus2.cloudapp.azure.com
     ```
 
-##### Verifying the installation
+
+#### Verifying the installation
 
 15. Connect to your newly deployed HANA instance via SSH:
 
@@ -176,13 +181,16 @@ In this simple example, we'll deploy a simple single-node HANA instance.
     hdbsql -i 01 -u SYSTEM -p Initial1 "SELECT CURRENT_TIME FROM DUMMY"
     ```
 
+
 ##### Deleting the deployment
 
-18. In your Azure Cloud Shell, run the following command to remove all deployed resources:
+18. If you don't need the deployment anymore, you can remove it just as easily.
+In your Azure Cloud Shell, run the following command to remove all deployed resources:
 
     ```sh
     terraform destroy
     ```
+
 
 ## Scenarios
 
@@ -193,7 +201,7 @@ In this simple example, we'll deploy a simple single-node HANA instance.
 - single-node HANA instance, two-tier [HSR](# "HANA System Replication") (primary/secondary)
 - Pacemaker high-availability cluster, fully configured with [SBD](# "STONITH by device") and SAP/Azure resource agents
 
-## Applications
+## Supported Applications
 
 #### XSA
 - [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html)
