@@ -1,4 +1,4 @@
-# Automated Deployments of SAP Landscapes in Microsoft Azure
+# Automated SAP Deployments in Azure Cloud
 
 This repository contains a set of highly customizable templates that can be used to automatically deploy complex SAP landscapes in the Azure Cloud.
 The templates are split into:
@@ -16,6 +16,8 @@ which run different roles to install and configure SAP HANA and required applica
 - [Getting Started](#getting-started)
 - [Scenarios](#scenarios)
 - [Supported Applications](#supported-applications)
+- [Required SAP Downloads](#required-sap-download)
+- [Contact](#contact)
 
 ## Usage
 
@@ -48,8 +50,10 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
-| SAPCAR_1110-80000935.EXE | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
-| IMDB_SERVER100_122_17-10009569.SAR | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
+| `SAPCAR_1110-80000935.EXE` | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar` |
+| `IMDB_SERVER100_122_17-10009569.SAR` | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
+
+*(**Note**: See the section on [**Required SAP Downloads**](#required-sap-downloads) for a full list of SAP packages, if you want to install additional applications on top of HANA, such as XSA.)*
 
 5. In the Azure Portal, create a **Storage Account**.
 *(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
@@ -162,12 +166,14 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
     ```sh
     Apply complete! Resources: 19 added, 0 changed, 0 destroyed.
+    
     Outputs:
+    
     ip = Connect using tniek@xs1-db0-tniek-xs1.westus2.cloudapp.azure.com
     ```
 
 
-#### Verifying the installation
+#### Verifying the deployment
 
 15. Connect to your newly deployed HANA instance via SSH:
 
@@ -197,10 +203,10 @@ In your Azure Cloud Shell, run the following command to remove all deployed reso
 
 ## Scenarios
 
-#### HANA single-node instance
+#### [HANA single-node instance](deploy/vm/modules/single_node_hana)
 - single-node HANA instance
 
-#### HANA high-availability pair
+#### [HANA high-availability pair](deploy/vm/modules/ha_pair)
 - single-node HANA instance, two-tier [HSR](# "HANA System Replication") (primary/secondary)
 - Pacemaker high-availability cluster, fully configured with [SBD](# "STONITH by device") and SAP/Azure resource agents
 
@@ -210,3 +216,31 @@ Currently, the templates are capable of deploying the following applications on 
 #### XSA
 - [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html)
 - [SHINE Demo Model](https://blogs.saphana.com/2014/03/10/shine-sap-hana-interactive-education/)
+
+## Required SAP Downloads
+
+Depending on your application requirements, you may need to download additional SAP packages and adjust the templates accordingly:
+
+| Name | OS | Version | SWDC filename | Scenario | Template parameter |
+| ---- | -- | ------- | ------------- | ---------| ------------------ |
+| SAPCAR | Linux x86_64 | 7.21 | `SAPCAR_1110-80000935.EXE` | All | `url_sap_sapcar` |
+| SAPCAR | Windows 64-bit | 7.21 | `SAPCAR_1110-80000938.EXE` | Windows bastion host | `url_sap_sapcar_win` |
+| SAP Host Agent | Linux x86_64 | 7.21 SP36 | `SAPHOSTAGENT36_36-20009394.SAR` | All | `url_sap_hostagent` |
+| HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `IMDB_SERVER100_122_17-10009569.SAR` | HANA 1.0 landscapes | `url_sap_hdbserver` |
+| HANA DB Server | Linux x86_64 | 2.00.32 for HANA DB 2.00 | `IMDB_SERVER20_032_0-80002031.SAR` | HANA 2.0 landscapes | `url_sap_hdbserver` |
+| HANA Studio | Windows 64-bit | 122.20 (SPS12) for HANA DB 1.00 | `IMC_STUDIO2_122_20-80000321.SAR` | Windows bastion host | `url_hana_studio` | 
+| XS Advanced Runtime | | SP00 Patch87 | `EXTAPPSER00P_87-70001316.SAR` | XSA | `url_xsa_runtime` |
+| DI Core | | SP12 Patch9 | `XSACDEVXDI12_9-70001255.ZIP` | XSA | `url_di_core` |
+| SAPUI5 | | SP52 Patch19 | `XSACUI5FESV452P_19-70003351.ZIP` | XSA | `url_sapui5` | 
+| Portal Services | | SP02 Patch3 | `XSACPORTALSERV02_3-80002098.ZIP` | XSA | `url_portal_services` | 
+| XS Services | | SP06 Patch9 | `XSACSERVICES06_9-70002361.ZIP` | XSA | `url_xs_services` |
+| HANA Cockpit 2.0 | | SP07 Patch11 | `SAPHANACOCKPIT07_11-70002299.SAR` | XSA + Cockpit | `url_cockpit` |
+| SHINE Content (XSA) | | SP05 Patch3 | `XSACSHINE05_3-70002323.ZIP` | XSA + SHINE | `url_shine_xsa` |
+
+
+## Contact
+
+We look forward to your feedback and welcome any contributions!
+
+Please freel free to reach out to our team at ![image](http://safemail.justlikeed.net/e/3149a6fc0a17ff3863440aa38a16501b.png).
+
