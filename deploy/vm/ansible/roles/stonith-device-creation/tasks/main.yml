@@ -1,25 +1,11 @@
-- name: Create service principal
-  shell: az ad sp create-for-rbac
-  register: sp_create_output
-
 - set_fact:
-    json_output: "{{ sp_create_output.stdout|from_json }}"
-
-- debug:
-    msg: "{{ json_output }}"
-  when: json_output
-
-- set_fact:
-    app_id:  "{{ json_output.appId }}"
+    app_id:  "{{ azure_service_principal_id }}"
 
 - debug:
     msg: "{{ app_id }}"
 
 - set_fact:
-    tenant: "{{ json_output.tenant }}"
-
-- set_fact:
-    password: "{{ json_output.password }}"
+    password: "{{ azure_service_principal_pw }}"
 
 - name: Get subscriptionid
   shell: az account show
@@ -31,14 +17,12 @@
 - set_fact:
     Subscription_ID: "{{ json_subscription_info.id }}"
 
+- set_fact:
+    tenant: "{{ json_subscription_info.tenantId }}"
+
 - name: Sleep to let service principal be created before accessing
   pause:
     seconds: 30
-
-# TODO: Figure out custom role: "Role definition limit exceeded. No more role definitions can be created."
-
-- name: Assign custom role to the service principal
-  shell: az role assignment create --assignee {{ app_id }} --role Owner
 
 - name: Configure STONITH timeout
   shell: crm configure property stonith-timeout=900

@@ -32,7 +32,9 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"install_xsa\": ${var.install_xsa}, \
      \"install_shine\": ${var.install_shine}, \
      \"install_cockpit\": ${var.install_cockpit}, \
-     \"url_cockpit\": \"${var.url_cockpit}\" }" \
+     \"url_cockpit\": \"${var.url_cockpit}\" , \
+     \"azure_service_principal_id\": \"${var.azure_service_principal_id}\", \
+     \"azure_service_principal_pw\": \"${var.azure_service_principal_pw}\" }" \
      -i '../../ansible/azure_rm.py' ${var.ansible_playbook_path}
      EOT
 
