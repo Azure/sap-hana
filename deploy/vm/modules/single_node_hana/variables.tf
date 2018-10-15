@@ -6,7 +6,12 @@ variable "ansible_playbook_path" {
 variable "az_region" {}
 
 variable "az_resource_group" {
-  description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
+  description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
+}
+
+variable "bastion_username" {
+  description = "The username for the bastion host"
+  default     = "bastion_user"
 }
 
 variable "db_num" {
@@ -34,9 +39,24 @@ variable "install_xsa" {
   default     = false
 }
 
+variable "private_ip_address_hdb" {
+  description = "The desired private IP address of this HANA database.  If it isn't specified, a dynamic IP will be allocated."
+  default     = "10.0.0.6"
+}
+
+variable "private_ip_address_windows_bastion" {
+  description = "The desired private IP address of this bastion host.  If it isn't specified, a dynamic IP will be allocated."
+  default     = "10.0.0.4"
+}
+
 variable "public_ip_allocation_type" {
   description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
   default     = "Dynamic"
+}
+
+variable "pw_bastion" {
+  description = "The password for the bastion host.  Must be replaced if you plan on having a bastion host"
+  default     = ""
 }
 
 variable "pw_db_system" {
@@ -97,6 +117,10 @@ variable "url_di_core" {
   default     = ""
 }
 
+variable "url_hana_studio" {
+  description = "URL for the Windows version of HANA Studio to install on the bastion host"
+}
+
 variable "url_portal_services" {
   description = "URL for Portal Services"
   default     = ""
@@ -110,6 +134,10 @@ variable "url_sap_hdbserver" {
 variable "url_sap_sapcar" {
   type        = "string"
   description = "The URL that points to the SAPCAR bits"
+}
+
+variable "url_sapcar_windows" {
+  description = "URL for SAPCAR for Windows to run on the bastion host"
 }
 
 variable "url_sapui5" {
@@ -153,6 +181,7 @@ variable "azure_service_principal_id" {
 variable "azure_service_principal_pw" {
   description = "Service principal password"
   default     = ""
+}
 
 variable "bastion_username" {
   description = "The username for the bastion host"
@@ -160,9 +189,7 @@ variable "bastion_username" {
 
 variable "pw_bastion" {
   description = "The password for the bastion host"
-
   default     = "LandScape123"
-
 }
 
 variable "url_sapcar_windows" {
@@ -171,4 +198,9 @@ variable "url_sapcar_windows" {
 
 variable "url_hana_studio" {
   description = "URL for the Windows version of HANA Studio to install on the bastion host"
+}
+
+variable "windows_bastion" {
+  description = "Whether or not you want a windows bastion host"
+  default     = false
 }

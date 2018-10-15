@@ -2,8 +2,7 @@
 provider "azurerm" {}
 
 module "common_setup" {
-  source = "../common_setup"
-
+  source            = "../common_setup"
   az_region         = "${var.az_region}"
   az_resource_group = "${var.az_resource_group}"
   sap_instancenum   = "${var.sap_instancenum}"
@@ -19,6 +18,7 @@ module "create_db" {
   db_num                    = "${var.db_num}"
   hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
   nsg_id                    = "${module.common_setup.nsg_id}"
+  private_ip_address        = "${var.private_ip_address_hdb}"
   public_ip_allocation_type = "${var.public_ip_allocation_type}"
   sap_sid                   = "${var.sap_sid}"
   sshkey_path_public        = "${var.sshkey_path_public}"
@@ -28,13 +28,15 @@ module "create_db" {
 }
 
 module "bastion_host" {
-  source            = "../bastion_host"
-  az_resource_group = "${module.common_setup.resource_group_name}"
-  az_region         = "${var.az_region}"
-  sap_sid           = "${var.sap_sid}"
-  subnet_id         = "${module.common_setup.vnet_subnets[1]}"
-  bastion_username  = "${var.bastion_username}"
-  pw_bastion        = "${var.pw_bastion}"
+  source             = "../bastion_host"
+  az_resource_group  = "${module.common_setup.resource_group_name}"
+  az_region          = "${var.az_region}"
+  sap_sid            = "${var.sap_sid}"
+  subnet_id          = "${module.common_setup.vnet_subnets[1]}"
+  bastion_username   = "${var.bastion_username}"
+  private_ip_address = "${var.private_ip_address_windows_bastion}"
+  pw_bastion         = "${var.pw_bastion}"
+  windows_bastion    = "${var.windows_bastion}"
 }
 
 module "configure_vm" {

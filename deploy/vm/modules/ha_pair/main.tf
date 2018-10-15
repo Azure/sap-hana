@@ -1,3 +1,4 @@
+# Configure the Microsoft Azure Provider
 provider "azurerm" {}
 
 module "common_setup" {
@@ -148,6 +149,18 @@ module "vm_and_disk_creation_iscsi" {
   machine_type          = "iscsi"
 }
 
+module "bastion_host" {
+  source             = "../bastion_host"
+  az_resource_group  = "${module.common_setup.resource_group_name}"
+  az_region          = "${var.az_region}"
+  sap_sid            = "${var.sap_sid}"
+  subnet_id          = "${module.common_setup.vnet_subnets[1]}"
+  bastion_username   = "${var.bastion_username}"
+  private_ip_address = "${var.private_ip_address_windows_bastion}"
+  pw_bastion         = "${var.pw_bastion}"
+  windows_bastion    = "${var.windows_bastion}"
+}
+
 module "configure_vm" {
   source = "../playbook-execution"
 
@@ -184,4 +197,8 @@ module "configure_vm" {
   install_cockpit                = "${var.install_cockpit}"
   azure_service_principal_id     = "${var.azure_service_principal_id}"
   azure_service_principal_pw     = "${var.azure_service_principal_pw}"
+  url_sapcar_windows             = "${var.url_sapcar_windows}"
+  url_hana_studio                = "${var.url_hana_studio}"
+  bastion_username               = "${var.bastion_username}"
+  pw_bastion                     = "${var.pw_bastion}"
 }

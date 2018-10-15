@@ -8,6 +8,11 @@ variable "bastion_username" {
   description = "The username for the bastion host"
 }
 
+variable "private_ip_address" {
+  description = "The desired private IP address of this NIC.  If it isn't specified, a dynamic IP will be allocated."
+  default     = ""
+}
+
 variable "pw_bastion" {
   description = "The password for the bastion host"
 }
@@ -25,6 +30,14 @@ variable "subnet_id" {
   description = "The id of the subnet the bastion host will be in.  This should be different than the HANA vms."
 }
 
+variable "windows_bastion" {
+  description = "Whether or not you want a windows bastion host"
+  default     = false
+}
+
 locals {
+  dynamic      = "Dynamic"
+  empty_string = ""
   machine_name = "${lower(var.sap_sid)}-bastion"
+  static       = "Static"
 }

@@ -1,6 +1,7 @@
 output "ip" {
   depends_on = ["azurerm_key_vault_certificate"]
-  value = "${module.nic_and_pip_setup.fqdn}"
+
+  value = "${azurerm_public_ip.pip.*.fqdn}"
 }
 
 output "machine_hostname" {

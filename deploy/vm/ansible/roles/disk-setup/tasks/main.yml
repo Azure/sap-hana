@@ -1,7 +1,7 @@
 ---
 
 - name: ensure storage management software is installed
-  package: 
+  package:
     name="{{ item }}"
     state=present
   with_items:
@@ -17,7 +17,7 @@
    new_disk=0
    if [ ! -b {{ item.key }} ]; then
           /usr/bin/rescan-scsi-bus.sh
-          new_disk=1 
+          new_disk=1
           # if disk is not available after scan exit with error
           [ ! -b {{ item.key }} ] && new_disk=2 && echo "ERROR: disk {{ item.key }} not found"
    fi
@@ -29,7 +29,7 @@
   tags:
   - disk_setup
 
-- name: create disk partitions 
+- name: create disk partitions
   shell: |
    if pvdisplay -C '{{ item.key }}' ; then
        echo '{{ item.key }}' in use
@@ -82,9 +82,9 @@
   tags:
     - disk_setup
 
-- name: create logical volumes 
-  lvol: 
-    state: present 
+- name: create logical volumes
+  lvol:
+    state: present
     vg: "{{ item.value.vol }}"
     lv: lv_{{ item.key }}
     size: "{{ item.value.size }}"
@@ -92,7 +92,7 @@
   with_dict: "{{ logvols }}"
   tags:
     - disk_setup
-  when: ( logvols is defined ) 
+  when: ( logvols is defined )
 
 - name: create filesystems
   filesystem:
