@@ -19,6 +19,7 @@ which run different roles to install and configure SAP HANA and required applica
 - [Scenarios](#scenarios)
 - [Supported Applications](#supported-applications)
 - [Required SAP Downloads](#required-sap-downloads)
+- [License & Copyright](#license--copyright)
 - [Contact](#contact)
 
 ## Usage
@@ -239,6 +240,11 @@ Depending on your application requirements, you may need to download additional 
 | HANA Cockpit 2.0 | | SP07 Patch11 | `SAPHANACOCKPIT07_11-70002299.SAR` | XSA + Cockpit | `url_cockpit` |
 | SHINE Content (XSA) | | SP05 Patch3 | `XSACSHINE05_3-70002323.ZIP` | XSA + SHINE | `url_shine_xsa` |
 
+## License & Copyright
+
+Copyright © 2018 Microsoft Azure.
+
+Licensed under the [MIT License](LICENSE).
 
 ## Contact
 
