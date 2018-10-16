@@ -9,8 +9,8 @@ which deploy the infrastructure components (such as VMs, network, storage) in Az
 * **Ansible playbooks**
 which run different roles to install and configure SAP HANA and required applications on the already deployed infrastructure.
 
- ![image](https://raw.githubusercontent.com/Azure/sap-hana/7494c4d66cd8aa222e453326261d50bd72e25a8d/template-hapair.png)
- ![image](https://raw.githubusercontent.com/Azure/sap-hana/61374fa02c7951ffd8cc949d0af5d2b154ed119d/shine-dashboard.png)
+ ![image](https://raw.githubusercontent.com/Azure/sap-hana/5d2e36d4b80f13980e85af2bc67ff32819c14f8c/template-hapair.png)
+ ![image](https://raw.githubusercontent.com/Azure/sap-hana/5d2e36d4b80f13980e85af2bc67ff32819c14f8c/shine-dashboard.png)
 
 ## Table of contents
 
