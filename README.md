@@ -253,8 +253,8 @@ Depending on your application requirements, you may need to download additional 
 | SAPCAR | Linux x86_64 | 7.21 | `SAPCAR_1110-80000935.EXE` | All | `url_sap_sapcar` |
 | SAPCAR | Windows 64-bit | 7.21 | `SAPCAR_1110-80000938.EXE` | Windows bastion host | `url_sap_sapcar_win` |
 | SAP Host Agent | Linux x86_64 | 7.21 SP36 | `SAPHOSTAGENT36_36-20009394.SAR` | All | `url_sap_hostagent` |
-| HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `IMDB_SERVER100_122_17-10009569.SAR` | HANA 1.0 landscapes | `url_sap_hdbserver` |
-| HANA DB Server | Linux x86_64 | 2.00.32 for HANA DB 2.00 | `IMDB_SERVER20_032_0-80002031.SAR` | HANA 2.0 landscapes | `url_sap_hdbserver` |
+| HANA DB Server | Linux x86_64 | 122.20 (SPS12) for HANA DB 1.00 | `IMDB_SERVER100_122_20-10009569.SAR` | HANA 1.0 landscapes | `url_sap_hdbserver` |
+| HANA DB Server | Linux x86_64 | 2.00.33 for HANA DB 2.00 | `IMDB_SERVER20_033_0-80002031.SAR` | HANA 2.0 landscapes | `url_sap_hdbserver` |
 | HANA Studio | Windows 64-bit | 122.20 (SPS12) for HANA DB 1.00 | `IMC_STUDIO2_122_20-80000321.SAR` | Windows bastion host | `url_hana_studio` | 
 | XS Advanced Runtime | | SP00 Patch87 | `EXTAPPSER00P_87-70001316.SAR` | XSA | `url_xsa_runtime` |
 | DI Core | | SP12 Patch9 | `XSACDEVXDI12_9-70001255.ZIP` | XSA | `url_di_core` |
