@@ -18,17 +18,19 @@ The following options can be customized in the single-node scenario:
 | **HANA version**  <td colspan=3> *Which version of HDB Server to install*
 |   | HANA 1.0 SPS12 (PL13 or higher)  | `useHana2 = false`  |
 |   | HANA 2.0 SPS2 or higher  | `useHana2 = true`  |
-| **Database containers**  <td colspan=3> *Whether to install HDB with single or multiple database containers (tenants)*
+| **Database containers** * <td colspan=3> *Whether to install HDB with single or multiple database containers (tenants)*
 |   | Single container (HANA 1.0 only)  | `hdb_mdc = false`  |
 |   | Multi-database containers (MDC)  | `hdb_mdc = true`   |
-| **Bastion host**  <td colspan=3> *Whether to deploy a bastion host ("jump box") through which the HANA VM can be accessed*
-|   | No bastion host  | `bastion = "none"`  |
-|   | Windows bastion host (incl. HANA Studio)  | `bastion = "windows"`  |
-|   | Linux bastion host (incl. HANA Studio)  | `bastion = "linux"`  |
+| **Bastion host** * <td colspan=3> *Whether to deploy a bastion host ("jump box") through which the HANA VM can be accessed*
+|   | No bastion host  | `bastion_windows = false`<br>`bastion_linux = false`  |
+|   | Windows bastion host (incl. HANA Studio)  | `bastion_windows = true`  |
+|   | Linux bastion host (incl. HANA Studio)  | `bastion_linux = true`  |
 | **SAP Applications**  <td colspan=3> *Which SAP applications to install on top of HANA (if any)*
 |   | XSA  | `install_xsa = true`  |
 |   | [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html) (requires XSA) | `install_cockpit = true`  |
 |   | [SHINE Demo Content](https://blogs.saphana.com/2014/03/10/shine-sap-hana-interactive-education/) (requires XSA)  | `install_shine = true`  |
+
+ *(**Note**: Features marked with an * are work in progress and not fully available yet.)*
 
 ## Usage
 
