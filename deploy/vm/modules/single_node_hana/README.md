@@ -43,7 +43,9 @@ The following options can be customized in the single-node scenario:
     ```sh
     cd sap-hana/deploy/vm/modules/single_node_hana/
 
-4. Create a `terraform.tfvars` file for your deployment. You can use the provided [Boilerplate template](terraform.tfvars) for single-node scenarios as a starting point and adjust the variables according to your requirements.
+4. Create a `terraform.tfvars` file for your deployment. You can use the provided [Boilerplate template ](terraform.tfvars.template) for single-node scenarios as a starting point and adjust the variables according to your requirements.
+
+ *(**Note**: You need to rename the boilerplate template from `terraform.tfvars.template` to `terraform.tfvars` before you can use it.)*
 
 5. Now, [run the deployment](https://github.com/Azure/sap-hana#running-the-deployment) of your HANA single-node instance. You can [verify the installation](https://github.com/Azure/sap-hana#verifying-the-deployment) afterwards.
 
