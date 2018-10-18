@@ -16,6 +16,8 @@ This scenario deploys a single-node HANA instance in two sites (primary and seco
   - STONITH by device (SBD), via an Azure service principal
   - SAPHanaSR Pacemaker resource agent (to facilitate HSR failover)
   - azure-events Pacemaker resource agent (to anticipate scheduled maintenance events and trigger graceful failover)
+- At present, this HANA high-availability scenario is only supported for Azure VM deployments using SuSE Linux Enterprise Server (SLES) 12.3 or higher.
+- For additional details on the underlying implementation, please see the [documentation of the reference architecture](https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability).
 - If you don't have a high-availability requirement, you can just deploy the [HANA single-node scenario](../single_node_hana).
 
 ## Features
