@@ -7,18 +7,11 @@
 - set_fact:
     password: "{{ azure_service_principal_pw }}"
 
-- name: Get subscriptionid
-  shell: az account show
-  register: subscription_info
+- set_fact:
+    Subscription_ID: "{{ lookup('env','AZURE_SUBSCRIPTION_ID') }}"
 
 - set_fact:
-    json_subscription_info: "{{ subscription_info.stdout|from_json }}"
-
-- set_fact:
-    Subscription_ID: "{{ json_subscription_info.id }}"
-
-- set_fact:
-    tenant: "{{ json_subscription_info.tenantId }}"
+    tenant: "{{ lookup('env','AZURE_TENANT') }}"
 
 - name: Sleep to let service principal be created before accessing
   pause:
