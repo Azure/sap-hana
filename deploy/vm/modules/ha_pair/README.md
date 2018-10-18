@@ -6,8 +6,17 @@ This scenario deploys a single-node HANA instance in two sites (primary and seco
 
 ## Table of contents
 
+- [Considerations](#considerations)
 - [Features](#features)
 - [Usage](#usage)
+
+## Considerations
+- This scenario already configures all resources required for the Pacemaker HA cluster, including:
+  - Heartbeat, via iSCSI device
+  - STONITH by device (SBD), via an Azure service principal
+  - SAPHanaSR Pacemaker resource agent (to facilitate HSR failover)
+  - azure-events Pacemaker resource agent (to anticipate scheduled maintenance events and trigger graceful failover)
+- If you don't have a high-availability requirement, you can just deploy the [HANA single-node scenario](../single_node_hana).
 
 ## Features
 
