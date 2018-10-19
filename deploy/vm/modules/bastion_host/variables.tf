@@ -10,7 +10,7 @@ variable "bastion_username" {
 
 variable "private_ip_address" {
   description = "The desired private IP address of this NIC.  If it isn't specified, a dynamic IP will be allocated."
-  default     = ""
+  default     = "10.0.0.4"
 }
 
 variable "pw_bastion" {
@@ -40,4 +40,6 @@ locals {
   empty_string = ""
   machine_name = "${lower(var.sap_sid)}-bastion"
   static       = "Static"
+  winrm_port   = 5986
+  rdp_port     = 3389
 }

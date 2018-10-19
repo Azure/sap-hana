@@ -46,7 +46,7 @@ variable "private_ip_address_hdb" {
 
 variable "private_ip_address_windows_bastion" {
   description = "The desired private IP address of this bastion host.  If it isn't specified, a dynamic IP will be allocated."
-  default     = "10.0.1.4"
+  default     = "10.0.0.4"
 }
 
 variable "public_ip_allocation_type" {
