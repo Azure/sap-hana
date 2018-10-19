@@ -12,10 +12,10 @@ This scenario deploys a single-node HANA instance in two sites (primary and seco
 
 ## Considerations
 - This scenario already configures all resources required for the Pacemaker HA cluster, including:
-  - Heartbeat, via iSCSI device
-  - STONITH by device (SBD), via an Azure service principal
-  - SAPHanaSR Pacemaker resource agent (to facilitate HSR failover)
+  - STONITH by device (SBD), via iSCSI target server
+  - SAPHanaSR and SAPHanaTopology Pacemaker resource agents (to facilitate HSR failover)
   - azure-events Pacemaker resource agent (to anticipate scheduled maintenance events and trigger graceful failover)
+- In this design, the SBD device uses a iSCSI target server on an additional VM; while this is optional, it allows for faster failover. For more details, please refer to the [reference architecture of high-availability VM landscapes using Pacemaker on SuSE Linux Enterprise Server (SLES)](https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-suse-pacemaker).
 - At present, this HANA high-availability scenario is only supported for Azure VM deployments using SuSE Linux Enterprise Server (SLES) 12.3 or higher.
 - For additional details on the underlying implementation, please see the [documentation of the reference architecture](https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability).
 - If you don't have a high-availability requirement, you can just deploy the [HANA single-node scenario](../single_node_hana).
