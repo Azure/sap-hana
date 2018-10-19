@@ -28,10 +28,10 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"url_xs_services\": \"${var.url_xs_services}\", \
      \"url_shine_xsa\": \"${var.url_shine_xsa}\", \
      \"url_sapcar_windows\": \"${var.url_sapcar_windows}\", \
-     \"url_hana_studio\": \"${var.url_hana_studio}\", \
+     \"url_hana_studio_windows\": \"${var.url_hana_studio_windows}\", \
      \"pwd_db_xsaadmin\": \"${var.pwd_db_xsaadmin}\", \
-     \"pw_bastion\": \"${var.pw_bastion}\", \
-     \"bastion_username\": \"${var.bastion_username}\", \
+     \"pw_bastion_windows\": \"${var.pw_bastion_windows}\", \
+     \"bastion_username_windows\": \"${var.bastion_username_windows}\", \
      \"pwd_db_tenant\": \"${var.pwd_db_tenant}\", \
      \"pwd_db_shine\": \"${var.pwd_db_shine}\", \
      \"email_shine\": \"${var.email_shine}\", \

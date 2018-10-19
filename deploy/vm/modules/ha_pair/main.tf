@@ -150,14 +150,14 @@ module "vm_and_disk_creation_iscsi" {
 }
 
 module "bastion_host" {
-  source             = "../bastion_host"
+  source             = "../windows_bastion_host"
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
   sap_sid            = "${var.sap_sid}"
   subnet_id          = "${module.common_setup.vnet_subnets[0]}"
-  bastion_username   = "${var.bastion_username}"
+  bastion_username   = "${var.bastion_username_windows}"
   private_ip_address = "${var.private_ip_address_windows_bastion}"
-  pw_bastion         = "${var.pw_bastion}"
+  pw_bastion         = "${var.pw_bastion_windows}"
   windows_bastion    = "${var.windows_bastion}"
 }
 
@@ -198,7 +198,7 @@ module "configure_vm" {
   azure_service_principal_id     = "${var.azure_service_principal_id}"
   azure_service_principal_pw     = "${var.azure_service_principal_pw}"
   url_sapcar_windows             = "${var.url_sapcar_windows}"
-  url_hana_studio                = "${var.url_hana_studio}"
-  bastion_username               = "${var.bastion_username}"
-  pw_bastion                     = "${var.pw_bastion}"
+  url_hana_studio_windows        = "${var.url_hana_studio_windows}"
+  bastion_username_windows       = "${var.bastion_username_windows}"
+  pw_bastion_windows             = "${var.pw_bastion_windows}"
 }

@@ -6,7 +6,7 @@ variable "az_resource_group" {
   description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
-variable "bastion_username" {
+variable "bastion_username_windows" {
   description = "The username for the bastion host"
 }
 
@@ -50,7 +50,7 @@ variable "private_ip_address_lb_frontend" {
   default     = ""                                                             # not needed in single node case
 }
 
-variable "pw_bastion" {
+variable "pw_bastion_windows" {
   description = "The password for the bastion host"
 }
 
@@ -109,7 +109,7 @@ variable "url_di_core" {
   default     = ""
 }
 
-variable "url_hana_studio" {
+variable "url_hana_studio_windows" {
   description = "URL for the Windows version of HANA Studio to install on the bastion host"
 }
 
