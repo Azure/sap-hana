@@ -14,13 +14,23 @@ which run different roles to install and configure SAP HANA and required applica
 
 ## Table of contents
 
+- [Scenarios](#scenarios)
 - [Usage](#usage)
 - [Getting Started](#getting-started)
-- [Scenarios](#scenarios)
 - [Supported Applications](#supported-applications)
 - [Required SAP Downloads](#required-sap-downloads)
 - [License & Copyright](#license--copyright)
 - [Contact](#contact)
+
+## Scenarios
+
+#### [HANA single-node instance](deploy/vm/modules/single_node_hana)
+- single-node HANA instance
+
+#### [HANA high-availability pair](deploy/vm/modules/ha_pair)
+- single-node HANA instance, two-tier [HSR](# "HANA System Replication") (primary/secondary)
+- Pacemaker high-availability cluster, fully configured with [SBD](# "STONITH by device") and SAP/Azure resource agents
+
 
 ## Usage
 
@@ -31,6 +41,7 @@ A typical deployment lifecycle will require the following steps:
 * [**Running the deployment**](#running-the-deployment)
 * [**Verifying the deployment**](#verifying-the-deployment)
 * [**Deleting the deployment**](#deleting-the-deployment) (optional)
+
 
 ## Getting Started
 
@@ -226,16 +237,6 @@ In your Azure Cloud Shell, run the following command to remove all deployed reso
     ```sh
     terraform destroy
     ```
-
-
-## Scenarios
-
-#### [HANA single-node instance](deploy/vm/modules/single_node_hana)
-- single-node HANA instance
-
-#### [HANA high-availability pair](deploy/vm/modules/ha_pair)
-- single-node HANA instance, two-tier [HSR](# "HANA System Replication") (primary/secondary)
-- Pacemaker high-availability cluster, fully configured with [SBD](# "STONITH by device") and SAP/Azure resource agents
 
 ## Supported Applications
 
