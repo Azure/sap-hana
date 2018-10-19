@@ -2,7 +2,7 @@
 
 This scenario deploys a single-node HANA instance in two sites (primary and secondary), replicated on database level via HANA System Replication (HSR). This scenario is known as "high-availability pair" or "HA pair."
 
-<img src="https://raw.githubusercontent.com/Azure/sap-hana/tniek-doc-ha/deploy/vm/modules/ha_pair/sld-hapair.png" alt="Landscape Diagram" width="800"/>
+<img src="https://raw.githubusercontent.com/Azure/sap-hana/4a53e38c2c94047043b32cd00d62f2b57dbddb28/deploy/vm/modules/ha_pair/sld-hapair.png" alt="Landscape Diagram" width="800"/>
 
 ## Table of contents
 
