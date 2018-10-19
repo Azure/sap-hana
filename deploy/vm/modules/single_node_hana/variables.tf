@@ -46,7 +46,7 @@ variable "private_ip_address_hdb" {
 
 variable "private_ip_address_windows_bastion" {
   description = "The desired private IP address of this bastion host.  If it isn't specified, a dynamic IP will be allocated."
-  default     = "10.0.0.4"
+  default     = "10.0.1.4"
 }
 
 variable "public_ip_allocation_type" {
@@ -119,6 +119,7 @@ variable "url_di_core" {
 
 variable "url_hana_studio" {
   description = "URL for the Windows version of HANA Studio to install on the bastion host"
+  default     = ""
 }
 
 variable "url_portal_services" {
@@ -138,6 +139,7 @@ variable "url_sap_sapcar" {
 
 variable "url_sapcar_windows" {
   description = "URL for SAPCAR for Windows to run on the bastion host"
+  default     = ""
 }
 
 variable "url_sapui5" {
@@ -181,23 +183,6 @@ variable "azure_service_principal_id" {
 variable "azure_service_principal_pw" {
   description = "Service principal password"
   default     = ""
-}
-
-variable "bastion_username" {
-  description = "The username for the bastion host"
-}
-
-variable "pw_bastion" {
-  description = "The password for the bastion host"
-  default     = "LandScape123"
-}
-
-variable "url_sapcar_windows" {
-  description = "URL for SAPCAR for Windows to run on the bastion host"
-}
-
-variable "url_hana_studio" {
-  description = "URL for the Windows version of HANA Studio to install on the bastion host"
 }
 
 variable "windows_bastion" {

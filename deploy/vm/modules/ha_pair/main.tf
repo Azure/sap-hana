@@ -154,7 +154,7 @@ module "bastion_host" {
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
   sap_sid            = "${var.sap_sid}"
-  subnet_id          = "${module.common_setup.vnet_subnets[1]}"
+  subnet_id          = "${module.common_setup.vnet_subnets[0]}"
   bastion_username   = "${var.bastion_username}"
   private_ip_address = "${var.private_ip_address_windows_bastion}"
   pw_bastion         = "${var.pw_bastion}"

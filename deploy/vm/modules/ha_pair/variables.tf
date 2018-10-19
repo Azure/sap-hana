@@ -3,34 +3,14 @@ variable "ansible_playbook_path" {
   default     = "../../ansible/ha_pair_playbook.yml"
 }
 
-variable "az_client_id" {
-  description = "The id for this Azure client"
-}
-
-variable "az_client_secret" {
-  description = "The secret for the Azure client given in az_client_id"
-}
-
 variable "az_region" {}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
-variable "az_subscription_id" {
-  description = "The id for this Azure subscription"
-}
-
-variable "az_tenant_id" {
-  description = "The id for this Azure tenant"
-}
-
 variable "bastion_username" {
   description = "The username for the bastion host"
-}
-
-variable "db_num" {
-  description = "which node is currently being created"
 }
 
 variable "email_shine" {
@@ -146,6 +126,11 @@ variable "url_di_core" {
   default     = ""
 }
 
+variable "url_hana_studio" {
+  description = "URL for the Windows version of HANA Studio to install on the bastion host"
+  default     = ""
+}
+
 variable "url_portal_services" {
   description = "URL for Portal Services"
   default     = ""
@@ -159,6 +144,11 @@ variable "url_sap_hdbserver" {
 variable "url_sap_sapcar" {
   type        = "string"
   description = "The url that points to the SAPCAR bits"
+}
+
+variable "url_sapcar_windows" {
+  description = "URL for SAPCAR for Windows to run on the bastion host"
+  default     = ""
 }
 
 variable "url_sapui5" {
