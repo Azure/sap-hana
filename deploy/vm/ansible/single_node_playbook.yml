@@ -1,5 +1,5 @@
 ---
-- hosts: db0
+- hosts: "db{{ db_num }}"
   become: true
   roles:
     - disk-setup
@@ -7,7 +7,7 @@
     - { role: xsa-install, when: install_xsa == true }
     - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }
 
-- hosts: db0
+- hosts: "db{{ db_num }}"
   become: true
   become_user: "{{ sap_sid|lower }}adm"
   roles:

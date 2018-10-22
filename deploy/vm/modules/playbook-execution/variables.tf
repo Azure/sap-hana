@@ -6,6 +6,11 @@ variable "az_resource_group" {
   description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
+variable "db_num" {
+  description = "which node is currently being created"
+  default     = 0
+}
+
 variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = "shinedemo@microsoft.com"

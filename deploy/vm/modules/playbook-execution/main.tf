@@ -15,6 +15,7 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"pwd_db_system\": \"${var.pw_db_system}\", \
      \"pwd_hacluster\": \"${var.pw_hacluster}\", \
      \"use_hana2\": \"${var.useHana2}\", \
+     \"db_num\": \"${var.db_num}\", \
      \"db0_ip\": \"${var.private_ip_address_db0}\", \
      \"db1_ip\": \"${var.private_ip_address_db1}\", \
      \"lb_frontend_ip\": \"${var.private_ip_address_lb_frontend}\", \

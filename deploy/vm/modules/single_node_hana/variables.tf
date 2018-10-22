@@ -11,6 +11,7 @@ variable "az_resource_group" {
 
 variable "db_num" {
   description = "which node is currently being created"
+  default     = "0"
 }
 
 variable "email_shine" {
