@@ -140,6 +140,6 @@ resource "azurerm_virtual_machine" "windows_bastion" {
   }
 
   tags {
-    windows_bastion = ""
+    win_bastion = ""
   }
 }

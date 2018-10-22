@@ -5,7 +5,7 @@
 
 - name: download HANA Studio
   win_get_url:
-    url: "{{ url_hana_studio }}"
+    url: "{{ url_hana_studio_windows }}"
     dest: C:\Users\{{ bastion_username_windows }}\Downloads\HANA_STUDIO_WINDOWS.SAR
 
 - name: Extract HANA Studio

@@ -14,7 +14,7 @@
     - { role: shine-install, when: install_xsa == true and install_shine == true }
     - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
-- hosts: bastion
+- hosts: win_bastion
   connection: winrm
   vars:
     ansible_user: "{{ bastion_username_windows }}"

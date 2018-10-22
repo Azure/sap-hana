@@ -11,7 +11,7 @@
   roles:
     - iscsi-setup
 
-- hosts: windows_bastion
+- hosts: win_bastion
   connection: winrm
   vars:
     ansible_user: "{{ bastion_username_windows }}"
