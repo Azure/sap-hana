@@ -38,7 +38,7 @@ variable "windows_bastion" {
 locals {
   dynamic      = "Dynamic"
   empty_string = ""
-  machine_name = "${lower(var.sap_sid)}-windows_bastion"
+  machine_name = "${lower(var.sap_sid)}-windows-bastion"
   static       = "Static"
   winrm_port   = 5986
   rdp_port     = 3389
