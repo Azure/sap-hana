@@ -27,7 +27,7 @@ module "create_db" {
   vm_size                   = "${var.vm_size}"
 }
 
-module "bastion_host" {
+module "windows_bastion_host" {
   source             = "../windows_bastion_host"
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
@@ -54,7 +54,7 @@ module "configure_vm" {
   pw_os_sidadm               = "${var.pw_os_sidadm}"
   pw_db_system               = "${var.pw_db_system}"
   useHana2                   = "${var.useHana2}"
-  vms_configured             = "${module.create_db.machine_hostname}, ${module.bastion_host.machine_hostname}"
+  vms_configured             = "${module.create_db.machine_hostname}, ${module.windows_bastion_host.machine_hostname}"
   url_xsa_runtime            = "${var.url_xsa_runtime}"
   url_di_core                = "${var.url_di_core}"
   url_sapui5                 = "${var.url_sapui5}"

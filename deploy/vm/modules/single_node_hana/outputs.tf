@@ -2,6 +2,6 @@ output "db_ip" {
   value = "Connect using ${var.vm_user}@${module.create_db.fqdn}"
 }
 
-output "bastion_ip" {
-  value = "${module.bastion_host.ip}"
+output "windows_bastion_ip" {
+  value = "${module.windows_bastion_host.ip}"
 }

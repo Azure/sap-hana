@@ -149,7 +149,7 @@ module "vm_and_disk_creation_iscsi" {
   machine_type          = "iscsi"
 }
 
-module "bastion_host" {
+module "windows_bastion_host" {
   source             = "../windows_bastion_host"
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
