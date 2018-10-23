@@ -25,6 +25,7 @@
 
 - hosts: db0,db1
   become: true
+  any_errors_fatal: true
   vars:
     db_num: "{{ ansible_hostname[-1] }}"
   roles:
