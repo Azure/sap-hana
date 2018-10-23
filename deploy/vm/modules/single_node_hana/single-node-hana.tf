@@ -7,6 +7,7 @@ module "common_setup" {
   az_resource_group = "${var.az_resource_group}"
   sap_instancenum   = "${var.sap_instancenum}"
   sap_sid           = "${var.sap_sid}"
+  use_existing_nsg  = "${var.defined_nsg}"
   useHana2          = "${var.useHana2}"
 }
 

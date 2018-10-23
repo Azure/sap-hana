@@ -32,4 +32,5 @@ module "nsg" {
   sap_instancenum     = "${var.sap_instancenum}"
   sap_sid             = "${var.sap_sid}"
   useHana2            = "${var.useHana2}"
+  enable              = "${var.use_existing_nsg == local.empty_string}"
 }

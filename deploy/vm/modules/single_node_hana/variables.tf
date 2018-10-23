@@ -19,6 +19,11 @@ variable "db_num" {
   default     = "0"
 }
 
+variable "defined_nsg" {
+  default     = ""
+  description = "Set this variable to the resource id of the NSG that you would like to use.  Make sure that it is in the same region as the network you assign it to."
+}
+
 variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = "shinedemo@microsoft.com"
