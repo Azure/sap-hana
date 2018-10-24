@@ -1,6 +1,6 @@
 variable "az_region" {}
 
-variable "enable" {
+variable "use_existing_nsg" {
   description = "Lets you disable creation of the NSG if you would like to use your own"
   default     = true
 }
