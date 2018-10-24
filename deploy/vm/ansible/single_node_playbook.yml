@@ -1,5 +1,5 @@
 ---
-- hosts: db0
+- hosts: "db{{ db_num }}"
   become: true
   roles:
     - disk-setup
@@ -7,10 +7,20 @@
     - { role: xsa-install, when: install_xsa == true }
     - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }
 
-- hosts: db0
+- hosts: "db{{ db_num }}"
   become: true
   become_user: "{{ sap_sid|lower }}adm"
   roles:
     - { role: shine-install, when: install_xsa == true and install_shine == true }
     - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
+- hosts: win_bastion
+  connection: winrm
+  vars:
+    ansible_user: "{{ bastion_username_windows }}"
+    ansible_password: "{{ pw_bastion_windows }}"
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
+  roles:
+    - set-up-windows-bastion

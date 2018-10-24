@@ -1,5 +1,5 @@
 output "nsg_id" {
-  value = "${module.nsg.nsg-id}"
+  value = "${element( concat(module.nsg.nsg-id, list(var.use_existing_nsg)),0)}"
 }
 
 output "vnet_subnets" {

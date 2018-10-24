@@ -1,3 +1,4 @@
+# This calls the module to create this node's network interface card and public IP.
 module "nic_and_pip_setup" {
   source = "../generic_nic_and_pip"
 
@@ -11,6 +12,7 @@ module "nic_and_pip_setup" {
   backend_ip_pool_ids       = "${var.backend_ip_pool_ids}"
 }
 
+# This module creates a VM and the disks that HANA db will need.
 module "vm_and_disk_creation" {
   source = "../generic_vm_and_disk_creation"
 

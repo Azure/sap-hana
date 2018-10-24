@@ -1,13 +1,16 @@
+# This gets the IP address of the machine you deploy from.
 data "http" "local_ip" {
   url = "http://api.ipify.org"
 }
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "sap-nsg" {
+  count               = "${var.use_existing_nsg ? 1 : 0}"
   name                = "${var.sap_sid}-nsg"
   location            = "${var.az_region}"
   resource_group_name = "${var.resource_group_name}"
 
+  # This rule lets you ssh to the Database VMs
   security_rule {
     name                       = "SSH"
     priority                   = 1001
@@ -20,6 +23,7 @@ resource "azurerm_network_security_group" "sap-nsg" {
     destination_address_prefix = "*"
   }
 
+  # This rule specifically allows the machine you use to deploy to access the VMs
   security_rule {
     name                       = "local-ip-allow-vnet"
     priority                   = 100
@@ -45,12 +49,13 @@ resource "azurerm_network_security_group" "sap-nsg" {
   }
 
   tags {
-    environment = "Terraform SAP HANA single node deployment nsg"
+    environment = "Terraform SAP HANA deployment nsg"
   }
 }
 
+# The Ports that HANA 1 uses are different from the ones HANA 2 uses
 resource "azurerm_network_security_rule" "hana1-http" {
-  count                       = "${!var.useHana2 ? 1 : 0}"
+  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1 and are creating a new NSG
   name                        = "HTTP"
   priority                    = 1030
   direction                   = "Inbound"
@@ -65,7 +70,7 @@ resource "azurerm_network_security_rule" "hana1-http" {
 }
 
 resource "azurerm_network_security_rule" "hana1-https" {
-  count                       = "${!var.useHana2 ? 1 : 0}"
+  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1 and are creating a new NSG
   name                        = "HTTPS"
   priority                    = 1040
   direction                   = "Inbound"
@@ -79,9 +84,9 @@ resource "azurerm_network_security_rule" "hana1-https" {
   network_security_group_name = "${azurerm_network_security_group.sap-nsg.name}"
 }
 
-# Specify that those are for HANA 2 and XSA only
+# The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa-http" {
-  count                       = "${var.useHana2 ? 1 : 0}"
+  count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
   name                        = "XSA-HTTP"
   priority                    = 1030
   direction                   = "Inbound"
@@ -95,8 +100,9 @@ resource "azurerm_network_security_rule" "hana2-xsa-http" {
   network_security_group_name = "${azurerm_network_security_group.sap-nsg.name}"
 }
 
+# The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa" {
-  count                       = "${var.useHana2 ? 1 : 0}"
+  count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
   name                        = "XSA"
   priority                    = 1040
   direction                   = "Inbound"

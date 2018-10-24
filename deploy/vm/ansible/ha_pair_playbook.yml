@@ -11,8 +11,21 @@
   roles:
     - iscsi-setup
 
+- hosts: win_bastion
+  connection: winrm
+  vars:
+    ansible_user: "{{ bastion_username_windows }}"
+    ansible_password: "{{ pw_bastion_windows }}"
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
+  roles:
+    - set-up-windows-bastion
+
+
 - hosts: db0,db1
   become: true
+  any_errors_fatal: true
   vars:
     db_num: "{{ ansible_hostname[-1] }}"
   roles:

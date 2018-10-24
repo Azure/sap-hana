@@ -1,14 +1,13 @@
-# Create a resource group
+# Create a resource group.
 resource "azurerm_resource_group" "hana-resource-group" {
   name     = "${var.az_resource_group}"
   location = "${var.az_region}"
 
   tags {
-    environment = "Terraform SAP HANA HA-pair deployment"
+    environment = "Terraform SAP HANA deployment"
   }
 }
 
-# TODO(pabowers): switch to use the Terraform registry version when release for nsg support becomes available
 module "vnet" {
   source  = "Azure/vnet/azurerm"
   version = "1.2.0"
@@ -25,6 +24,7 @@ module "vnet" {
   }
 }
 
+# This module creates a network security group with the ports opened that are needed for HANA.
 module "nsg" {
   source              = "../nsg_for_hana"
   resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
@@ -32,4 +32,5 @@ module "nsg" {
   sap_instancenum     = "${var.sap_instancenum}"
   sap_sid             = "${var.sap_sid}"
   useHana2            = "${var.useHana2}"
+  use_existing_nsg    = "${var.use_existing_nsg == local.empty_string}"
 }

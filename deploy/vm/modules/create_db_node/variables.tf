@@ -1,55 +1,34 @@
+variable "availability_set_id" {
+  description = "The id associated with the availability set to put this VM into."
+  default     = ""                                                                 # Empty string denotes that this VM is not in an availability set.
+}
+
 variable "az_region" {}
 
 variable "az_resource_group" {
-  description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
-}
-
-variable "storage_disk_sizes_gb" {
-  type        = "list"
-  description = "List disk sizes in GB for all disks this VM will need"
-}
-
-variable "sshkey_path_public" {
-  description = "The path on the local machine to where the public key is"
-}
-
-variable "sap_sid" {
-  default = "PV1"
-}
-
-variable "vm_size" {
-  default = "Standard_E8s_v3"
-}
-
-variable "vm_user" {
-  description = "The username of your HANA db vm."
-}
-
-variable "availability_set_id" {
-  description = "The if associated with the availability set to put this vm into."
-  default     = ""
-}
-
-variable "db_num" {
-  description = "which node is currently being created"
-}
-
-variable "hana_subnet_id" {
-  description = "The hana specific subnet that this node needs to be on"
-}
-
-variable "nsg_id" {
-  description = "The nsg id for the nsg that will control this vm."
+  description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
 variable "backend_ip_pool_ids" {
   type        = "list"
-  description = "The ids that associate the load balancer's back end ip pool with this nic."
+  description = "The ids that associate the load balancer's back end IP pool with this VM's NIC."
   default     = []
 }
 
+variable "db_num" {
+  description = "The number of the node that is currently being created."
+}
+
+variable "hana_subnet_id" {
+  description = "The HANA specific subnet that this node needs to be on."
+}
+
+variable "nsg_id" {
+  description = "The NSG id for the NSG that will control this VM."
+}
+
 variable "private_ip_address" {
-  description = "The desired private ip address of this nic.  If it isn't specified, a dynamic ip will be allocated."
+  description = "The desired private IP address of this NIC.  If it isn't specified, a dynamic IP will be allocated."
   default     = ""
 }
 
@@ -57,7 +36,28 @@ variable "public_ip_allocation_type" {
   description = "Defines whether the IP address is static or dynamic. Options are Static or Dynamic."
 }
 
+variable "sap_sid" {
+  default = "PV1"
+}
+
+variable "sshkey_path_public" {
+  description = "The path on the local machine to where the public key is"
+}
+
+variable "storage_disk_sizes_gb" {
+  type        = "list"
+  description = "List disk sizes in GB for all disks this VM will need"
+}
+
+variable "vm_size" {
+  default = "Standard_E8s_v3"
+}
+
+variable "vm_user" {
+  description = "The username of your HANA database VM."
+}
+
 locals {
-  vm_db_name   = "db${var.db_num}"
   machine_name = "${lower(var.sap_sid)}-db${var.db_num}"
+  vm_db_name   = "db${var.db_num}"
 }
