@@ -55,7 +55,7 @@ resource "azurerm_network_security_group" "sap-nsg" {
 
 # The Ports that HANA 1 uses are different from the ones HANA 2 uses
 resource "azurerm_network_security_rule" "hana1-http" {
-  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1
+  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1 and are creating a new NSG
   name                        = "HTTP"
   priority                    = 1030
   direction                   = "Inbound"
@@ -70,7 +70,7 @@ resource "azurerm_network_security_rule" "hana1-http" {
 }
 
 resource "azurerm_network_security_rule" "hana1-https" {
-  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1
+  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1 and are creating a new NSG
   name                        = "HTTPS"
   priority                    = 1040
   direction                   = "Inbound"
@@ -84,7 +84,7 @@ resource "azurerm_network_security_rule" "hana1-https" {
   network_security_group_name = "${azurerm_network_security_group.sap-nsg.name}"
 }
 
-# The rule is only created if we use HANA 2
+# The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa-http" {
   count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
   name                        = "XSA-HTTP"
@@ -100,7 +100,7 @@ resource "azurerm_network_security_rule" "hana2-xsa-http" {
   network_security_group_name = "${azurerm_network_security_group.sap-nsg.name}"
 }
 
-# The rule is only created if we use HANA 2
+# The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa" {
   count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
   name                        = "XSA"
