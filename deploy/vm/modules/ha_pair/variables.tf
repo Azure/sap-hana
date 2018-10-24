@@ -11,6 +11,7 @@ variable "az_resource_group" {
 
 variable "bastion_username_windows" {
   description = "The username for the bastion host"
+  default     = "bastion_user"
 }
 
 variable "email_shine" {
@@ -60,7 +61,8 @@ variable "public_ip_allocation_type" {
 }
 
 variable "pw_bastion_windows" {
-  description = "The password for the bastion host"
+  description = "The password for the bastion host.  Must be replaced if you plan on having a Windows bastion host"
+  default     = ""
 }
 
 variable "pw_db_system" {
