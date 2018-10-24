@@ -39,11 +39,11 @@ variable "install_xsa" {
   default     = false
 }
 
-variable "private_ip_address_db0" {
+variable "private_ip_address_hdb0" {
   default = "10.0.0.6"
 }
 
-variable "private_ip_address_db1" {
+variable "private_ip_address_hdb1" {
   default = "10.0.0.7"
 }
 
@@ -74,7 +74,7 @@ variable "pw_bastion_windows" {
   default     = ""
 }
 
-variable "pw_db_system" {
+variable "pw_hdb_system" {
   description = "Password for the database user SYSTEM"
 }
 
@@ -91,17 +91,17 @@ variable "pw_os_sidadm" {
   description = "Password for this specific sidadm, which is an OS user"
 }
 
-variable "pwd_db_shine" {
+variable "pwd_hdb_shine" {
   description = "Password for SHINE user"
   default     = ""
 }
 
-variable "pwd_db_tenant" {
+variable "pwd_hdb_tenant" {
   description = "Password for SYSTEM user (tenant DB)"
   default     = ""
 }
 
-variable "pwd_db_xsaadmin" {
+variable "pwd_hdb_xsaadmin" {
   description = "Password for XSAADMIN user"
   default     = ""
 }

@@ -15,7 +15,7 @@ variable "backend_ip_pool_ids" {
   default     = []
 }
 
-variable "db_num" {
+variable "hdb_num" {
   description = "The number of the node that is currently being created."
 }
 
@@ -58,6 +58,6 @@ variable "vm_user" {
 }
 
 locals {
-  machine_name = "${lower(var.sap_sid)}-db${var.db_num}"
-  vm_db_name   = "db${var.db_num}"
+  machine_name = "${lower(var.sap_sid)}-hdb${var.hdb_num}"
+  vm_hdb_name  = "hdb${var.hdb_num}"
 }

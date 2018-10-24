@@ -26,5 +26,5 @@ module "vm_and_disk_creation" {
   nic_id                = "${module.nic_and_pip_setup.nic_id}"
   availability_set_id   = "${var.availability_set_id}"
   machine_type          = "database-${var.az_resource_group}"
-  tags                  = "${map(local.vm_db_name, "")}"
+  tags                  = "${map(local.vm_hdb_name, "")}"
 }

@@ -85,17 +85,17 @@ resource "azurerm_lb_rule" "lb-hana2-rule" {
   frontend_ip_configuration_name = "hsr-front"
 }
 
-module "create_db0" {
-  source = "../create_db_node"
+module "create_hdb0" {
+  source = "../create_hdb_node"
 
   availability_set_id       = "${azurerm_availability_set.ha-pair-availset.id}"
   az_resource_group         = "${module.common_setup.resource_group_name}"
   az_region                 = "${module.common_setup.resource_group_location}"
   backend_ip_pool_ids       = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
-  db_num                    = "0"
+  hdb_num                   = "0"
   hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
   nsg_id                    = "${module.common_setup.nsg_id}"
-  private_ip_address        = "${var.private_ip_address_db0}"
+  private_ip_address        = "${var.private_ip_address_hdb0}"
   public_ip_allocation_type = "${var.public_ip_allocation_type}"
   sap_sid                   = "${var.sap_sid}"
   sshkey_path_public        = "${var.sshkey_path_public}"
@@ -104,17 +104,17 @@ module "create_db0" {
   vm_size                   = "${var.vm_size}"
 }
 
-module "create_db1" {
-  source = "../create_db_node"
+module "create_hdb1" {
+  source = "../create_hdb_node"
 
   availability_set_id       = "${azurerm_availability_set.ha-pair-availset.id}"
   az_resource_group         = "${module.common_setup.resource_group_name}"
   az_region                 = "${module.common_setup.resource_group_location}"
   backend_ip_pool_ids       = ["${azurerm_lb_backend_address_pool.availability-back-pool.id}"]
-  db_num                    = "1"
+  hdb_num                   = "1"
   hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
   nsg_id                    = "${module.common_setup.nsg_id}"
-  private_ip_address        = "${var.private_ip_address_db1}"
+  private_ip_address        = "${var.private_ip_address_hdb1}"
   public_ip_allocation_type = "${var.public_ip_allocation_type}"
   sap_sid                   = "${var.sap_sid}"
   sshkey_path_public        = "${var.sshkey_path_public}"
@@ -179,24 +179,24 @@ module "configure_vm" {
   vm_user                        = "${var.vm_user}"
   url_sap_sapcar                 = "${var.url_sap_sapcar}"
   url_sap_hdbserver              = "${var.url_sap_hdbserver}"
-  private_ip_address_db0         = "${var.private_ip_address_db0}"
-  private_ip_address_db1         = "${var.private_ip_address_db1}"
+  private_ip_address_hdb0        = "${var.private_ip_address_hdb0}"
+  private_ip_address_hdb1        = "${var.private_ip_address_hdb1}"
   private_ip_address_lb_frontend = "${var.private_ip_address_lb_frontend}"
   pw_hacluster                   = "${var.pw_hacluster}"
   pw_os_sapadm                   = "${var.pw_os_sapadm}"
   pw_os_sidadm                   = "${var.pw_os_sidadm}"
-  pw_db_system                   = "${var.pw_db_system}"
+  pw_hdb_system                  = "${var.pw_hdb_system}"
   useHana2                       = "${var.useHana2}"
-  vms_configured                 = "${module.create_db0.machine_hostname}, ${module.create_db1.machine_hostname}, ${module.vm_and_disk_creation_iscsi.machine_hostname}"
+  vms_configured                 = "${module.create_hdb0.machine_hostname}, ${module.create_hdb1.machine_hostname}, ${module.vm_and_disk_creation_iscsi.machine_hostname}"
   url_xsa_runtime                = "${var.url_xsa_runtime}"
   url_di_core                    = "${var.url_di_core}"
   url_sapui5                     = "${var.url_sapui5}"
   url_portal_services            = "${var.url_portal_services}"
   url_xs_services                = "${var.url_xs_services}"
   url_shine_xsa                  = "${var.url_shine_xsa}"
-  pwd_db_xsaadmin                = "${var.pwd_db_xsaadmin}"
-  pwd_db_tenant                  = "${var.pwd_db_tenant}"
-  pwd_db_shine                   = "${var.pwd_db_shine}"
+  pwd_hdb_xsaadmin               = "${var.pwd_hdb_xsaadmin}"
+  pwd_hdb_tenant                 = "${var.pwd_hdb_tenant}"
+  pwd_hdb_shine                  = "${var.pwd_hdb_shine}"
   email_shine                    = "${var.email_shine}"
   url_cockpit                    = "${var.url_cockpit}"
   install_xsa                    = "${var.install_xsa}"

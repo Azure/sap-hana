@@ -1,5 +1,5 @@
 ---
-- hosts: db0,db1
+- hosts: hdb0,hdb1
   become: true
 
   roles:
@@ -23,7 +23,7 @@
     - set-up-windows-bastion
 
 
-- hosts: db0,db1
+- hosts: hdb0,hdb1
   become: true
   any_errors_fatal: true
   vars:
@@ -37,22 +37,22 @@
   roles:
     - ssh-key-distribute
 
-- hosts: db0
+- hosts: hdb0
   become: true
   roles:
     - ha-cluster-init
 
-- hosts: db1
+- hosts: hdb1
   become: true
   roles:
     - ha-cluster-join
 
-- hosts: db0,db1
+- hosts: hdb0,hdb1
   become: true
   roles:
     - configure-corosync
 
-- hosts: db0
+- hosts: hdb0
   become: true
   tasks:
   - name: Restart corosync
@@ -61,8 +61,8 @@
     pause:
       seconds: 15
 
-# Corosync has to restart on db0 before it can on db1
-- hosts: db1
+# Corosync has to restart on hdb0 before it can on hdb1
+- hosts: hdb1
   become: true
   tasks:
   - name: Restart corosync
@@ -71,12 +71,12 @@
     pause:
       seconds: 15
 
-- hosts: db0
+- hosts: hdb0
   become: true
   roles:
     - salvage-corrupted-cib
 
-- hosts: db0
+- hosts: hdb0
   become: true
   tasks:
     - name: cib status
@@ -98,14 +98,14 @@
   roles:
     - stonith-device-creation
 
-- hosts: db0,db1
+- hosts: hdb0,hdb1
   become: true
   roles:
     - saphana-install
     - { role: xsa-install, when: install_xsa == true }
     - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }
 
-- hosts: db0
+- hosts: hdb0
   become: true
   become_user: "{{ sap_sid|lower }}adm"
   roles:
@@ -113,12 +113,12 @@
     - { role: shine-install, when: install_xsa == true and install_shine == true }
     - { role: cockpit-install, when: install_xsa == true and install_cockpit == true }
 
-- hosts: db0
+- hosts: hdb0
   become: true
   roles:
     - set-up-hana-pacemaker-resources
 
-- hosts: db0,db1
+- hosts: hdb0,hdb1
   become: true
   tasks:
     - name: Download AzEvents into /usr/lib/ocf/resource.d/heartbeat
@@ -127,7 +127,7 @@
         dest: /usr/lib/ocf/resource.d/heartbeat
         mode: 0755
 
-- hosts: db0
+- hosts: hdb0
   become: true
   roles:
     - add-AzEvents-agent

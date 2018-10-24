@@ -1,9 +1,9 @@
-output "db_ip" {
-  value = "${module.create_db.fqdn}"
+output "hdb_vm_user" {
+  value = "${var.vm_user}"
 }
 
-output "db_vm_user" {
-  value = "${var.vm_user}"
+output "hdb_ip" {
+  value = "${module.create_hdb.fqdn}"
 }
 
 output "windows_bastion_ip" {

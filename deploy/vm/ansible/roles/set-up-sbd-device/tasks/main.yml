@@ -11,7 +11,7 @@
   lineinfile:
     dest: '/etc/iscsi/initiatorname.iscsi'
     regexp: '^InitiatorName=iqn'
-    line: "InitiatorName={{ iscsi_object }}.prod-{{ cluster_name }}-{{ db_num }}.local:prod-{{ cluster_name }}-{{ db_num }}"
+    line: "InitiatorName={{ iscsi_object }}.prod-{{ cluster_name }}-{{ hdb_num }}.local:prod-{{ cluster_name }}-{{ hdb_num }}"
     state: 'present'
   register: iscsi_register_initiator_name
 

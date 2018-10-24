@@ -10,7 +10,7 @@ variable "bastion_username_windows" {
   description = "The username for the bastion host"
 }
 
-variable "db_num" {
+variable "hdb_num" {
   description = "which node is currently being created"
   default     = 0
 }
@@ -35,14 +35,14 @@ variable "install_xsa" {
   default     = false
 }
 
-variable "private_ip_address_db0" {
-  description = "Private ip address of db0 in HA pair"
-  default     = ""                                     # not needed in single node case
+variable "private_ip_address_hdb0" {
+  description = "Private ip address of hdb0 in HA pair"
+  default     = ""                                      # not needed in single node case
 }
 
-variable "private_ip_address_db1" {
-  description = "Private ip address of db1 in HA pair"
-  default     = ""                                     # not needed in single node case
+variable "private_ip_address_hdb1" {
+  description = "Private ip address of hdb1 in HA pair"
+  default     = ""                                      # not needed in single node case
 }
 
 variable "private_ip_address_lb_frontend" {
@@ -54,7 +54,7 @@ variable "pw_bastion_windows" {
   description = "The password for the bastion host"
 }
 
-variable "pw_db_system" {
+variable "pw_hdb_system" {
   description = "Password for the database user SYSTEM"
 }
 
@@ -72,17 +72,17 @@ variable "pw_os_sidadm" {
   description = "Password for this specific sidadm, which is an OS user"
 }
 
-variable "pwd_db_shine" {
+variable "pwd_hdb_shine" {
   description = "Password for SHINE user"
   default     = ""
 }
 
-variable "pwd_db_tenant" {
+variable "pwd_hdb_tenant" {
   description = "Password for SYSTEM user (tenant DB)"
   default     = ""
 }
 
-variable "pwd_db_xsaadmin" {
+variable "pwd_hdb_xsaadmin" {
   description = "Password for XSAADMIN user"
   default     = ""
 }

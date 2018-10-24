@@ -18,10 +18,10 @@ url_xs_services:
 pwd_os_sidadm:
 
 # Password for SYSTEM user (SYSTEMDB)
-pwd_db_system:
+pwd_hdb_system:
 
 # Password for XSAADMIN user
-pwd_db_xsaadmin:
+pwd_hdb_xsaadmin:
 
 # Password for SYSTEM user (tenant DB)
-pwd_db_tenant:
+pwd_hdb_tenant:
