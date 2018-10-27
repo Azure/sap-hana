@@ -31,6 +31,10 @@
   roles:
     - set-up-sbd-device
     - host-name-resolution
+
+- hosts: db0,db1,iscsi
+  become: true
+  roles:
     - ssh-key-distribute
 
 - hosts: db0

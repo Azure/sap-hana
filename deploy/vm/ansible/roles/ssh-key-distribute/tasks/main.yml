@@ -1,24 +1,48 @@
-- name: Generate SSH keys
-  shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
-  args:
-    creates: /root/.ssh/id_rsa
+- name: Generate SSH key for current user
+  user:
+    name: root
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+  register: user_info
 
-- fetch:
-    src: /root/.ssh/id_rsa.pub
-    dest: tmp/keys/{{ ansible_hostname }}_rsa.pub
-    flat: yes
+- debug:
+    var: user_info
 
 - name: Add authorized key to remote
   authorized_key:
     user: root
     state: present
-    key: "{{ lookup('file', 'tmp/keys/{{ item }}_rsa.pub')}}"
-  with_items: "{{ play_hosts }}"
+    key: "{{ user_info.ssh_public_key }}"
+  delegate_to: "{{ item }}"
+  become: true
+  when: item != inventory_hostname
+  with_items: "{{ groups['azure'] }}"
+
+- debug:
+    var: inventory_hostname
+
+- debug:
+    var: ansible_facts['eth0']['ipv4']['address']
+
+- debug:
+    var: ansible_facts['ssh_host_key_rsa_public']
+
+# - name: Tell the host about our servers it might want to ssh to with hostnames
+#   shell: ssh-keyscan {{ inventory_hostname }},{{ ansible_facts['eth0']['ipv4']['address'] }}
+#   register: host_key
+- set_fact:
+    host_key_rsa: "{{ inventory_hostname }},{{ ansible_facts['eth0']['ipv4']['address'] }} ssh-rsa {{ ansible_facts['ssh_host_key_rsa_public'] }}"
+
+- debug:
+    var: host_key_rsa
+
 
 - name: tell the host about our servers it might want to ssh to with hostnames
-  shell: ssh-keyscan {{ hostvars[item]['ansible_fqdn'].split('.')[0] }} >> ~/.ssh/known_hosts
-  with_items: "{{ play_hosts }}"
-
-- name: tell the host about our servers it might want to ssh to with ip addresses
-  shell: ssh-keyscan {{ hostvars[item]['ansible_default_ipv4']['address'] }} >> ~/.ssh/known_hosts
-  with_items: "{{ play_hosts }}"
+  known_hosts:
+    path: /root/.ssh/known_hosts
+    name: "{{ inventory_hostname }}"
+    key: "{{ host_key_rsa }}"
+  delegate_to: "{{ item }}"
+  become: true
+  when: item != inventory_hostname
+  with_items: "{{ groups['azure'] }}"
