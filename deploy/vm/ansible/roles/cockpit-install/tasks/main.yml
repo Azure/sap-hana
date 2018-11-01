@@ -3,7 +3,7 @@
 - name: Log into XSA
   shell: |
     . ~/.bashrc
-    xs login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ sap_instancenum }}30/ -s SAP -u XSA_ADMIN  -p {{ pwd_hdb_xsaadmin }}
+    xs login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ sap_instancenum }}30/ -s SAP -u XSA_ADMIN  -p {{ pwd_db_xsaadmin }}
   args:
     executable: /bin/bash
 

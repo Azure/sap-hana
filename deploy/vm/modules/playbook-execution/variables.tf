@@ -54,7 +54,7 @@ variable "pw_bastion_windows" {
   description = "The password for the bastion host"
 }
 
-variable "pw_hdb_system" {
+variable "pw_db_system" {
   description = "Password for the database user SYSTEM"
 }
 
@@ -72,17 +72,17 @@ variable "pw_os_sidadm" {
   description = "Password for this specific sidadm, which is an OS user"
 }
 
-variable "pwd_hdb_shine" {
+variable "pwd_db_shine" {
   description = "Password for SHINE user"
   default     = ""
 }
 
-variable "pwd_hdb_tenant" {
+variable "pwd_db_tenant" {
   description = "Password for SYSTEM user (tenant DB)"
   default     = ""
 }
 
-variable "pwd_hdb_xsaadmin" {
+variable "pwd_db_xsaadmin" {
   description = "Password for XSAADMIN user"
   default     = ""
 }

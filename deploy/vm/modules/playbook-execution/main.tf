@@ -13,7 +13,7 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"sap_instancenum\": \"${var.sap_instancenum}\", \
      \"pwd_os_sapadm\": \"${var.pw_os_sapadm}\", \
      \"pwd_os_sidadm\": \"${var.pw_os_sidadm}\", \
-     \"pwd_hdb_system\": \"${var.pw_hdb_system}\", \
+     \"pwd_db_system\": \"${var.pw_db_system}\", \
      \"pwd_hacluster\": \"${var.pw_hacluster}\", \
      \"use_hana2\": \"${var.useHana2}\", \
      \"hdb_num\": \"${var.hdb_num}\", \
@@ -29,11 +29,11 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"url_shine_xsa\": \"${var.url_shine_xsa}\", \
      \"url_sapcar_windows\": \"${var.url_sapcar_windows}\", \
      \"url_hana_studio_windows\": \"${var.url_hana_studio_windows}\", \
-     \"pwd_hdb_xsaadmin\": \"${var.pwd_hdb_xsaadmin}\", \
+     \"pwd_db_xsaadmin\": \"${var.pwd_db_xsaadmin}\", \
      \"pw_bastion_windows\": \"${var.pw_bastion_windows}\", \
      \"bastion_username_windows\": \"${var.bastion_username_windows}\", \
-     \"pwd_hdb_tenant\": \"${var.pwd_hdb_tenant}\", \
-     \"pwd_hdb_shine\": \"${var.pwd_hdb_shine}\", \
+     \"pwd_db_tenant\": \"${var.pwd_db_tenant}\", \
+     \"pwd_db_shine\": \"${var.pwd_db_shine}\", \
      \"email_shine\": \"${var.email_shine}\", \
      \"install_xsa\": ${var.install_xsa}, \
      \"install_shine\": ${var.install_shine}, \

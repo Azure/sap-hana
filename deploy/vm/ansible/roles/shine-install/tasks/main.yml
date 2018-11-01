@@ -8,7 +8,7 @@
 - name: Log into XSA
   shell: |
     . ~/.bashrc
-    xs login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ sap_instancenum }}30/ -s SAP -u XSA_ADMIN  -p {{ pwd_hdb_xsaadmin }}
+    xs login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ sap_instancenum }}30/ -s SAP -u XSA_ADMIN  -p {{ pwd_db_xsaadmin }}
   args:
     executable: /bin/bash
     chdir: "/usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}"
@@ -29,7 +29,7 @@
 - name: Execute SQL to prepare SHINE
   shell: |
     . ~/.bashrc
-    hdbsql -d SYSTEMDB -u SYSTEM -p {{ pwd_hdb_system }} -i {{ sap_instancenum }} -I /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/prepare_shine.sql
+    hdbsql -d SYSTEMDB -u SYSTEM -p {{ pwd_db_system }} -i {{ sap_instancenum }} -I /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/prepare_shine.sql
   args:
     executable: /bin/bash
 
