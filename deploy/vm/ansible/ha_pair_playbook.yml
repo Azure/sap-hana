@@ -32,7 +32,7 @@
     - set-up-sbd-device
     - host-name-resolution
 
-- hosts: db0,db1,iscsi
+- hosts: hdb0,hdb1,iscsi
   become: true
   roles:
     - ssh-key-distribute

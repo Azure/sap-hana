@@ -10,11 +10,11 @@
 - debug:
     msg: "{{ check_hdbsql }}"
 
-- name: Copy SSFS key storage to db1
+- name: Copy SSFS key storage to hdb1
   shell: |
       . ~/.bashrc
-      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['db1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
-      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/SSFS_{{ sap_sid }}.KEY "{{ groups['db1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/
+      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
+      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/SSFS_{{ sap_sid }}.KEY "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/
   args: 
     executable: '/bin/bash'
   become: true
@@ -27,10 +27,10 @@
   args: 
     executable: '/bin/bash'
 
-- name: Stop HDB on db1 and use hdbnsutil to register secondary site
+- name: Stop HDB on hdb1 and use hdbnsutil to register secondary site
   shell: |
       . ~/.bashrc
       sapcontrol -nr {{ sap_instancenum }} -function StopWait 600 10
-      hdbnsutil -sr_register --remoteHost={{ groups['db0'][0] }} --remoteInstance={{ sap_instancenum }} --replicationMode=sync --name=SITE2
-  delegate_to: "{{ groups['db1'][0] }}"
+      hdbnsutil -sr_register --remoteHost={{ groups['hdb0'][0] }} --remoteInstance={{ sap_instancenum }} --replicationMode=sync --name=SITE2
+  delegate_to: "{{ groups['hdb1'][0] }}"
   become: true
