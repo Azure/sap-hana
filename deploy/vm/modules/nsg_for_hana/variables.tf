@@ -4,6 +4,11 @@ variable "nsg_name" {
   description = "The name of the NSG to be created."
 }
 
+variable "allow_ips" {
+  description = "The ip addresses that will be allowed by the nsg"
+  type        = "list"
+}
+
 variable "use_existing_nsg" {
   description = "Lets you disable creation of the NSG if you would like to use your own"
   default     = false
@@ -23,5 +28,7 @@ variable "useHana2" {
 }
 
 locals {
+  all_ips      = "*"
+  empty_list   = []
   empty_string = ""
 }

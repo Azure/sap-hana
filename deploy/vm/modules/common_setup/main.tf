@@ -28,6 +28,7 @@ module "vnet" {
 module "nsg" {
   source              = "../nsg_for_hana"
   resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
+  allow_ips           = "${var.allow_ips}"
   az_region           = "${var.az_region}"
   nsg_name            = "${local.new_nsg_name}"
   sap_instancenum     = "${var.sap_instancenum}"

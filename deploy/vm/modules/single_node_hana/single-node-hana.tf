@@ -2,7 +2,9 @@
 provider "azurerm" {}
 
 module "common_setup" {
-  source            = "../common_setup"
+  source = "../common_setup"
+
+  allow_ips         = "${var.allow_ips}"
   az_region         = "${var.az_region}"
   az_resource_group = "${var.az_resource_group}"
   existing_nsg_name = "${var.existing_nsg_name}"
@@ -32,6 +34,7 @@ module "create_hdb" {
 
 module "windows_bastion_host" {
   source             = "../windows_bastion_host"
+  allow_ips          = "${var.allow_ips}"
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
   sap_sid            = "${var.sap_sid}"
