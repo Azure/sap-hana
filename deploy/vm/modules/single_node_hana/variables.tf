@@ -19,14 +19,19 @@ variable "hdb_num" {
   default     = "0"
 }
 
-variable "defined_nsg" {
-  default     = ""
-  description = "Set this variable to the resource id of the NSG that you would like to use.  Make sure that it is in the same region as the network you assign it to."
-}
-
 variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = "shinedemo@microsoft.com"
+}
+
+variable "existing_nsg_name" {
+  description = "The name of the pre-existing nsg that you would like to use"
+  default     = ""
+}
+
+variable "existing_nsg_rg" {
+  description = "The name of the pre-existing resource group that you would like to use"
+  default     = ""
 }
 
 variable "install_cockpit" {
@@ -179,6 +184,10 @@ variable "url_xs_services" {
 variable "url_xsa_runtime" {
   description = "URL for XSA runtime"
   default     = ""
+}
+
+variable "use_existing_nsg" {
+  default = false
 }
 
 variable "useHana2" {

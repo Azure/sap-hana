@@ -1,5 +1,5 @@
 output "nsg_id" {
-  value = "${element( concat(module.nsg.nsg-id, list(var.use_existing_nsg)),0)}"
+  value = "${data.azurerm_network_security_group.nsg_info.id}"
 }
 
 output "vnet_subnets" {

@@ -5,8 +5,8 @@ data "http" "local_ip" {
 
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "sap-nsg" {
-  count               = "${var.use_existing_nsg ? 1 : 0}"
-  name                = "${var.sap_sid}-nsg"
+  count               = "${var.use_existing_nsg ? 0 : 1}"
+  name                = "${var.nsg_name}"
   location            = "${var.az_region}"
   resource_group_name = "${var.resource_group_name}"
 
@@ -55,7 +55,7 @@ resource "azurerm_network_security_group" "sap-nsg" {
 
 # The Ports that HANA 1 uses are different from the ones HANA 2 uses
 resource "azurerm_network_security_rule" "hana1-http" {
-  count                       = "${var.use_existing_nsg ? (!var.useHana2 ? 1 : 0) : 0}" # The rule is only created if we use HANA 1 and are creating a new NSG
+  count                       = "${var.use_existing_nsg ? 0: (!var.useHana2 ? 1 : 0)}" # The rule is only created if we use HANA 1 and are creating a new NSG
   name                        = "HTTP"
   priority                    = 1030
   direction                   = "Inbound"
@@ -86,7 +86,7 @@ resource "azurerm_network_security_rule" "hana1-https" {
 
 # The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa-http" {
-  count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
+  count                       = "${var.use_existing_nsg ? 0 : (var.useHana2 ? 1 : 0)}"
   name                        = "XSA-HTTP"
   priority                    = 1030
   direction                   = "Inbound"
@@ -102,7 +102,7 @@ resource "azurerm_network_security_rule" "hana2-xsa-http" {
 
 # The rule is only created if we use HANA 2 and are creating a new NSG
 resource "azurerm_network_security_rule" "hana2-xsa" {
-  count                       = "${var.use_existing_nsg ? (var.useHana2 ? 1 : 0) : 0}"
+  count                       = "${var.use_existing_nsg ? 0 : (var.useHana2 ? 1 : 0)}"
   name                        = "XSA"
   priority                    = 1040
   direction                   = "Inbound"

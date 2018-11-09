@@ -1,8 +1,12 @@
 variable "az_region" {}
 
+variable "nsg_name" {
+  description = "The name of the nsg group to be created."
+}
+
 variable "use_existing_nsg" {
   description = "Lets you disable creation of the NSG if you would like to use your own"
-  default     = true
+  default     = false
 }
 
 variable "resource_group_name" {
@@ -11,10 +15,6 @@ variable "resource_group_name" {
 
 variable "sap_instancenum" {
   description = "The sap instance number which is in range 00-99"
-}
-
-variable "sap_sid" {
-  default = "PV1"
 }
 
 variable "useHana2" {

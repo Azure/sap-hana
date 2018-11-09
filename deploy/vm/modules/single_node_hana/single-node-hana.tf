@@ -5,9 +5,11 @@ module "common_setup" {
   source            = "../common_setup"
   az_region         = "${var.az_region}"
   az_resource_group = "${var.az_resource_group}"
+  existing_nsg_name = "${var.existing_nsg_name}"
+  existing_nsg_rg   = "${var.existing_nsg_rg}"
   sap_instancenum   = "${var.sap_instancenum}"
   sap_sid           = "${var.sap_sid}"
-  use_existing_nsg  = "${var.defined_nsg}"
+  use_existing_nsg  = "${var.use_existing_nsg}"
   useHana2          = "${var.useHana2}"
 }
 

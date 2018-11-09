@@ -29,8 +29,13 @@ module "nsg" {
   source              = "../nsg_for_hana"
   resource_group_name = "${azurerm_resource_group.hana-resource-group.name}"
   az_region           = "${var.az_region}"
+  nsg_name            = "${local.new_nsg_name}"
   sap_instancenum     = "${var.sap_instancenum}"
-  sap_sid             = "${var.sap_sid}"
   useHana2            = "${var.useHana2}"
-  use_existing_nsg    = "${var.use_existing_nsg == local.empty_string}"
+  use_existing_nsg    = "${var.use_existing_nsg}"
+}
+
+data "azurerm_network_security_group" "nsg_info" {
+  name                = "${var.use_existing_nsg ? var.existing_nsg_name : local.new_nsg_name}"
+  resource_group_name = "${var.use_existing_nsg ? var.existing_nsg_rg : azurerm_resource_group.hana-resource-group.name}"
 }
