@@ -1,7 +1,7 @@
 variable "az_region" {}
 
 variable "nsg_name" {
-  description = "The name of the nsg group to be created."
+  description = "The name of the NSG to be created."
 }
 
 variable "use_existing_nsg" {
