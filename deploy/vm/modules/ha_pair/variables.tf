@@ -1,3 +1,8 @@
+variable "allow_ips" {
+  description = "The ip addresses that will be allowed by the nsg"
+  default     = ["*"]
+}
+
 variable "ansible_playbook_path" {
   description = "Path from this module to the playbook"
   default     = "../../ansible/ha_pair_playbook.yml"

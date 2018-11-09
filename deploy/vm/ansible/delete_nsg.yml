@@ -1,0 +1,5 @@
+---
+- name: Delete NSG
+  hosts: localhost
+  roles:
+    - delete-nsg

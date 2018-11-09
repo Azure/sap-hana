@@ -1,3 +1,8 @@
+variable "allow_ips" {
+  description = "The ip addresses that will be allowed by the nsg"
+  type        = "list"
+}
+
 variable "az_region" {}
 
 variable "az_resource_group" {
@@ -36,6 +41,7 @@ variable "windows_bastion" {
 }
 
 locals {
+  all_ips      = "*"
   dynamic      = "Dynamic"
   empty_string = ""
   machine_name = "${lower(var.sap_sid)}-win-bastion"
