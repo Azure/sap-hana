@@ -36,6 +36,6 @@ module "nsg" {
 }
 
 data "azurerm_network_security_group" "nsg_info" {
-  name                = "${var.use_existing_nsg ? var.existing_nsg_name : local.new_nsg_name}"
+  name                = "${var.use_existing_nsg ? var.existing_nsg_name : module.nsg.nsg-name}"
   resource_group_name = "${var.use_existing_nsg ? var.existing_nsg_rg : azurerm_resource_group.hana-resource-group.name}"
 }
