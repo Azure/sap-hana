@@ -121,3 +121,7 @@
     state: present
     disable_recommends: no
 
+- name: Install resource agents
+  package:
+    name: resource-agents
+    state: latest

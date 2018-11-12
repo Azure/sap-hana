@@ -118,19 +118,10 @@
   roles:
     - set-up-hana-pacemaker-resources
 
-- hosts: hdb0,hdb1
-  become: true
-  tasks:
-    - name: Download AzEvents into /usr/lib/ocf/resource.d/heartbeat
-      get_url:
-        url: "https://tnieksap.blob.core.windows.net/tools/azevents/AzEvents"
-        dest: /usr/lib/ocf/resource.d/heartbeat
-        mode: 0755
-
 - hosts: hdb0
   become: true
   roles:
-    - add-AzEvents-agent
+    - add-azure-events-agent
 
 - name: playbook for linux bastion host
   vars:
