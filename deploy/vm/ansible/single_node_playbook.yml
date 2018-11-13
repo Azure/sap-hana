@@ -1,4 +1,8 @@
 ---
+- hosts: localhost
+  roles:
+    - update-security-group
+
 - hosts: "hdb0"
   become: true
   roles:
