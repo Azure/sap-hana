@@ -12,8 +12,7 @@ resource "azurerm_network_security_group" "windows_bastion_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "${local.rdp_port}"
-    source_address_prefix      = "${length(var.allow_ips) > 0 ? local.empty_string : local.all_ips}"
-    source_address_prefixes    = "${var.allow_ips}"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
@@ -25,8 +24,7 @@ resource "azurerm_network_security_group" "windows_bastion_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "${local.winrm_port}"
-    source_address_prefix      = "${length(var.allow_ips) > 0 ? local.empty_string : local.all_ips}"
-    source_address_prefixes    = "${var.allow_ips}"
+    source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
