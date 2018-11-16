@@ -1,11 +1,36 @@
 ---
-- hosts: localhost
+- name: "Create HANA cluster of {{ n }} VMs"
+  hosts: localhost
   roles:
      - { role: create-vm-cluster, vm_group: "hana_vm_group" }
 
-- name: "roless"
-  hosts: localhost
+- hosts: localhost
   tasks:
      - debug:
          msg: "Created HANA VM {{ item }}"
        with_items: "{{ groups['hana_vm_group'] }}"
+
+- name: Manamged disk for logs
+  hosts: localhost
+  tasks:
+     - name: create managed disks for logs
+       azure_rm_managed_disk:
+          name: "hana{{ item }}log"
+          resource_group: "{{ resource_group }}"
+          disk_size_gb: 256
+          managed_by: "hanavm-{{ item }}"
+       with_sequence: start=1 end="{{ n }}"
+     - name: create managed disks for logs
+       azure_rm_managed_disk:
+          name: "hana{{ item }}data"
+          resource_group: "{{ resource_group }}"
+          disk_size_gb: 256
+          managed_by: "hanavm-{{ item }}"
+       with_sequence: start=1 end="{{ n }}"
+     - name: Manamged disk for shared
+       azure_rm_managed_disk:
+          name: "hana{{ item }}shared"
+          resource_group: "{{ resource_group }}"
+          disk_size_gb: 256
+          managed_by: "hanavm-{{ item }}"
+       with_sequence: start=1 end="{{ n }}"
