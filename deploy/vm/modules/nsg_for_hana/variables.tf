@@ -28,7 +28,7 @@ variable "useHana2" {
 }
 
 locals {
-  all_ips      = "*"
+  all_ips      = "\\\"*\\\""
   empty_list   = []
   empty_string = ""
 }

@@ -5,7 +5,7 @@ resource null_resource "create-nsg" {
     command = <<EOT
               ansible-playbook \
 	            --extra-vars="{ \"sap_instancenum\": \"${var.sap_instancenum}\", \
-              \"allow_ips\": ${jsonencode(var.allow_ips)}, \
+              \"allow_ips\": ${length(var.allow_ips) > 0 ? jsonencode(var.allow_ips): local.all_ips}, \
               \"hana_nsg_name\": \"${var.nsg_name}\", \
               \"use_hana2\": ${var.useHana2}, \
               \"az_resource_group_name\": \"${var.resource_group_name}\" }" \
@@ -23,7 +23,7 @@ resource null_resource "destroy-nsg" {
     command = <<EOT
               ansible-playbook \
 	            --extra-vars="{ \"sap_instancenum\": \"${var.sap_instancenum}\", \
-              \"allow_ips\": ${jsonencode(var.allow_ips)}, \
+              \"allow_ips\": ${length(var.allow_ips) > 0 ? jsonencode(var.allow_ips): local.all_ips}, \
               \"hana_nsg_name\": \"${var.nsg_name}\", \
               \"use_hana2\": ${var.useHana2}, \
               \"az_resource_group_name\": \"${var.resource_group_name}\" }" \
