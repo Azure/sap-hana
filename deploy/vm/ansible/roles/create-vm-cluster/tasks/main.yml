@@ -79,18 +79,4 @@
             version: latest
       with_sequence: start=1 end="{{ n }}"
       async: 500
-#
-#- name: install the requirements
-#  hosts: hana_vm_group
-#  tasks:
-#    - copy:
-#        src: bootstrap.sh
-#        dest: "/home/{{vm_user}}"
-#        owner: "{{ vm_user }}"
-#        group: "{{ vm_user }}"
-#        mode: 0111
-#    - command: ./bootstrap.sh
-#      args:
-#        chdir: "/home/{{ vm_user }}"
-#      become: true
-#      become_method: sudo
+
