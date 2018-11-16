@@ -1,0 +1,96 @@
+---
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: eastus
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resource_group }}"
+        name: hana-vnet
+        address_prefixes: "10.0.0.0/16" 
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_group }}"
+        name: hana-subnet
+        address_prefix: "10.0.1.0/24"
+        virtual_network: hana-vnet
+    - name: Create public IP address
+      azure_rm_publicipaddress:
+        resource_group: "{{ resource_group }}"
+        allocation_method: Dynamic
+        name: "hanavm-pip{{ item }}"
+        domain_name: "hanavm-{{ item }}-{{ resource_group }}"
+      register: ip_sample
+      with_sequence: start=1 end="{{ n }}"
+    - debug:
+        msg: "hana vm :{{ ip_sample.results[0].state.dns_settings.fqdn }}"
+    - name: Create Network Security Group that allows SSH
+      azure_rm_securitygroup:
+         resource_group: "{{ resource_group }}"
+         name: hanaNetworkSecurityGroup
+         rules:
+           - name: SSH
+             protocol: Tcp
+             destination_port_range: 22
+             access: Allow
+             priority: 1001
+             direction: Inbound
+             source_address_prefix: "{{ allowed_source_ip_prefix }}"
+    - name: NIC for the VMs
+      azure_rm_networkinterface:
+          resource_group: "{{ resource_group }}"
+          name: "hanavm-nic{{ item }}"
+          virtual_network: "hana-vnet"
+          subnet: "hana-subnet"
+          public_ip_name: "hanavm-pip{{ item }}"
+          security_group: "hanaNetworkSecurityGroup"
+          ip_configurations:
+             - name: hana-ip-config
+               public_ip_address_name: "hanavm-pip{{ item }}"
+               primary: yes
+      register: nic_sample
+      with_sequence: start=1 end="{{ n }}"
+    - add_host:
+        name: "{{ item.state.dns_settings.fqdn }}"
+        groups: "{{ vm_group }}"
+        ansible_ssh_private_key_file: "{{ ssh_private_key_file }}"
+        ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
+        ansible_user: "{{ vm_user }}"
+      with_items: "{{ ip_sample.results }}"
+    - name: create hana VM
+      vars:
+        public_key_data: "{{ lookup('file','{{ ssh_public_key_file }}') }}"
+      azure_rm_virtualmachine:
+        resource_group: "{{ resource_group }}"
+        name: "hanavm-{{ item }}"
+        vm_size: Standard_D8s_v3
+        admin_username: "{{ vm_user }}"
+        ssh_password_enabled: false
+        ssh_public_keys:
+            - path: "/home/{{ vm_user }}/.ssh/authorized_keys"
+              key_data: "{{ public_key_data }}"
+        network_interfaces: "hanavm-nic{{ item }}"
+        started: yes
+        state: present
+        image:
+            offer: SLES
+            publisher: SUSE
+            sku: 12-SP3
+            version: latest
+      with_sequence: start=1 end="{{ n }}"
+      async: 500
+#
+#- name: install the requirements
+#  hosts: hana_vm_group
+#  tasks:
+#    - copy:
+#        src: bootstrap.sh
+#        dest: "/home/{{vm_user}}"
+#        owner: "{{ vm_user }}"
+#        group: "{{ vm_user }}"
+#        mode: 0111
+#    - command: ./bootstrap.sh
+#      args:
+#        chdir: "/home/{{ vm_user }}"
+#      become: true
+#      become_method: sudo

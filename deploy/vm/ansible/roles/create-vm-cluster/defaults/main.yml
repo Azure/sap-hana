@@ -1,0 +1,7 @@
+resource_group:
+ssh_private_key_file:
+allowed_source_ip_prefix:
+ssh_public_key_file:
+vm_user:
+vm_group: "hana"
+n:
