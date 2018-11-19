@@ -1,0 +1,4 @@
+
+- name: Install NTP ansible role
+  src: geerlingguy.ntp
+  version: 1.6.2
