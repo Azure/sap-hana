@@ -27,7 +27,7 @@
   become: true
   any_errors_fatal: true
   vars:
-    db_num: "{{ ansible_hostname[-1] }}"
+    hdb_num: "{{ ansible_hostname[-1] }}"
   roles:
     - set-up-sbd-device
     - host-name-resolution

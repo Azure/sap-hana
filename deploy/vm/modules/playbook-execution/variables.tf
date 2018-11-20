@@ -10,11 +10,6 @@ variable "bastion_username_windows" {
   description = "The username for the bastion host"
 }
 
-variable "hdb_num" {
-  description = "which node is currently being created"
-  default     = 0
-}
-
 variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = "shinedemo@microsoft.com"

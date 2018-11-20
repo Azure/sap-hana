@@ -18,7 +18,7 @@ module "create_hdb" {
 
   az_resource_group         = "${module.common_setup.resource_group_name}"
   az_region                 = "${var.az_region}"
-  hdb_num                   = "${var.hdb_num}"
+  hdb_num                   = 0
   hana_subnet_id            = "${module.common_setup.vnet_subnets[0]}"
   nsg_id                    = "${module.common_setup.nsg_id}"
   private_ip_address        = "${var.private_ip_address_hdb}"
@@ -52,7 +52,6 @@ module "configure_vm" {
   source                     = "../playbook-execution"
   ansible_playbook_path      = "${var.ansible_playbook_path}"
   az_resource_group          = "${module.common_setup.resource_group_name}"
-  hdb_num                    = "${var.hdb_num}"
   sshkey_path_private        = "${var.sshkey_path_private}"
   sap_instancenum            = "${var.sap_instancenum}"
   sap_sid                    = "${var.sap_sid}"

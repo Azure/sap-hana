@@ -14,11 +14,6 @@ variable "bastion_username_windows" {
   default     = "bastion_user"
 }
 
-variable "hdb_num" {
-  description = "which node is currently being created"
-  default     = "0"
-}
-
 variable "email_shine" {
   description = "e-mail address for SHINE user"
   default     = "shinedemo@microsoft.com"
