@@ -3,44 +3,39 @@
     name: "{{ hana_nsg_name }}"
     resource_group: "{{ resource_group }}"
   register: nsg_info
-- set_fact:
+
+- name: Get the current NSG rules
+  set_fact:
     nsg_rules: "{{ nsg_info['ansible_facts']['azure_securitygroups'][0]['properties']['securityRules'] }}"
-# - debug:
-#     var: nsg_rules
-# - debug:
-#     var: hostvars
-- set_fact: allow_ip="{{ hostvars[item]['public_ip'] }}"
+
+- debug:
+    var: nsg_rules
+
+- name: Create list of Ports to allow in new rules
+  set_fact:
+    dest_port_range: "{{ nsg_rules | map(attribute='properties.destinationPortRange') | list }}"
+
+- debug:
+    var: dest_port_range
+- name: Get the ip addresses of the vms
+  set_fact: allow_ip="{{ hostvars[item]['public_ip'] }}"
   with_items: "{{ groups['azure'] }}"
   register: allow_ips_result
 
-# - debug:
-#     var: allow_ips_result
+
 - name: make a list
   set_fact: allow_ips="{{ allow_ips_result.results | map(attribute='ansible_facts.allow_ip') | list }}"
 
 - debug:
     var: allow_ips
 
-- name: Add new ips to the NSG rules
-  json_modify:
-    data: "{{ item }}"
-    pointer: "/properties/sourceAddressPrefixes"
-    action: extend
-    extend: "{{ allow_ips }}"
-  with_items: "{{ nsg_rules }}"
-  when: item['properties']['access'] != 'Deny' and not 'sourceAddressPrefix' in item.properties
-  register: new_rules_result
-
-- debug:
-    var: item.result
-  with_items: "{{ new_rules_result.results }}"
-- name: make a list of rules
-  set_fact: nsg_rules_updated="{{ new_rules_result.results | map(attribute='result') | to_json }}"
-
-- debug:
-    var: nsg_rules_updated
 - name: Update NSG rules
   azure_rm_securitygroup:
     name: "{{ hana_nsg_name }}"
     resource_group: "{{ resource_group }}"
-    rules: nsg_rules_updated
+    rules:
+        - name: AllowVMsIPs
+          protocol: Tcp
+          priority: 110
+          source_address_prefix: "{{ allow_ips }}"
+          destination_port_range: "{{ allow_ports }}"
