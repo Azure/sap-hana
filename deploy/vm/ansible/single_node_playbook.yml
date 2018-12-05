@@ -1,5 +1,5 @@
 ---
-- hosts: "hdb0"
+- hosts: localhost
   become: true
   roles:
     - update-security-group
