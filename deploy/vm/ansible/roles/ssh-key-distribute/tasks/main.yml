@@ -16,8 +16,7 @@
   delegate_to: "{{ item }}"
   become: true
   when: item != inventory_hostname
-  with_items: "{{ groups['azure'] }}"
-
+  with_items: "{{ groups['linux'] }}"
 - debug:
     var: inventory_hostname
 
@@ -27,9 +26,6 @@
 - debug:
     var: ansible_facts['ssh_host_key_rsa_public']
 
-# - name: Tell the host about our servers it might want to ssh to with hostnames
-#   shell: ssh-keyscan {{ inventory_hostname }},{{ ansible_facts['eth0']['ipv4']['address'] }}
-#   register: host_key
 - set_fact:
     host_key_rsa: "{{ inventory_hostname }},{{ ansible_facts['eth0']['ipv4']['address'] }} ssh-rsa {{ ansible_facts['ssh_host_key_rsa_public'] }}"
 
@@ -45,4 +41,4 @@
   delegate_to: "{{ item }}"
   become: true
   when: item != inventory_hostname
-  with_items: "{{ groups['azure'] }}"
+  with_items: "{{ groups['linux'] }}"
