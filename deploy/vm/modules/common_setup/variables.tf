@@ -19,6 +19,11 @@ variable "existing_nsg_rg" {
   default     = ""
 }
 
+variable "install_xsa" {
+  description = "Flag that determines whether to install XSA on the host"
+  default     = false
+}
+
 variable "use_existing_nsg" {
   default     = false
   description = "When set to true, and the appropriate variables are provided, will use that nsg instead of creating a new one"
@@ -30,11 +35,6 @@ variable "sap_instancenum" {
 
 variable "sap_sid" {
   default = "PV1"
-}
-
-variable "useHana2" {
-  description = "A boolean that will choose between HANA 1.0 and 2.0."
-  default     = false
 }
 
 locals {

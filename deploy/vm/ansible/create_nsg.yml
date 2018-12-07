@@ -2,4 +2,4 @@
 - name: Create NSG
   hosts: localhost
   roles:
-    - create-nsg
+    - create-or-destroy-nsg

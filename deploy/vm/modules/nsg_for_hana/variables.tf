@@ -9,6 +9,11 @@ variable "allow_ips" {
   type        = "list"
 }
 
+variable "install_xsa" {
+  description = "Flag that determines whether to install XSA on the host"
+  default     = false
+}
+
 variable "use_existing_nsg" {
   description = "Lets you disable creation of the NSG if you would like to use your own"
   default     = false
@@ -20,11 +25,6 @@ variable "resource_group_name" {
 
 variable "sap_instancenum" {
   description = "The sap instance number which is in range 00-99"
-}
-
-variable "useHana2" {
-  description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
-  default     = false
 }
 
 locals {

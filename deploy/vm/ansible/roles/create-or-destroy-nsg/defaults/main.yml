@@ -18,19 +18,19 @@ hana_nsg_rules_common:
     priority: 600
     access: Deny
 
-hana1_rules:
-  - name: HTTP
+hana_xsc_rules:
+  - name: XSC-HTTP
     protocol: Tcp
     priority: 103
     destination_port_range: "80{{ sap_instancenum }}"
     source_address_prefix: "{{ allow_ips }}"
-  - name: HTTPS
+  - name: XSC-HTTPS
     protocol: Tcp
     priority: 104
     destination_port_range: "43{{ sap_instancenum }}"
     source_address_prefix: "{{ allow_ips }}"
 
-hana2_rules:
+hana_xsa_rules:
   - name: XSA-HTTP
     protocol: Tcp
     priority: 105
@@ -42,4 +42,5 @@ hana2_rules:
     destination_port_range: "50000-59999"
     source_address_prefix: "{{ allow_ips }}"
 
-hana_nsg_rules: "{{ hana_nsg_rules_common }} + {{ hana2_rules if use_hana2 else hana1_rules }}"
+hana_nsg_rules: "{{ hana_nsg_rules_common }} + {{ hana_xsa_rules if install_xsa else hana_xsc_rules }}"
+nsg_state: "present"
