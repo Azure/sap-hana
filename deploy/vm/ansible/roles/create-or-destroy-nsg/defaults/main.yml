@@ -14,9 +14,6 @@ hana_nsg_rules_common:
     priority: 102
     destination_port_range: "3{{ sap_instancenum }}00-3{{ sap_instancenum }}99"
     source_address_prefix: "{{ allow_ips }}"
-  - name: deny-all-inbound
-    priority: 600
-    access: Deny
 
 hana_xsc_rules:
   - name: XSC-HTTP
