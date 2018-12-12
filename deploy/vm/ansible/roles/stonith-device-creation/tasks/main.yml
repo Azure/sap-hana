@@ -1,11 +1,11 @@
 - set_fact:
-    app_id:  "{{ azure_service_principal_id }}"
+    app_id:  "{{ lookup('env','AZURE_CLIENT_ID') }}"
 
 - debug:
     msg: "{{ app_id }}"
 
 - set_fact:
-    password: "{{ azure_service_principal_pw }}"
+    password: "{{ lookup('env','AZURE_SECRET') }}"
 
 - set_fact:
     Subscription_ID: "{{ lookup('env','AZURE_SUBSCRIPTION_ID') }}"

@@ -1,7 +1,15 @@
 # Create a resource group.
+
+resource null_resource "configuration-check" {
+  provisioner "local-exec" {
+    command = "ansible-playbook ../../ansible/configcheck.yml"
+  }
+}
+
 resource "azurerm_resource_group" "hana-resource-group" {
-  name     = "${var.az_resource_group}"
-  location = "${var.az_region}"
+  depends_on = ["null_resource.configuration-check"]
+  name       = "${var.az_resource_group}"
+  location   = "${var.az_region}"
 
   tags {
     environment = "Terraform SAP HANA deployment"

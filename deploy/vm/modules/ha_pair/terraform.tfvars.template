@@ -7,12 +7,6 @@ az_resource_group = "demo1"
 # Unique domain name for easy VM access (example: "hana-on-azure1")
 az_domain_name = "hana-on-azure1"
 
-# Set your Azure service principal id.
-azure_service_principal_id = "XXX"
-
-# Set your Azure service principal password
-azure_service_principal_pw = "XXX"
-
 # Size of the VM to be deployed (example: "Standard_E8s_v3")
 # For HANA platform edition, a minimum of 32 GB of RAM is recommended
 vm_size = "Standard_E8s_v3"

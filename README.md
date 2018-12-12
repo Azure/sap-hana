@@ -99,12 +99,6 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     # Unique domain name for easy VM access (example: "hana-on-azure1")
     # Domain name should be all lower case and have no special characters except '-'.
     az_domain_name = "hana-on-azure1"
- 
-    # Set your Azure service principal id.
-    azure_service_principal_id = "XXX"
- 
-    # Set your Azure service principal password
-    azure_service_principal_pw = "XXX"
 
     # Size of the VM to be deployed (example: "Standard_E8s_v3")
     # For HANA platform edition, a minimum of 32 GB of RAM is recommended

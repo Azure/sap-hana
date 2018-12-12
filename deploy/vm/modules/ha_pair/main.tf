@@ -218,8 +218,6 @@ module "configure_vm" {
   install_xsa                    = "${var.install_xsa}"
   install_shine                  = "${var.install_shine}"
   install_cockpit                = "${var.install_cockpit}"
-  azure_service_principal_id     = "${var.azure_service_principal_id}"
-  azure_service_principal_pw     = "${var.azure_service_principal_pw}"
   url_sapcar_windows             = "${var.url_sapcar_windows}"
   url_hana_studio_windows        = "${var.url_hana_studio_windows}"
   bastion_username_windows       = "${var.bastion_username_windows}"
