@@ -11,6 +11,13 @@
   roles:
     - iscsi-setup
 
+- hosts: iscsi,hdb0,hdb1
+  become: true
+  vars:
+    ntp_manage_config: true
+  roles:
+    - geerlingguy.ntp
+
 - hosts: win_bastion
   connection: winrm
   vars:
