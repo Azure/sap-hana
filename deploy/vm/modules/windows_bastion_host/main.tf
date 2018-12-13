@@ -41,7 +41,7 @@ resource "azurerm_public_ip" "pip" {
   location                     = "${var.az_region}"
   resource_group_name          = "${var.az_resource_group}"
   public_ip_address_allocation = "dynamic"
-  domain_name_label            = "${lower(local.machine_name)}-${var.az_resource_group}"
+  domain_name_label            = "${lower(local.machine_name)}-${var.az_domain_name}"
 
   idle_timeout_in_minutes = 30
 

@@ -35,6 +35,7 @@ module "create_hdb" {
 module "windows_bastion_host" {
   source             = "../windows_bastion_host"
   allow_ips          = "${var.allow_ips}"
+  az_domain_name     = "${var.az_domain_name}"
   az_resource_group  = "${module.common_setup.resource_group_name}"
   az_region          = "${var.az_region}"
   sap_sid            = "${var.sap_sid}"

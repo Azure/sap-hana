@@ -3,6 +3,10 @@ variable "allow_ips" {
   type        = "list"
 }
 
+variable "az_domain_name" {
+  description = "Prefix to be used in the domain name"
+}
+
 variable "az_region" {}
 
 variable "az_resource_group" {
