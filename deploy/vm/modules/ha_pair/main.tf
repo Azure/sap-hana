@@ -176,6 +176,12 @@ resource "local_file" "write-config-to-json" {
   filename = "temp.json"
 }
 
+resource null_resource "install_ansible_roles" {
+  provisioner "local-exec" {
+    command = "ansible-galaxy install -r ../../ansible/requirements.yml"
+  }
+}
+
 module "configure_vm" {
   source = "../playbook-execution"
 
