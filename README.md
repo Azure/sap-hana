@@ -164,6 +164,10 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
     # Set this flag to true when installing Cockpit (requires XSA)
     install_cockpit = false
+
+    # Set this to be a list of the ip addresses that should be allowed by the NSG.  Empty list means that no restrictions are placed
+    allow_ips = []
+
     ```
 
 
