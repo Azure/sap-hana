@@ -8,42 +8,26 @@
         msg: "config passed {{ az_json }}"
 
 - hosts: localhost
-  tasks:
-    - debug:
-          msg: "linux_bastion required  :  {{az_json.linux_bastion}}"
-    - name: Create public IP address
-      azure_rm_publicipaddress:
-          resource_group: "{{ az_json.az_resource_group }}"
-          allocation_method: Dynamic
-          name: "{{ az_json.az_vm_name }}-pip"
-          domain_name: "{{az_json.az_vm_name}}"
-      register: ip_sample
-      when: az_json.linux_bastion == true
-    - debug:
-          msg: "linux_bastion vm :{{ ip_sample.state.dns_settings.fqdn }}"
-      when: az_json.linux_bastion == true
-    - name: NIC for linux bastion host
-      azure_rm_networkinterface:
-          resource_group: "{{ az_json.az_resource_group }}"
-          name: "{{ az_json.az_vm_name}}-nic"
-          virtual_network: "{{ az_json.az_vnet }}"
-          subnet: "{{ az_json.az_subnet }}"
-          public_ip_name: "{{ az_json.az_vm_name }}-pip"
-          security_group: "{{ az_json.nsg_id }}"
-      register: nic_sample
-      when: az_json.linux_bastion == true
-    - add_host:
-        name: "{{ ip_sample.state.dns_settings.fqdn }}"
-        groups: bastion_linux_group
-        ansible_ssh_private_key_file: "{{ az_json.ssh_private_key_file }}"
-        ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
-        ansible_user: "{{ az_json.az_user }}"
-        config_json: "{{ az_json }}"
-      when: az_json.linux_bastion == true
-
-- hosts: localhost
   roles:
-          - { role: create-azure-vm, when: az_json.linux_bastion == true, azure_vm_name: '{{ az_json.az_vm_name }}', public_key_path: '{{ az_json.az_public_key }}',azure_resource_group: '{{ az_json.az_resource_group }}', azure_user: '{{ az_json.az_user }}', azure_nic: '{{ nic_sample.state.name }}'}
+    - role: create-azure-vm
+      vars:
+        az_resource_group: "{{ az_json.az_resource_group }}"
+        pip_name: "{{ az_json.az_vm_name }}-pip"
+        public_ip_allocation_type: Dynamic
+        domain_name: "{{az_json.az_vm_name}}"
+        vm_size: Standard_D8s_v3
+        vm_user: "{{ az_json.az_user }}"
+        machine_name: '{{ az_json.az_vm_name }}'
+        nic_name: "{{ az_json.az_vm_name}}-nic"
+        subnet_name: "{{ az_json.az_subnet }}"
+        nsg_name: "{{ az_json.nsg_id }}"
+        vnet_name: "{{ az_json.az_vnet }}"
+        vm_groups: bastion_linux_group
+        ssh_public_key_file: "{{ az_json.az_public_key }}"
+        ssh_private_key_file: "{{ az_json.ssh_private_key_file }}"
+        other_host_vars:
+            - config_json: "{{ az_json }}"
+      when: az_json.linux_bastion == true
 
 - hosts: bastion_linux_group
   tasks:

@@ -1,6 +1,33 @@
 ---
-azure_resource_group:
-azure_user:
-azure_nic:
-path_ssh_key:
-azure_vm_name:
+availability_set_id: ""
+az_resource_group:
+domain_name:
+backend_ip_pool_ids: []
+nsg_name:
+
+# PIP specific values
+pip_name: "{{ machine_name }}-pip"
+pip_sku: Basic
+public_ip_allocation_type: "Dynamic"
+
+# NIC specific values
+nic_name: "{{ machine_name }}-nic"
+subnet_name:
+vnet_name:
+private_ip_address: ""
+private_ip_allocation: "{{ 'Dynamic' if private_ip_address == '' else 'Static' }}"
+enable_accelerated_networking: False
+
+# VM specific values
+source_image_offer: SLES-SAP
+source_image_publisher: SUSE
+source_image_sku: 12-SP3
+source_image_version: latest
+managed_disk_type: Premium_LRS
+vm_data_disks:
+vm_size:
+vm_user:
+ssh_private_key_file:
+ssh_public_key_file:
+vm_groups:
+other_host_vars:

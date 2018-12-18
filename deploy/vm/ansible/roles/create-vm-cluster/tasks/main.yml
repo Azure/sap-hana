@@ -15,15 +15,6 @@
         address_prefix: "10.0.1.0/24"
         virtual_network: hana-vnet
       register: hana_cluster_subnet
-    - name: Create public IP address
-      azure_rm_publicipaddress:
-        resource_group: "{{ resource_group }}"
-        allocation_method: Static
-        name: "{{ vm_group }}-pip{{ item }}"
-        domain_name: "{{ az_domain_name }}-{{ vm_group }}{{ item }}"
-        sku: Standard
-      register: ip_sample
-      with_sequence: start=1 end="{{ vm_count }}"
     - name: Create Network Security Group that allows SSH
       azure_rm_securitygroup:
          resource_group: "{{ resource_group }}"
@@ -36,49 +27,24 @@
              priority: 1001
              direction: Inbound
              source_address_prefix: "{{ allowed_source_ip_prefix }}"
-    - name: NIC for the VMs
-      azure_rm_networkinterface:
-          resource_group: "{{ resource_group }}"
-          name: "{{ vm_group }}-nic{{ item }}"
-          virtual_network: "hana-vnet"
-          subnet: "hana-subnet"
-          public_ip_name: "{{ vm_group }}-pip{{ item }}"
-          security_group: "{{ resource_group }}-hana-nsg"
-          enable_accelerated_networking: True
-          ip_configurations:
-             - name: hana-ip-config
-               public_ip_address_name: "{{ vm_group }}-pip{{ item }}"
-               primary: yes
-      register: nic_sample
-      with_sequence: start=1 end="{{ vm_count }}"
-    - add_host:
-        name: "{{ item.state.dns_settings.fqdn }}"
-        groups: "{{ vm_group }}"
-        ansible_ssh_private_key_file: "{{ ssh_private_key_file }}"
-        ansible_ssh_extra_args: "-o StrictHostKeyChecking=no"
-        ansible_user: "{{ vm_user }}"
-      with_items: "{{ ip_sample.results }}"
-    - name: create SLES  VM
-      vars:
-        public_key_data: "{{ lookup('file','{{ ssh_public_key_file }}') }}"
-      azure_rm_virtualmachine:
-        resource_group: "{{ resource_group }}"
-        managed_disk_type: Standard_LRS
-        name: "{{ vm_group }}-{{ item }}"
-        vm_size: Standard_D8s_v3
-        admin_username: "{{ vm_user }}"
-        ssh_password_enabled: false
-        ssh_public_keys:
-            - path: "/home/{{ vm_user }}/.ssh/authorized_keys"
-              key_data: "{{ public_key_data }}"
-        network_interfaces: "{{ vm_group }}-nic{{ item }}"
-        started: yes
-        state: present
-        image:
-            offer: SLES
-            publisher: SUSE
-            sku: 12-SP3
-            version: latest
-      with_sequence: start=1 end="{{ vm_count }}"
-      async: 1500
 
+    - name: Create vms
+      with_sequence: start=1 end="{{ vm_count }}"
+      include_role:
+        name: create-azure-vm
+      vars:
+        az_resource_group: "{{ resource_group }}"
+        public_ip_allocation_type: Static
+        pip_name: "{{ vm_group }}-pip{{ item }}"
+        pip_sku: Standard
+        domain_name: "{{ az_domain_name }}-{{ vm_group }}{{ item }}"
+        nic_name: "{{ vm_group }}-nic{{ item }}"
+        subnet_name: "hana-subnet"
+        vnet_name: "hana-vnet"
+        enable_accelerated_networking: True
+        vm_group: "{{ vm_group }}"
+        vm_size: Standard_D8s_v3
+        machine_name: "{{ vm_group }}-{{ item }}"
+        managed_disk_type: Standard_LRS
+        vm_user: "{{ vm_user }}"
+        nsg_name: "{{ resource_group }}-hana-nsg"
