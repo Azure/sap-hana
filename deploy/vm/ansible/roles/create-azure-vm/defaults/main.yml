@@ -25,7 +25,7 @@ source_image_sku: 12-SP3
 source_image_version: latest
 managed_disk_type: Premium_LRS
 vm_data_disks:
-vm_size:
+vm_size: "Standard_D2s_v3"
 vm_user:
 ssh_private_key_file:
 ssh_public_key_file:

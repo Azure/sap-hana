@@ -4,6 +4,9 @@ ssh_private_key_file:
 allowed_source_ip_prefix:
 ssh_public_key_file:
 vm_user:
-vm_group: "hana"
+az_vm_group: "hana"
 domain_name_prefix: "hana"
 vm_count:
+hana_subnet: "hana-subnet"
+hana_vnet: "hana-vnet"
+az_vm_size: "Standard_D8s_v3"
