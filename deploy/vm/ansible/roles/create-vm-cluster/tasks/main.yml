@@ -35,6 +35,7 @@
       with_sequence: start=1 end="{{ vm_count }}"
       include_role:
         name: create-azure-vm
+        vars_from: "{{ role_path }}/defaults/main.yml"
       vars:
         # Azure general values
         az_resource_group: "{{ resource_group }}"

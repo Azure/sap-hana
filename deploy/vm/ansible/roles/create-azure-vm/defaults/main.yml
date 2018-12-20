@@ -1,25 +1,25 @@
 ---
 availability_set_id: ""
 az_resource_group:
-backend_ip_pool_ids: []
-
 
 # PIP specific values
-pip_name: "{{ machine_name }}-pip"
+pip_name: "{{ vm_name }}-pip"
 pip_sku: Basic
 pip_allocation_type: "Dynamic"
 domain_name:
 
 # NIC specific values
-nic_name: "{{ machine_name }}-nic"
+nic_name: "{{ vm_name }}-nic"
 subnet_name:
 vnet_name:
 private_ip_address: ""
 private_ip_allocation: "{{ 'Dynamic' if private_ip_address == '' else 'Static' }}"
 enable_accelerated_networking: False
 nsg_name:
+backend_ip_pool_ids: []
 
 # VM specific values
+vm_name:
 source_image_offer: SLES-SAP
 source_image_publisher: SUSE
 source_image_sku: 12-SP3
