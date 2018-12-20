@@ -31,22 +31,25 @@
              direction: Inbound
              source_address_prefix: "{{ allowed_source_ip_prefix }}"
 
-    - name: Create vms
+    - name: Create VMs
       with_sequence: start=1 end="{{ vm_count }}"
       include_role:
         name: create-azure-vm
       vars:
+        # Azure general values
         az_resource_group: "{{ resource_group }}"
-        public_ip_allocation_type: Static
+        # PIP specific values
+        pip_allocation_type: Static
         pip_name: "{{ vm_group }}-pip{{ item }}"
         pip_sku: Standard
         domain_name: "{{ az_domain_name }}-{{ vm_group }}{{ item }}"
+        # NIC specific values
+        nsg_name: "{{ resource_group }}-hana-nsg"
         nic_name: "{{ vm_group }}-nic{{ item }}"
         subnet_name: "{{ hana_subnet }}"
         vnet_name: "{{ hana_vnet }}"
         enable_accelerated_networking: True
-        vm_group: "{{ vm_group_name }}"
-        vm_size: "{{ az_vm_size }}"
-        machine_name: "{{ vm_group }}-{{ item }}"
+        # VM specific values
+        ansible_host_groups: "{{ vm_group }}"
+        vm_name: "{{ vm_group }}-{{ item }}"
         managed_disk_type: Standard_LRS
-        nsg_name: "{{ resource_group }}-hana-nsg"

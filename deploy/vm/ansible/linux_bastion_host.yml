@@ -11,18 +11,23 @@
   roles:
     - role: create-azure-vm
       vars:
+        # Azure general values
         az_resource_group: "{{ az_json.az_resource_group }}"
+        # PIP specific values
         pip_name: "{{ az_json.az_vm_name }}-pip"
-        public_ip_allocation_type: Dynamic
+        pip_allocation_type: Dynamic
         domain_name: "{{az_json.az_vm_name}}"
-        vm_size: Standard_D8s_v3
-        vm_user: "{{ az_json.az_user }}"
-        machine_name: '{{ az_json.az_vm_name }}'
+        # NIC specific values
+        nsg_name: "{{ az_json.nsg_id }}"
         nic_name: "{{ az_json.az_vm_name}}-nic"
         subnet_name: "{{ az_json.az_subnet }}"
-        nsg_name: "{{ az_json.nsg_id }}"
         vnet_name: "{{ az_json.az_vnet }}"
-        vm_groups: bastion_linux_group
+        private_ip_address: "{{ az_json.private_ip_address }}"
+        # VM specific values
+        vm_size: Standard_D8s_v3
+        vm_user: "{{ az_json.az_user }}"
+        vm_name: '{{ az_json.az_vm_name }}'
+        ansible_host_groups: bastion_linux_group
         ssh_public_key_file: "{{ az_json.az_public_key }}"
         ssh_private_key_file: "{{ az_json.ssh_private_key_file }}"
         other_host_vars:
