@@ -48,6 +48,9 @@ locals {
   all_ips      = "*"
   dynamic      = "Dynamic"
   empty_string = ""
+  colon        = ":"
+  dash         = "-"
+
   machine_name = "${lower(var.sap_sid)}-win-bastion"
   static       = "Static"
   winrm_port   = 5986

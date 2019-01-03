@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "main" {
-  name                = "winbastion-keyvault"
+  name                = "kv-${lower(replace(replace(timestamp(),local.colon, local.empty_string), local.dash, local.empty_string))}"
   count               = "${var.windows_bastion ? 1 : 0}"
   location            = "${var.az_region}"
   resource_group_name = "${var.az_resource_group}"
