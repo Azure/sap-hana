@@ -35,7 +35,7 @@ which run different roles to install and configure SAP HANA and required applica
 ## Usage
 
 A typical deployment lifecycle will require the following steps:
-* [**Preparing your Azure Cloud Shell**](#preparing-your-azure-cloud-shell) (this has to be done only once)
+* [**Preparing your environment**](#preparing-your-environment) (this has to be done only once)
 * [**Getting the SAP packages**](#getting-the-sap-packages)
 * [**Adjusting the templates**](#adjusting-the-templates)
 * [**Running the deployment**](#running-the-deployment)
@@ -47,8 +47,11 @@ A typical deployment lifecycle will require the following steps:
 
 In this simple example, we'll deploy a simple single-node SAP HANA instance (specifically, HANA DB 1.0 SPS12 PL17).
 
-#### Preparing your Azure Cloud Shell
-1. From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
+#### Preparing your environment
+1. You have several options from where to run the automated deployment:
+* **Local deployments:** Open a shell on your local mine.
+* **VM deployment:** Connect to your VM using an SSH client.
+* **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
 
 2. Clone this repository:
 
@@ -56,38 +59,81 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     git clone https://github.com/Azure/sap-hana.git
     ```
 
+3. Log into your Azure subscription:
+
+    ```sh
+    az login
+    ```
+
+4. Create a service principal that will be used to manage Azure resources on your behalf:
+
+    ```sh
+    az ad sp create-for-rbac --name <service-principal-name> --password <service-principal-password>
+    ```
+    
+   *(**Note**: You can find additional information on creating service principals on [this page](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest).)*
+
+5. You will see an output similar to this:
+
+   ```{
+     "appId": "<service-principal-app-id>",
+     "displayName": "<service-principal-name>",
+     "name": "http://<service-principal-name>",
+     "password": "<service-principal-password>",
+     "tenant": "<service-principal-tenant-id>"
+   }
+   ```
+
+6. Set the details of the service principal as environment variables:
+
+    ```sh
+    # configure service principal for Ansible
+    export AZURE_SUBSCRIPTION_ID='<azure-subscription-id>'
+    export AZURE_CLIENT_ID='<service-principal-name>'
+    export AZURE_SECRET='<service-principal-password>'
+    export AZURE_TENANT='<service-principal-tenant-id>'
+
+    # configure service principal for Terraform
+    export ARM_SUBSCRIPTION_ID='<azure-subscription-id>'
+    export ARM_CLIENT_ID='<service-principal-name>'
+    export ARM_CLIENT_SECRET='<service-principal-password>'
+    export ARM_TENANT_ID='<service-principal-tenant-id>'
+    ```
+
+   *(**Note**: While you set the environment variables every time, the recommended way is to create a file ```set-sp.sh``` and copy the above contents into it; this way, you can just run the script by executing ```source set-sp.sh```.)*
+
 
 #### Getting the SAP packages
-3. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
+7. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
 
-4. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
+8. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
 | `SAPCAR_1110-80000935.EXE` | SAPCAR | Linux x86_64 | 7.21 | `url_sap_sapcar_linux` |
-| `IMDB_SERVER100_122_17-10009569.SAR` | HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
+| `IMDB_SERVER100_122_xx-10009569.SAR` | HANA DB Server | Linux x86_64 | 122.xx (SPS12) for HANA DB 1.00 | `url_sap_hdbserver` |
 
-*(**Note**: See the section on [**Required SAP Downloads**](#required-sap-downloads) for a full list of SAP packages, if you want to install additional applications on top of HANA, such as XSA.)*
+   *(**Note**: See the section on [**Required SAP Downloads**](#required-sap-downloads) for a full list of SAP packages, if you want to install additional applications on top of HANA, such as XSA.)*
 
-5. In the Azure Portal, create a **Storage Account**.
+9. In the Azure Portal, create a **Storage Account**.
 *(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
 
-6. In the storage account you just created, create a new **Blob Storage**.
+10. In the storage account you just created, create a new **Blob Storage**.
 
-7. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
+11. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
 
-8. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
+12. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
 
 
 #### Adjusting the templates
 
-9. Change into the directory for the HANA single-node scenario:
+13. Change into the directory for the HANA single-node scenario:
 
     ```sh
     cd sap-hana/deploy/vm/modules/single_node_hana/
     ```
 
-10. Use a text editor to create a Terraform variables file `terraform.tfvars`, adapting the download URLs accordingly:
+14. Use a text editor to create a Terraform variables file `terraform.tfvars`, adapting the download URLs accordingly:
 
     ```python
     # Azure region to deploy resource in; please choose the same region as your storage from step 3 (example: "westus2")
@@ -167,39 +213,15 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Running the deployment
 
-11. Log into your Azure subscription and configure Ansible and Terraform:
-
-    ```sh
-    az login
-    ```
-
-    Configure Ansible:
-    ```sh
-    export AZURE_SUBSCRIPTION_ID='XXX'
-    export AZURE_CLIENT_ID='XXX'
-    export AZURE_SECRET='XXX'
-    export AZURE_TENANT='XXX'
-    ```
-
-    Configure Terraform:
-    ```sh
-    export ARM_SUBSCRIPTION_ID='XXX'
-    export ARM_TENANT_ID='XXX'
-    export ARM_CLIENT_ID='XXX'
-    export ARM_CLIENT_SECRET='XXX'
-    ```
-
-    *(**Note:** Please note that you will need to create a service principal. If you don't have a service principal, please follow the instructions to create one, [How to create a service principal](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest))*
-
-12. Trigger the deployment:
+15. Trigger the deployment:
 
     ```sh
     terraform apply
     ```
 
-13. When prompted if you want to deploy the resources, answer `yes`. The deployment will start and take approx. 30 minutes (actual times may vary depending on region and other parameters).
+16. When prompted if you want to deploy the resources, answer `yes`. The deployment will start and take approx. 30 minutes (actual times may vary depending on region and other parameters).
 
-14. Once the deployment has finished, take note of the last three lines on your console; they should look like this:
+17. Once the deployment has finished, take note of the last three lines on your console; they should look like this:
 
     ```sh
     Apply complete! Resources: 19 added, 0 changed, 0 destroyed.
@@ -212,16 +234,16 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Verifying the deployment
 
-15. Connect to your newly deployed HANA instance via SSH:
+18. Connect to your newly deployed HANA instance via SSH:
 
-16. Switch to the <sid>adm user:
+19. Switch to the <sid>adm user:
 
     ```sh
     sudo su -
     su - xs1adm
     ```
 
-17. Run `hdbsql` to execute a simple query:
+20. Run `hdbsql` to execute a simple query:
 
     ```sh
     hdbsql -i 01 -u SYSTEM -p Initial1 "SELECT CURRENT_TIME FROM DUMMY"
@@ -230,7 +252,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Deleting the deployment
 
-18. If you don't need the deployment anymore, you can remove it just as easily.
+21. If you don't need the deployment anymore, you can remove it just as easily.
 In your Azure Cloud Shell, run the following command to remove all deployed resources:
 
     ```sh
@@ -253,9 +275,9 @@ Depending on your application requirements, you may need to download additional 
 | SAPCAR | Linux x86_64 | 7.21 | `SAPCAR_1110-80000935.EXE` | All | `url_sap_sapcar_linux` |
 | SAPCAR | Windows 64-bit | 7.21 | `SAPCAR_1110-80000938.EXE` | Windows bastion host | `url_sap_sapcar_win` |
 | SAP Host Agent | Linux x86_64 | 7.21 SP36 | `SAPHOSTAGENT36_36-20009394.SAR` | All | `url_sap_hostagent` |
-| HANA DB Server | Linux x86_64 | 122.17 (SPS12) for HANA DB 1.00 | `IMDB_SERVER100_122_17-10009569.SAR` | HANA 1.0 landscapes | `url_sap_hdbserver` |
-| HANA DB Server | Linux x86_64 | 2.00.32 for HANA DB 2.00 | `IMDB_SERVER20_032_0-80002031.SAR` | HANA 2.0 landscapes | `url_sap_hdbserver` |
-| HANA Studio | Windows 64-bit | 122.20 (SPS12) for HANA DB 1.00 | `IMC_STUDIO2_122_20-80000321.SAR` | Windows bastion host | `url_hana_studio` | 
+| HANA DB Server | Linux x86_64 | 122.xx (SPS12) for HANA DB 1.00 | `IMDB_SERVER100_122_xx-10009569.SAR` | HANA 1.0 landscapes | `url_sap_hdbserver` |
+| HANA DB Server | Linux x86_64 | 2.00.xx for HANA DB 2.00 | `IMDB_SERVER20_0xx_0-80002031.SAR` | HANA 2.0 landscapes | `url_sap_hdbserver` |
+| HANA Studio | Windows 64-bit | 122.xx (SPS12) for HANA DB 1.00 | `IMC_STUDIO2_122_xx-80000321.SAR` | Windows bastion host | `url_hana_studio` | 
 | XS Advanced Runtime | | SP00 Patch87 | `EXTAPPSER00P_87-70001316.SAR` | XSA | `url_xsa_runtime` |
 | DI Core | | SP12 Patch9 | `XSACDEVXDI12_9-70001255.ZIP` | XSA | `url_di_core` |
 | SAPUI5 | | SP52 Patch19 | `XSACUI5FESV452P_19-70003351.ZIP` | XSA | `url_sapui5` | 
@@ -266,7 +288,7 @@ Depending on your application requirements, you may need to download additional 
 
 ## License & Copyright
 
-Copyright © 2018 Microsoft Azure.
+Copyright © 2018-2019 Microsoft Azure.
 
 Licensed under the [MIT License](LICENSE).
 
