@@ -40,6 +40,7 @@ The following options can be customized in the single-node scenario:
 |   | XSA  | `install_xsa = true`  |
 |   | [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html) (requires XSA) | `install_cockpit = true`  |
 |   | [SHINE Demo Content](https://blogs.saphana.com/2014/03/10/shine-sap-hana-interactive-education/) (requires XSA)  | `install_shine = true`  |
+|   | [WebIDE](https://developers.sap.com/topics/sap-webide.html) (requires XSA)  | `install_webide = true`  |
 
  *(**Note**: Features marked with an * are work in progress and not fully available yet.)*
 

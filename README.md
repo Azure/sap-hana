@@ -204,6 +204,9 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
     # Set this flag to true when installing Cockpit (requires XSA)
     install_cockpit = false
+    
+    # Set this flag to true when installing WebIDE (requires XSA)
+    install_webide = false
 
     # Set this to be a list of the ip addresses that should be allowed by the NSG.  Empty list means that no restrictions are placed
     allow_ips = []
@@ -285,6 +288,9 @@ Depending on your application requirements, you may need to download additional 
 | XS Services | | SP06 Patch9 | `XSACSERVICES06_9-70002361.ZIP` | XSA | `url_xs_services` |
 | HANA Cockpit 2.0 | | SP07 Patch11 | `SAPHANACOCKPIT07_11-70002299.SAR` | XSA + Cockpit | `url_cockpit` |
 | SHINE Content (XSA) | | SP05 Patch3 | `XSACSHINE05_3-70002323.ZIP` | XSA + SHINE | `url_shine_xsa` |
+| HRTT for WebIDE | | SP04 Patch65 | `XSACHRTT04_65-70002322.ZIP` | XSA + WebIDE | `url_xsa_hrtt` |
+| WebIDE | | SP00 Patch2  | `XSACSAPWEBIDE00_2-80002257.ZIP` | XSA + WebIDE | `url_xsa_webide` |
+| MTA ext | | SAP Note 2336392  | `sap-xsac-devx-4.0.18.mtaext` | XSA + WebIDE | `url_xsa_mta` |
 
 ## License & Copyright
 
