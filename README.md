@@ -49,23 +49,28 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Preparing your environment
 1. You have several options from where to run the automated deployment:
-* **Local deployments:** Open a shell on your local mine.
-* **VM deployment:** Connect to your VM using an SSH client.
-* **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
+   * **Local deployments:** Open a shell on your local mine.
+   * **VM deployment:** Connect to your VM using an SSH client.
+   * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
 
-2. Clone this repository:
+2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
+   * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+   * [Terraform](https://www.terraform.io/downloads.html)
+   * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+
+3. Clone this repository:
 
     ```sh
     git clone https://github.com/Azure/sap-hana.git
     ```
 
-3. Log into your Azure subscription:
+4. Log into your Azure subscription:
 
     ```sh
     az login
     ```
 
-4. Create a service principal that will be used to manage Azure resources on your behalf:
+5. Create a service principal that will be used to manage Azure resources on your behalf:
 
     ```sh
     az ad sp create-for-rbac --name <service-principal-name> --password <service-principal-password>
@@ -73,7 +78,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     
    *(**Note**: You can find additional information on creating service principals on [this page](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest).)*
 
-5. You will see an output similar to this:
+6. You will see an output similar to this:
 
    ```{
      "appId": "<service-principal-app-id>",
@@ -84,7 +89,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
    }
    ```
 
-6. Set the details of the service principal as environment variables:
+7. Set the details of the service principal as environment variables:
 
     ```sh
     # configure service principal for Ansible
@@ -104,9 +109,9 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 
 #### Getting the SAP packages
-7. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
+8. Navigate to the [SAP Software Download Center (SWDC)](https://launchpad.support.sap.com/#/softwarecenter).
 
-8. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
+9. Search for the following packages required for the single-node HANA scenario and download them to your local machine:
 
 | SWDC filename | Package name | OS | Version | Template parameter |
 | ------------- | ------------ | -- | ------- | ------------------ |
@@ -115,25 +120,25 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
    *(**Note**: See the section on [**Required SAP Downloads**](#required-sap-downloads) for a full list of SAP packages, if you want to install additional applications on top of HANA, such as XSA.)*
 
-9. In the Azure Portal, create a **Storage Account**.
+10. In the Azure Portal, create a **Storage Account**.
 *(**Note:** Please make sure to choose a region close to you to improve transfer speed; the SAP bits are quite large.)*
 
-10. In the storage account you just created, create a new **Blob Storage**.
+11. In the storage account you just created, create a new **Blob Storage**.
 
-11. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
+12. In the new Blob Storage that you just created, create a new **Container** and name it `sapbits`.
 
-12. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
+13. Upload each of the SAP packages you downloaded in step 2 and take note of the download URL.
 
 
 #### Adjusting the templates
 
-13. Change into the directory for the HANA single-node scenario:
+14. Change into the directory for the HANA single-node scenario:
 
     ```sh
     cd sap-hana/deploy/vm/modules/single_node_hana/
     ```
 
-14. Use a text editor to create a Terraform variables file `terraform.tfvars`, adapting the download URLs accordingly:
+15. Use a text editor to create a Terraform variables file `terraform.tfvars`, adapting the download URLs accordingly:
 
     ```python
     # Azure region to deploy resource in; please choose the same region as your storage from step 3 (example: "westus2")
@@ -216,15 +221,15 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Running the deployment
 
-15. Trigger the deployment:
+16. Trigger the deployment:
 
     ```sh
     terraform apply
     ```
 
-16. When prompted if you want to deploy the resources, answer `yes`. The deployment will start and take approx. 30 minutes (actual times may vary depending on region and other parameters).
+17. When prompted if you want to deploy the resources, answer `yes`. The deployment will start and take approx. 30 minutes (actual times may vary depending on region and other parameters).
 
-17. Once the deployment has finished, take note of the last three lines on your console; they should look like this:
+18. Once the deployment has finished, take note of the last three lines on your console; they should look like this:
 
     ```sh
     Apply complete! Resources: 19 added, 0 changed, 0 destroyed.
@@ -237,16 +242,16 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Verifying the deployment
 
-18. Connect to your newly deployed HANA instance via SSH:
+19. Connect to your newly deployed HANA instance via SSH:
 
-19. Switch to the <sid>adm user:
+20. Switch to the <sid>adm user:
 
     ```sh
     sudo su -
     su - xs1adm
     ```
 
-20. Run `hdbsql` to execute a simple query:
+21. Run `hdbsql` to execute a simple query:
 
     ```sh
     hdbsql -i 01 -u SYSTEM -p Initial1 "SELECT CURRENT_TIME FROM DUMMY"
@@ -255,7 +260,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Deleting the deployment
 
-21. If you don't need the deployment anymore, you can remove it just as easily.
+22. If you don't need the deployment anymore, you can remove it just as easily.
 In your Azure Cloud Shell, run the following command to remove all deployed resources:
 
     ```sh
@@ -268,6 +273,7 @@ Currently, the templates are capable of deploying the following applications on 
 #### XSA
 - [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html)
 - [SHINE Demo Model](https://blogs.saphana.com/2014/03/10/shine-sap-hana-interactive-education/)
+- [SAP HANA WebIDE](https://developers.sap.com/topics/sap-webide.html)
 
 ## Required SAP Downloads
 
