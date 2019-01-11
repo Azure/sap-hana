@@ -94,13 +94,13 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     ```sh
     # configure service principal for Ansible
     export AZURE_SUBSCRIPTION_ID='<azure-subscription-id>'
-    export AZURE_CLIENT_ID='<service-principal-name>'
+    export AZURE_CLIENT_ID='<<service-principal-app-id>'
     export AZURE_SECRET='<service-principal-password>'
     export AZURE_TENANT='<service-principal-tenant-id>'
 
     # configure service principal for Terraform
     export ARM_SUBSCRIPTION_ID='<azure-subscription-id>'
-    export ARM_CLIENT_ID='<service-principal-name>'
+    export ARM_CLIENT_ID='<service-principal-app-id>'
     export ARM_CLIENT_SECRET='<service-principal-password>'
     export ARM_TENANT_ID='<service-principal-tenant-id>'
     ```
