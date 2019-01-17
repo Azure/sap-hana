@@ -94,7 +94,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     ```sh
     # configure service principal for Ansible
     export AZURE_SUBSCRIPTION_ID='<azure-subscription-id>'
-    export AZURE_CLIENT_ID='<<service-principal-app-id>'
+    export AZURE_CLIENT_ID='<service-principal-app-id>'
     export AZURE_SECRET='<service-principal-password>'
     export AZURE_TENANT='<service-principal-tenant-id>'
 
