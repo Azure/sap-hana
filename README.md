@@ -49,7 +49,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 
 #### Preparing your environment
 1. You have several options from where to run the automated deployment:
-   * **Local deployments:** Open a shell on your local mine.
+   * **Local deployments:** Open a shell on your local machine (Works on MacOS and Ubuntu).
    * **VM deployment:** Connect to your VM using an SSH client.
    * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
 
