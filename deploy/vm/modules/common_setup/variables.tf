@@ -38,7 +38,7 @@ variable "sap_sid" {
 }
 
 locals {
-  all_ips      = "*"
+  all_ips      = ["0.0.0.0/0"]
   empty_string = ""
   new_nsg_name = "${var.sap_sid}-nsg"
 
