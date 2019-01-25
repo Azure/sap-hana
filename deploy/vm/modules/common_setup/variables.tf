@@ -38,6 +38,18 @@ variable "sap_sid" {
 }
 
 locals {
+  all_ips      = "*"
   empty_string = ""
   new_nsg_name = "${var.sap_sid}-nsg"
+
+  // Structure for the rules will be: "rule_name,priority,destination_port_range"
+  hana_xsc_rules = [
+    "XSC-HTTP,103,80${var.sap_instancenum}",
+    "XSC-HTTPS,104,43${var.sap_instancenum}",
+  ]
+
+  hana_xsa_rules = [
+    "XSA-HTTP,105,4000-4999",
+    "XSA,106,50000-59999",
+  ]
 }

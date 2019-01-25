@@ -1,6 +1,6 @@
 variable "allow_ips" {
   description = "The IP addresses that will be allowed by the nsg"
-  default     = []
+  default     = ["0.0.0.0/0"]
 }
 
 variable "ansible_playbook_path" {

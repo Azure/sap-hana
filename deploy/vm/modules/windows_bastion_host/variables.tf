@@ -45,7 +45,6 @@ variable "windows_bastion" {
 }
 
 locals {
-  all_ips      = "*"
   dynamic      = "Dynamic"
   empty_string = ""
   colon        = ":"
