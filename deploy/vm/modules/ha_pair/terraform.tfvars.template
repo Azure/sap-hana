@@ -57,5 +57,5 @@ install_cockpit = false
 # Set this flag to true when installing WebIDE (requires XSA)
 install_webide = false
 
-# Set this to be a list of the ip addresses that should be allowed by the NSG.  Empty list means that no restrictions are placed
-allow_ips = []
+# Set this to be a list of the ip addresses that should be allowed by the NSG.
+allow_ips = ["0.0.0.0/0"]
