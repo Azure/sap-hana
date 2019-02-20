@@ -22,9 +22,9 @@ The following options can be customized in the single-node scenario:
 |   | Single container (HANA 1.0 only)  | `hdb_mdc = false`  |
 |   | Multi-database containers (MDC)  | `hdb_mdc = true`   |
 | **Bastion host** * <td colspan=3> *Whether to deploy a bastion host ("jump box") through which the HANA VM can be accessed*
-|   | No bastion host  | `bastion_windows = false`<br>`bastion_linux = false`  |
-|   | Windows bastion host (incl. HANA Studio)  | `bastion_windows = true`  |
-|   | Linux bastion host (incl. HANA Studio)  | `bastion_linux = true`  |
+|   | No bastion host  | `windows_bastion = false`<br>`linux_bastion = false`  |
+|   | Windows bastion host (incl. HANA Studio)  | `windows_bastion = true`  |
+|   | Linux bastion host (incl. HANA Studio)  | `linux_bastion = true`  |
 | **SAP Applications**  <td colspan=3> *Which SAP applications to install on top of HANA (if any)*
 |   | XSA  | `install_xsa = true`  |
 |   | [SAP HANA Cockpit](https://help.sap.com/viewer/6b94445c94ae495c83a19646e7c3fd56/2.0.03/en-US/da25cad976064dc0a24a1b0ee9b62525.html) (requires XSA) | `install_cockpit = true`  |
