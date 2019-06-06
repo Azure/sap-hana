@@ -1,9 +1,19 @@
+#!/usr/bin/env python3
+# 
+#       SapMonitor payload deployed on collector VM
+#
+#       License:        GNU General Public License (GPL)
+#       (c) 2019        Microsoft Corp.
+#
 import pyhdb
 import requests, json
 import sys, argparse
 import datetime, decimal
 import hashlib, hmac, base64
-import httplib as http_client
+try:
+   import http.client as http_client  # Python 3
+except ImportError:
+   import httplib as http_client      # Python 2
 import logging
 
 ###############################################################################
@@ -102,7 +112,7 @@ class REST:
          else:
             return response.content
       else:
-         print response.content
+         print(response.content) # poor man's logging
          response.raise_for_status()
 
 ###############################################################################
@@ -342,7 +352,7 @@ def monitor(args):
             logItem[c] = r[colIndex[c]]
          logData.append(logItem)
       jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-      ctx.azLa.ingest("SapHana_Infra", jsonData)
+      ctx.azLa.ingest("SapHana_cron", jsonData)
       
 def main():
    parser     = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
