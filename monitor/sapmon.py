@@ -10,10 +10,7 @@ import requests, json
 import sys, argparse
 import datetime, decimal
 import hashlib, hmac, base64
-try:
-   import http.client as http_client  # Python 3
-except ImportError:
-   import httplib as http_client      # Python 2
+import http.client as http_client
 import logging
 
 ###############################################################################
@@ -108,7 +105,7 @@ class REST:
       if response.status_code == requests.codes.ok:
          contentType = response.headers.get("content-type")
          if contentType and contentType.find("json") >= 0:
-            return json.loads(response.content)
+            return json.loads(response.content.decode("utf-8"))
          else:
             return response.content
       else:
@@ -232,14 +229,15 @@ class AzureLogAnalytics:
 application/json
 x-ms-date:%s
 /api/logs""" % (len(content), timestamp)
-         bytesHash   = bytes(stringHash).encode("utf-8")
+         bytesHash   = bytes(stringHash, encoding="utf-8")
          decodedKey  = base64.b64decode(self.sharedKey)
          encodedHash = base64.b64encode(hmac.new(
             decodedKey,
             bytesHash,
             digestmod=hashlib.sha256).digest()
          )
-         return "SharedKey %s:%s" % (self.workspaceId, encodedHash)
+         stringHash  = encodedHash.decode("utf-8")
+         return "SharedKey %s:%s" % (self.workspaceId, stringHash)
 
       timestamp   = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
       headers = {
@@ -265,7 +263,7 @@ class _Context:
 
    def __init__(self):
       self.vmInstance = AzureInstanceMetadataService.getComputeInstance()
-      vmTags = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
+      vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
       self.sapmonId   = vmTags["sapmonId"]
       self.azKv       = AzureKeyVault("sapmon-%s" % self.sapmonId)
 
@@ -274,7 +272,7 @@ class _Context:
       Read secrets from customer KeyVault and store credentials in context.
       """
       def sliceDict(d, s):
-         return {k: v for k, v in d.iteritems() if k.startswith(s)}
+         return {k: v for k, v in iter(d.items()) if k.startswith(s)}
       secrets = self.azKv.getCurrentSecrets()
 
       # extract HANA instance(s) from secrets
@@ -352,7 +350,7 @@ def monitor(args):
             logItem[c] = r[colIndex[c]]
          logData.append(logItem)
       jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-      ctx.azLa.ingest("SapHana_cron", jsonData)
+      ctx.azLa.ingest("SapHana_Infra", jsonData)
       
 def main():
    parser     = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
@@ -369,8 +367,14 @@ def main():
    monparser  = subparsers.add_parser("monitor", help="Execute the monitoring payload")
    monparser.set_defaults(func=monitor)
    args       = parser.parse_args()
-   args.func(args)
+   try: # see https://bugs.python.org/issue16308
+      f = getattr(args, "func")
+   except AttributeError:
+      parser.print_help()
+      sys.exit(0)
+   f(args)
 
 ctx = _Context()
 if __name__ == "__main__":
    main()
+
