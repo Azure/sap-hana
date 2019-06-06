@@ -19,6 +19,7 @@ which run different roles to install and configure SAP HANA and required applica
 - [Getting Started](#getting-started)
 - [Supported Applications](#supported-applications)
 - [Required SAP Downloads](#required-sap-downloads)
+- [Contributions](#contributions)
 - [License & Copyright](#license--copyright)
 - [Contact](#contact)
 
@@ -297,6 +298,12 @@ Depending on your application requirements, you may need to download additional 
 | HRTT for WebIDE | | SP04 Patch65 | `XSACHRTT04_65-70002322.ZIP` | XSA + WebIDE | `url_xsa_hrtt` |
 | WebIDE | | SP00 Patch2  | `XSACSAPWEBIDE00_2-80002257.ZIP` | XSA + WebIDE | `url_xsa_webide` |
 | MTA ext | | SAP Note 2336392  | `sap-xsac-devx-4.0.18.mtaext` | XSA + WebIDE | `url_xsa_mta` |
+
+## Contributions
+
+If you want to contribute to our project, be sure to review the [contributing guidelines](CONTRIBUTING.md).
+
+We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
 
 ## License & Copyright
 
