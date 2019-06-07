@@ -10,8 +10,7 @@ import requests, json
 import sys, argparse
 import datetime, decimal
 import hashlib, hmac, base64
-import http.client as http_client
-import logging
+import logging, http.client as http_client
 
 ###############################################################################
 
@@ -264,7 +263,7 @@ class _Context:
    def __init__(self):
       self.vmInstance = AzureInstanceMetadataService.getComputeInstance()
       vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
-      self.sapmonId   = vmTags["sapmonId"]
+      self.sapmonId   = vmTags["SapMonId"]
       self.azKv       = AzureKeyVault("sapmon-%s" % self.sapmonId)
 
    def parseSecrets(self):
@@ -354,7 +353,8 @@ def monitor(args):
       
 def main():
    parser     = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
-   subparsers = parser.add_subparsers(help="main functions")
+   subparsers = parser.add_subparsers(dest="command", help="main functions")
+   subparsers.required = True
    initparser = subparsers.add_parser("init", help="Initialize client KeyVault with SAP credentials")
    initparser.set_defaults(func=init)
    initparser.add_argument("HanaHostname", type=str, help="Hostname of the HDB to be monitored")
@@ -367,12 +367,7 @@ def main():
    monparser  = subparsers.add_parser("monitor", help="Execute the monitoring payload")
    monparser.set_defaults(func=monitor)
    args       = parser.parse_args()
-   try: # see https://bugs.python.org/issue16308
-      f = getattr(args, "func")
-   except AttributeError:
-      parser.print_help()
-      sys.exit(0)
-   f(args)
+   args.func(args)
 
 ctx = _Context()
 if __name__ == "__main__":
