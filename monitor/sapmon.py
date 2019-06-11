@@ -8,9 +8,16 @@
 import pyhdb
 import requests, json
 import sys, argparse
-import datetime, decimal
+import decimal
+from datetime import datetime, timedelta, date
 import hashlib, hmac, base64
 import logging, http.client as http_client
+
+###############################################################################
+
+STATE_FILE                   = "sapmon.state"
+INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
+LOG_TYPE                     = "SapHana_Infra"
 
 ###############################################################################
 
@@ -53,15 +60,20 @@ class SapHana:
       colIndex = {col[0] : idx for idx, col in enumerate(self.cursor.description)}
       return colIndex, self.cursor.fetchall()
 
-   def getLoadHistory(self, fromTimestamp, untilTimestamp = None):
+   def getLoadHistory(self, fromTimestamp):
       """
       Get infrastructure utilization via HANA Load History
       """
-      sqlFrom  = "'%s'" % fromTimestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
-      sqlUntil = "'%s'" % untilTimestamp.strftime("%Y-%m-%d %H:%M:%S.%f") if untilTimestamp else "NOW()"
-      sql      = """
+      if not fromTimestamp:
+         sqlFrom = "h.TIME > ADD_SECONDS(NOW(), %d)" % INITIAL_LOADHISTORY_TIMESPAN
+      else:
+         sqlFrom = "ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s'" % fromTimestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+      sql = """
 SELECT
-h.TIME AS SERVER_TIMESTAMP,
+h.TIME AS _SERVER_TIMESTAMP,
+i.VALUE AS _SERVER_UTC_OFFSET,
+ADD_SECONDS(h.TIME, i.VALUE*(-1)) AS UTC_TIMESTAMP,
 h.HOST AS HOST,
 'HOST' AS SCOPE,
 MAP(h.CPU, null, -1 , -1, -1, ROUND(100 * h.CPU / 1) / 100) AS CPU,
@@ -74,9 +86,11 @@ MAP(h.DISK_USED, null, -1 , -1, -1, ROUND(100 * h.DISK_USED / 1073741824) / 100)
 MAP(h.DISK_SIZE, null, -1 , -1, -1, ROUND(100 * h.DISK_SIZE / 1073741824) / 100) AS DISK_SIZE,
 MAP(lag(h.TIME) OVER (order by h.host, h.time) , null , -1,  MAP(SUBSTRING(cast (h.NETWORK_IN as VARCHAR),0,1) ,'-',-1, 'n',-1,  round( 10000000*( 100 * h.NETWORK_IN / (NANO100_BETWEEN(lag(h.time) OVER (order by h.host, h.time),h.time) )) / 1048576) / 100)) AS NETWORK_IN,
 MAP(lag(h.TIME) OVER (order by h.host, h.time) , null , -1, MAP(SUBSTRING(cast (h.NETWORK_OUT as VARCHAR),0,1) ,'-',-1, 'n',-1,  round( 10000000*( 100 * h.NETWORK_OUT / (NANO100_BETWEEN(lag(h.time) OVER (order by h.host, h.time),h.time) )) / 1048576) / 100)) AS NETWORK_OUT
-FROM SYS.M_LOAD_HISTORY_HOST h 
-WHERE h.TIME BETWEEN %s AND %s ORDER BY h.TIME ASC
-""" % (sqlFrom, sqlUntil)
+FROM SYS.M_LOAD_HISTORY_HOST h, SYS.M_HOST_INFORMATION i
+WHERE %s
+AND h.HOST = i.HOST AND UPPER(i.KEY) = 'TIMEZONE_OFFSET'
+ORDER BY h.TIME ASC
+""" % sqlFrom
       return self.runQuery(sql)
 
 ###############################################################################
@@ -218,9 +232,9 @@ class AzureLogAnalytics:
       self.sharedKey   = sharedKey
       self.uri         = "https://%s.ods.opinsights.azure.com/api/logs?api-version=2016-04-01" % workspaceId
 
-   def ingest(self, logType, jsonData):
+   def ingest(self, logType, jsonData, timeGenerated = None):
       """
-      Ingest JSON payload as custom log to Log Analytics.
+      Ingest JSON payload as custom log to Log Analytics
       """
       def buildSig(content, timestamp):
          stringHash  = """POST
@@ -238,13 +252,15 @@ x-ms-date:%s
          stringHash  = encodedHash.decode("utf-8")
          return "SharedKey %s:%s" % (self.workspaceId, stringHash)
 
-      timestamp   = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+      timestamp   = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
       headers = {
          "content-type":  "application/json",
          "Authorization": buildSig(jsonData, timestamp),
          "Log-Type":      logType,
          "x-ms-date":     timestamp,
       }
+      if timeGenerated:
+         headers["time-generated-field"] = timeGenerated
       return REST.sendRequest(
          self.uri,
          method  = requests.post,
@@ -265,6 +281,34 @@ class _Context:
       vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
       self.sapmonId   = vmTags["SapMonId"]
       self.azKv       = AzureKeyVault("sapmon-%s" % self.sapmonId)
+      self.lastPull   = self.readLastPullTimestamp()
+
+   def readLastPullTimestamp(self):
+      """
+      Read the timestamp (UTC) of the last successful pull from state file
+      """
+      lastPull = None
+      try:
+         with open(STATE_FILE, "r") as f:
+            data = json.load(f)
+         lastPull = datetime.strptime(data["lastPullUTC"], "%Y-%m-%d %H:%M:%S.%f")
+      finally:
+         return lastPull
+
+   def setLastPullTimestamp(self, timestamp):
+      """
+      Write the timestamp (UTC) of the last successful pull to state file
+      """
+      try:
+         data = {
+            "lastPullUTC": timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
+         }
+         with open(STATE_FILE, "w") as f:
+            json.dump(data, f)
+         self.lastPull = timestamp
+         return True
+      except:
+         return False
 
    def parseSecrets(self):
       """
@@ -297,7 +341,7 @@ class _JsonEncoder(json.JSONEncoder):
    def default(self, o):
       if isinstance(o, decimal.Decimal):
          return float(o)
-      elif isinstance(o, (datetime.datetime, datetime.date)):
+      elif isinstance(o, (datetime, date)):
          return o.isoformat()
       return super(_JsonEncoder, self).default(o)
 
@@ -340,16 +384,29 @@ def monitor(args):
    ctx.parseSecrets()
    for h in ctx.hanaInstances:
       h.connect()
-      fromTimestamp  = datetime.datetime.now() - datetime.timedelta(minutes=1)
+      if not ctx.lastPull:
+         fromTimestamp = None
+      else:
+         fromTimestamp  = ctx.lastPull + timedelta(seconds=1) 
       colIndex, resultRows = h.getLoadHistory(fromTimestamp)
+      lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
       logData = []
       for r in resultRows:
          logItem = {}
          for c in colIndex.keys():
+            if c.startswith("_"): # remove internal fields
+               continue
             logItem[c] = r[colIndex[c]]
+         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
+         # isoTime  = (r[colIndex["UTC_TIMESTAMP"]]).isoformat()
+         # ctx.azLa.ingest(LOG_TYPE, jsonData, timeGenerated = isoTime)
          logData.append(logItem)
       jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-      ctx.azLa.ingest("SapHana_Infra", jsonData)
+      ctx.azLa.ingest(LOG_TYPE, jsonData)
+      ctx.setLastPullTimestamp(lastPull)
+      with open("output", "w") as f:
+         f.write(jsonData)
+      return
       
 def main():
    parser     = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
