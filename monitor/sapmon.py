@@ -18,6 +18,8 @@ import logging, http.client as http_client
 STATE_FILE                   = "sapmon.state"
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
 LOG_TYPE                     = "SapHana_Infra"
+TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
+TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 
 ###############################################################################
 
@@ -67,7 +69,7 @@ class SapHana:
       if not fromTimestamp:
          sqlFrom = "h.TIME > ADD_SECONDS(NOW(), %d)" % INITIAL_LOADHISTORY_TIMESPAN
       else:
-         sqlFrom = "ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s'" % fromTimestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
+         sqlFrom = "ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s'" % fromTimestamp.strftime(TIME_FORMAT_HANA)
 
       sql = """
 SELECT
@@ -232,7 +234,7 @@ class AzureLogAnalytics:
       self.sharedKey   = sharedKey
       self.uri         = "https://%s.ods.opinsights.azure.com/api/logs?api-version=2016-04-01" % workspaceId
 
-   def ingest(self, logType, jsonData, timeGenerated = None):
+   def ingest(self, logType, jsonData):
       """
       Ingest JSON payload as custom log to Log Analytics
       """
@@ -252,15 +254,13 @@ x-ms-date:%s
          stringHash  = encodedHash.decode("utf-8")
          return "SharedKey %s:%s" % (self.workspaceId, stringHash)
 
-      timestamp   = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+      timestamp   = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
       headers = {
          "content-type":  "application/json",
          "Authorization": buildSig(jsonData, timestamp),
          "Log-Type":      logType,
          "x-ms-date":     timestamp,
       }
-      if timeGenerated:
-         headers["time-generated-field"] = timeGenerated
       return REST.sendRequest(
          self.uri,
          method  = requests.post,
@@ -301,7 +301,7 @@ class _Context:
       """
       try:
          data = {
-            "lastPullUTC": timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
+            "lastPullUTC": timestamp.strftime(TIME_FORMAT_HANA)
          }
          with open(STATE_FILE, "w") as f:
             json.dump(data, f)
@@ -398,8 +398,6 @@ def monitor(args):
                continue
             logItem[c] = r[colIndex[c]]
          jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
-         # isoTime  = (r[colIndex["UTC_TIMESTAMP"]]).isoformat()
-         # ctx.azLa.ingest(LOG_TYPE, jsonData, timeGenerated = isoTime)
          logData.append(logItem)
       jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
       ctx.azLa.ingest(LOG_TYPE, jsonData)
