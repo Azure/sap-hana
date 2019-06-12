@@ -291,7 +291,7 @@ class _Context:
       try:
          with open(STATE_FILE, "r") as f:
             data = json.load(f)
-         lastPull = datetime.strptime(data["lastPullUTC"], "%Y-%m-%d %H:%M:%S.%f")
+         lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
       finally:
          return lastPull
 
