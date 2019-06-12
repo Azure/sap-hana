@@ -347,7 +347,7 @@ class _JsonEncoder(json.JSONEncoder):
 
 ###############################################################################
 
-def init(args):
+def onboard(args):
    """
    Store credentials in the customer KeyVault.
    (To be executed as custom script upon initial deployment of collector VM.)
@@ -407,21 +407,21 @@ def monitor(args):
       return
       
 def main():
-   parser     = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
-   subparsers = parser.add_subparsers(dest="command", help="main functions")
-   subparsers.required = True
-   initparser = subparsers.add_parser("init", help="Initialize client KeyVault with SAP credentials")
-   initparser.set_defaults(func=init)
-   initparser.add_argument("HanaHostname", type=str, help="Hostname of the HDB to be monitored")
-   initparser.add_argument("HanaDbName", type=str, help="Name of the tenant DB (empty if not MDC)")
-   initparser.add_argument("HanaDbUsername", type=str, help="DB username to connect to the HDB tenant")
-   initparser.add_argument("HanaDbPassword", type=str, help="DB user password to connect to the HDB tenant")
-   initparser.add_argument("HanaDbSqlPort", type=int, help="SQL port of the tenant DB")
-   initparser.add_argument("LogAnalyticsWorkspaceId", type=str, help="Workspace ID (customer ID) of the Log Analytics Workspace")
-   initparser.add_argument("LogAnalyticsSharedKey", type=str, help="Shared key (primary) of the Log Analytics Workspace")
-   monparser  = subparsers.add_parser("monitor", help="Execute the monitoring payload")
-   monparser.set_defaults(func=monitor)
-   args       = parser.parse_args()
+   parser = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
+   subParsers = parser.add_subparsers(dest="command", help="main functions")
+   subParsers.required = True
+   onbParser = subParsers.add_parser("onboard", help="Onboard payload by adding credentials into KeyVault")
+   onbParser.set_defaults(func=onboard)
+   onbParser.add_argument("--HanaHostname", required=True, type=str, help="Hostname of the HDB to be monitored")
+   onbParser.add_argument("--HanaDbName", required=True, type=str, help="Name of the tenant DB (empty if not MDC)")
+   onbParser.add_argument("--HanaDbUsername", required=True, type=str, help="DB username to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbPassword", required=True, type=str, help="DB user password to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbSqlPort", required=True, type=int, help="SQL port of the tenant DB")
+   onbParser.add_argument("--LogAnalyticsWorkspaceId", required=True, type=str, help="Workspace ID (customer ID) of the Log Analytics Workspace")
+   onbParser.add_argument("--LogAnalyticsSharedKey", required=True, type=str, help="Shared key (primary) of the Log Analytics Workspace")
+   monParser  = subParsers.add_parser("monitor", help="Execute the monitoring payload")
+   monParser.set_defaults(func=monitor)
+   args = parser.parse_args()
    args.func(args)
 
 ctx = _Context()
