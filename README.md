@@ -53,6 +53,12 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
    * **Local deployments:** Open a shell on your local machine (Works on a Unix based system (i.e. MacOS, Linux, Cygwin, or Windows Subsystem for Linux)).
    * **VM deployment:** Connect to your VM using an SSH client.
    * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
+   
+   ***Note**: Cloud Shell comes pre-installed with Terraform 0.12 which, however, is not compatible with our scripts. To download the latest supported Terraform version 0.11.14 into your Cloud Shell home directory, please copy & paste the following command into a single line:*
+   
+   `wget https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip; unzip terraform_0.11.14_linux_amd64.zip; rm terraform_0.11.14_linux_amd64.zip`
+   
+   *To run Terraform 0.11.14 in later steps, you would execute `~/terraform` (instead of just `terraform`).*
 
 2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
    * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
