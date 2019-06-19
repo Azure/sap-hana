@@ -1,20 +1,21 @@
 variable "availability_set_id" {
   description = "The id associated with the availability set to put this VM into."
-  default     = ""                                                                 # Empty string denotes that this VM is not in an availability set.
+  default     = "" # Empty string denotes that this VM is not in an availability set.
 }
 
 variable "az_domain_name" {
   description = "Prefix to be used in the domain name"
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
 }
 
 variable "backend_ip_pool_ids" {
-  type        = "list"
+  type        = list(string)
   description = "The ids that associate the load balancer's back end IP pool with this VM's NIC."
   default     = []
 }
@@ -49,7 +50,7 @@ variable "sshkey_path_public" {
 }
 
 variable "storage_disk_sizes_gb" {
-  type        = "list"
+  type        = list(string)
   description = "List disk sizes in GB for all disks this VM will need"
 }
 
@@ -65,3 +66,4 @@ locals {
   machine_name = "${lower(var.sap_sid)}-hdb${var.hdb_num}"
   vm_hdb_name  = "hdb${var.hdb_num}"
 }
+

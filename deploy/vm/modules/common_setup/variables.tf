@@ -1,9 +1,10 @@
 variable "allow_ips" {
   description = "The ip addresses that will be allowed by the nsg"
-  type        = "list"
+  type        = list(string)
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
@@ -53,3 +54,4 @@ locals {
     "XSA,106,50000-59999",
   ]
 }
+

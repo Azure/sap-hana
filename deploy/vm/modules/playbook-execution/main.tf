@@ -46,7 +46,7 @@ resource null_resource "mount-disks-and-configure-hana" {
      -i '../../ansible/azure_rm.py' ${var.ansible_playbook_path}
      EOT
 
-    environment {
+    environment = {
       HOSTS = "${var.vms_configured}"
     }
   }

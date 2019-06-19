@@ -1,13 +1,14 @@
 variable "allow_ips" {
   description = "The IP addresses that will be allowed by the nsg"
-  type        = "list"
+  type        = list(string)
 }
 
 variable "az_domain_name" {
   description = "Prefix to be used in the domain name"
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
@@ -55,3 +56,4 @@ locals {
   winrm_port   = 5986
   rdp_port     = 3389
 }
+
