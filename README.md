@@ -54,10 +54,13 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
    * **VM deployment:** Connect to your VM using an SSH client.
    * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
    
+***Note**: Cloud Shell comes pre-installed with Terraform 0.12 which is now compatible with our scripts.
    
 2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
    * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
    * [Terraform](https://www.terraform.io/downloads.html)
+
+**Note**: The scripts have been tested with Terraform `v0.12.2` and `provider.azurerm v1.30.1`
    * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
    
    ***Note**: The scripts were built and tested with Ansible 2.6.x.*
