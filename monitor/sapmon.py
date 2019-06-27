@@ -20,6 +20,7 @@ INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
 LOG_TYPE                     = "SapHana_Infra"
 TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
+TIMEOUT_HANA                 = 5
 
 ###############################################################################
 
@@ -46,13 +47,21 @@ class SapHana:
       """
       Connect to a HDB instance
       """
-      self.connection = pyhdb.connect(
+      self.connection = pyhdb.Connection(
          host = self.host,
          port = self.port,
          user = self.user,
          password = self.password,
+         timeout = TIMEOUT_HANA,
          )
+      self.connection.connect()
       self.cursor = self.connection.cursor()
+
+   def disconnect(self):
+      """
+      Close an open HDB connection
+      """
+      self.connection.close()
 
    def runQuery(self, sql):
       """
@@ -389,6 +398,8 @@ def monitor(args):
       else:
          fromTimestamp  = ctx.lastPull + timedelta(seconds=1) 
       colIndex, resultRows = h.getLoadHistory(fromTimestamp)
+      if len(resultRows) == 0:
+         continue
       lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
       logData = []
       for r in resultRows:
@@ -404,7 +415,7 @@ def monitor(args):
       ctx.setLastPullTimestamp(lastPull)
       with open("output", "w") as f:
          f.write(jsonData)
-      return
+      h.disconnect()
       
 def main():
    parser = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
