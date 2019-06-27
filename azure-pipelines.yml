@@ -21,7 +21,7 @@ jobs:
       cd deploy/vm/modules/single_node_hana
       terraform init
       terraform plan -no-color
-    displayName: 'Test single node hana'
+    displayName: 'Test single-node HANA'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
       TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
