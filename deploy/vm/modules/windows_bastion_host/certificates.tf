@@ -1,11 +1,18 @@
-data "azurerm_client_config" "current" {}
+data "azurerm_client_config" "current" {
+}
 
 resource "azurerm_key_vault" "main" {
-  name                = "kv-${lower(replace(replace(timestamp(),local.colon, local.empty_string), local.dash, local.empty_string))}"
-  count               = "${var.windows_bastion ? 1 : 0}"
-  location            = "${var.az_region}"
-  resource_group_name = "${var.az_resource_group}"
-  tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
+  name = "kv-${lower(
+    replace(
+      replace(timestamp(), local.colon, local.empty_string),
+      local.dash,
+      local.empty_string,
+    ),
+  )}"
+  count               = var.windows_bastion ? 1 : 0
+  location            = var.az_region
+  resource_group_name = var.az_resource_group
+  tenant_id           = data.azurerm_client_config.current.tenant_id
 
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
@@ -15,8 +22,8 @@ resource "azurerm_key_vault" "main" {
   }
 
   access_policy {
-    tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-    object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.service_principal_object_id
 
     certificate_permissions = [
       "create",
@@ -29,15 +36,15 @@ resource "azurerm_key_vault" "main" {
     secret_permissions = []
   }
 
-  tags {
+  tags = {
     bastion-key-vault = ""
   }
 }
 
 resource "azurerm_key_vault_certificate" "main" {
   name      = "${local.machine_name}-cert"
-  count     = "${var.windows_bastion ? 1 : 0}"
-  vault_uri = "${azurerm_key_vault.main.vault_uri}"
+  count     = var.windows_bastion ? 1 : 0
+  vault_uri = azurerm_key_vault.main[0].vault_uri
 
   certificate_policy {
     issuer_parameters {
@@ -80,3 +87,4 @@ resource "azurerm_key_vault_certificate" "main" {
     }
   }
 }
+

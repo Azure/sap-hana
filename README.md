@@ -1,6 +1,6 @@
 # Automated SAP Deployments in Azure Cloud
 
-Master Branch's status: [![Build Status](https://travis-ci.org/Azure/sap-hana.svg?branch=master)](https://travis-ci.org/Azure/sap-hana)
+Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=1&branchName=master)
 
 This repository contains a set of highly customizable templates that can be used to automatically deploy complex SAP landscapes in the Azure Cloud.
 The templates are split into:
@@ -53,11 +53,18 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
    * **Local deployments:** Open a shell on your local machine (Works on a Unix based system (i.e. MacOS, Linux, Cygwin, or Windows Subsystem for Linux)).
    * **VM deployment:** Connect to your VM using an SSH client.
    * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
-
+   
+***Note**: Cloud Shell comes pre-installed with Terraform 0.12 which is now compatible with our scripts.
+   
 2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
    * [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
    * [Terraform](https://www.terraform.io/downloads.html)
+
+**Note**: The scripts have been tested with Terraform `v0.12.2` and `provider.azurerm v1.30.1`
    * [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+   
+   ***Note**: The scripts were built and tested with Ansible 2.6.x.*
+
 
 3. Clone this repository:
 

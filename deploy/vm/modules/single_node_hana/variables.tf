@@ -12,7 +12,8 @@ variable "az_domain_name" {
   description = "Prefix to be used in the domain name"
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
@@ -156,7 +157,7 @@ variable "url_portal_services" {
 }
 
 variable "url_sap_hdbserver" {
-  type        = "string"
+  type        = string
   description = "The URL that points to the HDB server 122.17 bits"
 }
 
@@ -241,3 +242,4 @@ locals {
   #name of the linux vm
   linux_vm_name = "${var.az_domain_name}-linux-bastion"
 }
+

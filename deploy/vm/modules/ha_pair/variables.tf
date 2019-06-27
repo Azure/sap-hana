@@ -12,7 +12,8 @@ variable "az_domain_name" {
   description = "Prefix to be used in the domain name"
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
@@ -98,7 +99,7 @@ variable "pw_db_system" {
 }
 
 variable "pw_hacluster" {
-  type        = "string"
+  type        = string
   description = "Password for the HA cluster nodes"
 }
 
@@ -172,7 +173,7 @@ variable "url_portal_services" {
 }
 
 variable "url_sap_hdbserver" {
-  type        = "string"
+  type        = string
   description = "The url that points to the HDB server 122.17 bits"
 }
 
@@ -272,3 +273,4 @@ locals {
     "3${var.sap_instancenum}42",
   ]
 }
+

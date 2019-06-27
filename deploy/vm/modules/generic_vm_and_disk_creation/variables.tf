@@ -3,7 +3,8 @@ variable "availability_set_id" {
   default     = ""
 }
 
-variable "az_region" {}
+variable "az_region" {
+}
 
 variable "az_resource_group" {
   description = "Which Azure resource group to deploy the HANA setup into.  i.e. <myResourceGroup>"
@@ -26,12 +27,12 @@ variable "sshkey_path_public" {
 }
 
 variable "storage_disk_sizes_gb" {
-  type        = "list"
+  type        = list(string)
   description = "List disk sizes in GB for all disks this VM will need"
 }
 
 variable "tags" {
-  type        = "map"
+  type        = map(string)
   description = "tags to add to the machine"
   default     = {}
 }
@@ -43,3 +44,4 @@ variable "vm_size" {
 variable "vm_user" {
   description = "The username of your VM."
 }
+
