@@ -1,6 +1,6 @@
 # Automated SAP Deployments in Azure Cloud
 
-Master Branch's status: [![Build Status](https://travis-ci.org/Azure/sap-hana.svg?branch=master)](https://travis-ci.org/Azure/sap-hana)
+Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=1&branchName=master)
 
 This repository contains a set of highly customizable templates that can be used to automatically deploy complex SAP landscapes in the Azure Cloud.
 The templates are split into:
