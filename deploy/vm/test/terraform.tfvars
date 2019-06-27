@@ -1,6 +1,6 @@
 az_region = "westus"
 vm_user = "azureuser"
-az_domain_name = "singlehana"
+az_domain_name = "singlehana-az-pipeline"
 sshkey_path_private = "/tmp/sshkey"
 sshkey_path_public = "/tmp/sshkey.pub"
 az_resource_group = "hana-pipeline-test-single-node"
