@@ -26,13 +26,13 @@ Execution-focused
 
 Coding Guidelines
 -----------------
-* Test:
-  * Azure pipeline is integrated with this repo that invokes build checks on the submitted pull requests. The pipeline runs the tests on the merge branch. The pull request is required to pass the Azure pipelines test before it can be merged.
-* Branch Policy:
+* Test
+  * This repository integrates with [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/), which invokes build checks on the submitted pull requests. The pipeline runs the tests on the merge branch. The pull request is required to pass the Azure pipelines test before it can be merged.
+* Branch Policy
   * The contributor needs to create a branch in the main repo so that the integrated Azure pipelines can test the submitted pull request.
-  * The Azure pipeline tests actually deploy resources based on the source branch to validate and verify the submitted pull request. Please note that the deployed resource group and the domain name are named after the source branch to allow exclusive test deployments for multiple pull requests and branches. So the branch name can only contain small case alphanumeric characters and hyphens.
+  * The Azure Pipelines build deploy resources by running terraform on the merge branch of the source branch and master to validate and verify the submitted pull request. Please note that the deployed resource group and the domain name are named after the source branch to allow exclusive test deployments for multiple pull requests and branches. **So the branch name can only contain small case alphanumeric characters and hyphens**.
   A recommended format of the branch name can be:
   ```sh
-  <Contributors github handle>-<feature>-<name>
+  <Contributor's github handle>-<feature name>
   ```
   
