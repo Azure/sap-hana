@@ -54,14 +54,24 @@ variable "az_spoke_address_space" {
   default	= "10.1.0.0/16"
 }
 
-variable "az_spoke_db_subnet" {
-  description	= "Name of the spoke DB Subnet to deploy the DB servers"
-  default	= "spoke-db-subnet"
+variable "az_spoke_db_client_subnet" {
+  description	= "Name of the spoke DB client Subnet"
+  default	= "spoke-db-client-subnet"
 }
 
-variable "az_spoke_db_subnet_prefix" {
-  description	= "Address Prefix of the Spoke DB Subnet"
+variable "az_spoke_db_admin_subnet" {
+  description	= "Name of the spoke DB admin Subnet"
+  default	= "spoke-db-admin-subnet"
+}
+
+variable "az_spoke_db_client_subnet_prefix" {
+  description	= "Address Prefix of the Spoke DB Client Subnet"
   default	= "10.1.1.0/24"
+}
+
+variable "az_spoke_db_admin_subnet_prefix" {
+  description	= "Address Prefix of the Spoke DB Admin Subnet"
+  default	= "10.1.2.0/24"
 }
 
 variable "az_jumpbox_os" {

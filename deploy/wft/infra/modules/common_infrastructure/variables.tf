@@ -22,10 +22,16 @@ variable "az_spoke_vnet" {
 variable "az_spoke_address_space" {
 }
 
-variable "az_spoke_db_subnet" {
+variable "az_spoke_db_client_subnet" {
 }
 
-variable "az_spoke_db_subnet_prefix" {
+variable "az_spoke_db_client_subnet_prefix" {
+}
+
+variable "az_spoke_db_admin_subnet" {
+}
+
+variable "az_spoke_db_admin_subnet_prefix" {
 }
 
 variable "az_jumpbox_os" {
