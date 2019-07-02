@@ -3,6 +3,10 @@ provider "azurerm" {
   version = "~> 1.30.1"
 }
 
+output "Pipeline_PR1" {
+  value = "Pipeline test PR1"
+}
+
 module "common_setup" {
   source            = "../common_setup"
   allow_ips         = var.allow_ips
