@@ -1,5 +1,9 @@
 ---
 - hosts: hdb0,hdb1
+  roles:
+    - { role: imds-reg, scenario: "hana-hapair", state: "ansible-started"}
+
+- hosts: hdb0,hdb1
   become: true
 
   roles:
@@ -135,3 +139,7 @@
   vars:
      config_json_file: ../modules/ha_pair/temp.json
   import_playbook: linux_bastion_host.yml
+
+- hosts: hdb0,hdb1
+  roles:
+    - { role: imds-reg, scenario: "hana-hapair", state: "ansible-finished"}

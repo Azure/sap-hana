@@ -1,0 +1,14 @@
+---
+# This role registers the current deployment state with Azure's Metadata Service (IMDS)
+- name: Registering with IMDS as {{ http_user_agent }}
+  uri:
+    url: http://169.254.169.254/metadata
+    method: GET    
+    http_agent: {{ http_user_agent }}
+    body:
+      api-version: {{ api_version }}
+    return_content: yes
+  register: response
+
+- debug:
+    msg: "IMDS response = {{ response.json }}"

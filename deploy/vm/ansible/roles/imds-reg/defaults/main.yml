@@ -1,0 +1,12 @@
+---
+# Deployment Scenario
+scenario:
+
+# Deployment State
+state:
+
+# HTTP User-Agent
+http_user_agent: "SAP on Azure Automated; scenario={{ scenario }}; state={{ state }}"
+
+# IMDS API Version
+api_version: "2018-02-01"
