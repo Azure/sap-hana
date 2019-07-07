@@ -1,7 +1,7 @@
 ---
 - hosts: hdb0,hdb1
   roles:
-    - { role: imds-reg, scenario: "hana-hapair", state: "ansible-started"}
+    - { role: imds-reg, scenario: "hana-hapair", deploy_status: "started"}
 
 - hosts: hdb0,hdb1
   become: true
@@ -142,4 +142,4 @@
 
 - hosts: hdb0,hdb1
   roles:
-    - { role: imds-reg, scenario: "hana-hapair", state: "ansible-finished"}
+    - { role: imds-reg, scenario: "hana-hapair", deploy_status: "finished"}
