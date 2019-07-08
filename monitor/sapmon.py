@@ -420,6 +420,7 @@ def monitor(args):
       h.disconnect()
       
 def main():
+   global ctx
    parser = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
    subParsers = parser.add_subparsers(dest="command", help="main functions")
    subParsers.required = True
