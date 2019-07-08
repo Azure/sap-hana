@@ -15,6 +15,7 @@ import logging, http.client as http_client
 
 ###############################################################################
 
+PAYLOAD_VERSION              = "0.2"
 STATE_FILE                   = "sapmon.state"
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
 LOG_TYPE                     = "SapHana_Infra"
@@ -157,12 +158,13 @@ class AzureInstanceMetadataService:
          )
 
    @staticmethod
-   def getComputeInstance():
+   def getComputeInstance(operation):
       """
       Get the compute instance for the current VM via IMS
       """
       return AzureInstanceMetadataService._sendRequest(
          "instance",
+         headers = {"User-Agent": "SAP Monitor/%s (%s)" % (PAYLOAD_VERSION, operation)}
          )["compute"]
 
    @staticmethod
@@ -285,8 +287,8 @@ class _Context:
    """
    hanaInstances = []
 
-   def __init__(self):
-      self.vmInstance = AzureInstanceMetadataService.getComputeInstance()
+   def __init__(self, operation):
+      self.vmInstance = AzureInstanceMetadataService.getComputeInstance(operation)
       vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
       self.sapmonId   = vmTags["SapMonId"]
       self.azKv       = AzureKeyVault("sapmon%s" % self.sapmonId)
@@ -433,9 +435,10 @@ def main():
    monParser  = subParsers.add_parser("monitor", help="Execute the monitoring payload")
    monParser.set_defaults(func=monitor)
    args = parser.parse_args()
+   ctx = _Context(args.command)
    args.func(args)
 
-ctx = _Context()
+ctx = None
 if __name__ == "__main__":
    main()
 
