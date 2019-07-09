@@ -5,7 +5,9 @@
 trigger: none
 # Only trigger build when a PR is opened
 pr:
-- master
+  branches:
+    include:
+    - master
   paths:
     exclude:
     - README.md
