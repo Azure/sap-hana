@@ -323,28 +323,25 @@ class _Context:
    hanaInstances = []
 
    def __init__(self, operation):
-      self.vmInstance   = AzureInstanceMetadataService.getComputeInstance(operation)
-      vmTags            = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
-      self.sapmonId     = vmTags["SapMonId"]
-      self.azKv         = AzureKeyVault("sapmon%s" % self.sapmonId)
+      self.vmInstance       = AzureInstanceMetadataService.getComputeInstance(operation)
+      vmTags                = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
+      self.sapmonId         = vmTags["SapMonId"]
+      self.azKv             = AzureKeyVault("sapmon%s" % self.sapmonId)
+      self.lastPull         = None
+      self.lastResultHashes = {}
       self.readStateFile()
 
    def readStateFile(self):
       """
       Get most recent state (with hashes from point-in-time queries and last pull timestamp) from a local file
       """
-      lastPull         = None
-      lastResultHashes = {}
       try:
          with open(STATE_FILE, "r") as f:
             data = json.load(f)
-         lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
-         lastResultHashes = data["lastResultHashes"]
+         self.lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
+         self.lastResultHashes = data["lastResultHashes"]
       except:
          pass
-      finally:
-         self.lastPull = lastPull
-         self.lastResultHashes = lastResultHashes
       return
 
    def writeStateFile(self):
