@@ -120,7 +120,7 @@ ORDER BY h.TIME ASC
       if len(resultRows) == 0:
          return None
       resultHash = hashlib.md5(str(resultRows).encode("utf-8")).hexdigest()
-      if query in ctx.resultHashes and ctx.resultHashes[query] == resultHash:
+      if query in ctx.lastResultHashes and ctx.lastResultHashes[query] == resultHash:
          return None
       else:
          return resultHash
@@ -333,18 +333,18 @@ class _Context:
       """
       Get most recent state (with hashes from point-in-time queries and last pull timestamp) from a local file
       """
-      lastPull     = None
-      resultHashes = {}
+      lastPull         = None
+      lastResultHashes = {}
       try:
          with open(STATE_FILE, "r") as f:
             data = json.load(f)
          lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
-         resultHashes = data["resultHashes"]
+         lastResultHashes = data["lastResultHashes"]
       except:
          pass
       finally:
          self.lastPull = lastPull
-         self.resultHashes = resultHashes
+         self.lastResultHashes = lastResultHashes
       return
 
    def writeStateFile(self):
@@ -353,7 +353,7 @@ class _Context:
       """
       try:
          data = {
-            "resultHashes": self.resultHashes,
+            "lastResultHashes": self.lastResultHashes,
          }
          if self.lastPull:
             data["lastPullUTC"] = self.lastPull.strftime(TIME_FORMAT_HANA)
@@ -375,7 +375,7 @@ class _Context:
       """
       Set the hash of a specific (point-in-time) query and persist to state file
       """
-      self.resultHashes[query] = resultHash
+      self.lastResultHashes[query] = resultHash
       return self.writeStateFile()
 
    def parseSecrets(self):
