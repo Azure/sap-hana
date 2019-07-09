@@ -6,6 +6,10 @@ trigger: none
 # Only trigger build when a PR is opened
 pr:
 - master
+  paths:
+    exclude:
+    - README.md
+    - monitor/*
 jobs:
 - job: "single_node_hana"
   variables:
