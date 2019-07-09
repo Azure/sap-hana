@@ -12,13 +12,13 @@ import decimal
 from datetime import datetime, timedelta, date
 import hashlib, hmac, base64
 import logging, http.client as http_client
+import hashlib
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.2"
+PAYLOAD_VERSION              = "0.3"
 STATE_FILE                   = "sapmon.state"
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
-LOG_TYPE                     = "SapHana_Infra"
 TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 TIMEOUT_HANA                 = 5
@@ -72,6 +72,7 @@ class SapHana:
       colIndex = {col[0] : idx for idx, col in enumerate(self.cursor.description)}
       return colIndex, self.cursor.fetchall()
 
+   # TODO(tniek): Refactor monitoring into Query class
    def getLoadHistory(self, fromTimestamp):
       """
       Get infrastructure utilization via HANA Load History
@@ -104,6 +105,40 @@ AND h.HOST = i.HOST AND UPPER(i.KEY) = 'TIMEZONE_OFFSET'
 ORDER BY h.TIME ASC
 """ % sqlFrom
       return self.runQuery(sql)
+
+   def getHostConfig(self):
+      """
+      Get HANA host configuration
+      """
+      sql = "SELECT * FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION"
+      return self.runQuery(sql)
+
+   def getNewResultHash(self, query, resultRows):
+      """
+      Compute hash of a specific query result and return it only if it's different from the previous one
+      """
+      if len(resultRows) == 0:
+         return None
+      resultHash = hashlib.md5(str(resultRows).encode("utf-8")).hexdigest()
+      if query in ctx.resultHashes and ctx.resultHashes[query] == resultHash:
+         return None
+      else:
+         return resultHash
+
+   def convertIntoJson(self, colIndex, resultRows):
+      """
+      Convert a query result into a JSON-formatted string (as required by Log Analytics)
+      """
+      logData = []
+      for r in resultRows:
+         logItem = {}
+         for c in colIndex.keys():
+            if c.startswith("_"): # remove internal fields
+               continue
+            logItem[c] = r[colIndex[c]]
+         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
+         logData.append(logItem)
+      return json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
 
 ###############################################################################
 
@@ -262,10 +297,10 @@ x-ms-date:%s
             bytesHash,
             digestmod=hashlib.sha256).digest()
          )
-         stringHash  = encodedHash.decode("utf-8")
+         stringHash = encodedHash.decode("utf-8")
          return "SharedKey %s:%s" % (self.workspaceId, stringHash)
 
-      timestamp   = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
+      timestamp = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
       headers = {
          "content-type":  "application/json",
          "Authorization": buildSig(jsonData, timestamp),
@@ -288,38 +323,60 @@ class _Context:
    hanaInstances = []
 
    def __init__(self, operation):
-      self.vmInstance = AzureInstanceMetadataService.getComputeInstance(operation)
-      vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
-      self.sapmonId   = vmTags["SapMonId"]
-      self.azKv       = AzureKeyVault("sapmon%s" % self.sapmonId)
-      self.lastPull   = self.readLastPullTimestamp()
+      self.vmInstance   = AzureInstanceMetadataService.getComputeInstance(operation)
+      vmTags            = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
+      self.sapmonId     = vmTags["SapMonId"]
+      self.azKv         = AzureKeyVault("sapmon%s" % self.sapmonId)
+      self.readStateFile()
 
-   def readLastPullTimestamp(self):
+   def readStateFile(self):
       """
-      Read the timestamp (UTC) of the last successful pull from state file
+      Get most recent state (with hashes from point-in-time queries and last pull timestamp) from a local file
       """
-      lastPull = None
+      lastPull     = None
+      resultHashes = {}
       try:
          with open(STATE_FILE, "r") as f:
             data = json.load(f)
          lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
+         resultHashes = data["resultHashes"]
+      except:
+         pass
       finally:
-         return lastPull
+         self.lastPull = lastPull
+         self.resultHashes = resultHashes
+      return
 
-   def setLastPullTimestamp(self, timestamp):
+   def writeStateFile(self):
       """
-      Write the timestamp (UTC) of the last successful pull to state file
+      Persist current state (with hashes from point-in-time queries and last pull timestamp) into a local file
       """
       try:
          data = {
-            "lastPullUTC": timestamp.strftime(TIME_FORMAT_HANA)
+            "resultHashes": self.resultHashes,
          }
+         if self.lastPull:
+            data["lastPullUTC"] = self.lastPull.strftime(TIME_FORMAT_HANA)
          with open(STATE_FILE, "w") as f:
             json.dump(data, f)
-         self.lastPull = timestamp
          return True
       except:
          return False
+      return
+
+   def setLastPullTimestamp(self, timestamp):
+      """
+      Set the timestamp (UTC) of the last successful pull and persist to state file
+      """
+      self.lastPull = timestamp
+      return self.writeStateFile()
+
+   def setResultHash(self, query, resultHash):
+      """
+      Set the hash of a specific (point-in-time) query and persist to state file
+      """
+      self.resultHashes[query] = resultHash
+      return self.writeStateFile()
 
    def parseSecrets(self):
       """
@@ -360,8 +417,8 @@ class _JsonEncoder(json.JSONEncoder):
 
 def onboard(args):
    """
-   Store credentials in the customer KeyVault.
-   (To be executed as custom script upon initial deployment of collector VM.)
+   Store credentials in the customer KeyVault
+   (To be executed as custom script upon initial deployment of collector VM)
    """
    # Credentials (provided by user) to the existing HANA instance
    hanaSecretName  = "SapHana-%s" % args.HanaDbName
@@ -402,28 +459,28 @@ def monitor(args):
    ctx.parseSecrets()
    for h in ctx.hanaInstances:
       h.connect()
+      # TODO(tniek): Implement proper query framework
+
+      # HANA Host Configuration
+      colIndex, resultRows = h.getHostConfig()
+      resultHash = h.getNewResultHash("HostConfig", resultRows)
+      if resultHash:
+         jsonData = h.convertIntoJson(colIndex, resultRows)
+         ctx.azLa.ingest("SapHana_HostConfig", jsonData)
+         ctx.setResultHash("HostConfig", resultHash)
+
+      # HANA Load History
       if not ctx.lastPull:
          fromTimestamp = None
       else:
-         fromTimestamp  = ctx.lastPull + timedelta(seconds=1) 
+         fromTimestamp = ctx.lastPull + timedelta(seconds=1)
       colIndex, resultRows = h.getLoadHistory(fromTimestamp)
-      if len(resultRows) == 0:
-         continue
-      lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
-      logData = []
-      for r in resultRows:
-         logItem = {}
-         for c in colIndex.keys():
-            if c.startswith("_"): # remove internal fields
-               continue
-            logItem[c] = r[colIndex[c]]
-         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
-         logData.append(logItem)
-      jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-      ctx.azLa.ingest(LOG_TYPE, jsonData)
-      ctx.setLastPullTimestamp(lastPull)
-      with open("output", "w") as f:
-         f.write(jsonData)
+      if len(resultRows) > 0:
+         jsonData = h.convertIntoJson(colIndex, resultRows)
+         ctx.azLa.ingest("SapHana_LoadHistory", jsonData)
+         lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
+         ctx.setLastPullTimestamp(lastPull)
+
       h.disconnect()
       
 def main():
