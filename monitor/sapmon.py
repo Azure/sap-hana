@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, date
 import hashlib, hmac, base64
 import logging, http.client as http_client
 import hashlib
+import re
 
 ###############################################################################
 
@@ -203,13 +204,13 @@ class AzureInstanceMetadataService:
          )["compute"]
 
    @staticmethod
-   def getAuthToken(resource):
+   def getAuthToken(resource, msiClientId = None):
       """
       Get an authentication token via IMS
       """
       return AzureInstanceMetadataService._sendRequest(
          "identity/oauth2/token",
-         params = {"resource": resource}
+         params = {"resource": resource, "client_id": msiClientId}
          )["access_token"]
 
 ###############################################################################
@@ -220,9 +221,9 @@ class AzureKeyVault:
    """
    params  = {"api-version": "7.0"}
 
-   def __init__(self, keyvaultName):
+   def __init__(self, keyvaultName, msiClientId = None):
       self.uri     = "https://%s.vault.azure.net" % keyvaultName
-      self.token   = AzureInstanceMetadataService.getAuthToken("https://vault.azure.net")
+      self.token   = AzureInstanceMetadataService.getAuthToken("https://vault.azure.net", msiClientId)
       self.headers = {
          "Authorization": "Bearer %s" % self.token,
          "Content-Type":  "application/json"
@@ -326,7 +327,7 @@ class _Context:
       self.vmInstance       = AzureInstanceMetadataService.getComputeInstance(operation)
       vmTags                = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
       self.sapmonId         = vmTags["SapMonId"]
-      self.azKv             = AzureKeyVault("sapmon%s" % self.sapmonId)
+      self.azKv             = AzureKeyVault("sapmon%s" % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
       self.lastPull         = None
       self.lastResultHashes = {}
       self.readStateFile()
@@ -387,6 +388,10 @@ class _Context:
       hanaSecrets = sliceDict(secrets, "SapHana-")
       for h in hanaSecrets.keys():
          hanaDetails  = json.loads(hanaSecrets[h])
+         if not hanaDetails["HanaDbPassword"]:
+            hanaDetails["HanaDbPassword"] = self.fetchHanaPasswordFromKeyVault(
+               hanaDetails["HanaDbPasswordKeyVaultUrl"],
+               hanaDetails["PasswordKeyVaultMsiClientId"])
          hanaInstance = SapHana(hanaDetails = hanaDetails)
          self.hanaInstances.append(hanaInstance)
 
@@ -396,6 +401,10 @@ class _Context:
          laSecret["LogAnalyticsWorkspaceId"],
          laSecret["LogAnalyticsSharedKey"]
          )
+   def fetchHanaPasswordFromKeyVault(self, passwordKeyVault, passwordKeyVaultMsiClientId):
+      vaultNameSearch = re.search('https://(.*).vault.azure.net', passwordKeyVault)
+      kv = AzureKeyVault(vaultNameSearch.group(1), passwordKeyVaultMsiClientId)
+      return kv.getSecret(passwordKeyVault)
 
 ###############################################################################
 
@@ -420,11 +429,13 @@ def onboard(args):
    # Credentials (provided by user) to the existing HANA instance
    hanaSecretName  = "SapHana-%s" % args.HanaDbName
    hanaSecretValue = json.dumps({
-      "HanaHostname":   args.HanaHostname,
-      "HanaDbName":     args.HanaDbName,
-      "HanaDbUsername": args.HanaDbUsername,
-      "HanaDbPassword": args.HanaDbPassword,
-      "HanaDbSqlPort":  args.HanaDbSqlPort,
+      "HanaHostname":                args.HanaHostname,
+      "HanaDbName":                  args.HanaDbName,
+      "HanaDbUsername":              args.HanaDbUsername,
+      "HanaDbPassword":              args.HanaDbPassword,
+      "HanaDbPasswordKeyVaultUrl":   args.HanaDbPasswordKeyVaultUrl,
+      "HanaDbSqlPort":               args.HanaDbSqlPort,
+      "PasswordKeyVaultMsiClientId": args.PasswordKeyVaultMsiClientId,
       })
    ctx.azKv.setSecret(hanaSecretName, hanaSecretValue)
 
@@ -436,8 +447,14 @@ def onboard(args):
       })
    ctx.azKv.setSecret(laSecretName, laSecretValue)
 
+   hanaDetails = json.loads(hanaSecretValue)
+   if not hanaDetails["HanaDbPassword"]:
+      hanaDetails["HanaDbPassword"] = ctx.fetchHanaPasswordFromKeyVault(
+         hanaDetails["HanaDbPasswordKeyVaultUrl"],
+         hanaDetails["PasswordKeyVaultMsiClientId"])
+
    # Check connectivity to HANA instance
-   hana = SapHana(hanaDetails = json.loads(hanaSecretValue))
+   hana = SapHana(hanaDetails = hanaDetails)
    hana.connect()
    hana.runQuery("SELECT 0 FROM DUMMY")
    hana.disconnect()
@@ -490,10 +507,12 @@ def main():
    onbParser.add_argument("--HanaHostname", required=True, type=str, help="Hostname of the HDB to be monitored")
    onbParser.add_argument("--HanaDbName", required=True, type=str, help="Name of the tenant DB (empty if not MDC)")
    onbParser.add_argument("--HanaDbUsername", required=True, type=str, help="DB username to connect to the HDB tenant")
-   onbParser.add_argument("--HanaDbPassword", required=True, type=str, help="DB user password to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbPassword", required=False, type=str, help="DB user password to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbPasswordKeyVaultUrl", required=False, type=str, help="Link to the KeyVault secret containing DB user password to connect to the HDB tenant")
    onbParser.add_argument("--HanaDbSqlPort", required=True, type=int, help="SQL port of the tenant DB")
    onbParser.add_argument("--LogAnalyticsWorkspaceId", required=True, type=str, help="Workspace ID (customer ID) of the Log Analytics Workspace")
    onbParser.add_argument("--LogAnalyticsSharedKey", required=True, type=str, help="Shared key (primary) of the Log Analytics Workspace")
+   onbParser.add_argument("--PasswordKeyVaultMsiClientId", required=False, type=str, help="MSI Client ID used to get the access token from IMDS")
    monParser  = subParsers.add_parser("monitor", help="Execute the monitoring payload")
    monParser.set_defaults(func=monitor)
    args = parser.parse_args()
