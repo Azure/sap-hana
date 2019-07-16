@@ -1,115 +1,53 @@
-variable "region" {
-  description = "Azure region to deploy the sap setup into"
+variable "infrastructure" {
+  description = "Details of the Azure infrastructure to deploy the SAP landscape into"
 }
 
-variable "resource_group_existing" {
-  description = "Use existing resource group"
-}
+variable "infra_default" {
+  description = "Default argument values for the Azure infrastructure resources"
+  default = {
+    "region"         = "eastus"
+    "resource_group" = "sap-rg"
+    "vnets" = {
+      "management" = {
+        "name"          = "vnet-mgmt"
+        "address_space" = "10.0.0.0/16"
+        "subnet_default" = {
+          "name"   = "subnet-mgmt-default"
+          "prefix" = "10.0.1.0/24"
+          "nsg" = {
+            "name" = "nsg-mgmt-default"
+          }
 
-variable "resource_group_name" {
-  description = "Name of the azure resource group to deploy the sap setup into"
-}
+        }
+      }
+      "sap" = {
+        "name"          = "vnet-sap"
+        "address_space" = "10.1.0.0/16"
+        "subnet_admin" = {
+          "name"   = "subnet-sap-admin"
+          "prefix" = "10.1.1.0/24"
+          "nsg" = {
+            "name" = "nsg-sap-admin"
+          }
 
-variable "mgmt_vnet_existing" {
-  description = "Use existing management vnet"
-}
+        }
+        "subnet_client" = {
+          "name"   = "subnet-sap-client"
+          "prefix" = "10.1.2.0/24"
+          "nsg" = {
+            "name" = "nsg-sap-client"
+          }
 
-variable "mgmt_vnet_name" {
-  description = "Name of the management vnet"
-}
+        }
+        "subnet_app" = {
+          "name"   = "subnet-app"
+          "prefix" = "10.1.3.0/24"
+          "nsg" = {
+            "name" = "nsg-app"
+          }
 
-variable "mgmt_vnet_address_space" {
-  description = "Address space of the management vnet"
-}
-
-variable "sap_vnet_existing" {
-  description = "Use existing sap vnet"
-}
-
-variable "sap_vnet_name" {
-  description = "Name of the sap vnet"
-}
-
-variable "sap_vnet_address_space" {
-  description = "Address space of the sap vnet"
-}
-
-variable "mgmt_default_subnet_existing" {
-  description = "Use existing management subnet"
-}
-
-variable "mgmt_default_subnet_name" {
-  description = "Name of the management subnet"
-}
-
-variable "mgmt_default_subnet_prefix" {
-  description = "Address prefix of the management subnet"
-}
-
-variable "sap_client_subnet_existing" {
-  description = "Use existing sap client subnet"
-}
-
-variable "sap_client_subnet_name" {
-  description = "Name of the sap client subnet"
-}
-
-variable "sap_client_subnet_prefix" {
-  description = "Address prefix of the sap client subnet"
-}
-
-variable "sap_admin_subnet_existing" {
-  description = "Use existing sap admin subnet"
-}
-
-variable "sap_admin_subnet_name" {
-  description = "Name of the sap admin subnet"
-}
-
-variable "sap_admin_subnet_prefix" {
-  description = "Address prefix of the sap admin subnet"
-}
-
-variable "sap_app_subnet_existing" {
-  description = "Use existing sap application subnet"
-}
-
-variable "sap_app_subnet_name" {
-  description = "Name of the sap application subnet"
-}
-
-variable "sap_app_subnet_prefix" {
-  description = "Address prefix of the sap application subnet"
-}
-
-variable "mgmt_default_nsg_existing" {
-  description = "Use existing management nsg"
-}
-
-variable "mgmt_default_nsg_name" {
-  description = "Name of the management nsg"
-}
-
-variable "sap_client_nsg_existing" {
-  description = "Use existing sap client nsg"
-}
-
-variable "sap_client_nsg_name" {
-  description = "Name of the sap client nsg"
-}
-
-variable "sap_admin_nsg_existing" {
-  description = "Use existing sap admin nsg"
-}
-
-variable "sap_admin_nsg_name" {
-  description = "Name of the sap admin nsg"
-}
-
-variable "sap_app_nsg_existing" {
-  description = "Use existing sap application nsg"
-}
-
-variable "sap_app_nsg_name" {
-  description = "Name of the sap application nsg"
+        }
+      }
+    }
+  }
 }
