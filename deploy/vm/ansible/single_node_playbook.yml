@@ -1,4 +1,8 @@
 ---
+- hosts: hdb0
+  roles:
+    - { role: imds-reg, scenario: "hana-singlenode", deploy_status: "started"}
+
 - hosts: "hdb0"
   become: true
   roles:
@@ -30,3 +34,7 @@
   vars:
     config_json_file: ../modules/single_node_hana/temp.json
   import_playbook: linux_bastion_host.yml
+
+- hosts: hdb0
+  roles:
+    - { role: imds-reg, scenario: "hana-singlenode", deploy_status: "finished"}
