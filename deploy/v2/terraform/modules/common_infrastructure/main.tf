@@ -91,14 +91,14 @@ resource "azurerm_network_security_group" "sap-app-nsg" {
   resource_group_name = var.resource_group_existing ? var.resource_group_name : azurerm_resource_group.rg[0].name
 }
 
-# imports existing management vnet data
+# Imports existing management vnet data
 data "azurerm_virtual_network" "mgmt-vnet" {
   count               = var.mgmt_vnet_existing ? 1 : 0
   name                = var.mgmt_vnet_name
   resource_group_name = var.resource_group_name
 }
 
-# imports existing sap vnet data
+# Imports existing sap vnet data
 data "azurerm_virtual_network" "sap-vnet" {
   count               = var.sap_vnet_existing ? 1 : 0
   name                = var.sap_vnet_name
@@ -115,7 +115,7 @@ resource "azurerm_virtual_network_peering" "mgmt-sap-peering" {
   allow_virtual_network_access = true
 }
 
-# peers sap vnet to management vnet
+# Peers sap vnet to management vnet
 resource "azurerm_virtual_network_peering" "sap-mgmt-peering" {
   count                        = signum((var.mgmt_vnet_existing ? 0 : 1) + (var.sap_vnet_existing ? 0 : 1))
   name                         = "${var.sap_vnet_name}-${var.mgmt_vnet_name}-peering"

@@ -1,5 +1,5 @@
 variable "region" {
-  description = "Azure region to deploy the sap setup"
+  description = "Azure region to deploy the sap setup into"
 }
 
 variable "resource_group_existing" {
@@ -7,7 +7,7 @@ variable "resource_group_existing" {
 }
 
 variable "resource_group_name" {
-  description = "Name of the azure resource group to deploy the sap setup"
+  description = "Name of the azure resource group to deploy the sap setup into"
 }
 
 variable "mgmt_vnet_existing" {
