@@ -12,12 +12,14 @@ import decimal
 from datetime import datetime, timedelta, date
 import hashlib, hmac, base64
 import logging, http.client as http_client
+import hashlib
+import re
 
 ###############################################################################
 
+PAYLOAD_VERSION              = "0.3"
 STATE_FILE                   = "sapmon.state"
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
-LOG_TYPE                     = "SapHana_Infra"
 TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 TIMEOUT_HANA                 = 5
@@ -71,6 +73,7 @@ class SapHana:
       colIndex = {col[0] : idx for idx, col in enumerate(self.cursor.description)}
       return colIndex, self.cursor.fetchall()
 
+   # TODO(tniek): Refactor monitoring into Query class
    def getLoadHistory(self, fromTimestamp):
       """
       Get infrastructure utilization via HANA Load History
@@ -103,6 +106,40 @@ AND h.HOST = i.HOST AND UPPER(i.KEY) = 'TIMEZONE_OFFSET'
 ORDER BY h.TIME ASC
 """ % sqlFrom
       return self.runQuery(sql)
+
+   def getHostConfig(self):
+      """
+      Get HANA host configuration
+      """
+      sql = "SELECT * FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION"
+      return self.runQuery(sql)
+
+   def getNewResultHash(self, query, resultRows):
+      """
+      Compute hash of a specific query result and return it only if it's different from the previous one
+      """
+      if len(resultRows) == 0:
+         return None
+      resultHash = hashlib.md5(str(resultRows).encode("utf-8")).hexdigest()
+      if query in ctx.lastResultHashes and ctx.lastResultHashes[query] == resultHash:
+         return None
+      else:
+         return resultHash
+
+   def convertIntoJson(self, colIndex, resultRows):
+      """
+      Convert a query result into a JSON-formatted string (as required by Log Analytics)
+      """
+      logData = []
+      for r in resultRows:
+         logItem = {}
+         for c in colIndex.keys():
+            if c.startswith("_"): # remove internal fields
+               continue
+            logItem[c] = r[colIndex[c]]
+         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
+         logData.append(logItem)
+      return json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
 
 ###############################################################################
 
@@ -157,22 +194,23 @@ class AzureInstanceMetadataService:
          )
 
    @staticmethod
-   def getComputeInstance():
+   def getComputeInstance(operation):
       """
       Get the compute instance for the current VM via IMS
       """
       return AzureInstanceMetadataService._sendRequest(
          "instance",
+         headers = {"User-Agent": "SAP Monitor/%s (%s)" % (PAYLOAD_VERSION, operation)}
          )["compute"]
 
    @staticmethod
-   def getAuthToken(resource):
+   def getAuthToken(resource, msiClientId = None):
       """
       Get an authentication token via IMS
       """
       return AzureInstanceMetadataService._sendRequest(
          "identity/oauth2/token",
-         params = {"resource": resource}
+         params = {"resource": resource, "client_id": msiClientId}
          )["access_token"]
 
 ###############################################################################
@@ -183,9 +221,9 @@ class AzureKeyVault:
    """
    params  = {"api-version": "7.0"}
 
-   def __init__(self, keyvaultName):
+   def __init__(self, keyvaultName, msiClientId = None):
       self.uri     = "https://%s.vault.azure.net" % keyvaultName
-      self.token   = AzureInstanceMetadataService.getAuthToken("https://vault.azure.net")
+      self.token   = AzureInstanceMetadataService.getAuthToken("https://vault.azure.net", msiClientId)
       self.headers = {
          "Authorization": "Bearer %s" % self.token,
          "Content-Type":  "application/json"
@@ -260,10 +298,10 @@ x-ms-date:%s
             bytesHash,
             digestmod=hashlib.sha256).digest()
          )
-         stringHash  = encodedHash.decode("utf-8")
+         stringHash = encodedHash.decode("utf-8")
          return "SharedKey %s:%s" % (self.workspaceId, stringHash)
 
-      timestamp   = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
+      timestamp = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
       headers = {
          "content-type":  "application/json",
          "Authorization": buildSig(jsonData, timestamp),
@@ -285,39 +323,58 @@ class _Context:
    """
    hanaInstances = []
 
-   def __init__(self):
-      self.vmInstance = AzureInstanceMetadataService.getComputeInstance()
-      vmTags          = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
-      self.sapmonId   = vmTags["SapMonId"]
-      self.azKv       = AzureKeyVault("sapmon%s" % self.sapmonId)
-      self.lastPull   = self.readLastPullTimestamp()
+   def __init__(self, operation):
+      self.vmInstance       = AzureInstanceMetadataService.getComputeInstance(operation)
+      vmTags                = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
+      self.sapmonId         = vmTags["SapMonId"]
+      self.azKv             = AzureKeyVault("sapmon%s" % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
+      self.lastPull         = None
+      self.lastResultHashes = {}
+      self.readStateFile()
 
-   def readLastPullTimestamp(self):
+   def readStateFile(self):
       """
-      Read the timestamp (UTC) of the last successful pull from state file
+      Get most recent state (with hashes from point-in-time queries and last pull timestamp) from a local file
       """
-      lastPull = None
       try:
          with open(STATE_FILE, "r") as f:
             data = json.load(f)
-         lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
-      finally:
-         return lastPull
+         self.lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
+         self.lastResultHashes = data["lastResultHashes"]
+      except:
+         pass
+      return
 
-   def setLastPullTimestamp(self, timestamp):
+   def writeStateFile(self):
       """
-      Write the timestamp (UTC) of the last successful pull to state file
+      Persist current state (with hashes from point-in-time queries and last pull timestamp) into a local file
       """
       try:
          data = {
-            "lastPullUTC": timestamp.strftime(TIME_FORMAT_HANA)
+            "lastResultHashes": self.lastResultHashes,
          }
+         if self.lastPull:
+            data["lastPullUTC"] = self.lastPull.strftime(TIME_FORMAT_HANA)
          with open(STATE_FILE, "w") as f:
             json.dump(data, f)
-         self.lastPull = timestamp
          return True
       except:
          return False
+      return
+
+   def setLastPullTimestamp(self, timestamp):
+      """
+      Set the timestamp (UTC) of the last successful pull and persist to state file
+      """
+      self.lastPull = timestamp
+      return self.writeStateFile()
+
+   def setResultHash(self, query, resultHash):
+      """
+      Set the hash of a specific (point-in-time) query and persist to state file
+      """
+      self.lastResultHashes[query] = resultHash
+      return self.writeStateFile()
 
    def parseSecrets(self):
       """
@@ -331,6 +388,10 @@ class _Context:
       hanaSecrets = sliceDict(secrets, "SapHana-")
       for h in hanaSecrets.keys():
          hanaDetails  = json.loads(hanaSecrets[h])
+         if not hanaDetails["HanaDbPassword"]:
+            hanaDetails["HanaDbPassword"] = self.fetchHanaPasswordFromKeyVault(
+               hanaDetails["HanaDbPasswordKeyVaultUrl"],
+               hanaDetails["PasswordKeyVaultMsiClientId"])
          hanaInstance = SapHana(hanaDetails = hanaDetails)
          self.hanaInstances.append(hanaInstance)
 
@@ -340,6 +401,10 @@ class _Context:
          laSecret["LogAnalyticsWorkspaceId"],
          laSecret["LogAnalyticsSharedKey"]
          )
+   def fetchHanaPasswordFromKeyVault(self, passwordKeyVault, passwordKeyVaultMsiClientId):
+      vaultNameSearch = re.search('https://(.*).vault.azure.net', passwordKeyVault)
+      kv = AzureKeyVault(vaultNameSearch.group(1), passwordKeyVaultMsiClientId)
+      return kv.getSecret(passwordKeyVault)
 
 ###############################################################################
 
@@ -358,17 +423,19 @@ class _JsonEncoder(json.JSONEncoder):
 
 def onboard(args):
    """
-   Store credentials in the customer KeyVault.
-   (To be executed as custom script upon initial deployment of collector VM.)
+   Store credentials in the customer KeyVault
+   (To be executed as custom script upon initial deployment of collector VM)
    """
-   # Credentials (provided by user) to the existing HANA Dinstance
+   # Credentials (provided by user) to the existing HANA instance
    hanaSecretName  = "SapHana-%s" % args.HanaDbName
    hanaSecretValue = json.dumps({
-      "HanaHostname":   args.HanaHostname,
-      "HanaDbName":     args.HanaDbName,
-      "HanaDbUsername": args.HanaDbUsername,
-      "HanaDbPassword": args.HanaDbPassword,
-      "HanaDbSqlPort":  args.HanaDbSqlPort,
+      "HanaHostname":                args.HanaHostname,
+      "HanaDbName":                  args.HanaDbName,
+      "HanaDbUsername":              args.HanaDbUsername,
+      "HanaDbPassword":              args.HanaDbPassword,
+      "HanaDbPasswordKeyVaultUrl":   args.HanaDbPasswordKeyVaultUrl,
+      "HanaDbSqlPort":               args.HanaDbSqlPort,
+      "PasswordKeyVaultMsiClientId": args.PasswordKeyVaultMsiClientId,
       })
    ctx.azKv.setSecret(hanaSecretName, hanaSecretValue)
 
@@ -379,6 +446,19 @@ def onboard(args):
       "LogAnalyticsSharedKey":   args.LogAnalyticsSharedKey,
       })
    ctx.azKv.setSecret(laSecretName, laSecretValue)
+
+   hanaDetails = json.loads(hanaSecretValue)
+   if not hanaDetails["HanaDbPassword"]:
+      hanaDetails["HanaDbPassword"] = ctx.fetchHanaPasswordFromKeyVault(
+         hanaDetails["HanaDbPasswordKeyVaultUrl"],
+         hanaDetails["PasswordKeyVaultMsiClientId"])
+
+   # Check connectivity to HANA instance
+   hana = SapHana(hanaDetails = hanaDetails)
+   hana.connect()
+   hana.runQuery("SELECT 0 FROM DUMMY")
+   hana.disconnect()
+   return
 
 def monitor(args):
    """
@@ -393,31 +473,32 @@ def monitor(args):
    ctx.parseSecrets()
    for h in ctx.hanaInstances:
       h.connect()
+      # TODO(tniek): Implement proper query framework
+
+      # HANA Host Configuration
+      colIndex, resultRows = h.getHostConfig()
+      resultHash = h.getNewResultHash("HostConfig", resultRows)
+      if resultHash:
+         jsonData = h.convertIntoJson(colIndex, resultRows)
+         ctx.azLa.ingest("SapHana_HostConfig", jsonData)
+         ctx.setResultHash("HostConfig", resultHash)
+
+      # HANA Load History
       if not ctx.lastPull:
          fromTimestamp = None
       else:
-         fromTimestamp  = ctx.lastPull + timedelta(seconds=1) 
+         fromTimestamp = ctx.lastPull + timedelta(seconds=1)
       colIndex, resultRows = h.getLoadHistory(fromTimestamp)
-      if len(resultRows) == 0:
-         continue
-      lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
-      logData = []
-      for r in resultRows:
-         logItem = {}
-         for c in colIndex.keys():
-            if c.startswith("_"): # remove internal fields
-               continue
-            logItem[c] = r[colIndex[c]]
-         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
-         logData.append(logItem)
-      jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-      ctx.azLa.ingest(LOG_TYPE, jsonData)
-      ctx.setLastPullTimestamp(lastPull)
-      with open("output", "w") as f:
-         f.write(jsonData)
+      if len(resultRows) > 0:
+         jsonData = h.convertIntoJson(colIndex, resultRows)
+         ctx.azLa.ingest("SapHana_LoadHistory", jsonData)
+         lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
+         ctx.setLastPullTimestamp(lastPull)
+
       h.disconnect()
       
 def main():
+   global ctx
    parser = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
    subParsers = parser.add_subparsers(dest="command", help="main functions")
    subParsers.required = True
@@ -426,16 +507,19 @@ def main():
    onbParser.add_argument("--HanaHostname", required=True, type=str, help="Hostname of the HDB to be monitored")
    onbParser.add_argument("--HanaDbName", required=True, type=str, help="Name of the tenant DB (empty if not MDC)")
    onbParser.add_argument("--HanaDbUsername", required=True, type=str, help="DB username to connect to the HDB tenant")
-   onbParser.add_argument("--HanaDbPassword", required=True, type=str, help="DB user password to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbPassword", required=False, type=str, help="DB user password to connect to the HDB tenant")
+   onbParser.add_argument("--HanaDbPasswordKeyVaultUrl", required=False, type=str, help="Link to the KeyVault secret containing DB user password to connect to the HDB tenant")
    onbParser.add_argument("--HanaDbSqlPort", required=True, type=int, help="SQL port of the tenant DB")
    onbParser.add_argument("--LogAnalyticsWorkspaceId", required=True, type=str, help="Workspace ID (customer ID) of the Log Analytics Workspace")
    onbParser.add_argument("--LogAnalyticsSharedKey", required=True, type=str, help="Shared key (primary) of the Log Analytics Workspace")
+   onbParser.add_argument("--PasswordKeyVaultMsiClientId", required=False, type=str, help="MSI Client ID used to get the access token from IMDS")
    monParser  = subParsers.add_parser("monitor", help="Execute the monitoring payload")
    monParser.set_defaults(func=monitor)
    args = parser.parse_args()
+   ctx = _Context(args.command)
    args.func(args)
 
-ctx = _Context()
+ctx = None
 if __name__ == "__main__":
    main()
 

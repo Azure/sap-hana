@@ -5,7 +5,13 @@
 trigger: none
 # Only trigger build when a PR is opened
 pr:
-- master
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - README.md
+    - monitor/*
 jobs:
 - job: "single_node_hana"
   variables:
@@ -35,8 +41,8 @@ jobs:
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
       TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
-      TF_VAR_az_resource_group: single-node-$(System.PullRequest.SourceBranch)
-      TF_VAR_az_domain_name: single-node-$(System.PullRequest.SourceBranch)
+      TF_VAR_az_resource_group: single-node-$(Build.BuildId)
+      TF_VAR_az_domain_name: single-node-$(Build.BuildId)
       TF_VAR_url_sap_sapcar_linux: $(hana-int-sapcar-721-linux)
       TF_VAR_url_sap_hdbserver: $(hana-int-hana2sps03-server)
       TF_VAR_url_hana_studio_linux: $(hana-int-hanastudio-linux)
@@ -60,8 +66,8 @@ jobs:
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
       TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
-      TF_VAR_az_resource_group: single-node-$(System.PullRequest.SourceBranch)
-      TF_VAR_az_domain_name: single-node-$(System.PullRequest.SourceBranch)
+      TF_VAR_az_resource_group: single-node-$(Build.BuildId)
+      TF_VAR_az_domain_name: single-node-$(Build.BuildId)
       TF_VAR_url_sap_sapcar_linux: $(hana-int-sapcar-721-linux)
       TF_VAR_url_sap_hdbserver: $(hana-int-hana2sps03-server)
       TF_VAR_url_hana_studio_linux: $(hana-int-hanastudio-linux)
