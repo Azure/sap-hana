@@ -6,23 +6,61 @@
 #       (c) 2019        Microsoft Corp.
 #
 import pyhdb
+from datetime import datetime, timedelta, date
+import http.client as http_client
 import requests, json
 import sys, argparse
 import decimal
-from datetime import datetime, timedelta, date
 import hashlib, hmac, base64
-import logging, http.client as http_client
+import logging, logging.config
 import hashlib
 import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.3"
+PAYLOAD_VERSION              = "0.31"
 STATE_FILE                   = "sapmon.state"
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
 TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 TIMEOUT_HANA                 = 5
+DEFAULT_CONSOLE_LOG_LEVEL    = logging.WARNING
+DEFAULT_FILE_LOG_LEVEL       = logging.INFO
+LOG_FILENAME                 = "sapmon.log"
+
+###############################################################################
+
+LOG_CONFIG = {
+   "version": 1,
+   "disable_existing_loggers": True,
+   "formatters": {
+      "detailed": {
+         "format": "[%(process)d] %(asctime)s %(levelname).1s %(funcName)s:%(lineno)d %(message)s",
+      },
+      "simple": {
+         "format": "%(levelname)-8s %(message)s",
+      }
+   },
+   "handlers": {
+      "console": {
+         "class": "logging.StreamHandler",
+         "formatter": "simple",
+         "level": DEFAULT_CONSOLE_LOG_LEVEL,
+      },
+      "file": {
+         "class": "logging.handlers.RotatingFileHandler",
+         "formatter": "detailed",
+         "level": DEFAULT_FILE_LOG_LEVEL,
+         "filename": LOG_FILENAME,
+         "maxBytes": 2000,
+         "backupCount": 10,
+      },
+   },
+   "root": {
+      "level": logging.DEBUG,
+      "handlers": ["console", "file"],
+   }
+}
 
 ###############################################################################
 
@@ -324,6 +362,7 @@ class _Context:
    hanaInstances = []
 
    def __init__(self, operation):
+      self.logger           = self.getLogger()
       self.vmInstance       = AzureInstanceMetadataService.getComputeInstance(operation)
       vmTags                = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
       self.sapmonId         = vmTags["SapMonId"]
@@ -331,6 +370,14 @@ class _Context:
       self.lastPull         = None
       self.lastResultHashes = {}
       self.readStateFile()
+
+   def getLogger(self):
+      """
+      Initialize a global logger
+      """
+      logging.config.dictConfig(LOG_CONFIG)
+      logger = logging.getLogger(__name__)
+      return logger
 
    def readStateFile(self):
       """
@@ -499,11 +546,13 @@ def monitor(args):
       
 def main():
    global ctx
-   parser = argparse.ArgumentParser(description="SAP on Azure Monitor Payload")
-   subParsers = parser.add_subparsers(dest="command", help="main functions")
+   parser = argparse.ArgumentParser(description="SAP Monitor Payload")
+   parser.add_argument("--verbose", action="store_true", dest="verbose", help="run in verbose mode") 
+   subParsers = parser.add_subparsers(title="actions", help="Select action to run")
    subParsers.required = True
-   onbParser = subParsers.add_parser("onboard", help="Onboard payload by adding credentials into KeyVault")
-   onbParser.set_defaults(func=onboard)
+   subParsers.dest = "command"
+   onbParser = subParsers.add_parser("onboard", description="Onboard payload", help="Onboard payload by adding credentials into KeyVault")
+   onbParser.set_defaults(func=onboard, command="onboard")
    onbParser.add_argument("--HanaHostname", required=True, type=str, help="Hostname of the HDB to be monitored")
    onbParser.add_argument("--HanaDbName", required=True, type=str, help="Name of the tenant DB (empty if not MDC)")
    onbParser.add_argument("--HanaDbUsername", required=True, type=str, help="DB username to connect to the HDB tenant")
@@ -513,9 +562,12 @@ def main():
    onbParser.add_argument("--LogAnalyticsWorkspaceId", required=True, type=str, help="Workspace ID (customer ID) of the Log Analytics Workspace")
    onbParser.add_argument("--LogAnalyticsSharedKey", required=True, type=str, help="Shared key (primary) of the Log Analytics Workspace")
    onbParser.add_argument("--PasswordKeyVaultMsiClientId", required=False, type=str, help="MSI Client ID used to get the access token from IMDS")
-   monParser  = subParsers.add_parser("monitor", help="Execute the monitoring payload")
+   monParser  = subParsers.add_parser("monitor", description="Monitor payload", help="Execute the monitoring payload")
    monParser.set_defaults(func=monitor)
    args = parser.parse_args()
+   if args.verbose:
+      # LOG_CONFIG["handlers"]["console"]["formatter"] = "detailed"
+      LOG_CONFIG["handlers"]["console"]["level"] = logging.DEBUG
    ctx = _Context(args.command)
    args.func(args)
 
