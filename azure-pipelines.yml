@@ -13,7 +13,7 @@ pr:
     - README.md
     - monitor/*
 jobs:
-- job: "single_node_hana"
+- job: single_node_hana
   variables:
     - group: azure-config-variables
     - group: azure-sap-hana-pipeline-secrets
@@ -83,3 +83,14 @@ jobs:
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+- job: cleanup_rg
+  variables:
+      - group: azure-config-variables
+      - group: azure-sap-hana-pipeline-secrets
+  dependsOn: single_node_hana
+  condition: failed()
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      az group delete -n single-node-$(Build.BuildId) --yes --subscription $(landscape-subscription)
+    displayName: 'Delete resource group single-node-$(Build.BuildId)'
