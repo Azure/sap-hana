@@ -25,7 +25,7 @@ TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 TIMEOUT_HANA                 = 5
 DEFAULT_CONSOLE_LOG_LEVEL    = logging.INFO
-DEFAULT_FILE_LOG_LEVEL       = logging.WARNING
+DEFAULT_FILE_LOG_LEVEL       = logging.INFO
 LOG_FILENAME                 = "sapmon.log"
 
 ###############################################################################
@@ -61,6 +61,12 @@ LOG_CONFIG = {
       "handlers": ["console", "file"],
    }
 }
+
+###############################################################################
+
+ERROR_GETTING_AUTH_TOKEN      = 10
+ERROR_SETTING_KEYVAULT_SECRET = 20
+ERROR_HANA_CONNECTION         = 30
 
 ###############################################################################
 
@@ -290,7 +296,8 @@ class AzureInstanceMetadataService:
             )["access_token"]
          logger.debug("authToken=%s" % authToken)
       except Exception as e:
-         logger.error("could not get auth token (%s)" % e)
+         logger.critical("could not get auth token (%s)" % e)
+         sys.exit(ERROR_GETTING_AUTH_TOKEN)
       return authToken
 
 ###############################################################################
@@ -606,7 +613,7 @@ def onboard(args):
       ctx.azKv.setSecret(hanaSecretName, hanaSecretValue)
    except Exception as e:
       logger.critical("could not store HANA credentials in KeyVault secret (%s)" % e)
-      sys.exit(100)
+      sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
 
    # Credentials (created by HanaRP) to the newly created Log Analytics Workspace
    laSecretName = "AzureLogAnalytics"
@@ -621,7 +628,7 @@ def onboard(args):
       ctx.azKv.setSecret(laSecretName, laSecretValue)
    except Exception as e:
       logger.critical("could not store Log Analytics credentials in KeyVault secret (%s)" % e)
-      sys.exit(100)
+      sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
 
    hanaDetails = json.loads(hanaSecretValue)
    logger.debug("hanaDetails=%s" % hanaDetails)
@@ -640,7 +647,9 @@ def onboard(args):
       hana.disconnect()
    except Exception as e:
       logger.critical("could not connect to HANA instance and run test query (%s)" % e)
-      sys.exit(100)
+      sys.exit(ERROR_HANA_CONNECTION)
+
+   logger.info("onboarding payload successfully completed")
    return
 
 def monitor(args):
@@ -660,7 +669,7 @@ def monitor(args):
          h.connect()
       except Exception as e:
          logger.critical("could not connect to HANA instance (%s)" % e)
-         sys.exit(100)
+         sys.exit(ERROR_HANA_CONNECTION)
 
       # TODO(tniek): Implement proper query framework
 
@@ -694,6 +703,9 @@ def monitor(args):
          h.disconnect()
       except Exception as e:
          logger.error("could not disconnect from HANA instance (%s)" % e)
+
+   logger.info("monitor payload successfully completed")
+   return
       
 def main():
    global ctx, logger
