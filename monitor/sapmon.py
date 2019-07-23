@@ -9,7 +9,7 @@ import pyhdb
 from datetime import datetime, timedelta, date
 import http.client as http_client
 import requests, json
-import sys, argparse
+import os, sys, argparse
 import decimal
 import hashlib, hmac, base64
 import logging, logging.config
@@ -19,14 +19,15 @@ import re
 ###############################################################################
 
 PAYLOAD_VERSION              = "0.4"
-STATE_FILE                   = "sapmon.state"
+PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
+STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
 TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
 TIMEOUT_HANA                 = 5
 DEFAULT_CONSOLE_LOG_LEVEL    = logging.INFO
 DEFAULT_FILE_LOG_LEVEL       = logging.INFO
-LOG_FILENAME                 = "sapmon.log"
+LOG_FILENAME                 = "%s/sapmon.log" % PAYLOAD_DIRECTORY
 
 ###############################################################################
 
@@ -294,7 +295,6 @@ class AzureInstanceMetadataService:
             "identity/oauth2/token",
             params = {"resource": resource, "client_id": msiClientId}
             )["access_token"]
-         logger.debug("authToken=%s" % authToken)
       except Exception as e:
          logger.critical("could not get auth token (%s)" % e)
          sys.exit(ERROR_GETTING_AUTH_TOKEN)
@@ -370,7 +370,6 @@ class AzureKeyVault:
          for k in kvSecrets:
             id = k["id"].split("/")[-1]
             secrets[id] = self.getSecret(k["id"])
-         logger.debug("secrets=%s" % secrets)
       except Exception as e:
          logger.error("could not get current KeyVault secrets (%s)" % e)
       return secrets
@@ -536,7 +535,6 @@ class _Context(object):
 
       logger.info("parsing secrets")
       secrets = self.azKv.getCurrentSecrets()
-      logger.debug("secrets=%s" % secrets)
 
       # extract HANA instance(s) from secrets
       hanaSecrets = sliceDict(secrets, "SapHana-")
@@ -564,7 +562,6 @@ class _Context(object):
       # extract Log Analytics credentials from secrets
       try:
          laSecret = json.loads(secrets["AzureLogAnalytics"])
-         logger.debug("laSecret=%s" % laSecret)
       except Exception as e:
          logger.error("could not parse Log Analytics credentials (%s)" % e)
       self.azLa = AzureLogAnalytics(
@@ -587,6 +584,9 @@ class _JsonEncoder(json.JSONEncoder):
       return super(_JsonEncoder, self).default(o)
 
 ###############################################################################
+
+def getPayloadDir():
+   return os.path.dirname(os.path.realpath(__file__))
 
 def onboard(args):
    """
