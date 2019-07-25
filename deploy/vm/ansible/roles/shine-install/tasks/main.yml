@@ -4,6 +4,11 @@
   get_url:
     url: "{{ url_shine_xsa }}"
     dest: /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/XSASHINE.ZIP
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
 
 - name: Log into XSA
   shell: |

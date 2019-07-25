@@ -4,17 +4,32 @@
   get_url:
     url: "{{ url_xsa_hrtt }}"
     dest: /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/XSAHRTT.ZIP
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
   when: install_cockpit == false
   
 - name: Download WebIDE
   get_url:
     url: "{{ url_xsa_webide }}"
     dest: /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/XSAWEBIDE.ZIP
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
 
 - name: Download MTA ext
   get_url:
     url: "{{ url_xsa_mta }}"
     dest: /usr/sap/{{ sap_sid|upper }}/HDB{{ sap_instancenum }}/XSAWEBIDE.mtaext
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
 
 - name: Log into XSA
   shell: |

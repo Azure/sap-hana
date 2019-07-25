@@ -167,6 +167,21 @@ variable "url_xsa_mta" {
   default     = ""
 }
 
+variable "url_timeout" {
+  description = "Timeout in seconds for URL request."
+  default     = 30
+}
+
+variable "url_retries_cnt" {
+  description = "The number of attempts to download the installation bits from the URLs."
+  default     = 10
+}
+
+variable "url_retries_delay" {
+  description = "The time between each attempt to download the installation bits from the URLs"
+  default     = 10
+}
+
 variable "useHana2" {
   description = "If this is set to true, then, ports specifically for HANA 2.0 will be opened."
   default     = false
@@ -189,3 +204,4 @@ variable "linux_bastion" {
   description = "flag to determine if linux bastion host is needed or not"
   default     = false
 }
+
