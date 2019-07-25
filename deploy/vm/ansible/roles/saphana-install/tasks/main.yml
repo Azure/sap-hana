@@ -20,7 +20,6 @@
     dest: /hana/shared/install/SAPCAR_LINUX.EXE
     mode: 0755
     timeout: "{{ url_timeout }}"
-  # 10 retries with 10 second in between
   register: result
   until: result is succeeded
   retries: "{{ url_retries_cnt }}"
