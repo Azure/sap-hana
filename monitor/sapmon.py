@@ -191,6 +191,7 @@ ORDER BY h.TIME ASC
          else:
             if ctx.lastResultHashes[query] == resultHash:
                logger.info("result is identical to last execution")
+               resultHash = None
             else:
                logger.info("result has changed from last execution")
       return resultHash   
