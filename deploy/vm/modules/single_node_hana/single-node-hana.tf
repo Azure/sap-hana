@@ -23,7 +23,7 @@ module "create_hdb" {
   az_region                 = var.az_region
   hdb_num                   = 0
   az_domain_name            = var.az_domain_name
-  hana_subnet_id            = module.common_setup.vnet_subnets[0]
+  hana_subnet_id            = module.common_setup.vnet_subnets
   nsg_id                    = module.common_setup.nsg_id
   private_ip_address        = var.private_ip_address_hdb
   public_ip_allocation_type = var.public_ip_allocation_type
@@ -41,7 +41,7 @@ module "windows_bastion_host" {
   az_resource_group  = module.common_setup.resource_group_name
   az_region          = var.az_region
   sap_sid            = var.sap_sid
-  subnet_id          = module.common_setup.vnet_subnets[0]
+  subnet_id          = module.common_setup.vnet_subnets
   bastion_username   = var.bastion_username_windows
   private_ip_address = var.private_ip_address_windows_bastion
   pw_bastion         = var.pw_bastion_windows
