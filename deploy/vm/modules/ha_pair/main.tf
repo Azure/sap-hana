@@ -37,7 +37,7 @@ resource "azurerm_lb" "ha-pair-lb" {
 
   frontend_ip_configuration {
     name                          = "hsr-front"
-    subnet_id                     = module.common_setup.vnet_subnets[0]
+    subnet_id                     = module.common_setup.vnet_subnets
     private_ip_address_allocation = "Static"
     private_ip_address            = var.private_ip_address_lb_frontend
   }
@@ -99,7 +99,7 @@ module "create_hdb0" {
   az_domain_name            = var.az_domain_name
   backend_ip_pool_ids       = [azurerm_lb_backend_address_pool.availability-back-pool.id]
   hdb_num                   = "0"
-  hana_subnet_id            = module.common_setup.vnet_subnets[0]
+  hana_subnet_id            = module.common_setup.vnet_subnets
   nsg_id                    = module.common_setup.nsg_id
   private_ip_address        = var.private_ip_address_hdb0
   public_ip_allocation_type = var.public_ip_allocation_type
@@ -119,7 +119,7 @@ module "create_hdb1" {
   az_domain_name            = var.az_domain_name
   backend_ip_pool_ids       = [azurerm_lb_backend_address_pool.availability-back-pool.id]
   hdb_num                   = "1"
-  hana_subnet_id            = module.common_setup.vnet_subnets[0]
+  hana_subnet_id            = module.common_setup.vnet_subnets
   nsg_id                    = module.common_setup.nsg_id
   private_ip_address        = var.private_ip_address_hdb1
   public_ip_allocation_type = var.public_ip_allocation_type
@@ -140,7 +140,7 @@ module "nic_and_pip_setup_iscsi" {
   nsg_id                    = module.common_setup.nsg_id
   private_ip_address        = var.private_ip_address_iscsi
   public_ip_allocation_type = var.public_ip_allocation_type
-  subnet_id                 = module.common_setup.vnet_subnets[0]
+  subnet_id                 = module.common_setup.vnet_subnets
 }
 
 module "vm_and_disk_creation_iscsi" {
@@ -165,7 +165,7 @@ module "windows_bastion_host" {
   az_resource_group  = module.common_setup.resource_group_name
   az_region          = var.az_region
   sap_sid            = var.sap_sid
-  subnet_id          = module.common_setup.vnet_subnets[0]
+  subnet_id          = module.common_setup.vnet_subnets
   bastion_username   = var.bastion_username_windows
   private_ip_address = var.private_ip_address_windows_bastion
   pw_bastion         = var.pw_bastion_windows
