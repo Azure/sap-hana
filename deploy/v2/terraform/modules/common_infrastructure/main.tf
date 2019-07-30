@@ -65,13 +65,13 @@ resource "azurerm_subnet" "subnet-sap-admin" {
   address_prefix       = var.infrastructure.vnets.sap.subnet_admin.prefix
 }
 
-# Creates client subnet of SAP VNET
-resource "azurerm_subnet" "subnet-sap-client" {
-  count                = var.infrastructure.vnets.sap.subnet_client.is_existing ? 0 : 1
-  name                 = var.infrastructure.vnets.sap.subnet_client.name
+# Creates db subnet of SAP VNET
+resource "azurerm_subnet" "subnet-sap-db" {
+  count                = var.infrastructure.vnets.sap.subnet_db.is_existing ? 0 : 1
+  name                 = var.infrastructure.vnets.sap.subnet_db.name
   resource_group_name  = var.infrastructure.resource_group.is_existing ? var.infrastructure.resource_group.name : azurerm_resource_group.rg[0].name
   virtual_network_name = var.infrastructure.vnets.sap.is_existing ? var.infrastructure.vnets.sap.name : azurerm_virtual_network.vnet-sap[0].name
-  address_prefix       = var.infrastructure.vnets.sap.subnet_client.prefix
+  address_prefix       = var.infrastructure.vnets.sap.subnet_db.prefix
 }
 
 # Creates app subnet of SAP VNET
@@ -99,10 +99,10 @@ data "azurerm_subnet" "subnet-sap-admin" {
   virtual_network_name = var.infrastructure.vnets.sap.name
 }
 
-# Imports data of existing SAP client subnet
-data "azurerm_subnet" "subnet-sap-client" {
-  count                = var.infrastructure.vnets.sap.subnet_client.is_existing ? 1 : 0
-  name                 = var.infrastructure.vnets.sap.subnet_client.name
+# Imports data of existing SAP db subnet
+data "azurerm_subnet" "subnet-sap-db" {
+  count                = var.infrastructure.vnets.sap.subnet_db.is_existing ? 1 : 0
+  name                 = var.infrastructure.vnets.sap.subnet_db.name
   resource_group_name  = var.infrastructure.resource_group.name
   virtual_network_name = var.infrastructure.vnets.sap.name
 }
@@ -134,10 +134,10 @@ resource "azurerm_network_security_group" "nsg-admin" {
   resource_group_name = var.infrastructure.resource_group.is_existing ? var.infrastructure.resource_group.name : azurerm_resource_group.rg[0].name
 }
 
-# Creates SAP client subnet nsg
-resource "azurerm_network_security_group" "nsg-client" {
-  count               = var.infrastructure.vnets.sap.subnet_client.nsg.is_existing ? 0 : 1
-  name                = var.infrastructure.vnets.sap.subnet_client.nsg.name
+# Creates SAP db subnet nsg
+resource "azurerm_network_security_group" "nsg-db" {
+  count               = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
+  name                = var.infrastructure.vnets.sap.subnet_db.nsg.name
   location            = var.infrastructure.region
   resource_group_name = var.infrastructure.resource_group.is_existing ? var.infrastructure.resource_group.name : azurerm_resource_group.rg[0].name
 }
@@ -164,10 +164,10 @@ data "azurerm_network_security_group" "nsg-admin" {
   resource_group_name = var.infrastructure.resource_group.name
 }
 
-# Imports the SAP client subnet nsg data
-data "azurerm_network_security_group" "nsg-client" {
-  count               = var.infrastructure.vnets.sap.subnet_client.nsg.is_existing ? 1 : 0
-  name                = var.infrastructure.vnets.sap.subnet_client.nsg.name
+# Imports the SAP db subnet nsg data
+data "azurerm_network_security_group" "nsg-db" {
+  count               = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 1 : 0
+  name                = var.infrastructure.vnets.sap.subnet_db.nsg.name
   resource_group_name = var.infrastructure.resource_group.name
 }
 
@@ -192,11 +192,11 @@ resource "azurerm_subnet_network_security_group_association" "Associate-nsg-admi
   network_security_group_id = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].id : azurerm_network_security_group.nsg-admin[0].id
 }
 
-# Associates SAP client nsg to SAP client subnet
-resource "azurerm_subnet_network_security_group_association" "Associate-nsg-client" {
-  count                     = var.infrastructure.vnets.sap.subnet_client.nsg.is_existing ? 0 : 1
-  subnet_id                 = var.infrastructure.vnets.sap.subnet_client.is_existing ? data.azurerm_subnet.subnet-sap-client[0].id : azurerm_subnet.subnet-sap-client[0].id
-  network_security_group_id = var.infrastructure.vnets.sap.subnet_client.nsg.is_existing ? data.azurerm_network_security_group.nsg-client[0].id : azurerm_network_security_group.nsg-client[0].id
+# Associates SAP db nsg to SAP db subnet
+resource "azurerm_subnet_network_security_group_association" "Associate-nsg-db" {
+  count                     = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
+  subnet_id                 = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
+  network_security_group_id = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].id : azurerm_network_security_group.nsg-db[0].id
 }
 
 # Associates SAP app nsg to SAP app subnet
