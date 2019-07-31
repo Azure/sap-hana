@@ -18,7 +18,7 @@ import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4"
+PAYLOAD_VERSION              = "0.4.1"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
@@ -218,6 +218,7 @@ class REST:
    Provide access to a REST endpoint
    """
    @staticmethod
+   # TODO: improve error handling (include HTTP status together with response)
    def sendRequest(endpoint, method = requests.get, params = {}, headers = {}, timeout = 5, data = None, debug = False):
       if debug:
          http_client.HTTPConnection.debuglevel = 1
@@ -344,7 +345,8 @@ class AzureKeyVault:
             data   = json.dumps({"value": secretValue})
             ) == secretValue
       except Exception as e:
-         logger.error("could not set KeyVault secret (%s)" % e)
+         logger.critical("could not set KeyVault secret (%s)" % e)
+         sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
       return success
 
    def getSecret(self, secretId):
@@ -446,7 +448,7 @@ class _Context(object):
       logger.debug("vmTags=%s" % vmTags)
       self.sapmonId = vmTags["SapMonId"]
       logger.debug("sapmonId=%s " % self.sapmonId)
-      self.azKv = AzureKeyVault("sapmon%s" % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
+      self.azKv = AzureKeyVault("sapmon-kv-%s" % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
       self.lastPull = None
       self.lastResultHashes = {}
       self.readStateFile()
