@@ -19,11 +19,21 @@
     url: "{{ url_sapcar }}"
     dest: /hana/shared/install/SAPCAR_LINUX.EXE
     mode: 0755
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
 
 - name: download hdbserver
   get_url:
     url: "{{ url_hdbserver }}"
     dest: /hana/shared/install/IMDB_SERVER_LINUX.SAR
+    timeout: "{{ url_timeout }}"
+  register: result
+  until: result is succeeded
+  retries: "{{ url_retries_cnt }}"
+  delay: "{{ url_retries_delay }}"
 
 - name: extract hdbserver
   command: ./SAPCAR_LINUX.EXE -manifest SIGNATURE.SMF -xvf IMDB_SERVER_LINUX.SAR
