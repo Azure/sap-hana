@@ -18,7 +18,7 @@ import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.1"
+PAYLOAD_VERSION              = "0.4.2"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
@@ -28,6 +28,7 @@ TIMEOUT_HANA                 = 5
 DEFAULT_CONSOLE_LOG_LEVEL    = logging.INFO
 DEFAULT_FILE_LOG_LEVEL       = logging.INFO
 LOG_FILENAME                 = "%s/sapmon.log" % PAYLOAD_DIRECTORY
+KEYVAULT_NAMING_CONVENTIONS  = ["sapmon%s", "sapmon-kv-%s"]
 
 ###############################################################################
 
@@ -67,6 +68,7 @@ LOG_CONFIG = {
 
 ERROR_GETTING_AUTH_TOKEN      = 10
 ERROR_SETTING_KEYVAULT_SECRET = 20
+ERROR_KEYVAULT_NOT_FOUND      = 21
 ERROR_HANA_CONNECTION         = 30
 
 ###############################################################################
@@ -310,9 +312,9 @@ class AzureKeyVault:
    """
    params  = {"api-version": "7.0"}
 
-   def __init__(self, keyvaultName, msiClientId = None):
-      logger.info("initializing KeyVault")
-      self.uri     = "https://%s.vault.azure.net" % keyvaultName
+   def __init__(self, kvName, msiClientId = None):
+      logger.info("initializing KeyVault %s" % kvName)
+      self.uri     = "https://%s.vault.azure.net" % kvName
       self.token   = AzureInstanceMetadataService.getAuthToken("https://vault.azure.net", msiClientId)
       self.headers = {
          "Authorization": "Bearer %s" % self.token,
@@ -329,8 +331,10 @@ class AzureKeyVault:
          params  = self.params,
          headers = self.headers,
          data    = data,
-         )["value"]
-      return response
+         )
+      if response and "value" in response:
+         return response["value"]
+      return None
 
    def setSecret(self, secretName, secretValue):
       """
@@ -376,6 +380,16 @@ class AzureKeyVault:
       except Exception as e:
          logger.error("could not get current KeyVault secrets (%s)" % e)
       return secrets
+
+   @staticmethod
+   def exists(kvName):
+      """
+      Check if a KeyVault with a specified name exists
+      """
+      logger.info("checking if KeyVault %s exists" % kvName)
+      kv = AzureKeyVault(kvName)
+      logger.debug("probing secrets of %s" % kv.uri)
+      return (kv._sendRequest("%s/secrets" % kv.uri)) is not None
 
 ###############################################################################
 
@@ -448,11 +462,29 @@ class _Context(object):
       logger.debug("vmTags=%s" % vmTags)
       self.sapmonId = vmTags["SapMonId"]
       logger.debug("sapmonId=%s " % self.sapmonId)
-      self.azKv = AzureKeyVault("sapmon-kv-%s" % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
+      self.azKv = self.identifyKeyVault(vmTags.get("SapMonMsiClientId", None))
       self.lastPull = None
       self.lastResultHashes = {}
       self.readStateFile()
       return
+
+   def identifyKeyVault(self, msiClientId):
+      """
+      Identify the correct KeyVault name to use
+      """
+      logger.info("identifying KeyVault name")
+      azKv = None
+      kvNames = [ k % self.sapmonId for k in KEYVAULT_NAMING_CONVENTIONS ]
+      for k in kvNames:
+         if AzureKeyVault.exists(k):
+            logger.debug("KeyVault %s exists" % k)
+            azKv = AzureKeyVault(k, msiClientId)
+            break
+         logger.debug("KeyVault %s does not exist" % k)
+      if not azKv:
+         logger.critical("could not find any KeyVault named %s" % kvNames)
+         sys.exit(ERROR_KEYVAULT_NOT_FOUND)
+      return azKv
 
    def readStateFile(self):
       """
