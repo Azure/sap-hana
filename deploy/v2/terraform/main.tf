@@ -5,7 +5,7 @@ provider "azurerm" {
 
 # Setup common infrastructure
 module "common_infrastructure" {
-  source              = "../../modules/common_infrastructure"
+  source              = "./modules/common_infrastructure"
   is_single_node_hana = "true"
   infrastructure      = var.infrastructure
 }
