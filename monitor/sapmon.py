@@ -18,7 +18,7 @@ import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.2"
+PAYLOAD_VERSION              = "0.4.3"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
@@ -333,8 +333,8 @@ class AzureKeyVault:
          data    = data,
          )
       if response and "value" in response:
-         return response["value"]
-      return None
+         return (True, response["value"])
+      return (False, None)
 
    def setSecret(self, secretName, secretValue):
       """
@@ -343,11 +343,11 @@ class AzureKeyVault:
       logger.info("setting KeyVault secret for secretName=%s" % secretName)
       success = False
       try:
-         success = self._sendRequest(
+         (success, response) = self._sendRequest(
             "%s/secrets/%s" % (self.uri, secretName),
             method = requests.put,
             data   = json.dumps({"value": secretValue})
-            ) == secretValue
+            )
       except Exception as e:
          logger.critical("could not set KeyVault secret (%s)" % e)
          sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
@@ -360,7 +360,7 @@ class AzureKeyVault:
       logger.info("getting KeyVault secret for secretId=%s" % secretId)
       secret = None
       try:
-         secret = self._sendRequest(secretId)
+         (success, secret) = self._sendRequest(secretId)
       except Exception as e:
          logger.error("could not get KeyVault secret for secretId=%s (%s)" % (secretId, e))
       return secret
@@ -372,7 +372,7 @@ class AzureKeyVault:
       logger.info("getting current KeyVault secrets")
       secrets = {}
       try:
-         kvSecrets = self._sendRequest("%s/secrets" % self.uri)
+         (success, kvSecrets) = self._sendRequest("%s/secrets" % self.uri)
          logger.debug("kvSecrets=%s" % kvSecrets)
          for k in kvSecrets:
             id = k["id"].split("/")[-1]
@@ -387,9 +387,13 @@ class AzureKeyVault:
       Check if a KeyVault with a specified name exists
       """
       logger.info("checking if KeyVault %s exists" % kvName)
-      kv = AzureKeyVault(kvName)
-      logger.debug("probing secrets of %s" % kv.uri)
-      return (kv._sendRequest("%s/secrets" % kv.uri)) is not None
+      try:
+         kv = AzureKeyVault(kvName)
+         logger.debug("probing secrets of %s" % kv.uri)
+         (success, response) = kv._sendRequest("%s/secrets" % kv.uri)
+      except Exception as e:
+         logger.error("could not determine is KeyVault %s exists (%s)" % (kvName, e))
+      return success
 
 ###############################################################################
 
