@@ -13,3 +13,6 @@
 
 # ignore ansible retry files
 *.retry
+
+# ignore IDE files
+.idea/
