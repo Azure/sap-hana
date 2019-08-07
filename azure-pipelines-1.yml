@@ -1,19 +1,57 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- wft
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# This Azure pipeline YAML contains tests to validate and verify the pull requests made for automated deployment of SAP landscape.
+# This pipeline will only run all the tests if the PR is made from a branch of Azure/sap-hana repo.
+# Branches from forked repositories will fail in the Azure provider authentication phase due to security reason
+# Only trigger build when a PR is opened related to code under deploy/v2
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - deploy/v2/*
+variables:
+  - group: azure-config-variables
+  - group: azure-sap-hana-pipeline-secrets
+jobs:
+- job: createAllNew
+  pool:
+    vmImage: "ubuntu-16.04"
+  steps:        
+  - template: templates/terraform-deployment-steps.yaml
+    parameters:
+      inputJSONFile: '../input.auto.tfvars.allNew.json'
+      testCaseName: 'wft-allNew'
+      replacePlaceHolder: 'VAR_AZ_RG_NAME'
+      replaceValue: 'wft-allNew-$(Build.BuildId)'
+- job: reuseRG
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      az group create --location westus2 -n wft-existingRG-$(Build.BuildId)
+      id=$(az group show --name wft-existingRG-$(Build.BuildId) --query id)
+  - template: templates/terraform-deployment-steps.yaml
+    parameters:
+      inputJSONFile: '../input.auto.tfvars.existingRG.json'
+      testCaseName: 'wft-existingRG'
+      replacePlaceHolder: 'VAR_AZ_RG_ID'
+      replaceValue: $id
+- job: reuseVnet
+- job: reuseNSG
+- job: destroyALL
+  steps:
+    - script: |
+        echo "Terraform destroy to destroy the deployment"
+        cd deploy/v2/terraform
+        terraform destroy -auto-approve -no-color
+      displayName: 'Destroy....'
+      env:
+        TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
+        TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
+        AZURE_CLIENT_ID: $(hana-pipeline-spn-id)
+        AZURE_SECRET: $(hana-pipeline-spn-pw)
+        AZURE_TENANT: $(landscape-tenant)
+        AZURE_SUBSCRIPTION_ID: $(landscape-subscription)
+        ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+        ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+        ARM_TENANT_ID: $(landscape-tenant)
+        ARM_SUBSCRIPTION_ID: $(landscape-subscription)
