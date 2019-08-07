@@ -1,0 +1,51 @@
+{
+
+    "infrastructure" : {
+            "region" : "westus2",
+
+            "resource_group" : {
+                    "is_existing" : "false",
+                    "name" : "VAR_AZ_RG_NAME"
+            },
+
+            "vnets" : {
+                    "management" : {
+                            "is_existing" : "false",
+                            "name" : "vnet-management",
+                            "address_space" : "10.0.0.0/16",
+                            "subnet_mgmt" : {
+                                    "is_existing" : "false",
+                                    "name" : "subnet-mgmt",
+                                    "prefix" : "10.0.1.0/24",
+                                    "nsg" : {
+                                            "is_existing" : "false",
+                                            "name" : "nsg-mgmt"
+                                    }
+                            }
+                    },
+                    "sap" : {
+                            "is_existing" : "false",
+                            "name" : "vnet-sap",
+                            "address_space" : "10.1.0.0/16",
+                            "subnet_admin" : {
+                                    "is_existing" : "false",
+                                    "name" : "subnet-admin",
+                                    "prefix" : "10.1.1.0/24",
+                                    "nsg" : {
+                                            "is_existing" : "false",
+                                            "name" : "nsg-admin"
+                                    }
+                            },
+                            "subnet_db" : {
+                                    "is_existing" : "false",
+                                    "name" : "subnet-db",
+                                    "prefix" : "10.1.2.0/24",
+                                    "nsg" : {
+                                            "is_existing" : "false",
+                                            "name" : "nsg-db"
+                                    }
+                            }
+                    }
+            }
+    }
+}
