@@ -1,0 +1,36 @@
+parameters:
+    inputJSONFile: '../input.auto.tfvars.allNew.json'
+    testCaseName: 'wft-all-new'
+    replacePlaceHolder: 'AZ_RG_NAME'
+    replaceValue: ''
+steps:
+        - checkout: self  # self represents the repo where the initial Pipelines YAML file was found
+          clean: "all" # clean up all before the job runs
+          path: "sap-hana"  # path to check out source code, relative to the agent's build directory
+          persistCredentials: boolean  # set to 'true' to leave the OAuth token in the Git config after the initial fetch
+        - script: |
+            pip install packaging
+            pip install --ignore-installed pyyaml ansible[azure]
+            sudo -H pip install msrest==0.6.0
+          displayName: 'Install python tools'
+        - script: |
+            ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
+            sed -i "s/${{parameters.replacePlaceHolder}}/${{parameters.replaceValue}}/g" $VAR_FILE_NAME
+            cd deploy/v2/terraform
+            echo "Terraform apply started. Resource group: $VAR_AZ_RG_NAME"  
+            terraform init
+            terraform apply -auto-approve -var-file=$VAR_FILE_NAME
+          displayName: 'Deploy all resources without using exsiting resource(s)'
+          env:
+            VAR_FILE_NAME: ${{parameters.inputJSONFile}}
+            VAR_AZ_RG_NAME: ${{parameters.testCaseName}}-$(Build.BuildId)
+            TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
+            TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
+            AZURE_CLIENT_ID: $(hana-pipeline-spn-id)
+            AZURE_SECRET: $(hana-pipeline-spn-pw)
+            AZURE_TENANT: $(landscape-tenant)
+            AZURE_SUBSCRIPTION_ID: $(landscape-subscription)
+            ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+            ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+            ARM_TENANT_ID: $(landscape-tenant)
+            ARM_SUBSCRIPTION_ID: $(landscape-subscription)
