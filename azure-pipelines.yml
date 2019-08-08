@@ -12,6 +12,7 @@ pr:
     exclude:
     - README.md
     - monitor/*
+    - deploy/v2/*
 jobs:
 - job: single_node_hana
   variables:

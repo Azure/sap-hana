@@ -1,0 +1,48 @@
+# This Azure pipeline YAML is a step template that will perform:
+# - Install python tools
+# - Deployment for the current test case
+
+parameters:
+#####################################################################
+# Eg:  inputJSONFile: '../pipelineInputJSON/input.auto.tfvars.      #   
+#      allNew.json'                                                 #
+#      testCaseName: 'wft-all-new'                                  #
+#      replacePlaceHolder: 'AZ_RG_NAME'                             #
+#      replaceValue: 'wft-allNew-$(Build.BuildId)'                  #
+#####################################################################
+    inputJSONFile: ''
+    testCaseName: ''
+    replacePlaceHolder: ''
+    replaceValue: ''
+steps:
+        - checkout: self
+          clean: "all"
+          path: "sap-hana"
+          persistCredentials: true
+        - script: |
+            pip install packaging
+            pip install --ignore-installed pyyaml ansible[azure]
+            sudo -H pip install msrest==0.6.0
+          displayName: 'Install python tools'
+        - script: |
+            ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
+            cd deploy/v2/terraform
+            sed -i "s|VAR_AZ_RG_NAME|${{parameters.testCaseName}}-$(Build.BuildId)|g" $VAR_FILE_NAME
+            sed -i "s|${{parameters.replacePlaceHolder}}|${{parameters.replaceValue}}|g" $VAR_FILE_NAME
+            cat $VAR_FILE_NAME
+            terraform init
+            terraform apply -auto-approve -var-file=$VAR_FILE_NAME
+          displayName: 'Deploy test case ${{parameters.testCaseName}}'
+          env:
+            VAR_FILE_NAME: ${{parameters.inputJSONFile}}
+            VAR_AZ_RG_NAME: ${{parameters.testCaseName}}-$(Build.BuildId)
+            TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
+            TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
+            AZURE_CLIENT_ID: $(hana-pipeline-spn-id)
+            AZURE_SECRET: $(hana-pipeline-spn-pw)
+            AZURE_TENANT: $(landscape-tenant)
+            AZURE_SUBSCRIPTION_ID: $(landscape-subscription)
+            ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+            ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+            ARM_TENANT_ID: $(landscape-tenant)
+            ARM_SUBSCRIPTION_ID: $(landscape-subscription)
