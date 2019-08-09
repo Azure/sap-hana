@@ -94,5 +94,7 @@ jobs:
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      az group delete -n single-node-$(Build.BuildId) --yes --subscription $(landscape-subscription)
+      if $(az group exists -n single-node-$(Build.BuildId)); then
+         az group delete -n single-node-$(Build.BuildId) --yes --subscription $(landscape-subscription)
+      fi     
     displayName: 'Delete resource group single-node-$(Build.BuildId)'
