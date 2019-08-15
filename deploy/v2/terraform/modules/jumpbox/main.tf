@@ -24,8 +24,9 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 
 # NETWORK SECURITY RULES =========================================================================================
 
-# Creates jumpbox RDP network security rule
+# Creates Windows jumpbox RDP network security rule
 resource "azurerm_network_security_rule" "nsr-rdp" {
+  count                       = lookup(var.jumpboxes, "windows_jumpbox", false) != false ? 1 : 0
   name                        = "rdp"
   resource_group_name         = var.rg[0].name
   network_security_group_name = var.nsg-mgmt[0].name
@@ -36,22 +37,23 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
   source_port_range           = "*"
   destination_port_range      = 3389
   source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  destination_address_prefix  = lookup(var.jumpboxes.windows_jumpbox, "private_ip_address", false) != false ? var.jumpboxes.windows_jumpbox.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 5)
 }
 
-# Creates jumpbox SSH network security rule
+# Creates Linux jumpbox and RTI box SSH network security rule
 resource "azurerm_network_security_rule" "nsr-ssh" {
-  name                        = "ssh"
+  for_each                    = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher }
+  name                        = "${each.key}-ssh"
   resource_group_name         = var.rg[0].name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = 102
+  priority                    = each.key == "linux_jumpbox" ? 102 : 103
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 22
   source_address_prefix       = "*"
-  destination_address_prefix  = "*"
+  destination_address_prefix  = each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 4) : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 6) : null
 }
 
 # NICS ============================================================================================================
