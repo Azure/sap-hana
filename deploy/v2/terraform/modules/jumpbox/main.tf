@@ -58,6 +58,15 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 
 # NICS ============================================================================================================
 
+# Creates the public IP addresses
+resource "azurerm_public_ip" "public-ip" {
+  for_each            = { for k, v in var.jumpboxes : (k) => (v)}
+  name                = "${each.key}-public-ip"
+  location            = var.rg[0].location
+  resource_group_name = var.rg[0].name
+  allocation_method   = "Static"
+}
+
 # Creates the jumpbox NIC and IP address
 resource "azurerm_network_interface" "nic-primary" {
   for_each                      = var.jumpboxes
@@ -72,6 +81,7 @@ resource "azurerm_network_interface" "nic-primary" {
     subnet_id                     = var.subnet-mgmt[0].id
     private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? each.value.private_ip_address : each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 4) : each.key == "windows_jumpbox" ? lookup(var.jumpboxes.windows_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 5) : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 6) : null
     private_ip_address_allocation = "static"
+    public_ip_address_id          = azurerm_public_ip.public-ip[each.key].id
   }
 }
 
