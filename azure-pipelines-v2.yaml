@@ -126,7 +126,7 @@ stages:
       parameters:
         testCaseName: $(testcase)
 #####################################################################
-# This stage destroy resources crated from all above test cases.    #
+# This stage destroy resources created from all above test cases.    #
 # It will be triggered after stage CreatingResources is finished.   #
 # It will always be triggered, regardless the status of stage one - #
 # success of fail                                                   #
