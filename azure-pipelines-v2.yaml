@@ -60,7 +60,7 @@ stages:
     steps:
     - script: |
         az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-        az group create --location westus2 -n $(testcase)
+        az group create --location eastus -n $(testcase)
         echo '##vso[task.setvariable variable=arm_id]$(az group show --name $(testcase) --query id --output tsv)'
     - template: templates/update-place-holder.yaml
       parameters:
@@ -85,7 +85,7 @@ stages:
     steps:
     - script: |
         az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-        echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-$(Build.BuildId) --name vnet-management --query id --output tsv)'
+        echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
     - template: templates/update-place-holder.yaml
       parameters:
         scenario: $(scenario)
