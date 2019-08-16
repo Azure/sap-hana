@@ -28,7 +28,7 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 resource "azurerm_network_security_rule" "nsr-rdp" {
   count                       = lookup(var.jumpboxes, "windows_jumpbox", false) != false ? 1 : 0
   name                        = "rdp"
-  resource_group_name         = var.rg[0].name
+  resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
   priority                    = 101
   direction                   = "Inbound"
@@ -44,7 +44,7 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
 resource "azurerm_network_security_rule" "nsr-ssh" {
   for_each                    = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher }
   name                        = "${each.key}-ssh"
-  resource_group_name         = var.rg[0].name
+  resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
   priority                    = each.key == "linux_jumpbox" ? 102 : 103
   direction                   = "Inbound"
