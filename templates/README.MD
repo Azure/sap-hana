@@ -17,6 +17,9 @@ This is Azure pipeline test created for deploy/v2
 4. **reuseNSG**: use existing NSG (nsg geneareted from  [allNew](#allNew))
 
 ## Design
+
+![pipeline_v2_workflow](https://user-images.githubusercontent.com/38501271/63207042-ac3e1580-c074-11e9-808b-f7bd037bc42b.jpg)
+
 - All PRs against master and include code change in deploy/v2 will trigger this pipeline test.
 - Each scenario will create a testcase with name that contains name of the testcase and buildId, eg. v2-allNew-289.
 - Each testcase will create resources under it's own resource group, which has the same name as the testcase, eg. resource group v2-allNew-289.
