@@ -60,7 +60,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 
 # Creates the public IP addresses
 resource "azurerm_public_ip" "public-ip" {
-  for_each            = { for k, v in var.jumpboxes : (k) => (v)}
+  for_each            = var.jumpboxes
   name                = "${each.key}-public-ip"
   location            = var.rg[0].location
   resource_group_name = var.rg[0].name
@@ -70,7 +70,7 @@ resource "azurerm_public_ip" "public-ip" {
 # Creates the jumpbox NIC and IP address
 resource "azurerm_network_interface" "nic-primary" {
   for_each                      = var.jumpboxes
-  name                          = "${each.value.name}-nic1"
+  name                          = each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : each.key == "windows_jumpbox" ? lookup(var.jumpboxes.windows_jumpbox, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : null
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
   network_security_group_id     = var.nsg-mgmt[0].id
