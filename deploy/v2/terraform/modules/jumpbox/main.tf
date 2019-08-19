@@ -15,7 +15,7 @@ resource "random_id" "random-id" {
 
 # Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
-  name                     = "diag${random_id.random-id.hex}"
+  name                     = lookup(var.infrastructure,"boot_diagnostics_account_name", false) == false ? "diag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
   resource_group_name      = var.rg[0].name
   location                 = var.rg[0].location
   account_replication_type = "LRS"
@@ -26,7 +26,7 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 
 # Creates Windows jumpbox RDP network security rule
 resource "azurerm_network_security_rule" "nsr-rdp" {
-  count                       = lookup(var.jumpboxes, "windows_jumpbox", false) != false ? 1 : 0
+  count                       = lookup(var.jumpboxes, "windows_jumpbox", false) == false ? 0 : var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
   name                        = "rdp"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
@@ -36,13 +36,13 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 3389
-  source_address_prefix       = "*"
+  source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
   destination_address_prefix  = lookup(var.jumpboxes.windows_jumpbox, "private_ip_address", false) != false ? var.jumpboxes.windows_jumpbox.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 5)
 }
 
 # Creates Linux jumpbox and RTI box SSH network security rule
 resource "azurerm_network_security_rule" "nsr-ssh" {
-  for_each                    = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher }
+  for_each                    = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher ? var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? false : true : false }
   name                        = "${each.key}-ssh"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
@@ -52,7 +52,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 22
-  source_address_prefix       = "*"
+  source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
   destination_address_prefix  = each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 4) : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 6) : null
 }
 
@@ -74,7 +74,6 @@ resource "azurerm_network_interface" "nic-primary" {
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
   network_security_group_id     = var.nsg-mgmt[0].id
-  enable_accelerated_networking = "true"
 
   ip_configuration {
     name                          = "${each.value.name}-nic1-ip"
@@ -94,7 +93,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
   network_interface_ids         = [azurerm_network_interface.nic-primary[each.key].id]
-  vm_size                       = "Standard_D4s_v3"
+  vm_size                       = each.value.size
   delete_os_disk_on_termination = "true"
 
   storage_os_disk {
@@ -137,7 +136,7 @@ resource "azurerm_virtual_machine" "vm-windows" {
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
   network_interface_ids         = [azurerm_network_interface.nic-primary[each.key].id]
-  vm_size                       = "Standard_D4s_v3"
+  vm_size                       = each.value.size
   delete_os_disk_on_termination = "true"
 
   storage_os_disk {
