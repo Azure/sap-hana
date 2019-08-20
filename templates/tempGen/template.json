@@ -16,7 +16,8 @@
                "prefix":"10.0.1.0/24",
                "nsg":{
                   "is_existing":"false",
-                  "name":"nsg-mgmt"
+                  "name":"nsg-mgmt",
+                  "allowed_ips":"*"
                }
             }
          },
@@ -49,6 +50,7 @@
       "windows_jumpbox":{
          "name":"jumpbox-windows",
          "destroy_after_deploy":"false",
+         "size":"Standard_D4s_v3",
          "os":{
             "publisher":"MicrosoftWindowsServer",
             "offer":"WindowsServer",
@@ -67,6 +69,7 @@
       "linux_jumpbox":{
          "name":"jumpbox-linux",
          "destroy_after_deploy":"false",
+         "size":"Standard_D4s_v3",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",
@@ -87,6 +90,7 @@
       "rti_box":{
          "name":"rti",
          "destroy_after_deploy":"true",
+         "size":"Standard_D4s_v3",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",
