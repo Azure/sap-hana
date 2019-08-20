@@ -1,0 +1,9 @@
+{
+    "infrastructure" : {
+            "resource_group" : {
+                    "is_existing" : "true",
+                    "name" : "var-rg-name",
+					"arm_id" : "rg-arm-id"
+            }
+	}
+}
