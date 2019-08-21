@@ -51,7 +51,8 @@
          {
          "name":"jumpbox-windows",
          "destroy_after_deploy":"false",
-         "size":"Standard_D4s_v3",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"MicrosoftWindowsServer",
             "offer":"WindowsServer",
@@ -73,7 +74,8 @@
          {
          "name":"jumpbox-linux",
          "destroy_after_deploy":"false",
-         "size":"Standard_D4s_v3",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",
@@ -94,7 +96,8 @@
          {
          "name":"rti",
          "destroy_after_deploy":"true",
-         "size":"Standard_D4s_v3",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",

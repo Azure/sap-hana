@@ -126,7 +126,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
     name              = "${var.jumpboxes.linux[count.index].name}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
-    managed_disk_type = "StandardSSD_LRS"
+    managed_disk_type = var.jumpboxes.linux[count.index].disk_type
   }
 
   storage_image_reference {
@@ -169,7 +169,7 @@ resource "azurerm_virtual_machine" "vm-windows" {
     name              = "${var.jumpboxes.windows[count.index].name}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
-    managed_disk_type = "StandardSSD_LRS"
+    managed_disk_type = var.jumpboxes.windows[count.index].disk_type
   }
 
   storage_image_reference {
