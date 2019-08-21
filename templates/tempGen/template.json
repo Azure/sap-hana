@@ -47,7 +47,8 @@
       }
    },
    "jumpboxes":{
-      "windows_jumpbox":{
+      "windows":[
+         {
          "name":"jumpbox-windows",
          "destroy_after_deploy":"false",
          "size":"Standard_D4s_v3",
@@ -65,8 +66,11 @@
             "hana_studio_windows",
             "sap_router"
          ]
-      },
-      "linux_jumpbox":{
+         }
+      ],   
+      
+      "linux":[
+         {
          "name":"jumpbox-linux",
          "destroy_after_deploy":"false",
          "size":"Standard_D4s_v3",
@@ -86,8 +90,8 @@
             "hana_studio_linux",
             "sap_router"
          ]
-      },
-      "rti_box":{
+         },
+         {
          "name":"rti",
          "destroy_after_deploy":"true",
          "size":"Standard_D4s_v3",
@@ -106,6 +110,7 @@
          "components":[
             "ansible"
          ]
-      }
+         }
+      ]   
    }
 }

@@ -26,61 +26,87 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 
 # Creates Windows jumpbox RDP network security rule
 resource "azurerm_network_security_rule" "nsr-rdp" {
-  count                       = lookup(var.jumpboxes, "windows_jumpbox", false) == false ? 0 : var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
+  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : length(var.jumpboxes.windows)
   name                        = "rdp"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = 101
+  priority                    = count.index + 101
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 3389
   source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
-  destination_address_prefix  = lookup(var.jumpboxes.windows_jumpbox, "private_ip_address", false) != false ? var.jumpboxes.windows_jumpbox.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 5)
+  destination_address_prefix  = lookup(var.jumpboxes.windows[count.index], "private_ip_address", false) != false ? var.jumpboxes.windows[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4))
 }
 
 # Creates Linux jumpbox and RTI box SSH network security rule
 resource "azurerm_network_security_rule" "nsr-ssh" {
-  for_each                    = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher ? var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? false : true : false }
-  name                        = "${each.key}-ssh"
+  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : length(var.jumpboxes.linux)
+  name                        = "${var.jumpboxes.linux[count.index].name}-ssh"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = each.key == "linux_jumpbox" ? 102 : 103
+  priority                    = count.index + 106
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 22
   source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
-  destination_address_prefix  = each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 4) : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 6) : null
+  destination_address_prefix  = lookup(var.jumpboxes.linux[count.index], "private_ip_address", false) != false ?  var.jumpboxes.linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 9))
 }
 
 # NICS ============================================================================================================
 
-# Creates the public IP addresses
-resource "azurerm_public_ip" "public-ip" {
-  for_each            = var.jumpboxes
-  name                = "${each.key}-public-ip"
+# Creates the public IP addresses for Windows VMs
+resource "azurerm_public_ip" "public-ip-windows" {
+  count               = length(var.jumpboxes.windows)
+  name                = "${var.jumpboxes.windows[count.index].name}-public-ip"
   location            = var.rg[0].location
   resource_group_name = var.rg[0].name
   allocation_method   = "Static"
 }
 
-# Creates the jumpbox NIC and IP address
-resource "azurerm_network_interface" "nic-primary" {
-  for_each                      = var.jumpboxes
-  name                          = each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : each.key == "windows_jumpbox" ? lookup(var.jumpboxes.windows_jumpbox, "nic_name", false) != false ? each.value.nic_name : "${each.value.name}-nic1" : null
+# Creates the NIC and IP address for Windows VMs
+resource "azurerm_network_interface" "nic-primary-windows" {
+  count                         = length(var.jumpboxes.windows)
+  name                          = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
   network_security_group_id     = var.nsg-mgmt[0].id
 
   ip_configuration {
-    name                          = "${each.value.name}-nic1-ip"
+    name                          = "${var.jumpboxes.windows[count.index].name}-nic1-ip"
     subnet_id                     = var.subnet-mgmt[0].id
-    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? each.value.private_ip_address : each.key == "linux_jumpbox" ? lookup(var.jumpboxes.linux_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 4) : each.key == "windows_jumpbox" ? lookup(var.jumpboxes.windows_jumpbox, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 5) : each.key == "rti_box" ? lookup(var.jumpboxes.rti_box, "private_ip_address", false) != false ? each.value.private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, 6) : null
+    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? var.jumpboxes.windows[count.index].private_ip_address : lookup(var.jumpboxes.windows[count.index], "private_ip_address", false) != false ? var.jumpboxes.windows[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4))
     private_ip_address_allocation = "static"
-    public_ip_address_id          = azurerm_public_ip.public-ip[each.key].id
+    public_ip_address_id          = azurerm_public_ip.public-ip-windows[count.index].id
+  }
+}
+
+# Creates the public IP addresses for Linux VMs
+resource "azurerm_public_ip" "public-ip-linux" {
+  count               = length(var.jumpboxes.linux)
+  name                = "${var.jumpboxes.linux[count.index].name}-public-ip"
+  location            = var.rg[0].location
+  resource_group_name = var.rg[0].name
+  allocation_method   = "Static"
+}
+
+# Creates the NIC and IP address for Linux VMs
+resource "azurerm_network_interface" "nic-primary-linux" {
+  count                         = length(var.jumpboxes.linux)
+  name                          = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
+  location                      = var.rg[0].location
+  resource_group_name           = var.rg[0].name
+  network_security_group_id     = var.nsg-mgmt[0].id
+
+  ip_configuration {
+    name                          = "${var.jumpboxes.linux[count.index].name}-nic1-ip"
+    subnet_id                     = var.subnet-mgmt[0].id
+    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? var.jumpboxes.linux[count.index].private_ip_address : lookup(var.jumpboxes.linux[count.index], "private_ip_address", false) != false ? var.jumpboxes.linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 9))
+    private_ip_address_allocation = "static"
+    public_ip_address_id          = azurerm_public_ip.public-ip-linux[count.index].id
   }
 }
 
@@ -88,38 +114,38 @@ resource "azurerm_network_interface" "nic-primary" {
 
 # Creates Linux VM
 resource "azurerm_virtual_machine" "vm-linux" {
-  for_each                      = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") == v.os.publisher }
-  name                          = each.value.name
+  count				= length(var.jumpboxes.linux)
+  name                          = var.jumpboxes.linux[count.index].name
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-primary[each.key].id]
-  vm_size                       = each.value.size
+  network_interface_ids         = [azurerm_network_interface.nic-primary-linux[count.index].id]
+  vm_size                       = var.jumpboxes.linux[count.index].size
   delete_os_disk_on_termination = "true"
 
   storage_os_disk {
-    name              = "${each.value.name}-osdisk"
+    name              = "${var.jumpboxes.linux[count.index].name}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "StandardSSD_LRS"
   }
 
   storage_image_reference {
-    publisher = each.value.os.publisher
-    offer     = each.value.os.offer
-    sku       = each.value.os.sku
+    publisher = var.jumpboxes.linux[count.index].os.publisher
+    offer     = var.jumpboxes.linux[count.index].os.offer
+    sku       = var.jumpboxes.linux[count.index].os.sku
     version   = "latest"
   }
 
   os_profile {
-    computer_name  = each.value.name
-    admin_username = each.value.authentication.username
+    computer_name  = var.jumpboxes.linux[count.index].name
+    admin_username = var.jumpboxes.linux[count.index].authentication.username
   }
 
   os_profile_linux_config {
     disable_password_authentication = true
     ssh_keys {
-      path     = "/home/${each.value.authentication.username}/.ssh/authorized_keys"
-      key_data = file(each.value.authentication.path_to_public_key)
+      path     = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/authorized_keys"
+      key_data = file(var.jumpboxes.linux[count.index].authentication.path_to_public_key)
     }
   }
 
@@ -131,32 +157,32 @@ resource "azurerm_virtual_machine" "vm-linux" {
 
 # Creates Windows VM
 resource "azurerm_virtual_machine" "vm-windows" {
-  for_each                      = { for k, v in var.jumpboxes : (k) => (v) if replace(v.os.publisher, "Windows", "") != v.os.publisher }
-  name                          = each.value.name
+  count				= length(var.jumpboxes.windows)
+  name                          = var.jumpboxes.windows[count.index].name
   location                      = var.rg[0].location
   resource_group_name           = var.rg[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-primary[each.key].id]
-  vm_size                       = each.value.size
+  network_interface_ids         = [azurerm_network_interface.nic-primary-windows[count.index].id]
+  vm_size                       = var.jumpboxes.windows[count.index].size
   delete_os_disk_on_termination = "true"
 
   storage_os_disk {
-    name              = "${each.value.name}-osdisk"
+    name              = "${var.jumpboxes.windows[count.index].name}-osdisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "StandardSSD_LRS"
   }
 
   storage_image_reference {
-    publisher = each.value.os.publisher
-    offer     = each.value.os.offer
-    sku       = each.value.os.sku
+    publisher = var.jumpboxes.windows[count.index].os.publisher
+    offer     = var.jumpboxes.windows[count.index].os.offer
+    sku       = var.jumpboxes.windows[count.index].os.sku
     version   = "latest"
   }
 
   os_profile {
-    computer_name  = each.value.name
-    admin_username = each.value.authentication.username
-    admin_password = each.value.authentication.password
+    computer_name  = var.jumpboxes.windows[count.index].name
+    admin_username = var.jumpboxes.windows[count.index].authentication.username
+    admin_password = var.jumpboxes.windows[count.index].authentication.password
   }
 
   os_profile_windows_config {
