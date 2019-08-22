@@ -13,6 +13,8 @@ pr:
     - README.md
     - monitor/*
     - deploy/v2/*
+    - templates/*
+    - tools/*
 jobs:
 - job: single_node_hana
   variables:
