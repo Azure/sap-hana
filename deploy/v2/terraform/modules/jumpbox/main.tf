@@ -26,34 +26,34 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 
 # Creates Windows jumpbox RDP network security rule
 resource "azurerm_network_security_rule" "nsr-rdp" {
-  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : length(var.jumpboxes.windows)
-  name                        = "${var.jumpboxes.windows[count.index].name}-rdp"
+  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
+  name                        = "rdp"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = count.index + 101
+  priority                    = 101
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 3389
   source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
-  destination_address_prefix  = lookup(var.jumpboxes.windows[count.index], "private_ip_address", false) != false ? var.jumpboxes.windows[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4))
+  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
 }
 
 # Creates Linux jumpbox and RTI box SSH network security rule
 resource "azurerm_network_security_rule" "nsr-ssh" {
-  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : length(var.jumpboxes.linux)
-  name                        = "${var.jumpboxes.linux[count.index].name}-ssh"
+  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
+  name                        = "ssh"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = count.index + 106
+  priority                    = 102
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 22
   source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
-  destination_address_prefix  = lookup(var.jumpboxes.linux[count.index], "private_ip_address", false) != false ?  var.jumpboxes.linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 9))
+  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
 }
 
 # NICS ============================================================================================================
