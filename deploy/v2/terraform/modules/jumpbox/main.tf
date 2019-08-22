@@ -27,7 +27,7 @@ resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
 # Creates Windows jumpbox RDP network security rule
 resource "azurerm_network_security_rule" "nsr-rdp" {
   count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : length(var.jumpboxes.windows)
-  name                        = "rdp"
+  name                        = "${var.jumpboxes.windows[count.index].name}-rdp"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
   priority                    = count.index + 101
