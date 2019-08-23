@@ -104,7 +104,7 @@ resource "azurerm_network_interface" "nic-primary-linux" {
   ip_configuration {
     name                          = "${var.jumpboxes.linux[count.index].name}-nic1-ip"
     subnet_id                     = var.subnet-mgmt[0].id
-    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? var.jumpboxes.linux[count.index].private_ip_address : lookup(var.jumpboxes.linux[count.index], "private_ip_address", false) != false ? var.jumpboxes.linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 9))
+    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? var.jumpboxes.linux[count.index].private_ip_address : lookup(var.jumpboxes.linux[count.index], "private_ip_address", false) != false ? var.jumpboxes.linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4 + length(var.jumpboxes.windows)))
     private_ip_address_allocation = "static"
     public_ip_address_id          = azurerm_public_ip.public-ip-linux[count.index].id
   }
