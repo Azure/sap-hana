@@ -19,6 +19,7 @@ steps:
       cd ../../deploy/v2/terraform
       terraform init
       terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
+      az group update --resource-group ${{parameters.testCaseName}} --set tags.Delete=True
     displayName: 'Terraform Deployment'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
