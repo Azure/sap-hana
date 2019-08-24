@@ -153,7 +153,7 @@ stages:
           for rg in "${rg_list[@]}"
           do
             if $(az group exists -n $rg); then
-              az group delete -n $rg -y
+              az group delete -n $rg --no-wait -y
               echo $rg
             fi
           done
