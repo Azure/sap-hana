@@ -8,7 +8,7 @@
 resource "random_id" "random-id" {
   keepers = {
     # Generate a new id only when a new resource group is defined
-    resource_group = var.rg[0].name
+    resource_group = var.resource-group[0].name
   }
   byte_length = 8
 }
@@ -16,8 +16,8 @@ resource "random_id" "random-id" {
 # Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
   name                     = lookup(var.infrastructure,"boot_diagnostics_account_name", false) == false ? "diag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
-  resource_group_name      = var.rg[0].name
-  location                 = var.rg[0].location
+  resource_group_name      = var.resource-group[0].name
+  location                 = var.resource-group[0].location
   account_replication_type = "LRS"
   account_tier             = "Standard"
 }
@@ -62,8 +62,8 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 resource "azurerm_public_ip" "public-ip-windows" {
   count               = length(var.jumpboxes.windows)
   name                = "${var.jumpboxes.windows[count.index].name}-public-ip"
-  location            = var.rg[0].location
-  resource_group_name = var.rg[0].name
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
   allocation_method   = "Static"
 }
 
@@ -71,8 +71,8 @@ resource "azurerm_public_ip" "public-ip-windows" {
 resource "azurerm_network_interface" "nic-primary-windows" {
   count                         = length(var.jumpboxes.windows)
   name                          = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
-  location                      = var.rg[0].location
-  resource_group_name           = var.rg[0].name
+  location                      = var.resource-group[0].location
+  resource_group_name           = var.resource-group[0].name
   network_security_group_id     = var.nsg-mgmt[0].id
 
   ip_configuration {
@@ -88,8 +88,8 @@ resource "azurerm_network_interface" "nic-primary-windows" {
 resource "azurerm_public_ip" "public-ip-linux" {
   count               = length(var.jumpboxes.linux)
   name                = "${var.jumpboxes.linux[count.index].name}-public-ip"
-  location            = var.rg[0].location
-  resource_group_name = var.rg[0].name
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
   allocation_method   = "Static"
 }
 
@@ -97,8 +97,8 @@ resource "azurerm_public_ip" "public-ip-linux" {
 resource "azurerm_network_interface" "nic-primary-linux" {
   count                         = length(var.jumpboxes.linux)
   name                          = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
-  location                      = var.rg[0].location
-  resource_group_name           = var.rg[0].name
+  location                      = var.resource-group[0].location
+  resource_group_name           = var.resource-group[0].name
   network_security_group_id     = var.nsg-mgmt[0].id
 
   ip_configuration {
@@ -116,8 +116,8 @@ resource "azurerm_network_interface" "nic-primary-linux" {
 resource "azurerm_virtual_machine" "vm-linux" {
   count				= length(var.jumpboxes.linux)
   name                          = var.jumpboxes.linux[count.index].name
-  location                      = var.rg[0].location
-  resource_group_name           = var.rg[0].name
+  location                      = var.resource-group[0].location
+  resource_group_name           = var.resource-group[0].name
   network_interface_ids         = [azurerm_network_interface.nic-primary-linux[count.index].id]
   vm_size                       = var.jumpboxes.linux[count.index].size
   delete_os_disk_on_termination = "true"
@@ -159,8 +159,8 @@ resource "azurerm_virtual_machine" "vm-linux" {
 resource "azurerm_virtual_machine" "vm-windows" {
   count				= length(var.jumpboxes.windows)
   name                          = var.jumpboxes.windows[count.index].name
-  location                      = var.rg[0].location
-  resource_group_name           = var.rg[0].name
+  location                      = var.resource-group[0].location
+  resource_group_name           = var.resource-group[0].name
   network_interface_ids         = [azurerm_network_interface.nic-primary-windows[count.index].id]
   vm_size                       = var.jumpboxes.windows[count.index].size
   delete_os_disk_on_termination = "true"

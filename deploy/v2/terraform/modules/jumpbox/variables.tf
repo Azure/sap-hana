@@ -6,7 +6,7 @@ variable "infrastructure" {
   description = "Details of the Azure infrastructure to deploy the SAP landscape into"
 }
 
-variable "rg" {
+variable "resource-group" {
   description = "Details of the resource group"
 }
 

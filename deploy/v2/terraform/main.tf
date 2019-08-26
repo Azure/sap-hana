@@ -15,7 +15,7 @@ module "jumpbox" {
   source         = "./modules/jumpbox"
   infrastructure = var.infrastructure
   jumpboxes      = var.jumpboxes
-  rg             = module.common_infrastructure.rg
+  resource-group = module.common_infrastructure.resource-group
   subnet-mgmt    = module.common_infrastructure.subnet-mgmt
   nsg-mgmt       = module.common_infrastructure.nsg-mgmt
 }

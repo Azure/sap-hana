@@ -1,5 +1,5 @@
-output "rg" {
-  value = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.rg : azurerm_resource_group.rg
+output "resource-group" {
+  value = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group : azurerm_resource_group.resource-group
 }
 
 output "subnet-mgmt" {
