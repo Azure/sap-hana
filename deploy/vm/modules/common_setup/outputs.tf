@@ -7,7 +7,7 @@ output "vnet_subnets" {
 }
 
 output "vnet_name" {
-  value = azurerm_subnet.subnet.name
+  value = azurerm_virtual_network.vnet.name
 }
 
 output "resource_group_name" {
