@@ -18,7 +18,7 @@ import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.2"
+PAYLOAD_VERSION              = "0.4.4"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
@@ -66,10 +66,12 @@ LOG_CONFIG = {
 
 ###############################################################################
 
-ERROR_GETTING_AUTH_TOKEN      = 10
-ERROR_SETTING_KEYVAULT_SECRET = 20
-ERROR_KEYVAULT_NOT_FOUND      = 21
-ERROR_HANA_CONNECTION         = 30
+ERROR_GETTING_AUTH_TOKEN       = 10
+ERROR_SETTING_KEYVAULT_SECRET  = 20
+ERROR_KEYVAULT_NOT_FOUND       = 21
+ERROR_GETTING_LOG_CREDENTIALS  = 22
+ERROR_GETTING_HANA_CREDENTIALS = 23
+ERROR_HANA_CONNECTION          = 30
 
 ###############################################################################
 
@@ -333,8 +335,8 @@ class AzureKeyVault:
          data    = data,
          )
       if response and "value" in response:
-         return response["value"]
-      return None
+         return (True, response["value"])
+      return (False, None)
 
    def setSecret(self, secretName, secretValue):
       """
@@ -343,11 +345,11 @@ class AzureKeyVault:
       logger.info("setting KeyVault secret for secretName=%s" % secretName)
       success = False
       try:
-         success = self._sendRequest(
+         (success, response) = self._sendRequest(
             "%s/secrets/%s" % (self.uri, secretName),
             method = requests.put,
             data   = json.dumps({"value": secretValue})
-            ) == secretValue
+            )
       except Exception as e:
          logger.critical("could not set KeyVault secret (%s)" % e)
          sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
@@ -360,7 +362,7 @@ class AzureKeyVault:
       logger.info("getting KeyVault secret for secretId=%s" % secretId)
       secret = None
       try:
-         secret = self._sendRequest(secretId)
+         (success, secret) = self._sendRequest(secretId)
       except Exception as e:
          logger.error("could not get KeyVault secret for secretId=%s (%s)" % (secretId, e))
       return secret
@@ -372,7 +374,7 @@ class AzureKeyVault:
       logger.info("getting current KeyVault secrets")
       secrets = {}
       try:
-         kvSecrets = self._sendRequest("%s/secrets" % self.uri)
+         (success, kvSecrets) = self._sendRequest("%s/secrets" % self.uri)
          logger.debug("kvSecrets=%s" % kvSecrets)
          for k in kvSecrets:
             id = k["id"].split("/")[-1]
@@ -382,17 +384,20 @@ class AzureKeyVault:
       return secrets
 
    @staticmethod
-   def exists(kvName):
+   def exists(kvName, msiClientId):
       """
       Check if a KeyVault with a specified name exists
       """
       logger.info("checking if KeyVault %s exists" % kvName)
-      kv = AzureKeyVault(kvName)
-      logger.debug("probing secrets of %s" % kv.uri)
-      return (kv._sendRequest("%s/secrets" % kv.uri)) is not None
+      try:
+         kv = AzureKeyVault(kvName, msiClientId=msiClientId)
+         logger.debug("probing secrets of %s" % kv.uri)
+         (success, response) = kv._sendRequest("%s/secrets" % kv.uri)
+      except Exception as e:
+         logger.error("could not determine is KeyVault %s exists (%s)" % (kvName, e))
+      return success
 
 ###############################################################################
-
 class AzureLogAnalytics:
    """
    Provide access to an Azure Log Analytics WOrkspace
@@ -476,7 +481,7 @@ class _Context(object):
       azKv = None
       kvNames = [ k % self.sapmonId for k in KEYVAULT_NAMING_CONVENTIONS ]
       for k in kvNames:
-         if AzureKeyVault.exists(k):
+         if AzureKeyVault.exists(k, msiClientId):
             logger.debug("KeyVault %s exists" % k)
             azKv = AzureKeyVault(k, msiClientId)
             break
@@ -585,8 +590,8 @@ class _Context(object):
                hanaDetails["HanaDbPassword"] = password
                logger.debug("retrieved HANA password successfully from KeyVault; password=%s" % password)
             except Exception as e:
-               logger.error("could not fetch HANA password (instance=%s) from separate KeyVault (%s)" % (h, e))
-               continue
+               logger.critical("could not fetch HANA password (instance=%s) from separate KeyVault (%s)" % (h, e))
+               sys.exit(ERROR_GETTING_HANA_CREDENTIALS)
          try:
             hanaInstance = SapHana(hanaDetails = hanaDetails)
          except Exception as e:
@@ -598,7 +603,8 @@ class _Context(object):
       try:
          laSecret = json.loads(secrets["AzureLogAnalytics"])
       except Exception as e:
-         logger.error("could not parse Log Analytics credentials (%s)" % e)
+         logger.critical("could not fetch Log Analytics credentials (%s)" % e)
+         sys.exit(ERROR_GETTING_LOG_CREDENTIALS)
       self.azLa = AzureLogAnalytics(
          laSecret["LogAnalyticsWorkspaceId"],
          laSecret["LogAnalyticsSharedKey"]

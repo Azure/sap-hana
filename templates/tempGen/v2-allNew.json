@@ -1,0 +1,7 @@
+{
+    "infrastructure" : {
+            "resource_group" : {
+                    "name" : "var-rg-name"
+            }
+    }
+}
