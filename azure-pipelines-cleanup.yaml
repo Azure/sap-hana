@@ -1,5 +1,5 @@
 schedules:
-- cron: '* * * * *'
+- cron: '0 0 * * *'
   displayName: Daily midnight clean up
   branches:
     include:
