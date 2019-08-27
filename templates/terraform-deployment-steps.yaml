@@ -31,3 +31,4 @@ steps:
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+
