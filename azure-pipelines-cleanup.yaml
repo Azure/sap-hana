@@ -24,3 +24,4 @@ jobs:
         fi
       done
     displayName: 'Clean up resource group daily'
+
