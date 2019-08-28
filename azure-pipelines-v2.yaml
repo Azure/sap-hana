@@ -135,6 +135,8 @@ stages:
 # It will be triggered after stage CreatingResources is finished.   #
 # It will always be triggered, regardless the status of stage one - #
 # success of fail                                                   #
+# Tag "Delete=True" will be added to mark all resource groups for   #
+# scheduled deletion done by azure-pipelines-cleanup.yaml           #
 #####################################################################
 - stage: DestroyingResources
   dependsOn: CreatingResources
@@ -153,7 +155,8 @@ stages:
           for rg in "${rg_list[@]}"
           do
             if $(az group exists -n $rg); then
-              az group delete -n $rg -y
+              az group update --resource-group $rg --set tags.Delete=True
+              az group delete -n $rg --no-wait -y
               echo $rg
             fi
           done

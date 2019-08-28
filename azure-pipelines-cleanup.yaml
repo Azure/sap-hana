@@ -1,0 +1,27 @@
+schedules:
+- cron: '0 0 * * *'
+  displayName: Daily midnight clean up
+  branches:
+    include:
+    - master
+  always: true
+variables:
+  - group: azure-config-variables
+  - group: azure-sap-hana-pipeline-secrets
+jobs:
+- job: dailyCleanup
+  pool:
+    vmImage: "ubuntu-16.04"
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      groups=$(az group list --tag Delete=True --query [].name --output tsv)
+      for rg in $groups
+      do
+        if $(az group exists -n $rg); then
+          az group delete -n $rg --no-wait -y
+          echo $rg
+        fi
+      done
+    displayName: 'Clean up resource group daily'
+
