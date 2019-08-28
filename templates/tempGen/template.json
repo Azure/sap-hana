@@ -59,7 +59,7 @@
             "sku":"2016-Datacenter"
          },
          "authentication":{
-            "type":"credentials",
+            "type":"password",
             "username":"azureadm",
             "password":"Sap@hana2019!"
          },
