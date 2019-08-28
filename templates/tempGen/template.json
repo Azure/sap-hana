@@ -84,7 +84,6 @@
          "authentication":{
             "type":"key",
             "username":"azureadm",
-            "use_existing":"true",
             "path_to_public_key":"/tmp/sshkey.pub",
             "path_to_private_key":"/tmp/sshkey"
          },
@@ -106,7 +105,6 @@
          "authentication":{
             "type":"key",
             "username":"azureadm",
-            "use_existing":"false",
             "path_to_public_key":"/tmp/sshkey.pub",
             "path_to_private_key":"/tmp/sshkey"
          },

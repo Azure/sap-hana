@@ -68,7 +68,7 @@ resource "azurerm_public_ip" "public-ip-windows" {
 }
 
 # Creates the NIC and IP address for Windows VMs
-resource "azurerm_network_interface" "nic-primary-windows" {
+resource "azurerm_network_interface" "nic-windows" {
   count                         = length(var.jumpboxes.windows)
   name                          = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
   location                      = var.resource-group[0].location
@@ -94,7 +94,7 @@ resource "azurerm_public_ip" "public-ip-linux" {
 }
 
 # Creates the NIC and IP address for Linux VMs
-resource "azurerm_network_interface" "nic-primary-linux" {
+resource "azurerm_network_interface" "nic-linux" {
   count                         = length(var.jumpboxes.linux)
   name                          = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
   location                      = var.resource-group[0].location
@@ -118,7 +118,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
   name                          = var.jumpboxes.linux[count.index].name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-primary-linux[count.index].id]
+  network_interface_ids         = [azurerm_network_interface.nic-linux[count.index].id]
   vm_size                       = var.jumpboxes.linux[count.index].size
   delete_os_disk_on_termination = "true"
 
@@ -142,10 +142,13 @@ resource "azurerm_virtual_machine" "vm-linux" {
   }
 
   os_profile_linux_config {
-    disable_password_authentication = true
-    ssh_keys {
-      path     = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/authorized_keys"
-      key_data = file(var.jumpboxes.linux[count.index].authentication.path_to_public_key)
+    disable_password_authentication = var.jumpboxes.linux[count.index].authentication.type != "password" ? true : false
+    dynamic "ssh_keys" {
+      for_each = var.jumpboxes.linux[count.index].authentication.type != "password" ? ["key"] : []
+      content {
+        path     = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/authorized_keys"
+        key_data = file(var.jumpboxes.linux[count.index].authentication.path_to_public_key)
+      }
     }
   }
 
@@ -161,7 +164,7 @@ resource "azurerm_virtual_machine" "vm-windows" {
   name                          = var.jumpboxes.windows[count.index].name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-primary-windows[count.index].id]
+  network_interface_ids         = [azurerm_network_interface.nic-windows[count.index].id]
   vm_size                       = var.jumpboxes.windows[count.index].size
   delete_os_disk_on_termination = "true"
 
