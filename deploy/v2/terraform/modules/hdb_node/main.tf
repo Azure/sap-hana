@@ -4,7 +4,7 @@
 
 # NETWORK SECURITY RULES =========================================================================================
 
-# Creates network security rule to deny traffic for SAP admin subnet
+# Creates network security rule to deny external traffic for SAP admin subnet
 resource "azurerm_network_security_rule" "nsr-admin" {
   count                       = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1
   name                        = "deny-inbound-traffic"
@@ -20,7 +20,7 @@ resource "azurerm_network_security_rule" "nsr-admin" {
   destination_address_prefix  = "${var.infrastructure.vnets.sap.subnet_admin.prefix}"
 }
 
-# Creates network security rule for SAP db subnet
+# Creates network security rule for SAP DB subnet
 resource "azurerm_network_security_rule" "nsr-db" {
   count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
   name                        = "nsr-subnet-db"
@@ -55,7 +55,7 @@ resource "azurerm_network_interface" "nic-hdb-admin" {
   }
 }
 
-# Creates the db traffic NIC and private IP address for HANA database nodes
+# Creates the DB traffic NIC and private IP address for HANA database nodes
 resource "azurerm_network_interface" "nic-hdb-db" {
   count                         = length(var.databases)
   name                          = lookup(var.databases[count.index].db_nic, "name", false) != false ? var.databases[count.index].db_nic.name : "${var.databases[count.index].name}-db-nic"
@@ -65,7 +65,7 @@ resource "azurerm_network_interface" "nic-hdb-db" {
   enable_accelerated_networking = true
 
   ip_configuration {
-    primary			  = true
+    primary                       = true
     name                          = "${var.databases[count.index].name}-db-nic-ip"
     subnet_id                     = var.subnet-sap-db[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? var.databases[count.index].db_nic.private_ip_address : lookup(var.databases[count.index].db_nic, "private_ip_address", false) != false ? var.databases[count.index].db_nic.private_ip_address : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, (count.index + 4))
@@ -103,8 +103,8 @@ resource "azurerm_virtual_machine" "vm-hdb" {
   }
 
   dynamic "storage_data_disk" {
-    iterator                    = disk
-    for_each                    = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.data_log.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.data_log.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.data_log.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.data_log.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.data_log.count) : []
+    iterator = disk
+    for_each = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.data_log.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.data_log.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.data_log.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.data_log.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.data_log.count) : []
     content {
       name                      = "${var.databases[count.index].name}-disk-data-log-${disk.value}"
       caching                   = var.databases[count.index].size == "S" ? local.sizes.S.storage.data_log.caching : var.databases[count.index].size == "M" ? local.sizes.M.storage.data_log.caching : var.databases[count.index].size == "L" ? local.sizes.L.storage.data_log.caching : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.data_log.caching : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.data_log.caching : null
@@ -117,43 +117,43 @@ resource "azurerm_virtual_machine" "vm-hdb" {
   }
 
   dynamic "storage_data_disk" {
-    iterator                    = disk
-    for_each                    = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.shared.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.shared.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.shared.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.shared.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.shared.count) : []
+    iterator = disk
+    for_each = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.shared.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.shared.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.shared.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.shared.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.shared.count) : []
     content {
       name                      = "${var.databases[count.index].name}-disk-shared-${disk.value}"
       caching                   = var.databases[count.index].size == "S" ? local.sizes.S.storage.shared.caching : var.databases[count.index].size == "M" ? local.sizes.M.storage.shared.caching : var.databases[count.index].size == "L" ? local.sizes.L.storage.shared.caching : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.shared.caching : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.shared.caching : null
       create_option             = "Empty"
       managed_disk_type         = var.databases[count.index].size == "S" ? local.sizes.S.storage.shared.disk_type : var.databases[count.index].size == "M" ? local.sizes.M.storage.shared.disk_type : var.databases[count.index].size == "L" ? local.sizes.L.storage.shared.disk_type : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.shared.disk_type : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.shared.disk_type : null
       disk_size_gb              = var.databases[count.index].size == "S" ? local.sizes.S.storage.shared.size_gb : var.databases[count.index].size == "M" ? local.sizes.M.storage.shared.size_gb : var.databases[count.index].size == "L" ? local.sizes.L.storage.shared.size_gb : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.shared.size_gb : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.shared.size_gb : null
-      write_accelerator_enabled = var.databases[count.index].size == "S" ? local.sizes.S.storage.shared.write_accelerator : var.databases[count.index].size == "M" ? local.sizes.M.storage.shared.write_accelerator : var.databases[count.index].size == "L" ? local.sizes.L.storage.shared.write_accelerator : var.databases[count.index].size == "XL"? local.sizes.XL.storage.shared.write_accelerator : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.shared.write_accelerator : null
+      write_accelerator_enabled = var.databases[count.index].size == "S" ? local.sizes.S.storage.shared.write_accelerator : var.databases[count.index].size == "M" ? local.sizes.M.storage.shared.write_accelerator : var.databases[count.index].size == "L" ? local.sizes.L.storage.shared.write_accelerator : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.shared.write_accelerator : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.shared.write_accelerator : null
       lun                       = disk.value + (var.databases[count.index].size == "S" ? local.sizes.S.storage.data_log.count : var.databases[count.index].size == "M" ? local.sizes.M.storage.data_log.count : var.databases[count.index].size == "L" ? local.sizes.L.storage.data_log.count : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.data_log.count : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.data_log.count : null)
     }
   }
 
   dynamic "storage_data_disk" {
-    iterator                    = disk
-    for_each                    = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.sap.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.sap.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.sap.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.sap.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.sap.count) : []
+    iterator = disk
+    for_each = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.sap.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.sap.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.sap.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.sap.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.sap.count) : []
     content {
       name                      = "${var.databases[count.index].name}-disk-sap-${disk.value}"
-      caching                   = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.caching : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.caching : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.caching : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.caching :var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.caching : null
+      caching                   = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.caching : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.caching : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.caching : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.caching : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.caching : null
       create_option             = "Empty"
       managed_disk_type         = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.disk_type : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.disk_type : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.disk_type : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.disk_type : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.disk_type : null
-      disk_size_gb              = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.size_gb : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.size_gb : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.size_gb : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.size_gb :var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.size_gb : null
+      disk_size_gb              = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.size_gb : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.size_gb : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.size_gb : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.size_gb : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.size_gb : null
       write_accelerator_enabled = var.databases[count.index].size == "S" ? local.sizes.S.storage.sap.write_accelerator : var.databases[count.index].size == "M" ? local.sizes.M.storage.sap.write_accelerator : var.databases[count.index].size == "L" ? local.sizes.L.storage.sap.write_accelerator : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.sap.write_accelerator : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.sap.write_accelerator : null
       lun                       = disk.value + (var.databases[count.index].size == "S" ? (local.sizes.S.storage.data_log.count + local.sizes.S.storage.shared.count) : var.databases[count.index].size == "M" ? (local.sizes.M.storage.data_log.count + local.sizes.M.storage.shared.count) : var.databases[count.index].size == "L" ? (local.sizes.L.storage.data_log.count + local.sizes.L.storage.shared.count) : var.databases[count.index].size == "XL" ? (local.sizes.XL.storage.data_log.count + local.sizes.XL.storage.shared.count) : var.databases[count.index].size == "XXL" ? (local.sizes.XXL.storage.data_log.count + local.sizes.XXL.storage.shared.count) : null)
     }
   }
 
   dynamic "storage_data_disk" {
-    iterator                    = disk
-    for_each                    = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.backup.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.backup.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.backup.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.backup.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.backup.count) : []
+    iterator = disk
+    for_each = var.databases[count.index].size == "S" ? range(local.sizes.S.storage.backup.count) : var.databases[count.index].size == "M" ? range(local.sizes.M.storage.backup.count) : var.databases[count.index].size == "L" ? range(local.sizes.L.storage.backup.count) : var.databases[count.index].size == "XL" ? range(local.sizes.XL.storage.backup.count) : var.databases[count.index].size == "XXL" ? range(local.sizes.XXL.storage.backup.count) : []
     content {
       name                      = "${var.databases[count.index].name}-disk-backup-${disk.value}"
       caching                   = var.databases[count.index].size == "S" ? local.sizes.S.storage.backup.caching : var.databases[count.index].size == "M" ? local.sizes.M.storage.backup.caching : var.databases[count.index].size == "L" ? local.sizes.L.storage.backup.caching : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.backup.caching : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.backup.caching : null
       create_option             = "Empty"
       managed_disk_type         = var.databases[count.index].size == "S" ? local.sizes.S.storage.backup.disk_type : var.databases[count.index].size == "M" ? local.sizes.M.storage.backup.disk_type : var.databases[count.index].size == "L" ? local.sizes.L.storage.backup.disk_type : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.backup.disk_type : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.backup.disk_type : null
       disk_size_gb              = var.databases[count.index].size == "S" ? local.sizes.S.storage.backup.size_gb : var.databases[count.index].size == "M" ? local.sizes.M.storage.backup.size_gb : var.databases[count.index].size == "L" ? local.sizes.L.storage.backup.size_gb : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.backup.size_gb : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.backup.size_gb : null
-      write_accelerator_enabled = var.databases[count.index].size == "S" ? local.sizes.S.storage.backup.write_accelerator : var.databases[count.index].size == "M" ? local.sizes.M.storage.backup.write_accelerator : var.databases[count.index].size == "L" ? local.sizes.L.storage.backup.write_accelerator : var.databases[count.index].size == "XL"? local.sizes.XL.storage.backup.write_accelerator : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.backup.write_accelerator : null
+      write_accelerator_enabled = var.databases[count.index].size == "S" ? local.sizes.S.storage.backup.write_accelerator : var.databases[count.index].size == "M" ? local.sizes.M.storage.backup.write_accelerator : var.databases[count.index].size == "L" ? local.sizes.L.storage.backup.write_accelerator : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.backup.write_accelerator : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.backup.write_accelerator : null
       lun                       = disk.value + (var.databases[count.index].size == "S" ? (local.sizes.S.storage.data_log.count + local.sizes.S.storage.shared.count + local.sizes.S.storage.sap.count) : var.databases[count.index].size == "M" ? (local.sizes.M.storage.data_log.count + local.sizes.M.storage.shared.count + local.sizes.M.storage.sap.count) : var.databases[count.index].size == "L" ? (local.sizes.L.storage.data_log.count + local.sizes.L.storage.shared.count + local.sizes.L.storage.sap.count) : var.databases[count.index].size == "XL" ? (local.sizes.XL.storage.data_log.count + local.sizes.XL.storage.shared.count + local.sizes.XL.storage.sap.count) : var.databases[count.index].size == "XXL" ? (local.sizes.XXL.storage.data_log.count + local.sizes.XXL.storage.shared.count + local.sizes.XXL.storage.sap.count) : null)
     }
   }
