@@ -94,7 +94,6 @@ resource "azurerm_virtual_machine" "vm-hdb" {
     disk_size_gb      = var.databases[count.index].size == "S" ? local.sizes.S.storage.os.size_gb : var.databases[count.index].size == "M" ? local.sizes.M.storage.os.size_gb : var.databases[count.index].size == "L" ? local.sizes.L.storage.os.size_gb : var.databases[count.index].size == "XL" ? local.sizes.XL.storage.os.size_gb : var.databases[count.index].size == "XXL" ? local.sizes.XXL.storage.os.size_gb : null
   }
 
-
   storage_image_reference {
     publisher = var.databases[count.index].os.publisher
     offer     = var.databases[count.index].os.offer
