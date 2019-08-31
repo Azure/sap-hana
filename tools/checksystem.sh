@@ -52,8 +52,9 @@ checkNicConfig()
   # Verify that flags are properly set to avoid port flapping on VLI systems
 
   # If this isn't a HPE VLI system, then there are no NIC flags to be concerned of
+  #   Note that product name can be one of: UV300, HPE, or "HPE Integrity MC990 X Server"
   PRODUCT_NAME=$(dmidecode -s system-product-name)
-  if [ "${PRODUCT_NAME}" != "UV300" ] && [ "${PRODUCT_NAME}" != "HPE" ]; then
+  if [ "${PRODUCT_NAME}" != "UV300" ] && [ "${PRODUCT_NAME}" != "HPE" ] && [[ ! "${PRODUCT_NAME}" =~ "MC990 X" ]]; then
     echo "Note: System is not a VLI system - skipping NIC checks"
     return
   fi
