@@ -19,3 +19,16 @@ module "jumpbox" {
   subnet-mgmt    = module.common_infrastructure.subnet-mgmt
   nsg-mgmt       = module.common_infrastructure.nsg-mgmt
 }
+
+# Create HANA database nodes
+module "jumpbox" {
+  source         		 = "./modules/hdb_node"
+  infrastructure 		 = var.infrastructure
+  databases      		 = var.databases
+  resource-group 		 = module.common_infrastructure.resource-group
+  subnet-admin   		 = module.common_infrastructure.subnet-admin
+  nsg-admin      		 = module.common_infrastructure.nsg-admin
+  subnet-db      		 = module.common_infrastructure.subnet-db
+  nsg-db         		 = module.common_infrastructure.nsg-db
+  storageaccount-bootdiagnostics = module.jumpbox.storageaccount-bootdiagnostics
+}
