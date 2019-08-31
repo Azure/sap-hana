@@ -21,14 +21,14 @@ module "jumpbox" {
 }
 
 # Create HANA database nodes
-module "jumpbox" {
+module "hdb" {
   source         		 = "./modules/hdb_node"
   infrastructure 		 = var.infrastructure
   databases      		 = var.databases
   resource-group 		 = module.common_infrastructure.resource-group
-  subnet-admin   		 = module.common_infrastructure.subnet-admin
+  subnet-sap-admin   		 = module.common_infrastructure.subnet-sap-admin
   nsg-admin      		 = module.common_infrastructure.nsg-admin
-  subnet-db      		 = module.common_infrastructure.subnet-db
+  subnet-sap-db      		 = module.common_infrastructure.subnet-sap-db
   nsg-db         		 = module.common_infrastructure.nsg-db
   storageaccount-bootdiagnostics = module.jumpbox.storageaccount-bootdiagnostics
 }

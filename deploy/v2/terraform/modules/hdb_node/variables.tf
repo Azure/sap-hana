@@ -10,11 +10,11 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-admin" {
+variable "subnet-sap-admin" {
   description = "Details of the SAP admin subnet"
 }
 
-variable "subnet-db" {
+variable "subnet-sap-db" {
   description = "Details of the SAP DB subnet"
 }
 
@@ -33,5 +33,5 @@ variable "storageaccount-bootdiagnostics" {
 
 # Imports HANA database sizing information
 locals {
-  sizes = jsondecode(file("../../../hdb_sizes.json"))
+  sizes = jsondecode(file("${path.module}/../../../hdb_sizes.json"))
 }
