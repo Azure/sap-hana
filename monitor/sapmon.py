@@ -18,7 +18,7 @@ import re
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.4"
+PAYLOAD_VERSION              = "0.4.5"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
@@ -437,6 +437,7 @@ x-ms-date:%s
          "Authorization": buildSig(jsonData, timestamp),
          "Log-Type":      logType,
          "x-ms-date":     timestamp,
+         "time-generated-field": "UTC_TIMESTAMP",
       }
       logger.debug("headers=%s" % headers)
       logger.debug("data=%s" % jsonData)
