@@ -117,55 +117,51 @@
 
     "databases":[
         {
-            "name":"hdb1",
-            "platform":"",
+            "platform":"HANA",
+	    "version":"2.00.043",
             "os":{
                 "publisher":"SUSE",
                 "offer":"SLES-SAP",
                 "sku":"12-sp2"
             },
             "size":"S",
-            "high_availability":"",
+	    "filesystem":"xfs",
+            "high_availability":false,
             "authentication":{
                 "type":"key",
-                "username":"azureadm",
+                "os_username":"azureadm",
                 "path_to_public_key":"/tmp/sshkey.pub",
                 "path_to_private_key":"/tmp/sshkey"
             },
             "instance":{
-                "sid":"",
-                "instance_number":""
+                "sid":"HN1",
+                "instance_number":"00"
             },
             "credentials":{
-                "db_systemdb_password":"",
-                "db_tenant_password":"",
-                "os_sidadm_password":"",
-                "os_sapadm_password":""
+                "db_systemdb_password":"Manager1",
+                "db_tenant_password":"Manager1",
+                "os_sidadm_password":"Help4you",
+                "os_sapadm_password":"Help4you"
             },
             "components":[
                 {
-                    "name":"",
+                    "name":"XSA",
                     "credentials":{
-                    "xsa_admin_password":""
+                    "xsa_admin_password":"Manager1"
                     },
-                    "routing":""
+                    "routing":"port"
                 },
                 {
-                    "name":"",
+                    "name":"Cockpit",
                     "credentials":{
-                    "cockpit_admin_password":""
+                    "cockpit_admin_password":"Manager1"
                     }
                 }
             ],
             "nodes":[
                 {
-		    "name":"hdb-node1",
-                    "role":""
-	        },
-		{
-		    "name":"hdb-node2",
-		    "role":""
-		}
+		    "name":"hdb-node1"
+	        }
             ]
         }
     ]
