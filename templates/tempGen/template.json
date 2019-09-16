@@ -115,57 +115,57 @@
       ]   
    },
 
-    "databases" : [
+    "databases":[
         {
-            "name" : "hdb1",
-            "platform" : "",
-            "os" : {
-                "publisher" : "SUSE",
-                "offer" : "SLES-SAP",
-                "sku" : "12-sp2"
+            "name":"hdb1",
+            "platform":"",
+            "os":{
+                "publisher":"SUSE",
+                "offer":"SLES-SAP",
+                "sku":"12-sp2"
             },
-            "size" : "S",
-            "high_availability" : "",
-            "authentication" : {
-                "type" : "key",
-                "username" : "azureadm",
-                "path_to_public_key" : "/tmp/sshkey.pub",
-                "path_to_private_key" : "/tmp/sshkey"
+            "size":"S",
+            "high_availability":"",
+            "authentication":{
+                "type":"key",
+                "username":"azureadm",
+                "path_to_public_key":"/tmp/sshkey.pub",
+                "path_to_private_key":"/tmp/sshkey"
             },
-            "admin_nic" : {
+            "instance":{
+                "sid":"",
+                "instance_number":""
             },
-            "db_nic" : {
+            "credentials":{
+                "db_systemdb_password":"",
+                "db_tenant_password":"",
+                "os_sidadm_password":"",
+                "os_sapadm_password":""
             },
-            "instance" : {
-                "sid" : "",
-                "instance_number" : ""
-            },
-            "credentials" : {
-                "db_systemdb_password" : "",
-                "db_tenant_password" : "",
-                "os_sidadm_password" : "",
-                "os_sapadm_password" : ""
-            },
-            "components" : [
+            "components":[
                 {
-                    "name" : "",
-                    "credentials" : {
-                    "xsa_admin_password" : ""
+                    "name":"",
+                    "credentials":{
+                    "xsa_admin_password":""
                     },
-                    "routing" : ""
+                    "routing":""
                 },
                 {
-                    "name" : "",
-                    "credentials" : {
-                    "cockpit_admin_password" : ""
+                    "name":"",
+                    "credentials":{
+                    "cockpit_admin_password":""
                     }
                 }
             ],
-            "nodes" : [
+            "nodes":[
                 {
-                    "private_ip" : "",
-                    "role" : ""
-	        }
+		    "name":"hdb-node1",
+                    "role":""
+	        },
+		{
+		    "name":"hdb-node2",
+		    "role":""
+		}
             ]
         }
     ]

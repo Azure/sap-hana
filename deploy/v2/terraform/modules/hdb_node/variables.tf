@@ -35,3 +35,8 @@ variable "storageaccount-bootdiagnostics" {
 locals {
   sizes = jsondecode(file("${path.module}/../../../hdb_sizes.json"))
 }
+
+# List of HANA DB nodes to be created
+locals {
+  nodes = zipmap(range(length(flatten([for database in var.databases : [ for node in database.nodes : node.name] if database.platform == "HANA"]))),flatten([for database in var.databases: [for node in database.nodes : { name = node.name, admin_nic_ip = lookup(node, "admin_nic_ip", false), db_nic_ip = lookup(node, "db_nic_ip", false), size = database.size, os = database.os, authentication = database.authentication, availability_set_name = database.availability_set_name } ] if database.platform == "HANA"]))
+}

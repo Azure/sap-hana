@@ -3,204 +3,54 @@
         "compute" : {
             "vm_size" : "Standard_M32ls"
         },
-        "storage" : {
-            "os" : {
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
                 "size_gb" : 64,
                 "caching" : "ReadWrite"
             },
-            "data_log" : {
-                "count" : 3,
+            {
+                "name" : "data",
+                "count" : 1,
                 "disk_type" : "Premium_LRS",
                 "size_gb" : 512,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             },
-            "shared" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "sap" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "backup" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            }
-        }
-    },
-
-    "M" : {
-        "compute" : {
-            "vm_size" : "Standard_M64ls"
-        },
-        "storage" : {
-            "os" : {
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadWrite"
-            },
-            "data_log" : {
-                "count" : 3,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "shared" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "sap" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "backup" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            }
-        }
-    },
-
-    "L" : {
-        "compute" : {
-            "vm_size" : "Standard_M64s"
-        },
-        "storage" : {
-            "os" : {
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadWrite"
-            },
-            "data_log" : {
+            {
+                "name" : "log",
                 "count" : 2,
                 "disk_type" : "Premium_LRS",
-                "size_gb" : 1024,
+                "size_gb" : 512,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             },
-            "shared" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "sap" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "backup" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            }
-        }
-    },
-
-        "XL" : {
-        "compute" : {
-            "vm_size" : "Standard_M128s"
-        },
-        "storage" : {
-            "os" : {
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 128,
-                "caching" : "ReadWrite"
-            },
-            "data_log" : {
+            {
+                "name" : "shared",
                 "count" : 3,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "shared" : {
-                "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
+                "size_gb" : 512,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             },
-            "sap" : {
+            {
+                "name" : "logbackup",
                 "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
                 "size_gb" : 64,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             },
-            "backup" : {
+            {
+                "name" : "databackup",
                 "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
+                "size_gb" : 512,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             }
-        }
-    },
-
-    "XXL" : {
-        "compute" : {
-            "vm_size" : "Standard_M128ms"
-        },
-        "storage" : {
-            "os" : {
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 128,
-                "caching" : "ReadWrite"
-            },
-            "data_log" : {
-                "count" : 5,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "shared" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "sap" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            "backup" : {
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 1024,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            }
-        }
+        ]
     }
 }
