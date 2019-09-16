@@ -1,7 +1,7 @@
 {
     "S" : {
         "compute" : {
-            "vm_size" : "Standard_M32ls"
+            "vm_size" : "Standard_D4s_v3"
         },
         "storage" : [
             {
