@@ -16,7 +16,8 @@
                "prefix":"10.0.1.0/24",
                "nsg":{
                   "is_existing":"false",
-                  "name":"nsg-mgmt"
+                  "name":"nsg-mgmt",
+                  "allowed_ips":"*"
                }
             }
          },
@@ -46,16 +47,19 @@
       }
    },
    "jumpboxes":{
-      "windows_jumpbox":{
+      "windows":[
+         {
          "name":"jumpbox-windows",
          "destroy_after_deploy":"false",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"MicrosoftWindowsServer",
             "offer":"WindowsServer",
             "sku":"2016-Datacenter"
          },
          "authentication":{
-            "type":"credentials",
+            "type":"password",
             "username":"azureadm",
             "password":"Sap@hana2019!"
          },
@@ -63,10 +67,15 @@
             "hana_studio_windows",
             "sap_router"
          ]
-      },
-      "linux_jumpbox":{
+         }
+      ],   
+      
+      "linux":[
+         {
          "name":"jumpbox-linux",
          "destroy_after_deploy":"false",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",
@@ -75,7 +84,6 @@
          "authentication":{
             "type":"key",
             "username":"azureadm",
-            "use_existing":"true",
             "path_to_public_key":"/tmp/sshkey.pub",
             "path_to_private_key":"/tmp/sshkey"
          },
@@ -83,10 +91,12 @@
             "hana_studio_linux",
             "sap_router"
          ]
-      },
-      "rti_box":{
+         },
+         {
          "name":"rti",
          "destroy_after_deploy":"true",
+         "size":"Standard_D2s_v3",
+         "disk_type":"StandardSSD_LRS",
          "os":{
             "publisher":"Canonical",
             "offer":"UbuntuServer",
@@ -95,13 +105,13 @@
          "authentication":{
             "type":"key",
             "username":"azureadm",
-            "use_existing":"false",
             "path_to_public_key":"/tmp/sshkey.pub",
             "path_to_private_key":"/tmp/sshkey"
          },
          "components":[
             "ansible"
          ]
-      }
+         }
+      ]   
    }
 }
