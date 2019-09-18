@@ -15,53 +15,59 @@ import hashlib, hmac, base64
 import logging, logging.config
 import hashlib
 import re
+from azure_storage_logging.handlers import QueueStorageHandler
+from azure.mgmt.storage import StorageManagementClient
+from azure.common.credentials import BasicTokenAuthentication
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.6"
-PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
-STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
-INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
-TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
-TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
-TIMEOUT_HANA                 = 5
-DEFAULT_CONSOLE_LOG_LEVEL    = logging.INFO
-DEFAULT_FILE_LOG_LEVEL       = logging.INFO
-LOG_FILENAME                 = "%s/sapmon.log" % PAYLOAD_DIRECTORY
-KEYVAULT_NAMING_CONVENTION   = "sapmon-kv-%s"
+PAYLOAD_VERSION                   = "0.5.0"
+PAYLOAD_DIRECTORY                 = os.path.dirname(os.path.realpath(__file__))
+STATE_FILE                        = "%s/sapmon.state" % PAYLOAD_DIRECTORY
+INITIAL_LOADHISTORY_TIMESPAN      = -(60 * 1)
+TIME_FORMAT_HANA                  = "%Y-%m-%d %H:%M:%S.%f"
+TIME_FORMAT_LOG_ANALYTICS         = "%a, %d %b %Y %H:%M:%S GMT"
+TIMEOUT_HANA                      = 5
+DEFAULT_CONSOLE_LOG_LEVEL         = logging.INFO
+DEFAULT_FILE_LOG_LEVEL            = logging.INFO
+DEFAULT_QUEUE_LOG_LEVEL           = logging.INFO
+LOG_FILENAME                      = "%s/sapmon.log" % PAYLOAD_DIRECTORY
+KEYVAULT_NAMING_CONVENTION        = "sapmon-kv-%s"
+STORAGE_ACCOUNT_NAMING_CONVENTION = "sapmonsto%s"
+STORAGE_QUEUE_NAMING_CONVENTION   = "sapmon-que-%s"
 
 ###############################################################################
 
 LOG_CONFIG = {
-   "version": 1,
-   "disable_existing_loggers": True,
-   "formatters": {
-      "detailed": {
-         "format": "[%(process)d] %(asctime)s %(levelname).1s %(funcName)s:%(lineno)d %(message)s",
-      },
-      "simple": {
-         "format": "%(levelname)-8s %(message)s",
-      }
-   },
-   "handlers": {
-      "console": {
-         "class": "logging.StreamHandler",
-         "formatter": "simple",
-         "level": DEFAULT_CONSOLE_LOG_LEVEL,
-      },
-      "file": {
-         "class": "logging.handlers.RotatingFileHandler",
-         "formatter": "detailed",
-         "level": DEFAULT_FILE_LOG_LEVEL,
-         "filename": LOG_FILENAME,
-         "maxBytes": 10000000,
-         "backupCount": 10,
-      },
-   },
-   "root": {
-      "level": logging.DEBUG,
-      "handlers": ["console", "file"],
-   }
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "detailed": {
+            "format": "[%(process)d] %(asctime)s %(levelname).1s %(funcName)s:%(lineno)d %(message)s",
+        },
+        "simple": {
+            "format": "%(levelname)-8s %(message)s",
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+            "level": DEFAULT_CONSOLE_LOG_LEVEL,
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "detailed",
+            "level": DEFAULT_FILE_LOG_LEVEL,
+            "filename": LOG_FILENAME,
+            "maxBytes": 10000000,
+            "backupCount": 10,
+        },
+    },
+    "root": {
+        "level": logging.DEBUG,
+        "handlers": ["console", "file"],
+    }
 }
 
 ###############################################################################
@@ -458,6 +464,35 @@ x-ms-date:%s
 
 ###############################################################################
 
+class AzureStorageQueue():
+    accountName = None
+    name = None
+    token = {}
+    subscriptionId = None
+    resourceGroup = None
+    def __init__(self, sapmonId, msiClientID, subscriptionId, resourceGroup):
+        """
+        Retrieve the name of the storage account and storage queue
+        """
+        self.accountName = STORAGE_ACCOUNT_NAMING_CONVENTION % sapmonId
+        self.name = STORAGE_QUEUE_NAMING_CONVENTION % sapmonId
+        tokenResponse = AzureInstanceMetadataService.getAuthToken(resource="https://management.azure.com/", msiClientId=msiClientID)
+        self.token["access_token"] = tokenResponse
+        self.subscriptionId = subscriptionId
+        self.resourceGroup = resourceGroup
+
+    def getAccessKey(self):
+        """
+        Get the access key to the storage queue
+        """
+        storageclient = StorageManagementClient(credentials=BasicTokenAuthentication(self.token), subscription_id=self.subscriptionId)
+        storageKeys = storageclient.storage_accounts.list_keys(resource_group_name=self.resourceGroup, account_name=self.accountName)
+        if storageKeys is None or len(storageKeys.keys) <= 0 :
+           print("Could not retrive storage keys of the storage account{0}".format(self.accountName))
+           return None
+        return storageKeys.keys[0].value
+################################################################################
+
 class _Context(object):
    """
    Internal context handler
@@ -467,16 +502,31 @@ class _Context(object):
    def __init__(self, operation):
       logger.info("initializing context")
       self.vmInstance = AzureInstanceMetadataService.getComputeInstance(operation)
-      vmTags = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
-      logger.debug("vmTags=%s" % vmTags)
-      self.sapmonId = vmTags["SapMonId"]
+      self.vmTags = dict(map(lambda s : s.split(':'), self.vmInstance["tags"].split(";")))
+      logger.debug("vmTags=%s" % self.vmTags)
+      self.sapmonId = self.vmTags["SapMonId"]
       logger.debug("sapmonId=%s " % self.sapmonId)
-      self.azKv = AzureKeyVault(KEYVAULT_NAMING_CONVENTION % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
+      self.azKv = AzureKeyVault(KEYVAULT_NAMING_CONVENTION % self.sapmonId, self.vmTags.get("SapMonMsiClientId", None))
       if not self.azKv.exists():
          sys.exit(ERROR_KEYVAULT_NOT_FOUND)
       self.lastPull = None
       self.lastResultHashes = {}
       self.readStateFile()
+      self.addQueueLogHandler()
+      return
+ 
+   def addQueueLogHandler(self):
+      global logger
+      storageQueue = AzureStorageQueue(sapmonId=self.sapmonId, msiClientID=self.vmTags.get("SapMonMsiClientId", None),subscriptionId=self.vmInstance["subscriptionId"],resourceGroup=self.vmInstance["resourceGroupName"])
+      storageKey = storageQueue.getAccessKey()
+      queueStorageLogHandler = QueueStorageHandler(account_name=storageQueue.accountName,
+                                                   account_key=storageKey,
+                                                   protocol="https",
+                                                   queue=storageQueue.name)
+      queueStorageLogHandler.level = DEFAULT_QUEUE_LOG_LEVEL
+      formatter = logging.Formatter(LOG_CONFIG["formatters"]["detailed"]["format"])
+      queueStorageLogHandler.setFormatter(formatter)
+      logger.addHandler(queueStorageLogHandler)
       return
 
    def readStateFile(self):
@@ -735,7 +785,15 @@ def monitor(args):
 
    logger.info("monitor payload successfully completed")
    return
-      
+
+def initLogger(args):
+   global logger
+   if args.verbose:
+      LOG_CONFIG["handlers"]["console"]["formatter"] = "detailed"
+      LOG_CONFIG["handlers"]["console"]["level"] = logging.DEBUG
+   logging.config.dictConfig(LOG_CONFIG)
+   logger = logging.getLogger(__name__)
+
 def main():
    global ctx, logger
    parser = argparse.ArgumentParser(description="SAP Monitor Payload")
@@ -757,11 +815,7 @@ def main():
    monParser  = subParsers.add_parser("monitor", description="Monitor payload", help="Execute the monitoring payload")
    monParser.set_defaults(func=monitor)
    args = parser.parse_args()
-   if args.verbose:
-      LOG_CONFIG["handlers"]["console"]["formatter"] = "detailed"
-      LOG_CONFIG["handlers"]["console"]["level"] = logging.DEBUG
-   logging.config.dictConfig(LOG_CONFIG)
-   logger = logging.getLogger(__name__)
+   initLogger(args)
    ctx = _Context(args.command)
    args.func(args)
 
