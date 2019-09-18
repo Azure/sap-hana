@@ -18,7 +18,6 @@ variable "subnet-sap-db" {
   description = "Details of the SAP DB subnet"
 }
 
-
 variable "nsg-admin" {
   description = "Details of the SAP admin subnet NSG"
 }

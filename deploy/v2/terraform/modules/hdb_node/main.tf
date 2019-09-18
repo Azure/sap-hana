@@ -1,5 +1,5 @@
 ##################################################################################################################
-# Database Node
+# HANA DB Node
 ##################################################################################################################
 
 # NETWORK SECURITY RULES =========================================================================================
@@ -105,7 +105,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
     version   = "latest"
   }
 
-   dynamic "storage_data_disk" {
+  dynamic "storage_data_disk" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : {name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching, write_accelerator = storage_type.write_accelerator } ]if storage_type.name != "os" ])
     content {
