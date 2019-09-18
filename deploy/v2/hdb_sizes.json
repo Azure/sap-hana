@@ -1,0 +1,57 @@
+{
+    "S" : {
+        "compute" : {
+            "vm_size" : "Standard_D4s_v3",
+	    "swap_size_gb": 2
+        },
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadWrite"
+            },
+            {
+                "name" : "data",
+                "count" : 1,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "log",
+                "count" : 2,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "shared",
+                "count" : 3,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "logbackup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "databackup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            }
+        ]
+    }
+}

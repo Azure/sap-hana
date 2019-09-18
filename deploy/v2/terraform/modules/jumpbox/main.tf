@@ -15,7 +15,7 @@ resource "random_id" "random-id" {
 
 # Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
-  name                     = lookup(var.infrastructure,"boot_diagnostics_account_name", false) == false ? "diag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
+  name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "diag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
   resource_group_name      = var.resource-group[0].name
   location                 = var.resource-group[0].location
   account_replication_type = "LRS"
@@ -69,11 +69,11 @@ resource "azurerm_public_ip" "public-ip-windows" {
 
 # Creates the NIC and IP address for Windows VMs
 resource "azurerm_network_interface" "nic-windows" {
-  count                         = length(var.jumpboxes.windows)
-  name                          = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
-  network_security_group_id     = var.nsg-mgmt[0].id
+  count                     = length(var.jumpboxes.windows)
+  name                      = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
+  location                  = var.resource-group[0].location
+  resource_group_name       = var.resource-group[0].name
+  network_security_group_id = var.nsg-mgmt[0].id
 
   ip_configuration {
     name                          = "${var.jumpboxes.windows[count.index].name}-nic1-ip"
@@ -95,11 +95,11 @@ resource "azurerm_public_ip" "public-ip-linux" {
 
 # Creates the NIC and IP address for Linux VMs
 resource "azurerm_network_interface" "nic-linux" {
-  count                         = length(var.jumpboxes.linux)
-  name                          = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
-  network_security_group_id     = var.nsg-mgmt[0].id
+  count                     = length(var.jumpboxes.linux)
+  name                      = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
+  location                  = var.resource-group[0].location
+  resource_group_name       = var.resource-group[0].name
+  network_security_group_id = var.nsg-mgmt[0].id
 
   ip_configuration {
     name                          = "${var.jumpboxes.linux[count.index].name}-nic1-ip"
@@ -114,7 +114,7 @@ resource "azurerm_network_interface" "nic-linux" {
 
 # Creates Linux VM
 resource "azurerm_virtual_machine" "vm-linux" {
-  count				= length(var.jumpboxes.linux)
+  count                         = length(var.jumpboxes.linux)
   name                          = var.jumpboxes.linux[count.index].name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -161,7 +161,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
 
 # Creates Windows VM
 resource "azurerm_virtual_machine" "vm-windows" {
-  count				= length(var.jumpboxes.windows)
+  count                         = length(var.jumpboxes.windows)
   name                          = var.jumpboxes.windows[count.index].name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
