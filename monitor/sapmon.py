@@ -5,28 +5,30 @@
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
 #
-import pyhdb
-from datetime import datetime, timedelta, date
-import http.client as http_client
-import requests, json
-import os, sys, argparse
+import argparse
+import base64
+from datetime import date, datetime, timedelta
 import decimal
-import hashlib, hmac, base64
-import logging, logging.config
 import hashlib
+import hmac
+import http.client as http_client
+import json
+import logging
+import logging.config
+import os
+import pyhdb
 import re
+import requests
+import sys
 
 ###############################################################################
 
-PAYLOAD_VERSION              = "0.4.6"
+PAYLOAD_VERSION              = "0.6.0"
 PAYLOAD_DIRECTORY            = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                   = "%s/sapmon.state" % PAYLOAD_DIRECTORY
-INITIAL_LOADHISTORY_TIMESPAN = -(60 * 1)
-TIME_FORMAT_HANA             = "%Y-%m-%d %H:%M:%S.%f"
 TIME_FORMAT_LOG_ANALYTICS    = "%a, %d %b %Y %H:%M:%S GMT"
-TIMEOUT_HANA                 = 5
 DEFAULT_CONSOLE_LOG_LEVEL    = logging.INFO
-DEFAULT_FILE_LOG_LEVEL       = logging.INFO
+DEFAULT_FILE_LOG_LEVEL       = logging.DEBUG
 LOG_FILENAME                 = "%s/sapmon.log" % PAYLOAD_DIRECTORY
 KEYVAULT_NAMING_CONVENTION   = "sapmon-kv-%s"
 
@@ -75,13 +77,151 @@ ERROR_HANA_CONNECTION          = 30
 
 ###############################################################################
 
+sapmonContentTypes = {
+   "HANA": "SapHanaCheck"
+}
+
+class SapmonCheck:
+   """
+   Implements a monitoring check inside SAP Monitor
+   """
+   version       = ""
+   name          = ""
+   description   = ""
+   customLog     = ""
+   frequencySecs = 0
+   state         = {}
+   def __init__(self, version, name, description, customLog, frequencySecs, enabled=True):
+      self.version       = version
+      self.name          = name
+      self.description   = description
+      self.customLog     = customLog
+      self.frequencySecs = frequencySecs
+      self.state         = {
+         "isEnabled":    enabled,
+         "lastRunLocal": None,
+      }
+
+class SapHanaCheck(SapmonCheck):
+   """
+   Implements a SAP HANA-specific monitoring check
+   """
+   COL_SERVER_UTC      = "_SERVER_UTC"
+   COL_TIMESERIES_UTC  = "_TIMESERIES_UTC"
+   COL_CONTENT_VERSION = "CONTENT_VERSION"
+   COL_SAPMON_VERSION  = "SAPMON_VERSION"
+   TIME_FORMAT_HANA    = "%Y-%m-%d %H:%M:%S.%f"
+
+   prefix             = "HANA"
+   isTimeSeries       = False
+   def __init__(self, hanaOptions, **kwargs):
+      super().__init__(**kwargs)
+      self.query                  = hanaOptions["query"]
+      self.isTimeSeries           = hanaOptions.get("isTimeSeries", False)
+      self.colTimeGenerated       = self.COL_TIMESERIES_UTC if self.isTimeSeries else self.COL_SERVER_UTC
+      self.initialTimespanSecs    = hanaOptions.get("initialTimespanSecs", 0)
+      self.state["lastRunServer"] = None
+
+   def prepareSql(self):
+      """
+      Prepare the SQL statement based on the check-specific query
+      """
+      logger.info("preparing SQL statement")
+      # insert logic to get server UTC time (_SERVER_UTC)
+      sqlTimestamp = ", '%s' AS %s, '%s' AS %s, CURRENT_UTCTIMESTAMP AS %s FROM DUMMY," % \
+         (self.version, self.COL_CONTENT_VERSION, PAYLOAD_VERSION, self.COL_SAPMON_VERSION, self.COL_SERVER_UTC)
+      logger.debug("sqlTimestamp=%s" % sqlTimestamp)
+      sql = self.query.replace(" FROM", sqlTimestamp, 1)
+      # if time series, insert time condition
+      if self.isTimeSeries:
+         lastRunServer = self.state.get("lastRunServer", None)
+         # TODO(tniek) - make WHERE conditions for time series queries more flexible
+         if not lastRunServer:
+            logger.info("time series query for check %s_%s has never been run, applying initalTimespanSecs=%d" % \
+               (self.prefix, self.name, self.initialTimespanSecs))
+            sqlUntilNow = " WHERE h.TIME > ADD_SECONDS(NOW(), %d) AND" % (self.initialTimespanSecs * (-1))
+         else:
+            logger.info("time series query for check %s_%s has been run at %s, filter out only new records since then" % \
+               (self.prefix, self.name, lastRunServer.strftime(self.TIME_FORMAT_HANA)))
+            try:
+               sqlUntilNow = " WHERE ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s' AND" % lastRunServer.strftime(self.TIME_FORMAT_HANA)
+            except Exception as e:
+               logger.error("could not format lastRunServer=%s (%s)" % (str(lastRunServer), e))
+         logger.debug("sqlUntilNow=%s" % sqlUntilNow)
+         sql = sql.replace(" WHERE", sqlUntilNow, 1)
+         logger.debug("sql=%s" % sql)
+      return sql
+
+   def run(self, hana):
+      """
+      Run this SAP HANA-specific check
+      """
+      logger.info("running HANA SQL query")
+      sql = self.prepareSql()
+      self.colIndex, self.lastResult = hana.runQuery(sql)
+      self.updateState(hana)
+      resultJson = self.convertResultIntoJson()
+      return resultJson
+
+   def calculateResultHash(self):
+      """
+      Calculate the MD5 hash of a result set
+      """
+      logger.info("calculating SQL result hash")
+      resultHash = None
+      if len(self.lastResult) == 0:
+         logger.debug("SQL result is empty")
+      else:
+         try:
+            resultHash = hashlib.md5(str(self.lastResult).encode("utf-8")).hexdigest()
+            logger.debug("resultHash=%s" % resultHash)
+         except Exception as e:
+            logger.error("could not calculate result hash (%s)" % e)
+      return resultHash
+
+   def convertResultIntoJson(self):
+      """
+      Convert the last query result into a JSON-formatted string (as required by Log Analytics)
+      """
+      logger.info("converting result set into JSON")
+      logData = []
+      for r in self.lastResult:
+         logItem = {}
+         for c in self.colIndex.keys():
+            if c != self.colTimeGenerated and (c.startswith("_") or c == "DUMMY"): # remove internal fields
+               continue
+            logItem[c] = r[self.colIndex[c]]
+         try:
+            jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
+         except Exception as e:
+            logger.error("could not encode logItem=%s into JSON (%s)" % (logItem, e))
+         logData.append(logItem)
+      return json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
+
+   def updateState(self, hana):
+      """
+      Update the internal state of this check (including last run times)
+      """
+      logger.info("updating internal state of check %s_%s" % (self.prefix, self.name))
+      self.state["lastRunLocal"] = datetime.utcnow()
+      if len(self.lastResult) == 0:
+         logger.info("SQL result is empty")
+         return False
+      self.state["lastRunServer"] = self.lastResult[0][self.colIndex[self.COL_SERVER_UTC]]
+      self.state["lastResultHash"] = self.calculateResultHash()
+      logger.info("internal state successfully updated")
+      return True
+
+###############################################################################
+
 class SapHana:
    """
    Provide access to a HANA Database (HDB) instance
    """
+   TIMEOUT_HANA_SECS = 5
+
    connection = None
    cursor     = None
-
    def __init__(self, host = None, port = None, user = None, password = None, hanaDetails = None):
       logger.info("initializing HANA instance")
       if hanaDetails:
@@ -104,7 +244,7 @@ class SapHana:
          port = self.port,
          user = self.user,
          password = self.password,
-         timeout = TIMEOUT_HANA,
+         timeout = self.TIMEOUT_HANA_SECS,
          )
       self.connection.connect()
       self.cursor = self.connection.cursor()
@@ -123,98 +263,6 @@ class SapHana:
       colIndex = {col[0] : idx for idx, col in enumerate(self.cursor.description)}
       return colIndex, self.cursor.fetchall()
 
-   # TODO(tniek): Refactor monitoring into Query class
-   def getLoadHistory(self, fromTimestamp):
-      """
-      Get infrastructure utilization via HANA Load History
-      """
-      logger.info("getting HANA Load History")
-      if not fromTimestamp:
-         sqlFrom = "h.TIME > ADD_SECONDS(NOW(), %d)" % INITIAL_LOADHISTORY_TIMESPAN
-      else:
-         sqlFrom = "ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s'" % fromTimestamp.strftime(TIME_FORMAT_HANA)
-      logger.debug("sqlFrom=%s" % sqlFrom)
-      sql = """
-SELECT
-h.TIME AS _SERVER_TIMESTAMP,
-i.VALUE AS _SERVER_UTC_OFFSET,
-ADD_SECONDS(h.TIME, i.VALUE*(-1)) AS UTC_TIMESTAMP,
-h.HOST AS HOST,
-'HOST' AS SCOPE,
-MAP(h.CPU, null, -1 , -1, -1, ROUND(100 * h.CPU / 1) / 100) AS CPU,
-MAP(h.MEMORY_RESIDENT, null, -1 , -1, -1, ROUND(100 * h.MEMORY_RESIDENT / 1048576) / 100) AS MEMORY_RESIDENT,
-MAP(h.MEMORY_TOTAL_RESIDENT, null, -1 , -1, -1, ROUND(100 * h.MEMORY_TOTAL_RESIDENT / 1048576) / 100) AS MEMORY_TOTAL_RESIDENT,
-MAP(h.MEMORY_SIZE, null, -1 , -1, -1, ROUND(100 * h.MEMORY_SIZE / 1048576) / 100) AS MEMORY_SIZE,
-MAP(h.MEMORY_USED, null, -1 , -1, -1, ROUND(100 * h.MEMORY_USED / 1048576) / 100) AS MEMORY_USED,
-MAP(h.MEMORY_ALLOCATION_LIMIT, null, -1 , -1, -1, ROUND(100 * h.MEMORY_ALLOCATION_LIMIT / 1048576) / 100) AS MEMORY_ALLOCATION_LIMIT,
-MAP(h.DISK_USED, null, -1 , -1, -1, ROUND(100 * h.DISK_USED / 1073741824) / 100) AS DISK_USED,
-MAP(h.DISK_SIZE, null, -1 , -1, -1, ROUND(100 * h.DISK_SIZE / 1073741824) / 100) AS DISK_SIZE,
-MAP(lag(h.TIME) OVER (order by h.host, h.time) , null , -1,  MAP(SUBSTRING(cast (h.NETWORK_IN as VARCHAR),0,1) ,'-',-1, 'n',-1,  round( 10000000*( 100 * h.NETWORK_IN / (NANO100_BETWEEN(lag(h.time) OVER (order by h.host, h.time),h.time) )) / 1048576) / 100)) AS NETWORK_IN,
-MAP(lag(h.TIME) OVER (order by h.host, h.time) , null , -1, MAP(SUBSTRING(cast (h.NETWORK_OUT as VARCHAR),0,1) ,'-',-1, 'n',-1,  round( 10000000*( 100 * h.NETWORK_OUT / (NANO100_BETWEEN(lag(h.time) OVER (order by h.host, h.time),h.time) )) / 1048576) / 100)) AS NETWORK_OUT
-FROM SYS.M_LOAD_HISTORY_HOST h, SYS.M_HOST_INFORMATION i
-WHERE %s
-AND h.HOST = i.HOST AND UPPER(i.KEY) = 'TIMEZONE_OFFSET'
-ORDER BY h.TIME ASC
-""" % sqlFrom
-      result = None
-      try:
-         result = self.runQuery(sql)
-      except Exception as e:
-         logger.error("could not get HANA Load History (%s)" % e)
-      return result
-
-   def getHostConfig(self):
-      """
-      Get HANA host configuration
-      """
-      logger.info("getting HANA Host Config")
-      result = None
-      sql = "SELECT * FROM SYS.M_LANDSCAPE_HOST_CONFIGURATION"
-      try:
-         result = self.runQuery(sql)
-      except Exception as e:
-         logger.error("could not get HANA Host Config (%s)" % e)
-      return result
-
-   def getNewResultHash(self, query, resultRows):
-      """
-      Compute hash of a specific query result and return it only if it's different from the previous one
-      """
-      logger.info("comparing query result with last execution")
-      resultHash = None
-      if len(resultRows) == 0:
-         logger.info("result is empty")
-      else:
-         try:
-            resultHash = hashlib.md5(str(resultRows).encode("utf-8")).hexdigest()
-            logger.debug("resultHash=%s" % resultHash)
-         except Exception as e:
-            logger.error("could not calculate result hash (%s)" % e)
-         if query not in ctx.lastResultHashes:
-            logger.info("query has not been executed before")
-         else:
-            if ctx.lastResultHashes[query] == resultHash:
-               logger.info("result is identical to last execution")
-               resultHash = None
-            else:
-               logger.info("result has changed from last execution")
-      return resultHash   
-
-   def convertIntoJson(self, colIndex, resultRows):
-      """
-      Convert a query result into a JSON-formatted string (as required by Log Analytics)
-      """
-      logData = []
-      for r in resultRows:
-         logItem = {}
-         for c in colIndex.keys():
-            if c.startswith("_"): # remove internal fields
-               continue
-            logItem[c] = r[colIndex[c]]
-         jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
-         logData.append(logItem)
-      return json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
-
 ###############################################################################
 
 class REST:
@@ -222,7 +270,7 @@ class REST:
    Provide access to a REST endpoint
    """
    @staticmethod
-   # TODO: improve error handling (include HTTP status together with response)
+   # TODO(tniek) - improve error handling (include HTTP status together with response)
    def sendRequest(endpoint, method = requests.get, params = {}, headers = {}, timeout = 5, data = None, debug = False):
       if debug:
          http_client.HTTPConnection.debuglevel = 1
@@ -412,7 +460,7 @@ class AzureLogAnalytics:
       self.uri         = "https://%s.ods.opinsights.azure.com/api/logs?api-version=2016-04-01" % workspaceId
       return
 
-   def ingest(self, logType, jsonData):
+   def ingest(self, logType, jsonData, colTimeGenerated):
       """
       Ingest JSON payload as custom log to Log Analytics
       """
@@ -434,13 +482,12 @@ x-ms-date:%s
 
       logger.info("ingesting telemetry into Log Analytics")
       timestamp = datetime.utcnow().strftime(TIME_FORMAT_LOG_ANALYTICS)
-      logger.debug("timestamp=%s" % timestamp)
       headers = {
          "content-type":  "application/json",
          "Authorization": buildSig(jsonData, timestamp),
          "Log-Type":      logType,
          "x-ms-date":     timestamp,
-         "time-generated-field": "UTC_TIMESTAMP",
+         "time-generated-field": colTimeGenerated,
       }
       logger.debug("headers=%s" % headers)
       logger.debug("data=%s" % jsonData)
@@ -463,6 +510,7 @@ class _Context(object):
    Internal context handler
    """
    hanaInstances = []
+   availChecks   = []
 
    def __init__(self, operation):
       logger.info("initializing context")
@@ -474,67 +522,95 @@ class _Context(object):
       self.azKv = AzureKeyVault(KEYVAULT_NAMING_CONVENTION % self.sapmonId, vmTags.get("SapMonMsiClientId", None))
       if not self.azKv.exists():
          sys.exit(ERROR_KEYVAULT_NOT_FOUND)
-      self.lastPull = None
-      self.lastResultHashes = {}
+      self.initChecks()
       self.readStateFile()
+      return
+
+   def initChecks(self):
+      """
+      Initialize all sapmonChecks (pre-delivered via JSON files)
+      """
+      logger.info("initializing monitoring checks")
+      for filename in os.listdir(PAYLOAD_DIRECTORY):
+         if not filename.endswith(".json"):
+            continue
+         contentFullPath = "%s/%s" % (PAYLOAD_DIRECTORY, filename)
+         logger.debug("contentFullPath=%s" % contentFullPath)
+         try:
+            with open(contentFullPath, "r") as file:
+               data = file.read()
+            jsonData = json.loads(data)
+         except Exception as e:
+            logger.error("could not load content file %s (%s)" % (contentFullPath, e))
+         contentType = jsonData.get("contentType", None)
+         if not contentType:
+            logging.error("content type not specified in content file %s, skipping" % contentFullPath)
+            continue
+         contentVersion = jsonData.get("contentVersion", None)
+         if not contentVersion:
+            logging.error("content version not specified in content file %s, skipping" % contentFullPath)
+            continue
+         checks = jsonData.get("checks", [])
+         if not contentType in sapmonContentTypes:
+            logging.error("unknown content type %s, skipping content file %s" % (contentType, contentFullPath))
+            continue
+         for checkOptions in checks:
+            try:
+               logging.info("instantiate check of type %s" % contentType)
+               checkOptions["version"] = contentVersion
+               logging.debug("checkOptions=%s" % checkOptions)
+               check = eval(sapmonContentTypes[contentType])(**checkOptions)
+               self.availChecks.append(check)
+            except Exception as e:
+               logger.error("could not instantiate new check of type %s (%s)" % (contentType, e))
+      logger.info("successfully loaded %d monitoring checks" % len(self.availChecks))
       return
 
    def readStateFile(self):
       """
-      Get most recent state (with hashes from point-in-time queries and last pull timestamp) from a local file
+      Get most recent state from a local file
       """
       logger.info("reading state file")
-      success = True
+      success  = True
+      jsonData = {}
       try:
-         with open(STATE_FILE, "r") as f:
-            data = json.load(f)
-         self.lastPull = datetime.strptime(data["lastPullUTC"], TIME_FORMAT_HANA)
-         logger.debug("lastPull=%s" % self.lastPull)
-         self.lastResultHashes = data["lastResultHashes"]
-         logger.debug("lastResultHashes=%s" % self.lastResultHashes)
+         logger.debug("STATE_FILE=%s" % STATE_FILE)
+         with open(STATE_FILE, "r") as file:
+            data = file.read()
+         jsonData = json.loads(data, object_hook=_JsonDecoder.datetimeHook)
       except FileNotFoundError as e:
          logger.warning("state file %s does not exist" % STATE_FILE)
       except Exception as e:
-         success = False
          logger.error("could not read state file %s (%s)" % (STATE_FILE, e))
+      for c in self.availChecks:
+         sectionKey = "%s_%s" % (c.prefix, c.name)
+         if sectionKey in jsonData:
+            logger.debug("parsing section %s" % sectionKey)
+            section = jsonData.get(sectionKey, {})
+            for k in section.keys():
+               c.state[k] = section[k]
+         else:
+            logger.warning("section %s not found in state file" % sectionKey)
+      logger.info("successfully parsed state file")
       return success
 
    def writeStateFile(self):
       """
-      Persist current state (with hashes from point-in-time queries and last pull timestamp) into a local file
+      Persist current state into a local file
       """
       logger.info("writing state file")
-      success = False
+      success  = False
+      jsonData = {}
       try:
-         data = {
-            "lastResultHashes": self.lastResultHashes,
-         }
-         if self.lastPull:
-            data["lastPullUTC"] = self.lastPull.strftime(TIME_FORMAT_HANA)
+         logger.debug("STATE_FILE=%s" % STATE_FILE)
+         for c in self.availChecks:
+            sectionKey = "%s_%s" % (c.prefix, c.name)
+            jsonData[sectionKey] = c.state
          with open(STATE_FILE, "w") as f:
-            json.dump(data, f)
+            json.dump(jsonData, f, indent=3, cls=_JsonEncoder)
          success = True
       except Exception as e:
          logger.error("could not write state file %s (%s)" % (STATE_FILE, e))
-      return success
-
-   def setLastPullTimestamp(self, timestamp):
-      """
-      Set the timestamp (UTC) of the last successful pull and persist to state file
-      """
-      logger.info("setting last pull timestamp (timestamp=%s)" % timestamp)
-      self.lastPull = timestamp
-      success = self.writeStateFile()
-      logger.debug("lastPullTimestamp %ssuccessfully updated" % ("not " if not success else ""))
-      return success
-
-   def setResultHash(self, query, resultHash):
-      """
-      Set the hash of a specific (point-in-time) query and persist to state file
-      """
-      logger.info("setting result hash (query=%s, resultHash=%s)" % (query, resultHash))
-      self.lastResultHashes[query] = resultHash
-      success = self.writeStateFile()
       return success
 
    def fetchHanaPasswordFromKeyVault(self, passwordKeyVault, passwordKeyVaultMsiClientId):
@@ -567,7 +643,7 @@ class _Context(object):
       # extract HANA instance(s) from secrets
       hanaSecrets = sliceDict(secrets, "SapHana-")
       for h in hanaSecrets.keys():
-         hanaDetails  = json.loads(hanaSecrets[h])
+         hanaDetails = json.loads(hanaSecrets[h])
          logger.debug("hanaDetails[%s]=%s" % (h, hanaDetails))
          if not hanaDetails["HanaDbPassword"]:
             logger.info("no HANA password provided; need to fetch password from separate KeyVault")
@@ -611,6 +687,18 @@ class _JsonEncoder(json.JSONEncoder):
       elif isinstance(o, (datetime, date)):
          return o.isoformat()
       return super(_JsonEncoder, self).default(o)
+
+class _JsonDecoder(json.JSONDecoder):
+   """
+   Helper class to de-serialize JSON into datetime and Decimal objects
+   """
+   def datetimeHook(jsonData):
+      for (k, v) in jsonData.items():
+         try:
+            jsonData[k] = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+         except Exception as e:
+            pass
+      return jsonData
 
 ###############################################################################
 
@@ -693,6 +781,7 @@ def monitor(args):
    """
    logger.info("starting monitor payload")
    ctx.parseSecrets()
+   # TODO(tniek) - proper handling of source connection types
    for h in ctx.hanaInstances:
       try:
          h.connect()
@@ -700,33 +789,21 @@ def monitor(args):
          logger.critical("could not connect to HANA instance (%s)" % e)
          sys.exit(ERROR_HANA_CONNECTION)
 
-      # TODO(tniek): Implement proper query framework
-
-      try:
-         # HANA Host Configuration
-         colIndex, resultRows = h.getHostConfig()
-         resultHash = h.getNewResultHash("HostConfig", resultRows)
-         if resultHash:
-            jsonData = h.convertIntoJson(colIndex, resultRows)
-            ctx.azLa.ingest("SapHana_HostConfig", jsonData)
-            ctx.setResultHash("HostConfig", resultHash)
-      except Exception as e:
-         logger.error("could not process HANA Host Config (%s)" % e)
-
-      try:
-         # HANA Load History
-         if not ctx.lastPull:
-            fromTimestamp = None
-         else:
-            fromTimestamp = ctx.lastPull + timedelta(seconds=1)
-         colIndex, resultRows = h.getLoadHistory(fromTimestamp)
-         if len(resultRows) > 0:
-            jsonData = h.convertIntoJson(colIndex, resultRows)
-            ctx.azLa.ingest("SapHana_LoadHistory", jsonData)
-            lastPull = resultRows[-1][colIndex["UTC_TIMESTAMP"]]
-            ctx.setLastPullTimestamp(lastPull)
-      except Exception as e:
-         logger.error("could not process HANA Load History (%s)" % e)
+      for c in ctx.availChecks:
+         if not c.state["isEnabled"]:
+            logger.info("check %s_%s has been disabled, skipping" % (c.prefix, c.name))
+            continue
+         lastRunLocal = c.state["lastRunLocal"]
+         logger.debug("lastRunLocal=%s; frequencySecs=%d; currentLocal=%s" % \
+            (lastRunLocal, c.frequencySecs, datetime.utcnow()))
+         if lastRunLocal and \
+            lastRunLocal + timedelta(seconds=c.frequencySecs) > datetime.utcnow():
+            logger.info("check %s_%s is not due yet, skipping" % (c.prefix, c.name))
+            continue
+         logger.info("running check %s_%s" % (c.prefix, c.name))
+         resultJson = c.run(h)
+         ctx.azLa.ingest(c.customLog, resultJson, c.colTimeGenerated)
+      ctx.writeStateFile()
 
       try:
          h.disconnect()
