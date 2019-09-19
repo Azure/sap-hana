@@ -6,6 +6,7 @@
 #       (c) 2019        Microsoft Corp.
 #
 
+from abc import ABC, abstractmethod
 import argparse
 from azure_storage_logging.handlers import QueueStorageHandler
 from azure.mgmt.storage import StorageManagementClient
@@ -88,7 +89,7 @@ sapmonContentTypes = {
    "HANA": "SapHanaCheck"
 }
 
-class SapmonCheck:
+class SapmonCheck(ABC):
    """
    Implements a monitoring check inside SAP Monitor
    """
@@ -108,6 +109,14 @@ class SapmonCheck:
          "isEnabled":    enabled,
          "lastRunLocal": None,
       }
+
+   @abstractmethod
+   def run(self):
+      pass
+
+   @abstractmethod
+   def updateState(self):
+      pass
 
 class SapHanaCheck(SapmonCheck):
    """
@@ -545,8 +554,8 @@ class _Context(object):
    """
    Internal context handler
    """
-   hanaInstances = []
-   availChecks   = []
+   hanaInstances   = []
+   availableChecks = []
 
    def __init__(self, operation):
       logger.info("initializing context")
@@ -611,10 +620,10 @@ class _Context(object):
                checkOptions["version"] = contentVersion
                logging.debug("checkOptions=%s" % checkOptions)
                check = eval(sapmonContentTypes[contentType])(**checkOptions)
-               self.availChecks.append(check)
+               self.availableChecks.append(check)
             except Exception as e:
                logger.error("could not instantiate new check of type %s (%s)" % (contentType, e))
-      logger.info("successfully loaded %d monitoring checks" % len(self.availChecks))
+      logger.info("successfully loaded %d monitoring checks" % len(self.availableChecks))
       return
 
    def readStateFile(self):
@@ -633,7 +642,7 @@ class _Context(object):
          logger.warning("state file %s does not exist" % STATE_FILE)
       except Exception as e:
          logger.error("could not read state file %s (%s)" % (STATE_FILE, e))
-      for c in self.availChecks:
+      for c in self.availableChecks:
          sectionKey = "%s_%s" % (c.prefix, c.name)
          if sectionKey in jsonData:
             logger.debug("parsing section %s" % sectionKey)
@@ -654,7 +663,7 @@ class _Context(object):
       jsonData = {}
       try:
          logger.debug("STATE_FILE=%s" % STATE_FILE)
-         for c in self.availChecks:
+         for c in self.availableChecks:
             sectionKey = "%s_%s" % (c.prefix, c.name)
             jsonData[sectionKey] = c.state
          with open(STATE_FILE, "w") as f:
@@ -840,7 +849,7 @@ def monitor(args):
          logger.critical("could not connect to HANA instance (%s)" % e)
          sys.exit(ERROR_HANA_CONNECTION)
 
-      for c in ctx.availChecks:
+      for c in ctx.availableChecks:
          if not c.state["isEnabled"]:
             logger.info("check %s_%s has been disabled, skipping" % (c.prefix, c.name))
             continue
