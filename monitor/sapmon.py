@@ -130,6 +130,8 @@ class SapHanaCheck(SapmonCheck):
 
    prefix             = "HANA"
    isTimeSeries       = False
+   colIndex           = {}
+   lastResult         = []
    def __init__(self, hanaOptions, **kwargs):
       super().__init__(**kwargs)
       self.query                  = hanaOptions["query"]
@@ -163,6 +165,7 @@ class SapHanaCheck(SapmonCheck):
                sqlUntilNow = " WHERE ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s' AND" % lastRunServer.strftime(self.TIME_FORMAT_HANA)
             except Exception as e:
                logger.error("could not format lastRunServer=%s (%s)" % (str(lastRunServer), e))
+               return None
          logger.debug("sqlUntilNow=%s" % sqlUntilNow)
          sql = sql.replace(" WHERE", sqlUntilNow, 1)
          logger.debug("sql=%s" % sql)
@@ -174,8 +177,9 @@ class SapHanaCheck(SapmonCheck):
       """
       logger.info("running HANA SQL query")
       sql = self.prepareSql()
-      self.colIndex, self.lastResult = hana.runQuery(sql)
-      self.updateState(hana)
+      if sql:
+         self.colIndex, self.lastResult = hana.runQuery(sql)
+         self.updateState(hana)
       resultJson = self.convertResultIntoJson()
       return resultJson
 
@@ -200,19 +204,20 @@ class SapHanaCheck(SapmonCheck):
       Convert the last query result into a JSON-formatted string (as required by Log Analytics)
       """
       logger.info("converting result set into JSON")
-      logData = []
+      logData  = []
+      jsonData = "{}"
       for r in self.lastResult:
          logItem = {}
          for c in self.colIndex.keys():
             if c != self.colTimeGenerated and (c.startswith("_") or c == "DUMMY"): # remove internal fields
                continue
             logItem[c] = r[self.colIndex[c]]
-         try:
-            jsonData = json.dumps(logItem, sort_keys=True, indent=4, cls=_JsonEncoder)
-         except Exception as e:
-            logger.error("could not encode logItem=%s into JSON (%s)" % (logItem, e))
          logData.append(logItem)
-      return json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
+      try:
+         jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
+      except Exception as e:
+         logger.error("could not encode logItem=%s into JSON (%s)" % (logItem, e))
+      return jsonData
 
    def updateState(self, hana):
       """
