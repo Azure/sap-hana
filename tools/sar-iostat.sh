@@ -9,6 +9,11 @@ LOCK_FILE="/tmp/sar-iostat.lock"
 SAR_OUTPUT="${DUMP_DIR}/sar.data"
 IOSTAT_OUTPUT="${DUMP_DIR}/iostat.log"
 MPSTAT_OUTPUT="${DUMP_DIR}/mpstat.log"
+TCPDUMP_OUTPUT_ETH1="${DUMP_DIR}/tcpdump-eth1.out"
+TCPDUMP_OUTPUT_ETH2="${DUMP_DIR}/tcpdump-eth2.out"
+TCPDUMP_OUTPUT_ETH3="${DUMP_DIR}/tcpdump-eth3.out"
+TCPDUMP_OUTPUT_ETH4="${DUMP_DIR}/tcpdump-eth4.out"
+
 LOGROTATE_CONF="${DUMP_DIR}/sar-iostat-lr.conf"
 
 # Function definitions
@@ -21,13 +26,18 @@ function start_jobs() {
   iostat -d -k -x -y 1 > "${IOSTAT_OUTPUT}" &
   # mpstat collects averages, so pull that less often
   mpstat -I ALL 5 > "${MPSTAT_OUTPUT}" &
-  sar -A -n DEV -o "${SAR_OUTPUT}" 1 > /dev/null &
+  sar -A -o "${SAR_OUTPUT}" 1 > /dev/null &
+
+  tcpdump -tttt -i eth1 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH1}" 2>/dev/null &
+  tcpdump -tttt -i eth2 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH2}" 2>/dev/null &
+  tcpdump -tttt -i eth3 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH3}" 2>/dev/null &
+  tcpdump -tttt -i eth4 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH4}" 2>/dev/null &
 }
 
 function stop_jobs() {
   # Delete the collection processes
 
-  killall -w iostat mpstat sar
+  killall -w iostat mpstat sar tcpdump
 }
 
 function ctrl_c() {
@@ -68,7 +78,13 @@ function ctrl_c() {
     "${IOSTAT_OUTPUT}" "${MPSTAT_OUTPUT}" "${SAR_OUTPUT}" {
       compress
       rotate 60
-  }
+    }
+
+    "${TCPDUMP_OUTPUT_ETH1}" "${TCPDUMP_OUTPUT_ETH2}" "${TCPDUMP_OUTPUT_ETH3}" "${TCPDUMP_OUTPUT_ETH4}" {
+      compress
+      notifempty
+      rotate 60
+    }
 EOF
 
   # Start collecting our data
@@ -92,7 +108,7 @@ EOF
     # it is safest to stop collection, rotate, and start collection again
 
     stop_jobs > /dev/null 2>&1
-    logrotate -f "${LOGROTATE_CONF}"
+    /usr/sbin/logrotate -f "${LOGROTATE_CONF}"
     start_jobs
   done
 
