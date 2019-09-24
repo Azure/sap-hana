@@ -28,10 +28,10 @@ function start_jobs() {
   mpstat -I ALL 5 > "${MPSTAT_OUTPUT}" &
   sar -A -o "${SAR_OUTPUT}" 1 > /dev/null &
 
-  /usr/sbin/tcpdump -tttt -i eth1 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH1}" 2>/dev/null &
-  /usr/sbin/tcpdump -tttt -i eth2 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH2}" 2>/dev/null &
-  /usr/sbin/tcpdump -tttt -i eth3 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH3}" 2>/dev/null &
-  /usr/sbin/tcpdump -tttt -i eth4 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH4}" 2>/dev/null &
+  /usr/sbin/tcpdump -tttt -i eth1 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH1}" -U 2>/dev/null &
+  /usr/sbin/tcpdump -tttt -i eth2 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH2}" -U 2>/dev/null &
+  /usr/sbin/tcpdump -tttt -i eth3 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH3}" -U 2>/dev/null &
+  /usr/sbin/tcpdump -tttt -i eth4 ether proto 0x8808 -w "${TCPDUMP_OUTPUT_ETH4}" -U 2>/dev/null &
 }
 
 function stop_jobs() {
