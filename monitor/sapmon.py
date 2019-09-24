@@ -720,9 +720,9 @@ class _Context(object):
                   hanaDetails["HanaDbPasswordKeyVaultUrl"],
                   hanaDetails["PasswordKeyVaultMsiClientId"])
                hanaDetails["HanaDbPassword"] = password
-               logger.debug("retrieved HANA password successfully from KeyVault; password=%s" % password)
+               logger.debug("retrieved HANA password successfully from KeyVault")
             except Exception as e:
-               logger.critical("could not fetch HANA password (instance=%s) from separate KeyVault (%s)" % (h, e))
+               logger.critical("could not fetch HANA password (instance=%s) from KeyVault (%s)" % (h, e))
                sys.exit(ERROR_GETTING_HANA_CREDENTIALS)
          try:
             hanaInstance = SapHana(hanaDetails = hanaDetails)
