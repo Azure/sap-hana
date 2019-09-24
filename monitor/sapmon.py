@@ -28,7 +28,7 @@ import sys
 
 ###############################################################################
 
-PAYLOAD_VERSION                   = "0.6.0"
+PAYLOAD_VERSION                   = "0.6.1"
 PAYLOAD_DIRECTORY                 = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                        = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 TIME_FORMAT_LOG_ANALYTICS         = "%a, %d %b %Y %H:%M:%S GMT"
@@ -713,7 +713,6 @@ class _Context(object):
       hanaSecrets = sliceDict(secrets, "SapHana-")
       for h in hanaSecrets.keys():
          hanaDetails = json.loads(hanaSecrets[h])
-         logger.debug("hanaDetails[%s]=%s" % (h, hanaDetails))
          if not hanaDetails["HanaDbPassword"]:
             logger.info("no HANA password provided; need to fetch password from separate KeyVault")
             try:
@@ -728,7 +727,7 @@ class _Context(object):
          try:
             hanaInstance = SapHana(hanaDetails = hanaDetails)
          except Exception as e:
-            logger.error("could not create HANA instance (hanaDetails=%s) (%s)" % (hanaDetails, e))
+            logger.error("could not create HANA instance %s) (%s)" % (h, e))
             continue
          self.hanaInstances.append(hanaInstance)
 
