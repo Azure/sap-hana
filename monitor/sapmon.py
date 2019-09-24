@@ -793,7 +793,6 @@ def onboard(args):
       "HanaDbSqlPort":               args.HanaDbSqlPort,
       "PasswordKeyVaultMsiClientId": args.PasswordKeyVaultMsiClientId,
       })
-   logger.debug("hanaSecretValue=%s" % hanaSecretValue)
    logger.info("storing HANA credentials as KeyVault secret")
    try:
       ctx.azKv.setSecret(hanaSecretName, hanaSecretValue)
@@ -808,7 +807,6 @@ def onboard(args):
       "LogAnalyticsWorkspaceId": args.LogAnalyticsWorkspaceId,
       "LogAnalyticsSharedKey":   args.LogAnalyticsSharedKey,
       })
-   logger.debug("laSecretValue=%s" % laSecretValue)
    logger.info("storing Log Analytics credentials as KeyVault secret")
    try:
       ctx.azKv.setSecret(laSecretName, laSecretValue)
@@ -817,7 +815,6 @@ def onboard(args):
       sys.exit(ERROR_SETTING_KEYVAULT_SECRET)
 
    hanaDetails = json.loads(hanaSecretValue)
-   logger.debug("hanaDetails=%s" % hanaDetails)
    if not hanaDetails["HanaDbPassword"]:
       logger.info("no HANA password provided; need to fetch password from separate KeyVault")
       hanaDetails["HanaDbPassword"] = ctx.fetchHanaPasswordFromKeyVault(
