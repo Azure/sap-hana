@@ -5,3 +5,7 @@ variable "infrastructure" {
 variable "jumpboxes" {
   description = "Details of the jumpboxes and RTI box"
 }
+
+variable "databases" {
+  description = "Details of the HANA database nodes"
+}
