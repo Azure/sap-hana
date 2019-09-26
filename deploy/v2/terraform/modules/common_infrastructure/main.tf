@@ -234,3 +234,32 @@ resource "azurerm_virtual_network_peering" "peering-sap-management" {
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }
+
+# STORAGE ACCOUNTS ===============================================================================================
+
+# Generates random text for boot diagnostics storage account name
+resource "random_id" "random-id" {
+  keepers = {
+    # Generate a new id only when a new resource group is defined
+    resource_group = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  }
+  byte_length = 4
+}
+
+# Creates storage account for storing SAP Bits
+resource "azurerm_storage_account" "storageaccount-sapbits" {
+  name                     = "sasapbits${random_id.random-id.hex}"
+  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                 = var.infrastructure.region
+  account_replication_type = "LRS"
+  account_tier             = "Standard"
+}
+
+# Creates boot diagnostics storage account
+resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
+  name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
+  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                 = var.infrastructure.region
+  account_replication_type = "LRS"
+  account_tier             = "Standard"
+}

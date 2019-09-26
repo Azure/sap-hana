@@ -37,5 +37,5 @@ locals {
 
 # List of HANA DB nodes to be created
 locals {
-  nodes = zipmap(range(length(flatten([for database in var.databases : [ for node in database.nodes : node.name] if database.platform == "HANA"]))),flatten([for database in var.databases: [for node in database.nodes : { name = node.name, admin_nic_ip = lookup(node, "admin_nic_ip", false), db_nic_ip = lookup(node, "db_nic_ip", false), size = database.size, os = database.os, authentication = database.authentication} ] if database.platform == "HANA"]))
+  nodes = zipmap(range(length(flatten([for database in var.databases : [for node in database.nodes : node.name]]))), flatten([for database in var.databases : [for node in database.nodes : { platform = database.platform, name = node.name, admin_nic_ip = lookup(node, "admin_nic_ip", false), db_nic_ip = lookup(node, "db_nic_ip", false), size = database.size, os = database.os, authentication = database.authentication }]]))
 }

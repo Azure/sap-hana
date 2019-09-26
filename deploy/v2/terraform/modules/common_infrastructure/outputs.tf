@@ -25,3 +25,11 @@ output "subnet-sap-db" {
 output "nsg-db" {
   value = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db : azurerm_network_security_group.nsg-db
 }
+
+output "storageaccount-bootdiagnostics" {
+  value = azurerm_storage_account.storageaccount-bootdiagnostics
+}
+
+output "storageaccount-sapbits" {
+  value = azurerm_storage_account.storageaccount-sapbits
+}
