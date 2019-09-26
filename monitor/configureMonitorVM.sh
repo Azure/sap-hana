@@ -35,3 +35,5 @@ ExecuteCommand "pip3 install pyhdb"
 ExecuteCommand "pip3 install azure_storage_logging"
 # Install azure-mgmt-storage
 ExecuteCommand "pip3 install azure-mgmt-storage"
+# Install JSON-Datetime
+ExecuteCommand "pip3 install json-datetime"
