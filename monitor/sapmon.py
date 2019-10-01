@@ -29,10 +29,11 @@ import traceback
 
 ###############################################################################
 
-PAYLOAD_VERSION                   = "0.6.3"
+PAYLOAD_VERSION                   = "0.6.4"
 PAYLOAD_DIRECTORY                 = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                        = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 TIME_FORMAT_LOG_ANALYTICS         = "%a, %d %b %Y %H:%M:%S GMT"
+TIME_FORMAT_JSON                  = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_CONSOLE_LOG_LEVEL         = logging.INFO
 DEFAULT_FILE_LOG_LEVEL            = logging.INFO
 DEFAULT_QUEUE_LOG_LEVEL           = logging.DEBUG
@@ -160,13 +161,17 @@ class SapHanaCheck(SapmonCheck):
                (self.prefix, self.name, self.initialTimespanSecs))
             sqlUntilNow = " WHERE h.TIME > ADD_SECONDS(NOW(), %d) AND" % (self.initialTimespanSecs * (-1))
          else:
-            logger.info("time series query for check %s_%s has been run at %s, filter out only new records since then" % \
-               (self.prefix, self.name, lastRunServer.strftime(self.TIME_FORMAT_HANA)))
-            try:
-               sqlUntilNow = " WHERE ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s' AND" % lastRunServer
-            except Exception as e:
-               logger.error("could not format lastRunServer=%s (%s)" % lastRunServer, e)
+            if not isinstance(lastRunServer, datetime):
+               logger.error("lastRunServer=%s has not been de-serialized into a valid datetime object" % str(lastRunServer))
                return None
+            try:
+               lastRunServerHana = lastRunServer.strftime(self.TIME_FORMAT_HANA)
+            except:
+               logger.error("could not format lastRunServer=%s into HANA format" % str(lastRunServer))
+               return None
+            logger.info("time series query for check %s_%s has been run at %s, filter out only new records since then" % \
+               (self.prefix, self.name, lastRunServerHana))
+            sqlUntilNow = " WHERE ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s' AND" % lastRunServerHana
          logger.debug("sqlUntilNow=%s" % sqlUntilNow)
          sql = sql.replace(" WHERE", sqlUntilNow, 1)
          logger.debug("sql=%s" % sql)
@@ -215,10 +220,11 @@ class SapHanaCheck(SapmonCheck):
             logItem[c] = r[self.colIndex[c]]
          logData.append(logItem)
       try:
-         jsonData = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
+         resultJson = json.dumps(logData, sort_keys=True, indent=4, cls=_JsonEncoder)
+         logger.debug("resultJson=%s" % str(resultJson))
       except Exception as e:
          logger.error("could not encode logItem=%s into JSON (%s)" % (logItem, e))
-      return jsonData
+      return resultJson
 
    def updateState(self, hana):
       """
@@ -511,7 +517,6 @@ x-ms-date:%s
          "x-ms-date":     timestamp,
          "time-generated-field": colTimeGenerated,
       }
-      logger.debug("headers=%s" % headers)
       logger.debug("data=%s" % jsonData)
       response = None
       try:
@@ -676,8 +681,8 @@ class _Context(object):
          for c in self.availableChecks:
             sectionKey = "%s_%s" % (c.prefix, c.name)
             jsonData[sectionKey] = c.state
-         with open(STATE_FILE, "w") as f:
-            json.dump(jsonData, f, indent=3, cls=_JsonEncoder)
+         with open(STATE_FILE, "w") as file:
+            json.dump(jsonData, file, indent=3, cls=_JsonEncoder)
          success = True
       except Exception as e:
          logger.error("could not write state file %s (%s)" % (STATE_FILE, e))
@@ -754,7 +759,7 @@ class _JsonEncoder(json.JSONEncoder):
       if isinstance(o, decimal.Decimal):
          return float(o)
       elif isinstance(o, (datetime, date)):
-         return o.isoformat()
+         return datetime.strftime(o, TIME_FORMAT_JSON)
       return super(_JsonEncoder, self).default(o)
 
 class _JsonDecoder(json.JSONDecoder):
@@ -764,7 +769,7 @@ class _JsonDecoder(json.JSONDecoder):
    def datetimeHook(jsonData):
       for (k, v) in jsonData.items():
          try:
-            jsonData[k] = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+            jsonData[k] = datetime.strptime(v, TIME_FORMAT_JSON)
          except Exception as e:
             pass
       return jsonData
@@ -916,4 +921,3 @@ logger = None
 ctx    = None
 if __name__ == "__main__":
    main()
-
