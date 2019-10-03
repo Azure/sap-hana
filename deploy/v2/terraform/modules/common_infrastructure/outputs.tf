@@ -31,5 +31,5 @@ output "storageaccount-bootdiagnostics" {
 }
 
 output "storageaccount-sapbits" {
-  value = azurerm_storage_account.storageaccount-sapbits
+  value = var.software.storage_account_sapbits.is_existing ? data.azurerm_storage_account.storageaccount-sapbits : azurerm_storage_account.storageaccount-sapbits
 }

@@ -1,6 +1,6 @@
 # Initalizes Azure rm provider
 provider "azurerm" {
-  version = "~> 1.30.1"
+  version = "~> 1.34.0"
 }
 
 # Setup common infrastructure
@@ -8,6 +8,7 @@ module "common_infrastructure" {
   source              = "./modules/common_infrastructure"
   is_single_node_hana = "true"
   infrastructure      = var.infrastructure
+  software            = var.software
 }
 
 # Create Jumpboxes and RTI box
@@ -37,12 +38,14 @@ module "hdb_node" {
 
 # Generate output JSON file
 module "output_json" {
-  source           = "./modules/output_json"
-  infrastructure   = var.infrastructure
-  jumpboxes        = var.jumpboxes
-  databases        = var.databases
-  nic-windows      = module.jumpbox.nic-windows
-  nic-linux        = module.jumpbox.nic-linux
-  nic-dbnode-admin = module.hdb_node.nic-dbnode-admin
-  nic-dbnode-db    = module.hdb_node.nic-dbnode-db
+  source                 = "./modules/output_json"
+  infrastructure         = var.infrastructure
+  jumpboxes              = var.jumpboxes
+  databases              = var.databases
+  software               = var.software
+  storageaccount-sapbits = module.common_infrastructure.storageaccount-sapbits
+  nic-windows            = module.jumpbox.nic-windows
+  nic-linux              = module.jumpbox.nic-linux
+  nic-dbnode-admin       = module.hdb_node.nic-dbnode-admin
+  nic-dbnode-db          = module.hdb_node.nic-dbnode-db
 }

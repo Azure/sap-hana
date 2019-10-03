@@ -10,6 +10,10 @@ variable "databases" {
   description = "Details of the HANA database nodes"
 }
 
+variable "software" {
+  description = "Details of the infrastructure components required for SAP installation"
+}
+
 variable "nic-linux" {
   description = "Details of the Linux jumpbox NICs"
 }
@@ -24,6 +28,10 @@ variable "nic-dbnode-admin" {
 
 variable "nic-dbnode-db" {
   description = "Details of the database NIC of DB nodes"
+}
+
+variable "storageaccount-sapbits" {
+  description = "Details of the storage account for SAP bits"
 }
 
 locals {
