@@ -5,6 +5,7 @@
 trigger: none
 # Only trigger build when a PR is opened
 pr:
+  autoCancel: false # Don't cancel the current build
   branches:
     include:
     - master
