@@ -29,7 +29,7 @@ import traceback
 
 ###############################################################################
 
-PAYLOAD_VERSION                   = "0.6.4"
+PAYLOAD_VERSION                   = "0.6.5"
 PAYLOAD_DIRECTORY                 = os.path.dirname(os.path.realpath(__file__))
 STATE_FILE                        = "%s/sapmon.state" % PAYLOAD_DIRECTORY
 TIME_FORMAT_LOG_ANALYTICS         = "%a, %d %b %Y %H:%M:%S GMT"
@@ -159,22 +159,22 @@ class SapHanaCheck(SapmonCheck):
          if not lastRunServer:
             logger.info("time series query for check %s_%s has never been run, applying initalTimespanSecs=%d" % \
                (self.prefix, self.name, self.initialTimespanSecs))
-            sqlUntilNow = " WHERE h.TIME > ADD_SECONDS(NOW(), %d) AND" % (self.initialTimespanSecs * (-1))
+            lastRunServerUtc = "ADD_SECONDS(NOW(), i.VALUE*(-1) - %d)" % self.initialTimespanSecs
          else:
             if not isinstance(lastRunServer, datetime):
                logger.error("lastRunServer=%s has not been de-serialized into a valid datetime object" % str(lastRunServer))
                return None
             try:
-               lastRunServerHana = lastRunServer.strftime(self.TIME_FORMAT_HANA)
+               lastRunServerUtc = "'%s'" % lastRunServer.strftime(self.TIME_FORMAT_HANA)
             except:
                logger.error("could not format lastRunServer=%s into HANA format" % str(lastRunServer))
                return None
             logger.info("time series query for check %s_%s has been run at %s, filter out only new records since then" % \
-               (self.prefix, self.name, lastRunServerHana))
-            sqlUntilNow = " WHERE ADD_SECONDS(h.TIME, i.VALUE*(-1)) > '%s' AND" % lastRunServerHana
-         logger.debug("sqlUntilNow=%s" % sqlUntilNow)
-         sql = sql.replace(" WHERE", sqlUntilNow, 1)
+               (self.prefix, self.name, lastRunServerUtc))
+         logger.debug("lastRunServerUtc = %s" % lastRunServerUtc)
+         sql = sql.replace("{lastRunServerUtc}", lastRunServerUtc, 1)
          logger.debug("sql=%s" % sql)
+         # sys.exit()
       return sql
 
    def run(self, hana):
@@ -921,3 +921,4 @@ logger = None
 ctx    = None
 if __name__ == "__main__":
    main()
+
