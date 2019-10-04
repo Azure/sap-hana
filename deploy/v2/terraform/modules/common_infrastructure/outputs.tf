@@ -26,10 +26,10 @@ output "nsg-db" {
   value = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db : azurerm_network_security_group.nsg-db
 }
 
-output "storageaccount-bootdiagnostics" {
-  value = azurerm_storage_account.storageaccount-bootdiagnostics
+output "storage-bootdiag" {
+  value = azurerm_storage_account.storage-bootdiag
 }
 
-output "storageaccount-sapbits" {
-  value = var.software.storage_account_sapbits.is_existing ? data.azurerm_storage_account.storageaccount-sapbits : azurerm_storage_account.storageaccount-sapbits
+output "storage-sapbits" {
+  value = var.software.storage_account_sapbits.is_existing ? data.azurerm_storage_account.storage-sapbits : azurerm_storage_account.storage-sapbits
 }

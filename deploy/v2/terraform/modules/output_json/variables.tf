@@ -14,30 +14,30 @@ variable "software" {
   description = "Details of the infrastructure components required for SAP installation"
 }
 
-variable "nic-linux" {
+variable "nics-linux-jumpboxes" {
   description = "Details of the Linux jumpbox NICs"
 }
 
-variable "nic-windows" {
+variable "nics-windows-jumpboxes" {
   description = "Details of the Windows jumpbox NICs"
 }
 
-variable "nic-dbnode-admin" {
+variable "nics-dbnodes-admin" {
   description = "Details of the admin NIC of DB nodes"
 }
 
-variable "nic-dbnode-db" {
+variable "nics-dbnodes-db" {
   description = "Details of the database NIC of DB nodes"
 }
 
-variable "storageaccount-sapbits" {
+variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
 locals {
-  windows-jumpbox-ips = var.nic-windows[*].private_ip_address
-  linux-jumpbox-ips   = var.nic-linux[*].private_ip_address
-  dbnode-admin-ips    = [for k, v in var.nic-dbnode-admin : v.private_ip_address]
-  dbnode-db-ips       = [for k, v in var.nic-dbnode-db : v.private_ip_address]
-  dbnodes             = flatten([for database in var.databases : [for node in database.nodes : { role = node.role, platform = database.platform, name = node.name }]])
+  ips-windows-jumpboxes = var.nics-windows-jumpboxes[*].private_ip_address
+  ips-linux-jumpboxes   = var.nics-linux-jumpboxes[*].private_ip_address
+  ips-dbnodes-admin     = [for k, v in var.nics-dbnodes-admin : v.private_ip_address]
+  ips-dbnodes-db        = [for k, v in var.nics-dbnodes-db : v.private_ip_address]
+  dbnodes               = flatten([for database in var.databases : [for node in database.nodes : { role = node.role, platform = database.platform, name = node.name }]])
 }

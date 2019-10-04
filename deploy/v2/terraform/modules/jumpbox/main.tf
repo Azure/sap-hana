@@ -38,7 +38,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 
 # NICS ============================================================================================================
 
-# Creates the public IP addresses for Windows VMs
+# Creates the public IP addresses for Windows jumpboxes
 resource "azurerm_public_ip" "public-ip-windows" {
   count               = length(var.jumpboxes.windows)
   name                = "${var.jumpboxes.windows[count.index].name}-public-ip"
@@ -133,40 +133,27 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
   }
 
+  connection {
+    type        = "ssh"
+    host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
+    user        = var.jumpboxes.linux[count.index].authentication.username
+    private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
+    password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+  }
+
   provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-    }
     source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_public_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub"
     on_failure  = "continue"
   }
 
   provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-    }
     source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa"
     on_failure  = "continue"
   }
 
   provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", null)
-    }
     source      = var.output-json.filename
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/output.json"
     on_failure  = "continue"
@@ -174,7 +161,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
 
   boot_diagnostics {
     enabled     = true
-    storage_uri = var.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
 
@@ -213,6 +200,6 @@ resource "azurerm_virtual_machine" "vm-windows" {
 
   boot_diagnostics {
     enabled     = true
-    storage_uri = var.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }

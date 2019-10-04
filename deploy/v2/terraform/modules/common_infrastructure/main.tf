@@ -247,7 +247,7 @@ resource "random_id" "random-id" {
 }
 
 # Creates storage account for storing SAP Bits
-resource "azurerm_storage_account" "storageaccount-sapbits" {
+resource "azurerm_storage_account" "storage-sapbits" {
   count                    = var.software.storage_account_sapbits.is_existing ? 0 : 1
   name                     = lookup(var.software.storage_account_sapbits, "name", false) ? var.software.storage_account_sapbits.name : "sapbits${random_id.random-id.hex}"
   resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
@@ -261,19 +261,19 @@ resource "azurerm_storage_account" "storageaccount-sapbits" {
 resource "azurerm_storage_container" "storagecontainer-sapbits" {
   count                 = var.software.storage_account_sapbits.is_existing ? 0 : 1
   name                  = var.software.storage_account_sapbits.container_name
-  storage_account_name  = azurerm_storage_account.storageaccount-sapbits[0].name
+  storage_account_name  = azurerm_storage_account.storage-sapbits[0].name
   container_access_type = var.software.storage_account_sapbits.container_access_type
 }
 
 # Imports existing storage account to use for SAP bits
-data "azurerm_storage_account" "storageaccount-sapbits" {
+data "azurerm_storage_account" "storage-sapbits" {
   count               = var.software.storage_account_sapbits.is_existing ? 1 : 0
   name                = split("/", var.software.storage_account_sapbits.arm_id)[8]
   resource_group_name = split("/", var.software.storage_account_sapbits.arm_id)[4]
 }
 
 # Creates boot diagnostics storage account
-resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
+resource "azurerm_storage_account" "storage-bootdiag" {
   name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
   resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   location                 = var.infrastructure.region

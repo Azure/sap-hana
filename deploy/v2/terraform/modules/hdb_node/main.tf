@@ -39,7 +39,7 @@ resource "azurerm_network_security_rule" "nsr-db" {
 # NICS ============================================================================================================
 
 # Creates the admin traffic NIC and private IP address for database nodes
-resource "azurerm_network_interface" "nic-dbnode-admin" {
+resource "azurerm_network_interface" "nics-dbnodes-admin" {
   for_each                      = local.nodes
   name                          = "${each.value.name}-admin-nic"
   location                      = var.resource-group[0].location
@@ -56,7 +56,7 @@ resource "azurerm_network_interface" "nic-dbnode-admin" {
 }
 
 # Creates the DB traffic NIC and private IP address for database nodes
-resource "azurerm_network_interface" "nic-dbnode-db" {
+resource "azurerm_network_interface" "nics-dbnodes-db" {
   for_each                      = local.nodes
   name                          = "${each.value.name}-db-nic"
   location                      = var.resource-group[0].location
@@ -81,8 +81,8 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
   name                          = each.value.name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  primary_network_interface_id  = azurerm_network_interface.nic-dbnode-db[each.key].id
-  network_interface_ids         = [azurerm_network_interface.nic-dbnode-admin[each.key].id, azurerm_network_interface.nic-dbnode-db[each.key].id]
+  primary_network_interface_id  = azurerm_network_interface.nics-dbnodes-db[each.key].id
+  network_interface_ids         = [azurerm_network_interface.nics-dbnodes-admin[each.key].id, azurerm_network_interface.nics-dbnodes-db[each.key].id]
   vm_size                       = lookup(local.sizes, "${each.value.size}").compute.vm_size
   delete_os_disk_on_termination = "true"
 
@@ -138,6 +138,6 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 
   boot_diagnostics {
     enabled     = true
-    storage_uri = var.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }

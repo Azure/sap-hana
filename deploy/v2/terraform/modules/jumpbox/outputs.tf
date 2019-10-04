@@ -1,7 +1,7 @@
-output "nic-linux" {
+output "nics-linux-jumpboxes" {
   value = azurerm_network_interface.nic-linux
 }
 
-output "nic-windows" {
+output "nics-windows-jumpboxes" {
   value = azurerm_network_interface.nic-windows
 }

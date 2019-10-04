@@ -26,7 +26,7 @@ variable "nsg-db" {
   description = "Details of the SAP DB subnet NSG"
 }
 
-variable "storageaccount-bootdiagnostics" {
+variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 

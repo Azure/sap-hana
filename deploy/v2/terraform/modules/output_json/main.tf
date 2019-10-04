@@ -4,6 +4,59 @@
 
 # Generates the output JSON with IP address details
 resource "local_file" "output-json" {
-  content  = jsonencode({ "infrastructure" = var.infrastructure, "jumpboxes" = { "windows" = [for windows-jumpbox in var.jumpboxes.windows : { name = windows-jumpbox.name, destroy_after_deploy = windows-jumpbox.destroy_after_deploy, size = windows-jumpbox.size, disk_type = windows-jumpbox.disk_type, os = windows-jumpbox.os, authentication = windows-jumpbox.authentication, components = windows-jumpbox.components, private_ip_address = local.windows-jumpbox-ips[index(var.jumpboxes.windows, windows-jumpbox)] }], "linux" = [for linux-jumpbox in var.jumpboxes.linux : { name = linux-jumpbox.name, destroy_after_deploy = linux-jumpbox.destroy_after_deploy, size = linux-jumpbox.size, disk_type = linux-jumpbox.disk_type, os = linux-jumpbox.os, authentication = linux-jumpbox.authentication, components = linux-jumpbox.components, private_ip_address = local.linux-jumpbox-ips[index(var.jumpboxes.linux, linux-jumpbox)] }] }, "databases" = [for database in var.databases : { platform = database.platform, version = database.version, os = database.os, size = database.size, filesystem = database.filesystem, high_availability = database.high_availability, instance = database.instance, authentication = database.authentication, credentials = database.credentials, components = database.components, nodes = [for dbnode-admin-ip in local.dbnode-admin-ips : { admin_nic_ip = dbnode-admin-ip, db_nic_ip = local.dbnode-db-ips[index(local.dbnode-admin-ips, dbnode-admin-ip)], role = local.dbnodes[index(local.dbnode-admin-ips, dbnode-admin-ip)].role } if local.dbnodes[index(local.dbnode-admin-ips, dbnode-admin-ip)].platform == database.platform] }], "software" = { "storage_account_sapbits" = { "name" = var.storageaccount-sapbits[0].name, "storage_access_key" = var.storageaccount-sapbits[0].primary_access_key, "container_name" = var.software.storage_account_sapbits.container_name } } })
+  content = jsonencode({
+    "infrastructure" = var.infrastructure,
+    "jumpboxes" = {
+      "windows" = [for windows-jumpbox in var.jumpboxes.windows : {
+        name                 = windows-jumpbox.name,
+        destroy_after_deploy = windows-jumpbox.destroy_after_deploy,
+        size                 = windows-jumpbox.size,
+        disk_type            = windows-jumpbox.disk_type,
+        os                   = windows-jumpbox.os,
+        authentication       = windows-jumpbox.authentication,
+        components           = windows-jumpbox.components,
+        private_ip_address   = local.ips-windows-jumpboxes[index(var.jumpboxes.windows, windows-jumpbox)]
+        }
+      ],
+      "linux" = [for linux-jumpbox in var.jumpboxes.linux : {
+        name                 = linux-jumpbox.name,
+        destroy_after_deploy = linux-jumpbox.destroy_after_deploy,
+        size                 = linux-jumpbox.size,
+        disk_type            = linux-jumpbox.disk_type,
+        os                   = linux-jumpbox.os,
+        authentication       = linux-jumpbox.authentication,
+        components           = linux-jumpbox.components,
+        private_ip_address   = local.ips-linux-jumpboxes[index(var.jumpboxes.linux, linux-jumpbox)]
+        }
+      ]
+    },
+    "databases" = [for database in var.databases : {
+      platform          = database.platform,
+      version           = database.version,
+      os                = database.os,
+      size              = database.size,
+      filesystem        = database.filesystem,
+      high_availability = database.high_availability,
+      instance          = database.instance,
+      authentication    = database.authentication,
+      credentials       = database.credentials,
+      components        = database.components,
+      nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
+        ip_admin_nic = ip-dbnode-admin,
+        ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
+        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
+        } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
+      ]
+      }
+    ],
+    "software" = {
+      "storage_account_sapbits" = {
+        "name"               = var.storage-sapbits[0].name,
+        "storage_access_key" = var.storage-sapbits[0].primary_access_key,
+        "container_name"     = var.software.storage_account_sapbits.container_name
+      }
+    }
+    }
+  )
   filename = "${path.module}/../../../output.json"
 }

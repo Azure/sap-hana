@@ -1,7 +1,7 @@
-output "nic-dbnode-admin" {
-  value = azurerm_network_interface.nic-dbnode-admin
+output "nics-dbnodes-admin" {
+  value = azurerm_network_interface.nics-dbnodes-admin
 }
 
-output "nic-dbnode-db" {
-  value = azurerm_network_interface.nic-dbnode-db
+output "nics-dbnodes-db" {
+  value = azurerm_network_interface.nics-dbnodes-db
 }
