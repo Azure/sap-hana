@@ -120,7 +120,7 @@
         "offer": "SLES-SAP",
         "sku": "12-sp2"
       },
-      "size": "Demo",
+      "size": "S",
       "filesystem": "xfs",
       "high_availability": false,
       "authentication": {
@@ -168,6 +168,7 @@
       "account_kind": "BlockBlobStorage",
       "container_name": "bits",
       "container_access_type": "private"
+<<<<<<< HEAD
     },
     "downloader": {
       "credentials":{
@@ -207,6 +208,8 @@
           "https":"https://127.0.0.1:8888"
         }
       }
+=======
+>>>>>>> a6a0226... Revert "modified as per hdbsizes.json"
     }
   },
   "sshkey": {
