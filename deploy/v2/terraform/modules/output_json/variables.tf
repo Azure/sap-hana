@@ -34,6 +34,10 @@ variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
+variable "tf-output-file-path" {
+  description = "Path of the Terraform output file"
+}
+
 locals {
   ips-windows-jumpboxes = var.nics-windows-jumpboxes[*].private_ip_address
   ips-linux-jumpboxes   = var.nics-linux-jumpboxes[*].private_ip_address

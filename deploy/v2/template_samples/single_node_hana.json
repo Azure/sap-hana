@@ -172,5 +172,8 @@
             "container_name" : "bits",
             "container_access_type" : "private"
         }  
-    }
+    },
+    "options" : {
+        "read_tf_output_from_file" : "${path.module}/../../../output.json"
+  }
 }

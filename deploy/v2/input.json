@@ -188,5 +188,8 @@
             "container_name" : "",
             "container_access_type" : ""
         }
-    }
+    },
+    "options" : {
+        "read_tf_output_from_file" : ""
+    } 
 }

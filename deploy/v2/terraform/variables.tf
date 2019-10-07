@@ -13,3 +13,7 @@ variable "databases" {
 variable "software" {
   description = "Details of the infrastructure components required for SAP installation"
 }
+
+variable "options" {
+  description = "Miscellaneous options like path for output JSON etc."
+}

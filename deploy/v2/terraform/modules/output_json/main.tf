@@ -58,5 +58,5 @@ resource "local_file" "output-json" {
     }
     }
   )
-  filename = "${path.module}/../../../output.json"
+  filename = var.tf-output-file-path
 }
