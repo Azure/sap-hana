@@ -38,6 +38,11 @@ variable "tf-output-file-path" {
   description = "Path of the Terraform output file"
 }
 
+# Imports HANA database sizing information
+locals {
+  sizes = jsondecode(file("${path.module}/../../../hdb_sizes.json"))
+}
+
 locals {
   ips-windows-jumpboxes = var.nics-windows-jumpboxes[*].private_ip_address
   ips-linux-jumpboxes   = var.nics-linux-jumpboxes[*].private_ip_address

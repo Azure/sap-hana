@@ -126,7 +126,7 @@
     "databases" : [
         {
 	    "platform" : "",
-	    "version" : "",
+	    "db_version" : "",
 	    "os" : {
 		"publisher" : "",
                 "offer" : "",

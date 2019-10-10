@@ -2,7 +2,7 @@
 # OUTPUT JSON
 ##################################################################################################################
 
-# Generates the output JSON with IP address details
+# Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
     "infrastructure" = var.infrastructure,
@@ -32,7 +32,7 @@ resource "local_file" "output-json" {
     },
     "databases" = [for database in var.databases : {
       platform          = database.platform,
-      version           = database.version,
+      db_version        = database.db_version,
       os                = database.os,
       size              = database.size,
       filesystem        = database.filesystem,
@@ -42,9 +42,11 @@ resource "local_file" "output-json" {
       credentials       = database.credentials,
       components        = database.components,
       nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
+        name         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name
         ip_admin_nic = ip-dbnode-admin,
         ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
-        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
+        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role,
+        disk_details = zipmap(range(length(flatten([for storage_type in lookup(local.sizes, "${database.size}").storage : [for disk_count in range(storage_type.count) : "${storage_type.name}-${index(range(storage_type.count),disk_count)}" ] if storage_type.name != "os" ]))), flatten([for storage_type in lookup(local.sizes, "${database.size}").storage : [for disk_count in range(storage_type.count) : "${storage_type.name}-${index(range(storage_type.count),disk_count)}" ] if storage_type.name != "os" ]))
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ]
       }
@@ -58,5 +60,5 @@ resource "local_file" "output-json" {
     }
     }
   )
-  filename = var.tf-output-file-path
+  filename = abspath(var.tf-output-file-path)
 }
