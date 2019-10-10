@@ -90,7 +90,7 @@ class DownloadItem:
         self.time       = time if time else 0
         self.filename   = filename if filename else ""
         self.target_dir = target_dir if target_dir else ""
-        self.last_pos        = last_pos if last_pos else 0
+        self.last_pos   = last_pos if last_pos else 0
 
     def download(self):
         payload = {
