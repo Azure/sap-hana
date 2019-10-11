@@ -40,7 +40,7 @@ resource "azurerm_network_security_rule" "nsr-db" {
 
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-admin" {
-  for_each                      = local.nodes
+  for_each                      = local.dbnodes
   name                          = "${each.value.name}-admin-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -57,7 +57,7 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 
 # Creates the DB traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-db" {
-  for_each                      = local.nodes
+  for_each                      = local.dbnodes
   name                          = "${each.value.name}-db-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -77,7 +77,7 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
 
 # Creates database VM
 resource "azurerm_virtual_machine" "vm-dbnode" {
-  for_each                      = local.nodes
+  for_each                      = local.dbnodes
   name                          = each.value.name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name

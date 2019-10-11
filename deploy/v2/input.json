@@ -167,7 +167,7 @@
 		    }
 		}
             ],
-	    "nodes" : [
+	    "dbnodes" : [
 	        {
 		    "name" : "",
 		    "admin_nic_ip" : "",

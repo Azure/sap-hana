@@ -34,19 +34,15 @@ variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
-variable "tf-output-file-path" {
-  description = "Path of the Terraform output file"
-}
-
 # Imports HANA database sizing information
 locals {
-  sizes = jsondecode(file("${path.module}/../../../hdb_sizes.json"))
+  sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))
 }
 
 locals {
   ips-windows-jumpboxes = var.nics-windows-jumpboxes[*].private_ip_address
   ips-linux-jumpboxes   = var.nics-linux-jumpboxes[*].private_ip_address
-  ips-dbnodes-admin     = [for k, v in var.nics-dbnodes-admin : v.private_ip_address]
-  ips-dbnodes-db        = [for k, v in var.nics-dbnodes-db : v.private_ip_address]
-  dbnodes               = flatten([for database in var.databases : [for node in database.nodes : { role = node.role, platform = database.platform, name = node.name }]])
+  ips-dbnodes-admin     = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
+  ips-dbnodes-db        = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
+  dbnodes               = flatten([for database in var.databases : [for dbnode in database.dbnodes : { role = dbnode.role, platform = database.platform, name = dbnode.name }]])
 }

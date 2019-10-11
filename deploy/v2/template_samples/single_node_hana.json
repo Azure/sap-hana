@@ -155,7 +155,7 @@
                     }
                 }
             ],
-            "nodes" : [
+            "dbnodes" : [
                 {
 	            "name" : "hdb1",
 		    "role" : "worker"
@@ -172,8 +172,5 @@
             "container_name" : "bits",
             "container_access_type" : "private"
         }  
-    },
-    "options" : {
-        "read_tf_output_from_file" : "../../../output.json"
-  }
+    }
 }

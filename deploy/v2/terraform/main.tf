@@ -43,7 +43,6 @@ module "output_json" {
   jumpboxes              = var.jumpboxes
   databases              = var.databases
   software               = var.software
-  tf-output-file-path    = var.options.read_tf_output_from_file
   storage-sapbits        = module.common_infrastructure.storage-sapbits
   nics-windows-jumpboxes = module.jumpbox.nics-windows-jumpboxes
   nics-linux-jumpboxes   = module.jumpbox.nics-linux-jumpboxes
