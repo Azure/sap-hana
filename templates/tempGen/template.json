@@ -158,7 +158,7 @@
                     }
                 }
             ],
-            "nodes":[
+            "dbnodes":[
                 {
 		    "name":"hdb-node1",
 	            "role":"worker"
