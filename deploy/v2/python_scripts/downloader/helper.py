@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # 
-#       SapMonitor payload deployed on collector VM
+#       SMP Downloader
 #
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
@@ -13,7 +13,6 @@ import requests
 from requests.adapters import HTTPAdapter
 
 from SAP_Scenarios import *
-
 
 class HTTPSession(requests.Session):
     def __init__(self, auth=None, headers=None, retry=5):

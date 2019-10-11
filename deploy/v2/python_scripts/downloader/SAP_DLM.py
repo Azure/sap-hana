@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # 
-#       SapMonitor payload deployed on collector VM
+#       SMP Downloader
 #
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
 #
 
-import context
+import commons
 
 from requests.auth import HTTPBasicAuth
 from helper import *
@@ -132,7 +132,7 @@ class DownloadItem:
                 else:
                     self.last_pos = os.path.getsize(target)
                     print("current file size is %s ..." % self.last_pos)
-        if context.skip_download:
+        if commons.skip_download:
             return True
 
         # Second request to download the file from new or resume

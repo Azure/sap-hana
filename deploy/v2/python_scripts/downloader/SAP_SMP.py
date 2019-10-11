@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # 
-#       SapMonitor payload deployed on collector VM
+#       SMP Downloader
 #
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
@@ -82,7 +82,7 @@ class SMP:
         )
 
         # --------------------------------------------------------
-        # STEP 1 - Open SMP and btain SAML envelope
+        # STEP 1 - Open SMP and obtain SAML envelope
         # --------------------------------------------------------
         (cookies_launchpad, inputs_launchpad, body_auth) = SMP.process_page(
             url       = SMP.url_launchpad,

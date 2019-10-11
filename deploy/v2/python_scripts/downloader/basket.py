@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # 
-#       SapMonitor payload deployed on collector VM
+#       SMP Downloader
 #
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
 #
 
 import argparse
-import context
+import commons
 import re
 
 from helper import *
@@ -16,16 +16,14 @@ from SAP_Scenarios import *
 from SAP_SMP import *
 
 parser = argparse.ArgumentParser(description="Downloader")
-parser.add_argument("--config", required=True, type=str, help="The configuration file")
-parser.add_argument("--basket", required=False, type=bool, default=False, help="To include item in the basket, default False")
-parser.add_argument("--dryrun", required=False, type=bool, default=False, help="Dryrun set to True will not actually download the bits")
+parser.add_argument("--config", required=True, type=str, dest="config", help="The configuration file")
+parser.add_argument("--basket", required=False, action="store_true", dest="basket", help="To include item in the basket, default False")
+parser.add_argument("--dryrun", required=False, action="store_true", dest="dryrun", help="Dryrun set to True will not actually download the bits")
 
 args = parser.parse_args()
-
 Config.load(args.config)
-
 include_basket        = args.basket
-context.skip_download = args.dryrun
+commons.skip_download = args.dryrun
 
 # define shortcuts to the configuration files
 app = Config.app_scenario

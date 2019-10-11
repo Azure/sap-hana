@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # 
-#       SapMonitor payload deployed on collector VM
+#       SMP Downloader  
 #
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
