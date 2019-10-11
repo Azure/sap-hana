@@ -118,7 +118,7 @@
     "databases":[
         {
             "platform":"HANA",
-	    "version":"2.00.043",
+	    "db_version":"2.00.043",
             "os":{
                 "publisher":"SUSE",
                 "offer":"SLES-SAP",
