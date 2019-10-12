@@ -118,9 +118,8 @@ class DownloadItem:
         # Find filename
         if disposition.find('filename="') < 0:
             return
-        fileNameSearch = re.search("\"(.*?)\"",disposition)
-        filename       = fileNameSearch.group(0).replace('"','')
-
+        filename    = re.search("\"(.*?)\"",disposition).group(1)
+        print ("file: ", filename)
         # Create directory for files: either the latest timestamp from Download Basket or "bits"
         if self.time != 0:
             directory = os.path.join(os.getcwd(), str(self.time), self.target_dir)
