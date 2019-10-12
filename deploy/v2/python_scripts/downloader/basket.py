@@ -7,7 +7,6 @@
 #
 
 import argparse
-import commons
 import re
 
 from helper import *
@@ -22,15 +21,15 @@ parser.add_argument("--dryrun", required=False, action="store_true", dest="dryru
 
 args = parser.parse_args()
 Config.load(args.config)
-include_basket        = args.basket
-commons.skip_download = args.dryrun
+include_basket = args.basket
+dryrun         = args.dryrun
 
 # define shortcuts to the configuration files
 app = Config.app_scenario
 db  = Config.db_scenario
 rti = Config.rti_scenario
 
-DLM.init()
+DLM.init(dryrun)
 basket = DownloadBasket()
 
 if include_basket:
@@ -91,11 +90,12 @@ for p in packages:
         if p.selector: result = results[eval(p.selector)]
         print("%s\n" % (result))
         basket.add_item(DownloadItem(
-            id         = result["Fastkey"],
-            desc       = result["Description"],
-            size       = result["Filesize"],
-            time       = basket.latest,
-            target_dir = p.target_dir,
+            id            = result["Fastkey"],
+            desc          = result["Description"],
+            size          = result["Filesize"],
+            time          = basket.latest,
+            target_dir    = p.target_dir,
+            skip_download = dryrun,
         ))
 
 if len(basket.items) > 0:

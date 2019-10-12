@@ -5,8 +5,7 @@
 #       License:        GNU General Public License (GPL)
 #       (c) 2019        Microsoft Corp.
 #
-
-import commons
+import re
 
 from requests.auth import HTTPBasicAuth
 from helper import *
@@ -18,10 +17,12 @@ class DLM:
     url_tech  = "https://tech.support.sap.com/odata/svt/swdcuisrv/DownloadContentSet"
     url_token = "https://origin.softwaredownloads.sap.com/tokengen/"
 
-    sess      = None
+    sess          = None
+    skip_download = False
 
     @staticmethod
-    def init():
+    def init(dryrun):
+        DLM.skip_download = dryrun if dryrun else False
         DLM.sess = HTTPSession(
         auth     = HTTPBasicAuth(
                 Config.credentials.sap_user,
@@ -67,30 +68,33 @@ class DLM:
                 dl_size = int(values[3])
                 dl_time = int(values[5])
                 basket.add_item(DownloadItem(
-                    id         = dl_id,
-                    desc       = dl_desc,
-                    size       = dl_size,
-                    time       = dl_time,
-                    target_dir = "APP",
+                    id            = dl_id,
+                    desc          = dl_desc,
+                    size          = dl_size,
+                    time          = dl_time,
+                    target_dir    = "APP",
+                    skip_download = DLM.skip_download,
                 ))
 
 
 class DownloadItem:
-    id       = ""
-    desc     = ""
-    size     = 0
-    time     = 0
-    filename = ""
-    last_pos = 0
+    id            = ""
+    desc          = ""
+    size          = 0
+    time          = 0
+    filename      = ""
+    last_pos      = 0
+    skip_download = False
 
-    def __init__(self, id=None, desc=None, size=None, time=None, filename=None, target_dir=None, last_pos=None):
-        self.id         = id if id else ""
-        self.desc       = desc if desc else ""
-        self.size       = size if size else 0
-        self.time       = time if time else 0
-        self.filename   = filename if filename else ""
-        self.target_dir = target_dir if target_dir else ""
-        self.last_pos   = last_pos if last_pos else 0
+    def __init__(self, id=None, desc=None, size=None, time=None, filename=None, target_dir=None, last_pos=None, skip_download=None):
+        self.id            = id if id else ""
+        self.desc          = desc if desc else ""
+        self.size          = size if size else 0
+        self.time          = time if time else 0
+        self.filename      = filename if filename else ""
+        self.target_dir    = target_dir if target_dir else ""
+        self.last_pos      = last_pos if last_pos else 0
+        self.skip_download = skip_download if skip_download else False
 
     def download(self):
         payload = {
@@ -111,9 +115,13 @@ class DownloadItem:
         if not "content-disposition" in resp.headers:
             return
         disposition = resp.headers["content-disposition"]
+        # Find filename
         if disposition.find('filename="') < 0:
             return
-        filename = disposition.replace('"', '')
+        fileNameSearch = re.search("\"(.*?)\"",disposition)
+        filename       = fileNameSearch.group(0).replace('"','')
+
+        # Create directory for files: either the latest timestamp from Download Basket or "bits"
         if self.time != 0:
             directory = os.path.join(os.getcwd(), str(self.time), self.target_dir)
         else:
@@ -132,7 +140,7 @@ class DownloadItem:
                 else:
                     self.last_pos = os.path.getsize(target)
                     print("current file size is %s ..." % self.last_pos)
-        if commons.skip_download:
+        if self.skip_download:
             return True
 
         # Second request to download the file from new or resume

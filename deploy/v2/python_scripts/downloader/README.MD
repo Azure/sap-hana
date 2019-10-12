@@ -21,7 +21,6 @@ DLM stands for Download Manager
 │   │   ├───python_scripts
 │   │   │   └───downloader
 │   │   │           basket.py
-│   │   │           common.py
 │   │   │           hdb.json
 │   │   │           helper.py
 │   │   │           s4.json
