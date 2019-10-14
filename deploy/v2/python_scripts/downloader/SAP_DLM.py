@@ -184,7 +184,19 @@ class DownloadBasket:
                 self.items.pop(cnt)
                 continue
             cnt += 1
-
+            
+    # Download all items from basket as well as search result according to configuration
+    # It prints out download progress. See example:
+    #
+    # (1/8)     Revision 2.00.043.0 (SPS04) for HANA DB .. (3372886 KB) - Done:   0%
+    # (2/8)     Revision 04 for SAP HANA CLIENT 2.0         (316869 KB) - Done:  44%
+    # (3/8)     Revision 243.00 for SAP HANA STUDIO 2       (723893 KB) - Done:  48%
+    # (4/8)     Revision 243.00 for SAP HANA STUDIO 2       (758928 KB) - Done:  58%
+    # (5/8)     SAP EXTENDED APP SERVICES 00               (1532058 KB) - Done:  67%
+    # (6/8)     SP12 Patch9 for DEVX DI 1.0                 (719293 KB) - Done:  88%
+    # (7/8)     SP52 Patch29 for SAPUI5 FESV4 XSA 1         (179589 KB) - Done:  97%
+    # (8/8)     SAPCAR                                        (4467 KB) - Done:  99%
+    #                                                      (7607983 KB) - Done: 100%
     def download_all(self):
         total_complete_size = 0
         for cnt in range(len(self.items)):
