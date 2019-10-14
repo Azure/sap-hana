@@ -5,7 +5,6 @@ DLM stands for Download Manager
 
 ## Table of Contents
 - [How to Run](#HowToRun)
-- [FileStructure](#FileStructure)
 - [Workflow](#Workflow)
 
 ## HowToRun
@@ -13,19 +12,7 @@ DLM stands for Download Manager
 - `python3 basket.py --help` : check required inputs
 - `--config <name of the json>` : Mandatory. It triggers download of bits according to SAP_Scenarios.py and JSON input files
 - `--basket`: If set, it triggers download of bits according to SAP_Scenarios.py and JSON input files + the latest files (add in one shot into the basket) from SMP download basket.
-- `--dryrun True`: If set, it triggers the download without actually download the bits.
-
-## FileStructure
-├───deploy
-│   ├───v2
-│   │   ├───python_scripts
-│   │   │   └───downloader
-│   │   │           basket.py
-│   │   │           hdb.json
-│   │   │           helper.py
-│   │   │           s4.json
-│   │   │           SAP_DLM.py
-│   │   │           SAP_Scenarios.py
-│   │   │           SAP_SMP.py
+- `--dryrun`: If set, it triggers the download without actually download the bits.
 
 ## Workflow
+![workflow](https://user-images.githubusercontent.com/38501271/66783833-9e96e780-ee8d-11e9-8efa-d1e0d5fc1348.JPG)
