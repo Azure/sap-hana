@@ -16,7 +16,7 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 3389
-  source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
+  source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
   destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
 }
 
@@ -32,7 +32,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = 22
-  source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips}"
+  source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
   destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
 }
 
