@@ -234,3 +234,49 @@ resource "azurerm_virtual_network_peering" "peering-sap-management" {
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }
+
+# STORAGE ACCOUNTS ===============================================================================================
+
+# Generates random text for boot diagnostics storage account name
+resource "random_id" "random-id" {
+  keepers = {
+    # Generate a new id only when a new resource group is defined
+    resource_group = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  }
+  byte_length = 4
+}
+
+# Creates storage account for storing SAP Bits
+resource "azurerm_storage_account" "storage-sapbits" {
+  count                    = var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                     = lookup(var.software.storage_account_sapbits, "name", false) ? var.software.storage_account_sapbits.name : "sapbits${random_id.random-id.hex}"
+  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                 = var.infrastructure.region
+  account_replication_type = "LRS"
+  account_tier             = "Premium"
+  account_kind             = var.software.storage_account_sapbits.account_kind
+}
+
+# Creates the storage container inside the storage account for SAP bits
+resource "azurerm_storage_container" "storagecontainer-sapbits" {
+  count                 = var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                  = var.software.storage_account_sapbits.container_name
+  storage_account_name  = azurerm_storage_account.storage-sapbits[0].name
+  container_access_type = var.software.storage_account_sapbits.container_access_type
+}
+
+# Imports existing storage account to use for SAP bits
+data "azurerm_storage_account" "storage-sapbits" {
+  count               = var.software.storage_account_sapbits.is_existing ? 1 : 0
+  name                = split("/", var.software.storage_account_sapbits.arm_id)[8]
+  resource_group_name = split("/", var.software.storage_account_sapbits.arm_id)[4]
+}
+
+# Creates boot diagnostics storage account
+resource "azurerm_storage_account" "storage-bootdiag" {
+  name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
+  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                 = var.infrastructure.region
+  account_replication_type = "LRS"
+  account_tier             = "Standard"
+}

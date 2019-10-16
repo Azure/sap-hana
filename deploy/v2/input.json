@@ -126,19 +126,19 @@
     "databases" : [
         {
 	    "platform" : "",
-	    "version" : "",
+	    "db_version" : "",
 	    "os" : {
 		"publisher" : "",
                 "offer" : "",
                 "sku" : ""
             },
-	    "size" : "",
-	    "filesystem" : "",
+            "size" : "",
+            "filesystem" : "",
             "high_availability" : "",
             "authentication" : {
                 "type" : "",
                 "os_username" : "",
-		"os_password" : "",
+                "os_password" : "",
                 "path_to_public_key" : "",
                 "path_to_private_key" : ""
             },
@@ -167,7 +167,7 @@
 		    }
 		}
             ],
-	    "nodes" : [
+	    "dbnodes" : [
 	        {
 		    "name" : "",
 		    "admin_nic_ip" : "",
@@ -176,5 +176,20 @@
 		}
 	    ]
         }
-    ]
+    ],
+    "software" : {
+        "storage_account_sapbits" : {
+            "is_existing" : "",
+            "arm_id" : "",
+            "name" : "",
+            "account_tier" : "",
+            "account_replication_type" : "",
+            "account_kind" : "",
+            "container_name" : "",
+            "container_access_type" : ""
+        }
+    },
+    "options" : {
+        "read_tf_output_from_file" : ""
+    } 
 }

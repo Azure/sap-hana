@@ -39,8 +39,8 @@ resource "azurerm_network_security_rule" "nsr-db" {
 # NICS ============================================================================================================
 
 # Creates the admin traffic NIC and private IP address for database nodes
-resource "azurerm_network_interface" "nic-dbnode-admin" {
-  for_each                      = local.nodes
+resource "azurerm_network_interface" "nics-dbnodes-admin" {
+  for_each                      = local.dbnodes
   name                          = "${each.value.name}-admin-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -50,14 +50,14 @@ resource "azurerm_network_interface" "nic-dbnode-admin" {
   ip_configuration {
     name                          = "${each.value.name}-admin-nic-ip"
     subnet_id                     = var.subnet-sap-admin[0].id
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_admin.is_existing ? each.value.admin_nic_ip : lookup(each.value, "admin_nic_ip", false) != false ? each.value.admin_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_admin.prefix, tonumber(each.key) + 4) 
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_admin.is_existing ? each.value.admin_nic_ip : lookup(each.value, "admin_nic_ip", false) != false ? each.value.admin_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_admin.prefix, tonumber(each.key) + 4)
     private_ip_address_allocation = "static"
   }
 }
 
 # Creates the DB traffic NIC and private IP address for database nodes
-resource "azurerm_network_interface" "nic-dbnode-db" {
-  for_each                      = local.nodes
+resource "azurerm_network_interface" "nics-dbnodes-db" {
+  for_each                      = local.dbnodes
   name                          = "${each.value.name}-db-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -77,24 +77,24 @@ resource "azurerm_network_interface" "nic-dbnode-db" {
 
 # Creates database VM
 resource "azurerm_virtual_machine" "vm-dbnode" {
-  for_each                      = local.nodes
+  for_each                      = local.dbnodes
   name                          = each.value.name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  primary_network_interface_id  = azurerm_network_interface.nic-dbnode-db[each.key].id
-  network_interface_ids         = [azurerm_network_interface.nic-dbnode-admin[each.key].id, azurerm_network_interface.nic-dbnode-db[each.key].id]
+  primary_network_interface_id  = azurerm_network_interface.nics-dbnodes-db[each.key].id
+  network_interface_ids         = [azurerm_network_interface.nics-dbnodes-admin[each.key].id, azurerm_network_interface.nics-dbnodes-db[each.key].id]
   vm_size                       = lookup(local.sizes, "${each.value.size}").compute.vm_size
   delete_os_disk_on_termination = "true"
 
   dynamic "storage_os_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : {name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching } ] if storage_type.name == "os" ])
+    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                      = "${each.value.name}-osdisk"
-      caching                   = disk.value.caching
-      create_option             = "FromImage"
-      managed_disk_type         = disk.value.disk_type
-      disk_size_gb              = disk.value.size_gb
+      name              = "${each.value.name}-osdisk"
+      caching           = disk.value.caching
+      create_option     = "FromImage"
+      managed_disk_type = disk.value.disk_type
+      disk_size_gb      = disk.value.size_gb
     }
   }
 
@@ -107,7 +107,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 
   dynamic "storage_data_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : {name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching, write_accelerator = storage_type.write_accelerator } ]if storage_type.name != "os" ])
+    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching, write_accelerator = storage_type.write_accelerator }] if storage_type.name != "os"])
     content {
       name                      = "${each.value.name}-${disk.value.name}-${disk.value.id}"
       caching                   = disk.value.caching
@@ -138,6 +138,6 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 
   boot_diagnostics {
     enabled     = true
-    storage_uri = var.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }

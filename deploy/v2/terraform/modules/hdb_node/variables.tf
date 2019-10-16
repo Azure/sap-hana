@@ -26,16 +26,16 @@ variable "nsg-db" {
   description = "Details of the SAP DB subnet NSG"
 }
 
-variable "storageaccount-bootdiagnostics" {
+variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
 # Imports HANA database sizing information
 locals {
-  sizes = jsondecode(file("${path.module}/../../../hdb_sizes.json"))
+  sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))
 }
 
 # List of HANA DB nodes to be created
 locals {
-  nodes = zipmap(range(length(flatten([for database in var.databases : [ for node in database.nodes : node.name] if database.platform == "HANA"]))),flatten([for database in var.databases: [for node in database.nodes : { name = node.name, admin_nic_ip = lookup(node, "admin_nic_ip", false), db_nic_ip = lookup(node, "db_nic_ip", false), size = database.size, os = database.os, authentication = database.authentication} ] if database.platform == "HANA"]))
+  dbnodes = zipmap(range(length(flatten([for database in var.databases : [for dbnode in database.dbnodes : dbnode.name]]))), flatten([for database in var.databases : [for dbnode in database.dbnodes : { platform = database.platform, name = dbnode.name, admin_nic_ip = lookup(dbnode, "admin_nic_ip", false), db_nic_ip = lookup(dbnode, "db_nic_ip", false), size = database.size, os = database.os, authentication = database.authentication }]]))
 }

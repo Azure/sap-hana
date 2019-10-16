@@ -103,8 +103,8 @@
 	    "authentication" : {
 	        "type" : "key",
 		"username" : "azureadm",
-		"path_to_public_key" : "~/.ssh/ssh_key.pub",
-		"path_to_private_key" : "~/.ssh/ssh_key"
+		"path_to_public_key" : "~/.ssh/id_rsa.pub",
+		"path_to_private_key" : "~/.ssh/id_rsa"
 	    },
 	    "components" : [
 	        "ansible"
@@ -115,20 +115,20 @@
     "databases" : [
         {
             "platform" : "HANA",
-            "version" : "2.00.043",
+            "db_version" : "2.00.043",
             "os" : {
-                "publisher" : "SUSE",
-                "offer" : "SLES-SAP",
-                "sku" : "12-sp2"
+                "publisher" : "Redhat",
+                "offer" : "RHEL-SAP-HANA",
+                "sku" : "7.3"
             },
             "size" : "S",
-	    "filesystem" : "XFS",
+            "filesystem" : "XFS",
             "high_availability" : false,
             "authentication" : {
                 "type" : "key",
                 "os_username" : "azureadm",
-                "path_to_public_key" : "~/.ssh/ssh_key.pub",
-                "path_to_private_key" : "~/.ssh/ssh_key"
+                "path_to_public_key" : "~/.ssh/id_rsa.pub",
+                "path_to_private_key" : "~/.ssh/id_rsa"
             },
             "instance" : {
                 "sid" : "HN1",
@@ -155,12 +155,22 @@
                     }
                 }
             ],
-            "nodes" : [
+            "dbnodes" : [
                 {
 	            "name" : "hdb1",
 		    "role" : "worker"
                 }
             ]
         }
-    ]
+    ],
+    "software" : {
+        "storage_account_sapbits" : {
+            "is_existing" : false,
+            "account_tier" : "Premium",
+            "account_replication_type" : "LRS",
+            "account_kind" : "BlockBlobStorage",
+            "container_name" : "bits",
+            "container_access_type" : "private"
+        }  
+    }
 }

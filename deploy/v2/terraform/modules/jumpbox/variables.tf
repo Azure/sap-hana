@@ -17,3 +17,11 @@ variable "subnet-mgmt" {
 variable "nsg-mgmt" {
   description = "Details of the management NSG"
 }
+
+variable "storage-bootdiag" {
+  description = "Details of the boot diagnostics storage account"
+}
+
+variable "output-json" {
+  description = "Details of the output JSON"
+}

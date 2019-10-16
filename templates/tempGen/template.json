@@ -118,7 +118,7 @@
     "databases":[
         {
             "platform":"HANA",
-	    "version":"2.00.043",
+	    "db_version":"2.00.043",
             "os":{
                 "publisher":"SUSE",
                 "offer":"SLES-SAP",
@@ -158,12 +158,22 @@
                     }
                 }
             ],
-            "nodes":[
+            "dbnodes":[
                 {
 		    "name":"hdb-node1",
 	            "role":"worker"
 	        }
             ]
         }
-    ]
+    ],
+    "software":{
+        "storage_account_sapbits":{
+            "is_existing":false,
+            "account_tier":"Premium",
+            "account_replication_type":"LRS",
+            "account_kind":"BlockBlobStorage",
+            "container_name":"bits",
+            "container_access_type":"private"
+        }  
+    }
 }

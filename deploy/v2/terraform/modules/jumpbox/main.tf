@@ -2,26 +2,6 @@
 # JUMPBOXES
 ##################################################################################################################
 
-# BOOT DIAGNOSTICS ===============================================================================================
-
-# Generates random text for boot diagnostics storage account name
-resource "random_id" "random-id" {
-  keepers = {
-    # Generate a new id only when a new resource group is defined
-    resource_group = var.resource-group[0].name
-  }
-  byte_length = 8
-}
-
-# Creates boot diagnostics storage account
-resource "azurerm_storage_account" "storageaccount-bootdiagnostics" {
-  name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "diag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
-  resource_group_name      = var.resource-group[0].name
-  location                 = var.resource-group[0].location
-  account_replication_type = "LRS"
-  account_tier             = "Standard"
-}
-
 # NETWORK SECURITY RULES =========================================================================================
 
 # Creates Windows jumpbox RDP network security rule
@@ -58,7 +38,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 
 # NICS ============================================================================================================
 
-# Creates the public IP addresses for Windows VMs
+# Creates the public IP addresses for Windows jumpboxes
 resource "azurerm_public_ip" "public-ip-windows" {
   count               = length(var.jumpboxes.windows)
   name                = "${var.jumpboxes.windows[count.index].name}-public-ip"
@@ -153,9 +133,35 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
   }
 
+  connection {
+    type        = "ssh"
+    host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
+    user        = var.jumpboxes.linux[count.index].authentication.username
+    private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
+    password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+  }
+
+  provisioner "file" {
+    source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_public_key", null)
+    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub"
+    on_failure  = "continue"
+  }
+
+  provisioner "file" {
+    source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", null)
+    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa"
+    on_failure  = "continue"
+  }
+
+  provisioner "file" {
+    source      = var.output-json.filename
+    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/output.json"
+    on_failure  = "continue"
+  }
+
   boot_diagnostics {
     enabled     = true
-    storage_uri = azurerm_storage_account.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
 
@@ -194,6 +200,6 @@ resource "azurerm_virtual_machine" "vm-windows" {
 
   boot_diagnostics {
     enabled     = true
-    storage_uri = azurerm_storage_account.storageaccount-bootdiagnostics.primary_blob_endpoint
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
