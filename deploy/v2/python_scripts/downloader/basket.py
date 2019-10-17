@@ -16,6 +16,7 @@ from SAP_SMP import *
 
 parser = argparse.ArgumentParser(description="Downloader")
 parser.add_argument("--config", required=True, type=str, dest="config", help="The configuration file")
+parser.add_argument("--dir", required=False, type=str, dest="dir", help="Location to place the download file")
 parser.add_argument("--basket", required=False, action="store_true", dest="basket", help="To include item in the basket, default False")
 parser.add_argument("--dryrun", required=False, action="store_true", dest="dryrun", help="Dryrun set to True will not actually download the bits")
 
@@ -23,13 +24,14 @@ args = parser.parse_args()
 Config.load(args.config)
 include_basket = args.basket
 dryrun         = args.dryrun
+download_dir   = args.dir
 
 # define shortcuts to the configuration files
 app = Config.app_scenario
 db  = Config.db_scenario
 rti = Config.rti_scenario
 
-DLM.init(dryrun)
+DLM.init(download_dir, dryrun)
 basket = DownloadBasket()
 
 if include_basket:
@@ -94,6 +96,7 @@ for p in packages:
             desc          = result["Description"],
             size          = result["Filesize"],
             time          = basket.latest,
+            base_dir      = download_dir,
             target_dir    = p.target_dir,
             skip_download = dryrun,
         ))
