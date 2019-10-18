@@ -21,8 +21,10 @@ class DLM:
     skip_download = False
 
     @staticmethod
-    def init(dryrun):
+    def init(base_dir, dryrun):
         DLM.skip_download = dryrun if dryrun else False
+        DLM.base_dir      = base_dir if base_dir else ""
+
         DLM.sess = HTTPSession(
         auth     = HTTPBasicAuth(
                 Config.credentials.sap_user,
@@ -72,6 +74,7 @@ class DLM:
                     desc          = dl_desc,
                     size          = dl_size,
                     time          = dl_time,
+                    base_dir      = DLM.base_dir,
                     target_dir    = "APP",
                     skip_download = DLM.skip_download,
                 ))
@@ -83,15 +86,17 @@ class DownloadItem:
     size          = 0
     time          = 0
     filename      = ""
+    base_dir      = ""
     last_pos      = 0
     skip_download = False
 
-    def __init__(self, id=None, desc=None, size=None, time=None, filename=None, target_dir=None, last_pos=None, skip_download=None):
+    def __init__(self, id=None, desc=None, size=None, time=None, filename=None, base_dir=None, target_dir=None, last_pos=None, skip_download=None):
         self.id            = id if id else ""
         self.desc          = desc if desc else ""
         self.size          = size if size else 0
         self.time          = time if time else 0
         self.filename      = filename if filename else ""
+        self.base_dir      = base_dir if base_dir else ""
         self.target_dir    = target_dir if target_dir else ""
         self.last_pos      = last_pos if last_pos else 0
         self.skip_download = skip_download if skip_download else False
@@ -115,13 +120,16 @@ class DownloadItem:
         if not "content-disposition" in resp.headers:
             return
         disposition = resp.headers["content-disposition"]
+
         # Find filename
         if disposition.find('filename="') < 0:
             return
         filename    = re.search("\"(.*?)\"",disposition).group(1)
-        print ("file: ", filename)
-        # Create directory for files: either the latest timestamp from Download Basket or "bits"
-        if self.time != 0:
+
+        # If no path provided from input, create directory for files: either the latest timestamp from Download Basket or "bits"
+        if self.base_dir:
+            directory = os.path.join(self.base_dir, self.target_dir)
+        elif self.time != 0:
             directory = os.path.join(os.getcwd(), str(self.time), self.target_dir)
         else:
             directory = os.path.join(os.getcwd(), "bits", self.target_dir)
