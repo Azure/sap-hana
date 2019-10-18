@@ -135,26 +135,42 @@ resource "azurerm_virtual_machine" "vm-linux" {
 
   connection {
     type        = "ssh"
-    host        = var.jumpboxes.linux[count.index].name == "rti" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
+    host        = azurerm_public_ip.public-ip-linux[count.index].ip_address
     user        = var.jumpboxes.linux[count.index].authentication.username
     private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
     password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
   }
 
+  # Copy ssh keypair over to jumpboxes and set permission
   provisioner "file" {
     source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_public_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub"
-    on_failure  = "continue"
   }
 
   provisioner "file" {
     source      = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa"
-    on_failure  = "continue"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 644 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub",
+      "chmod 600 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa",
+    ]
+  }
+
+  # Copy output.json for ansbile only on RTI. 
+  # Use on_failure = "continue" current workaround to use conditional provisioner
   provisioner "file" {
-    source      = var.output-json.filename
+    connection {
+      type        = "ssh"
+      host        = var.jumpboxes.linux[count.index].destroy_after_deploy == "true" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
+      user        = var.jumpboxes.linux[count.index].authentication.username
+      private_key = lookup(var.jumpboxes.linux[count.index].authentication, "path_to_private_key", false) == false ? null : file(var.jumpboxes.linux[count.index].authentication.path_to_private_key)
+      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+    }
+
+    source      = "${path.root}/../output.json"
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/output.json"
     on_failure  = "continue"
   }
