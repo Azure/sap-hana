@@ -54,7 +54,7 @@ class DLM:
         assert(resp.status_code == 200), \
             "Unexpected response when refreshing basket; status = %d" % (resp.status_code)
 
-        j = json.loads(resp.content)
+        j = json.loads(resp.content.decode("utf-8"))
         if j.get("d", None):
             results = j["d"].get("results", [])
             for r in results:
