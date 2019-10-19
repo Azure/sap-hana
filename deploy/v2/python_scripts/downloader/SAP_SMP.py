@@ -185,7 +185,7 @@ class SMP:
         assert(resp.status_code == 200), \
             "Unable to retrieve search results; status = %d" % (resp.status_code)
 
-        j = json.loads(resp.content)
+        j = json.loads(resp.content.decode("utf-8"))
         assert("d" in j and "results" in j["d"]), \
             "Invalid search result format"
         results = j["d"]["results"]
@@ -212,7 +212,7 @@ class SMP:
         )
         assert(resp.status_code == 200), \
             "Unable to retrieve search results; status = %d" % (resp.status_code)
-        j = json.loads(resp.content)
+        j = json.loads(resp.content.decode("utf-8"))
         assert("d" in j and "results" in j["d"]), \
             "Invalid search result format"
         results = j["d"]["results"]
