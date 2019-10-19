@@ -30,6 +30,10 @@ variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
+variable "sshkey" {
+  description = "Details of ssh key pair"
+}
+
 # Imports HANA database sizing information
 locals {
   sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))

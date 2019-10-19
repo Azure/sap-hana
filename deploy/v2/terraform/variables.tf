@@ -13,3 +13,7 @@ variable "databases" {
 variable "software" {
   description = "Details of the infrastructure components required for SAP installation"
 }
+
+variable "sshkey" {
+  description = "Details of ssh key pair"
+}

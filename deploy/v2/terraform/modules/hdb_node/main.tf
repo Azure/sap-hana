@@ -131,7 +131,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
       for_each = each.value.authentication.type != "password" ? ["key"] : []
       content {
         path     = "/home/${each.value.authentication.os_username}/.ssh/authorized_keys"
-        key_data = file(each.value.authentication.path_to_public_key)
+        key_data = file(var.sshkey.path_to_public_key)
       }
     }
   }

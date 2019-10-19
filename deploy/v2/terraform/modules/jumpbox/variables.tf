@@ -2,6 +2,10 @@ variable "jumpboxes" {
   description = "Details of the jumpboxes"
 }
 
+variable "databases" {
+  description = "Details of the databases"
+}
+
 variable "infrastructure" {
   description = "Details of the Azure infrastructure to deploy the SAP landscape into"
 }
@@ -20,6 +24,10 @@ variable "nsg-mgmt" {
 
 variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
+}
+
+variable "sshkey" {
+  description = "Details of ssh key pair"
 }
 
 variable "output-json" {

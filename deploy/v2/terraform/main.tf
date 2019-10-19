@@ -16,6 +16,8 @@ module "jumpbox" {
   source           = "./modules/jumpbox"
   infrastructure   = var.infrastructure
   jumpboxes        = var.jumpboxes
+  databases        = var.databases
+  sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
   subnet-mgmt      = module.common_infrastructure.subnet-mgmt
   nsg-mgmt         = module.common_infrastructure.nsg-mgmt
@@ -28,6 +30,7 @@ module "hdb_node" {
   source           = "./modules/hdb_node"
   infrastructure   = var.infrastructure
   databases        = var.databases
+  sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
   subnet-sap-admin = module.common_infrastructure.subnet-sap-admin
   nsg-admin        = module.common_infrastructure.nsg-admin

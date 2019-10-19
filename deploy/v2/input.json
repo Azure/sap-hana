@@ -1,195 +1,192 @@
 {
-    "infrastructure" : {
-        "region" : "",
-        "resource_group" : {
-            "is_existing" : "",
-            "arm_id" : "",
-            "name" : ""
-        },
-        "vnets" : {
-            "management" : {
-                "is_existing" : "",
-                "arm_id" : "",
-                "name" : "",
-                "address_space" : "",
-                "subnet_mgmt" : {
-                    "is_existing" : "",
-                    "arm_id" : "",
-                    "name" : "",
-                    "prefix" : "",
-                    "nsg" : {
-                        "is_existing" : "",
-                        "arm_id" : "",
-                        "name" : "",
-                        "allowed_ips" : ["0.0.0.0/0"] 
-                    }
-                }
-            },
-            "sap" : {
-                "is_existing" : "",
-                "arm_id" : "",
-                "name" : "",
-                "address_space" : "",
-                "subnet_admin" : {
-                    "is_existing" : "",
-                    "arm_id" : "",
-                    "name" : "",
-                    "prefix" : "",
-                    "nsg" : {
-                        "is_existing" : "",
-                        "arm_id" : "",
-                        "name" : ""
-                    }
-                },
-                "subnet_db" : {
-                    "is_existing" : "",
-                    "arm_id" : "",
-                    "name" : "",
-                    "prefix" : "",
-                    "nsg" : {
-                        "is_existing" : "",
-                        "arm_id" : "",
-                        "name" : ""
-                    }
-                }
-            }
-        },
-    "boot_diagnostics_account_name" : ""
+  "infrastructure": {
+    "region": "",
+    "resource_group": {
+      "is_existing": "",
+      "arm_id": "",
+      "name": ""
     },
-    "jumpboxes" : {
-        "windows" : [
-            {
-            "name" : "",
-            "destroy_after_deploy" : "",
-            "size" : "",
-            "nic_name" : "",
-            "private_ip_address" : "",
-            "os" : {
-                "publisher" : "",
-                "offer" : "",
-                "sku" : ""
-            },
-            "authentication" : {
-                "type" : "",
-                "username" : "",
-                "password" : ""
-            },
-            "components" : [
-	    ]
-            }
-        ],
-        "linux" : [
-            {
-            "name" : "",
-            "destroy_after_deploy" : "",
-            "size" : "",
-            "nic_name" : "",
-            "private_ip_address" : "",
-            "os" : {
-                "publisher" : "",
-                "offer" : "",
-                "sku" : ""
-            },
-            "authentication" : {
-                "type" : "",
-                "username" : "",
-                "use_existing" : "",
-                "path_to_public_key" : "",
-                "path_to_private_key" : ""
-            },
-            "components" : [
-	    ]
-            },
-            {
-            "name" : "",
-            "destroy_after_deploy" : "",
-            "size" : "",
-            "nic_name" : "",
-            "private_ip_address" : "",
-            "os" : {
-                "publisher" : "",
-                "offer" : "",
-                "sku" : ""
-            },
-            "authentication" : {
-                "type" : "",
-                "username" : "",
-                "use_existing" : "",
-                "path_to_public_key" : "",
-                "path_to_private_key" : ""
-            },
-            "components" : [
-	    ]
-            }
-        ]
-    },
-    "databases" : [
-        {
-	    "platform" : "",
-	    "db_version" : "",
-	    "os" : {
-		"publisher" : "",
-                "offer" : "",
-                "sku" : ""
-            },
-            "size" : "",
-            "filesystem" : "",
-            "high_availability" : "",
-            "authentication" : {
-                "type" : "",
-                "os_username" : "",
-                "os_password" : "",
-                "path_to_public_key" : "",
-                "path_to_private_key" : ""
-            },
-	    "instance" : {
-		"sid" : "",
-		"instance_number" : ""
-	    },
-	    "credentials" : {
-		"db_systemdb_password" : "",
-		"db_tenant_password" : "",
-		"os_sidadm_password" : "",
-		"os_sapadm_password" : ""
-	    },
-	    "components" : [
-		{
-		    "name" : "",
-		    "credentials" : {
-		    	"xsa_admin_password" : ""
-		    },
-		    "routing" : ""
-		},
-		{
-	            "name" : "",
-		    "credentials" : {
-		    	"cockpit_admin_password" : ""
-		    }
-		}
-            ],
-	    "dbnodes" : [
-	        {
-		    "name" : "",
-		    "admin_nic_ip" : "",
-		    "db_nic_ip" : "",
-		    "role" : ""
-		}
-	    ]
+    "vnets": {
+      "management": {
+        "is_existing": "",
+        "arm_id": "",
+        "name": "",
+        "address_space": "",
+        "subnet_mgmt": {
+          "is_existing": "",
+          "arm_id": "",
+          "name": "",
+          "prefix": "",
+          "nsg": {
+            "is_existing": "",
+            "arm_id": "",
+            "name": "",
+            "allowed_ips": [
+              "0.0.0.0/0"
+            ]
+          }
         }
+      },
+      "sap": {
+        "is_existing": "",
+        "arm_id": "",
+        "name": "",
+        "address_space": "",
+        "subnet_admin": {
+          "is_existing": "",
+          "arm_id": "",
+          "name": "",
+          "prefix": "",
+          "nsg": {
+            "is_existing": "",
+            "arm_id": "",
+            "name": ""
+          }
+        },
+        "subnet_db": {
+          "is_existing": "",
+          "arm_id": "",
+          "name": "",
+          "prefix": "",
+          "nsg": {
+            "is_existing": "",
+            "arm_id": "",
+            "name": ""
+          }
+        }
+      }
+    },
+    "boot_diagnostics_account_name": ""
+  },
+  "jumpboxes": {
+    "windows": [
+      {
+        "name": "",
+        "destroy_after_deploy": "",
+        "size": "",
+        "nic_name": "",
+        "private_ip_address": "",
+        "os": {
+          "publisher": "",
+          "offer": "",
+          "sku": ""
+        },
+        "authentication": {
+          "type": "",
+          "username": "",
+          "password": ""
+        },
+        "components": []
+      }
     ],
-    "software" : {
-        "storage_account_sapbits" : {
-            "is_existing" : "",
-            "arm_id" : "",
-            "name" : "",
-            "account_tier" : "",
-            "account_replication_type" : "",
-            "account_kind" : "",
-            "container_name" : "",
-            "container_access_type" : ""
+    "linux": [
+      {
+        "name": "",
+        "destroy_after_deploy": "",
+        "size": "",
+        "nic_name": "",
+        "private_ip_address": "",
+        "os": {
+          "publisher": "",
+          "offer": "",
+          "sku": ""
+        },
+        "authentication": {
+          "type": "",
+          "username": "",
+          "use_existing": ""
+        },
+        "components": []
+      },
+      {
+        "name": "",
+        "destroy_after_deploy": "",
+        "size": "",
+        "nic_name": "",
+        "private_ip_address": "",
+        "os": {
+          "publisher": "",
+          "offer": "",
+          "sku": ""
+        },
+        "authentication": {
+          "type": "",
+          "username": "",
+          "use_existing": ""
+        },
+        "components": []
+      }
+    ]
+  },
+  "databases": [
+    {
+      "platform": "",
+      "db_version": "",
+      "os": {
+        "publisher": "",
+        "offer": "",
+        "sku": ""
+      },
+      "size": "",
+      "filesystem": "",
+      "high_availability": "",
+      "authentication": {
+        "type": "",
+        "os_username": "",
+        "os_password": ""
+      },
+      "instance": {
+        "sid": "",
+        "instance_number": ""
+      },
+      "credentials": {
+        "db_systemdb_password": "",
+        "db_tenant_password": "",
+        "os_sidadm_password": "",
+        "os_sapadm_password": ""
+      },
+      "components": [
+        {
+          "name": "",
+          "credentials": {
+            "xsa_admin_password": ""
+          },
+          "routing": ""
+        },
+        {
+          "name": "",
+          "credentials": {
+            "cockpit_admin_password": ""
+          }
         }
-    },
-    "options" : {
-        "read_tf_output_from_file" : ""
-    } 
+      ],
+      "dbnodes": [
+        {
+          "name": "",
+          "admin_nic_ip": "",
+          "db_nic_ip": "",
+          "role": ""
+        }
+      ]
+    }
+  ],
+  "software": {
+    "storage_account_sapbits": {
+      "is_existing": "",
+      "arm_id": "",
+      "name": "",
+      "account_tier": "",
+      "account_replication_type": "",
+      "account_kind": "",
+      "container_name": "",
+      "container_access_type": ""
+    }
+  },
+  "sshkey": {
+    "path_to_public_key": "",
+    "path_to_private_key": ""
+  },
+  "options": {
+    "read_tf_output_from_file": ""
+  }
 }
