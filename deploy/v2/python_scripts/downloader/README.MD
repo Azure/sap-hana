@@ -11,6 +11,7 @@ DLM stands for Download Manager
 - add SMP credentials to JSON files `(hdb.json`, `s4.json` are examples for different scenarios).
 - `python3 basket.py --help` : check required inputs
 - `--config <name of the json>` : Mandatory. It triggers download of bits according to SAP_Scenarios.py and JSON input files
+- `--dir <absolute path to download the bits`: Optional. The downloader will use this dir to store downloaded bits instead of default path, which is the same folder as the python script
 - `--basket`: If set, it triggers download of bits according to SAP_Scenarios.py and JSON input files + the latest files (add in one shot into the basket) from SMP download basket.
 - `--dryrun`: If set, it triggers the download without actually download the bits.
 
