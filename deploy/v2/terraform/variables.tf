@@ -17,3 +17,7 @@ variable "software" {
 variable "sshkey" {
   description = "Details of ssh key pair"
 }
+
+variable "options" {
+  description = "Configuration options"
+}

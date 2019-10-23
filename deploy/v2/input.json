@@ -1,10 +1,69 @@
 {
+<<<<<<< HEAD
   "infrastructure": {
     "region": "",
     "resource_group": {
       "is_existing": "",
       "arm_id": "",
       "name": ""
+=======
+    "infrastructure" : {
+        "region" : "",
+        "resource_group" : {
+            "is_existing" : "",
+            "arm_id" : "",
+            "name" : ""
+        },
+        "vnets" : {
+            "management" : {
+                "is_existing" : "",
+                "arm_id" : "",
+                "name" : "",
+                "address_space" : "",
+                "subnet_mgmt" : {
+                    "is_existing" : "",
+                    "arm_id" : "",
+                    "name" : "",
+                    "prefix" : "",
+                    "nsg" : {
+                        "is_existing" : "",
+                        "arm_id" : "",
+                        "name" : "",
+                        "allowed_ips" :[] 
+                    }
+                }
+            },
+            "sap" : {
+                "is_existing" : "",
+                "arm_id" : "",
+                "name" : "",
+                "address_space" : "",
+                "subnet_admin" : {
+                    "is_existing" : "",
+                    "arm_id" : "",
+                    "name" : "",
+                    "prefix" : "",
+                    "nsg" : {
+                        "is_existing" : "",
+                        "arm_id" : "",
+                        "name" : ""
+                    }
+                },
+                "subnet_db" : {
+                    "is_existing" : "",
+                    "arm_id" : "",
+                    "name" : "",
+                    "prefix" : "",
+                    "nsg" : {
+                        "is_existing" : "",
+                        "arm_id" : "",
+                        "name" : ""
+                    }
+                }
+            }
+        },
+    "boot_diagnostics_account_name" : ""
+>>>>>>> Adjust the templates accordingly
     },
     "vnets": {
       "management": {
@@ -187,6 +246,7 @@
     "path_to_private_key": ""
   },
   "options": {
-    "read_tf_output_from_file": ""
+    "read_tf_output_from_file": "",
+    "enable_secure_transfer": false
   }
 }

@@ -9,6 +9,7 @@ module "common_infrastructure" {
   is_single_node_hana = "true"
   infrastructure      = var.infrastructure
   software            = var.software
+  options             = var.options
 }
 
 # Create Jumpboxes and RTI box
