@@ -188,6 +188,6 @@
   },
   "options": {
     "read_tf_output_from_file": "",
-    "enable_secure_transfer": false
+    "enable_secure_transfer": true
   }
 }
