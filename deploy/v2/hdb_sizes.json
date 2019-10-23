@@ -1,8 +1,8 @@
 {
     "S" : {
         "compute" : {
-            "vm_size" : "Standard_D4s_v3",
-	    "swap_size_gb": 2
+            "vm_size" : "Standard_M32ls",
+	    "swap_size_gb" : 2
         },
         "storage" : [
             {
@@ -13,16 +13,8 @@
                 "caching" : "ReadWrite"
             },
             {
-                "name" : "data",
-                "count" : 1,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false
-            },
-            {
-                "name" : "log",
-                "count" : 2,
+                "name" : "data_log",
+                "count" : 3,
                 "disk_type" : "Premium_LRS",
                 "size_gb" : 512,
                 "caching" : "ReadOnly",
@@ -30,14 +22,14 @@
             },
             {
                 "name" : "shared",
-                "count" : 3,
+                "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
                 "size_gb" : 512,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             },
             {
-                "name" : "logbackup",
+                "name" : "sap",
                 "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
                 "size_gb" : 64,
@@ -45,10 +37,198 @@
                 "write_accelerator" : false
             },
             {
-                "name" : "databackup",
+                "name" : "backup",
                 "count" : 1,
                 "disk_type" : "StandardSSD_LRS",
                 "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            }
+        ]
+    },
+    "M" : {
+        "compute" : {
+            "vm_size" : "Standard_M64ls",
+	    "swap_size_gb" : 2
+        },
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadWrite"
+            },
+            {
+                "name" : "data_log",
+                "count" : 3,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "shared",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "sap",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "backup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 512,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            }
+        ]
+    },
+    "L" : {
+        "compute" : {
+            "vm_size" : "Standard_M64s",
+	    "swap_size_gb" : 2
+        },
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadWrite"
+            },
+            {
+                "name" : "data_log",
+                "count" : 2,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "shared",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "sap",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "backup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            }
+        ]
+    },
+    "XL" : {
+        "compute" : {
+            "vm_size" : "Standard_M128s",
+	    "swap_size_gb" : 2
+        },
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 128,
+                "caching" : "ReadWrite"
+            },
+            {
+                "name" : "data_log",
+                "count" : 3,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "shared",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "sap",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "backup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            }
+        ]
+    },
+    "XXL" : {
+        "compute" : {
+            "vm_size" : "Standard_M128ms",
+	    "swap_size_gb" : 2
+        },
+        "storage" : [
+            {
+                "name" : "os",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 128,
+                "caching" : "ReadWrite"
+            },
+            {
+                "name" : "data_log",
+                "count" : 5,
+                "disk_type" : "Premium_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "shared",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "sap",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 64,
+                "caching" : "ReadOnly",
+                "write_accelerator" : false
+            },
+            {
+                "name" : "backup",
+                "count" : 1,
+                "disk_type" : "StandardSSD_LRS",
+                "size_gb" : 1024,
                 "caching" : "ReadOnly",
                 "write_accelerator" : false
             }
