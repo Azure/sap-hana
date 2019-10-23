@@ -78,9 +78,9 @@
         "size": "Standard_D2s_v3",
         "disk_type": "StandardSSD_LRS",
         "os": {
-          "publisher": "Redhat",
-          "offer": "RHEL-SAP",
-          "sku": "7.5"
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "16.04-LTS"
         },
         "authentication": {
           "type": "password",

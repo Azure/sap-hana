@@ -33,3 +33,7 @@ variable "sshkey" {
 variable "output-json" {
   description = "Details of the output JSON"
 }
+
+variable "ansible-inventory" {
+  description = "Details of the Ansible inventory"
+}
