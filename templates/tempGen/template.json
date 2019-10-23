@@ -173,5 +173,8 @@
   "sshkey": {
     "path_to_public_key": "/tmp/sshkey.pub",
     "path_to_private_key": "/tmp/sshkey"
+  },
+  "options": {
+    "enable_secure_transfer": true
   }
 }

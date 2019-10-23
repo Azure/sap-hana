@@ -248,13 +248,14 @@ resource "random_id" "random-id" {
 
 # Creates storage account for storing SAP Bits
 resource "azurerm_storage_account" "storage-sapbits" {
-  count                    = var.software.storage_account_sapbits.is_existing ? 0 : 1
-  name                     = lookup(var.software.storage_account_sapbits, "name", false) ? var.software.storage_account_sapbits.name : "sapbits${random_id.random-id.hex}"
-  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  location                 = var.infrastructure.region
-  account_replication_type = "LRS"
-  account_tier             = "Premium"
-  account_kind             = var.software.storage_account_sapbits.account_kind
+  count                     = var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                      = lookup(var.software.storage_account_sapbits, "name", false) ? var.software.storage_account_sapbits.name : "sapbits${random_id.random-id.hex}"
+  resource_group_name       = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                  = var.infrastructure.region
+  account_replication_type  = "LRS"
+  account_tier              = "Premium"
+  account_kind              = var.software.storage_account_sapbits.account_kind
+  enable_https_traffic_only = var.options.enable_secure_transfer
 }
 
 # Creates the storage container inside the storage account for SAP bits
@@ -274,9 +275,10 @@ data "azurerm_storage_account" "storage-sapbits" {
 
 # Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storage-bootdiag" {
-  name                     = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
-  resource_group_name      = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  location                 = var.infrastructure.region
-  account_replication_type = "LRS"
-  account_tier             = "Standard"
+  name                      = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
+  resource_group_name       = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                  = var.infrastructure.region
+  account_replication_type  = "LRS"
+  account_tier              = "Standard"
+  enable_https_traffic_only = var.options.enable_secure_transfer
 }

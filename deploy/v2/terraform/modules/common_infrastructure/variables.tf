@@ -10,3 +10,7 @@ variable "is_single_node_hana" {
 variable "software" {
   description = "Details of the infrastructure components required for SAP installation"
 }
+
+variable "options" {
+  description = "Configuration options"
+}

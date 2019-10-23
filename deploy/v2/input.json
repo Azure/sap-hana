@@ -187,6 +187,7 @@
     "path_to_private_key": ""
   },
   "options": {
-    "read_tf_output_from_file": ""
+    "read_tf_output_from_file": "",
+    "enable_secure_transfer": true
   }
 }
