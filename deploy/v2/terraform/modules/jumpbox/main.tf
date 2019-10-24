@@ -94,6 +94,7 @@ resource "azurerm_network_interface" "nic-linux" {
 
 # Creates Linux VM
 resource "azurerm_virtual_machine" "vm-linux" {
+  depends_on                    = [var.output-json, var.ansible-inventory]
   count                         = length(var.jumpboxes.linux)
   name                          = var.jumpboxes.linux[count.index].name
   location                      = var.resource-group[0].location
@@ -162,7 +163,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
     on_failure = "continue"
   }
 
-  # Copies output.json for ansbile on RTI. 
+  # Copies output.json and inventory file for ansbile on RTI.
   provisioner "file" {
     connection {
       type        = "ssh"
@@ -172,23 +173,8 @@ resource "azurerm_virtual_machine" "vm-linux" {
       password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
     }
 
-    source      = var.output-json.filename
-    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/output.json"
-    on_failure  = "continue"
-  }
-
-  # Copies inventory file for ansbile on RTI.
-  provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].destroy_after_deploy == "true" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-    }
-
-    source      = var.ansible-inventory.filename
-    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/hosts"
+    source      = "${path.root}/../ansible_config_files/"
+    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}"
     on_failure  = "continue"
   }
 

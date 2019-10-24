@@ -120,7 +120,7 @@
         "offer": "SLES-SAP",
         "sku": "12-sp2"
       },
-      "size": "S",
+      "size": "Demo",
       "filesystem": "xfs",
       "high_availability": false,
       "authentication": {
