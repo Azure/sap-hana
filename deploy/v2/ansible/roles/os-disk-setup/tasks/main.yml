@@ -1,5 +1,7 @@
 ---
 
+# Prepare disks and mount points
+
 - name: Create device list
   shell: ls -l /dev/disk/azure/scsi1/* | awk '{split($0,disks," "); system("readlink -f " disks[9])}'
   register: device_list
@@ -11,7 +13,7 @@
   loop: "{{ hdb_sizes[hana_database.size].storage }}"
   when: item.name != 'os'
 
-- name: Physical volume group
+- name: Create physical volume group
   lvg: 
     vg: "vg_{{ item.key }}"
     pvs: "{{ item.value.devices }}"
@@ -19,7 +21,7 @@
   register: physical_vg
   failed_when: physical_vg is failed
 
-- name: Logical volume group
+- name: Create logical volume group
   lvol:
     state: present
     vg: "vg_{{ item.key }}"
@@ -29,13 +31,13 @@
   register: logical_vg
   failed_when: logical_vg is failed
  
-- name: Mount point directories
+- name: Create mount points
   file:
     path: "{% if item.key=='sap' %}/usr/{{ item.key }}{% else %}/hana/{{ item.key }}{% endif %}"
     state: directory
   with_dict: "{{ disk_dict }}"
 
-- name: Filesystems
+- name: Create file systems
   filesystem:
      fstype: "{{ hana_database.filesystem | default('xfs') }}"
      dev: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
