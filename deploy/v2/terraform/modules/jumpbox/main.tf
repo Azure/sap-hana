@@ -189,11 +189,14 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
 
     inline = [
+      # Installs Git
       "sudo apt update",
-      "sudo apt-get install git",
+      "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      # Installs Ansible
       "sudo apt install software-properties-common",
       "sudo apt-add-repository --yes --update ppa:ansible/ansible",
-      "sudo apt -y install ansible",
+      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
+      # Clones project repository
       "git clone https://github.com/Azure/sap-hana.git"
     ]
     on_failure = "continue"

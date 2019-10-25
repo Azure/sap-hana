@@ -67,6 +67,15 @@ resource "local_file" "output-json" {
 
 # Generates the Ansible Inventory file
 resource "local_file" "ansible-inventory" {
-  content  = templatefile("${path.module}/ansible_inventory.tmpl", { jumpboxes-windows = var.jumpboxes.windows, jumpboxes-linux = var.jumpboxes.linux, ips-jumpboxes-windows = local.ips-jumpboxes-windows, ips-jumpboxes-linux = local.ips-jumpboxes-linux, ips-dbnodes-admin = local.ips-dbnodes-admin, ips-dbnodes-db = local.ips-dbnodes-db, dbnodes = local.dbnodes })
+  content = templatefile("${path.module}/ansible_inventory.tmpl", {
+    jumpboxes-windows     = var.jumpboxes.windows,
+    jumpboxes-linux       = var.jumpboxes.linux,
+    ips-jumpboxes-windows = local.ips-jumpboxes-windows,
+    ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
+    ips-dbnodes-admin     = local.ips-dbnodes-admin,
+    ips-dbnodes-db        = local.ips-dbnodes-db,
+    dbnodes               = local.dbnodes
+    }
+  )
   filename = "${path.root}/../ansible_config_files/hosts"
 }
