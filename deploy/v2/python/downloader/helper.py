@@ -77,7 +77,7 @@ class Config(object):
             "Config file %s does not exist" % filename
 
         with open(filename) as f:
-            data = json.load(f)
+            data = json.load(f)["software"]["downloader"]
 
         # Debug section
         if "debug" in data:
