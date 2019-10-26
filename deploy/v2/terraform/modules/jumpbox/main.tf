@@ -140,6 +140,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
     user        = var.jumpboxes.linux[count.index].authentication.username
     private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
     password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+    timeout     = var.ssh-timeout
   }
 
   # Copies ssh keypair over to jumpboxes and sets permission
@@ -171,6 +172,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
       user        = var.jumpboxes.linux[count.index].authentication.username
       private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
       password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+      timeout     = var.ssh-timeout
     }
 
     source      = "${path.root}/../ansible_config_files/"
@@ -186,6 +188,7 @@ resource "azurerm_virtual_machine" "vm-linux" {
       user        = var.jumpboxes.linux[count.index].authentication.username
       private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
       password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+      timeout     = var.ssh-timeout
     }
 
     inline = [

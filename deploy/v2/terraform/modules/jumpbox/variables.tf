@@ -37,3 +37,8 @@ variable "output-json" {
 variable "ansible-inventory" {
   description = "Details of the Ansible inventory"
 }
+
+variable "ssh-timeout" {
+  description = "Timeout for connection that used by provisioner"
+  default     = "30s"
+}
