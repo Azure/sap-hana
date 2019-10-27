@@ -25,5 +25,5 @@
       loop: "{{ output.databases|flatten(levels=1) }}"
       when: item.platform == 'HANA'
   roles:
-    - { role: os-disk-setup }
     - { role: os-preparation }
+    - { role: os-disk-setup }
