@@ -45,7 +45,6 @@
     - { prop: '/usr/lib64/libssl.so.10', value: '/usr/lib64/libssl.so.1.0.1' }
     - { prop: '/usr/lib64/libcrypto.so.10', value: '/usr/lib64/libcrypto.so.1.0.1' }
 
-
 - name: Task 3.13 - Maximum Number of Proccesses a User
   copy:
     dest: /etc/security/limits.d/99-sapsys.conf
