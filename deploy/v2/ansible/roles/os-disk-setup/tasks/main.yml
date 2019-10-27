@@ -8,10 +8,10 @@
 
 - name: Create dictionary with disk name and devices list
   set_fact:
-    start: "{{ start|int+item.count }}"
-    disk_dict: "{{ disk_dict | combine({ item.name: {'count': item.count, 'devices': device_list.stdout_lines[start|int:start|int+item.count]} }) }}"
-  loop: "{{ hdb_sizes[hana_database.size].storage }}"
-  when: item.name != 'os'
+    start: "{{ start|int+item.value.count }}"
+    disk_dict: "{{ disk_dict | combine({ item.key: {'count': item.value.count, 'mount_point': item.value.mount_point, 'devices': device_list.stdout_lines[start|int:start|int+item.value.count]} }) }}"
+  with_dict: "{{ hdb_sizes[hana_database.size].storage }}"
+  when: item.key != 'os'
 
 - name: Create physical volume group
   lvg: 
@@ -33,7 +33,7 @@
  
 - name: Create mount points
   file:
-    path: "{% if item.key=='sap' %}/usr/{{ item.key }}{% else %}/hana/{{ item.key }}{% endif %}"
+    path: "{{ item.value.mount_point }}"
     state: directory
   with_dict: "{{ disk_dict }}"
 
@@ -47,7 +47,7 @@
 
 - name: Mount volumes
   mount:
-    path: "{% if item.key=='sap' %}/usr/{{ item.key }}{% else %}/hana/{{ item.key }}{% endif %}"
+    path: "{{ item.value.mount_point }}"
     fstype: "{{ hana_database.filesystem | default('xfs') }}"
     opts: "defaults,nofail"
     src: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
