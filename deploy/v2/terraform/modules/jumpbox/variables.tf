@@ -56,3 +56,9 @@ locals {
     if vm.tags.JumpboxName == "RTI"
   }.index[0]
 }
+
+# RTI IP and authentication details
+locals { 
+  output-tf = jsondecode(var.output-json.content)
+  rti = [ for jumpbox-linux in local.output-tf.jumpboxes.linux : { public_ip_address = jumpbox-linux.public_ip_address, authentication = jumpbox-linux.authentication} if jumpbox-linux.destroy_after_deploy == "true"]
+}
