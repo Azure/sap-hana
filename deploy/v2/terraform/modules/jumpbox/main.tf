@@ -98,7 +98,6 @@ resource "azurerm_network_interface" "nic-linux" {
 
 # Creates Linux VM
 resource "azurerm_virtual_machine" "vm-linux" {
-  #depends_on                    = [var.output-json, var.ansible-inventory]
   count                         = length(var.jumpboxes.linux)
   name                          = var.jumpboxes.linux[count.index].name
   location                      = var.resource-group[0].location

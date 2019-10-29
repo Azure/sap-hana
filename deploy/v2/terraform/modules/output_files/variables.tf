@@ -11,31 +11,31 @@ variable "databases" {
 }
 
 variable "software" {
-  description = "Details of the infrastructure components required for SAP installation"
+  description = "Details of the information required to download SAP installation media"
 }
 
 variable "nics-jumpboxes-linux" {
-  description = "Details of the Linux jumpbox NICs"
+  description = "NICs of the Linux jumpboxes"
 }
 
 variable "nics-jumpboxes-windows" {
-  description = "Details of the Windows jumpbox NICs"
+  description = "NICs of the Windows jumpboxes"
 }
 
 variable "public-ips-jumpboxes-linux" {
-  description = "Details of the Linux jumpbox public IPs"
+  description = "Public IPs of the Linux jumpboxes"
 }
 
 variable "public-ips-jumpboxes-windows" {
-  description = "Details of the Windows jumpbox public IPs"
+  description = "Public IPs of the Windows jumpboxes"
 }
 
 variable "nics-dbnodes-admin" {
-  description = "Details of the admin NIC of DB nodes"
+  description = "Admin NICs of HANA database nodes"
 }
 
 variable "nics-dbnodes-db" {
-  description = "Details of the database NIC of DB nodes"
+  description = "NICs of HANA database nodes"
 }
 
 variable "storage-sapbits" {
