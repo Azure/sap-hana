@@ -27,7 +27,7 @@
                 "disk_type" : "Premium_LRS",
                 "size_gb" : 512,
                 "caching" : "None",
-                "write_accelerator" : true,
+                "write_accelerator" : false,
                 "mount_point" : "/hana/log"
             },
             {
