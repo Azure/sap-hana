@@ -71,6 +71,10 @@ resource "azurerm_public_ip" "public-ip-linux" {
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
   allocation_method   = "Static"
+
+  tags = {
+    PublicIPFor = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
+  }
 }
 
 # Creates the NIC and IP address for Linux VMs
@@ -94,7 +98,7 @@ resource "azurerm_network_interface" "nic-linux" {
 
 # Creates Linux VM
 resource "azurerm_virtual_machine" "vm-linux" {
-  depends_on                    = [var.output-json, var.ansible-inventory]
+  #depends_on                    = [var.output-json, var.ansible-inventory]
   count                         = length(var.jumpboxes.linux)
   name                          = var.jumpboxes.linux[count.index].name
   location                      = var.resource-group[0].location
@@ -134,6 +138,11 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
   }
 
+  tags = {
+    JumpboxName  = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
+    JumpboxIndex = count.index
+  }
+
   connection {
     type        = "ssh"
     host        = azurerm_public_ip.public-ip-linux[count.index].ip_address
@@ -147,13 +156,11 @@ resource "azurerm_virtual_machine" "vm-linux" {
   provisioner "file" {
     source      = lookup(var.sshkey, "path_to_public_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub"
-    on_failure  = "continue"
   }
 
   provisioner "file" {
     source      = lookup(var.sshkey, "path_to_private_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa"
-    on_failure  = "continue"
   }
 
   provisioner "remote-exec" {
@@ -161,48 +168,6 @@ resource "azurerm_virtual_machine" "vm-linux" {
       "chmod 644 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub",
       "chmod 600 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa",
     ]
-    on_failure = "continue"
-  }
-
-  # Copies output.json and inventory file for ansbile on RTI.
-  provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].destroy_after_deploy == "true" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-      timeout     = var.ssh-timeout
-    }
-
-    source      = "${path.root}/../ansible_config_files/"
-    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}"
-    on_failure  = "continue"
-  }
-
-  # Installs Git, Ansible and clones repository on RTI
-  provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].destroy_after_deploy == "true" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-      timeout     = var.ssh-timeout
-    }
-
-    inline = [
-      # Installs Git
-      "sudo apt update",
-      "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
-      # Installs Ansible
-      "sudo apt install software-properties-common",
-      "sudo apt-add-repository --yes --update ppa:ansible/ansible",
-      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
-      # Clones project repository
-      "git clone https://github.com/Azure/sap-hana.git"
-    ]
-    on_failure = "continue"
   }
 
   boot_diagnostics {
@@ -247,5 +212,37 @@ resource "azurerm_virtual_machine" "vm-windows" {
   boot_diagnostics {
     enabled     = true
     storage_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+}
+
+resource "null_resource" "prepare-rti" {
+  connection {
+    type        = "ssh"
+    host        = local.rti-pip
+    user        = var.jumpboxes.linux[local.rti-index].authentication.username
+    private_key = var.jumpboxes.linux[local.rti-index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    password    = lookup(var.jumpboxes.linux[local.rti-index].authentication, "password", null)
+    timeout     = var.ssh-timeout
+  }
+
+  # Copies output.json and inventory file for ansbile on RTI.
+  provisioner "file" {
+    source      = "${path.root}/../ansible_config_files/"
+    destination = "/home/${var.jumpboxes.linux[local.rti-index].authentication.username}"
+  }
+
+  # Installs Git, Ansible and clones repository on RTI
+  provisioner "remote-exec" {
+    inline = [
+      # Installs Git
+      "sudo apt update",
+      "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      # Installs Ansible
+      "sudo apt install software-properties-common",
+      "sudo apt-add-repository --yes --update ppa:ansible/ansible",
+      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
+      # Clones project repository
+      "git clone https://github.com/Azure/sap-hana.git"
+    ]
   }
 }

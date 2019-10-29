@@ -42,3 +42,17 @@ variable "ssh-timeout" {
   description = "Timeout for connection that used by provisioner"
   default     = "30s"
 }
+
+# Identify RTI by tags and save the public IP and index of the linux jumpboxes
+locals {
+  rti-pip = {
+    for pip in azurerm_public_ip.public-ip-linux :
+    "pip" => pip.ip_address...
+    if pip.tags.PublicIPFor == "RTI"
+  }.pip[0]
+  rti-index = {
+    for vm in azurerm_virtual_machine.vm-linux :
+    "index" => tonumber(vm.tags.JumpboxIndex)...
+    if vm.tags.JumpboxName == "RTI"
+  }.index[0]
+}
