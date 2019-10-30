@@ -1,0 +1,29 @@
+# This Azure pipeline YAML is a step template that will perform:
+# - Logon to rti
+# - Continue deployment with Ansible for the current test case
+
+parameters:
+#####################################################################
+# Eg:  testCaseName: current test case name eg: v2-reuseVNET-777    #
+#####################################################################
+    testCaseName: ''
+steps:
+  - script: |
+      echo "Ansible Deployment in Progress..."
+      cd deploy/v2/ansible_config_files
+      rti_user=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .authentication.username')
+      rti_public_ip=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .public_ip_address')
+      ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" 'OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES" ANSIBLE_HOST_KEY_CHECKING="False" ansible-playbook --version'
+    displayName: 'Ansible Deployment'
+    env:
+      TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
+      TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
+      AZURE_CLIENT_ID: $(hana-pipeline-spn-id)
+      AZURE_SECRET: $(hana-pipeline-spn-pw)
+      AZURE_TENANT: $(landscape-tenant)
+      AZURE_SUBSCRIPTION_ID: $(landscape-subscription)
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+

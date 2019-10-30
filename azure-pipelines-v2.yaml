@@ -58,6 +58,9 @@ stages:
     - template: templates/terraform-deployment-steps.yaml
       parameters:
         testCaseName: $(testcase)
+    - template: templates/ansible-deployment-steps.yaml
+      parameters:
+        testCaseName: $(testcase)
   - job: reuseRG
     variables:
       scenario: v2-reuseRG
@@ -80,6 +83,9 @@ stages:
         placeHolder: rg-arm-id
         value: $(arm_id)
     - template: templates/terraform-deployment-steps.yaml
+      parameters:
+        testCaseName: $(testcase)
+    - template: templates/ansible-deployment-steps.yaml
       parameters:
         testCaseName: $(testcase)
   - job: reuseVnet
@@ -106,6 +112,9 @@ stages:
     - template: templates/terraform-deployment-steps.yaml
       parameters:
         testCaseName: $(testcase)
+    - template: templates/ansible-deployment-steps.yaml
+      parameters:
+        testCaseName: $(testcase)
   - job: reuseNSG
     dependsOn: createAllNew
     variables:
@@ -128,6 +137,9 @@ stages:
         placeHolder: nsg-arm-id
         value: $(arm_id)
     - template: templates/terraform-deployment-steps.yaml
+      parameters:
+        testCaseName: $(testcase)
+    - template: templates/ansible-deployment-steps.yaml
       parameters:
         testCaseName: $(testcase)
 #####################################################################
