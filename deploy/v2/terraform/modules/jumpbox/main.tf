@@ -214,20 +214,24 @@ resource "azurerm_virtual_machine" "vm-windows" {
   }
 }
 
+# Prepare RTI:
+#   1. Copy folder ansible_config_files over to RTI
+#   2. Install Git/Ansible and clone GitHub repo on RTI
 resource "null_resource" "prepare-rti" {
+  depends_on = [azurerm_virtual_machine.vm-linux]
   connection {
     type        = "ssh"
-    host        = local.rti[0].public_ip_address # local.rti-pip
-    user        = local.rti[0].authentication.username  #var.jumpboxes.linux[local.rti-index].authentication.username
-    private_key = local.rti[0].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null # var.jumpboxes.linux[local.rti-index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
-    password    = lookup(local.rti[0].authentication, "password", null) #  lookup(var.jumpboxes.linux[local.rti-index].authentication, "password", null)
-    # timeout     = var.ssh-timeout
+    host        = local.rti-info[0].public_ip_address
+    user        = local.rti-info[0].authentication.username
+    private_key = local.rti-info[0].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    password    = lookup(local.rti-info[0].authentication, "password", null)
+    timeout     = var.ssh-timeout
   }
 
   # Copies output.json and inventory file for ansbile on RTI.
   provisioner "file" {
     source      = "${path.root}/../ansible_config_files/"
-    destination = "/home/${local.rti[0].authentication.username}" # "/home/${var.jumpboxes.linux[local.rti-index].authentication.username}"
+    destination = "/home/${local.rti-info[0].authentication.username}"
   }
 
   # Installs Git, Ansible and clones repository on RTI

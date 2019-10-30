@@ -43,22 +43,14 @@ variable "ssh-timeout" {
   default     = "30s"
 }
 
-# Identify RTI by tags and save the public IP and index of the linux jumpboxes
-locals {
-  rti-pip = {
-    for pip in azurerm_public_ip.public-ip-linux :
-    "pip" => pip.ip_address...
-    if pip.tags.PublicIPFor == "RTI"
-  }.pip[0]
-  rti-index = {
-    for vm in azurerm_virtual_machine.vm-linux :
-    "index" => tonumber(vm.tags.JumpboxIndex)...
-    if vm.tags.JumpboxName == "RTI"
-  }.index[0]
-}
-
 # RTI IP and authentication details
-locals { 
+locals {
   output-tf = jsondecode(var.output-json.content)
-  rti = [ for jumpbox-linux in local.output-tf.jumpboxes.linux : { public_ip_address = jumpbox-linux.public_ip_address, authentication = jumpbox-linux.authentication} if jumpbox-linux.destroy_after_deploy == "true"]
+  rti-info = [
+    for jumpbox-linux in local.output-tf.jumpboxes.linux : {
+      public_ip_address = jumpbox-linux.public_ip_address,
+      authentication    = jumpbox-linux.authentication
+    }
+    if jumpbox-linux.destroy_after_deploy == "true"
+  ]
 }
