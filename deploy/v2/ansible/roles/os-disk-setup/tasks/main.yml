@@ -8,10 +8,10 @@
 
 - name: Create dictionary with disk name and devices list
   set_fact:
-    start: "{{ start|int+item.value.count }}"
-    disk_dict: "{{ disk_dict | combine({ item.key: {'count': item.value.count, 'mount_point': item.value.mount_point, 'devices': device_list.stdout_lines[start|int:start|int+item.value.count]} }) }}"
-  with_dict: "{{ hdb_sizes[hana_database.size].storage }}"
-  when: item.key != 'os'
+    start: "{{ start|int+item.count }}"
+    disk_dict: "{{ disk_dict | combine({ item.name: {'count': item.count, 'mount_point': item.mount_point, 'devices': device_list.stdout_lines[start|int:start|int+item.count]} }) }}"
+  loop: "{{ hdb_sizes[hana_database.size].storage }}"
+  when: item.name != 'os'
 
 - name: Create physical volume group
   lvg: 
