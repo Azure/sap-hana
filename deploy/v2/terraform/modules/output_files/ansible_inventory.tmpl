@@ -1,0 +1,14 @@
+[jumpboxes_windows]
+%{~ for jumpbox-windows in jumpboxes-windows }
+${ips-jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}  ansible_connection=winrm  ansible_user=${jumpbox-windows.authentication.username}
+%{~ endfor }
+
+[jumpboxes_linux]
+%{~ for jumpbox-linux in jumpboxes-linux }
+${ips-jumpboxes-linux[index(jumpboxes-linux, jumpbox-linux)]}  ansible_connection=ssh  ansible_user=${jumpbox-linux.authentication.username}
+%{~ endfor }
+
+[hanadbnodes]
+%{~ for ip-dbnode-admin in ips-dbnodes-admin }
+${ips-dbnodes-db[index(ips-dbnodes-admin, ip-dbnode-admin)]}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].username}
+%{~ endfor }
