@@ -38,7 +38,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
 
 # NICS ============================================================================================================
 
-# Creates the public IP addresses for Windows jumpboxes
+# Creates the public IP addresses for Windows VMs
 resource "azurerm_public_ip" "public-ip-windows" {
   count               = length(var.jumpboxes.windows)
   name                = "${var.jumpboxes.windows[count.index].name}-public-ip"
@@ -133,25 +133,33 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
   }
 
+  boot_diagnostics {
+    enabled     = true
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+
+  tags = {
+    JumpboxName = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
+  }
+
   connection {
     type        = "ssh"
     host        = azurerm_public_ip.public-ip-linux[count.index].ip_address
     user        = var.jumpboxes.linux[count.index].authentication.username
     private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
     password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+    timeout     = var.ssh-timeout
   }
 
-  # Copy ssh keypair over to jumpboxes and set permission
+  # Copies ssh keypair over to jumpboxes and sets permission
   provisioner "file" {
     source      = lookup(var.sshkey, "path_to_public_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub"
-    on_failure  = "continue"
   }
 
   provisioner "file" {
     source      = lookup(var.sshkey, "path_to_private_key", null)
     destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa"
-    on_failure  = "continue"
   }
 
   provisioner "remote-exec" {
@@ -159,27 +167,6 @@ resource "azurerm_virtual_machine" "vm-linux" {
       "chmod 644 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub",
       "chmod 600 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa",
     ]
-    on_failure = "continue"
-  }
-
-  # Copy output.json for ansbile only on RTI. 
-  provisioner "file" {
-    connection {
-      type        = "ssh"
-      host        = var.jumpboxes.linux[count.index].destroy_after_deploy == "true" ? azurerm_public_ip.public-ip-linux[count.index].ip_address : null
-      user        = var.jumpboxes.linux[count.index].authentication.username
-      private_key = var.jumpboxes.linux[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
-      password    = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-    }
-
-    source      = var.output-json.filename
-    destination = "/home/${var.jumpboxes.linux[count.index].authentication.username}/output.json"
-    on_failure  = "continue"
-  }
-
-  boot_diagnostics {
-    enabled     = true
-    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
 
@@ -219,5 +206,45 @@ resource "azurerm_virtual_machine" "vm-windows" {
   boot_diagnostics {
     enabled     = true
     storage_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+
+  tags = {
+    JumpboxName = var.jumpboxes.windows[count.index].destroy_after_deploy ? "RTI" : "WINDOWS-JUMPBOX"
+  }
+}
+
+# Prepare RTI:
+#   1. Copy folder ansible_config_files over to RTI
+#   2. Install Git/Ansible and clone GitHub repo on RTI
+resource "null_resource" "prepare-rti" {
+  depends_on = [azurerm_virtual_machine.vm-linux]
+  connection {
+    type        = "ssh"
+    host        = local.rti-info[0].public_ip_address
+    user        = local.rti-info[0].authentication.username
+    private_key = local.rti-info[0].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    password    = lookup(local.rti-info[0].authentication, "password", null)
+    timeout     = var.ssh-timeout
+  }
+
+  # Copies output.json and inventory file for ansbile on RTI.
+  provisioner "file" {
+    source      = "${path.root}/../ansible_config_files/"
+    destination = "/home/${local.rti-info[0].authentication.username}"
+  }
+
+  # Installs Git, Ansible and clones repository on RTI
+  provisioner "remote-exec" {
+    inline = [
+      # Installs Git
+      "sudo apt update",
+      "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      # Installs Ansible
+      "sudo apt install software-properties-common",
+      "sudo apt-add-repository --yes --update ppa:ansible/ansible",
+      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
+      # Clones project repository
+      "git clone https://github.com/Azure/sap-hana.git"
+    ]
   }
 }
