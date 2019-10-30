@@ -77,12 +77,7 @@ class Config(object):
             "Config file %s does not exist" % filename
 
         with open(filename) as f:
-            input_json = json.load(f)
-
-        assert(("software" in input_json and "downloader" in input_json["software"])), \
-            "Software and downloader fields are required in input.json"
-
-        data = input_json["software"]["downloader"]
+            data = json.load(f)
 
         # Debug section
         if "debug" in data:
