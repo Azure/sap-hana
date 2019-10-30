@@ -1,5 +1,5 @@
 ##################################################################################################################
-# OUTPUT JSON
+# OUTPUT Files
 ##################################################################################################################
 
 # Generates the output JSON with IP address and disk details
@@ -7,26 +7,28 @@ resource "local_file" "output-json" {
   content = jsonencode({
     "infrastructure" = var.infrastructure,
     "jumpboxes" = {
-      "windows" = [for windows-jumpbox in var.jumpboxes.windows : {
-        name                 = windows-jumpbox.name,
-        destroy_after_deploy = windows-jumpbox.destroy_after_deploy,
-        size                 = windows-jumpbox.size,
-        disk_type            = windows-jumpbox.disk_type,
-        os                   = windows-jumpbox.os,
-        authentication       = windows-jumpbox.authentication,
-        components           = windows-jumpbox.components,
-        private_ip_address   = local.ips-windows-jumpboxes[index(var.jumpboxes.windows, windows-jumpbox)]
+      "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
+        name                 = jumpbox-windows.name,
+        destroy_after_deploy = jumpbox-windows.destroy_after_deploy,
+        size                 = jumpbox-windows.size,
+        disk_type            = jumpbox-windows.disk_type,
+        os                   = jumpbox-windows.os,
+        authentication       = jumpbox-windows.authentication,
+        components           = jumpbox-windows.components,
+        private_ip_address   = local.ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
+        public_ip_address    = local.public-ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
         }
       ],
-      "linux" = [for linux-jumpbox in var.jumpboxes.linux : {
-        name                 = linux-jumpbox.name,
-        destroy_after_deploy = linux-jumpbox.destroy_after_deploy,
-        size                 = linux-jumpbox.size,
-        disk_type            = linux-jumpbox.disk_type,
-        os                   = linux-jumpbox.os,
-        authentication       = linux-jumpbox.authentication,
-        components           = linux-jumpbox.components,
-        private_ip_address   = local.ips-linux-jumpboxes[index(var.jumpboxes.linux, linux-jumpbox)]
+      "linux" = [for jumpbox-linux in var.jumpboxes.linux : {
+        name                 = jumpbox-linux.name,
+        destroy_after_deploy = jumpbox-linux.destroy_after_deploy,
+        size                 = jumpbox-linux.size,
+        disk_type            = jumpbox-linux.disk_type,
+        os                   = jumpbox-linux.os,
+        authentication       = jumpbox-linux.authentication,
+        components           = jumpbox-linux.components,
+        private_ip_address   = local.ips-jumpboxes-linux[index(var.jumpboxes.linux, jumpbox-linux)]
+        public_ip_address    = local.public-ips-jumpboxes-linux[index(var.jumpboxes.linux, jumpbox-linux)]
         }
       ]
     },
@@ -60,5 +62,20 @@ resource "local_file" "output-json" {
     }
     }
   )
-  filename = "${path.root}/../output.json"
+  filename = "${path.root}/../ansible_config_files/output.json"
+}
+
+# Generates the Ansible Inventory file
+resource "local_file" "ansible-inventory" {
+  content = templatefile("${path.module}/ansible_inventory.tmpl", {
+    jumpboxes-windows     = var.jumpboxes.windows,
+    jumpboxes-linux       = var.jumpboxes.linux,
+    ips-jumpboxes-windows = local.ips-jumpboxes-windows,
+    ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
+    ips-dbnodes-admin     = local.ips-dbnodes-admin,
+    ips-dbnodes-db        = local.ips-dbnodes-db,
+    dbnodes               = local.dbnodes
+    }
+  )
+  filename = "${path.root}/../ansible_config_files/hosts"
 }

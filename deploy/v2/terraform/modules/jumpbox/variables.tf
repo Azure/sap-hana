@@ -33,3 +33,24 @@ variable "sshkey" {
 variable "output-json" {
   description = "Details of the output JSON"
 }
+
+variable "ansible-inventory" {
+  description = "Details of the Ansible inventory"
+}
+
+variable "ssh-timeout" {
+  description = "Timeout for connection that used by provisioner"
+  default     = "30s"
+}
+
+# RTI IP and authentication details
+locals {
+  output-tf = jsondecode(var.output-json.content)
+  rti-info = [
+    for jumpbox-linux in local.output-tf.jumpboxes.linux : {
+      public_ip_address = jumpbox-linux.public_ip_address,
+      authentication    = jumpbox-linux.authentication
+    }
+    if jumpbox-linux.destroy_after_deploy == "true"
+  ]
+}
