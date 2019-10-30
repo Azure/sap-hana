@@ -71,10 +71,6 @@ resource "azurerm_public_ip" "public-ip-linux" {
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
   allocation_method   = "Static"
-
-  tags = {
-    PublicIPFor = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
-  }
 }
 
 # Creates the NIC and IP address for Linux VMs
@@ -137,9 +133,13 @@ resource "azurerm_virtual_machine" "vm-linux" {
     }
   }
 
+  boot_diagnostics {
+    enabled     = true
+    storage_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+
   tags = {
-    JumpboxName  = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
-    JumpboxIndex = count.index
+    JumpboxName = var.jumpboxes.linux[count.index].destroy_after_deploy ? "RTI" : "LINUX-JUMPBOX"
   }
 
   connection {
@@ -167,11 +167,6 @@ resource "azurerm_virtual_machine" "vm-linux" {
       "chmod 644 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa.pub",
       "chmod 600 /home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/id_rsa",
     ]
-  }
-
-  boot_diagnostics {
-    enabled     = true
-    storage_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
 
@@ -211,6 +206,10 @@ resource "azurerm_virtual_machine" "vm-windows" {
   boot_diagnostics {
     enabled     = true
     storage_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+
+  tags = {
+    JumpboxName = var.jumpboxes.windows[count.index].destroy_after_deploy ? "RTI" : "WINDOWS-JUMPBOX"
   }
 }
 
