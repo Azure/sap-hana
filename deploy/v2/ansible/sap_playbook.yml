@@ -9,17 +9,17 @@
   vars_files: 
      - "vars/packages.yml" 
   pre_tasks:
-    - name: Include Hana DB sizes
+    - name: Include SAP HANA DB sizes
       include_vars:
         file: ../hdb_sizes.json
         name: hdb_sizes
 
-    - name: Include Output json
+    - name: Include output JSON
       include_vars:
         file: "/home/{{ ansible_user }}/output.json"
         name: output
 
-    - name: Dictionary of Hana
+    - name: Create dictionary with HANA database inforamtion from output.JSON
       set_fact: 
         hana_database: "{{ item }}"
       loop: "{{ output.databases|flatten(levels=1) }}"
