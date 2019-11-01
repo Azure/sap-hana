@@ -54,33 +54,33 @@ This is Azure pipeline test created for deploy/v2
   - sample:
     ```yaml
     - job: reuseRG${{parameters.osVersion}}
-  variables:
-    scenario: v2-reuseRG
-    testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
-  steps:
-  - script: |
-      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      az group create --location eastus -n $(testcase)
-      echo '##vso[task.setvariable variable=arm_id]$(az group show --name $(testcase) --query id --output tsv)'
-  - template: update-place-holder.yaml
-    parameters:
-      scenario: $(scenario)
-      testCaseName: $(testcase)
-      placeHolder: var-rg-name
-      value: $(testcase)
-  - template: update-place-holder.yaml
-    parameters:
-      scenario: $(scenario)
-      testCaseName: $(testcase)
-      placeHolder: rg-arm-id
-      value: $(arm_id)
-  - template: terraform-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
-      osImage: ${{parameters.osImage}}
-  - template: ansible-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
+      variables:
+        scenario: v2-reuseRG
+        testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
+      steps:
+      - script: |
+          az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+          az group create --location eastus -n $(testcase)
+          echo '##vso[task.setvariable variable=arm_id]$(az group show --name $(testcase) --query id --output tsv)'
+      - template: update-place-holder.yaml
+        parameters:
+          scenario: $(scenario)
+          testCaseName: $(testcase)
+          placeHolder: var-rg-name
+          value: $(testcase)
+      - template: update-place-holder.yaml
+        parameters:
+          scenario: $(scenario)
+          testCaseName: $(testcase)
+          placeHolder: rg-arm-id
+          value: $(arm_id)
+      - template: terraform-deployment-steps.yaml
+        parameters:
+          testCaseName: $(testcase)
+          osImage: ${{parameters.osImage}}
+      - template: ansible-deployment-steps.yaml
+        parameters:
+          testCaseName: $(testcase)
     ```
   - add the new scenario to `stage: DestroyingResources` -> `job: cleanUp` -> varible `scenario_list`.
 
