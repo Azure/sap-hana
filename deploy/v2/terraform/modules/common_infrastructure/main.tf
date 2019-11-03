@@ -253,17 +253,24 @@ resource "azurerm_storage_account" "storage-sapbits" {
   resource_group_name       = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   location                  = var.infrastructure.region
   account_replication_type  = "LRS"
-  account_tier              = "Premium"
+  account_tier              = var.software.storage_account_sapbits.account_tier
   account_kind              = var.software.storage_account_sapbits.account_kind
   enable_https_traffic_only = var.options.enable_secure_transfer
 }
 
 # Creates the storage container inside the storage account for SAP bits
 resource "azurerm_storage_container" "storagecontainer-sapbits" {
-  count                 = var.software.storage_account_sapbits.is_existing ? 0 : 1
+  count                 = lookup(var.software.storage_account_sapbits, "container_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
   name                  = var.software.storage_account_sapbits.container_name
   storage_account_name  = azurerm_storage_account.storage-sapbits[0].name
   container_access_type = var.software.storage_account_sapbits.container_access_type
+}
+
+# Creates file share inside the storage account for SAP bits
+resource "azurerm_storage_share" "fileshare-sapbits" {
+  count                = lookup(var.software.storage_account_sapbits, "share_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                 = var.software.storage_account_sapbits.share_name
+  storage_account_name = azurerm_storage_account.storage-sapbits[0].name
 }
 
 # Imports existing storage account to use for SAP bits

@@ -164,9 +164,9 @@
   "software": {
     "storage_account_sapbits": {
       "is_existing": false,
-      "account_tier": "Premium",
+      "account_tier": "Standard",
       "account_replication_type": "LRS",
-      "account_kind": "BlockBlobStorage",
+      "account_kind": "StorageV2",
       "container_name": "bits",
       "container_access_type": "private"
     },

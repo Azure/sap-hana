@@ -1,6 +1,6 @@
 # Initalizes Azure rm provider
 provider "azurerm" {
-  version = "~> 1.34.0"
+  version = "~> 1.36.1"
 }
 
 # Setup common infrastructure
