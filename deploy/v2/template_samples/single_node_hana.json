@@ -164,7 +164,7 @@
   "software": {
     "storage_account_sapbits": {
       "is_existing": false,
-      "account_tier": "Standard",
+      "account_tier": "Premium",
       "account_replication_type": "LRS",
       "account_kind": "StorageV2",
       "container_name": "bits",
