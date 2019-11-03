@@ -29,5 +29,30 @@
       loop: "{{ output.databases|flatten(levels=1) }}"
       when: item.platform == 'HANA'
   roles:
+    - { role: os-preparation }
+    - { role: os-disk-setup }
     - { role: sap-media-download }
     - { role: sap-hana-install }
+
+
+- hosts: linux-jumpboxes
+  become: true
+  become_user: root
+  vars:
+    azure_files_mount_path: "/sapmnt"
+    hdbstudio_install_path: "/usr/sap/hanastudio"
+    hdbstudio_software_loc: "{{ azure_files_mount_path }}/DB/DATA_UNITS/HDB_STUDIO_LINUX_X86_64"
+    hdbstudio_template_path: "/usr/sap"
+  pre_tasks:
+    - name: Include output JSON
+      include_vars:
+        file: "/home/{{ ansible_user }}/output.json"
+        name: output
+
+    - name: Create dictionary with Linux Jumpbox inforamtion from output.JSON
+      set_fact:
+        linux_jumpbox: "{{ item }}"
+      loop: "{{ output.jumpboxes.linux|flatten(levels=1) }}"
+      when: item.name == 'jumpbox-linux'
+  roles:
+    - { role: hana-studio-linux-install, when: '"hana_studio_linux" in linux_jumpbox.components' }

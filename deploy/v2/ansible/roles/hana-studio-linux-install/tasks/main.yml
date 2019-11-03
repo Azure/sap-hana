@@ -1,25 +1,19 @@
 ---
 
-# Mount Azure Files on all Linux VMs
- 
-- name: Create list of hosts to mount Azure file
-  set_fact: 
-     host_list: "['{{ item }}'] + ['localhost']"
-  with_items: "{{ groups['hanadbnodes'] }}"
+- name: Install cifs package
+  package:
+    name: cifs-utils 
+    state: present
 
 - name: Create azure fileshare credentials directory
   file:
     path: "/etc/smbcredentials"
     state: directory
-  delegate_to: "{{ item }}"
-  with_items: "{{ host_list }}"
 
 - name: Create azure fileshare mount directory
   file:
     path: "{{ azure_files_mount_path }}"
     state: directory
-  delegate_to: "{{ item }}"
-  with_items: "{{ host_list }}"
 
 - name: Create credentials file
   copy:
@@ -28,15 +22,31 @@
       password={{ output.software.storage_account.storage_access_key }}
     dest: /etc/smbcredentials/{{ output.software.storage_account.name }}.cred
     mode: 600
-  delegate_to: "{{ item }}"
-  with_items: "{{ host_list }}"
 
-- name: Mount storage for SAP bits on RTI and DB nodes
+- name: Mount storage for SAP bits on Jumpbox
   mount:
     path: "{{ azure_files_mount_path }}"
     fstype: cifs
     opts: "credentials=/etc/smbcredentials/{{ output.software.storage_account.name }}.cred,dir_mode=0755,file_mode=0755,serverino,defaults,nofail,vers=3.0"
     src: "//{{ output.software.storage_account.name }}.file.core.windows.net/sapmnt"
     state: mounted
-  delegate_to: "{{ item }}"
-  with_items: "{{ host_list }}"
+
+- name: Create hdbstudio install path
+  file:
+   path: "{{ item }}"
+   state: directory
+  with_items:
+   - "{{ hdbstudio_template_path }}"
+   - "{{ hdbstudio_install_path }}"
+ 
+- name: Create install template for HANA Studio
+  template:
+    src: hdbstudio.j2
+    dest: "{{ hdbstudio_template_path }}/hdbstudio.cfg"
+
+- name: Install HANA Studio
+  shell: "{{ hdbstudio_software_loc }}/hdbinst --batch --configfile={{ hdbstudio_template_path }}/hdbstudio.cfg"
+  args:
+    chdir: "{{ hdbstudio_install_path }}"
+  register: hdb_studio
+  until: hdb_studio is succeeded
