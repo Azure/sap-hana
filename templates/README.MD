@@ -50,7 +50,7 @@ This is Azure pipeline test created for deploy/v2
   - create a new job under `jobs`
   - define the scenario by setting variable `scenario`
   - in `script` section, add necessary step(s) to retrieve the value(s) for placeholder(s) (eg. using az cli)
-  - use `templates/update-place-holder.yaml` as many times as needed to replace the above values into `templates/tempGen/<scenario>.json`
+  - use `templates/test-case-template-update.yaml` as many times as needed to replace the above values into `templates/tempGen/<scenario>.json`
   - sample:
     ```yaml
     - job: reuseRG${{parameters.osVersion}}
@@ -62,13 +62,13 @@ This is Azure pipeline test created for deploy/v2
           az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
           az group create --location eastus -n $(testcase)
           echo '##vso[task.setvariable variable=arm_id]$(az group show --name $(testcase) --query id --output tsv)'
-      - template: update-place-holder.yaml
+      - template: test-case-template-update.yaml
         parameters:
           scenario: $(scenario)
           testCaseName: $(testcase)
           placeHolder: var-rg-name
           value: $(testcase)
-      - template: update-place-holder.yaml
+      - template: test-case-template-update.yaml
         parameters:
           scenario: $(scenario)
           testCaseName: $(testcase)
