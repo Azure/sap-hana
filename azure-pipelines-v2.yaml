@@ -64,7 +64,7 @@ stages:
 # Tag "Delete=True" will be added to mark all resource groups for   #
 # scheduled deletion done by azure-pipelines-cleanup.yaml           #
 #####################################################################
-- stage: DestoryingResources
+- stage: DestroyingResources
   dependsOn: CreatingResources
   condition: or(succeededOrFailed(), always())
   jobs:
