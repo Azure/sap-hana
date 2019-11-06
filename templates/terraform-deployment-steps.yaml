@@ -7,6 +7,7 @@ parameters:
 # Eg:  testCaseName: current test case name eg: v2-reuseVNET-777    #
 #####################################################################
     testCaseName: ''
+    osImage: ''
 steps:
   - script: |
       ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
@@ -14,6 +15,8 @@ steps:
       cd templates/tempGen
       sed -i "s|var-sap-user|$(hana-smp-nancyc-username)|g" template.json
       sed -i "s|var-sap-password|$(hana-smp-nancyc-password)|g" template.json
+      sed -i "s|var-os-image|${{parameters.osImage}}|g" template.json
+      cat template.json
       python tempGen.py --custom=${{parameters.testCaseName}}.json --template=template.json --output=${{parameters.testCaseName}}.json
       echo "Input JSON for terraform ready:"
       cat ${{parameters.testCaseName}}.json

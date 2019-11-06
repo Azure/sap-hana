@@ -115,11 +115,7 @@
     {
       "platform": "HANA",
       "db_version": "2.00.043",
-      "os": {
-        "publisher": "SUSE",
-        "offer": "SLES-SAP",
-        "sku": "12-sp2"
-      },
+      "os": {var-os-image},
       "size": "Demo",
       "filesystem": "xfs",
       "high_availability": false,

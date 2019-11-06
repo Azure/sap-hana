@@ -44,104 +44,18 @@ stages:
 - stage: CreatingResources
   dependsOn: SetEnv
   jobs:
-  - job: createAllNew
-    variables:
-      scenario: v2-allNew
-      testcase: $(scenario)-$(Build.BuildId)
-    steps:
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: var-rg-name
-        value: $(testcase)
-    - template: templates/terraform-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-    - template: templates/ansible-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-  - job: reuseRG
-    variables:
-      scenario: v2-reuseRG
-      testcase: $(scenario)-$(Build.BuildId)
-    steps:
-    - script: |
-        az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-        az group create --location eastus -n $(testcase)
-        echo '##vso[task.setvariable variable=arm_id]$(az group show --name $(testcase) --query id --output tsv)'
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: var-rg-name
-        value: $(testcase)
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: rg-arm-id
-        value: $(arm_id)
-    - template: templates/terraform-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-    - template: templates/ansible-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-  - job: reuseVnet
-    dependsOn: createAllNew
-    variables:
-      scenario: v2-reuseVNET
-      testcase: $(scenario)-$(Build.BuildId)
-    steps:
-    - script: |
-        az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-        echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: var-rg-name
-        value: $(testcase)
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: vnet-arm-id
-        value: $(arm_id)
-    - template: templates/terraform-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-    - template: templates/ansible-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-  - job: reuseNSG
-    dependsOn: createAllNew
-    variables:
-      scenario: v2-reuseNSG
-      testcase: $(scenario)-$(Build.BuildId)
-    steps:
-    - script: |
-        az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-        echo '##vso[task.setvariable variable=arm_id]$(az network nsg show --resource-group v2-allNew-$(Build.BuildId) --name nsg-mgmt --query id --output tsv)' 
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: var-rg-name
-        value: $(testcase)
-    - template: templates/update-place-holder.yaml
-      parameters:
-        scenario: $(scenario)
-        testCaseName: $(testcase)
-        placeHolder: nsg-arm-id
-        value: $(arm_id)
-    - template: templates/terraform-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
-    - template: templates/ansible-deployment-steps.yaml
-      parameters:
-        testCaseName: $(testcase)
+  - template: templates/job-template-per-os.yaml
+    parameters:
+      osVersion: "SLES12"
+      osImage: '\"offer\": \"SLES-SAP\", 
+                \"publisher\": \"SUSE\", 
+                \"sku\": \"12-sp2\"'
+  - template: templates/job-template-per-os.yaml
+    parameters:
+      osVersion: "RHEL7"
+      osImage: '\"offer\": \"RHEL\", 
+                \"publisher\": \"RedHat\", 
+                \"sku\": \"7-LVM\"'
 #####################################################################
 # This stage destroy resources created from all above test cases.   #
 # It will be triggered after stage CreatingResources is finished.   #
@@ -158,18 +72,29 @@ stages:
     steps:
       - script: |
           az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-          rg_list=(
-            v2-allNew-$(Build.BuildId) 
-            v2-reuseRG-$(Build.BuildId) 
-            v2-reuseVNET-$(Build.BuildId) 
-            v2-reuseNSG-$(Build.BuildId)
+          os_list=(
+            SLES12
+            RHEL7
           )
+          scenario_list=(
+            v2-allNew
+            v2-reuseRG
+            v2-reuseVNET
+            v2-reuseNSG
+          )
+          for scenario in "${scenario_list[@]}"
+          do
+            for os in "${os_list[@]}"
+            do
+              rg_list+=("${scenario}-${os}-$(Build.BuildId)")
+            done
+          done
           for rg in "${rg_list[@]}"
           do
+            echo $rg
             if $(az group exists -n $rg); then
               az group update --resource-group $rg --set tags.Delete=True
               az group delete -n $rg --no-wait -y
-              echo $rg
             fi
           done
         displayName: 'Clean up'
