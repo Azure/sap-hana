@@ -1,0 +1,57 @@
+---
+
+# Prepare disks and mount points
+
+- name: Create device list
+  shell: ls -l /dev/disk/azure/scsi1/* | awk '{split($0,disks," "); system("readlink -f " disks[9])}'
+  register: device_list
+
+- name: Create dictionary with disk name and devices list
+  set_fact:
+    start: "{{ start|int+item.count }}"
+    disk_dict: "{{ disk_dict | combine({ item.name: {'count': item.count, 'mount_point': item.mount_point, 'devices': device_list.stdout_lines[start|int:start|int+item.count]} }) }}"
+  loop: "{{ hdb_sizes[hana_database.size].storage }}"
+  when: item.name != 'os'
+
+- name: Create physical volume group
+  lvg: 
+    vg: "vg_{{ item.key }}"
+    pvs: "{{ item.value.devices }}"
+  with_dict: "{{ disk_dict }}"
+  register: physical_vg
+  failed_when: physical_vg is failed
+
+- name: Create logical volume group
+  lvol:
+    state: present
+    vg: "vg_{{ item.key }}"
+    lv: "lv_hana_{{ item.key }}"
+    size: 100%FREE
+  with_dict: "{{ disk_dict }}"
+  register: logical_vg
+  failed_when: logical_vg is failed
+ 
+- name: Create mount points
+  file:
+    path: "{{ item.value.mount_point }}"
+    state: directory
+  with_dict: "{{ disk_dict }}"
+
+- name: Create file systems
+  filesystem:
+     fstype: "{{ hana_database.filesystem | default('xfs') }}"
+     dev: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
+  with_dict: "{{ disk_dict }}"
+  register: file_system
+  failed_when: file_system is failed
+
+- name: Mount volumes
+  mount:
+    path: "{{ item.value.mount_point }}"
+    fstype: "{{ hana_database.filesystem | default('xfs') }}"
+    opts: "defaults,nofail"
+    src: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
+    state: mounted
+  with_dict: "{{ disk_dict }}"
+  register: vol_mount
+  failed_when: vol_mount is failed

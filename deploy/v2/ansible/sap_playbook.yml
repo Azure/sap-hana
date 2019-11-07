@@ -1,0 +1,29 @@
+---
+
+- hosts: hanadbnodes
+  become: true
+  become_user: root
+  vars:
+    disk_dict: {}
+    start: 0
+  vars_files: 
+     - "vars/packages.yml" 
+  pre_tasks:
+    - name: Include SAP HANA DB sizes
+      include_vars:
+        file: ../hdb_sizes.json
+        name: hdb_sizes
+
+    - name: Include output JSON
+      include_vars:
+        file: "/home/{{ ansible_user }}/output.json"
+        name: output
+
+    - name: Create dictionary with HANA database inforamtion from output.JSON
+      set_fact: 
+        hana_database: "{{ item }}"
+      loop: "{{ output.databases|flatten(levels=1) }}"
+      when: item.platform == 'HANA'
+  roles:
+    - { role: os-preparation }
+    - { role: os-disk-setup }
