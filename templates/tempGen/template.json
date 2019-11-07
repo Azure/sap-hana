@@ -161,8 +161,8 @@
       "is_existing": false,
       "account_tier": "Premium",
       "account_replication_type": "LRS",
-      "account_kind": "BlockBlobStorage",
-      "blob_container_name": "bits",
+      "account_kind": "FileStorage",
+      "file_share_name": "bits",
       "container_access_type": "private"
     },
     "downloader": {
