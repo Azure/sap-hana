@@ -167,7 +167,7 @@
       "account_tier": "Premium",
       "account_replication_type": "LRS",
       "account_kind": "StorageV2",
-      "container_name": "bits",
+      "blob_container_name": "bits",
       "container_access_type": "private"
     },
     "downloader": {

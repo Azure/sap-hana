@@ -57,8 +57,8 @@ resource "local_file" "output-json" {
       "storage_account_sapbits" = {
         "name"               = var.storage-sapbits[0].name,
         "storage_access_key" = var.storage-sapbits[0].primary_access_key,
-        "container_name"     = lookup(var.software.storage_account_sapbits, "container_name", null)
-        "share_name"         = lookup(var.software.storage_account_sapbits, "share_name", null)
+        "blob_container_name"     = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
+        "file_share_name"         = lookup(var.software.storage_account_sapbits, "file_share_name", null)
       }
     }
     }

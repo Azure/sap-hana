@@ -260,16 +260,16 @@ resource "azurerm_storage_account" "storage-sapbits" {
 
 # Creates the storage container inside the storage account for SAP bits
 resource "azurerm_storage_container" "storagecontainer-sapbits" {
-  count                 = lookup(var.software.storage_account_sapbits, "container_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
-  name                  = var.software.storage_account_sapbits.container_name
+  count                 = lookup(var.software.storage_account_sapbits, "blob_container_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                  = var.software.storage_account_sapbits.blob_container_name
   storage_account_name  = azurerm_storage_account.storage-sapbits[0].name
   container_access_type = var.software.storage_account_sapbits.container_access_type
 }
 
 # Creates file share inside the storage account for SAP bits
 resource "azurerm_storage_share" "fileshare-sapbits" {
-  count                = lookup(var.software.storage_account_sapbits, "share_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
-  name                 = var.software.storage_account_sapbits.share_name
+  count                = lookup(var.software.storage_account_sapbits, "file_share_name", false) == false ? 0 : var.software.storage_account_sapbits.is_existing ? 0 : 1
+  name                 = var.software.storage_account_sapbits.file_share_name
   storage_account_name = azurerm_storage_account.storage-sapbits[0].name
 }
 

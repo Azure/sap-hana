@@ -178,8 +178,8 @@
       "account_tier": "",
       "account_replication_type": "",
       "account_kind": "",
-      "container_name": "",
-      "share_name": "",
+      "blob_container_name": "",
+      "file_share_name": "",
       "container_access_type": ""
     },
     "downloader": {
