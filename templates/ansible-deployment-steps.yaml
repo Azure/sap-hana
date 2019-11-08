@@ -15,7 +15,7 @@ steps:
       rti_public_ip=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .public_ip_address')     
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" << EOF
       cd sap-hana
-      git checkout $(Build.SourceBranchName)      
+      git checkout $(System.PullRequest.SourceBranch)      
       EOF
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" 'OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES" ANSIBLE_HOST_KEY_CHECKING="False" ansible-playbook -i hosts sap-hana/deploy/v2/ansible/sap_playbook.yml'
     displayName: 'Ansible Deployment'
