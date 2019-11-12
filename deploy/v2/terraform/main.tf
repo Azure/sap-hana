@@ -19,6 +19,7 @@ module "jumpbox" {
   jumpboxes         = var.jumpboxes
   databases         = var.databases
   sshkey            = var.sshkey
+  ssh-timeout       = var.ssh-timeout
   resource-group    = module.common_infrastructure.resource-group
   subnet-mgmt       = module.common_infrastructure.subnet-mgmt
   nsg-mgmt          = module.common_infrastructure.nsg-mgmt
@@ -55,4 +56,25 @@ module "output_files" {
   public-ips-jumpboxes-linux   = module.jumpbox.public-ips-jumpboxes-linux
   nics-dbnodes-admin           = module.hdb_node.nics-dbnodes-admin
   nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
+}
+
+resource "null_resource" "ansible_playbook" {
+  depends_on = [module.hdb_node.dbnodes, module.jumpbox.prepare-rti]
+  connection {
+    type        = "ssh"
+    host        = module.jumpbox.rti-info.public_ip_address
+    user        = module.jumpbox.rti-info.authentication.username
+    private_key = module.jumpbox.rti-info.authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    password    = lookup(module.jumpbox.rti-info.authentication, "password", null)
+    timeout     = var.ssh-timeout
+  }
+
+  # Run Ansible Playbook on jumpbox if ansible_execution set to true
+  provisioner "remote-exec" {
+    inline = [
+      "export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES",
+      "export ANSIBLE_HOST_KEY_CHECKING=False",
+      var.options.ansible_execution ? "ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml" : "ansible-playbook --version"
+    ]
+  }
 }

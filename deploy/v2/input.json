@@ -64,7 +64,6 @@
         "name": "",
         "destroy_after_deploy": "",
         "size": "",
-        "nic_name": "",
         "private_ip_address": "",
         "os": {
           "publisher": "",
@@ -84,7 +83,6 @@
         "name": "",
         "destroy_after_deploy": "",
         "size": "",
-        "nic_name": "",
         "private_ip_address": "",
         "os": {
           "publisher": "",
@@ -102,7 +100,6 @@
         "name": "",
         "destroy_after_deploy": "",
         "size": "",
-        "nic_name": "",
         "private_ip_address": "",
         "os": {
           "publisher": "",
@@ -132,8 +129,8 @@
       "high_availability": "",
       "authentication": {
         "type": "",
-        "os_username": "",
-        "os_password": ""
+        "username": "",
+        "password": ""
       },
       "instance": {
         "sid": "",
@@ -228,6 +225,7 @@
   },
   "options": {
     "read_tf_output_from_file": "",
-    "enable_secure_transfer": true
+    "enable_secure_transfer": true,
+    "ansible_execution": true
   }
 }
