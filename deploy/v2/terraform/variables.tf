@@ -23,6 +23,6 @@ variable "options" {
 }
 
 variable "ssh-timeout" {
-  description = "Timeout for connection that used by provisioner"
+  description = "Timeout for connection that is used by provisioner"
   default     = "30s"
 }

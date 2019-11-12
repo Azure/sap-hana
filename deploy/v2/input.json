@@ -129,8 +129,8 @@
       "high_availability": "",
       "authentication": {
         "type": "",
-        "username": "",
-        "password": ""
+        "os_username": "",
+        "os_password": ""
       },
       "instance": {
         "sid": "",
