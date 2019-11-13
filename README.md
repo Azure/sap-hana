@@ -81,7 +81,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
 5. Create a service principal that will be used to manage Azure resources on your behalf:
 
     ```sh
-    az ad sp create-for-rbac --name <service-principal-name> --password <service-principal-password>
+    az ad sp create-for-rbac --name <service-principal-name>
     ```
     
    *(**Note**: You can find additional information on creating service principals on [this page](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest).)*
@@ -222,7 +222,7 @@ In this simple example, we'll deploy a simple single-node SAP HANA instance (spe
     install_webide = false
 
     # Set this to be a list of the ip addresses that should be allowed by the NSG.  Empty list means that no restrictions are placed
-    allow_ips = []
+    allow_ips = ["0.0.0.0/0"]
 
     ```
 
