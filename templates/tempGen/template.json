@@ -121,7 +121,7 @@
       "high_availability": false,
       "authentication": {
         "type": "key",
-        "os_username": "azureadm"
+        "username": "azureadm"
       },
       "instance": {
         "sid": "HN1",
