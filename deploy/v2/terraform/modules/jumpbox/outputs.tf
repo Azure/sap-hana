@@ -13,3 +13,12 @@ output "public-ips-jumpboxes-linux" {
 output "public-ips-jumpboxes-windows" {
   value = azurerm_public_ip.public-ip-windows
 }
+
+output "rti-info" {
+  value = local.rti-info[0]
+}
+
+# Workaround to create dependency betweeen ../main.tf ansible_execution and module jumpbox
+output "prepare-rti" {
+  value = null_resource.prepare-rti
+}

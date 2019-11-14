@@ -224,6 +224,7 @@
   },
   "options": {
     "read_tf_output_from_file": "",
-    "enable_secure_transfer": true
+    "enable_secure_transfer": true,
+    "ansible_execution": true
   }
 }
