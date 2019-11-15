@@ -241,8 +241,8 @@ resource "null_resource" "prepare-rti" {
       "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
       # Installs Ansible
       "sudo apt install software-properties-common",
-      "sudo apt-add-repository --yes --update ppa:ansible/ansible",
-      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
+      "sudo apt-add-repository --yes --update ppa:ansible/ansible-2.8",
+      "sudo apt -y install ansible=2.8*",
       # Clones project repository
       "git clone https://github.com/Azure/sap-hana.git"
     ]
