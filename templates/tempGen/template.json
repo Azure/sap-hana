@@ -131,23 +131,29 @@
         "db_systemdb_password": "Manager1",
         "db_tenant_password": "Manager1",
         "os_sidadm_password": "Help4you",
-        "os_sapadm_password": "Help4you"
+        "os_sapadm_password": "Help4you",
+        "xsa_admin_password": "Manager1",
+        "cockpit_admin_password": "Manager1"
       },
-      "components": [
-        {
-          "name": "XSA",
-          "credentials": {
-            "xsa_admin_password": "Manager1"
-          },
-          "routing": "port"
-        },
-        {
-          "name": "Cockpit",
-          "credentials": {
-            "cockpit_admin_password": "Manager1"
-          }
-        }
-      ],
+      "components": {
+        "hana_database": [],
+        "hana_client": [],
+        "xs": [
+          "xsac_alm_pi_ui",
+          "xsac_portal_serv",
+          "xsac_services",
+          "xsac_ui5_fesv5",
+          "xsac_ui5_sb",
+          "xsac_xsa_cockpit"
+        ],
+        "shine": []
+      },
+      "xsa": {
+        "routing": "port"
+      },
+      "shine": {
+        "email": "shinedemo@microsoft.com"
+      },
       "dbnodes": [
         {
           "name": "hdb-node1",

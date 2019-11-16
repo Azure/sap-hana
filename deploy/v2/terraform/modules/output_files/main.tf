@@ -43,12 +43,13 @@ resource "local_file" "output-json" {
       authentication    = database.authentication,
       credentials       = database.credentials,
       components        = database.components,
+      xsa               = database.xsa,
+      shine             = database.shine,
       nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
         dbname       = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name
         ip_admin_nic = ip-dbnode-admin,
         ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
-        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role,
-        disk_details = zipmap(range(length(flatten([for storage_type in lookup(local.sizes, "${database.size}").storage : [for disk_count in range(storage_type.count) : "${storage_type.name}-${index(range(storage_type.count), disk_count)}"] if storage_type.name != "os"]))), flatten([for storage_type in lookup(local.sizes, "${database.size}").storage : [for disk_count in range(storage_type.count) : "${storage_type.name}-${index(range(storage_type.count), disk_count)}"] if storage_type.name != "os"]))
+        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ]
       }
@@ -59,7 +60,8 @@ resource "local_file" "output-json" {
         "storage_access_key" = var.storage-sapbits[0].primary_access_key,
         "blob_container_name"     = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
         "file_share_name"         = lookup(var.software.storage_account_sapbits, "file_share_name", null)
-      }
+      },
+      "downloader" = var.software.downloader
     }
     }
   )

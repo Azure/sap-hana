@@ -42,11 +42,6 @@ variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
-# Imports HANA database sizing information
-locals {
-  sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))
-}
-
 locals {
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
   ips-jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
@@ -54,5 +49,5 @@ locals {
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
-  dbnodes                      = flatten([for database in var.databases : [for dbnode in database.dbnodes : { role = dbnode.role, platform = database.platform, username = database.authentication.username, name = dbnode.name }]])
+  dbnodes                      = flatten([for database in var.databases : [for dbnode in database.dbnodes : { role = dbnode.role, platform = database.platform, authentication = database.authentication, name = dbnode.name }]])
 }
