@@ -1,9 +1,9 @@
 {
   "infrastructure": {
-    "region": "eastus2",
+    "region": "eastus",
     "resource_group": {
       "is_existing": "false",
-      "name": "test-rgeu2"
+      "name": "test-rg"
     },
     "vnets": {
       "management": {
