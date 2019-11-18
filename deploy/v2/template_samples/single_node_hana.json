@@ -1,9 +1,9 @@
 {
   "infrastructure": {
-    "region": "eastus",
+    "region": "eastus2",
     "resource_group": {
       "is_existing": "false",
-      "name": "test-rg"
+      "name": "test-rgeu2"
     },
     "vnets": {
       "management": {
@@ -150,8 +150,7 @@
           "xsac_ui5_fesv5",
           "xsac_ui5_sb",
           "xsac_xsa_cockpit"
-        ],
-        "shine": []
+        ]
       },
       "xsa": {
         "routing": "port"
@@ -176,41 +175,41 @@
       "file_share_name": "bits"
     },
     "downloader": {
-      "credentials":{
-        "sap_user":"",
-        "sap_password":""
+      "credentials": {
+        "sap_user": "",
+        "sap_password": ""
       },
-      "scenarios":[
+      "scenarios": [
         {
-          "scenario_type":"DB",
-          "product_name":"HANA",
-          "product_version":"2.0",
-          "os_type":"LINUX_X64",
-          "os_version":"SLES12.3",
-          "components":[
+          "scenario_type": "DB",
+          "product_name": "HANA",
+          "product_version": "2.0",
+          "os_type": "LINUX_X64",
+          "os_version": "SLES12.3",
+          "components": [
             "PLATFORM"
           ]
         },
         {
-          "scenario_type":"RTI",
-          "product_name":"RTI",
-          "os_type":"LINUX_X64"
+          "scenario_type": "RTI",
+          "product_name": "RTI",
+          "os_type": "LINUX_X64"
         },
         {
-          "scenario_type":"BASTION",
-          "os_type":"NT_X64"
+          "scenario_type": "BASTION",
+          "os_type": "NT_X64"
         },
         {
-          "scenario_type":"BASTION",
-          "os_type":"LINUX_X64"
+          "scenario_type": "BASTION",
+          "os_type": "LINUX_X64"
         }
       ],
-      "debug":{
-        "enabled":false,
-        "cert":"charles.pem",
-        "proxies":{
-          "http":"http://127.0.0.1:8888",
-          "https":"https://127.0.0.1:8888"
+      "debug": {
+        "enabled": false,
+        "cert": "charles.pem",
+        "proxies": {
+          "http": "http://127.0.0.1:8888",
+          "https": "https://127.0.0.1:8888"
         }
       }
     }
@@ -220,7 +219,6 @@
     "path_to_private_key": "~/.ssh/id_rsa"
   },
   "options": {
-    "read_tf_output_from_file": "../ansible_config_files/output.json",
     "enable_secure_transfer": true,
     "ansible_execution": true
   }
