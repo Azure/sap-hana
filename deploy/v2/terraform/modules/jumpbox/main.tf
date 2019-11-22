@@ -230,15 +230,6 @@ resource "azurerm_virtual_machine" "vm-windows" {
   os_profile_windows_config {
     provision_vm_agent = true
 
-    winrm {
-      protocol = "Http"
-    }
-
-    winrm {
-      protocol        = "Https"
-      certificate_url = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
-    }
-
     # Auto-Login's required to configure WinRM
     additional_unattend_config {
       pass         = "oobeSystem"

@@ -10,6 +10,12 @@ $Thumbprint = (Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Subj
 Write-Host "Enable HTTPS in WinRM.."
 winrm create winrm/config/Listener?Address=*+Transport=HTTPS "@{Hostname=`"$ComputerName`"; CertificateThumbprint=`"$Thumbprint`"}"
 
+Write-Host "Enabling Powershell Remoting.."
+Enable-PSRemoting -Force
+
+Write-Host "Allowing HTTP traffic.."
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+
 Write-Host "Enabling Basic Authentication.."
 winrm set winrm/config/service/Auth "@{Basic=`"true`"}"
 
