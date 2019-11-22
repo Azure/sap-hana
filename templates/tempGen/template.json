@@ -121,7 +121,7 @@
       "high_availability": false,
       "authentication": {
         "type": "key",
-        "os_username": "azureadm"
+        "username": "azureadm"
       },
       "instance": {
         "sid": "HN1",
@@ -131,23 +131,28 @@
         "db_systemdb_password": "Manager1",
         "db_tenant_password": "Manager1",
         "os_sidadm_password": "Help4you",
-        "os_sapadm_password": "Help4you"
+        "os_sapadm_password": "Help4you",
+        "xsa_admin_password": "Manager1",
+        "cockpit_admin_password": "Manager1"
       },
-      "components": [
-        {
-          "name": "XSA",
-          "credentials": {
-            "xsa_admin_password": "Manager1"
-          },
-          "routing": "port"
-        },
-        {
-          "name": "Cockpit",
-          "credentials": {
-            "cockpit_admin_password": "Manager1"
-          }
-        }
-      ],
+      "components": {
+        "hana_database": [],
+        "hana_client": [],
+        "xs": [
+          "xsac_alm_pi_ui",
+          "xsac_portal_serv",
+          "xsac_services",
+          "xsac_ui5_fesv5",
+          "xsac_ui5_sb",
+          "xsac_xsa_cockpit"
+        ]
+      },
+      "xsa": {
+        "routing": "port"
+      },
+      "shine": {
+        "email": "shinedemo@microsoft.com"
+      },
       "dbnodes": [
         {
           "name": "hdb-node1",
@@ -166,41 +171,41 @@
       "container_access_type": "private"
     },
     "downloader": {
-      "credentials":{
-        "sap_user":"var-sap-user",
-        "sap_password":"var-sap-password"
+      "credentials": {
+        "sap_user": "var-sap-user",
+        "sap_password": "var-sap-password"
       },
-      "scenarios":[
+      "scenarios": [
         {
-          "scenario_type":"DB",
-          "product_name":"HANA",
-          "product_version":"2.0",
-          "os_type":"LINUX_X64",
-          "os_version":"SLES12.3",
-          "components":[
+          "scenario_type": "DB",
+          "product_name": "HANA",
+          "product_version": "2.0",
+          "os_type": "LINUX_X64",
+          "os_version": "SLES12.3",
+          "components": [
             "PLATFORM"
           ]
         },
         {
-          "scenario_type":"RTI",
-          "product_name":"RTI",
-          "os_type":"LINUX_X64"
+          "scenario_type": "RTI",
+          "product_name": "RTI",
+          "os_type": "LINUX_X64"
         },
         {
-          "scenario_type":"BASTION",
-          "os_type":"NT_X64"
+          "scenario_type": "BASTION",
+          "os_type": "NT_X64"
         },
         {
-          "scenario_type":"BASTION",
-          "os_type":"LINUX_X64"
+          "scenario_type": "BASTION",
+          "os_type": "LINUX_X64"
         }
       ],
-      "debug":{
-        "enabled":false,
-        "cert":"charles.pem",
-        "proxies":{
-          "http":"http://127.0.0.1:8888",
-          "https":"https://127.0.0.1:8888"
+      "debug": {
+        "enabled": false,
+        "cert": "charles.pem",
+        "proxies": {
+          "http": "http://127.0.0.1:8888",
+          "https": "https://127.0.0.1:8888"
         }
       }
     }
@@ -210,6 +215,7 @@
     "path_to_private_key": "/tmp/sshkey"
   },
   "options": {
-    "enable_secure_transfer": true
+    "enable_secure_transfer": true,
+    "ansible_execution": false
   }
 }

@@ -121,8 +121,8 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 
   os_profile {
     computer_name  = each.value.name
-    admin_username = each.value.authentication.os_username
-    admin_password = lookup(each.value.authentication, "os_password", null)
+    admin_username = each.value.authentication.username
+    admin_password = lookup(each.value.authentication, "password", null)
   }
 
   os_profile_linux_config {
@@ -130,7 +130,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
     dynamic "ssh_keys" {
       for_each = each.value.authentication.type != "password" ? ["key"] : []
       content {
-        path     = "/home/${each.value.authentication.os_username}/.ssh/authorized_keys"
+        path     = "/home/${each.value.authentication.username}/.ssh/authorized_keys"
         key_data = file(var.sshkey.path_to_public_key)
       }
     }

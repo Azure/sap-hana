@@ -24,6 +24,7 @@ steps:
   - script: |
       echo "Terraform Deployment in Progress..."
       cd deploy/v2/terraform
+      terraform -version
       terraform init
       terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
     displayName: 'Terraform Deployment'

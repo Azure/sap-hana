@@ -14,6 +14,7 @@ steps:
       rti_user=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .authentication.username')
       rti_public_ip=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .public_ip_address')     
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" << EOF
+      ansible-playbook --version
       cd sap-hana
       git checkout $(System.PullRequest.SourceBranch)      
       EOF

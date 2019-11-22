@@ -39,8 +39,7 @@ variable "ansible-inventory" {
 }
 
 variable "ssh-timeout" {
-  description = "Timeout for connection that used by provisioner"
-  default     = "30s"
+  description = "Timeout for connection that is used by provisioner"
 }
 
 # RTI IP and authentication details

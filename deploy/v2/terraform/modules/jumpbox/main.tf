@@ -50,7 +50,7 @@ resource "azurerm_public_ip" "public-ip-windows" {
 # Creates the NIC and IP address for Windows VMs
 resource "azurerm_network_interface" "nic-windows" {
   count                     = length(var.jumpboxes.windows)
-  name                      = lookup(var.jumpboxes.windows[count.index], "nic_name", false) != false ? var.jumpboxes.windows[count.index].nic_name : "${var.jumpboxes.windows[count.index].name}-nic1"
+  name                      = "${var.jumpboxes.windows[count.index].name}-nic1"
   location                  = var.resource-group[0].location
   resource_group_name       = var.resource-group[0].name
   network_security_group_id = var.nsg-mgmt[0].id
@@ -76,7 +76,7 @@ resource "azurerm_public_ip" "public-ip-linux" {
 # Creates the NIC and IP address for Linux VMs
 resource "azurerm_network_interface" "nic-linux" {
   count                     = length(var.jumpboxes.linux)
-  name                      = lookup(var.jumpboxes.linux[count.index], "nic_name", false) != false ? var.jumpboxes.linux[count.index].nic_name : "${var.jumpboxes.linux[count.index].name}-nic1"
+  name                      = "${var.jumpboxes.linux[count.index].name}-nic1"
   location                  = var.resource-group[0].location
   resource_group_name       = var.resource-group[0].name
   network_security_group_id = var.nsg-mgmt[0].id
@@ -241,8 +241,8 @@ resource "null_resource" "prepare-rti" {
       "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
       # Installs Ansible
       "sudo apt install software-properties-common",
-      "sudo apt-add-repository --yes --update ppa:ansible/ansible",
-      "sudo apt -y install ansible=2.8.6-1ppa~xenial",
+      "sudo apt-add-repository --yes --update ppa:ansible/ansible-2.8",
+      "sudo apt -y install ansible=2.8*",
       # Clones project repository
       "git clone https://github.com/Azure/sap-hana.git"
     ]
