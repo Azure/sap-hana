@@ -66,8 +66,7 @@
           "password": "Sap@hana2019!"
         },
         "components": [
-          "hana_studio_windows",
-          "sap_router"
+          "hana_studio_windows"
         ]
       }
     ],
@@ -87,8 +86,7 @@
           "username": "azureadm"
         },
         "components": [
-          "hana_studio_linux",
-          "sap_router"
+          "hana_studio_linux"
         ]
       },
       {
@@ -137,7 +135,7 @@
       },
       "components": {
         "hana_database": [],
-        "hana_client": [],
+        "hana_client_linux": [],
         "xs": [
           "xsac_alm_pi_ui",
           "xsac_portal_serv",
