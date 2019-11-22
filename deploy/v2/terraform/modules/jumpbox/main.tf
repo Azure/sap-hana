@@ -186,7 +186,6 @@ resource "azurerm_virtual_machine" "vm-linux" {
   }
 }
 
-
 # Creates Windows VM
 resource "azurerm_virtual_machine" "vm-windows" {
   count                         = length(var.jumpboxes.windows)
