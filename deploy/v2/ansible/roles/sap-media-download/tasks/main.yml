@@ -3,17 +3,6 @@
 # This is temperary solution to get bits from SMP
 
 # Due to the file permission limitation with blob (always 770), we currently only support using azure files.
-
-- name:  Hana version variable to sap media download for 1.0
-  set_fact: 
-    hana_version: 1.0
-  when: hana_database.db_version is regex("1([0-9]\d|[0-9]\d{2}).\d{2}")  
-
-- name:  Hana version variable to sap media download for 2.0
-  set_fact:
-    hana_version: 2.0
-  when: hana_database.db_version is regex("2.\d{2}.0([4-9]\d|[0-9]\d{2,})") 
-
 - name: Install unzip
   apt: 
     name: unzip
@@ -35,13 +24,8 @@
     state: latest
     executable: pip3
 
-- name: Create configuration json with SMP credentials
-  template:
-    src: hdb_json.j2 
-    dest: "../python/downloader/hdb.json"
-
 - name: Download installation media
-  shell: "python3 ../python/downloader/basket.py --config ../python/downloader/hdb.json --dir {{ azure_files_mount_path }}"
+  shell: "python3 {{ sap_media_download_script_loc }}/python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"
 
 - name: Identify media archive
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
