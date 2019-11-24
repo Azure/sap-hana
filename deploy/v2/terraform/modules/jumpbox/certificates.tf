@@ -24,7 +24,7 @@ resource "azurerm_key_vault" "key-vault" {
 
   access_policy {
     tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-    object_id = data.azurerm_client_config.current.object_id == "" ? "${data.external.current-user.result.objectId}" : "${data.azurerm_client_config.current.object_id}"
+    object_id = data.azurerm_client_config.current.object_id == "" ? "${data.external.current-user[0].result.objectId}" : "${data.azurerm_client_config.current.object_id}"
 
     certificate_permissions = [
       "create",
