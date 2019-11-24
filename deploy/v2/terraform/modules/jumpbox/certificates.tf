@@ -6,6 +6,7 @@
 data "azurerm_client_config" "current" {}
 
 data "external" "current-user" {
+  count   = data.azurerm_client_config.current.object_id == "" ? 1 : 0
   program = ["az", "ad", "signed-in-user", "show", "--query", "{displayName: displayName,objectId: objectId,objectType: objectType}"]
 }
 
