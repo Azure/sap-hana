@@ -12,7 +12,7 @@ data "external" "current-user" {
 
 # Creates Azure key vault
 resource "azurerm_key_vault" "key-vault" {
-  name                = "winrm-keyvault"
+  name                = "winrm-kv-${var.random-id.hex}"
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
   tenant_id           = "${data.azurerm_client_config.current.tenant_id}"

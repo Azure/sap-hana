@@ -33,3 +33,7 @@ output "storage-bootdiag" {
 output "storage-sapbits" {
   value = var.software.storage_account_sapbits.is_existing ? data.azurerm_storage_account.storage-sapbits : azurerm_storage_account.storage-sapbits
 }
+
+output "random-id" {
+  value = random_id.random-id
+}

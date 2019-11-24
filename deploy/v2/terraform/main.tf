@@ -26,6 +26,7 @@ module "jumpbox" {
   storage-bootdiag  = module.common_infrastructure.storage-bootdiag
   output-json       = module.output_files.output-json
   ansible-inventory = module.output_files.ansible-inventory
+  random-id         = module.common_infrastructure.random-id
 }
 
 # Create HANA database nodes
