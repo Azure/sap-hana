@@ -148,7 +148,8 @@
           "xsac_ui5_fesv5",
           "xsac_ui5_sb",
           "xsac_xsa_cockpit"
-        ]
+        ],
+        "shine": []
       },
       "xsa": {
         "routing": "port"
