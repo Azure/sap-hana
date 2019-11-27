@@ -6,6 +6,12 @@
     name: cifs-utils
     state: present
 
+- name: check the cifs process
+  shell: "lsmod |grep cifs"
+  register: cifs_proc
+
+- debug: var=cifs_proc
+
 - name: Create azure fileshare credentials directory
   file:
     path: "/etc/smbcredentials"
