@@ -34,10 +34,22 @@
     dest: /etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred
     mode: 0600
 
+- name: mount storage with shell module
+  shell: "mount -t cifs //{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/sapmnt {{ azure_files_mount_path }} -o vers=3.0,credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino"
+  register: mount_sapbits
+
+- debug: var=mount_sapbits
+
+- name: Display the mount
+  shell: "df -h"
+  register: mount_paths
+
+- debug: var=mount_paths
+
 - name: Mount storage for SAP bits on RTI and DB nodes
   mount:
     path: "{{ azure_files_mount_path }}"
     fstype: cifs
-    opts: "credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino,defaults,nofail,vers=3.0"
+    opts: "credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino,vers=3.0"
     src: "//{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/sapmnt"
     state: mounted
