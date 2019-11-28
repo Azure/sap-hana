@@ -3,14 +3,11 @@
 # Mount Azure Files on all Linux VMs
 - name: Install cifs package
   package:
-    name: cifs-utils
+    name:
+      - "*" 
+      - cifs-utils
     state: present
-
-- name: check the cifs process
-  shell: "lsmod |grep cifs"
-  register: cifs_proc
-
-- debug: var=cifs_proc
+  
 
 - name: Create azure fileshare credentials directory
   file:
@@ -26,19 +23,13 @@
 
 - debug: var=azure_file_directory
 
-- name: Display the Azure fileshare mount directory
-  shell: "ls -l {{ azure_files_mount_path }}"
-  register: azure_file_mount
-
-- debug: var=azure_file_mount
-
 - name: Create credentials file
   copy:
     content: |
       username={{ output.software.storage_account_sapbits.name }}
       password={{ output.software.storage_account_sapbits.storage_access_key }}
     dest: /etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred
-    mode: 0600
+    mode: 0700
 
 - name: mount storage with shell module
   shell: "mount -t cifs //{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/sapmnt {{ azure_files_mount_path }} -o vers=3.0,credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino"
