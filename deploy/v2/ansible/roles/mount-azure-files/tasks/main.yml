@@ -3,26 +3,8 @@
 # Mount Azure Files on all Linux VMs
 - name: Install cifs package
   package:
-    name:
-      - keyutils
-      - cifs-utils
+    name: cifs-utils
     state: present
-
-- name:  fuse
-  shell: "modprobe fuse"
-  register:  fuse_probe
-
-- name:  cifs
-  shell: "modprobe cifs"
-  register:  cifs_probe
-
-- debug: var=cifs_probe
-
-- name: displayfilesystems
-  shell: "cat /proc/filesystems"
-  register: file_system
-
-- debug: var=file_system
 
 - name: Create azure fileshare credentials directory
   file:
@@ -34,9 +16,6 @@
     path: "{{ azure_files_mount_path }}"
     state: directory
     mode: 0755
-  register: azure_file_directory
-
-- debug: var=azure_file_directory
 
 - name: Create credentials file
   copy:
@@ -46,30 +25,10 @@
     dest: /etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred
     mode: 0700
 
-- name: Debug cifs
-  shell: "lsmod |egrep 'fuse|cifs'"
-  register: cifs_debug
-  ignore_errors: true
-
-- debug: var=cifs_debug
-
-- name: mount storage with shell module
-  shell: "mount -t cifs //{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/sapmnt {{ azure_files_mount_path }} -o vers=3.0,credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino"
-  register: mount_sapbits
-  ignore_errors: true
-
-- debug: var=mount_sapbits
-
-- name: Display the mount
-  shell: "df -h"
-  register: mount_paths
-
-- debug: var=mount_paths
-
 - name: Mount storage for SAP bits on RTI and DB nodes
   mount:
     path: "{{ azure_files_mount_path }}"
     fstype: cifs
     opts: "credentials=/etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred,dir_mode=0755,file_mode=0755,serverino,vers=3.0"
-    src: "//{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/sapmnt"
+    src: "//{{ output.software.storage_account_sapbits.name }}.file.core.windows.net/{{ output.software.storage_account_sapbits.file_share_name }}"
     state: mounted
