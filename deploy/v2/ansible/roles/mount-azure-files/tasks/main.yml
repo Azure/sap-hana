@@ -7,6 +7,10 @@
       - cifs-utils
     state: present
 
+- name:  fuse
+  shell: "modprobe fuse"
+  register:  fuse_probe
+
 - name:  cifs
   shell: "modprobe cifs"
   register:  cifs_probe
@@ -17,7 +21,7 @@
   shell: "cat /proc/filesystems"
   register: file_system
 
-- debug: var=file_systems
+- debug: var=file_system
 
 - name: Create azure fileshare credentials directory
   file:
