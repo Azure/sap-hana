@@ -32,7 +32,7 @@
 - name: Debug cifs
   shell: "lsmod |egrep 'fuse|cifs'"
   register: cifs_debug
-  ignogre_errors: true
+  ignore_errors: true
 
 - debug: var=cifs_debug
 
