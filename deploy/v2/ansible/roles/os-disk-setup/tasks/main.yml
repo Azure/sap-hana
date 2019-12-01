@@ -20,6 +20,7 @@
   with_dict: "{{ disk_dict }}"
   register: physical_vg
   failed_when: physical_vg is failed
+  ignore_errors: true
 
 - name: Create logical volume group
   lvol:
@@ -30,6 +31,7 @@
   with_dict: "{{ disk_dict }}"
   register: logical_vg
   failed_when: logical_vg is failed
+  ignore_errors: true 
  
 - name: Create mount points
   file:
