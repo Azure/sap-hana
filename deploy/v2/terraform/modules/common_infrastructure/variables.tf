@@ -14,3 +14,11 @@ variable "software" {
 variable "options" {
   description = "Configuration options"
 }
+
+variable "databases" {
+  description = "Details of the databases"
+}
+
+locals {
+  sku = var.databases.os.publisher == "Redhat" ? tonumber(var.databases.os.sku) : 0
+}
