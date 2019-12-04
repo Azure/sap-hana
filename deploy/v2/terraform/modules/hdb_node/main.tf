@@ -17,7 +17,7 @@ resource "azurerm_network_security_rule" "nsr-admin" {
   source_port_range           = "*"
   destination_port_range      = "*"
   source_address_prefix       = "*"
-  destination_address_prefix  = "${var.infrastructure.vnets.sap.subnet_admin.prefix}"
+  destination_address_prefix  = var.infrastructure.vnets.sap.subnet_admin.prefix
 }
 
 # Creates network security rule for SAP DB subnet
@@ -32,8 +32,8 @@ resource "azurerm_network_security_rule" "nsr-db" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "*"
-  source_address_prefix       = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
-  destination_address_prefix  = "${var.infrastructure.vnets.sap.subnet_db.prefix}"
+  source_address_prefix       = var.infrastructure.vnets.management.subnet_mgmt.prefix
+  destination_address_prefix  = var.infrastructure.vnets.sap.subnet_db.prefix
 }
 
 # NICS ============================================================================================================
@@ -83,12 +83,12 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
   resource_group_name           = var.resource-group[0].name
   primary_network_interface_id  = azurerm_network_interface.nics-dbnodes-db[each.key].id
   network_interface_ids         = [azurerm_network_interface.nics-dbnodes-admin[each.key].id, azurerm_network_interface.nics-dbnodes-db[each.key].id]
-  vm_size                       = lookup(local.sizes, "${each.value.size}").compute.vm_size
+  vm_size                       = lookup(local.sizes, each.value.size).compute.vm_size
   delete_os_disk_on_termination = "true"
 
   dynamic "storage_os_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
+    for_each = flatten([for storage_type in lookup(local.sizes, each.value.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
       name              = "${each.value.name}-osdisk"
       caching           = disk.value.caching
@@ -107,7 +107,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 
   dynamic "storage_data_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, "${each.value.size}").storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching, write_accelerator = storage_type.write_accelerator }] if storage_type.name != "os"])
+    for_each = flatten([for storage_type in lookup(local.sizes, each.value.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching, write_accelerator = storage_type.write_accelerator }] if storage_type.name != "os"])
     content {
       name                      = "${each.value.name}-${disk.value.name}-${disk.value.id}"
       caching                   = disk.value.caching

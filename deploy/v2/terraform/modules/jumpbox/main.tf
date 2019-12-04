@@ -17,7 +17,7 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
   source_port_range           = "*"
   destination_port_range      = 3389
   source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
-  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
+  destination_address_prefix  = var.infrastructure.vnets.management.subnet_mgmt.prefix
 }
 
 # Creates Windows jumpbox WinRM network security rule
@@ -33,7 +33,7 @@ resource "azurerm_network_security_rule" "nsr-winrm" {
   source_port_range           = "*"
   destination_port_ranges     = [5985, 5986]
   source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
-  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
+  destination_address_prefix  = var.infrastructure.vnets.management.subnet_mgmt.prefix
 }
 
 # Creates Linux jumpbox and RTI box SSH network security rule
@@ -49,7 +49,7 @@ resource "azurerm_network_security_rule" "nsr-ssh" {
   source_port_range           = "*"
   destination_port_range      = 22
   source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
-  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
+  destination_address_prefix  = var.infrastructure.vnets.management.subnet_mgmt.prefix
 }
 
 # NICS ============================================================================================================
@@ -218,10 +218,10 @@ resource "azurerm_virtual_machine" "vm-windows" {
   }
 
   os_profile_secrets {
-    source_vault_id = "${azurerm_key_vault.key-vault.id}"
+    source_vault_id = azurerm_key_vault.key-vault.id
 
     vault_certificates {
-      certificate_url   = "${azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id}"
+      certificate_url   = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
       certificate_store = "My"
     }
   }

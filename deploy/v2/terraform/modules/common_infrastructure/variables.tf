@@ -20,5 +20,5 @@ variable "databases" {
 }
 
 locals {
-  sku = var.databases.os.publisher == "Redhat" ? tonumber(var.databases.os.sku) : 0
+  sku = [for sku in  distinct([for database in var.databases : tonumber(database.os.sku) if database.os.publisher == "Redhat"]) : sku if sku < 7.5]
 }

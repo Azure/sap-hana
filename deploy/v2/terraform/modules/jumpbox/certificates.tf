@@ -15,7 +15,7 @@ resource "azurerm_key_vault" "key-vault" {
   name                = "winrm-kv-${var.random-id.hex}"
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
-  tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
 
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
@@ -23,8 +23,8 @@ resource "azurerm_key_vault" "key-vault" {
   sku_name = "standard"
 
   access_policy {
-    tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-    object_id = data.azurerm_client_config.current.object_id == "" ? "${data.external.current-user[0].result.objectId}" : "${data.azurerm_client_config.current.object_id}"
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id == "" ? data.external.current-user[0].result.objectId : data.azurerm_client_config.current.object_id
 
     certificate_permissions = [
       "create",
