@@ -42,6 +42,10 @@ variable "ssh-timeout" {
   description = "Timeout for connection that is used by provisioner"
 }
 
+variable "random-id" {
+  description = "Random hex for creating unique Azure key vault name"
+}
+
 # RTI IP and authentication details
 locals {
   output-tf = jsondecode(var.output-json.content)

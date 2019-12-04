@@ -66,8 +66,7 @@
           "password": "Sap@hana2019!"
         },
         "components": [
-          "hana_studio_windows",
-          "sap_router"
+          "hana_studio_windows"
         ]
       }
     ],
@@ -88,8 +87,7 @@
           "password": "Sap@hana2019!"
         },
         "components": [
-          "hana_studio_linux",
-          "sap_router"
+          "hana_studio_linux"
         ]
       },
       {
@@ -122,7 +120,7 @@
         "sku": "7.3"
       },
       "size": "Demo",
-      "filesystem": "XFS",
+      "filesystem": "xfs",
       "high_availability": false,
       "authentication": {
         "type": "key",
@@ -142,7 +140,7 @@
       },
       "components": {
         "hana_database": [],
-        "hana_client": [],
+        "hana_client_linux": [],
         "xs": [
           "xsac_alm_pi_ui",
           "xsac_portal_serv",
@@ -150,7 +148,8 @@
           "xsac_ui5_fesv5",
           "xsac_ui5_sb",
           "xsac_xsa_cockpit"
-        ]
+        ],
+        "shine": []
       },
       "xsa": {
         "routing": "port"

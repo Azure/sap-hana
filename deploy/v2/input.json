@@ -146,7 +146,7 @@
       },
       "components": {
         "hana_database": [],
-        "hana_client": [],
+        "hana_client_linux": [],
         "xs": [],
         "shine": []
       },

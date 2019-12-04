@@ -20,13 +20,29 @@ resource "azurerm_network_security_rule" "nsr-rdp" {
   destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
 }
 
+# Creates Windows jumpbox WinRM network security rule
+resource "azurerm_network_security_rule" "nsr-winrm" {
+  count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
+  name                        = "winrm"
+  resource_group_name         = var.nsg-mgmt[0].resource_group_name
+  network_security_group_name = var.nsg-mgmt[0].name
+  priority                    = 102
+  direction                   = "Inbound"
+  access                      = "allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_ranges     = [5985, 5986]
+  source_address_prefixes     = var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips
+  destination_address_prefix  = "${var.infrastructure.vnets.management.subnet_mgmt.prefix}"
+}
+
 # Creates Linux jumpbox and RTI box SSH network security rule
 resource "azurerm_network_security_rule" "nsr-ssh" {
   count                       = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
   name                        = "ssh"
   resource_group_name         = var.nsg-mgmt[0].resource_group_name
   network_security_group_name = var.nsg-mgmt[0].name
-  priority                    = 102
+  priority                    = 103
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
@@ -198,9 +214,36 @@ resource "azurerm_virtual_machine" "vm-windows" {
     computer_name  = var.jumpboxes.windows[count.index].name
     admin_username = var.jumpboxes.windows[count.index].authentication.username
     admin_password = var.jumpboxes.windows[count.index].authentication.password
+    custom_data    = "Param($ComputerName = \"${var.jumpboxes.windows[count.index].name}\") ${file("${path.module}/winrm_files/winrm.ps1")}"
+  }
+
+  os_profile_secrets {
+    source_vault_id = "${azurerm_key_vault.key-vault.id}"
+
+    vault_certificates {
+      certificate_url   = "${azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id}"
+      certificate_store = "My"
+    }
   }
 
   os_profile_windows_config {
+    provision_vm_agent = true
+
+    # Auto-Login's required to configure WinRM
+    additional_unattend_config {
+      pass         = "oobeSystem"
+      component    = "Microsoft-Windows-Shell-Setup"
+      setting_name = "AutoLogon"
+      content      = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>1</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
+    }
+
+    # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
+    additional_unattend_config {
+      pass         = "oobeSystem"
+      component    = "Microsoft-Windows-Shell-Setup"
+      setting_name = "FirstLogonCommands"
+      content      = file("${path.module}/winrm_files/FirstLogonCommands.xml")
+    }
   }
 
   boot_diagnostics {
