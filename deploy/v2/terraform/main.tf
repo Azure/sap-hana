@@ -10,7 +10,7 @@ module "common_infrastructure" {
   infrastructure      = var.infrastructure
   software            = var.software
   options             = var.options
-  databases	      = var.databases
+  databases           = var.databases
 }
 
 # Create Jumpboxes and RTI box
