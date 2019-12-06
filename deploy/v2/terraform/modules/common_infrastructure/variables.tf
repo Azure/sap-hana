@@ -18,7 +18,3 @@ variable "options" {
 variable "databases" {
   description = "Details of the databases"
 }
-
-locals {
-  sku = [for sku in distinct([for database in var.databases : tonumber(database.os.sku) if lower(database.os.publisher) == "redhat"]) : sku if sku < 7.5]
-}
