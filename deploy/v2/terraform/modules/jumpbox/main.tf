@@ -282,6 +282,8 @@ resource "null_resource" "prepare-rti" {
       # Installs Git
       "sudo apt update",
       "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      # Install pip3
+      "sudo apt -y install python3-pip",
       # Installs Ansible
       "sudo apt install software-properties-common",
       "sudo apt-add-repository --yes --update ppa:ansible/ansible-2.8",
