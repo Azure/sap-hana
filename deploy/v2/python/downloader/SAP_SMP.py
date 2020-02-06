@@ -217,3 +217,4 @@ class SMP:
             "Invalid search result format"
         results = j["d"]["results"]
         return results
+    
