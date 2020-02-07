@@ -59,6 +59,38 @@ resource "azurerm_network_security_rule" "hana-xsa-rules" {
   network_security_group_name = azurerm_network_security_group.sap_nsg[0].name
 }
 
+# Creates Windows jumpbox RDP network security rule
+resource "azurerm_network_security_rule" "nsr-rdp" {
+  count                       = var.windows_bastion ? 1 : 0
+  name                        = "rdp"
+  resource_group_name         = azurerm_resource_group.hana-resource-group.name
+  network_security_group_name = azurerm_network_security_group.sap_nsg[0].name
+  priority                    = 103
+  direction                   = "Inbound"
+  access                      = "allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = 3389
+  source_address_prefixes     = var.allow_ips
+  destination_address_prefix  = "*"
+}
+
+# Creates Windows jumpbox WinRM network security rule
+resource "azurerm_network_security_rule" "nsr-winrm" {
+  count                       = var.windows_bastion ? 1 : 0
+  name                        = "winrm"
+  resource_group_name         = azurerm_resource_group.hana-resource-group.name
+  network_security_group_name = azurerm_network_security_group.sap_nsg[0].name
+  priority                    = 104
+  direction                   = "Inbound"
+  access                      = "allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_ranges     = [5985, 5986]
+  source_address_prefixes     = var.allow_ips
+  destination_address_prefix  = "*"
+}
+
 data "azurerm_network_security_group" "nsg_info" {
   name = element(
     concat(
