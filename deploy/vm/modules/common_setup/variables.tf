@@ -50,13 +50,13 @@ locals {
 
   // Structure for the rules will be: "rule_name,priority,destination_port_range"
   hana_xsc_rules = [
-    "XSC-HTTP,103,80${var.sap_instancenum}",
-    "XSC-HTTPS,104,43${var.sap_instancenum}",
+    "XSC-HTTP,105,80${var.sap_instancenum}",
+    "XSC-HTTPS,106,43${var.sap_instancenum}",
   ]
 
   hana_xsa_rules = [
-    "XSA-HTTP,105,4000-4999",
-    "XSA,106,50000-59999",
+    "XSA-HTTP,107,4000-4999",
+    "XSA,108,50000-59999",
   ]
 }
 
