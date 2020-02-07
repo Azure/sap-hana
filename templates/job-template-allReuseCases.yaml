@@ -19,9 +19,6 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-  - template: ansible-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
 - job: reuseRG${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
@@ -77,9 +74,6 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-  - template: ansible-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
 - job: reuseNSG${{parameters.osVersion}}
   timeoutInMinutes: 180
   dependsOn: createAllNew${{parameters.osVersion}}
@@ -106,6 +100,3 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-  - template: ansible-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
