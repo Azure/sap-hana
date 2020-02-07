@@ -14,6 +14,7 @@ module "common_setup" {
   sap_instancenum   = var.sap_instancenum
   sap_sid           = var.sap_sid
   use_existing_nsg  = var.use_existing_nsg
+  windows_bastion   = var.windows_bastion
 }
 
 module "create_hdb" {
