@@ -35,16 +35,19 @@ stages:
         sudo -H pip install msrest==0.6.0
       displayName: 'Install python tools'
 #####################################################################
-# This stage create resources for below test cases:                 # 
-# - createAllNew: it creates all resources from scratch             # 
-# - reuseRG: it only reuses an existing resource group              #
-# - reuseVnet: it only reuses an existing vnet from createAllNew    #
-# - reuseNSG: it only reuses an existing NSG from createAllNew      #
+# This stage create resources for below test cases:                 #
+# - Below testcases are tested only with SLES12                      # 
+#   - createAllNew: it creates all resources from scratch           # 
+#   - reuseRG: it only reuses an existing resource group            #
+#   - reuseVnet: it only reuses an existing vnet from createAllNew  #
+#   - reuseNSG: it only reuses an existing NSG from createAllNew    #
+# - createAllNew testcase will be test again with below OS          #
+#   - RHEL7                                                         #
 #####################################################################
 - stage: CreatingResources
   dependsOn: SetEnv
   jobs:
-  - template: templates/job-template-per-os.yaml
+  - template: templates/job-template-allReuseCases.yaml
     parameters:
       osVersion: "SLES12"
       osImage: '\"offer\": \"SLES-SAP\", 
