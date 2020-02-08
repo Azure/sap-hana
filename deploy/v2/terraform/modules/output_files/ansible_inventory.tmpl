@@ -4,10 +4,6 @@ ${ips-jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}  ansible_con
 %{~ endfor }
 
 [jumpboxes_linux]
-
-%{~ endfor }
-
-[jumpboxes_linux]
 %{~ for jumpbox-linux in jumpboxes-linux }
 %{~ if jumpbox-linux.destroy_after_deploy != "true" && jumpbox-linux.authentication.type == "key" }
 ${ips-jumpboxes-linux[index(jumpboxes-linux, jumpbox-linux)]}  ansible_connection=ssh  ansible_user=${jumpbox-linux.authentication.username}
