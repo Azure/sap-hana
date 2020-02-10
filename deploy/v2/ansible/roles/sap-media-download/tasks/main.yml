@@ -22,8 +22,10 @@
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
   register: bits_file
 
+# By using creates, it will not extract the bits if folder DB/DATA_UNITS exsits
 - name: Extract media archive
   unarchive: 
     src: "{{ azure_files_mount_path }}/DB/{{bits_file.stdout}}"
     dest: "{{ azure_files_mount_path }}/DB"
     remote_src: yes
+    creates: "{{ azure_files_mount_path }}/DB/DATA_UNITS"

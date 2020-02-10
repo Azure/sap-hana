@@ -10,7 +10,7 @@ components: "{{ lookup('file', '../components.json') }}"
 hana_client_install_path: "/usr/sap/shared"
 output: "{{ hostvars['localhost'].output }}"
 hana_database: "{{ hostvars['localhost'].hana_database }}"
-linux_jumpboxes: "{{ hostvars['localhost'].jumpboxes.linux"
+linux_jumpboxes: "{{ hostvars['localhost'].output.jumpboxes.linux }}"
 sap_media_download_script_loc: "/home/{{ansible_user}}/sap-hana/deploy/v2"
 jumpbox_comp_dict: {}
 media_copy_loc: C:\Users\{{ ansible_user }}\install
