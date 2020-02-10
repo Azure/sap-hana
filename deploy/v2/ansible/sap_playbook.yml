@@ -51,3 +51,10 @@
   become_user: root
   roles: 
     - { role: hdb-server-install }
+
+# Jumpboxes Components install
+- hosts: jumpboxes_linux
+  become: true
+  become_user: root
+  roles: 
+    - { role: linux-jumpboxes-install }
