@@ -19,4 +19,3 @@
     creates: C:\Users\{{ ansible_user }}\SAP_HANA_CLIENT
   loop: "{{ client.variants|flatten(levels=1) }}"
   when: item.os == 'WINDOWS'
-  
