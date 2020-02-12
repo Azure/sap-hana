@@ -61,7 +61,7 @@ module "output_files" {
 }
 
 resource "null_resource" "ansible_playbook" {
-  depends_on = [module.hdb_node.dbnodes, module.jumpbox.prepare-rti]
+  depends_on = [module.hdb_node.dbnodes, module.jumpbox.prepare-rti, module.jumpbox.vm-windows]
   connection {
     type        = "ssh"
     host        = module.jumpbox.rti-info.public_ip_address

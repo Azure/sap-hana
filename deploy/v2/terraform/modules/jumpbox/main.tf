@@ -229,12 +229,21 @@ resource "azurerm_virtual_machine" "vm-windows" {
   os_profile_windows_config {
     provision_vm_agent = true
 
+    winrm {
+      protocol = "Http"
+    }
+
+    winrm {
+      protocol        = "Https"
+      certificate_url = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
+    }
+
     # Auto-Login's required to configure WinRM
     additional_unattend_config {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "AutoLogon"
-      content      = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>1</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
+      content      = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>2</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
     }
 
     # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
@@ -282,10 +291,12 @@ resource "null_resource" "prepare-rti" {
       # Installs Git
       "sudo apt update",
       "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      # Install pip3
+      "sudo apt -y install python3-pip",
       # Installs Ansible
-      "sudo apt install software-properties-common",
-      "sudo apt-add-repository --yes --update ppa:ansible/ansible-2.8",
-      "sudo apt -y install ansible=2.8*",
+      "sudo -H pip3 install \"ansible>=2.8,<2.9\"",
+      # Install pywinrm
+      "sudo -H pip3 install \"pywinrm>=0.3.0\"",
       # Clones project repository
       "git clone https://github.com/Azure/sap-hana.git"
     ]

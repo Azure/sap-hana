@@ -22,3 +22,7 @@ output "rti-info" {
 output "prepare-rti" {
   value = null_resource.prepare-rti
 }
+
+output "vm-windows" {
+  value = azurerm_virtual_machine.vm-windows
+}

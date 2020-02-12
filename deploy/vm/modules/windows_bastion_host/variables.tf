@@ -53,7 +53,5 @@ locals {
 
   machine_name = "${lower(var.sap_sid)}-win-bastion"
   static       = "Static"
-  winrm_port   = 5986
-  rdp_port     = 3389
 }
 

@@ -1,6 +1,6 @@
 [jumpboxes_windows]
 %{~ for jumpbox-windows in jumpboxes-windows }
-${ips-jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}  ansible_connection=winrm  ansible_user=${jumpbox-windows.authentication.username} ansible_ssh_pass=${jumpbox-windows.authentication.password}  ansible_ssh_port=5986
+${ips-jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}  ansible_connection=winrm  ansible_user=${jumpbox-windows.authentication.username} ansible_ssh_pass=${jumpbox-windows.authentication.password}  ansible_ssh_port=5986 ansible_winrm_transport=ntlm ansible_winrm_server_cert_validation=ignore
 %{~ endfor }
 
 [jumpboxes_linux]

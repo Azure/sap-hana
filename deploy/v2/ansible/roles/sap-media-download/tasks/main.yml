@@ -9,20 +9,11 @@
     state: latest
     force_apt_get: yes
 
-- name: Download pip
-  get_url:
-    url: https://bootstrap.pypa.io/get-pip.py
-    dest: /usr/bin/get-pip.py
-
-- name: Install pip
-  command: |
-    python3 /usr/bin/get-pip.py
-
+# Explicitly install bs4 with python3
 - name: Install beautifulsoup4
-  pip:
-    name: beautifulsoup4
-    state: latest
-    executable: pip3
+  command: |
+    pip3 install beautifulsoup4
+  become: true
 
 - name: Download installation media
   shell: "python3 {{ sap_media_download_script_loc }}/python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"

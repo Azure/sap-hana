@@ -18,7 +18,7 @@ from helper import *
 class SMP:
     url_launchpad = "https://launchpad.support.sap.com"
     url_auth      = "https://authn.hana.ondemand.com/saml2/sp/mds"
-    url_sso       = "https://accounts.sap.com/saml2/idp/sso/accounts.sap.com"
+    url_sso       = "https://accounts.sap.com/saml2/idp/sso"
     url_portal    = "https://authn.hana.ondemand.com/saml2/sp/acs/supportportal/supportportal"
     url_search    = "https://launchpad.support.sap.com/services/odata/svt/swdcuisrv/SearchResultSet"
     url_retrieve  = "https://launchpad.support.sap.com/services/odata/svt/swdcuisrv/DownloadItemSet"
@@ -217,3 +217,4 @@ class SMP:
             "Invalid search result format"
         results = j["d"]["results"]
         return results
+    

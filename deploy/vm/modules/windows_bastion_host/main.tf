@@ -1,38 +1,3 @@
-resource "azurerm_network_security_group" "windows_bastion_nsg" {
-  count               = var.windows_bastion ? 1 : 0
-  name                = "windows_bastion_nsg"
-  location            = var.az_region
-  resource_group_name = var.az_resource_group
-
-  security_rule {
-    name                       = "RDP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = local.rdp_port
-    source_address_prefixes    = var.allow_ips
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "winrm"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = local.winrm_port
-    source_address_prefixes    = var.allow_ips
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    environment = "windows_bastion"
-  }
-}
-
 resource "azurerm_public_ip" "pip" {
   count               = var.windows_bastion ? 1 : 0
   name                = "${local.machine_name}-pip"
@@ -50,12 +15,11 @@ resource "azurerm_public_ip" "pip" {
 
 # Create network interface
 resource "azurerm_network_interface" "nic" {
-  count                     = var.windows_bastion ? 1 : 0
-  depends_on                = [azurerm_public_ip.pip]
-  name                      = "${local.machine_name}-nic"
-  location                  = var.az_region
-  resource_group_name       = var.az_resource_group
-  network_security_group_id = var.windows_bastion ? azurerm_network_security_group.windows_bastion_nsg[0].id : local.empty_string
+  count               = var.windows_bastion ? 1 : 0
+  depends_on          = [azurerm_public_ip.pip]
+  name                = "${local.machine_name}-nic"
+  location            = var.az_region
+  resource_group_name = var.az_resource_group
 
   ip_configuration {
     name                          = "${local.machine_name}-nic-configuration"
