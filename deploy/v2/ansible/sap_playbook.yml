@@ -58,3 +58,8 @@
   become_user: root
   roles: 
     - { role: linux-jumpboxes-install }
+
+# Windows jumpboxes components install
+- hosts: jumpboxes_windows
+  roles: 
+    - { role: windows-jumpboxes-install }
