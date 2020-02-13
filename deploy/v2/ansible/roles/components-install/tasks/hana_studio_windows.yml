@@ -22,7 +22,7 @@
 
 - name: Install HANA Studio on Windows jumpboxes
   win_shell: "{{ ansible_facts['user_dir'] }}\\install\\{{ item.media_loc }}\\{{ item.installer }} -a studio -b --path={{ ansible_facts['user_dir'] }}\\SAP_HANA_STUDIO"
-  args: ""
+  args:
     creates: "{{ ansible_facts['user_dir'] }}\\SAP_HANA_STUDIO"
   loop: "{{ studio.variants|flatten(levels=1) }}"
   when: item.os == 'WINDOWS'
