@@ -45,9 +45,16 @@
   roles:
     - { role: sap-media-download }
 
-# Hana DB Components install 
+# Hana DB components install 
 - hosts: hanadbnodes
   become: true
   become_user: root
   roles: 
     - { role: hdb-server-install }
+
+# Linux jumpboxes components install
+- hosts: jumpboxes_linux
+  become: true
+  become_user: root
+  roles: 
+    - { role: linux-jumpboxes-install }
