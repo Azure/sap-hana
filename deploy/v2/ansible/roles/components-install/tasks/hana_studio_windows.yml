@@ -6,10 +6,10 @@
   loop: "{{ components }}"
   when: item.component == 'hana_studio'
 
-- name: Copy to Hana Studio Installer
+- name: Copy HANA Studio Installer to windows jumpboxes
   win_copy: 
     src: "{{ hana_software_loc }}/{{ item.media_loc }}"
-    dest: C:\Users\{{ ansible_user }}\install
+    dest: "{{ ansible_facts['user_dir'] }}\\install"
   loop: "{{ studio.variants|flatten(levels=1) }}"
   when: item.os == 'WINDOWS'
 
@@ -20,9 +20,9 @@
     product_id: vcredist
     arguments: /install /quiet
 
-- name: Install Hana Studio on Windows jumpboxes
-  win_shell: C:\Users\{{ ansible_user }}\install\{{ item.media_loc }}\{{ item.installer }} -a studio -b --path=C:\Users\{{ ansible_user }}\SAP_HANA_STUDIO
-  args: 
-    creates: C:\Users\{{ ansible_user }}\SAP_HANA_STUDIO
+- name: Install HANA Studio on Windows jumpboxes
+  win_shell: "{{ ansible_facts['user_dir'] }}\\install\\{{ item.media_loc }}\\{{ item.installer }} -a studio -b --path={{ ansible_facts['user_dir'] }}\\SAP_HANA_STUDIO"
+  args: ""
+    creates: "{{ ansible_facts['user_dir'] }}\\SAP_HANA_STUDIO"
   loop: "{{ studio.variants|flatten(levels=1) }}"
   when: item.os == 'WINDOWS'
