@@ -66,7 +66,8 @@
           "password": "Sap@hana2019!"
         },
         "components": [
-          "hana_studio_windows"
+          "hana_studio_windows",
+          "hana_client_windows"
         ]
       }
     ],
@@ -79,14 +80,15 @@
         "os": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "16.04-LTS"
+          "sku": "18.04-LTS"
         },
         "authentication": {
           "type": "key",
           "username": "azureadm"
         },
         "components": [
-          "hana_studio_linux"
+          "hana_studio_linux",
+          "hana_client_linux"
         ]
       },
       {
@@ -97,7 +99,7 @@
         "os": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "16.04-LTS"
+          "sku": "18.04-LTS"
         },
         "authentication": {
           "type": "key",
