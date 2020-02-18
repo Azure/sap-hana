@@ -37,7 +37,7 @@
       when:
         - output.options.enable_prometheus == True
         - ansible_facts['distribution_file_variety'] == 'SUSE'
-        - ansible_facts['distribution_version] is regex("(12.[3-9]|15.\d)")
+        - ansible_facts['distribution_version'] is regex("(12.[3-9]|15.\d)")
 
 # Mount Azure File share on all linux servers
 - hosts: all_linux_servers
