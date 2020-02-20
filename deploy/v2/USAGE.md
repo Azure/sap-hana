@@ -143,7 +143,7 @@ The SAP environments deployed by this codebase are configured by JSON input file
 These configuration files provide a high degree of customization for the user, but can be a little daunting if you are new to the codebase.
 Therefore example configuration files have been supplied with the code.
 
-The minimal amount of change required to an example configuration file, is to configure your SAP Launchpad credentials so that the code can automatically login and download the required SAP packages to install.
+The minimal amount of change required to an example configuration file is to configure your SAP Launchpad credentials so that the code can automatically login and download the required SAP packages to install.
 
 Configuring your SAP Launchpad credentials for the simplest example JSON input file, requires you to provide your SAP user and password to another utility script.
 
