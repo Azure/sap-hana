@@ -12,7 +12,7 @@
 # exit immediately if a command fails
 set -o errexit
 
-# exit immediately if an unsed variable is used
+# exit immediately if an unset variable is used
 set -o nounset
 
 # import common functions that are reused across scripts
