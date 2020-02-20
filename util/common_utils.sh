@@ -37,3 +37,17 @@ function run_command()
 	# run the command
 	${command}
 }
+
+
+# Given a return/exit status code (numeric argument)
+#   and an error message (string argument)
+# This function returns immediately if the status code is zero.
+# Otherwise it prints the error message to STDOUT and exits.
+# Note: The error is prefixed with "ERROR: " and is sent to STDOUT, not STDERR
+function continue_or_error_and_exit()
+{
+	local status_code=$1
+	local error_message="$2"
+
+	((status_code != 0)) && { echo "ERROR: ${error_message}"; exit 1; }
+}

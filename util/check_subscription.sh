@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
+###############################################################################
+#
+# Purpose:
+# This script simplifies the user interaction with Azure to determine the
+# currently configured subscription.
+#
+###############################################################################
+
 # exit immediately if an unsed variable is used
 set -o nounset
+
+# import common functions that are reused across scripts
+source util/common_utils.sh
 
 
 function main()
@@ -29,20 +40,6 @@ function display_subscription_info()
 	subscription_id=$(echo "${subscription_info}" | grep '"id":' | cut -d'"' -f4)
 
 	echo -e "Your current subscription is ${subscription_name} (ID=${subscription_id})"
-}
-
-
-# Given a return/exit status code (numeric argument)
-#   and an error message (string argument)
-# This function returns immediately if the status code is zero.
-# Otherwise it prints the error message to STDOUT and exits.
-# Note: The error is prefixed with "ERROR: " and is sent to STDOUT, not STDERR
-function continue_or_error_and_exit()
-{
-	local status_code=$1
-	local error_message="$2"
-
-	((status_code != 0)) && { echo "ERROR: ${error_message}"; exit 1; }
 }
 
 

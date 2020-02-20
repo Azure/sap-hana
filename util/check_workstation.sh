@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 
+###############################################################################
+#
+# Purpose:
+# This script simplifies the user interaction with various tools on their
+# operating system to ensure they have versions that meet the project's
+# requirements.
+#
+###############################################################################
+
 # exit immediately if a command fails
 set -o errexit
 
 # exit immediately if an unsed variable is used
 set -o nounset
+
+# import common functions that are reused across scripts
+source util/common_utils.sh
 
 
 function main()

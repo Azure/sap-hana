@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 
-# exit immediately if a command fails
-# set -o errexit
+###############################################################################
+#
+# Purpose:
+# This script simplifies the user interaction with Azure to create a service
+# principal and save the required authentication details to a script.
+#
+###############################################################################
 
 # exit immediately if an unsed variable is used
 set -o nounset
+
+# import common functions that are reused across scripts
+source util/common_utils.sh
 
 
 # name of the script where the auth info will be saved
@@ -101,20 +109,6 @@ function append_line_to_auth_script()
 
 	# append line to file
 	echo "${auth_script_line}" >> ${auth_script}
-}
-
-
-# Given a return/exit status code (numeric argument)
-#   and an error message (string argument)
-# This function returns immediately if the status code is zero.
-# Otherwise it prints the error message to STDOUT and exits.
-# Note: The error is prefixed with "ERROR: " and is sent to STDOUT, not STDERR
-function continue_or_error_and_exit()
-{
-	local status_code=$1
-	local error_message="$2"
-
-	((status_code != 0)) && { echo "ERROR: ${error_message}"; exit 1; }
 }
 
 
