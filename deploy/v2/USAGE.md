@@ -1,7 +1,7 @@
 # Usage Guide for V2
 
 This document aims to describe the basic process to get started with V2 of the codebase.
-It does not go into detail about how to customize the code, but instead focusses on demonstrating the end-to-end lifecycle.
+It does not go into detail about how to customize the code, but instead focuses on demonstrating the end-to-end lifecycle.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ You also need some familiarity with using the following technologies/tools:
 
 ### Obtaining the Code
 
-Before continuing you should first obtain a copy of the code, so that you can use the utiliy scripts provided.
+Before continuing you should first obtain a copy of the code, so that you can use the utility scripts provided.
 
 1. On the Linux command line, navigate to the directory you wish to clone the code within.
    This directory will be the parent directory of the directory containing the code. For example:
@@ -41,7 +41,7 @@ Before continuing you should first obtain a copy of the code, so that you can us
    git clone https://github.com/Azure/sap-hana.git
    ```
 
-   **Note:** See [Cloning a respository](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) if you are not familiar with this process.
+   **Note:** See [Cloning a repository](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) if you are not familiar with this process.
 
 1. Navigate into the project root directory. For example:
 
@@ -180,7 +180,7 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
      - `Installing OS package` (~5 minutes)
 
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
-   By default, all the provisioned resources (excluding the service pricipal) are deployed into the same resource group.
+   By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
 
 1. To easily delete the provisioned resources, run the following utility script:
 
