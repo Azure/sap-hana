@@ -58,6 +58,10 @@ function create_service_principal_script()
 
 	# create the service principal and capture the output
 	sp_details=$(az ad sp create-for-rbac --name "${service_principal_name}")
+	local sp_creation_status=$?
+
+	# check the SP was created successfully
+	continue_or_error_and_exit $sp_creation_status "There was a problem creating the service principal. If you are logged into Azure CLI, then it could relate to lack of admin/owner permissions."
 
 	# determine authorization credentials
 	local subscription_id
