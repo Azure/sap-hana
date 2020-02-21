@@ -26,6 +26,8 @@ You also need some familiarity with using the following technologies/tools:
 
 Before continuing you should first obtain a copy of the code, so that you can use the utility scripts provided.
 
+**Note:** Currently, the utility scripts are only available for Linux/MacOS workstations. If you are interested in Windows support, then please upvote (:thumbsup:) the issue [Add utility scripts for Windows](https://github.com/Azure/sap-hana/issues/289).
+
 1. On the Linux command line, navigate to the directory you wish to clone the code within.
    This directory will be the parent directory of the directory containing the code. For example:
 
