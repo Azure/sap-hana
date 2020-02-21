@@ -61,6 +61,7 @@ Running the code requires the following tools with the minimal supported/tested 
 |-----------|------------------------------------|
 | Azure CLI | 2.0.63                             |
 | Terraform | 0.12.12                            |
+| Ansible   | 2.8.1 (see note below)             |
 
 1. To easily check which tool versions you have installed, run the following utility script:
 
@@ -72,10 +73,10 @@ Running the code requires the following tools with the minimal supported/tested 
    ```text
    azure-cli = 2.0.77
    Terraform = 0.12.16
-   ansible = 2.8.1
+   ansible = 2.8.4
    ```
 
-   **Note:** Ansible is only a prerequisite of the workstation if you opt to split the Terraform and Ansible stages.
+   **Note:** Ansible is only a prerequisite of the workstation if you opt to split the Terraform and Ansible stages, and intend to run Ansible from your workstation rather than the runtime instance (RTI) in Azure.
 
 ### Configuring the Target Azure Subscription
 
