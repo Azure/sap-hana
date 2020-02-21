@@ -174,12 +174,12 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
    **Note:** This process can take in the region of 90 minutes to complete.
    Particularly slow stages are:
 
-     - `Install XSA components` (~35 minutes)
-     - `Extract media archive` (~15 minutes)
-     - `Install SHINE` (~10 minutes)
-     - `Install HANA Database using hdblcm` (~10 minutes)
-     - `Download installation media` (~5 minutes)
      - `Installing OS package` (~5 minutes)
+     - `Download installation media` (~5 minutes)
+     - `Extract media archive` (~15 minutes)
+     - `Install HANA Database using hdblcm` (~10 minutes)
+     - `Install XSA components` (~35 minutes)
+     - `Install SHINE` (~10 minutes)
 
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
    By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
