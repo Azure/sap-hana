@@ -31,15 +31,12 @@ function main()
 
 function check_command_line_arguments()
 {
+	local args_count=$#
+
 	# Check there's just a single argument provided
-	case $# in
-		1)
-			:
-			;;
-		*)
-			continue_or_error_and_exit 1 "You must specify a single command line argument for the service principal name"
-			;;
-	esac
+	if [[ ${args_count} -ne 1 ]]; then
+		continue_or_error_and_exit 1 "You must specify a single command line argument for the service principal name"
+	fi
 }
 
 

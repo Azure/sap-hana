@@ -38,15 +38,12 @@ function main()
 
 function check_command_line_arguments()
 {
+	local args_count=$#
+
 	# Check there're just two arguments provided
-	case $# in
-		2)
-			:
-			;;
-		*)
-			continue_or_error_and_exit 1 "You must specify 2 command line arguments for the SAP download credentials: a username and a password"
-			;;
-	esac
+	if [[ ${args_count} -ne 2 ]]; then
+		continue_or_error_and_exit 1 "You must specify 2 command line arguments for the SAP download credentials: a username and a password"
+	fi
 }
 
 
