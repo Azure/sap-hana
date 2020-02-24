@@ -53,6 +53,7 @@ function edit_json_template_for_sap_credentials()
 	local sap_password="$2"
 
 	# use temp file method to avoid BSD sed issues on Mac/OSX
+	# See: https://stackoverflow.com/questions/5694228/sed-in-place-flag-that-works-both-on-mac-bsd-and-linux/5694430#5694430
 	local temp_template_json="${target_json}.tmp"
 
 	# filter JSON template file contents and write to temp file
