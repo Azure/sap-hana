@@ -75,13 +75,13 @@ function create_service_principal_script()
 	client_id=$(echo "${sp_details}"  | grep appId | sed -e 's/.*appId.:.\(.*\),/\1/')
 	client_secret=$(echo "${sp_details}" | grep password | sed -e 's/.*password.:.\(.*\),/\1/')
 
-	# create new bash script for authorization
-	create_new_auth_script
-	append_line_to_auth_script "#!/usr/bin/env bash"
-	append_line_to_auth_script "export ARM_SUBSCRIPTION_ID=${subscription_id}"
-	append_line_to_auth_script "export ARM_TENANT_ID=${tenant_id}"
-	append_line_to_auth_script "export ARM_CLIENT_ID=${client_id}"
-	append_line_to_auth_script "export ARM_CLIENT_SECRET=${client_secret}"
+	# create new script for authorization
+	cat <<- EOF > ${auth_script}
+		export ARM_SUBSCRIPTION_ID=${subscription_id}
+		export ARM_TENANT_ID=${tenant_id}
+		export ARM_CLIENT_ID=${client_id}
+		export ARM_CLIENT_SECRET=${client_secret}
+	EOF
 
 	# restore to previous value
 	IFS="${ifs_backup}"
@@ -98,23 +98,6 @@ function check_auth_script_does_not_exist()
 	[ ! -f ${auth_script} ]
 	auth_exists=$?
 	continue_or_error_and_exit $auth_exists "Authorization file already exists: ${auth_script}. Please reuse, move, or remove it."
-}
-
-
-function create_new_auth_script()
-{
-	# create a new empty file that can be executed
-	true > ${auth_script}
-	chmod 0755 ${auth_script}
-}
-
-
-function append_line_to_auth_script()
-{
-	local auth_script_line="$1"
-
-	# append line to file
-	echo "${auth_script_line}" >> ${auth_script}
 }
 
 
