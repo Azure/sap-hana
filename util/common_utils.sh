@@ -10,35 +10,6 @@
 ###############################################################################
 
 
-function print_line()
-{
-	# default line if not supplied
-	local line=''
-	[ $# -eq 0 ] || line="$1"
-
-	echo -e "${line}"
-}
-
-
-function print_tabbed_line()
-{
-	# default line if not supplied
-	local line=''
-	[ $# -eq 0 ] || line="$1"
-
-	print_line "\t${line}"
-}
-
-
-function run_command()
-{
-	local command="$1"
-
-	# run the command
-	${command}
-}
-
-
 # Given a return/exit status code (numeric argument)
 #   and an error message (string argument)
 # This function returns immediately if the status code is zero.

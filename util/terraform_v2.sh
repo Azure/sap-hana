@@ -76,16 +76,16 @@ function print_usage_info()
 {
 	local script_path="$0"
 
-	print_line
-	print_line "Usage:"
-	print_line
-	print_tabbed_line "${script_path} <command>"
-	print_line
-	print_line "The commands are:"
-	print_tabbed_line "init"
-	print_tabbed_line "apply"
-	print_tabbed_line "destroy"
-	print_line
+	echo
+	echo "Usage:"
+	echo
+	echo -e "\t${script_path} <command>"
+	echo
+	echo "The commands are:"
+	echo -e "\tinit"
+	echo -e "\tapply"
+	echo -e "\tdestroy"
+	echo
 	exit 2
 }
 
@@ -98,12 +98,12 @@ function run_terraform_command()
 	local command="terraform ${options}"
 
 	# describe the command that will be run (useful for debugging)
-	print_line "Running the following Terraform command:"
-	print_line
-	print_tabbed_line "${command}"
-	print_line
+	echo "Running the following Terraform command:"
+	echo
+	echo "${command}"
+	echo
 
-	run_command "${command}"
+	${command}
 }
 
 # Execute the main program flow with all arguments
