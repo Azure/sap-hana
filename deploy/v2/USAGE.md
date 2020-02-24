@@ -107,7 +107,7 @@ Before running any of the following code/scripts, you should login to the Azure 
 
 ### Configuring Authorization with Azure
 
-In order for Terraform/Ansible to manage resources in Azure, a Service Principal is required.
+In order for Terraform/Ansible to manage resources in Azure, a _Service Principal_ is required.
 The following process creates a new service principal in Azure, and stores the details required in an authorization script on the local workstation.
 This script can then be used (_sourced_) to configure the required environment variables on the local workstation that allows Terraform/Ansible to run without prompting the user for further authentication information.
 

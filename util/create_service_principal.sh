@@ -5,6 +5,8 @@
 # Purpose:
 # This script simplifies the user interaction with Azure to create a service
 # principal and save the required authentication details to a script.
+# This script is essentially wrapping the process described here:
+# https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
 #
 ###############################################################################
 
@@ -17,6 +19,9 @@ source util/common_utils.sh
 
 # name of the script where the auth info will be saved
 readonly auth_script='set-sp.sh'
+
+# link for service principal help
+readonly sp_link='https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli'
 
 
 function main()
@@ -58,7 +63,7 @@ function create_service_principal_script()
 	local sp_creation_status=$?
 
 	# check the SP was created successfully
-	continue_or_error_and_exit $sp_creation_status "There was a problem creating the service principal. If you are logged into Azure CLI, then it could relate to lack of admin/owner permissions."
+	continue_or_error_and_exit $sp_creation_status "There was a problem creating the service principal. If you are logged into Azure CLI, then it could relate to lack of admin/owner permissions. See ${sp_link} for further details."
 
 	# determine authorization credentials
 	local subscription_id
