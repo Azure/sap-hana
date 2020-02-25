@@ -2,7 +2,7 @@
 disk_dict: {}
 start: 0
 azure_files_mount_path: "/sapmnt"
-components_list: []
+hdb_comp_list: []
 linux_comp_list: []
 windows_comp_list: []
 hana_install_path: "/hana/shared/install"
