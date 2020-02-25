@@ -16,3 +16,6 @@
 
 # ignore IDE files
 .idea/
+
+# service principal auth secrets
+set-sp.sh
