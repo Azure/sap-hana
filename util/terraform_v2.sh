@@ -57,9 +57,6 @@ function main()
 			check_command_line_arguments_for_template "$@"
 			terraform_destroy "${template_name}"
 			;;
-		'clean')
-			terraform_clean
-			;;
 		*)
 			print_usage_info_and_exit
 			;;
@@ -129,37 +126,6 @@ function terraform_destroy()
 }
 
 
-# Clean the Terraform files up
-function terraform_clean()
-{
-	local state_file="terraform.tfstate"
-	local state_backup_file="terraform.tfstate.backup"
-	local terraform_dir=".terraform"
-
-	# If none of the files to be cleaned exist
-	if [ ! -f "${state_file}" ] && [ ! -f "${state_backup_file}" ] && [ ! -d "${terraform_dir}" ]; then
-		echo "Cleaning" not required
-		return
-	fi
-
-	echo
-	echo "The following will be removed:"
-	[ -f "${state_file}"        ] && echo -e "\t${state_file}"
-	[ -f "${state_backup_file}" ] && echo -e "\t${state_backup_file}"
-	[ -d "${terraform_dir}"     ] && echo -e "\t${terraform_dir}/"
-	echo
-	read -rp "Continue? [y/n]: " confirm_clean
-
-	case "${confirm_clean}" in
-		y|Y )
-			rm -rf "${state_file}" "${state_backup_file}" "${terraform_dir}"
-			;;
-		*)
-			;;
-	esac
-}
-
-
 # This function prints the correct/expected script usage but does not exit
 function print_usage_info()
 {
@@ -171,11 +137,9 @@ function print_usage_info()
 	echo -e "\t${script_path} <command>"
 	echo
 	echo "The commands are:"
-	echo -e "\tinit                            Runs 'terraform init' with V2 codebase"
-	echo -e "\tplan ${input_file_term}       Runs 'terraform plan' with V2 codebase"
-	echo -e "\tapply ${input_file_term}      Runs 'terraform apply' with V2 codebase"
-	echo -e "\tdestroy ${input_file_term}    Runs 'terraform destroy' with V2 codebase"
-	echo -e "\tclean                           Removes the local Terraform state files"
+	echo -e "\tinit"
+	echo -e "\tapply ${input_file_term}"
+	echo -e "\tdestroy ${input_file_term}"
 	echo
 	echo "Where ${input_file_term} is one of the following:"
 	print_allowed_json_template_names
@@ -235,20 +199,6 @@ function check_json_template_exists()
 	if [ ! -f "${template_path}" ]; then
 		print_usage_info
 		error_and_exit "'${template_name}' is not a valid ${input_file_term} to use with the '${terraform_action}' option"
-	fi
-}
-
-
-
-# This functionn checks the auth script exists and loads it, otherwise it exits
-# with an appropriate error
-function load_auth_script_credentials()
-{
-	if [ -f ${auth_script} ]; then
-		# shellcheck source=/dev/null
-		source "${auth_script}"
-	else
-		error_and_exit "Authorization file not found: ${auth_script}. Try running util/create_service_principal.sh to create it."
 	fi
 }
 

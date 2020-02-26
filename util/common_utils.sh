@@ -28,6 +28,6 @@ function error_and_exit()
 {
 	local error_message="$1"
 
-	printf "%s\n" "ERROR: ${error_message}" >&2
+	echo "ERROR: ${error_message}"
 	exit 1
 }
