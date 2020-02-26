@@ -166,10 +166,10 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
    util/terraform_v2.sh init
    ```
 
-1. To easily deploy the system, run the following utility script:
+1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh apply
+   util/terraform_v2.sh apply single_node_hana
    ```
 
    **Note:** This process can take in the region of 90 minutes to complete.
@@ -185,10 +185,10 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
    By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
 
-1. To easily delete the provisioned resources, run the following utility script:
+1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh destroy
+   util/terraform_v2.sh destroy single_node_hana
    ```
 
 ## Summary
@@ -217,8 +217,8 @@ util/set_sap_download_credentials.sh S123456789 MySAPpass
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
 util/terraform_v2.sh init
-util/terraform_v2.sh apply
+util/terraform_v2.sh apply single_node_hana
 
 # Destroy Lifecycle: Takes about 15 minutes and is performed once per SAP system build
-util/terraform_v2.sh destroy
+util/terraform_v2.sh destroy single_node_hana
 ```

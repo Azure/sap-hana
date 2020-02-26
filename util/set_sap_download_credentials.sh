@@ -42,7 +42,7 @@ function check_command_line_arguments()
 
 	# Check there're just two arguments provided
 	if [[ ${args_count} -ne 2 ]]; then
-		continue_or_error_and_exit 1 "You must specify 2 command line arguments for the SAP download credentials: a username and a password"
+		error_and_exit "You must specify 2 command line arguments for the SAP download credentials: a username and a password"
 	fi
 }
 
