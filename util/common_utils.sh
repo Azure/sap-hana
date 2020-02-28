@@ -20,5 +20,14 @@ function continue_or_error_and_exit()
 	local status_code=$1
 	local error_message="$2"
 
-	((status_code != 0)) && { echo "ERROR: ${error_message}"; exit 1; }
+	((status_code != 0)) && { error_and_exit "${error_message}"; }
+}
+
+
+function error_and_exit()
+{
+	local error_message="$1"
+
+	printf "%s\n" "ERROR: ${error_message}" >&2
+	exit 1
 }
