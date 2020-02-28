@@ -129,6 +129,7 @@ function terraform_destroy()
 }
 
 
+<<<<<<< HEAD
 # Clean the Terraform files up
 function terraform_clean()
 {
@@ -158,6 +159,8 @@ function terraform_clean()
 	esac
 }
 
+=======
+>>>>>>> 3a596c9... Utility script support for multiple input JSON templates (#297) (#298)
 # This function prints the correct/expected script usage but does not exit
 function print_usage_info()
 {
@@ -172,7 +175,10 @@ function print_usage_info()
 	echo -e "\tinit"
 	echo -e "\tapply ${input_file_term}"
 	echo -e "\tdestroy ${input_file_term}"
+<<<<<<< HEAD
 	echo -e "\tclean"
+=======
+>>>>>>> 3a596c9... Utility script support for multiple input JSON templates (#297) (#298)
 	echo
 	echo "Where ${input_file_term} is one of the following:"
 	print_allowed_json_template_names
