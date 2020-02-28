@@ -9,6 +9,9 @@
 #   + SAP Bits download
 #   + HANA installation including XSA and SHINE
 #   + HANA Client/Studio installation on Linux/Windows jumpboxes
+
+# A pipeline with no CI trigger
+trigger: none
 schedules:
 - cron: '0 12 * * *'
   displayName: Daily full test at noon
