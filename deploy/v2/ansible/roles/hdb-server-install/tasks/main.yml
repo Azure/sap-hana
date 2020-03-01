@@ -2,24 +2,26 @@
 
 - name: Create HANA components list from output JSON
   set_fact:
-    components_list: "{{ components_list + [ item.key ] }}"
+    hdb_comp_list: "{{ hdb_comp_list + [ item.key ] }}"
   loop: "{{ hana_database.components|dict2items }}"
 
 - name: Merge HANA Components list with its depends on components
   set_fact:
-    install_comp: "{{  [ item.depends_on ] + components_list }}"
+    hdb_comp_list: "{{  [ item.depends_on ] + hdb_comp_list }}"
   loop: "{{ components }}"
-  when: 'item.component in components_list'
+  when: 
+    - item.component in hdb_comp_list
+    - item.depends_on is defined
 
 - name: Create unique list of HANA Components
   set_fact:
-    hana_components: "{{ install_comp|flatten(levels=1)|unique }}"
+    hdb_comp_list: "{{ hdb_comp_list|flatten(levels=1)|unique }}"
 
 # Install HANA Components
 - name: Install HANA Components
   include_role:
     name: components-install
     tasks_from: "{{ component }}.yml"
-  loop: "{{ hana_components }}"
+  loop: "{{ hdb_comp_list }}"
   loop_control:
     loop_var: component
