@@ -1,6 +1,6 @@
 schedules:
 - cron: '0 0 * * *'
-  displayName: Daily midnight clean up
+  displayName: Daily midnight clean up (UTC)
   branches:
     include:
     - master

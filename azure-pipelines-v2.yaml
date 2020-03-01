@@ -36,13 +36,13 @@ stages:
       displayName: 'Install python tools'
 #####################################################################
 # This stage create resources for below test cases:                 #
-# - Below testcases are tested only with SLES12                      # 
+# - Below testcases are tested only with SLES12 SP4                 # 
 #   - createAllNew: it creates all resources from scratch           # 
 #   - reuseRG: it only reuses an existing resource group            #
 #   - reuseVnet: it only reuses an existing vnet from createAllNew  #
 #   - reuseNSG: it only reuses an existing NSG from createAllNew    #
 # - createAllNew testcase will be test again with below OS          #
-#   - RHEL7                                                         #
+#   - RHEL7.3                                                       #
 #####################################################################
 - stage: CreatingResources
   dependsOn: SetEnv

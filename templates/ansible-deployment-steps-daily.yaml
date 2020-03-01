@@ -5,11 +5,16 @@
 parameters:
 #####################################################################
 # Eg:  testCaseName: current test case name eg: v2-reuseVNET-777    #
+#                                                                   #
+# For all possible values, please refer to:                         #
+# - azure-pipelines-v2-daily.yaml                                   #
+# - sap-hana/templates/README.MD                                    #
+#                                                                   #
 #####################################################################
     testCaseName: ''
 steps:
   - script: |
-      echo "Ansible Deployment in Progress..."
+      echo "Ansible Deployment in progress..."
       cd deploy/v2/ansible_config_files
       rti_user=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .authentication.username')
       rti_public_ip=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .public_ip_address')     
@@ -27,4 +32,3 @@ steps:
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
-
