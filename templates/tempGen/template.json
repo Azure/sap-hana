@@ -50,47 +50,8 @@
   },
   "jumpboxes": {
     "windows": [
-      {
-        "name": "jumpbox-windows",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "MicrosoftWindowsServer",
-          "offer": "WindowsServer",
-          "sku": "2016-Datacenter"
-        },
-        "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
-        },
-        "components": [
-          "hana_studio_windows",
-          "hana_client_windows"
-        ]
-      }
     ],
     "linux": [
-      {
-        "name": "jumpbox-linux",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18.04-LTS"
-        },
-        "authentication": {
-          "type": "key",
-          "username": "azureadm"
-        },
-        "components": [
-          "hana_studio_linux",
-          "hana_client_linux"
-        ]
-      },
       {
         "name": "rti",
         "destroy_after_deploy": "true",
@@ -136,17 +97,7 @@
         "cockpit_admin_password": "Manager1"
       },
       "components": {
-        "hana_database": [],
-        "hana_client_linux": [],
-        "xs": [
-          "xsac_alm_pi_ui",
-          "xsac_portal_serv",
-          "xsac_services",
-          "xsac_ui5_fesv5",
-          "xsac_ui5_sb",
-          "xsac_xsa_cockpit"
-        ],
-        "shine": []
+        "hana_database": []
       },
       "xsa": {
         "routing": "ports"
