@@ -37,3 +37,8 @@ output "storage-sapbits" {
 output "random-id" {
   value = random_id.random-id
 }
+
+# This is a temporary hack to get an subnet ID for the LB - only for testing LB against RTI
+# output "vnet_subnets" {
+#   value = azurerm_subnet.subnet-mgmt[0].id
+# }
