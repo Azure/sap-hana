@@ -115,8 +115,11 @@ module "hana_load_balancer" {
   location            = var.resource-group[0].location
   subnet_id           = var.subnet-mgmt[0].id
   frontend_ip         = "10.0.1.13"
+<<<<<<< HEAD
   instance_number     = "10"
   network_interfaces  = azurerm_network_interface.nic-linux
+=======
+>>>>>>> e4b87a3... Initial WIP for HANA load balancer with standard naming conventions
 }
 
 # VIRTUAL MACHINES ================================================================================================

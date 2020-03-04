@@ -43,7 +43,7 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
   count                          = length(local.lb_ports)
   resource_group_name            = var.resource_group_name
   loadbalancer_id                = azurerm_lb.hana-lb.id
-  name                           = "HANA_2.0_${local.lb_ports[count.index]}"
+  name                           = "HANA_${var.db_version}_${local.lb_ports[count.index]}"
   protocol                       = "Tcp"
   frontend_port                  = local.lb_ports[count.index]
   backend_port                   = local.lb_ports[count.index]
