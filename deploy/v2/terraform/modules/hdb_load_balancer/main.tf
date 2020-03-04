@@ -38,3 +38,15 @@ resource "azurerm_network_interface_backend_address_pool_association" "hana-lb-n
   ip_configuration_name   = var.network_interfaces[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.hana-lb-back-pool.id
 }
+
+resource "azurerm_lb_rule" "hana-lb-rules" {
+  count                          = length(local.lb_ports)
+  resource_group_name            = var.resource_group_name
+  loadbalancer_id                = azurerm_lb.hana-lb.id
+  name                           = "HANA_2.0_${local.lb_ports[count.index]}"
+  protocol                       = "Tcp"
+  frontend_port                  = local.lb_ports[count.index]
+  backend_port                   = local.lb_ports[count.index]
+  frontend_ip_configuration_name = module.hana_resource_names.lb_fe_ip_conf
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.hana-lb-back-pool.id
+}
