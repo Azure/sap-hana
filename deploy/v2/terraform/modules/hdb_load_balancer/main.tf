@@ -22,3 +22,12 @@ resource "azurerm_lb_backend_address_pool" "hana-lb-back-pool" {
   loadbalancer_id     = azurerm_lb.hana-lb.id
   name                = module.hana_resource_names.lb_be_pool
 }
+
+resource "azurerm_lb_probe" "hana-lb-health-probe" {
+  resource_group_name = var.resource_group_name
+  loadbalancer_id     = azurerm_lb.hana-lb.id
+  name                = module.hana_resource_names.lb_health_probe
+  port                = "625${var.instance_number}"
+  interval_in_seconds = 5
+  number_of_probes    = 2
+}
