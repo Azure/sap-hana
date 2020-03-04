@@ -115,6 +115,7 @@ module "hana_load_balancer" {
   location            = var.resource-group[0].location
   subnet_id           = var.subnet-mgmt[0].id
   frontend_ip         = "10.0.1.13"
+  instance_number     = "10"
 }
 
 # VIRTUAL MACHINES ================================================================================================
