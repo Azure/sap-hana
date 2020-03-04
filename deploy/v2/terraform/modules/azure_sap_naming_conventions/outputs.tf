@@ -13,9 +13,5 @@ output "lb_fe_ip_conf" {
 }
 
 output "lb_be_pool" {
-  value = "${local.short_name}-bep"
-}
-
-output "lb_health_probe" {
-  value = "${local.short_name}-hp"
+  value = local.short_name
 }
