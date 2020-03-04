@@ -57,6 +57,9 @@ function main()
 			check_command_line_arguments_for_template "$@"
 			terraform_destroy "${template_name}"
 			;;
+		'clean')
+			terraform_clean
+			;;
 		*)
 			print_usage_info_and_exit
 			;;
@@ -126,6 +129,35 @@ function terraform_destroy()
 }
 
 
+# Clean the Terraform files up
+function terraform_clean()
+{
+	local state_file="terraform.tfstate"
+	local state_backup_file="terraform.tfstate.backup"
+	local terraform_dir=".terraform"
+
+	if [ ! -f "${state_file}" -a ! -f "${state_backup_file}" -a ! -d "${terraform_dir}" ]; then
+		echo "Cleaning" not required
+		return
+	fi
+
+	echo
+	echo "The following will be removed:"
+	[ -f "${state_file}"        ] && echo -e "\t${state_file}"
+	[ -f "${state_backup_file}" ] && echo -e "\t${state_backup_file}"
+	[ -d "${terraform_dir}"     ] && echo -e "\t${terraform_dir}/"
+	echo
+	read -p "Continue? [y/n]: " confirm_clean
+
+	case "${confirm_clean}" in
+		y|Y )
+			rm -rf "${state_file}" "${state_backup_file}" "${terraform_dir}"
+			;;
+		*)
+			;;
+	esac
+}
+
 # This function prints the correct/expected script usage but does not exit
 function print_usage_info()
 {
@@ -140,6 +172,7 @@ function print_usage_info()
 	echo -e "\tinit"
 	echo -e "\tapply ${input_file_term}"
 	echo -e "\tdestroy ${input_file_term}"
+	echo -e "\tclean"
 	echo
 	echo "Where ${input_file_term} is one of the following:"
 	print_allowed_json_template_names
