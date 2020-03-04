@@ -17,3 +17,7 @@ variable "instance_number" {
   description = "The HANA DB Instance Number"
   default     = "00"
 }
+
+# Network interfaces are added to the back end pool
+variable "network_interfaces" {
+}
