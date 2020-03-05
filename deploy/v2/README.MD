@@ -65,12 +65,12 @@ A typical deployment lifecycle will require the following steps:
    * **VM deployment:** Connect to your VM using an SSH client.
    * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
    
-***Note***: Cloud Shell comes pre-installed with Terraform 0.12 which is now compatible with our scripts.
+   *(**Note**: Cloud Shell comes pre-installed with Terraform 0.12 which is now compatible with our scripts.)*
    
 2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
    * [Terraform](https://www.terraform.io/downloads.html)
 
-**Note**: The scripts have been tested with Terraform `v0.12.12` and Ansible `2.8`
+   *(**Note**: The scripts have been tested with Terraform `v0.12.12` and Ansible `2.8`)*
 
 3. Clone this repository:
 
@@ -242,7 +242,7 @@ And we only include OS configuration for:
 
 If you use BYOS iamge, the Ansible playbook will throw error during the OS configuration. 
 
-#### Running the deployment
+#### Running Terraform deployment
 10. Initialize a working directory containing Terraform configuration files:
     ```sh
     
@@ -305,4 +305,4 @@ Licensed under the [MIT License](LICENSE).
 
 We look forward to your feedback and welcome any contributions!
 
-Please freel free to reach out to our team at ![image](http://safemail.justlikeed.net/e/3149a6fc0a17ff3863440aa38a16501b.png).
+Please feel free to reach out to our team at ![image](http://safemail.justlikeed.net/e/3149a6fc0a17ff3863440aa38a16501b.png).
