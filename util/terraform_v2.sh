@@ -54,7 +54,6 @@ function main()
 		'destroy')
 			check_command_line_arguments_for_template "$@"
 			terraform_destroy "${template_name}"
-			;;
 		'clean')
 			terraform_clean
 			;;
@@ -156,6 +155,7 @@ function terraform_clean()
 			;;
 	esac
 }
+
 
 # This function prints the correct/expected script usage but does not exit
 function print_usage_info()
