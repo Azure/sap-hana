@@ -36,7 +36,7 @@ locals {
       "3${var.instance_number}17",
     ]
 
-    "2.0" = [
+    "2" = [
       "3${var.instance_number}13",
       "3${var.instance_number}15",
       "3${var.instance_number}40",
@@ -47,5 +47,7 @@ locals {
     ]
   }
 
-  lb_ports = lookup(local.lb_ports_src, var.db_version, local.lb_ports_src["2.0"])
+  hana_version_switch = split(".", var.db_version)[0]
+
+  lb_ports = lookup(local.lb_ports_src, local.hana_version_switch, local.lb_ports_src["2"])
 }
