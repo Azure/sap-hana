@@ -56,7 +56,8 @@ A typical deployment lifecycle will require the following steps:
 * [**Running Ansible Playbook**](#running-ansible-playbook)
 * [**Deleting the deployment**](#deleting-the-deployment) (optional)
 
-
+   *(**Note**: There are some script under [sap-hana/util](https://github.com/Azure/sap-hana/tree/master/util) would help if you are using Linux based workstation)*
+   
 ## Getting Started
 
 #### Preparing your environment
@@ -240,10 +241,10 @@ And we only include OS configuration for:
 - SLES 12
 - RHEL 7.
 
-If you use BYOS iamge, the Ansible playbook will throw error during the OS configuration. 
+If you use BYOS image, the Ansible playbook will throw error during the OS configuration. 
 
 #### Running Terraform deployment
-10. Initialize a working directory containing Terraform configuration files:
+10. Step into terraform folder sap-hana/deploy/v2/terraform, initialize a working directory containing Terraform configuration files:
     ```sh
     
     terraform init
@@ -286,7 +287,7 @@ If you use BYOS iamge, the Ansible playbook will throw error during the OS confi
 In your Azure Cloud Shell, run the following command to remove all deployed resources:
 
     ```sh
-    terraform destroy
+    terraform destroy -var-file=<JSON configuration file>
     ```
 
 ## Contributions
