@@ -22,7 +22,7 @@ The result is an object that can be used to reference all the names for related
 resources, configured to that particular resource type. For example:
 
 | Reference                          | Value                                  |
-+------------------------------------+----------------------------------------+
+|------------------------------------|----------------------------------------|
 | `module.hana_resource_names.rg`    | `PRD-EAUS-VNT-INFRASTRUCTURE`          |
 | `module.hana_resource_names.lb`    | `PRD-EAUS-VNT-DEV0-S4-Z00-hdb-alb`     |
 
