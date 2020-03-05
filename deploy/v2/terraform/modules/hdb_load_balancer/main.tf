@@ -49,4 +49,5 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
   backend_port                   = local.lb_ports[count.index]
   frontend_ip_configuration_name = module.hana_resource_names.lb_fe_ip_conf
   backend_address_pool_id        = azurerm_lb_backend_address_pool.hana-lb-back-pool.id
+  probe_id                       = azurerm_lb_probe.hana-lb-health-probe.id
 }
