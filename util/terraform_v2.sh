@@ -20,6 +20,8 @@ set -o nounset
 # import common functions that are reused across scripts
 source util/common_utils.sh
 
+# name of the script where the auth info should be saved
+readonly auth_script='set-sp.sh'
 
 readonly input_file_term='<JSON template name>'
 readonly target_path="deploy/v2"
@@ -143,6 +145,8 @@ function run_terraform_command()
 
 	local command="terraform ${options}"
 
+	load_auth_script_credentials
+
 	# describe the command that will be run (useful for debugging)
 	echo "Running the following Terraform command:"
 	echo
@@ -178,6 +182,20 @@ function check_json_template_exists()
 	if [ ! -f "${template_path}" ]; then
 		print_usage_info
 		error_and_exit "'${template_name}' is not a valid ${input_file_term} to use with the '${terraform_action}' option"
+	fi
+}
+
+
+
+# This functionn checks the auth script exists and loads it, otherwise it exits
+# with an appropriate error
+function load_auth_script_credentials()
+{
+	if [ -f ${auth_script} ]; then
+		# shellcheck source=/dev/null
+		source "${auth_script}"
+	else
+		error_and_exit "Authorization file not found: ${auth_script}. Try running util/create_service_principal.sh to create it."
 	fi
 }
 
