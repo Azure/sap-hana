@@ -73,6 +73,19 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   }
 }
 
+# LOAD BALANCER ===================================================================================================
+
+# For PoC testing, the FE IP and instance number are hard coded
+module "hana_load_balancer" {
+  source              = "../hdb_load_balancer"
+  resource_group_name = var.resource-group[0].name
+  location            = var.resource-group[0].location
+  subnet_id           = var.subnet-sap-db[0].id
+  frontend_ip         = "10.0.1.13"
+  instance_number     = "10"
+  network_interfaces  = azurerm_network_interface.nics-dbnodes-db
+}
+
 # VIRTUAL MACHINES ================================================================================================
 
 # Creates database VM
