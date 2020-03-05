@@ -81,7 +81,7 @@ module "hana_load_balancer" {
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
   subnet_id           = var.subnet-sap-db[0].id
-  frontend_ip         = "10.0.1.13"
+  frontend_ip         = "10.1.2.13"
   instance_number     = "10"
   network_interfaces  = azurerm_network_interface.nics-dbnodes-db
 }
