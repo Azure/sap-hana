@@ -192,6 +192,7 @@ function check_json_template_exists()
 function load_auth_script_credentials()
 {
 	if [ -f ${auth_script} ]; then
+		# shellcheck source=/dev/null
 		source "${auth_script}"
 	else
 		error_and_exit "Authorization file not found: ${auth_script}. Try running util/create_service_principal.sh to create it."
