@@ -56,13 +56,14 @@ resource "local_file" "output-json" {
     ],
     "software" = {
       "storage_account_sapbits" = {
-        "name"               = var.storage-sapbits[0].name,
-        "storage_access_key" = var.storage-sapbits[0].primary_access_key,
-        "blob_container_name"     = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
-        "file_share_name"         = lookup(var.software.storage_account_sapbits, "file_share_name", null)
+        "name"                = var.storage-sapbits[0].name,
+        "storage_access_key"  = var.storage-sapbits[0].primary_access_key,
+        "blob_container_name" = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
+        "file_share_name"     = lookup(var.software.storage_account_sapbits, "file_share_name", null)
       },
       "downloader" = var.software.downloader
     }
+    "options" = var.options
     }
   )
   filename = "${path.root}/../ansible_config_files/output.json"

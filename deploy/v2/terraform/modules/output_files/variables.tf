@@ -14,6 +14,10 @@ variable "software" {
   description = "Details of the information required to download SAP installation media"
 }
 
+variable "options" {
+  description = "Configuration options"
+}
+
 variable "nics-jumpboxes-linux" {
   description = "NICs of the Linux jumpboxes"
 }

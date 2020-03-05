@@ -51,6 +51,7 @@ module "output_files" {
   jumpboxes                    = var.jumpboxes
   databases                    = var.databases
   software                     = var.software
+  options                      = var.options
   storage-sapbits              = module.common_infrastructure.storage-sapbits
   nics-jumpboxes-windows       = module.jumpbox.nics-jumpboxes-windows
   nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux

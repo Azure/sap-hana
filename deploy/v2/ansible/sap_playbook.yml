@@ -1,5 +1,9 @@
 ---
 
+# TODO: 
+# Remove YAML shorthand style for roles (Eg. - { role: os-preparation }) 
+# And replace with newer syntax on https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
+
 - hosts: localhost
   become: true
   become_user: root
@@ -29,6 +33,11 @@
   roles:
     - { role: os-preparation }
     - { role: os-disk-setup }
+    - role: enable-prometheus
+      when:
+        - output.options.enable_prometheus == True
+        - ansible_facts['distribution_file_variety'] == 'SUSE'
+        - ansible_facts['distribution_version'] is regex("(12.[3-4]|15.\d)")
 
 # Mount Azure File share on all linux servers
 - hosts: all_linux_servers
