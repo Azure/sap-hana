@@ -54,6 +54,7 @@ function main()
 		'destroy')
 			check_command_line_arguments_for_template "$@"
 			terraform_destroy "${template_name}"
+			;;
 		'clean')
 			terraform_clean
 			;;
