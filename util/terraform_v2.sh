@@ -54,7 +54,6 @@ function main()
 		'destroy')
 			check_command_line_arguments_for_template "$@"
 			terraform_destroy "${template_name}"
-			;;
 		'clean')
 			terraform_clean
 			;;
@@ -127,7 +126,6 @@ function terraform_destroy()
 }
 
 
-<<<<<<< HEAD
 # Clean the Terraform files up
 function terraform_clean()
 {
@@ -135,7 +133,8 @@ function terraform_clean()
 	local state_backup_file="terraform.tfstate.backup"
 	local terraform_dir=".terraform"
 
-	if [ ! -f "${state_file}" -a ! -f "${state_backup_file}" -a ! -d "${terraform_dir}" ]; then
+	# If none of the files to be cleaned exist
+	if [ ! -f "${state_file}" ] && [ ! -f "${state_backup_file}" ] && [ ! -d "${terraform_dir}" ]; then
 		echo "Cleaning" not required
 		return
 	fi
@@ -146,7 +145,7 @@ function terraform_clean()
 	[ -f "${state_backup_file}" ] && echo -e "\t${state_backup_file}"
 	[ -d "${terraform_dir}"     ] && echo -e "\t${terraform_dir}/"
 	echo
-	read -p "Continue? [y/n]: " confirm_clean
+	read -rp "Continue? [y/n]: " confirm_clean
 
 	case "${confirm_clean}" in
 		y|Y )
@@ -157,8 +156,7 @@ function terraform_clean()
 	esac
 }
 
-=======
->>>>>>> 3a596c9... Utility script support for multiple input JSON templates (#297) (#298)
+
 # This function prints the correct/expected script usage but does not exit
 function print_usage_info()
 {
@@ -170,13 +168,11 @@ function print_usage_info()
 	echo -e "\t${script_path} <command>"
 	echo
 	echo "The commands are:"
-	echo -e "\tinit"
-	echo -e "\tapply ${input_file_term}"
-	echo -e "\tdestroy ${input_file_term}"
-<<<<<<< HEAD
-	echo -e "\tclean"
-=======
->>>>>>> 3a596c9... Utility script support for multiple input JSON templates (#297) (#298)
+	echo -e "\tinit                            Runs 'terraform init' with V2 codebase"
+	echo -e "\tplan ${input_file_term}       Runs 'terraform plan' with V2 codebase"
+	echo -e "\tapply ${input_file_term}      Runs 'terraform apply' with V2 codebase"
+	echo -e "\tdestroy ${input_file_term}    Runs 'terraform destroy' with V2 codebase"
+	echo -e "\tclean                           Removes the local Terraform state files"
 	echo
 	echo "Where ${input_file_term} is one of the following:"
 	print_allowed_json_template_names
