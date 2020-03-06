@@ -94,6 +94,6 @@ This is Azure pipeline test created for deploy/v2
         osVersion: "SLES12"
         osImage: '\"offer\": \"SLES-SAP\", 
                   \"publisher\": \"SUSE\", 
-                  \"sku\": \"12-sp2\"'
+                  \"sku\": \"12-SP5\"'
     ```
   - add the new OS into os_list under `stage: DestroyingResources` -> `job: cleanUp` -> varible `os_list`.
