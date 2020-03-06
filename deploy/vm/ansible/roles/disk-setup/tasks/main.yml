@@ -5,7 +5,7 @@
     name="{{ item }}"
     state=present
   with_items:
-    - gdisk
+    - gptfdisk
     - sg3_utils
     - lvm2
   tags:
