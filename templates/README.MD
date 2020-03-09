@@ -92,8 +92,8 @@ This is Azure pipeline test created for deploy/v2
     - template: templates/job-template-per-os.yaml
       parameters:
         osVersion: "SLES12"
-        osImage: '\"offer\": \"SLES-SAP\", 
+        osImage: '\"offer\": \"sles-sap-12-sp5\", 
                   \"publisher\": \"SUSE\", 
-                  \"sku\": \"12-sp2\"'
+                  \"sku\": \"gen1\"'
     ```
   - add the new OS into os_list under `stage: DestroyingResources` -> `job: cleanUp` -> varible `os_list`.
