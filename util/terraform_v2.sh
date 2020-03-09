@@ -20,6 +20,8 @@ set -o nounset
 # import common functions that are reused across scripts
 source util/common_utils.sh
 
+# name of the script where the auth info should be saved
+readonly auth_script='set-sp.sh'
 
 readonly input_file_term='<JSON template name>'
 readonly target_path="deploy/v2"
@@ -195,6 +197,8 @@ function run_terraform_command()
 	local options="$1"
 
 	local command="terraform ${options}"
+
+	load_auth_script_credentials
 
 	# describe the command that will be run (useful for debugging)
 	echo "Running the following Terraform command:"
