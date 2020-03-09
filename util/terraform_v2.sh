@@ -239,6 +239,19 @@ function check_json_template_exists()
 }
 
 
+# This function checks the auth script exists and loads it, otherwise it exits
+# with an appropriate error
+function load_auth_script_credentials()
+{
+	if [ -f ${auth_script} ]; then
+		# shellcheck source=/dev/null
+		source "${auth_script}"
+	else
+		error_and_exit "Authorization file not found: ${auth_script}. Try running util/create_service_principal.sh to create it."
+	fi
+}
+
+
 # This function pretty prints all the currently available template file names
 function print_allowed_json_template_names()
 {
