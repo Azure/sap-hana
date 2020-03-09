@@ -178,7 +178,7 @@ variable "url_retries_cnt" {
 }
 
 variable "url_retries_delay" {
-  description = "The time between each attempt to download the installation bits from the URLs"
+  description = "The time (in seconds) between each attempt to download the installation bits from the URLs"
   default     = 10
 }
 
@@ -188,7 +188,7 @@ variable "package_retries_cnt" {
 }
 
 variable "package_retries_delay" {
-  description = "The time between each attempt to install packages"
+  description = "The time (in seconds) between each attempt to install packages"
   default     = 10
 }
 
