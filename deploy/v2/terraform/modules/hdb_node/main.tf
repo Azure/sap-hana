@@ -106,7 +106,9 @@ resource "azurerm_lb_probe" "hana-lb-health-probe" {
   interval_in_seconds = 5
   number_of_probes    = 2
 }
-
+# TODO:
+# Current behavior, it will try to add all VMs in the cluster into the backend pool, which would not work since we do not have availability sets created yet.
+# In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
 resource "azurerm_network_interface_backend_address_pool_association" "hana-lb-nic-bep" {
   count                   = length(azurerm_network_interface.nics-dbnodes-db)
   network_interface_id    = azurerm_network_interface.nics-dbnodes-db[count.index].id
