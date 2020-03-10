@@ -12,6 +12,8 @@
 
 # A pipeline with no CI trigger
 trigger: none
+# A pipeline with no PR triggers
+pr: none
 schedules:
 - cron: '0 12 * * *'
   displayName: Daily full test at noon (UTC)
