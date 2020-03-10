@@ -20,9 +20,9 @@ backend_ip_pool_ids: []
 
 # VM specific values
 vm_name:
-source_image_offer: SLES-SAP
+source_image_offer: sles-sap-12-sp5
 source_image_publisher: SUSE
-source_image_sku: 12-SP3
+source_image_sku: gen1
 source_image_version: latest
 managed_disk_type: Premium_LRS
 vm_data_disks: []

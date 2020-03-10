@@ -24,10 +24,6 @@
     name: targetcli
     state: absent
 
-# HOTFIX for issue 220
-- name: Re-register the SLE instance against its respective cloud repository
-  command: /usr/sbin/registercloudguest --force-new
-
 - name: Install iSCSI target packages
   package:
     name: targetcli-fb

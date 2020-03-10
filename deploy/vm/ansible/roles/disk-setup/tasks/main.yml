@@ -5,9 +5,13 @@
     name="{{ item }}"
     state=present
   with_items:
-    - gdisk
+    - gptfdisk
     - sg3_utils
     - lvm2
+  register: result
+  retries: "{{ package_retries_cnt }}"
+  until: result.rc == 0
+  delay: "{{ package_retries_delay }}"
   tags:
   - disk_setup
 

@@ -35,6 +35,8 @@ resource null_resource "mount-disks-and-configure-hana" {
      \"url_timeout\": \"${var.url_timeout}\", \
      \"url_retries_cnt\": \"${var.url_retries_cnt}\", \
      \"url_retries_delay\": \"${var.url_retries_delay}\",\
+     \"package_retries_cnt\": \"${var.package_retries_cnt}\", \
+     \"package_retries_delay\": \"${var.package_retries_delay}\", \
      \"pwd_db_xsaadmin\": \"${var.pwd_db_xsaadmin}\", \
      \"pw_bastion_windows\": \"${var.pw_bastion_windows}\", \
      \"bastion_username_windows\": \"${var.bastion_username_windows}\", \

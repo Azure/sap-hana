@@ -106,9 +106,9 @@
         started: yes
         state: present
         image:
-            offer: SLES
+            offer: sles-sap-12-sp5
             publisher: SUSE
-            sku: 12-SP3
+            sku: gen1
             version: latest
       with_sequence: start=1 end="{{ n }}"
       async: 1500
