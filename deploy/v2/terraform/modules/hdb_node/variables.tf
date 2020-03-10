@@ -85,7 +85,7 @@ locals {
     ]
   }
 
-  # Hash of Load Balancers to create for
+  # Hash of Load Balancers to create for HANA instances
   loadbalancers = zipmap(
     range(
       length([
