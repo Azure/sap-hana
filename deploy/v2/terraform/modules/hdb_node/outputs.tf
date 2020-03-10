@@ -14,3 +14,7 @@ output "dbnode-data-disk-att" {
 output "loadbalancers" {
   value = azurerm_lb.hana-lb
 }
+
+output "loadbalancers" {
+  value = azurerm_lb.hana-lb
+}
