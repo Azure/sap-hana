@@ -130,6 +130,18 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
   probe_id                       = azurerm_lb_probe.hana-lb-health-probe[0].id
 }
 
+# AVAILABILITY SET ================================================================================================
+
+resource "azurerm_availability_set" "hana-as" {
+  for_each                     = local.loadbalancers
+  name                         = "${each.value.sid}-as"
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  platform_update_domain_count = 20
+  platform_fault_domain_count  = 2
+  managed                      = true
+}
+
 # VIRTUAL MACHINES ================================================================================================
 
 # Creates database VM
@@ -138,6 +150,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
   name                          = each.value.name
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
+  availability_set_id           = azurerm_availability_set.hana-as[0].id
   primary_network_interface_id  = azurerm_network_interface.nics-dbnodes-db[each.key].id
   network_interface_ids         = [azurerm_network_interface.nics-dbnodes-admin[each.key].id, azurerm_network_interface.nics-dbnodes-db[each.key].id]
   vm_size                       = lookup(local.sizes, each.value.size).compute.vm_size
