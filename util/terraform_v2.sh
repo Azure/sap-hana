@@ -239,8 +239,7 @@ function check_json_template_exists()
 }
 
 
-
-# This functionn checks the auth script exists and loads it, otherwise it exits
+# This function checks the auth script exists and loads it, otherwise it exits
 # with an appropriate error
 function load_auth_script_credentials()
 {

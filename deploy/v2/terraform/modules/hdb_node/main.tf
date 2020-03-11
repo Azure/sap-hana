@@ -73,6 +73,63 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   }
 }
 
+# LOAD BALANCER ===================================================================================================
+
+resource "azurerm_lb" "hana-lb" {
+  for_each            = local.loadbalancers
+  name                = "hana-${each.value.sid}-lb"
+  resource_group_name = var.resource-group[0].name
+  location            = var.resource-group[0].location
+
+  frontend_ip_configuration {
+    name                          = "hana-${each.value.sid}-lb-feip"
+    subnet_id                     = var.subnet-sap-db[0].id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.lb_fe_ip : lookup(each.value, "lb_fe_ip", false) != false ? each.value.lb_fe_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4 + length(local.dbnodes))
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "hana-lb-back-pool" {
+  for_each            = local.loadbalancers
+  resource_group_name = var.resource-group[0].name
+  loadbalancer_id     = azurerm_lb.hana-lb[tonumber(each.key)].id
+  name                = "hana-${each.value.sid}-lb-bep"
+}
+
+resource "azurerm_lb_probe" "hana-lb-health-probe" {
+  for_each            = local.loadbalancers
+  resource_group_name = var.resource-group[0].name
+  loadbalancer_id     = azurerm_lb.hana-lb[0].id
+  name                = "hana-${each.value.sid}-lb-hp"
+  port                = "625${each.value.instance_number}"
+  protocol            = "Tcp"
+  interval_in_seconds = 5
+  number_of_probes    = 2
+}
+
+# TODO:
+# Current behavior, it will try to add all VMs in the cluster into the backend pool, which would not work since we do not have availability sets created yet.
+# In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
+resource "azurerm_network_interface_backend_address_pool_association" "hana-lb-nic-bep" {
+  count                   = length(azurerm_network_interface.nics-dbnodes-db)
+  network_interface_id    = azurerm_network_interface.nics-dbnodes-db[count.index].id
+  ip_configuration_name   = azurerm_network_interface.nics-dbnodes-db[count.index].ip_configuration[0].name
+  backend_address_pool_id = azurerm_lb_backend_address_pool.hana-lb-back-pool[0].id
+}
+
+resource "azurerm_lb_rule" "hana-lb-rules" {
+  count                          = length(local.loadbalancers[0].ports)
+  resource_group_name            = var.resource-group[0].name
+  loadbalancer_id                = azurerm_lb.hana-lb[0].id
+  name                           = "HANA_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"
+  protocol                       = "Tcp"
+  frontend_port                  = local.loadbalancers[0].ports[count.index]
+  backend_port                   = local.loadbalancers[0].ports[count.index]
+  frontend_ip_configuration_name = "hana-${local.loadbalancers[0].sid}-lb-feip"
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.hana-lb-back-pool[0].id
+  probe_id                       = azurerm_lb_probe.hana-lb-health-probe[0].id
+}
+
 # VIRTUAL MACHINES ================================================================================================
 
 # Creates database VM

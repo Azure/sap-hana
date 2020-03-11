@@ -10,3 +10,7 @@ output "nics-dbnodes-db" {
 output "dbnodes" {
   value = azurerm_virtual_machine.vm-dbnode
 }
+
+output "loadbalancers" {
+  value = azurerm_lb.hana-lb
+}
