@@ -133,11 +133,13 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
 # AVAILABILITY SET ================================================================================================
 
 resource "azurerm_availability_set" "hana-as" {
-  for_each            = local.loadbalancers
-  name                = "${each.value.sid}-as"
-  location            = var.resource-group[0].location
-  resource_group_name = var.resource-group[0].name
-  managed             = true
+  for_each                     = local.loadbalancers
+  name                         = "${each.value.sid}-as"
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  platform_update_domain_count = 20
+  platform_fault_domain_count  = 2
+  managed                      = true
 }
 
 # VIRTUAL MACHINES ================================================================================================
