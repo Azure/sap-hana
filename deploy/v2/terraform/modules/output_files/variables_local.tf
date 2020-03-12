@@ -1,23 +1,3 @@
-variable "infrastructure" {
-  description = "Details of the Azure infrastructure to deploy the SAP landscape into"
-}
-
-variable "jumpboxes" {
-  description = "Details of the jumpboxes"
-}
-
-variable "databases" {
-  description = "Details of the HANA database nodes"
-}
-
-variable "software" {
-  description = "Details of the information required to download SAP installation media"
-}
-
-variable "options" {
-  description = "Configuration options"
-}
-
 variable "nics-jumpboxes-linux" {
   description = "NICs of the Linux jumpboxes"
 }

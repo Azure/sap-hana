@@ -1,15 +1,3 @@
-variable "jumpboxes" {
-  description = "Details of the jumpboxes"
-}
-
-variable "databases" {
-  description = "Details of the databases"
-}
-
-variable "infrastructure" {
-  description = "Details of the Azure infrastructure to deploy the SAP landscape into"
-}
-
 variable "resource-group" {
   description = "Details of the resource group"
 }
@@ -26,20 +14,12 @@ variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
-variable "sshkey" {
-  description = "Details of ssh key pair"
-}
-
 variable "output-json" {
   description = "Details of the output JSON"
 }
 
 variable "ansible-inventory" {
   description = "Details of the Ansible inventory"
-}
-
-variable "ssh-timeout" {
-  description = "Timeout for connection that is used by provisioner"
 }
 
 variable "random-id" {

@@ -7,20 +7,25 @@ provider "azurerm" {
 module "common_infrastructure" {
   source              = "./modules/common_infrastructure"
   is_single_node_hana = "true"
-  infrastructure      = var.infrastructure
-  software            = var.software
-  options             = var.options
   databases           = var.databases
+  infrastructure      = var.infrastructure
+  jumpboxes           = var.jumpboxes
+  options             = var.options
+  software            = var.software
+  ssh-timeout         = var.ssh-timeout
+  sshkey              = var.sshkey
 }
 
 # Create Jumpboxes and RTI box
 module "jumpbox" {
   source            = "./modules/jumpbox"
+  databases         = var.databases
   infrastructure    = var.infrastructure
   jumpboxes         = var.jumpboxes
-  databases         = var.databases
-  sshkey            = var.sshkey
+  options           = var.options
+  software          = var.software
   ssh-timeout       = var.ssh-timeout
+  sshkey            = var.sshkey
   resource-group    = module.common_infrastructure.resource-group
   subnet-mgmt       = module.common_infrastructure.subnet-mgmt
   nsg-mgmt          = module.common_infrastructure.nsg-mgmt
@@ -33,8 +38,12 @@ module "jumpbox" {
 # Create HANA database nodes
 module "hdb_node" {
   source           = "./modules/hdb_node"
-  infrastructure   = var.infrastructure
   databases        = var.databases
+  infrastructure   = var.infrastructure
+  jumpboxes        = var.jumpboxes
+  options          = var.options
+  software         = var.software
+  ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
   subnet-sap-admin = module.common_infrastructure.subnet-sap-admin
@@ -47,11 +56,13 @@ module "hdb_node" {
 # Generate output files
 module "output_files" {
   source                       = "./modules/output_files"
+  databases                    = var.databases
   infrastructure               = var.infrastructure
   jumpboxes                    = var.jumpboxes
-  databases                    = var.databases
-  software                     = var.software
   options                      = var.options
+  software                     = var.software
+  ssh-timeout                  = var.ssh-timeout
+  sshkey                       = var.sshkey
   storage-sapbits              = module.common_infrastructure.storage-sapbits
   nics-jumpboxes-windows       = module.jumpbox.nics-jumpboxes-windows
   nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux

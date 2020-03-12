@@ -1,11 +1,3 @@
-variable "databases" {
-  description = "Details of the HANA database nodes"
-}
-
-variable "infrastructure" {
-  description = "Details of the Azure infrastructure to deploy the SAP landscape into"
-}
-
 variable "resource-group" {
   description = "Details of the resource group"
 }
@@ -28,10 +20,6 @@ variable "nsg-db" {
 
 variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
-}
-
-variable "sshkey" {
-  description = "Details of ssh key pair"
 }
 
 # Imports HANA database sizing information
