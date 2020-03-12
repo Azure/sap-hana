@@ -65,11 +65,10 @@ resource "azurerm_public_ip" "public-ip-windows" {
 
 # Creates the NIC and IP address for Windows VMs
 resource "azurerm_network_interface" "nic-windows" {
-  count                     = length(var.jumpboxes.windows)
-  name                      = "${var.jumpboxes.windows[count.index].name}-nic1"
-  location                  = var.resource-group[0].location
-  resource_group_name       = var.resource-group[0].name
-  network_security_group_id = var.nsg-mgmt[0].id
+  count               = length(var.jumpboxes.windows)
+  name                = "${var.jumpboxes.windows[count.index].name}-nic1"
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
 
   ip_configuration {
     name                          = "${var.jumpboxes.windows[count.index].name}-nic1-ip"
@@ -91,11 +90,10 @@ resource "azurerm_public_ip" "public-ip-linux" {
 
 # Creates the NIC and IP address for Linux VMs
 resource "azurerm_network_interface" "nic-linux" {
-  count                     = length(var.jumpboxes.linux)
-  name                      = "${var.jumpboxes.linux[count.index].name}-nic1"
-  location                  = var.resource-group[0].location
-  resource_group_name       = var.resource-group[0].name
-  network_security_group_id = var.nsg-mgmt[0].id
+  count               = length(var.jumpboxes.linux)
+  name                = "${var.jumpboxes.linux[count.index].name}-nic1"
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
 
   ip_configuration {
     name                          = "${var.jumpboxes.linux[count.index].name}-nic1-ip"
@@ -106,52 +104,57 @@ resource "azurerm_network_interface" "nic-linux" {
   }
 }
 
+# tag: azurerm 2.0.0
+# Manages the association between NIC and NSG.
+resource "azurerm_network_interface_security_group_association" "nic-windows-nsg" {
+  count                     = length(var.jumpboxes.windows)
+  network_interface_id      = azurerm_network_interface.nic-windows[count.index].id
+  network_security_group_id = var.nsg-mgmt[0].id
+}
+
+resource "azurerm_network_interface_security_group_association" "nic-linux-nsg" {
+  count                     = length(var.jumpboxes.linux)
+  network_interface_id      = azurerm_network_interface.nic-linux[count.index].id
+  network_security_group_id = var.nsg-mgmt[0].id
+}
+
 # VIRTUAL MACHINES ================================================================================================
 
-# Creates Linux VM
-resource "azurerm_virtual_machine" "vm-linux" {
-  count                         = length(var.jumpboxes.linux)
-  name                          = var.jumpboxes.linux[count.index].name
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-linux[count.index].id]
-  vm_size                       = var.jumpboxes.linux[count.index].size
-  delete_os_disk_on_termination = "true"
+# tag: azurerm 2.0.0
+# Manages Linux Virtual Machine for Linux jumpboxes
+resource "azurerm_linux_virtual_machine" "vm-linux" {
+  count                           = length(var.jumpboxes.linux)
+  name                            = var.jumpboxes.linux[count.index].name
+  location                        = var.resource-group[0].location
+  resource_group_name             = var.resource-group[0].name
+  network_interface_ids           = [azurerm_network_interface.nic-linux[count.index].id]
+  size                            = var.jumpboxes.linux[count.index].size
+  computer_name                   = var.jumpboxes.linux[count.index].name
+  admin_username                  = var.jumpboxes.linux[count.index].authentication.username
+  admin_password                  = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
+  disable_password_authentication = var.jumpboxes.linux[count.index].authentication.type != "password" ? true : false
 
-  storage_os_disk {
-    name              = "${var.jumpboxes.linux[count.index].name}-osdisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = var.jumpboxes.linux[count.index].disk_type
+  os_disk {
+    name                 = "${var.jumpboxes.linux[count.index].name}-osdisk"
+    caching              = "ReadWrite"
+    storage_account_type = var.jumpboxes.linux[count.index].disk_type
   }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = var.jumpboxes.linux[count.index].os.publisher
     offer     = var.jumpboxes.linux[count.index].os.offer
     sku       = var.jumpboxes.linux[count.index].os.sku
     version   = "latest"
   }
 
-  os_profile {
-    computer_name  = var.jumpboxes.linux[count.index].name
-    admin_username = var.jumpboxes.linux[count.index].authentication.username
-    admin_password = lookup(var.jumpboxes.linux[count.index].authentication, "password", null)
-  }
+  admin_ssh_key {
+    username   = var.jumpboxes.linux[count.index].authentication.username
+    public_key = file(var.sshkey.path_to_public_key)
 
-  os_profile_linux_config {
-    disable_password_authentication = var.jumpboxes.linux[count.index].authentication.type != "password" ? true : false
-    dynamic "ssh_keys" {
-      for_each = var.jumpboxes.linux[count.index].authentication.type != "password" ? ["key"] : []
-      content {
-        path     = "/home/${var.jumpboxes.linux[count.index].authentication.username}/.ssh/authorized_keys"
-        key_data = file(var.sshkey.path_to_public_key)
-      }
-    }
   }
 
   boot_diagnostics {
-    enabled     = true
-    storage_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 
   tags = {
@@ -186,78 +189,62 @@ resource "azurerm_virtual_machine" "vm-linux" {
   }
 }
 
-# Creates Windows VM
-resource "azurerm_virtual_machine" "vm-windows" {
-  count                         = length(var.jumpboxes.windows)
-  name                          = var.jumpboxes.windows[count.index].name
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
-  network_interface_ids         = [azurerm_network_interface.nic-windows[count.index].id]
-  vm_size                       = var.jumpboxes.windows[count.index].size
-  delete_os_disk_on_termination = "true"
+# tag: azurerm 2.0.0
+# Manages Windows Virtual Machine for Windows jumpboxes
+resource "azurerm_windows_virtual_machine" "vm-windows" {
+  count                 = length(var.jumpboxes.windows)
+  name                  = var.jumpboxes.windows[count.index].name
+  location              = var.resource-group[0].location
+  resource_group_name   = var.resource-group[0].name
+  network_interface_ids = [azurerm_network_interface.nic-windows[count.index].id]
+  size                  = var.jumpboxes.windows[count.index].size
+  computer_name         = var.jumpboxes.windows[count.index].name
+  admin_username        = var.jumpboxes.windows[count.index].authentication.username
+  admin_password        = var.jumpboxes.windows[count.index].authentication.password
+  custom_data           = base64encode("Param($ComputerName = \"${var.jumpboxes.windows[count.index].name}\") ${file("${path.module}/winrm_files/winrm.ps1")}")
+  provision_vm_agent    = true
 
-  storage_os_disk {
-    name              = "${var.jumpboxes.windows[count.index].name}-osdisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = var.jumpboxes.windows[count.index].disk_type
+  os_disk {
+    name                 = "${var.jumpboxes.windows[count.index].name}-osdisk"
+    caching              = "ReadWrite"
+    storage_account_type = var.jumpboxes.windows[count.index].disk_type
   }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = var.jumpboxes.windows[count.index].os.publisher
     offer     = var.jumpboxes.windows[count.index].os.offer
     sku       = var.jumpboxes.windows[count.index].os.sku
     version   = "latest"
   }
 
-  os_profile {
-    computer_name  = var.jumpboxes.windows[count.index].name
-    admin_username = var.jumpboxes.windows[count.index].authentication.username
-    admin_password = var.jumpboxes.windows[count.index].authentication.password
-    custom_data    = "Param($ComputerName = \"${var.jumpboxes.windows[count.index].name}\") ${file("${path.module}/winrm_files/winrm.ps1")}"
+  secret {
+    certificate {
+      store = "My"
+      url   = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
+    }
+    key_vault_id = azurerm_key_vault.key-vault.id
   }
 
-  os_profile_secrets {
-    source_vault_id = azurerm_key_vault.key-vault.id
-
-    vault_certificates {
-      certificate_url   = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
-      certificate_store = "My"
-    }
+  winrm_listener {
+    protocol        = "Https"
+    certificate_url = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
   }
 
-  os_profile_windows_config {
-    provision_vm_agent = true
 
-    winrm {
-      protocol = "Http"
-    }
+  # Auto-Login's required to configure WinRM
+  additional_unattend_content {
+    setting = "AutoLogon"
+    content = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>2</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
+  }
 
-    winrm {
-      protocol        = "Https"
-      certificate_url = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
-    }
-
-    # Auto-Login's required to configure WinRM
-    additional_unattend_config {
-      pass         = "oobeSystem"
-      component    = "Microsoft-Windows-Shell-Setup"
-      setting_name = "AutoLogon"
-      content      = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>2</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
-    }
-
-    # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
-    additional_unattend_config {
-      pass         = "oobeSystem"
-      component    = "Microsoft-Windows-Shell-Setup"
-      setting_name = "FirstLogonCommands"
-      content      = file("${path.module}/winrm_files/FirstLogonCommands.xml")
-    }
+  # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
+  additional_unattend_content {
+    setting = "FirstLogonCommands"
+    content = file("${path.module}/winrm_files/FirstLogonCommands.xml")
   }
 
   boot_diagnostics {
-    enabled     = true
-    storage_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 
   tags = {
@@ -269,7 +256,7 @@ resource "azurerm_virtual_machine" "vm-windows" {
 #   1. Copy folder ansible_config_files over to RTI
 #   2. Install Git/Ansible and clone GitHub repo on RTI
 resource "null_resource" "prepare-rti" {
-  depends_on = [azurerm_virtual_machine.vm-linux]
+  depends_on = [azurerm_linux_virtual_machine.vm-linux]
   connection {
     type        = "ssh"
     host        = local.rti-info[0].public_ip_address

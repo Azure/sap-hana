@@ -94,3 +94,35 @@ locals {
     ]
   )
 }
+
+# List of data disks to be created for HANA DB nodes
+locals {
+  data-disk-per-dbnode = flatten([
+    for storage_type in lookup(local.sizes, local.dbnodes[0].size).storage : [
+      for disk_count in range(storage_type.count) : {
+        name                      = join("-", [storage_type.name, disk_count])
+        storage_account_type      = storage_type.disk_type,
+        disk_size_gb              = storage_type.size_gb,
+        caching                   = storage_type.caching,
+        write_accelerator_enabled = storage_type.write_accelerator
+      }
+    ]
+    if storage_type.name != "os"
+  ])
+
+  data-disk-list = flatten([
+    for database in var.databases : [
+      for dbnode in database.dbnodes : [
+        for datadisk in local.data-disk-per-dbnode : {
+          name                      = join("-", [dbnode.name, datadisk.name])
+          caching                   = datadisk.caching
+          storage_account_type      = datadisk.storage_account_type
+          disk_size_gb              = datadisk.disk_size_gb
+          write_accelerator_enabled = datadisk.write_accelerator_enabled
+        }
+      ]
+    ]
+    if database.platform == "HANA"
+    ]
+  )
+}
