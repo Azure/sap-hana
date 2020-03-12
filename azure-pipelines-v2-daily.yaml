@@ -56,9 +56,9 @@ stages:
   - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "SLES12"
-      osImage: '\"offer\": \"SLES-SAP\", 
+      osImage: '\"offer\": \"sles-sap-12-sp5\", 
                 \"publisher\": \"SUSE\", 
-                \"sku\": \"12-SP4\"'
+                \"sku\": \"gen1\"'
   - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "RHEL7"
