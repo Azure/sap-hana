@@ -166,6 +166,12 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
    util/terraform_v2.sh init
    ```
 
+1. To easily check which resources will be deployed, run the following utility script:
+
+   ```text
+   util/terraform_v2.sh plan single_node_hana
+   ```
+
 1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
@@ -190,6 +196,14 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
    ```text
    util/terraform_v2.sh destroy single_node_hana
    ```
+
+1. To easily clean up the working directries and files, run the following utility script:
+
+   ```text
+   util/terraform_v2.sh clean
+   ```
+
+   :hand: This is a destructive and irreversible process. It list which files are to be removed, and will ask for confirmation.
 
 ## Summary
 
