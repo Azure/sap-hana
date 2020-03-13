@@ -56,9 +56,9 @@ stages:
   - template: templates/job-template-per-os.yaml
     parameters:
       osVersion: "RHEL7"
-      osImage: '\"offer\": \"RHEL-SAP-HANA\", 
+      osImage: '\"offer\": \"RHEL-SAP-HA\", 
                 \"publisher\": \"RedHat\", 
-                \"sku\": \"7.3\"'
+                \"sku\": \"7.6\"'
 #####################################################################
 # This stage destroy resources created from all above test cases.   #
 # It will be triggered after stage CreatingResources is finished.   #

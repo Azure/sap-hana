@@ -56,15 +56,15 @@ stages:
   - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "SLES12"
-      osImage: '\"offer\": \"SLES-SAP\", 
+      osImage: '\"offer\": \"sles-sap-12-sp5\", 
                 \"publisher\": \"SUSE\", 
-                \"sku\": \"12-SP4\"'
+                \"sku\": \"gen1\"'
   - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "RHEL7"
-      osImage: '\"offer\": \"RHEL-SAP-HANA\", 
+      osImage: '\"offer\": \"RHEL-SAP-HA\", 
                 \"publisher\": \"RedHat\", 
-                \"sku\": \"7.3\"'
+                \"sku\": \"7.6\"'
 #####################################################################
 # This stage destroy resources created from all above test cases.   #
 # It will be triggered after stage CreatingResources is finished.   #
