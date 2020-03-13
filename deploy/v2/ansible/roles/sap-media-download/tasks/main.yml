@@ -15,8 +15,13 @@
     pip3 install beautifulsoup4
   become: true
 
+- name: Check whether the installation media already exists and extracted
+  stat: path={{ azure_files_mount_path }}/DB/DATA_UNITS
+  register: extract_path_status
+
 - name: Download installation media
   shell: "python3 {{ sap_media_download_script_loc }}/python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"
+  when: extract_path_status == false
 
 - name: Identify media archive
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
@@ -27,3 +32,4 @@
     src: "{{ azure_files_mount_path }}/DB/{{bits_file.stdout}}"
     dest: "{{ azure_files_mount_path }}/DB"
     remote_src: yes
+    creates: "{{ azure_files_mount_path }}/DB/DATA_UNITS"
