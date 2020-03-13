@@ -104,8 +104,7 @@ resource "azurerm_network_interface" "nic-linux" {
   }
 }
 
-# tag: azurerm 2.0.0
-# Manages the association between NIC and NSG.
+# Manages the association between NIC and NSG
 resource "azurerm_network_interface_security_group_association" "nic-windows-nsg" {
   count                     = length(var.jumpboxes.windows)
   network_interface_id      = azurerm_network_interface.nic-windows[count.index].id
@@ -120,7 +119,6 @@ resource "azurerm_network_interface_security_group_association" "nic-linux-nsg" 
 
 # VIRTUAL MACHINES ================================================================================================
 
-# tag: azurerm 2.0.0
 # Manages Linux Virtual Machine for Linux jumpboxes
 resource "azurerm_linux_virtual_machine" "vm-linux" {
   count                           = length(var.jumpboxes.linux)
@@ -189,7 +187,6 @@ resource "azurerm_linux_virtual_machine" "vm-linux" {
   }
 }
 
-# tag: azurerm 2.0.0
 # Manages Windows Virtual Machine for Windows jumpboxes
 resource "azurerm_windows_virtual_machine" "vm-windows" {
   count                 = length(var.jumpboxes.windows)
@@ -237,7 +234,7 @@ resource "azurerm_windows_virtual_machine" "vm-windows" {
     content = "<AutoLogon><Password><Value>${var.jumpboxes.windows[count.index].authentication.password}</Value></Password><Enabled>true</Enabled><LogonCount>2</LogonCount><Username>${var.jumpboxes.windows[count.index].authentication.username}</Username></AutoLogon>"
   }
 
-  # Unattend config is to enable basic auth in WinRM, required for the provisioner stage.
+  # Unattended config is to enable basic auth in WinRM, required for the provisioner stage
   additional_unattend_content {
     setting = "FirstLogonCommands"
     content = file("${path.module}/winrm_files/FirstLogonCommands.xml")

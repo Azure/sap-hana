@@ -71,7 +71,6 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   }
 }
 
-# tag: azurerm 2.0.0
 # Manages the association between NIC and NSG.
 resource "azurerm_network_interface_security_group_association" "nic-dbnodes-admin-nsg" {
   for_each                  = local.dbnodes
@@ -156,8 +155,7 @@ resource "azurerm_availability_set" "hana-as" {
 
 # VIRTUAL MACHINES ================================================================================================
 
-# tag: azurerm 2.0.0
-# Create managed data disk
+# Creates managed data disk
 resource "azurerm_managed_disk" "data-disk" {
   count                = length(local.data-disk-list)
   name                 = local.data-disk-list[count.index].name
@@ -168,7 +166,6 @@ resource "azurerm_managed_disk" "data-disk" {
   disk_size_gb         = local.data-disk-list[count.index].disk_size_gb
 }
 
-# tag: azurerm 2.0.0
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   for_each            = local.dbnodes
@@ -213,7 +210,6 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   }
 }
 
-# tag: azurerm 2.0.0
 # Manages attaching a Disk to a Virtual Machine
 resource "azurerm_virtual_machine_data_disk_attachment" "vm-dbnode-data-disk" {
   count                     = length(local.data-disk-list)
