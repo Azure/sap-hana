@@ -26,12 +26,12 @@ resource "azurerm_network_security_rule" "nsr-db" {
   name                        = "nsr-subnet-db"
   resource_group_name         = var.nsg-db[0].resource_group_name
   network_security_group_name = var.nsg-db[0].name
-  priority                    = 102
+  priority                    = 101
   direction                   = "Inbound"
   access                      = "allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = "*"
+  destination_port_range      = 22
   source_address_prefix       = var.infrastructure.vnets.management.subnet_mgmt.prefix
   destination_address_prefix  = var.infrastructure.vnets.sap.subnet_db.prefix
 }
