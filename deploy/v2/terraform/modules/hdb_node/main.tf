@@ -173,6 +173,7 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   computer_name       = each.value.name
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
+  availability_set_id = azurerm_availability_set.hana-as[0].id
   network_interface_ids = [
     azurerm_network_interface.nics-dbnodes-admin[each.key].id,
     azurerm_network_interface.nics-dbnodes-db[each.key].id
