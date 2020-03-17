@@ -16,8 +16,10 @@ steps:
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" << EOF
       ansible-playbook --version
       cd sap-hana
-      git checkout $(System.PullRequest.SourceBranch)      
+      git checkout nancyc-reuse-sa  
+#      git checkout $(System.PullRequest.SourceBranch)      
       EOF
+      ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" 'OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES" ANSIBLE_HOST_KEY_CHECKING="False" ansible-playbook -i hosts sap-hana/deploy/v2/ansible/sap_playbook.yml'
       echo "Ansible Deployment disabled"
     displayName: 'Ansible Deployment'
     env:
