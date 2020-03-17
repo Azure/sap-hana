@@ -1,0 +1,42 @@
+# This Azure pipeline YAML is a step template that will perform:
+# - update input template with custom JSON
+# - Deployment for the current test case
+
+parameters:
+#####################################################################
+# Eg:  testCaseName: current test case name eg: v2-reuseVNET-777    #
+#####################################################################
+    testCaseName: ''
+    osImage: ''
+steps:
+  - script: |
+      ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
+      echo "Update ${{parameters.testCaseName}}.json"
+      cd templates/tempGen
+      sed -i "s|var-sap-user|$(hana-smp-nancyc-username)|g" template-daily.json
+      sed -i "s|var-sap-password|$(hana-smp-nancyc-password)|g" template-daily.json
+      sed -i "s|var-os-image|${{parameters.osImage}}|g" template-daily.json
+      cat template-daily.json
+      python tempGen.py --custom=${{parameters.testCaseName}}.json --template=template-daily.json --output=${{parameters.testCaseName}}.json
+      echo "Input JSON for terraform ready:"
+      cat ${{parameters.testCaseName}}.json
+    displayName: "Prepare input JSON"
+  - script: |
+      echo "Terraform Deployment in Progress..."
+      cd deploy/v2/terraform
+      terraform -version
+      terraform init
+      terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
+    displayName: 'Terraform Deployment'
+    env:
+      TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
+      TF_VAR_azure_service_principal_pw: $(hana-pipeline-spn-pw)
+      AZURE_CLIENT_ID: $(hana-pipeline-spn-id)
+      AZURE_SECRET: $(hana-pipeline-spn-pw)
+      AZURE_TENANT: $(landscape-tenant)
+      AZURE_SUBSCRIPTION_ID: $(landscape-subscription)
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+

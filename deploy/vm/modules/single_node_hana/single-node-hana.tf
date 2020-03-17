@@ -106,7 +106,7 @@ resource "null_resource" "destroy-vm" {
                ANSIBLE_HOST_KEY_CHECKING="False" \
                ansible-playbook -u '${var.vm_user}' \
                --private-key '${var.sshkey_path_private}' \
-               --extra-vars="{az_resource_group: \"${module.common_setup.resource_group_name}\", az_vm_name: \"${local.linux_vm_name}\"}" ../../ansible/delete_bastion_linux.yml
+               --extra-vars="{az_resource_group: \"${module.common_setup.resource_group_name}\", az_vm_name: \"${local.linux_vm_name}\", linux_bastion: \"${var.linux_bastion}\"}" ../../ansible/delete_bastion_linux.yml
 EOT
 
   }

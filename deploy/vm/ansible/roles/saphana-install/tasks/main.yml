@@ -1,4 +1,24 @@
 ---
+# SAP Note 2593824 - Linux Running SAP applications compiled with GCC 7.x
+- name: Install GCC 7.x for RedHat
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - compat-sap-c++-7
+    - libatomic
+  when:  ansible_os_family == "RedHat"
+
+- name: Install GCC 7.x for Suse
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libgcc_s1
+    - libstdc++6
+    - libatomic1
+  when:  ansible_os_family == "Suse"
+
 - name: create install dir
   file:
     path: /hana/shared/install

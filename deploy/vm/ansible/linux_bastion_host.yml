@@ -37,7 +37,7 @@
 - hosts: localhost
   tasks:
     - name: Retrieve the public IP of the new linux bastion vm
-      azure_rm_publicipaddress_facts:
+      azure_rm_publicipaddress_info:
         resource_group: "{{ az_json.az_resource_group }}"
         name:  "{{ az_json.az_vm_name }}-pip"
       register: lbh_metadata

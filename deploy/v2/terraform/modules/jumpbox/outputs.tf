@@ -24,5 +24,5 @@ output "prepare-rti" {
 }
 
 output "vm-windows" {
-  value = azurerm_virtual_machine.vm-windows
+  value = azurerm_windows_virtual_machine.vm-windows
 }
