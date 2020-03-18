@@ -167,63 +167,47 @@ resource "azurerm_managed_disk" "data-disk" {
 }
 
 # Manages Linux Virtual Machine for HANA DB servers
-# VIRTUAL MACHINES ================================================================================================
+resource "azurerm_linux_virtual_machine" "vm-dbnode" {
+  for_each            = local.dbnodes
+  name                = each.value.name
+  computer_name       = each.value.name
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
+  availability_set_id = azurerm_availability_set.hana-as[0].id
+  network_interface_ids = [
+    azurerm_network_interface.nics-dbnodes-db[each.key].id,
+    azurerm_network_interface.nics-dbnodes-admin[each.key].id
+  ]
+  size                            = lookup(local.sizes, each.value.size).compute.vm_size
+  admin_username                  = each.value.authentication.username
+  admin_password                  = lookup(each.value.authentication, "password", null)
+  disable_password_authentication = each.value.authentication.type != "password" ? true : false
 
-# TODO:
-# Currently there is an issue with SSH logon to HANA database VM if it is created with azurerm_linux_virtual_machine
-# Will migrate this code to use azurerm_linux_virtual_machine when the above issue fixed
-
-# Creates HANA database VM using azurerm_virtual_machine
-resource "azurerm_virtual_machine" "vm-dbnode" {
-  for_each                      = local.dbnodes
-  name                          = each.value.name
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
-  availability_set_id           = azurerm_availability_set.hana-as[0].id
-  primary_network_interface_id  = azurerm_network_interface.nics-dbnodes-db[each.key].id
-  network_interface_ids         = [azurerm_network_interface.nics-dbnodes-admin[each.key].id, azurerm_network_interface.nics-dbnodes-db[each.key].id]
-  vm_size                       = lookup(local.sizes, each.value.size).compute.vm_size
-  delete_os_disk_on_termination = "true"
-
-  dynamic "storage_os_disk" {
+  dynamic "os_disk" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, each.value.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name              = "${each.value.name}-osdisk"
-      caching           = disk.value.caching
-      create_option     = "FromImage"
-      managed_disk_type = disk.value.disk_type
-      disk_size_gb      = disk.value.size_gb
+      name                 = "${each.value.name}-osdisk"
+      caching              = disk.value.caching
+      storage_account_type = disk.value.disk_type
+      disk_size_gb         = disk.value.size_gb
     }
   }
 
-  storage_image_reference {
+  source_image_reference {
     publisher = each.value.os.publisher
     offer     = each.value.os.offer
     sku       = each.value.os.sku
     version   = "latest"
   }
 
-  os_profile {
-    computer_name  = each.value.name
-    admin_username = each.value.authentication.username
-    admin_password = lookup(each.value.authentication, "password", null)
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = each.value.authentication.type != "password" ? true : false
-    dynamic "ssh_keys" {
-      for_each = each.value.authentication.type != "password" ? ["key"] : []
-      content {
-        path     = "/home/${each.value.authentication.username}/.ssh/authorized_keys"
-        key_data = file(var.sshkey.path_to_public_key)
-      }
-    }
+  admin_ssh_key {
+    username   = each.value.authentication.username
+    public_key = file(var.sshkey.path_to_public_key)
   }
 
   boot_diagnostics {
-    enabled     = true
-    storage_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
 
@@ -231,7 +215,7 @@ resource "azurerm_virtual_machine" "vm-dbnode" {
 resource "azurerm_virtual_machine_data_disk_attachment" "vm-dbnode-data-disk" {
   count                     = length(local.data-disk-list)
   managed_disk_id           = azurerm_managed_disk.data-disk[count.index].id
-  virtual_machine_id        = azurerm_virtual_machine.vm-dbnode[floor(count.index / length(local.data-disk-list))].id
+  virtual_machine_id        = azurerm_linux_virtual_machine.vm-dbnode[floor(count.index / length(local.data-disk-list))].id
   caching                   = local.data-disk-list[count.index].caching
   write_accelerator_enabled = local.data-disk-list[count.index].write_accelerator_enabled
   lun                       = count.index
