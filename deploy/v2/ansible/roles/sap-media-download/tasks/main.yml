@@ -21,7 +21,7 @@
 
 - name: Download installation media
   shell: "python3 {{ sap_media_download_script_loc }}/python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"
-  when: extract_path_status == false
+  when: extract_path_status.stat.exists == false
 
 - name: Identify media archive
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
