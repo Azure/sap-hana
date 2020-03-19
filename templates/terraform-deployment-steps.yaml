@@ -16,6 +16,8 @@ steps:
       sed -i "s|var-sap-user|$(hana-smp-nancyc-username)|g" template.json
       sed -i "s|var-sap-password|$(hana-smp-nancyc-password)|g" template.json
       sed -i "s|var-os-image|${{parameters.osImage}}|g" template.json
+      sed -i "s|var-sa-access-key|$(hana-pipeline-sa-access-key)|g" template.json
+      sed -i "s|var-sa-arm-id|$(hana-pipeline-sa-arm-id)|g" template.json
       cat template.json
       python tempGen.py --custom=${{parameters.testCaseName}}.json --template=template.json --output=${{parameters.testCaseName}}.json
       echo "Input JSON for terraform ready:"
