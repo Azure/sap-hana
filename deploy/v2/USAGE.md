@@ -160,6 +160,13 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 
 ## Build/Update/Destroy Lifecycle
 
+In the following steps you will need to substitute a `<template_name>` for the template. The options are:
+
+- `single_node_hana`
+- `clustered_hana`
+
+:hand: It is important to note that code checkout can only be used for one deployment at a time, due to the Terraform working files.
+
 1. To easily initialize Terraform, run the following utility script:
 
    ```text
@@ -169,13 +176,13 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To easily check which resources will be deployed, run the following utility script:
 
    ```text
-   util/terraform_v2.sh plan single_node_hana
+   util/terraform_v2.sh plan <template_name>
    ```
 
-1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
+1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
 
    ```text
-   util/terraform_v2.sh apply single_node_hana
+   util/terraform_v2.sh apply <template_name>
    ```
 
    **Note:** This process can take in the region of 90 minutes to complete.
@@ -191,10 +198,10 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
    By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
 
-1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
+1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
 
    ```text
-   util/terraform_v2.sh destroy single_node_hana
+   util/terraform_v2.sh destroy <template_name>
    ```
 
 1. To easily clean up the working directries and files, run the following utility script:
