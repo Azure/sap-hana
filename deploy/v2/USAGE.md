@@ -126,19 +126,10 @@ This script can then be used (_sourced_) to configure the required environment v
      Retrying role assignment creation: 2/36
    A service principal has been created in Azure > App registrations, with the name: sp-eng-test
    Azure authorization details can be found within the script: set-sp.sh
-   You can enable this authorization by sourcing the script using the following command:
-   source set-sp.sh
+   The Azure authorization details are automatically used by the utility scripts if present.
    ```
 
-1. To source the authorization script, setting the required environment variables, run the following:
-
-   ```text
-   source set-sp.sh
-   ```
-
-   **Note:** The authorization script contains secret information, which you should store and secure appropriately.
-
-   **Note:** This step will need to be repeated for every new shell session. For example, if you logout of your VM, or open a new terminal session.
+   **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
 
 ### Configuring Deployment Template
 
@@ -235,7 +226,6 @@ util/check_subscription.sh
 
 # Configure Azure Authorization: Takes under a minute and is performed once per subscription
 util/create_service_principal.sh sp-eng-test
-source set-sp.sh
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
 util/set_sap_download_credentials.sh single_node_hana S123456789 MySAPpass
