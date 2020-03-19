@@ -126,19 +126,10 @@ This script can then be used (_sourced_) to configure the required environment v
      Retrying role assignment creation: 2/36
    A service principal has been created in Azure > App registrations, with the name: sp-eng-test
    Azure authorization details can be found within the script: set-sp.sh
-   You can enable this authorization by sourcing the script using the following command:
-   source set-sp.sh
+   The Azure authorization details are automatically used by the utility scripts if present.
    ```
 
-1. To source the authorization script, setting the required environment variables, run the following:
-
-   ```text
-   source set-sp.sh
-   ```
-
-   **Note:** The authorization script contains secret information, which you should store and secure appropriately.
-
-   **Note:** This step will need to be repeated for every new shell session. For example, if you logout of your VM, or open a new terminal session.
+   **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
 
 ### Configuring Deployment Template
 
@@ -150,15 +141,26 @@ The minimal amount of change required to an example configuration file is to con
 
 Configuring your SAP Launchpad credentials for the simplest example JSON input file requires you to provide your SAP user and password to another utility script.
 
+Configuring the SAP Launchpad credentials is done on a per template basis:
+
 1. Run the following utility script to configure your SAP download credentials:
 
    ```text
-   util/set_sap_download_credentials.sh <sap_user> <sap_password>
+   util/set_sap_download_credentials.sh <template_name> <sap_user> <sap_password>
    ```
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
 
+   **Note:** The current templates are `single_node_hana` and `clustered_hana`
+
 ## Build/Update/Destroy Lifecycle
+
+In the following steps you will need to substitute a `<template_name>` for the template. The options are:
+
+- `single_node_hana`
+- `clustered_hana`
+
+:hand: It is important to note that code checkout can only be used for one deployment at a time, due to the Terraform working files.
 
 1. To easily initialize Terraform, run the following utility script:
 
@@ -169,13 +171,13 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To easily check which resources will be deployed, run the following utility script:
 
    ```text
-   util/terraform_v2.sh plan single_node_hana
+   util/terraform_v2.sh plan <template_name>
    ```
 
-1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
+1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
 
    ```text
-   util/terraform_v2.sh apply single_node_hana
+   util/terraform_v2.sh apply <template_name>
    ```
 
    **Note:** This process can take in the region of 90 minutes to complete.
@@ -191,10 +193,10 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
    By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
 
-1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
+1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
 
    ```text
-   util/terraform_v2.sh destroy single_node_hana
+   util/terraform_v2.sh destroy <template_name>
    ```
 
 1. To easily clean up the working directries and files, run the following utility script:
@@ -224,10 +226,9 @@ util/check_subscription.sh
 
 # Configure Azure Authorization: Takes under a minute and is performed once per subscription
 util/create_service_principal.sh sp-eng-test
-source set-sp.sh
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
-util/set_sap_download_credentials.sh S123456789 MySAPpass
+util/set_sap_download_credentials.sh single_node_hana S123456789 MySAPpass
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
 util/terraform_v2.sh init
