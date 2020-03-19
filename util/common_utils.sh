@@ -31,3 +31,13 @@ function error_and_exit()
 	printf "%s\n" "ERROR: ${error_message}" >&2
 	exit 1
 }
+
+
+function check_file_exists()
+{
+	local file_path="$1"
+
+	if [ ! -f "${file_path}" ]; then
+		error_and_exit "File ${file_path} does not exist"
+	fi
+}
