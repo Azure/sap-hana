@@ -41,3 +41,15 @@ function check_file_exists()
 		error_and_exit "File ${file_path} does not exist"
 	fi
 }
+
+
+# This function pretty prints all the currently available template file names
+function print_allowed_json_template_names()
+{
+	local target_dir="$1"
+
+	# list JSON files in the templates dir
+	# filter the output of 'find' to extract just the filenames without extensions
+	# prefix the results with indents and hyphen bullets
+	find ${target_dir} -name '*.json' | sed -e 's/.*\/\(.*\)\.json/  - \1/'
+}

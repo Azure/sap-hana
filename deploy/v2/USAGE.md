@@ -70,6 +70,7 @@ Running the code requires the following tools with the minimal supported/tested 
    ```
 
    Example output:
+
    ```text
    azure-cli = 2.0.77
    Terraform = 0.12.16
@@ -101,6 +102,7 @@ Before running any of the following code/scripts, you should login to the Azure 
    ```
 
    Example output:
+
    ```text
    Your current subscription is MyOrg Azure Subscription (ID=f1b1baa4-3eda-4940-b907-263813c5b967)
    ```
@@ -118,6 +120,7 @@ This script can then be used (_sourced_) to configure the required environment v
    ```
 
    Example output:
+
    ```text
    Creating Azure Service Principal: sp-eng-test...
    Changing "sp-eng-test" to a valid URI of "http://sp-eng-test", which is the required format used for service principal names
@@ -146,7 +149,7 @@ Configuring the SAP Launchpad credentials is done on a per template basis:
 1. Run the following utility script to configure your SAP download credentials:
 
    ```text
-   util/set_sap_download_credentials.sh <template_name> <sap_user> <sap_password>
+   util/set_sap_download_credentials.sh <sap_user> <sap_password> <template_name>
    ```
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
@@ -228,7 +231,7 @@ util/check_subscription.sh
 util/create_service_principal.sh sp-eng-test
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
-util/set_sap_download_credentials.sh single_node_hana S123456789 MySAPpass
+util/set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
 util/terraform_v2.sh init
