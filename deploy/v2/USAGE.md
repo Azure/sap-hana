@@ -142,9 +142,7 @@ Therefore example configuration files have been supplied with the code.
 
 The minimal amount of change required to an example configuration file is to configure your SAP Launchpad credentials so that the code can automatically login and download the required SAP packages to install.
 
-Configuring your SAP Launchpad credentials for the simplest example JSON input file requires you to provide your SAP user and password to another utility script.
-
-Configuring the SAP Launchpad credentials is done on a per template basis:
+Configuring your SAP Launchpad credentials for a JSON template requires you to provide your SAP user and password to another utility script. This needs to be done for each template you intend to deploy.
 
 1. Run the following utility script to configure your SAP download credentials:
 
