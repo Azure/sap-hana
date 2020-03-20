@@ -121,7 +121,7 @@
       },
       "size": "Demo",
       "filesystem": "xfs",
-      "high_availability": false,
+      "high_availability": true,
       "authentication": {
         "type": "key",
         "username": "azureadm"
