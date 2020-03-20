@@ -104,7 +104,7 @@ Before running any of the following code/scripts, you should login to the Azure 
    Example output:
 
    ```text
-   Your current subscription is MyOrg Azure Subscription (ID=f1b1baa4-3eda-4940-b907-263813c5b967)
+   Your current subscription is MyOrg Azure Subscription (ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
    ```
 
 ### Configuring Authorization with Azure
@@ -124,7 +124,7 @@ This script can then be used (_sourced_) to configure the required environment v
    ```text
    Creating Azure Service Principal: sp-eng-test...
    Changing "sp-eng-test" to a valid URI of "http://sp-eng-test", which is the required format used for service principal names
-   Creating a role assignment under the scope of "/subscriptions/0cbd16ac-c0b4-4c4a-9bca-4ca95477f0a9"
+   Creating a role assignment under the scope of "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
      Retrying role assignment creation: 1/36
      Retrying role assignment creation: 2/36
    A service principal has been created in Azure > App registrations, with the name: sp-eng-test
@@ -152,16 +152,12 @@ Configuring your SAP Launchpad credentials for a JSON template requires you to p
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
 
-   **Note:** The current templates are `single_node_hana` and `clustered_hana`
+   **Note:** The current templates are located in `deploy/v2/template_samples/` and you do not need to specify the `.json` extension.
 
 ## Build/Update/Destroy Lifecycle
 
-In the following steps you will need to substitute a `<template_name>` for the template. The options are:
-
-- `single_node_hana`
-- `clustered_hana`
-
-:hand: It is important to note that code checkout can only be used for one deployment at a time, due to the Terraform working files.
+In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\
+`util/terraform_v2.sh`
 
 1. To easily initialize Terraform, run the following utility script:
 
@@ -175,7 +171,7 @@ In the following steps you will need to substitute a `<template_name>` for the t
    util/terraform_v2.sh plan <template_name>
    ```
 
-1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
+1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
    util/terraform_v2.sh apply <template_name>
@@ -194,7 +190,7 @@ In the following steps you will need to substitute a `<template_name>` for the t
 1. To review/inspect the provisioned resources navigate to the `test_rg` resource group of your configured Azure subscription in Azure portal.
    By default, all the provisioned resources (excluding the service principal) are deployed into the same resource group.
 
-1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`, `clustered_hana`):
+1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
    util/terraform_v2.sh destroy <template_name>
