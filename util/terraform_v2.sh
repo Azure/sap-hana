@@ -178,7 +178,7 @@ function print_usage_info()
 	echo -e "\tclean                           Removes the local Terraform state files"
 	echo
 	echo "Where ${input_file_term} is one of the following:"
-	print_allowed_json_template_names
+	print_allowed_json_template_names "${target_template_dir}"
 	echo
 }
 
@@ -250,17 +250,6 @@ function load_auth_script_credentials()
 		error_and_exit "Authorization file not found: ${auth_script}. Try running util/create_service_principal.sh to create it."
 	fi
 }
-
-
-# This function pretty prints all the currently available template file names
-function print_allowed_json_template_names()
-{
-	# list JSON files in the templates dir
-	# filter the output of 'find' to extract just the filenames without extensions
-	# prefix the results with indents and hyphen bullets
-	find ${target_template_dir} -name '*.json' | sed -e 's/.*\/\(.*\)\.json/  - \1/'
-}
-
 
 # Execute the main program flow with all arguments
 main "$@"
