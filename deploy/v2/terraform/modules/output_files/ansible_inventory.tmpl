@@ -45,19 +45,19 @@ localhost  ansible_connection=ssh  ansible_user=${jumpbox-linux.authentication.u
 %{~ endfor }
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }
 %{~ if dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.type == "key" }
-${ips-dbnodes-db[index(ips-dbnodes-admin, ip-dbnode-admin)]}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}
+${ip-dbnode-admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}
 %{~ endif }
 %{~ if dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.type == "password" }
-${ips-dbnodes-db[index(ips-dbnodes-admin, ip-dbnode-admin)]}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}  ansible_ssh_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}  ansible_become_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}
+${ip-dbnode-admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}  ansible_ssh_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}  ansible_become_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}
 %{~ endif }
 %{~ endfor }
 
 [hanadbnodes]
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }
 %{~ if dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.type == "key" }
-${ips-dbnodes-db[index(ips-dbnodes-admin, ip-dbnode-admin)]}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}
+${ip-dbnode-admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}
 %{~ endif }
 %{~ if dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.type == "password" }
-${ips-dbnodes-db[index(ips-dbnodes-admin, ip-dbnode-admin)]}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}  ansible_ssh_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}  ansible_become_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}
+${ip-dbnode-admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.username}  ansible_ssh_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}  ansible_become_pass=${dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.password}
 %{~ endif }
 %{~ endfor }
