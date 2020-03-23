@@ -222,7 +222,7 @@
     "path_to_private_key": "~/.ssh/id_rsa"
   },
   "options": {
-    "ansible_execution": true,
+    "ansible_execution": false,
     "enable_secure_transfer": true,
     "enable_prometheus": true
   }
