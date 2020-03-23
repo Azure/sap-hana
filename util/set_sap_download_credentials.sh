@@ -52,7 +52,7 @@ function check_command_line_arguments()
 
 function list_available_templates()
 {
-	print_allowed_json_template_names "${target_template_dir}" | grep -v 'rti_only'
+	print_allowed_json_template_names "${target_template_dir}" | grep 'hana'
 }
 
 
