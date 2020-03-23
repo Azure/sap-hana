@@ -51,5 +51,5 @@ function print_allowed_json_template_names()
 	# list JSON files in the templates dir
 	# filter the output of 'find' to extract just the filenames without extensions
 	# prefix the results with indents and hyphen bullets
-	find ${target_dir} -name '*.json' | sed -e 's/.*\/\(.*\)\.json/  - \1/'
+	find "${target_dir}" -name '*.json' | sed -e 's/.*\/\(.*\)\.json/  - \1/'
 }
