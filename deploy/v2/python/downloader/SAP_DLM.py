@@ -159,7 +159,7 @@ class DownloadItem:
             if resp.status_code >= 200 and resp.status_code < 300:
                 break
             print("Received status code %d -> retrying..." % resp.status_code)
-        assert(resp.status_code in [200, 206]), \
+        assert(resp.status_code >= 200 and resp.status_code < 300), \
             "Unexpected response from DLM; status = %d" % (resp.status_code)
 
         with open(target, "wb") as f:
