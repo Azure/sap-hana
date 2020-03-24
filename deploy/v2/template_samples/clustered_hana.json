@@ -161,10 +161,6 @@
         {
           "name": "hdb1",
           "role": "worker"
-        },
-        {
-          "name": "hdb2",
-          "role": "worker"
         }
       ]
     }
