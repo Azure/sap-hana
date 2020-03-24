@@ -1,5 +1,5 @@
 #SUSE bug 1167134
-- name: disable Disable hostname setup 
+- name: Disable hostname setup 
   shell: |
     TARGET_KEY="DHCLIENT_SET_HOSTNAME"
     REPLACEMENT_VALUE="\"no\""
