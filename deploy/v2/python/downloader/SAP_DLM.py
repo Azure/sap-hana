@@ -156,7 +156,7 @@ class DownloadItem:
             resp  = DLM.sess.get(DLM.url_token, params=payload, timeout=resp_timeout_sec, stream=True, headers=resume_header)
             if self.last_pos > 0:
                 print("Resume at last_pos %s" % self.last_pos)
-            if resp.status_code in [200, 206]:
+            if resp.status_code >= 200 and resp.status_code < 300:
                 break
             print("Received status code %d -> retrying..." % resp.status_code)
         assert(resp.status_code in [200, 206]), \
