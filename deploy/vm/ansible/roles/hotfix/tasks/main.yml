@@ -1,0 +1,7 @@
+#SUSE bug 1167134
+- name: Disable hostname setup 
+  shell: |
+    TARGET_KEY="DHCLIENT_SET_HOSTNAME"
+    REPLACEMENT_VALUE="\"no\""
+    CONFIG_FILE="/etc/sysconfig/network/dhcp"
+    sed -i "s/\($TARGET_KEY *= *\).*/\1$REPLACEMENT_VALUE/" $CONFIG_FILE
