@@ -215,7 +215,7 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
 resource "azurerm_virtual_machine_data_disk_attachment" "vm-dbnode-data-disk" {
   count                     = length(local.data-disk-list)
   managed_disk_id           = azurerm_managed_disk.data-disk[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.vm-dbnode[floor(count.index / length(local.data-disk-list))].id
+  virtual_machine_id        = azurerm_linux_virtual_machine.vm-dbnode[floor(count.index / length(local.data-disk-per-dbnode))].id
   caching                   = local.data-disk-list[count.index].caching
   write_accelerator_enabled = local.data-disk-list[count.index].write_accelerator_enabled
   lun                       = count.index
