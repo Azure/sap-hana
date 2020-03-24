@@ -28,23 +28,19 @@ locals {
 }
 
 locals {
+  # Filter the list of databases to only HANA platform entries
+  hana-databases = [
+    for database in var.databases : database
+    if database.platform == "HANA"
+  ]
+
   # Numerically indexed Hash of HANA DB nodes to be created
-  dbnodes = zipmap(
-    range(
-      length(
-        flatten([
-          for database in var.databases : [
-            for dbnode in database.dbnodes : dbnode.name
-          ]
-          if database.platform == "HANA"
-        ])
-      )
-    ),
-    flatten([
-      for database in var.databases : [
+  dbnodes = flatten([
+    [
+      for database in local.hana-databases : [
         for dbnode in database.dbnodes : {
           platform       = database.platform,
-          name           = dbnode.name,
+          name           = "${dbnode.name}-0",
           admin_nic_ip   = lookup(dbnode, "admin_nic_ip", false),
           db_nic_ip      = lookup(dbnode, "db_nic_ip", false),
           size           = database.size,
@@ -53,9 +49,23 @@ locals {
           sid            = database.instance.sid
         }
       ]
-      if database.platform == "HANA"
-    ])
-  )
+    ],
+    [
+      for database in local.hana-databases : [
+        for dbnode in database.dbnodes : {
+          platform       = database.platform,
+          name           = "${dbnode.name}-1",
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ip", false),
+          db_nic_ip      = lookup(dbnode, "db_nic_ip", false),
+          size           = database.size,
+          os             = database.os,
+          authentication = database.authentication
+          sid            = database.instance.sid
+        }
+      ]
+      if database.high_availability
+    ]
+  ])
 
   # Ports used for specific HANA Versions
   lb_ports = {
@@ -77,12 +87,11 @@ locals {
   loadbalancers = zipmap(
     range(
       length([
-        for database in var.databases : database.instance.sid
-        if database.platform == "HANA"
+        for database in local.hana-databases : database.instance.sid
       ])
     ),
     [
-      for database in var.databases : {
+      for database in local.hana-databases : {
         sid             = database.instance.sid
         instance_number = database.instance.instance_number
         ports           = [
@@ -90,7 +99,6 @@ locals {
         ]
         lb_fe_ip        = lookup(database, "lb_fe_ip", false),
       }
-      if database.platform == "HANA"
     ]
   )
 }
@@ -111,18 +119,14 @@ locals {
   ])
 
   data-disk-list = flatten([
-    for database in var.databases : [
-      for dbnode in database.dbnodes : [
-        for datadisk in local.data-disk-per-dbnode : {
-          name                      = join("-", [dbnode.name, datadisk.name])
-          caching                   = datadisk.caching
-          storage_account_type      = datadisk.storage_account_type
-          disk_size_gb              = datadisk.disk_size_gb
-          write_accelerator_enabled = datadisk.write_accelerator_enabled
-        }
-      ]
+    for dbnode in local.dbnodes : [
+      for datadisk in local.data-disk-per-dbnode : {
+        name                      = join("-", [dbnode.name, datadisk.name])
+        caching                   = datadisk.caching
+        storage_account_type      = datadisk.storage_account_type
+        disk_size_gb              = datadisk.disk_size_gb
+        write_accelerator_enabled = datadisk.write_accelerator_enabled
+      }
     ]
-    if database.platform == "HANA"
-    ]
-  )
+  ])
 }
