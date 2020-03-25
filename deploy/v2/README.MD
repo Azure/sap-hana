@@ -242,7 +242,7 @@ And we only include OS configuration for:
 - SLES 12
 - RHEL 7.
 
-<sup>[2](#myfootnote2)</sup>: With [Prometheus](https://prometheus.io/) enabled, you will have more possiblity when you monitor your HANA instance using Azure Monitor for SAP Solutions (preview).
+<sup>[2](#myfootnote2)</sup>: Enabling [promethus](https://prometheus.io/) will enrich the set of telemetry even more when you monitor your Hana Instance using Azure Monitor for SAP Solutions
 
 If you use BYOS image, the Ansible playbook will throw error during the OS configuration. 
 
