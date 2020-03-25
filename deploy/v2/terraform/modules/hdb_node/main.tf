@@ -129,7 +129,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "hana-lb-n
 }
 
 resource "azurerm_lb_rule" "hana-lb-rules" {
-  count                          = length(local.loadbalancers[0].ports)
+  count                          = length(local.loadbalancers-ports)
   resource_group_name            = var.resource-group[0].name
   loadbalancer_id                = azurerm_lb.hana-lb[0].id
   name                           = "HANA_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"

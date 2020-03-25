@@ -94,29 +94,34 @@ locals {
       for database in local.hana-databases : {
         sid             = database.instance.sid
         instance_number = database.instance.instance_number
-        ports           = [
+        ports = [
           for port in local.lb_ports[split(".", database.db_version)[0]] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
         ]
-        lb_fe_ip        = lookup(database, "lb_fe_ip", false),
+        lb_fe_ip = lookup(database, "lb_fe_ip", false),
       }
     ]
   )
+
+  # List of ports for load balancer
+  loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
 }
 
 # List of data disks to be created for HANA DB nodes
 locals {
-  data-disk-per-dbnode = flatten([
-    for storage_type in lookup(local.sizes, local.dbnodes[0].size).storage : [
-      for disk_count in range(storage_type.count) : {
-        name                      = join("-", [storage_type.name, disk_count])
-        storage_account_type      = storage_type.disk_type,
-        disk_size_gb              = storage_type.size_gb,
-        caching                   = storage_type.caching,
-        write_accelerator_enabled = storage_type.write_accelerator
-      }
-    ]
-    if storage_type.name != "os"
-  ])
+  data-disk-per-dbnode = flatten(
+    length(local.dbnodes) > 0 ?
+    [
+      for storage_type in lookup(local.sizes, local.dbnodes[0].size).storage : [
+        for disk_count in range(storage_type.count) : {
+          name                      = join("-", [storage_type.name, disk_count])
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+        }
+      ]
+      if storage_type.name != "os"
+  ] : [])
 
   data-disk-list = flatten([
     for dbnode in local.dbnodes : [
