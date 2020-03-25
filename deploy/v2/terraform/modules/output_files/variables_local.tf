@@ -33,5 +33,25 @@ locals {
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
-  dbnodes                      = flatten([for database in var.databases : [for dbnode in database.dbnodes : { role = dbnode.role, platform = database.platform, authentication = database.authentication, name = dbnode.name }]])
+  dbnodes                      = flatten([
+    for database in var.databases : flatten([
+      [
+        for dbnode in database.dbnodes : {
+          role           = dbnode.role,
+          platform       = database.platform,
+          authentication = database.authentication,
+          name           = "${dbnode.name}-0"
+        }
+      ],
+      [
+        for dbnode in database.dbnodes : {
+          role           = dbnode.role,
+          platform       = database.platform,
+          authentication = database.authentication,
+          name           = "${dbnode.name}-1"
+        }
+        if database.high_availability
+      ]
+    ])
+  ])
 }
