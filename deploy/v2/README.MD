@@ -133,7 +133,7 @@ A typical deployment lifecycle will require the following steps:
     cd sap-hana/deploy/v2
     ```
 
-9. Use a text editor to create a JSON configuration file. There are filled examples under `sap-hana/deploy/v2/template_samples`. Full version of supported JSON configuration see below:
+9. Use a text editor to create a JSON configuration file. For complete JSON samples, please check [template-daily](https://github.com/Azure/sap-hana/blob/master/templates/tempGen/template-daily.json) which is used in our daily test, or [template](https://github.com/Azure/sap-hana/blob/master/templates/tempGen/template.json) which is used for all PRs. `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested. Full version of supported JSON configuration see below:
 
 | Section                                                         | Key                                           | Type              | Explain                                                                                                                                                                                                                                                                                                                                                                                                                |
 |-----------------------------------------------------------------|-----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -233,6 +233,7 @@ A typical deployment lifecycle will require the following steps:
 | <sub></sub>                                                     | <sub>path_to_public_key</sub>                 | <sub>string</sub> | <sub>(Optional) Path to public key. Reuiqred if key is used as   Authentication.type for any virtual machine. All deployed virtual machine   will share the same SSH key pair.</sub>                                                                                                                                                                                                                                   |
 | <sub>options</sub>                                              | <sub>enable_secure_transfer</sub>             | <sub>bool</sub>   | <sub>(Optional) Default true. If se to true, secure transfer will   be enabled.</sub>                                                                                                                                                                                                                                                                                                                                  |
 | <sub></sub>                                                     | <sub>ansible_execution</sub>                  | <sub>bool</sub>   | <sub>(Optional) Default true. If set to true, Ansible playbook will   be executed from jumpbox from terraform deployment.</sub>                                                                                                                                                                                                                                                                                       |
+| <sub></sub>                                                     | <sub>enable_prometheus</sub>                  | <sub>bool</sub>   | <sub>(Optional) Default true. If set to true, Ansible playbook will enable prometheus<sup>[2](#myfootnote2)</sup> on the VM.</sub>                                                                                                                                                                                                                                                                                       |
 
 
 <sup>[1](#myfootnote1)</sup>: Current Ansible playbook suppports images for SAP applications, e.g. SLES-SAP, RHEL-SAP-HANA. 
@@ -240,6 +241,8 @@ A typical deployment lifecycle will require the following steps:
 And we only include OS configuration for:
 - SLES 12
 - RHEL 7.
+
+<sup>[2](#myfootnote2)</sup>: Enabling [promethus](https://prometheus.io/) will enrich the set of telemetry even more when you monitor your Hana Instance using Azure Monitor for SAP Solutions
 
 If you use BYOS image, the Ansible playbook will throw error during the OS configuration. 
 

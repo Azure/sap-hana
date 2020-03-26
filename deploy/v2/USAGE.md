@@ -70,6 +70,7 @@ Running the code requires the following tools with the minimal supported/tested 
    ```
 
    Example output:
+
    ```text
    azure-cli = 2.0.77
    Terraform = 0.12.16
@@ -101,8 +102,9 @@ Before running any of the following code/scripts, you should login to the Azure 
    ```
 
    Example output:
+
    ```text
-   Your current subscription is MyOrg Azure Subscription (ID=f1b1baa4-3eda-4940-b907-263813c5b967)
+   Your current subscription is MyOrg Azure Subscription (ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
    ```
 
 ### Configuring Authorization with Azure
@@ -118,27 +120,19 @@ This script can then be used (_sourced_) to configure the required environment v
    ```
 
    Example output:
+
    ```text
    Creating Azure Service Principal: sp-eng-test...
    Changing "sp-eng-test" to a valid URI of "http://sp-eng-test", which is the required format used for service principal names
-   Creating a role assignment under the scope of "/subscriptions/0cbd16ac-c0b4-4c4a-9bca-4ca95477f0a9"
+   Creating a role assignment under the scope of "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
      Retrying role assignment creation: 1/36
      Retrying role assignment creation: 2/36
    A service principal has been created in Azure > App registrations, with the name: sp-eng-test
    Azure authorization details can be found within the script: set-sp.sh
-   You can enable this authorization by sourcing the script using the following command:
-   source set-sp.sh
+   The Azure authorization details are automatically used by the utility scripts if present.
    ```
 
-1. To source the authorization script, setting the required environment variables, run the following:
-
-   ```text
-   source set-sp.sh
-   ```
-
-   **Note:** The authorization script contains secret information, which you should store and secure appropriately.
-
-   **Note:** This step will need to be repeated for every new shell session. For example, if you logout of your VM, or open a new terminal session.
+   **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
 
 ### Configuring Deployment Template
 
@@ -148,17 +142,22 @@ Therefore example configuration files have been supplied with the code.
 
 The minimal amount of change required to an example configuration file is to configure your SAP Launchpad credentials so that the code can automatically login and download the required SAP packages to install.
 
-Configuring your SAP Launchpad credentials for the simplest example JSON input file requires you to provide your SAP user and password to another utility script.
+Configuring your SAP Launchpad credentials for a JSON template requires you to provide your SAP user and password to another utility script. This needs to be done for each template you intend to deploy.
 
 1. Run the following utility script to configure your SAP download credentials:
 
    ```text
-   util/set_sap_download_credentials.sh <sap_user> <sap_password>
+   util/set_sap_download_credentials.sh <sap_user> <sap_password> <template_name>
    ```
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
 
+   **Note:** The current templates are located in `deploy/v2/template_samples/` and you do not need to specify the `.json` extension.
+
 ## Build/Update/Destroy Lifecycle
+
+In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\
+`util/terraform_v2.sh`
 
 1. To easily initialize Terraform, run the following utility script:
 
@@ -169,13 +168,13 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To easily check which resources will be deployed, run the following utility script:
 
    ```text
-   util/terraform_v2.sh plan single_node_hana
+   util/terraform_v2.sh plan <template_name>
    ```
 
 1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh apply single_node_hana
+   util/terraform_v2.sh apply <template_name>
    ```
 
    **Note:** This process can take in the region of 90 minutes to complete.
@@ -194,7 +193,7 @@ Configuring your SAP Launchpad credentials for the simplest example JSON input f
 1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh destroy single_node_hana
+   util/terraform_v2.sh destroy <template_name>
    ```
 
 1. To easily clean up the working directries and files, run the following utility script:
@@ -224,10 +223,9 @@ util/check_subscription.sh
 
 # Configure Azure Authorization: Takes under a minute and is performed once per subscription
 util/create_service_principal.sh sp-eng-test
-source set-sp.sh
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
-util/set_sap_download_credentials.sh S123456789 MySAPpass
+util/set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
 util/terraform_v2.sh init

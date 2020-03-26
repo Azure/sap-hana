@@ -88,8 +88,7 @@ function create_service_principal_script()
 
 	echo "A service principal has been created in Azure > App registrations, with the name: ${service_principal_name}"
 	echo "Azure authorization details can be found within the script: ${auth_script}"
-	echo "You can enable this authorization by sourcing the script using the following command:"
-	echo "source ${auth_script}"
+	echo "The Azure authorization details are automatically used by the utility scripts if present."
 }
 
 

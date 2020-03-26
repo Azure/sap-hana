@@ -31,3 +31,25 @@ function error_and_exit()
 	printf "%s\n" "ERROR: ${error_message}" >&2
 	exit 1
 }
+
+
+function check_file_exists()
+{
+	local file_path="$1"
+
+	if [ ! -f "${file_path}" ]; then
+		error_and_exit "File ${file_path} does not exist"
+	fi
+}
+
+
+# This function pretty prints all the currently available template file names
+function print_allowed_json_template_names()
+{
+	local target_dir="$1"
+
+	# list JSON files in the templates dir
+	# filter the output of 'find' to extract just the filenames without extensions
+	# prefix the results with indents and hyphen bullets
+	find "${target_dir}" -name '*.json' | sed -e 's/.*\/\(.*\)\.json/  - \1/'
+}
