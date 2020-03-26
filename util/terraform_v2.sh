@@ -24,14 +24,12 @@ source util/common_utils.sh
 readonly auth_script='set-sp.sh'
 
 readonly input_file_term='<JSON template name>'
-readonly target_path="deploy/v2"
+
 readonly target_code="${target_path}/terraform/"
-readonly target_template_dir="${target_path}/template_samples"
 
 
 function main()
 {
-
 	# default to empty string when 0 args supplied
 	local terraform_action=''
 	[ $# -eq 0 ] || terraform_action="$1"

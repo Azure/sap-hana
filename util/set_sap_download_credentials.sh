@@ -19,12 +19,6 @@ set -o nounset
 source util/common_utils.sh
 
 
-# location of the input JSON template
-readonly target_path="deploy/v2"
-# readonly target_code="${target_path}/terraform/"
-readonly target_template_dir="${target_path}/template_samples"
-
-
 function main()
 {
 	check_command_line_arguments "$@"
@@ -60,22 +54,21 @@ function edit_json_template_for_sap_credentials()
 {
 	local sap_username="$1"
 	local sap_password="$2"
-	local template_name="$3"
+	local json_template_name="$3"
 
-	# use temp file method to avoid BSD sed issues on Mac/OSX
-	# See: https://stackoverflow.com/questions/5694228/sed-in-place-flag-that-works-both-on-mac-bsd-and-linux/5694430#5694430
-	local target_json="${target_template_dir}/${template_name}.json"
-	local temp_template_json="${target_json}.tmp"
+	# these are the JSON path in jq format
+	local sap_username_json_path='"software", "downloader", "credentials", "sap_user"'
+	local sap_password_json_path='"software", "downloader", "credentials", "sap_password"'
 
-	check_file_exists "${target_json}"
+	# Only attempt to set for non-empty usernames
+	if [[ "${sap_username}" != "" ]]; then
+		edit_json_template_for_path "${sap_username_json_path}" "${sap_username}" "${json_template_name}"
+	fi
 
-	# filter JSON template file contents and write to temp file
-	sed -e "s/\(.*\"sap_user\": \)\".*\(\"\)/\1\2${sap_username}\"/" \
-		-e "s/\(.*\"sap_password\": \)\".*\(\"\)/\1\2${sap_password}\"/" \
-		"${target_json}" > "${temp_template_json}"
-
-    # replace original JSON template file with temporary filtered one
-    mv "${temp_template_json}" "${target_json}"
+	# Only attempt to set for non-empty passwords
+	if [[ "${sap_password}" != "" ]]; then
+		edit_json_template_for_path "${sap_password_json_path}" "${sap_password}" "${json_template_name}"
+	fi
 }
 
 
