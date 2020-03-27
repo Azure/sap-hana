@@ -7,7 +7,11 @@ def mergeJSON(a, b, path=None):
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
-                mergeJSON(a[key], b[key], path + [str(key)])
+                t = mergeJSON(a[key], b[key], path + [str(key)])
+            elif isinstance(a[key], list) and isinstance(b[key], list):
+                path += [str(key)]
+                for i in range(len(a[key])):
+                    mergeJSON(a[key][i], b[key][i], path)
             elif a[key] == b[key]:
                 pass
             else:

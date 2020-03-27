@@ -3,10 +3,10 @@ parameters:
   osImage: ''
 
 jobs:
-- job: createAllNew${{parameters.osVersion}}
+- job: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew
+    scenario: v2-allNew-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml

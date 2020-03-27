@@ -3,10 +3,10 @@ parameters:
   osImage: ''
 
 jobs:
-- job: createAllNew${{parameters.osVersion}}
+- job: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew
+    scenario: v2-allNew-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml
@@ -19,10 +19,26 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-- job: reuseRG${{parameters.osVersion}}
+- job: createAllNew_HA_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-reuseRG
+    scenario: v2-allNew-HA
+    testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
+  steps:
+  - template: test-case-template-update.yaml
+    parameters:
+      scenario: $(scenario)
+      testCaseName: $(testcase)
+      placeHolder: var-rg-name
+      value: $(testcase)
+  - template: terraform-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
+      osImage: ${{parameters.osImage}}
+- job: reuseRG_SN_${{parameters.osVersion}}
+  timeoutInMinutes: 180
+  variables:
+    scenario: v2-reuseRG-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
@@ -48,16 +64,16 @@ jobs:
   - template: ansible-deployment-steps.yaml
     parameters:
       testCaseName: $(testcase)
-- job: reuseVnet${{parameters.osVersion}}
-  dependsOn: createAllNew${{parameters.osVersion}}
+- job: reuseVnet_SN_${{parameters.osVersion}}
+  dependsOn: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-reuseVNET
+    scenario: v2-reuseVNET-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-${{parameters.osVersion}}-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
+      echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
   - template: test-case-template-update.yaml
     parameters:
       scenario: $(scenario)
@@ -74,16 +90,16 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-- job: reuseNSG${{parameters.osVersion}}
+- job: reuseNSG_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
-  dependsOn: createAllNew${{parameters.osVersion}}
+  dependsOn: createAllNew_SN_${{parameters.osVersion}}
   variables:
-    scenario: v2-reuseNSG
+    scenario: v2-reuseNSG-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      echo '##vso[task.setvariable variable=arm_id]$(az network nsg show --resource-group v2-allNew-${{parameters.osVersion}}-$(Build.BuildId) --name nsg-mgmt --query id --output tsv)' 
+      echo '##vso[task.setvariable variable=arm_id]$(az network nsg show --resource-group v2-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name nsg-mgmt --query id --output tsv)' 
   - template: test-case-template-update.yaml
     parameters:
       scenario: $(scenario)

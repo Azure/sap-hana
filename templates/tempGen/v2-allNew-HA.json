@@ -1,0 +1,26 @@
+{
+  "infrastructure" : {
+      "resource_group" : {
+          "name" : "var-rg-name"
+      }
+  },
+  "databases" : [
+    {
+      "high_availability" : true,
+      "dbnodes": [
+        {
+          "name": "hdb-node1",
+          "role": "worker",
+          "admin_nic_ips": [
+            "10.1.1.4",
+            "10.1.1.5"
+          ],
+          "db_nic_ips": [
+            "10.1.2.4",
+            "10.1.2.5"
+          ]
+        }
+      ]
+    }
+  ]
+}
