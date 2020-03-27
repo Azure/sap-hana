@@ -159,8 +159,8 @@
       "dbnodes": [
         {
           "name": "",
-          "admin_nic_ip": "",
-          "db_nic_ip": "",
+          "admin_nic_ips": [],
+          "db_nic_ips": [],
           "role": ""
         }
       ]
