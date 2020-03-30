@@ -41,8 +41,8 @@ locals {
         for dbnode in database.dbnodes : {
           platform       = database.platform,
           name           = "${dbnode.name}-0",
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ip", false),
-          db_nic_ip      = lookup(dbnode, "db_nic_ip", false),
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0],
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
           size           = database.size,
           os             = database.os,
           authentication = database.authentication
@@ -55,8 +55,8 @@ locals {
         for dbnode in database.dbnodes : {
           platform       = database.platform,
           name           = "${dbnode.name}-1",
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ip", false),
-          db_nic_ip      = lookup(dbnode, "db_nic_ip", false),
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1],
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
           size           = database.size,
           os             = database.os,
           authentication = database.authentication
