@@ -11,7 +11,7 @@ def mergeJSON(baseJSON, updateJSON, path=None):
             elif isinstance(baseJSON[key], list) and isinstance(updateJSON[key], list):
                 path += [str(key)]
                 for i in range(len(baseJSON[key])):
-                    mergeJSON(baseJSON[key][i], udpateJSON[key][i], path)
+                    mergeJSON(baseJSON[key][i], updateJSON[key][i], path)
             elif baseJSON[key] == updateJSON[key]:
                 pass
             else:
