@@ -91,6 +91,11 @@ function configure_resource_group_for_template()
 
 	if [[ "${rg_name_from_env}" != "" ]]; then
 		util/set_resource_group.sh "${rg_name_from_env}" "${template_name}"
+
+		echo "********************************************************************************"
+		echo "The resource group in ${template_name} has been set to '${rg_name_from_env}'"
+		echo "This is based on the content of the environment variable SAP_HANA_RESOURCE_GROUP"
+		echo "********************************************************************************"
 	fi
 }
 
