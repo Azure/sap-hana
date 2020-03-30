@@ -38,6 +38,8 @@ SEARCH_FILENAME="/var/log/messages"     # Filename to search for error message
 # 2020-03-25T16:12:14.028479+00:00 hostname kernel: [11785727.694971] nfs: server 10.0.0.10 not responding, still trying
 SEARCH_FILTER="nfs: server .* not responding, still trying"
 
+SLEEP_DURATION=300                      # Number of seconds to sleep while start_jobs is running
+
 TCPDUMP_OUTPUT="${DUMP_DIR}/tcpdump.out"
 
 # Function definitions
@@ -92,7 +94,7 @@ function ctrl_c() {
 
   for (( ; ; )); do
     # Sleep for a while to give time for event to occur
-    sleep 300
+    sleep ${SLEEP_DURATION}
 
     # Check to see if an event has occurred
     # it is safest to stop collection, check, and start collection again
