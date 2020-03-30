@@ -34,14 +34,14 @@ stages:
         sudo -H pip install msrest==0.6.0
       displayName: 'Install python tools'
 ###############################################################################
-# This stage create resources for below test cases:                           #
+# This stage creates resources for below test cases:                           #
 # - Below testcases are tested only with SLES12 SP5                           #
 #   - createAllNew-HA: it creates all resources from scratch in HA Scenario   # 
 #   - createAllNew-SN: it creates all resources from scratch for single node  # 
 #   - reuseRG-SN: it only reuses an existing resource group for single node   #
 #   - reuseVnet-SN: it only reuses an existing vnet from createAllNew-SN      #
 #   - reuseNSG-SN: it only reuses an existing NSG from createAllNew-SN        #
-# - createAllNew-SN testcase will be test again with below OS                 #
+# - createAllNew-SN testcase will be tested again with below OS                 #
 #   - RHEL7.6                                                                 #
 ###############################################################################
 - stage: CreatingResources
