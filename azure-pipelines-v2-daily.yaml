@@ -86,10 +86,11 @@ stages:
             RHEL7
           )
           scenario_list=(
-            v2-allNew
-            v2-reuseRG
-            v2-reuseVNET
-            v2-reuseNSG
+            v2-allNew-SN
+            v2-allNew-HA
+            v2-reuseRG-SN
+            v2-reuseVNET-SN
+            v2-reuseNSG-SN
           )
           for scenario in "${scenario_list[@]}"
           do
