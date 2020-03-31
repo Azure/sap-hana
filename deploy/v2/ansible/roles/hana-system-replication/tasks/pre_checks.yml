@@ -1,0 +1,70 @@
+---
+
+- name: Check HANA system replication variables are set and seem valid
+  assert:
+    that:
+      - "hana_group | trim | length != 0"
+      - "sid | trim | regex_search('^[A-Za-z][A-Za-z\\d][A-Za-z\\d]$') | length == 3"  # must be 3 characters <alpha><alnum><alnum>, e.g. HN1, not 1_H
+      - "instance_number | trim | regex_search('^\\d\\d$') | length == 2"  # must be 2 digits <num><num>, e.g. 00, not 0 or a0
+      - "hana_system_user | trim | length != 0"
+      - "hana_dir | trim | length != 0"
+      - "sap_dir | trim | length != 0"
+      - "tmp_ssfs_dir | trim | length != 0"
+      - "hana_stop_start_timeout | trim | length != 0"
+      - "hana_stop_start_delay | trim | length != 0"
+
+- name: "Check that HANA directory {{ hana_dir }} exists and is a directory"
+  stat:
+    path: "{{ hana_dir }}"
+  register: hana_dir_status
+  failed_when: not (hana_dir_status.stat.isdir is defined and hana_dir_status.stat.isdir)
+
+- name: "Check that SAP directory {{ sap_dir }} exists and is a directory"
+  stat:
+    path: "{{ sap_dir }}"
+  register: sap_dir_status
+  failed_when: not (sap_dir_status.stat.isdir is defined and sap_dir_status.stat.isdir)
+
+- name: "Check that HANA IDX SVR file {{ path_idx_svr }} exists"
+  stat:
+    path: "{{ path_idx_svr }}"
+  register: idx_file_status
+  failed_when: idx_file_status.stat.exists == false
+
+- name: "Check if HANA DB Util {{ path_hdbnsutil }} exists"
+  stat:
+    path: "{{ path_hdbnsutil }}"
+  register: hdbnsutil_status
+  failed_when: hdbnsutil_status.stat.exists == false
+
+- name: Check that HANA admin OS user {{ sid_admin_user }} exists
+  user:
+    name: "{{ sid_admin_user }}"
+  check_mode: true
+  changed_when: false
+  register: sid_admin_user_status
+  failed_when: sid_admin_user_status.failed
+
+- name: Check that HANA DB system user ({{ hana_system_user }}) can access the SYSTEM database
+  become_user: "{{ sid_admin_user }}"
+  shell: >
+    source ~/.bashrc ;
+    {{ hdbsql_command }} -n {{ hana_container_address }} '{{ dummy_cmd }}'
+  changed_when: false
+
+- name: Check that HANA DB system user ({{ hana_system_user }}) can access the tenant database {{ hana_tenant_database_name }}
+  become_user: "{{ sid_admin_user }}"
+  shell: >
+    source ~/.bashrc ;
+    {{ hdbsql_command }} -n {{ hana_tenant_address }} '{{ dummy_cmd }}'
+  changed_when: false
+
+- name: Check HANA log mode is set to normal
+  become_user: "{{ sid_admin_user }}"
+  shell: >
+    {{ hdbsql_command }} -n {{ hana_container_address }} "{{ get_log_mode_cmd }}"
+  register: log_mode_status
+  failed_when: log_mode_status.rc != 0 or ("normal" not in log_mode_status.stdout)
+  changed_when: false
+  tags:
+    - skip_ansible_lint

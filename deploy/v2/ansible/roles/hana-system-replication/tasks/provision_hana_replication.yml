@@ -1,0 +1,45 @@
+---
+
+- name: Ensure HANA is configured for System Replication
+  become_user: "{{ sid_admin_user }}"
+  when: ansible_hostname == hana_database.nodes[0].dbname
+  block:
+    - import_tasks: set_global_ini_value.yml
+    - import_tasks: stop_hana.yml
+    - import_tasks: start_hana.yml
+
+    - name: Ensure Primary node is configured for System Replication
+      shell: >
+        source ~/.bashrc ;
+        {{ path_hdbnsutil }} -sr_enable --name=SITEA
+      register: hana_status
+      # rc == 102 means nameserver is already active
+      failed_when: hana_status.rc != 0 and hana_status.rc != 102
+      # Ignore lack of idempotency temporarily until a good solution is known
+      tags:
+        - skip_ansible_lint
+
+    - name: Check replication state on primary
+      shell: >
+        source ~/.bashrc ;
+        {{ path_hdbnsutil }} -sr_state | grep 'mode: primary'
+      changed_when: false
+
+- name: Ensure System Replication is configured
+  become_user: "{{ sid_admin_user }}"
+  when: ansible_hostname != hana_database.nodes[0].dbname
+  block:
+    - import_tasks: set_global_ini_value.yml
+    - import_tasks: stop_hana.yml
+
+    - name: Ensure Secondary node is registered as secondary in replication
+      shell: >
+        source ~/.bashrc ;
+        {{ path_hdbnsutil }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
+        --remoteInstance={{ instance_number }} --replicationMode=sync
+        --operationMode=logreplay --name=SITEB
+      # Ignore lack of idempotency temporarily until a good solution is known
+      tags:
+        - skip_ansible_lint
+
+    - import_tasks: start_hana.yml
