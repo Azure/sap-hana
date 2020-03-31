@@ -3,9 +3,11 @@
 ###############################################################################
 #
 # Purpose:
-# This script simplifies the user interaction with the JSON input templates so
-# the user does not need to manually edit JSON files when configuring their SAP
-# Launchpad access credentials for downloading SAP install media.
+# This script is for configuring deployment resource group name which helps 
+# to avoid clashes with others that might be sharing the same Azure subscription.
+# It also simplifies the user interaction with the JSON input templates so
+# the user does not need to manually edit JSON files when configuring their 
+# resource group.
 #
 ###############################################################################
 
