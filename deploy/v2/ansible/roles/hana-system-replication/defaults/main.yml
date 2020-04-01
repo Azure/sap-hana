@@ -9,12 +9,13 @@
 
 
 # These defaults are commonly overridden by the user
-sid: HN1
+sid: "HN1"
 instance_number: "00"
+hana_system_user_password: "PassWord"
 
 # For low spec Dev instances the timeout needs to be high
 # A delay of 2 seconds is also recommended
 # 2700 seconds is 45 minutes!
 # May be overridden, if required
-hana_stop_start_timeout: 2700
-hana_stop_start_delay: 2
+hana_stop_start_timeout_in_seconds: 2700
+hana_stop_start_delay_in_seconds: 2

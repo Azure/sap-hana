@@ -21,7 +21,7 @@
 - name: Ensure HANA is running
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ path_sapcontrol }} -nr {{ instance_number }} -function StartWait {{ hana_stop_start_timeout }} {{ hana_stop_start_delay }}
+    {{ path_sapcontrol }} -nr {{ instance_number }} -function StartWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_running.rc != 3
 
 - name: Check HANA is running

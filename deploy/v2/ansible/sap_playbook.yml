@@ -58,10 +58,11 @@
   roles:
     - role: hdb-server-install
     - role: hana-system-replication
-      when: is_clustered_system
+      when: hana_database.high_availability
       vars:
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
+        hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
 
 # Linux jumpboxes components install
 - hosts: jumpboxes_linux

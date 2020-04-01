@@ -10,8 +10,6 @@
       - "hana_dir | trim | length != 0"
       - "sap_dir | trim | length != 0"
       - "tmp_ssfs_dir | trim | length != 0"
-      - "hana_stop_start_timeout | trim | length != 0"
-      - "hana_stop_start_delay | trim | length != 0"
 
 - name: "Check that HANA directory {{ hana_dir }} exists and is a directory"
   stat:
