@@ -13,7 +13,7 @@
 - name: Determine if HANA is stopped
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ path_sapcontrol }} -nr {{ instance_number }} -function GetProcessList
+    {{ sapcontrol_command }} -nr {{ instance_number }} -function GetProcessList
   failed_when: false
   changed_when: false
   register: hana_stopped
@@ -21,13 +21,13 @@
 - name: Ensure HANA is stopped
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ path_sapcontrol }} -nr {{ instance_number }} -function StopWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
+    {{ sapcontrol_command }} -nr {{ instance_number }} -function StopWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_stopped.rc != 4
 
 - name: Check HANA is stopped
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ path_sapcontrol }} -nr {{ instance_number }} -function GetProcessList
+    {{ sapcontrol_command }} -nr {{ instance_number }} -function GetProcessList
   changed_when: false
   register: hana_stopped
   failed_when: hana_stopped.rc != 4

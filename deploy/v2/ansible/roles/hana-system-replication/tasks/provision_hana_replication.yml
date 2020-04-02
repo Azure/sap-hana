@@ -27,7 +27,7 @@
     - name: Ensure Primary node is configured for System Replication
       shell: >
         source ~/.bashrc ;
-        {{ path_hdbnsutil }} -sr_enable --name=SITEA
+        {{ hdbnsutil_command }} -sr_enable --name=SITEA
       register: hana_status
       # rc == 102 means nameserver is already active
       failed_when: hana_status.rc != 0 and hana_status.rc != 102
@@ -38,7 +38,7 @@
     - name: Check replication state on primary
       shell: >
         source ~/.bashrc ;
-        {{ path_hdbnsutil }} -sr_state | grep 'mode: primary'
+        {{ hdbnsutil_command }} -sr_state | grep 'mode: primary'
       changed_when: false
 
 - name: Ensure System Replication is configured
@@ -51,7 +51,7 @@
     - name: Ensure Secondary node is registered as secondary in replication
       shell: >
         source ~/.bashrc ;
-        {{ path_hdbnsutil }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
+        {{ hdbnsutil_command }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
         --remoteInstance={{ instance_number }} --replicationMode=sync
         --operationMode=logreplay --name=SITEB
       # Ignore lack of idempotency temporarily until a good solution is known

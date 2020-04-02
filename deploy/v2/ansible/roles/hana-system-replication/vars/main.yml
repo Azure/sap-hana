@@ -29,10 +29,6 @@ path_ssfs_dat: "{{ hana_global_dir }}/security/rsecssfs/data/{{ hsr_dat_name }}"
 path_ssfs_key: "{{ hana_global_dir }}/security/rsecssfs/key/{{ hsr_key_name }}"
 path_global_ini: "{{ hana_global_dir }}/hdb/custom/config/global.ini"
 
-path_idx_svr: "{{ hana_instance_executable_dir }}/hdbindexserver"
-path_hdbsql: "{{ hana_instance_executable_dir }}/hdbsql"
-path_hdbnsutil: "{{ hana_instance_executable_dir }}/hdbnsutil"
-path_sapcontrol: "{{ hana_instance_executable_dir }}/sapcontrol"
 path_sys_rep_status: "{{ hana_instance_executable_dir }}/python_support/systemReplicationStatus.py"
 
 # HANA Backup directory
@@ -45,8 +41,10 @@ hana_container_address: "localhost:3{{ instance_number }}13"
 hana_tenant_address: "localhost:3{{ instance_number }}15"
 hana_tenant_database_name: "{{ sid | upper }}"
 
-# Complete hdbsql command
-hdbsql_command: "{{ path_hdbsql }} -n localhost -i {{ instance_number }} -u SYSTEM -p {{ hana_system_user_password }}"
+# HANA utility commands
+hdbsql_command: "hdbsql -n localhost -i {{ instance_number }} -u SYSTEM -p {{ hana_system_user_password }}"
+hdbnsutil_command: "hdbnsutil"
+sapcontrol_command: "sapcontrol"
 
 # SQL Commands
 
