@@ -1,21 +1,5 @@
 ---
 
-- name: Check backup file exists for SYSTEMDB database for System Identifier {{ sid }}
-  become_user: "{{ sid_admin_user }}"
-  stat:
-    path: "{{ sid_backup_dir }}/INITIAL_SYSTEMDB_BACKUP_databackup_0_1"
-  register: systemdb_backup_file
-  failed_when: not systemdb_backup_file.stat.exists
-  changed_when: false
-
-- name: Check backup file exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
-  become_user: "{{ sid_admin_user }}"
-  stat:
-    path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP_databackup_0_1"
-  register: tenant_backup_file
-  failed_when: not tenant_backup_file.stat.exists
-  changed_when: false
-
 - name: Ensure replication status is active
   become_user: "{{ sid_admin_user }}"
   # Note: ideally we should be using set -o pipefail here (see for example https://xanmanning.co.uk/2019/03/21/ansible-lint-rule-306.html).
