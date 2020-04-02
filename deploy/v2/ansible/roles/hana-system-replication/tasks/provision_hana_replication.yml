@@ -17,7 +17,7 @@
   changed_when: false
 
 - name: Check whether replication has already been set up
-  become_user: "{{ sid_adm_user }}"
+  become_user: "{{ sid_admin_user }}"
   when: ansible_hostname == hana_database.nodes[0].dbname
   shell: >
     source ~/.bashrc ;
