@@ -1,5 +1,15 @@
 ---
 
+# sapcontrol EXITCODES
+#     0  Last webmethod call successful
+#     1  Last webmethod call failed, invalid parameter
+#     2  StartWait, StopWait, WaitforStarted, WaitforStopped, RestartServiceWait
+#        timed out
+#        CheckSystemCertificates detected warnings
+#     3  GetProcessList succeeded, all processes running correctly
+#        CheckSystemCertificates detected errors
+#     4  GetProcessList succeeded, all processes stopped
+
 - name: Check HANA system replication variables are set and seem valid
   assert:
     that:
@@ -11,37 +21,14 @@
       - "sap_dir | trim | length != 0"
       - "tmp_ssfs_dir | trim | length != 0"
 
-- name: "Check that HANA directory {{ hana_dir }} exists and is a directory"
-  stat:
-    path: "{{ hana_dir }}"
-  register: hana_dir_status
-  failed_when: not (hana_dir_status.stat.isdir is defined and hana_dir_status.stat.isdir)
-
-- name: "Check that SAP directory {{ sap_dir }} exists and is a directory"
-  stat:
-    path: "{{ sap_dir }}"
-  register: sap_dir_status
-  failed_when: not (sap_dir_status.stat.isdir is defined and sap_dir_status.stat.isdir)
-
-- name: "Check that HANA IDX SVR file {{ path_idx_svr }} exists"
-  stat:
-    path: "{{ path_idx_svr }}"
-  register: idx_file_status
-  failed_when: idx_file_status.stat.exists == false
-
-- name: "Check if HANA DB Util {{ path_hdbnsutil }} exists"
-  stat:
-    path: "{{ path_hdbnsutil }}"
-  register: hdbnsutil_status
-  failed_when: hdbnsutil_status.stat.exists == false
-
-- name: Check that HANA admin OS user {{ sid_admin_user }} exists
-  user:
-    name: "{{ sid_admin_user }}"
-  check_mode: true
-  changed_when: false
-  register: sid_admin_user_status
-  failed_when: sid_admin_user_status.failed
+- name: Check that HANA was installed successfully and is running normally
+  become_user: "{{ sid_adm_user }}"
+  shell: >
+    source ~/.bashrc
+    {{ path_sapcontrol }} -nr {{ instance_number }} -function GetProcessList
+  register: hana_process_list_result
+  failed_when: hana_process_list_result.rc != 3
+  changed: false
 
 - name: Check that HANA DB system user ({{ hana_system_user }}) can access the SYSTEM database
   become_user: "{{ sid_admin_user }}"
