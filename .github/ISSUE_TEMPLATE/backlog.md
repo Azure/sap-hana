@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Problem Statement**
+**Problem statement**
 A clear description of what is the problem that needs to be resolved
 
 **Enhancement**
