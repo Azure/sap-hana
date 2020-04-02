@@ -13,7 +13,7 @@
 - name: Determine if HANA is running
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ sapcontrol_command }} -nr {{ instance_number }} -function GetProcessList
+    {{ sapcontrol_command }} -function GetProcessList
   failed_when: false
   changed_when: false
   register: hana_running
@@ -21,13 +21,13 @@
 - name: Ensure HANA is running
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ sapcontrol_command }} -nr {{ instance_number }} -function StartWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
+    {{ sapcontrol_command }} -function StartWait {{ hana_stop_start_timeout_in_seconds }} {{ hana_stop_start_delay_in_seconds }}
   when: hana_running.rc != 3
 
 - name: Check HANA is running
   become_user: "{{ sid_admin_user }}"
   shell: >
-    {{ sapcontrol_command }} -nr {{ instance_number }} -function GetProcessList
+    {{ sapcontrol_command }} -function GetProcessList
   changed_when: false
   register: hana_running
   failed_when: hana_running.rc != 3
