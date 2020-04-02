@@ -29,6 +29,7 @@
 DUMP_BASE="/tmp/collect-logs"           # Base directory
 DUMP_DIR="${DUMP_BASE}/current"         # Current log directory
 LOCK_FILE="${DUMP_BASE}.lock"           # Lock file
+TCPDUMP_OUTPUT="${DUMP_DIR}/tcpdump.out" # Output file
 
 SEARCH_FILENAME="/var/log/messages"     # Filename to search for error message
 
@@ -39,15 +40,15 @@ SEARCH_FILENAME="/var/log/messages"     # Filename to search for error message
 SEARCH_FILTER="nfs: server .* not responding, still trying"
 
 SLEEP_DURATION=300                      # Number of seconds to sleep while start_jobs is running
+TCPDUMP_INTERFACE="any"                 # Network interface to capture
 
-TCPDUMP_OUTPUT="${DUMP_DIR}/tcpdump.out"
 
 # Function definitions
 
 function start_jobs() {
   # Start collecting our data
 
-  /usr/sbin/tcpdump -i any -w "${TCPDUMP_OUTPUT}" 2>/dev/null &
+  /usr/sbin/tcpdump -s 96 -W 10 -C 512 -i "${TCPDUMP_INTERFACE}" -w "${TCPDUMP_OUTPUT}" 2>/dev/null &
 }
 
 function stop_jobs() {
@@ -79,7 +80,7 @@ function ctrl_c() {
   if [ ! -e "${DUMP_DIR}" ]; then
     mkdir -p "${DUMP_DIR}"
   fi
-  rm -rf ${DUMP_DIR}/*
+  rm -rf ${DUMP_DIR:?}/*
 
   # Start collecting our data
 
