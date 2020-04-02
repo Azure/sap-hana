@@ -16,9 +16,19 @@
   failed_when: not tenant_backup_file.stat.exists
   changed_when: false
 
+- name: Check whether replication has already been set up
+  become_user: "{{ sid_adm_user }}"
+  when: ansible_hostname == hana_database.nodes[0].dbname
+  shell: >
+    source ~/.bashrc ;
+    {{ hdbnsutil_command }} -sr_state
+  register: hana_replication_status
+  changed_when: false
+  failed_when: false
+
 - name: Ensure HANA is configured for System Replication
   become_user: "{{ sid_admin_user }}"
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == hana_database.nodes[0].dbname and ('SITEA -> SITEB' not in hana_replication_status.stdout)
   block:
     # TODO: Revisit this later - import_tasks: set_global_ini_value.yml
     #                          - import_tasks: stop_hana.yml
@@ -31,7 +41,6 @@
       register: hana_status
       # rc == 102 means nameserver is already active
       failed_when: hana_status.rc != 0 and hana_status.rc != 102
-      # Ignore lack of idempotency temporarily until a good solution is known
       tags:
         - skip_ansible_lint
 
@@ -54,7 +63,6 @@
         {{ hdbnsutil_command }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
         --remoteInstance={{ instance_number }} --replicationMode=sync
         --operationMode=logreplay --name=SITEB
-      # Ignore lack of idempotency temporarily until a good solution is known
       tags:
         - skip_ansible_lint
 
