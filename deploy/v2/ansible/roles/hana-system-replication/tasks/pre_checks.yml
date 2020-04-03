@@ -22,7 +22,7 @@
       - "tmp_ssfs_dir | trim | length != 0"
 
 - name: Check that HANA was installed successfully and is running normally
-  become_user: "{{ sid_adm_user }}"
+  become_user: "{{ sid_admin_user }}"
   shell: >
     source ~/.bashrc
     {{ sapcontrol_command }} -function GetProcessList
