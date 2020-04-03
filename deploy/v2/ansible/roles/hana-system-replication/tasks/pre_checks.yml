@@ -16,7 +16,6 @@
       - "hana_group | trim | length != 0"
       - "sid | trim | regex_search('^[A-Za-z][A-Za-z\\d][A-Za-z\\d]$') | length == 3"  # must be 3 characters <alpha><alnum><alnum>, e.g. HN1, not 1_H
       - "instance_number | trim | regex_search('^\\d\\d$') | length == 2"  # must be 2 digits <num><num>, e.g. 00, not 0 or a0
-      - "hana_system_user | trim | length != 0"
       - "hana_dir | trim | length != 0"
       - "sap_dir | trim | length != 0"
       - "tmp_ssfs_dir | trim | length != 0"
@@ -30,14 +29,14 @@
   failed_when: hana_process_list_result.rc != 3
   changed_when: false
 
-- name: Check that HANA DB system user ({{ hana_system_user }}) can access the SYSTEM database
+- name: Check that HANA DB SYSTEM user can access the SYSTEM database
   become_user: "{{ sid_admin_user }}"
   shell: >
     source ~/.bashrc ;
     {{ hdbsql_command }} -n {{ hana_container_address }} '{{ dummy_cmd }}'
   changed_when: false
 
-- name: Check that HANA DB system user ({{ hana_system_user }}) can access the tenant database {{ hana_tenant_database_name }}
+- name: Check that HANA DB SYSTEM user can access the tenant database {{ hana_tenant_database_name }}
   become_user: "{{ sid_admin_user }}"
   shell: >
     source ~/.bashrc ;
