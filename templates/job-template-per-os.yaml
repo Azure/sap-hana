@@ -22,3 +22,22 @@ jobs:
   - template: ansible-deployment-steps.yaml
     parameters:
       testCaseName: $(testcase)
+- job: createAllNew_HA_${{parameters.osVersion}}
+  timeoutInMinutes: 180
+  variables:
+    scenario: v2-allNew-HA
+    testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
+  steps:
+  - template: test-case-template-update.yaml
+    parameters:
+      scenario: $(scenario)
+      testCaseName: $(testcase)
+      placeHolder: var-rg-name
+      value: $(testcase)
+  - template: terraform-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
+      osImage: ${{parameters.osImage}}
+  - template: ansible-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
