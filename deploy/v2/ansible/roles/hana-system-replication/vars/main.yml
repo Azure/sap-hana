@@ -5,7 +5,6 @@
 #
 # They may be overridden, if required, but normally are not
 
-hana_system_user: "SYSTEM"
 hana_group: "sapsys"
 hana_dir: "/hana"
 sap_dir: "/usr/sap"
