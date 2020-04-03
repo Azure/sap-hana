@@ -29,7 +29,22 @@
   failed_when: hana_process_list_result.rc != 3
   changed_when: false
 
+- name: Check whether replication has already been set up
+  become_user: "{{ sid_admin_user }}"
+  shell: >
+    source ~/.bashrc ;
+    {{ hdbnsutil_command }} -sr_state
+  register: hana_replication_status
+  changed_when: false
+  failed_when: false
+
+- name: Ensure current replication status is known
+  set_fact:
+    hana_system_replication_enabled: "{{ hana_replication_status.rc == 0 }}"
+
 - name: Check that HANA DB SYSTEM user can access the SYSTEM database
+  # If HSR is already enabled, we cannot read from the secondary node
+  when: (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
   become_user: "{{ sid_admin_user }}"
   shell: >
     source ~/.bashrc ;
@@ -37,6 +52,8 @@
   changed_when: false
 
 - name: Check that HANA DB SYSTEM user can access the tenant database {{ hana_tenant_database_name }}
+  # If HSR is already enabled, we cannot read from the secondary node
+  when: (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
   become_user: "{{ sid_admin_user }}"
   shell: >
     source ~/.bashrc ;
@@ -44,8 +61,11 @@
   changed_when: false
 
 - name: Check HANA log mode is set to normal
+  # If HSR is already enabled, we cannot read from the secondary node
+  when: (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
   become_user: "{{ sid_admin_user }}"
   shell: >
+    source ~/.bashrc ;
     {{ hdbsql_command }} -n {{ hana_container_address }} "{{ get_log_mode_cmd }}"
   register: log_mode_status
   failed_when: log_mode_status.rc != 0 or ("normal" not in log_mode_status.stdout)
