@@ -28,7 +28,7 @@
     {{ sapcontrol_command }} -function GetProcessList
   register: hana_process_list_result
   failed_when: hana_process_list_result.rc != 3
-  changed: false
+  changed_when: false
 
 - name: Check that HANA DB system user ({{ hana_system_user }}) can access the SYSTEM database
   become_user: "{{ sid_admin_user }}"
