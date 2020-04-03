@@ -57,6 +57,7 @@
     # TODO: Revisit this later - import_tasks: set_global_ini_value.yml
     - import_tasks: stop_hana.yml
 
+    # TODO: make replicationMode and operationMode configurable
     - name: Ensure Secondary node is registered as secondary in replication
       shell: >
         source ~/.bashrc ;

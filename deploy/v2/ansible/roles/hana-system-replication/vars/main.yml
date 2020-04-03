@@ -44,7 +44,7 @@ hana_tenant_database_name: "{{ sid | upper }}"
 # HANA utility commands
 hdbsql_command: "hdbsql -n localhost -i {{ instance_number }} -u SYSTEM -p {{ hana_system_user_password }}"
 hdbnsutil_command: "hdbnsutil"
-sapcontrol_command: "sapcontrol -nr instance_number"
+sapcontrol_command: "sapcontrol -nr {{ instance_number }}"
 
 # SQL Commands
 
