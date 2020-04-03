@@ -24,7 +24,7 @@
 - name: Check that HANA was installed successfully and is running normally
   become_user: "{{ sid_admin_user }}"
   shell: >
-    source ~/.bashrc
+    source ~/.bashrc ;
     {{ sapcontrol_command }} -function GetProcessList
   register: hana_process_list_result
   failed_when: hana_process_list_result.rc != 3
