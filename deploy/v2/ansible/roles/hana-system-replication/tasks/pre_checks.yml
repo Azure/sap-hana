@@ -40,7 +40,7 @@
 
 - name: Ensure current replication status is known
   set_fact:
-    hana_system_replication_enabled: "{{ hana_replication_status.rc == 0 }}"
+    hana_system_replication_enabled: "{{ 'mode: none' not in hana_replication_status.stdout }}"
 
 - name: Check that HANA DB SYSTEM user can access the SYSTEM database
   # If HSR is already enabled, we cannot read from the secondary node
