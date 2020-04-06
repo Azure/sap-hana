@@ -154,6 +154,23 @@ Configuring your SAP Launchpad credentials for a JSON template requires you to p
 
    **Note:** The current templates are located in `deploy/v2/template_samples/` and you do not need to specify the `.json` extension.
 
+You can programatically set the deployment's resource group name in Azure using another utility script.  This needs to be done for each template you intend to deploy.
+
+1. Run the following utility script to configure your deployment resource group name:
+
+   ```text
+   util/set_resource_group.sh <resource_group_name> <template_name>
+   ```
+
+   **Note:** You can avoid this step by setting the environment variable `SAP_HANA_RESOURCE_GROUP` to your desired resource group name.
+   This can be done in any of the standard ways, such as:
+
+     - Setting in your current terminal session (e.g. `export SAP_HANA_RESOURCE_GROUP="rg-sap-hana-dev"`)
+     - Setting as a prefix of your script command (e.g. `SAP_HANA_RESOURCE_GROUP="rg-sap-hana-dev" util/terraform_v2.sh plan single_node_hana`)
+     - Setting in your dot files (e.g. in `.bash_profile`)
+
+   In any case, this opens up scope for programatically setting the HANA deployment resource group using something personal to your user (e.g. $USER variable), which helps to avoid clashes with others that might be sharing the same Azure subscription.
+
 ## Build/Update/Destroy Lifecycle
 
 In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\

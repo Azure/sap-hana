@@ -1,9 +1,5 @@
 ---
 
-# TODO: 
-# Remove YAML shorthand style for roles (Eg. - { role: os-preparation }) 
-# And replace with newer syntax on https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
-
 - hosts: localhost
   become: true
   become_user: root
@@ -23,16 +19,16 @@
 - hosts: hanadbnodes
   become: true
   become_user: root
-  vars_files: 
-     - "vars/packages.yml" 
+  vars_files:
+    - "vars/packages.yml"
   pre_tasks:
     - name: Include SAP HANA DB sizes
       include_vars:
         file: ../hdb_sizes.json
         name: hdb_sizes
   roles:
-    - { role: os-preparation }
-    - { role: os-disk-setup }
+    - role: os-preparation
+    - role: os-disk-setup
     - role: enable-prometheus
       when:
         - output.options.enable_prometheus == True
@@ -44,7 +40,8 @@
   become: true
   become_user: root
   roles:
-    - { role: mount-azure-files, when: output.software.storage_account_sapbits.file_share_name != "" }
+    - role: mount-azure-files
+      when: output.software.storage_account_sapbits.file_share_name != ""
 
 # Download SAP Media on Azure File Share
 - hosts: localhost
@@ -52,23 +49,29 @@
   become: true
   become_user: root
   roles:
-    - { role: sap-media-download }
+    - role: sap-media-download
 
-# Hana DB components install 
+# Hana DB components install
 - hosts: hanadbnodes
   become: true
   become_user: root
-  roles: 
-    - { role: hdb-server-install }
+  roles:
+    - role: hdb-server-install
+    - role: hana-system-replication
+      when: hana_database.high_availability
+      vars:
+        sid: "{{ hana_database.instance.sid }}"
+        instance_number: "{{ hana_database.instance.instance_number }}"
+        hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
 
 # Linux jumpboxes components install
 - hosts: jumpboxes_linux
   become: true
   become_user: root
-  roles: 
-    - { role: linux-jumpboxes-install }
+  roles:
+    - role: linux-jumpboxes-install
 
 # Windows jumpboxes components install
 - hosts: jumpboxes_windows
-  roles: 
-    - { role: windows-jumpboxes-install }
+  roles:
+    - role: windows-jumpboxes-install

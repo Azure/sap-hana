@@ -12,19 +12,20 @@ This is Azure pipeline test created for deploy/v2
 
 ## Supported Scenarios
 
-1. **allNew**: create all resources from scratch
-2. **reuseRG**: use existing resource group (generated inside the job)
-3. **reuseVNET**: use existing vnet (management generated from [allNew](#allNew))
-4. **reuseNSG**: use existing NSG (nsg geneareted from  [allNew](#allNew))
+1. **allNew-SN**: create all resources from scratch for single node
+1. **allNew-HA**: create all resources from scratch for HA pair
+1. **reuseRG-SN**: use existing resource group (generated inside the job) for single node
+1. **reuseVNET-SN**: use existing vnet (management generated from [allNew](#allNew)) for single node
+1. **reuseNSG-SN**: use existing NSG (nsg geneareted from  [allNew](#allNew)) for single node
 
 ## Design
 
 ![pipeline_v2_workflow](https://user-images.githubusercontent.com/38501271/63207042-ac3e1580-c074-11e9-808b-f7bd037bc42b.jpg)
 
 - All PRs against master and include code change in deploy/v2 will trigger this pipeline test.
-- Each scenario will create a testcase with name that contains name of the testcase, os version and buildId, eg. v2-allNew-SLES12-289.
-- Each testcase will create resources under it's own resource group, which has the same name as the testcase, eg. resource group v2-allNew-SLES12-289.
-- Terraform will run with varible file generated during the test, which has name as the testcase as well, eg. v2-allNew-SLES12-289.json
+- Each scenario will create a testcase with name that contains name of the testcase, os version and buildId, eg. v2-allNew-SN-SLES12-289.
+- Each testcase will create resources under it's own resource group, which has the same name as the testcase, eg. resource group v2-allNew-SN-SLES12-289.
+- Terraform will run with varible file generated during the test, which has name as the testcase as well, eg. v2-allNew-SN-SLES12-289.json
 - After the deployment is done (successful/fail), cleanup job will delete the resource group
 ## Add New Scenario
 ### 1. Maintain custom JSON

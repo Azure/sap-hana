@@ -21,9 +21,9 @@ variables:
 stages:
 - stage: SetEnv
   jobs:
-  - job: installAnsible
+  - job: prepareAgent
     pool:
-      vmImage: "ubuntu-16.04"
+      vmImage: "ubuntu-18.04"
     steps:
     - checkout: self
       clean: "all"
@@ -31,19 +31,19 @@ stages:
       persistCredentials: true
     - script: |
         pip install packaging
-        pip install --ignore-installed pyyaml ansible[azure]
         sudo -H pip install msrest==0.6.0
       displayName: 'Install python tools'
-#####################################################################
-# This stage create resources for below test cases:                 #
-# - Below testcases are tested only with SLES12 SP4                 # 
-#   - createAllNew: it creates all resources from scratch           # 
-#   - reuseRG: it only reuses an existing resource group            #
-#   - reuseVnet: it only reuses an existing vnet from createAllNew  #
-#   - reuseNSG: it only reuses an existing NSG from createAllNew    #
-# - createAllNew testcase will be test again with below OS          #
-#   - RHEL7.3                                                       #
-#####################################################################
+###############################################################################
+# This stage creates resources for below test cases:                           #
+# - Below testcases are tested only with SLES12 SP5                           #
+#   - createAllNew-HA: it creates all resources from scratch in HA Scenario   # 
+#   - createAllNew-SN: it creates all resources from scratch for single node  # 
+#   - reuseRG-SN: it only reuses an existing resource group for single node   #
+#   - reuseVnet-SN: it only reuses an existing vnet from createAllNew-SN      #
+#   - reuseNSG-SN: it only reuses an existing NSG from createAllNew-SN        #
+# - createAllNew-SN testcase will be tested again with below OS                 #
+#   - RHEL7.6                                                                 #
+###############################################################################
 - stage: CreatingResources
   dependsOn: SetEnv
   jobs:
@@ -80,10 +80,11 @@ stages:
             RHEL7
           )
           scenario_list=(
-            v2-allNew
-            v2-reuseRG
-            v2-reuseVNET
-            v2-reuseNSG
+            v2-allNew-SN
+            v2-allNew-HA
+            v2-reuseRG-SN
+            v2-reuseVNET-SN
+            v2-reuseNSG-SN
           )
           for scenario in "${scenario_list[@]}"
           do

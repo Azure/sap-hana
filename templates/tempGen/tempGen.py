@@ -1,20 +1,24 @@
 import os, sys, argparse
 import json
 
-# function to update JSON a with b
-def mergeJSON(a, b, path=None):
+# function to update baseJSON with updateJSON
+def mergeJSON(baseJSON, updateJSON, path=None):
     if path is None: path = []
-    for key in b:
-        if key in a:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                mergeJSON(a[key], b[key], path + [str(key)])
-            elif a[key] == b[key]:
+    for key in updateJSON:
+        if key in baseJSON:
+            if isinstance(baseJSON[key], dict) and isinstance(updateJSON[key], dict):
+                t = mergeJSON(baseJSON[key], updateJSON[key], path + [str(key)])
+            elif isinstance(baseJSON[key], list) and isinstance(updateJSON[key], list):
+                path += [str(key)]
+                for i in range(len(baseJSON[key])):
+                    mergeJSON(baseJSON[key][i], updateJSON[key][i], path)
+            elif baseJSON[key] == updateJSON[key]:
                 pass
             else:
-            	a[key] = b[key]
+            	baseJSON[key] = updateJSON[key]
         else:
-            a[key] = b[key]
-    return a
+            baseJSON[key] = updateJSON[key]
+    return baseJSON
 
 def main():
 	parser = argparse.ArgumentParser(description="Create input JSON for terraform")

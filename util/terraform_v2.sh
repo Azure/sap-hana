@@ -24,38 +24,23 @@ source util/common_utils.sh
 readonly auth_script='set-sp.sh'
 
 readonly input_file_term='<JSON template name>'
-readonly target_path="deploy/v2"
+
 readonly target_code="${target_path}/terraform/"
-readonly target_template_dir="${target_path}/template_samples"
 
 
 function main()
 {
-
 	# default to empty string when 0 args supplied
 	local terraform_action=''
 	[ $# -eq 0 ] || terraform_action="$1"
-
-	# default to empty string when 1 or less args supplied
-	local template_name=''
-	[ $# -le 1 ] || template_name="$2"
 
 	# dispatch appropriate command
 	case "${terraform_action}" in
 		'init')
 			terraform_init
 			;;
-		'plan')
-			check_command_line_arguments_for_template "$@"
-			terraform_plan "${template_name}"
-			;;
-		'apply')
-			check_command_line_arguments_for_template "$@"
-			terraform_apply "${template_name}"
-			;;
-		'destroy')
-			check_command_line_arguments_for_template "$@"
-			terraform_destroy "${template_name}"
+		'plan'|'apply'|'destroy')
+			dispatch_terraform_template_action "$@"
 			;;
 		'clean')
 			terraform_clean
@@ -64,6 +49,54 @@ function main()
 			print_usage_info_and_exit
 			;;
 	esac
+}
+
+
+function dispatch_terraform_template_action()
+{
+	# default to empty string when 0 args supplied
+	local terraform_action=''
+	[ $# -eq 0 ] || terraform_action="$1"
+
+	# default to empty string when 1 or less args supplied
+	local template_name=''
+	[ $# -le 1 ] || template_name="$2"
+
+	check_command_line_arguments_for_template "$@"
+
+	configure_resource_group_for_template "${template_name}"
+
+	case "${terraform_action}" in
+		'plan')
+			terraform_plan "${template_name}"
+			;;
+		'apply')
+			terraform_apply "${template_name}"
+			;;
+		'destroy')
+			terraform_destroy "${template_name}"
+			;;
+	esac
+}
+
+
+# This function sets the given template's resource group name from an environment variable
+# If the environment variable is empty/undefined, then it leaves the resource group name unchanged
+function configure_resource_group_for_template()
+{
+	local template_name="$1"
+
+	# default environment variable to empty string if not set
+	local rg_name_from_env="${SAP_HANA_RESOURCE_GROUP-}"
+
+	if [[ "${rg_name_from_env}" != "" ]]; then
+		util/set_resource_group.sh "${rg_name_from_env}" "${template_name}"
+
+		echo "********************************************************************************"
+		echo "The resource group in ${template_name} has been set to '${rg_name_from_env}'"
+		echo "This is based on the content of the environment variable SAP_HANA_RESOURCE_GROUP"
+		echo "********************************************************************************"
+	fi
 }
 
 
