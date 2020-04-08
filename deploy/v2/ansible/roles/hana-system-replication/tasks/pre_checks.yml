@@ -18,7 +18,7 @@
       - "instance_number | trim | regex_search('^\\d\\d$') | length == 2"  # must be 2 digits <num><num>, e.g. 00, not 0 or a0
       - "hana_dir | trim | length != 0"
       - "sap_dir | trim | length != 0"
-      - "tmp_ssfs_dir | trim | length != 0"
+      - "tmp_copy_dir | trim | length != 0"
 
 - name: Check that HANA was installed successfully and is running normally
   become_user: "{{ sid_admin_user }}"

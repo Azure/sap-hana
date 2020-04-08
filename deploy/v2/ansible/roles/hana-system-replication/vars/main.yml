@@ -8,15 +8,15 @@
 hana_group: "sapsys"
 hana_dir: "/hana"
 sap_dir: "/usr/sap"
-tmp_ssfs_dir: "/tmp"
+tmp_copy_dir: "/tmp"
 
 sid_admin_user: "{{ sid | lower }}adm"
 
 hsr_dat_name: "SSFS_{{ sid | upper }}.DAT"
 hsr_key_name: "SSFS_{{ sid | upper }}.KEY"
 
-tmp_ssfs_dat: "{{ tmp_ssfs_dir }}/{{ hsr_dat_name }}"
-tmp_ssfs_key: "{{ tmp_ssfs_dir }}/{{ hsr_key_name }}"
+tmp_ssfs_dat: "{{ tmp_copy_dir }}/{{ hsr_dat_name }}"
+tmp_ssfs_key: "{{ tmp_copy_dir }}/{{ hsr_key_name }}"
 
 hana_data_dir: "{{ hana_dir }}/data"
 hana_backup_dir: "{{ hana_dir }}/backup"
