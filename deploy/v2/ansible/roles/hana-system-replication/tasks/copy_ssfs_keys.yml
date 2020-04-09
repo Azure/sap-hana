@@ -3,76 +3,64 @@
 - name: Ensure key files are in place
   # If HSR is already enabled, we don't need to do this
   when: not hana_system_replication_enabled
-  become_user: "{{ sid_admin_user }}"
   block:
-    - name: Ensure the Primary node SSFS files are present on the local host
-      when: ansible_hostname == hana_database.nodes[0].dbname
-      block:
 
-        - name: Ensure there is a local copy of Primary node SSFS_{{ sid | upper }}.DAT file
-          fetch:
-            src: "{{ path_ssfs_dat }}"
-            dest: "{{ tmp_ssfs_dat }}"
-            flat: yes
-
-        - name: Ensure there is a local copy of Primary node SSFS_{{ sid | upper }}.KEY file
-          fetch:
-            src: "{{ path_ssfs_key }}"
-            dest: "{{ tmp_ssfs_key }}"
-            flat: yes
-
-    - name: Ensure the Primary node SSFS files are placed on the Secondary node
+    - name: Ensure the secondary node SSFS files are backed up and removed
       when: ansible_hostname != hana_database.nodes[0].dbname
       block:
 
-        - name: Check SSFS_{{ sid | upper }}.DAT backup file exists on the Secondary node
+        - name: Check SSFS_{{ sid | upper }}.DAT backup file exists on the secondary node
           stat:
             path: "{{ path_ssfs_dat }}.bak"
           register: dat_backup_result
 
-        - name: Ensure SSFS_{{ sid | upper }}.DAT file is backed up on the Secondary node
+        - name: Ensure SSFS_{{ sid | upper }}.DAT file is backed up on the secondary node
           file:
             src: "{{ path_ssfs_dat }}"
             path: "{{ path_ssfs_dat }}.bak"
             state: hard
           when: dat_backup_result.stat.exists == false
 
-        - name: Check SSFS_{{ sid | upper }}.KEY backup file exists on the Secondary node
+        - name: Check SSFS_{{ sid | upper }}.KEY backup file exists on the secondary node
           stat:
             path: "{{ path_ssfs_key }}.bak"
           register: key_backup_result
 
-        - name: Ensure SSFS_{{ sid | upper }}.KEY file is backed up on the Secondary node
+        - name: Ensure SSFS_{{ sid | upper }}.KEY file is backed up on the secondary node
           file:
             src: "{{ path_ssfs_key }}"
             path: "{{ path_ssfs_key }}.bak"
             state: hard
           when: key_backup_result.stat.exists == false
 
-        - name: Ensure original SSFS_{{ sid | upper }}.DAT file is removed on the Secondary node
+        - name: Ensure original SSFS_{{ sid | upper }}.DAT file is removed on the secondary node
           file:
             path: "{{ path_ssfs_dat }}"
             state: absent
 
-        - name: Ensure original SSFS_{{ sid | upper }}.KEY file is removed on the Secondary node
+        - name: Ensure original SSFS_{{ sid | upper }}.KEY file is removed on the secondary node
           file:
             path: "{{ path_ssfs_key }}"
             state: absent
 
-        - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file is placed on the Secondary node
-          copy:
-            src: "{{ tmp_ssfs_dat }}"
-            dest: "{{ path_ssfs_dat }}"
-            owner: "{{ sid_admin_user }}"
-            group: "{{ hana_group }}"
-            # the permissions on the .DAT file are different to those on the .KEY file.
-            mode: 0644
+    - name: Ensure the primary node SSFS files are placed on the secondary node
+      when: ansible_hostname == hana_database.nodes[1].dbname
+      block:
 
-        - name: Ensure the Primary node SSFS_{{ sid | upper }}.KEY file is placed on the Secondary node
-          copy:
-            src: "{{ tmp_ssfs_key }}"
+        - name: Ensure the primary node SSFS_{{ sid | upper }}.DAT file is placed on the secondary node
+          synchronize:
+            set_remote_user: false
+            src: "{{ path_ssfs_dat }}"
+            dest: "{{ path_ssfs_dat }}"
+            mode: push
+            archive: true
+          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
+
+        - name: Ensure the primary node SSFS_{{ sid | upper }}.KEY file is placed on the secondary node
+          synchronize:
+            set_remote_user: false
+            src: "{{ path_ssfs_key }}"
             dest: "{{ path_ssfs_key }}"
-            owner: "{{ sid_admin_user }}"
-            group: "{{ hana_group }}"
-            # the permissions on the .DAT file are different to those on the .KEY file.
-            mode: 0640
+            mode: push
+            archive: true
+          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
