@@ -51,7 +51,10 @@ resource "local_file" "output-json" {
         ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
         role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
-      ]
+      ],
+      loadbalancer      = {
+        frontend_ip = var.loadbalancers[index(var.databases, database)].private_ip_address
+      }
       }
     ],
     "software" = {
