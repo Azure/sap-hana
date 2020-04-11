@@ -22,7 +22,6 @@
   include_role:
     name: components-install
     tasks_from: "{{ component }}.yml"
-    include_vars: vars/main.yml
   loop: "{{ hdb_comp_list }}"
   loop_control:
     loop_var: component

@@ -8,7 +8,6 @@ windows_comp_list: []
 hana_install_path: "/hana/shared/{{hana_database.instance.sid}}/install"
 hana_software_loc: "{{ azure_files_mount_path }}/DB/DATA_UNITS"
 components: "{{ lookup('file', '../components.json') }}"
-#hana_client_install_path: "/usr/sap/{{ hana_database.instance.sid }}"
 output: "{{ hostvars['localhost'].output }}"
 hana_database: "{{ hostvars['localhost'].hana_database }}"
 linux_jumpboxes: "{{ hostvars['localhost'].output.jumpboxes.linux }}"
