@@ -5,14 +5,10 @@
 
 - hosts: hdb0,hdb1
   become: true
-  roles:
-    - disable-cloud-netconfig
-
-- hosts: hdb0,hdb1
-  become: true
 
   roles:
     - disk-setup
+    - hotfix
 
 - hosts: iscsi
   become: true
