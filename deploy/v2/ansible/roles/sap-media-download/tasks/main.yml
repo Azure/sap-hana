@@ -20,7 +20,7 @@
   register: extract_path_status
 
 - name: Download installation media
-  shell: "python3 {{ sap_media_download_script_loc }}/python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"
+  shell: "python3 {{ playbook_dir }}../python/downloader/basket.py --config {{ inventory_dir }}/output.json --dir {{ azure_files_mount_path }}"
   when: extract_path_status.stat.exists == false
 
 - name: Identify media archive

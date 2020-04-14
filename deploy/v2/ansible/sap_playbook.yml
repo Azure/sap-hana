@@ -6,7 +6,7 @@
   pre_tasks:
     - name: Include output JSON
       include_vars:
-        file: "/home/{{ ansible_user }}/output.json"
+        file: "{{ inventory_dir }}/output.json"
         name: output
 
     - name: Create dictionary with HANA database inforamtion from output.JSON
