@@ -3,15 +3,15 @@
 ##################################################################################################################
 
 # Get the Azure Target Subscription and Tenant IDs
-data "azurerm_client_config" "target" {
+data "azurerm_client_config" "azure_config" {
 }
 
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
     "azure_config" = {
-      subscription_id = data.azurerm_client_config.target.subscription_id
-      tenant_id       = data.azurerm_client_config.target.tenant_id
+      subscription_id = data.azurerm_client_config.azure_config.subscription_id
+      tenant_id       = data.azurerm_client_config.azure_config.tenant_id
     },
     "infrastructure" = var.infrastructure,
     "jumpboxes" = {
