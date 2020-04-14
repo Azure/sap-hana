@@ -6,7 +6,7 @@
   loop: "{{ components }}"
   when: item.component == 'hana_client'
 
-- name: Install Hana Client on Linux Jumpboxes
+- name: Install Hana Client on Linux
   shell: "{{ hana_software_loc }}/{{ item.media_loc }}/{{ item.installer }} -a client -b --hostname={{ ansible_hostname }} --path={{ hana_client_install_path }}"
   loop: "{{ client.variants|flatten(levels=1) }}"
   when: item.os == 'LINUX'
