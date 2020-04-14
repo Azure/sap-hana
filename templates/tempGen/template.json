@@ -110,7 +110,8 @@
           "name": "hdb-node1",
           "role": "worker"
         }
-      ]
+      ],
+      "loadbalancer": {}
     }
   ],
   "software": {

@@ -162,7 +162,8 @@
           "name": "hdb1",
           "role": "worker"
         }
-      ]
+      ],
+      "loadbalancer": {}
     }
   ],
   "software": {

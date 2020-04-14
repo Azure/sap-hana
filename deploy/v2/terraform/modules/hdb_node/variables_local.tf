@@ -97,7 +97,7 @@ locals {
         ports = [
           for port in local.lb_ports[split(".", database.db_version)[0]] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
         ]
-        lb_fe_ip = lookup(database, "lb_fe_ip", false),
+        frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
       }
     ]
   )

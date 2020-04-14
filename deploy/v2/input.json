@@ -163,7 +163,10 @@
           "db_nic_ips": [],
           "role": ""
         }
-      ]
+      ],
+      "loadbalancer": {
+        "frontend_ip": ""
+      }
     }
   ],
   "software": {
