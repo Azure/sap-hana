@@ -56,8 +56,8 @@
       shell: >
         source ~/.bashrc ;
         {{ hdbnsutil_command }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
-        --remoteInstance={{ instance_number }} --replicationMode=sync
-        --operationMode=logreplay --name=SITEB
+        --remoteInstance={{ instance_number }} --replicationMode={{  hana_replication_mode }}
+        --operationMode={{ hana_operation_mode }} --name=SITEB
       tags:
         - skip_ansible_lint
 
