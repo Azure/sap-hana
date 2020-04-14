@@ -24,10 +24,6 @@
   become_user: "{{ sid_admin_user }}"
   when: ansible_hostname == hana_database.nodes[0].dbname and not hana_system_replication_enabled
   block:
-    # TODO: Revisit this later - import_tasks: set_global_ini_value.yml
-    #                          - import_tasks: stop_hana.yml
-    #                          - import_tasks: start_hana.yml
-
     - name: Ensure Primary node is configured for System Replication
       shell: >
         source ~/.bashrc ;
@@ -44,11 +40,15 @@
         {{ hdbnsutil_command }} -sr_state | grep 'mode: primary'
       changed_when: false
 
+    - import_tasks: set_global_ini_values.yml
+    - import_tasks: stop_hana.yml
+    - import_tasks: start_hana.yml
+
 - name: Ensure System Replication is configured
   become_user: "{{ sid_admin_user }}"
   when: ansible_hostname != hana_database.nodes[0].dbname and not hana_system_replication_enabled
   block:
-    # TODO: Revisit this later - import_tasks: set_global_ini_value.yml
+
     - import_tasks: stop_hana.yml
 
     # TODO: make replicationMode and operationMode configurable
