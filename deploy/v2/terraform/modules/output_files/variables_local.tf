@@ -26,6 +26,10 @@ variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
+variable "loadbalancers" {
+  description = "List of LoadBalancers created for HANA Databases"
+}
+
 locals {
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
   ips-jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
