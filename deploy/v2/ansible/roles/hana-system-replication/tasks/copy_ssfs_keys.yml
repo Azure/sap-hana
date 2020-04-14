@@ -47,6 +47,9 @@
       when: ansible_hostname == hana_database.nodes[1].dbname
       block:
 
+        # Note that we use the IP of the primary node and not its hostname, because
+        # it appears that the RTI attempts to resolve the hostname itself and fails.
+
         - name: Ensure the primary node SSFS_{{ sid | upper }}.DAT file is placed on the secondary node
           synchronize:
             set_remote_user: false
@@ -54,7 +57,7 @@
             dest: "{{ path_ssfs_dat }}"
             mode: push
             archive: true
-          delegate_to: "{{ hana_database.nodes[0].dbname }}"
+          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
 
         - name: Ensure the primary node SSFS_{{ sid | upper }}.KEY file is placed on the secondary node
           synchronize:
@@ -63,4 +66,4 @@
             dest: "{{ path_ssfs_key }}"
             mode: push
             archive: true
-          delegate_to: "{{ hana_database.nodes[0].dbname }}"
+          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
