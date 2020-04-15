@@ -71,6 +71,7 @@ module "output_files" {
   public-ips-jumpboxes-linux   = module.jumpbox.public-ips-jumpboxes-linux
   nics-dbnodes-admin           = module.hdb_node.nics-dbnodes-admin
   nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
+  loadbalancers                = module.hdb_node.loadbalancers
 }
 
 resource "null_resource" "ansible_playbook" {

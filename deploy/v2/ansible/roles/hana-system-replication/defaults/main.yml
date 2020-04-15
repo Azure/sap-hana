@@ -12,6 +12,8 @@
 sid: "HN1"
 instance_number: "00"
 hana_system_user_password: "PassWord"
+hana_replication_mode: "sync"
+hana_operation_mode: "logReplay"
 
 # For low spec Dev instances the timeout needs to be high
 # A delay of 2 seconds is also recommended

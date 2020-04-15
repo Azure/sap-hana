@@ -35,6 +35,9 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
+  - template: ansible-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
 - job: reuseRG_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
