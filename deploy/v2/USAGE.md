@@ -143,8 +143,8 @@ This script can then be used (_sourced_) to configure the required environment v
    Exaple output:
 
    ```text
-   Creating Azure Service Principal: fencing-agent-T0D...
-   Changing "fencing-agent-T0D" to a valid URI of "http://fencing-agent-T0D", which is the required format used for service principal names
+   Creating Azure Service Principal: fencing-agent-<SID>...
+   Changing "fencing-agent-T0D" to a valid URI of "http://fencing-agent-<SID>", which is the required format used for service principal names
    Creating a role assignment under the scope of "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
      Retrying role assignment creation: 1/36
    Role definition already exists
@@ -158,8 +158,8 @@ This script can then be used (_sourced_) to configure the required environment v
      "scope": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
      "type": "Microsoft.Authorization/roleAssignments"
    }
-   A service principal has been created in Azure > App registrations, with the name: fencing-agent-T0D
-   Azure authorization details can be found within the script: set-clustering-auth-T0D.sh
+   A service principal has been created in Azure > App registrations, with the name: fencing-agent-<SID>
+   Azure authorization details can be found within the script: set-clustering-auth-<SID>.sh
    The Azure authorization details are copied to the RTI during Terraform provisioning for usage by Ansible.
 
  **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
@@ -270,6 +270,9 @@ util/check_subscription.sh
 
 # Configure Azure Authorization: Takes under a minute and is performed once per subscription
 util/create_service_principal.sh sp-eng-test
+
+# For Clustered systems Provision Fence Agent Service Principal
+util/create_fenching_agent.sh <SID>
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
 util/set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
