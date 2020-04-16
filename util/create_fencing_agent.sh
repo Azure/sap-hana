@@ -16,7 +16,7 @@ set -o nounset
 source util/common_utils.sh
 
 # name of the script where the auth info will be saved
-readonly auth_script="set-clustering-auth-${1}.sh"
+readonly auth_script="set-clustering-auth-${1-}.sh"
 
 # link for service principal help
 readonly sp_link='https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli'
