@@ -1,0 +1,8 @@
+---
+
+ha_packages:
+  Suse:
+    - socat
+    - corosync
+    - resource-agents
+    - fence-agents
