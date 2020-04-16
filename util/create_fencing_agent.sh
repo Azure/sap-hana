@@ -56,20 +56,62 @@ function create_service_principal_script()
 	IFS=$'\n'
 
 	# create the service principal and capture the output
+	local sp_details=''
 	sp_details=$(az ad sp create-for-rbac --name "${service_principal_name}")
 	local sp_creation_status=$?
-
 	# check the SP was created successfully
 	continue_or_error_and_exit $sp_creation_status "There was a problem creating the service principal. If you are logged into Azure CLI, then it could relate to lack of admin/owner permissions. See ${sp_link} for further details."
 
-	# determine authorization credentials
-	local subscription_id
-	local tenant_id
-	local client_id
-	local client_secret
+
+	# ensure fencing agent role definition exsits
+	local fencing_template='Linux Fence Agent Role'
+	local sp_uri="http://${service_principal_name}"
+
+	local role_list=''
+	role_list=$(az role definition list --name "${fencing_template}")
+	local role_list_status=$?
+	continue_or_error_and_exit $role_list_status "There was a problem determining if the Fencing Agent role already exists. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+
+	# check if fencing agent role already exists and create it if not
+	if [[ "${role_list}" == "[]" ]]; then
+		az role definition create --role-definition "${template_file}"
+		local role_creation_status=$?
+		continue_or_error_and_exit $role_creation_status "There was a problem creating the Fencing Agent role. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+	else
+		echo "Role definition already exists"
+	fi
+
+	# ensure fencing agent role is assigned to fencing agent service principal
+	local assignment_list=''
+	assignment_list="$(az role assignment list --assignee "${sp_uri}" --role "${fencing_template}")"
+	local assignment_list_status=$?
+	continue_or_error_and_exit $assignment_list_status "There was a problem determining if the Fencing Agent role has already been assigned. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+
+	# check if fencing agent role assignment exists and create it if not
+	if [[ "${assignment_list}" == "[]" ]]; then
+		az role assignment create --assignee "${sp_uri}" --role "${fencing_template}"
+		local assignment_creation_status=$?
+		continue_or_error_and_exit $assignment_creation_status "There was a problem creating the Fencing Agent role assigment. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+	else
+		echo "Role assignment already exists"
+	fi
+
+
+	# determine authorization credentials for auth script
+	local subscription_id=''
 	subscription_id=$(az account show --query 'id')
+	local subscription_id_status=$?
+	continue_or_error_and_exit $subscription_id_status "There was a problem obtaining the Azure subscription ID. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+
+	local tenant_id=''
 	tenant_id=$(az account show --query 'tenantId')
+	local tenant_id_status=$?
+	continue_or_error_and_exit $tenant_id_status "There was a problem obtaining the Azure tenant ID. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
+
+	local client_id=''
 	client_id=$(echo "${sp_details}"  | grep appId | sed -e 's/.*appId.:.\(.*\),/\1/')
+
+	local client_secret=''
 	client_secret=$(echo "${sp_details}" | grep password | sed -e 's/.*password.:.\(.*\),/\1/')
 
 	# create new script for authorization
@@ -93,21 +135,6 @@ function create_service_principal_script()
 
 	# replace original JSON template file with temporary filtered one
 	mv "${temp_template_json}" "${template_file}"
-
-	# ensure role definition exsits
-	local fencing_template='Linux Fence Agent Role'
-	local sp_prefix='http://'
-	role_list="$(az role definition list --name 'Linux Fence Agent Role')"
-	if [[ "${role_list}" == "[]" ]]; then
-		az role definition create --role-definition "${template_file}"
-	else echo "Role definition already exists"
-	fi
-	# ensure role is assigned to fencing service principal
-	assignment_list="$(az role assignment list --assignee "${sp_prefix}${service_principal_name}" --role "${fencing_template}")"
-	if [[ "${assignment_list}" == "[]" ]]; then
-		az role assignment create --assignee "${sp_prefix}${service_principal_name}" --role "${fencing_template}"
-	else echo "Role assignment already exists"
-	fi
 
 	IFS="${ifs_backup}"
 
