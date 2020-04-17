@@ -6,14 +6,14 @@
     that:
       - "ha_cluster_password is defined"
       - "ha_cluster_password | trim | length > 0"
-      - "subscription_id is defined"
-      - "subscription_id | trim | length > 0"
-      - "tenant_id is defined"
-      - "tenant_id | trim | length > 0"
-      - "stonith_service_principal_application_id is defined"
-      - "stonith_service_principal_application_id | trim | length > 0"
-      - "stonith_service_principal_application_password is defined"
-      - "stonith_service_principal_application_password | trim | length > 0"
+      - "sap_hana_fencing_agent_subscription_id is defined"
+      - "sap_hana_fencing_agent_subscription_id | trim | length > 0"
+      - "sap_hana_fencing_agent_tenant_id is defined"
+      - "sap_hana_fencing_agent_tenant_id | trim | length > 0"
+      - "sap_hana_fencing_agent_client_id is defined"
+      - "sap_hana_fencing_agent_client_id | trim | length > 0"
+      - "sap_hana_fencing_agent_client_password is defined"
+      - "sap_hana_fencing_agent_client_password | trim | length > 0"
 
 - name: Check the required Clustering scripts are available
   when: ansible_os_family == 'Suse'

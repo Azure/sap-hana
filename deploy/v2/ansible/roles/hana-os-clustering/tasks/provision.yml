@@ -136,21 +136,21 @@
     - name: Ensure the Primary STONITH fencing device is created
       shell: >
         crm configure primitive rsc_st_azure_1 stonith:fence_azure_arm params
-        subscriptionId="{{ subscription_id }}"
+        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         resourceGroup="{{ output.infrastructure.resource_group.name }}"
-        tenantId="{{ tenant_id }}"
-        login="{{ stonith_service_principal_application_id }}"
-        passwd="{{ stonith_service_principal_application_password }}"
+        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
+        login="{{ sap_hana_fencing_agent_client_id }}"
+        passwd="{{ sap_hana_fencing_agent_client_password }}"
         action="off"
 
     - name: Ensure the Secondary STONITH fencing device is created
       shell: >
         crm configure primitive rsc_st_azure_2 stonith:fence_azure_arm params
-        subscriptionId="{{ subscription_id }}"
+        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         resourceGroup="{{ output.infrastructure.resource_group.name }}"
-        tenantId="{{ tenant_id }}"
-        login="{{ stonith_service_principal_application_id }}"
-        passwd="{{ stonith_service_principal_application_password }}"
+        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
+        login="{{ sap_hana_fencing_agent_client_id }}"
+        passwd="{{ sap_hana_fencing_agent_client_password }}"
         action="off"
 
     - name: Ensure STONITH fencing device colocation is configured
