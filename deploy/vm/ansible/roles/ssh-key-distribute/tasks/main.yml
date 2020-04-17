@@ -3,11 +3,11 @@
   args:
     creates: /root/.ssh/id_rsa
 
-- name: Ensure the Public SSH keys are available for exchanging SSH key trust between nodes
+- name: Ensure the public SSH keys are available for exchanging SSH key trust between nodes
   shell: cat /root/.ssh/id_rsa.pub
   register: cluster_public_ssh_key
 
-- name: Ensure the Primary Node public key is authorized on all nodes, required for crm_clustering
+- name: Ensure the public SSH keys are authorized on all nodes, required for crm cluster
   authorized_key:
     user: root
     key: "{{ hostvars[inventory_hostname].cluster_public_ssh_key.stdout }}"

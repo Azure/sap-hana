@@ -7,7 +7,7 @@
     - ansible_os_family|upper == 'SUSE'
   block:
 
-  #SUSE bug 1167134
+  # SUSE bug 1167134
   - name: Ensure DHCLIENT_SET_HOSTNAME is set to no
     lineinfile:
       path: /etc/sysconfig/network/dhcp
