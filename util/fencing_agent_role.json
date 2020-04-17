@@ -1,5 +1,5 @@
 {
-    "Name": "Linux Fence Agent Role",
+    "Name": "ROLE_NAME",
     "Id": null,
     "IsCustom": true,
     "Description": "Allows to deallocate and start virtual machines",
