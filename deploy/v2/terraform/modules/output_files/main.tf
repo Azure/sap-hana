@@ -2,9 +2,17 @@
 # OUTPUT Files
 ##################################################################################################################
 
+# Get the Azure Target Subscription and Tenant IDs
+data "azurerm_client_config" "azure_config" {
+}
+
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
+    "azure_config" = {
+      subscription_id = data.azurerm_client_config.azure_config.subscription_id
+      tenant_id       = data.azurerm_client_config.azure_config.tenant_id
+    },
     "infrastructure" = var.infrastructure,
     "jumpboxes" = {
       "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
@@ -51,7 +59,10 @@ resource "local_file" "output-json" {
         ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
         role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
-      ]
+      ],
+      loadbalancer      = {
+        frontend_ip = var.loadbalancers[index(var.databases, database)].private_ip_address
+      }
       }
     ],
     "software" = {

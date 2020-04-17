@@ -8,11 +8,9 @@ windows_comp_list: []
 hana_install_path: "/hana/shared/install"
 hana_software_loc: "{{ azure_files_mount_path }}/DB/DATA_UNITS"
 components: "{{ lookup('file', '../components.json') }}"
-hana_client_install_path: "/usr/sap/shared"
 output: "{{ hostvars['localhost'].output }}"
 hana_database: "{{ hostvars['localhost'].hana_database }}"
 linux_jumpboxes: "{{ hostvars['localhost'].output.jumpboxes.linux }}"
 windows_jumpboxes: "{{ hostvars['localhost'].output.jumpboxes.windows }}"
-sap_media_download_script_loc: "/home/{{ansible_user}}/sap-hana/deploy/v2"
 jumpbox_comp_dict: {}
 media_copy_loc: C:\Users\{{ ansible_user }}\install

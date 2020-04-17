@@ -72,3 +72,19 @@
   changed_when: false
   tags:
     - skip_ansible_lint
+
+- name: Ensure the Primary node SSFS files are present on the primary node
+  when: ansible_hostname == hana_database.nodes[0].dbname
+  block:
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists
+      stat:
+        path: "{{ path_ssfs_dat }}"
+      register: primary_dat_file_result
+      failed_when: primary_dat_file_result.failed
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.KEY file exists
+      stat:
+        path: "{{ path_ssfs_key }}"
+      register: primary_key_file_result
+      failed_when: primary_key_file_result.failed

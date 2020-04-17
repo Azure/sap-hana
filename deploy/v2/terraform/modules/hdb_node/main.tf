@@ -96,7 +96,7 @@ resource "azurerm_lb" "hana-lb" {
     name                          = "hana-${each.value.sid}-lb-feip"
     subnet_id                     = var.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.lb_fe_ip : lookup(each.value, "lb_fe_ip", false) != false ? each.value.lb_fe_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4 + length(local.dbnodes))
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.frontend_ip : lookup(each.value, "frontend_ip", false) != false ? each.value.frontend_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4 + length(local.dbnodes))
   }
 }
 
