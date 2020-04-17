@@ -128,6 +128,7 @@
         resource-stickiness="1000"
         migration-threshold="5000"
 
+    # Operation Default recommendation from section 6.3.1 in https://www.suse.com/media/white-paper/suse_linux_enterprise_server_for_sap_applications_12_sp1.pdf#page=32
     - name: Ensure the Operation Defaults are configured
       shell: >
         crm configure op_defaults \$id="op-options"
