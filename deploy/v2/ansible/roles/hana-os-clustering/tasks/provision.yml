@@ -120,7 +120,7 @@
         no-quorum-policy="ignore"
         stonith-enabled="true"
         stonith-action="reboot"
-        stonith-timeout="150s"
+        stonith-timeout="900s"
 
     - name: Ensure the Resource Defaults are configured
       shell: >
