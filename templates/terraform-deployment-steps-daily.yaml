@@ -22,6 +22,15 @@ steps:
       cat ${{parameters.testCaseName}}.json
     displayName: "Prepare input JSON"
   - script: |
+      cd deploy/v2/terraform
+      cat <<- EOF > set-clustering-auth-HN1.sh
+        export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
+        export SAP_HANA_FENCING_AGENT_TENANT_ID=$(landscape-tenant)
+        export SAP_HANA_FENCING_AGENT_CLIENT_ID=$(hana-pipeline-spn-id)
+        export SAP_HANA_FENCING_AGENT_CLIENT_SECRET=$(hana-pipeline-spn-pw)
+      EOF
+    displayName: 'Prepare SP for fencing agent'
+  - script: |
       echo "Terraform Deployment in Progress..."
       cd deploy/v2/terraform
       terraform -version
