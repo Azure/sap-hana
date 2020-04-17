@@ -133,29 +133,15 @@
         crm configure op_defaults \$id="op-options"
         timeout="600"
 
-    - name: Ensure the Primary STONITH fencing device is created
+    - name: Ensure the STONITH fencing device is created
       shell: >
-        crm configure primitive rsc_st_azure_1 stonith:fence_azure_arm params
+        crm configure primitive rsc_st_azure stonith:fence_azure_arm params
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         resourceGroup="{{ output.infrastructure.resource_group.name }}"
         tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
         login="{{ sap_hana_fencing_agent_client_id }}"
         passwd="{{ sap_hana_fencing_agent_client_password }}"
         action="off"
-
-    - name: Ensure the Secondary STONITH fencing device is created
-      shell: >
-        crm configure primitive rsc_st_azure_2 stonith:fence_azure_arm params
-        subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
-        resourceGroup="{{ output.infrastructure.resource_group.name }}"
-        tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
-        login="{{ sap_hana_fencing_agent_client_id }}"
-        passwd="{{ sap_hana_fencing_agent_client_password }}"
-        action="off"
-
-    - name: Ensure STONITH fencing device colocation is configured
-      shell: >
-        crm configure colocation col_st_azure -2000: rsc_st_azure_1:Started rsc_st_azure_2:Started
 
     - name: Ensure SAP HANA Topology resource is configured
       shell: >
