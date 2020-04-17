@@ -19,3 +19,6 @@
 
 # service principal auth secrets
 set-sp.sh
+
+# ignore any clustering auth scripts
+set-clustering-auth*.sh

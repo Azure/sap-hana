@@ -2,8 +2,7 @@
 
 - name: Perform pre-flight backup checks
   become_user: "{{ sid_admin_user }}"
-  # If HSR is already enabled, we cannot read from the secondary node
-  when: (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
+  when: ansible_hostname == hana_database.nodes[0].dbname
   block:
 
     - name: Check backup file exists for SYSTEMDB database for System Identifier {{ sid }}

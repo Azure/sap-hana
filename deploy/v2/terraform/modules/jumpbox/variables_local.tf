@@ -36,4 +36,11 @@ locals {
     }
     if jumpbox-linux.destroy_after_deploy == "true"
   ]
+  hana-sid = length([
+    for database in var.databases : database
+    if database.platform == "HANA"
+  ]) > 0 ? element([
+    for database in var.databases : database.instance.sid
+    if database.platform == "HANA"
+  ], 0) : ""
 }
