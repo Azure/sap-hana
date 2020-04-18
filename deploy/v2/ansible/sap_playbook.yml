@@ -55,6 +55,8 @@
 - hosts: hanadbnodes
   become: true
   become_user: root
+  vars_files:
+    - "vars/ha-packages.yml"
   roles:
     - role: hdb-server-install
     - role: hana-system-replication
@@ -63,6 +65,14 @@
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
         hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
+    - role: hana-os-clustering
+      when: hana_database.high_availability
+      vars:
+        ha_cluster_password: "ASecurePa55w0rd"   # @TODO Determine source of truth for this value
+        sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
+        sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
+        sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"
+        sap_hana_fencing_agent_client_password: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_SECRET') }}"
 
 # Linux jumpboxes components install
 - hosts: jumpboxes_linux
