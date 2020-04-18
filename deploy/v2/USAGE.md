@@ -132,7 +132,7 @@ This script can then be used (_sourced_) to configure the required environment v
    The Azure authorization details are automatically used by the utility scripts if present.
    ```
 
-   **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
+ **Note:** The generated authorization script contains secret information, which you should store and secure appropriately.
 
 ### Configuring Deployment Template
 
@@ -175,6 +175,28 @@ You can programatically set the deployment's resource group name in Azure using 
 
 In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\
 `util/terraform_v2.sh`
+
+1. If you are provisioning a clustered system, then you must first create a fencing agent service principal for the SAP HANA SID you are provisioning.
+   To easily create the service principal and authorization script, run the following command providing the HANA SID you wish to be included in the service principal name as the only command line argument (here the SID `HN1` is used):
+
+   ```text
+   util/create_fencing_agent.sh HN1
+   ```
+
+   Example output:
+
+   ```text
+   Creating Azure Service Principal: sap-hana-HN1-fencing-agent...
+   Changing "fencing-agent-T0D" to a valid URI of "http://sap-hana-HN1-fencing-agent", which is the required format used for service principal names
+   Creating a role assignment under the scope of "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+     Retrying role assignment creation: 1/36
+
+   A role has been created in the Azure subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, with the name: sap-hana-HN1-fencing-agent
+   A fencing agent has been created in Azure > App registrations, with the name: sap-hana-HN1-fencing-agent
+   The role has been assigned to the fencing agent
+   The fencing agent authorization details can be found within the script: set-clustering-auth-HN1.sh
+   The authorization details are copied to the RTI during Terraform provisioning for usage by Ansible.
+   ```
 
 1. To easily initialize Terraform, run the following utility script:
 
@@ -245,6 +267,9 @@ util/create_service_principal.sh sp-eng-test
 util/set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
+
+# For Clustered systems Provision Fence Agent Service Principal
+util/create_fenching_agent.sh HN1
 util/terraform_v2.sh init
 util/terraform_v2.sh apply single_node_hana
 

@@ -1,0 +1,17 @@
+{
+    "Name": "ROLE_NAME",
+    "Id": null,
+    "IsCustom": true,
+    "Description": "Allows to deallocate and start virtual machines",
+    "Actions": [
+      "Microsoft.Compute/*/read",
+      "Microsoft.Compute/virtualMachines/deallocate/action",
+      "Microsoft.Compute/virtualMachines/start/action",
+      "Microsoft.Compute/virtualMachines/powerOff/action"
+    ],
+    "NotActions": [
+    ],
+    "AssignableScopes": [
+      "/subscriptions/SUBSCRIPTION_ID"
+    ]
+}
