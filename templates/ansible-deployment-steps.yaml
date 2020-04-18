@@ -21,6 +21,7 @@ steps:
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" '
       export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
       export ANSIBLE_HOST_KEY_CHECKING=False
+      source sap-hana/deploy/v2/terraform/set-clustering-auth-HN1.sh
       ansible-playbook -i hosts sap-hana/deploy/v2/ansible/sap_playbook.yml
       '
     displayName: 'Ansible Deployment'
