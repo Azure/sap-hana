@@ -410,6 +410,14 @@ resource "null_resource" "prepare-rti" {
     destination = "/home/${local.rti-info[0].authentication.username}"
   }
 
+  # Copies Clustering Service Principal for ansbile on RTI.
+  provisioner "file" {
+    # Note: We provide a default empty clustering auth script content so this provisioner succeeds.
+    # Later in the execution, the script is sourced, but will have no impact if it has been defaulted
+    content     = fileexists("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") ? file("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") : "# default empty clustering auth script"
+    destination = "/home/${local.rti-info[0].authentication.username}/export-clustering-sp-details.sh"
+  }
+
   # Installs Git, Ansible and clones repository on RTI
   provisioner "remote-exec" {
     inline = [
