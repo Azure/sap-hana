@@ -6,7 +6,7 @@
   pre_tasks:
     - name: Include output JSON
       include_vars:
-        file: "/home/{{ ansible_user }}/output.json"
+        file: "{{ inventory_dir }}/output.json"
         name: output
 
     - name: Create dictionary with HANA database inforamtion from output.JSON
@@ -35,17 +35,26 @@
         - ansible_facts['distribution_file_variety'] == 'SUSE'
         - ansible_facts['distribution_version'] is regex("(12.[3-4]|15.\d)")
 
-# Mount Azure File share on all linux servers
-- hosts: all_linux_servers
+# Mount Azure File share on all linux jumpboxes including rti
+- hosts: localhost:jumpboxes_linux
   become: true
   become_user: root
   roles:
     - role: mount-azure-files
       when: output.software.storage_account_sapbits.file_share_name != ""
 
+# Mount Azure File share on all hanadbnodes. When the scenario is Large Instance, this task will be skipped
+- hosts: hanadbnodes
+  become: true
+  become_user: root
+  roles:
+    - role: mount-azure-files
+      when: 
+        - output.software.storage_account_sapbits.file_share_name != ""
+        - hana_database.size != "LargeInstance"
+
 # Download SAP Media on Azure File Share
 - hosts: localhost
-  connection: local
   become: true
   become_user: root
   roles:
