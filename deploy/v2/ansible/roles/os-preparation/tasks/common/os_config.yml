@@ -19,17 +19,22 @@
 - name: Task Disable Transparent Hugepages & Configure Processor C-States 3
   command: grub2-mkconfig -o /boot/grub2/grub.cfg
 
-- name: Create SWAP space
-  lineinfile:
-    dest: /etc/waagent.conf
-    regexp: "^{{ item.prop }}="
-    line: "{{ item.prop }}={{ item.value }}"
-  with_items:
-    - { prop: "ResourceDisk.Format", value: "y" }
-    - { prop: "ResourceDisk.EnableSwap", value: "y" }
-    - { prop: "ResourceDisk.SwapSizeMB", value: "{{ (hdb_sizes[hana_database.size].compute.swap_size_gb) * 1024|int }}" }
+# If current host is LargeInstance, creating swap will be skipped. 
+- name: Prepare SWAP
+  when: hana_database.size != "LargeInstance"
+  block:
+  
+  - name: Configure SWAP space
+    lineinfile:
+      dest: /etc/waagent.conf
+      regexp: "^{{ item.prop }}="
+      line: "{{ item.prop }}={{ item.value }}"
+    with_items:
+      - { prop: "ResourceDisk.Format", value: "y" }
+      - { prop: "ResourceDisk.EnableSwap", value: "y" }
+      - { prop: "ResourceDisk.SwapSizeMB", value: "{{ (hdb_sizes[hana_database.size].compute.swap_size_gb) * 1024|int }}" }
 
-- name: Restart waagent
-  service:
-     name: waagent 
-     state: restarted
+  - name: Restart waagent
+    service:
+      name: waagent 
+      state: restarted

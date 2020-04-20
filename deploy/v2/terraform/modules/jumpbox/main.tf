@@ -79,6 +79,37 @@ resource "azurerm_network_interface" "nic-windows" {
   }
 }
 
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Move Resource block
+
+  RESOURCE BLOCK: resource "azurerm_public_ip" "public-ip-linux"
+
+  MOVE CODE INTO: vm-jump.tf
++--------------------------------------4--------------------------------------*/
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Make RTI independent resource deployment
+
+  PROBLEM:  resource block for pip, nic, nsg, and vm can't be removed since they
+            are also used to create other jumpboxes that are not rti.
+            The way this can be done is:
+
+              make rti not one of the jumpboxes
+              copy code that's shared between jumpboxes and rti
+              remove code that is only used by rti to rti.tf
+
+  RESOURCE BLOCK: resource "azurerm_public_ip" "public-ip-linux"
+
+  COPY CODE INTO: vm-rti.tf
+
+  Change Object ID
+    FROM: resource "azurerm_public_ip" "public-ip-linux"
+    TO:   resource "azurerm_public_ip" "rti"
+
+  Decouple from var.jumpboxes.linux and specify an RTI count parameter with a 
+  default of 1
+
+  Fix Naming convention Let's discuss and document in the Naming Convention Doc
++--------------------------------------4--------------------------------------*/
 # Creates the public IP addresses for Linux VMs
 resource "azurerm_public_ip" "public-ip-linux" {
   count               = length(var.jumpboxes.linux)
@@ -88,6 +119,39 @@ resource "azurerm_public_ip" "public-ip-linux" {
   allocation_method   = "Static"
 }
 
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Move Resource block
+
+  RESOURCE BLOCK: resource "azurerm_network_interface" "nic-linux"
+
+  MOVE CODE INTO: vm-jump.tf
++--------------------------------------4--------------------------------------*/
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Make RTI independent resource deployment
+
+  PROBLEM:  resource block for pip, nic, nsg, and vm can't be removed since they
+            are also used to create other jumpboxes that are not rti.
+            The way this can be done is:
+
+              make rti not one of the jumpboxes
+              copy code that's shared between jumpboxes and rti
+              remove code that is only used by rti to rti.tf
+
+  RESOURCE BLOCK: resource "azurerm_network_interface" "nic-linux"
+
+  COPY CODE INTO: vm-rti.tf
+
+  Change Object ID
+    FROM: resource "azurerm_network_interface" "nic-linux"
+    TO:   resource "azurerm_network_interface" "rti"
+
+  Decouple from var.jumpboxes.linux and specify an RTI count parameter with a 
+  default of 1
+
+  Fix Naming convention Let's discuss and document in the Naming Convention Doc
+
+  Change ip_configuration.name to a static value. ex. ipconfig1
++--------------------------------------4--------------------------------------*/
 # Creates the NIC and IP address for Linux VMs
 resource "azurerm_network_interface" "nic-linux" {
   count               = length(var.jumpboxes.linux)
@@ -111,6 +175,35 @@ resource "azurerm_network_interface_security_group_association" "nic-windows-nsg
   network_security_group_id = var.nsg-mgmt[0].id
 }
 
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Move Resource block
+
+  RESOURCE BLOCK: resource "azurerm_network_interface_security_group_association" "nic-linux-nsg"
+
+  MOVE CODE INTO: vm-jump.tf
++--------------------------------------4--------------------------------------*/
+/*-----------------------------------------------------------------------------8
+TODO 20200415-MKD: Make RTI independent resource deployment
+
+  PROBLEM:  resource block for pip, nic, nsg, and vm can't be removed since they
+            are also used to create other jumpboxes that are not rti.
+            The way this can be done is:
+
+              make rti not one of the jumpboxes
+              copy code that's shared between jumpboxes and rti
+              remove code that is only used by rti to rti.tf
+
+  RESOURCE BLOCK: resource "azurerm_network_interface_security_group_association" "nic-linux-nsg"
+
+  COPY CODE INTO: vm-rti.tf
+
+  Change Object ID
+    FROM: resource "azurerm_network_interface_security_group_association" "nic-linux-nsg"
+    TO:   resource "azurerm_network_interface_security_group_association" "rti"
+
+  Decouple from var.jumpboxes.linux and specify an RTI count parameter with a 
+  default of 1
++--------------------------------------4--------------------------------------*/
 resource "azurerm_network_interface_security_group_association" "nic-linux-nsg" {
   count                     = length(var.jumpboxes.linux)
   network_interface_id      = azurerm_network_interface.nic-linux[count.index].id
@@ -119,6 +212,37 @@ resource "azurerm_network_interface_security_group_association" "nic-linux-nsg" 
 
 # VIRTUAL MACHINES ================================================================================================
 
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Move Resource block
+
+  RESOURCE BLOCK: resource "azurerm_linux_virtual_machine" "vm-linux"
+
+  MOVE CODE INTO: vm-jump.tf
++--------------------------------------4--------------------------------------*/
+/*-----------------------------------------------------------------------------8
+TODO 20200415-MKD: Make RTI independent resource deployment
+
+  PROBLEM:  resource block for pip, nic, nsg, and vm can't be removed since they
+            are also used to create other jumpboxes that are not rti.
+            The way this can be done is:
+
+              make rti not one of the jumpboxes
+              copy code that's shared between jumpboxes and rti
+              remove code that is only used by rti to rti.tf
+
+  RESOURCE BLOCK: resource "azurerm_linux_virtual_machine" "vm-linux"
+
+  COPY CODE INTO: vm-rti.tf
+
+  Change Object ID
+    FROM: resource "azurerm_linux_virtual_machine" "vm-linux"
+    TO:   resource "azurerm_linux_virtual_machine" "rti"
+
+  Decouple from var.jumpboxes.linux and specify an RTI count parameter with a 
+  default of 1
+
+  Fix Naming convention Let's discuss and document in the Naming Convention Doc
++--------------------------------------4--------------------------------------*/
 # Manages Linux Virtual Machine for Linux jumpboxes
 resource "azurerm_linux_virtual_machine" "vm-linux" {
   count                           = length(var.jumpboxes.linux)
@@ -249,6 +373,23 @@ resource "azurerm_windows_virtual_machine" "vm-windows" {
   }
 }
 
+/*-----------------------------------------------------------------------------8
+TODO 20200414-MKD: Make RTI independent resource deployment
+
+  PROBLEM:  resource block for pip, nic, nsg, and vm can't be removed since they
+            are also used to create other jumpboxes that are not rti.
+            The way this can be done is:
+
+              make rti not one of the jumpboxes
+              copy code that's shared between jumpboxes and rti
+              remove code that is only used by rti to rti.tf
+
+  RESOURCE BLOCK: resource "null_resource" "prepare-rti"
+
+  MOVE CODE INTO: vm-rti.tf
+
+  Fix depends_on
++--------------------------------------4--------------------------------------*/
 # Prepare RTI:
 #   1. Copy folder ansible_config_files over to RTI
 #   2. Install Git/Ansible and clone GitHub repo on RTI
@@ -267,6 +408,14 @@ resource "null_resource" "prepare-rti" {
   provisioner "file" {
     source      = "${path.root}/../ansible_config_files/"
     destination = "/home/${local.rti-info[0].authentication.username}"
+  }
+
+  # Copies Clustering Service Principal for ansbile on RTI.
+  provisioner "file" {
+    # Note: We provide a default empty clustering auth script content so this provisioner succeeds.
+    # Later in the execution, the script is sourced, but will have no impact if it has been defaulted
+    content     = fileexists("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") ? file("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") : "# default empty clustering auth script"
+    destination = "/home/${local.rti-info[0].authentication.username}/export-clustering-sp-details.sh"
   }
 
   # Installs Git, Ansible and clones repository on RTI

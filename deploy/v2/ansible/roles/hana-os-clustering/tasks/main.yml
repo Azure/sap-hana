@@ -1,0 +1,5 @@
+---
+
+- import_tasks: pre_checks.yml
+- import_tasks: provision.yml
+  when: cluster_existence_check_result.rc != 0

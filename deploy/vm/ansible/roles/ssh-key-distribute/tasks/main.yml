@@ -1,44 +1,15 @@
-- name: Generate SSH key for current user
-  user:
-    name: root
-    generate_ssh_key: yes
-    ssh_key_bits: 2048
-  register: user_info
+- name: Ensure there are SSH keys for the root user to communicate between nodes
+  shell: crm cluster init -y ssh
+  args:
+    creates: /root/.ssh/id_rsa
 
-- debug:
-    var: user_info
+- name: Ensure the public SSH keys are available for exchanging SSH key trust between nodes
+  shell: cat /root/.ssh/id_rsa.pub
+  register: cluster_public_ssh_key
 
-- name: Add authorized key to remote
+- name: Ensure the public SSH keys are authorized on all nodes, required for crm cluster
   authorized_key:
     user: root
-    state: present
-    key: "{{ user_info.ssh_public_key }}"
+    key: "{{ hostvars[inventory_hostname].cluster_public_ssh_key.stdout }}"
   delegate_to: "{{ item }}"
-  become: true
-  when: item != inventory_hostname
-  with_items: "{{ groups['linux'] }}"
-- debug:
-    var: inventory_hostname
-
-- debug:
-    var: ansible_facts['eth0']['ipv4']['address']
-
-- debug:
-    var: ansible_facts['ssh_host_key_rsa_public']
-
-- set_fact:
-    host_key_rsa: "{{ inventory_hostname }},{{ ansible_facts['eth0']['ipv4']['address'] }} ssh-rsa {{ ansible_facts['ssh_host_key_rsa_public'] }}"
-
-- debug:
-    var: host_key_rsa
-
-
-- name: tell the host about our servers it might want to ssh to with hostnames
-  known_hosts:
-    path: /root/.ssh/known_hosts
-    name: "{{ inventory_hostname }}"
-    key: "{{ host_key_rsa }}"
-  delegate_to: "{{ item }}"
-  become: true
-  when: item != inventory_hostname
-  with_items: "{{ groups['linux'] }}"
+  loop: "{{ groups['linux'] }}"
