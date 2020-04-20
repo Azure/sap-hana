@@ -1,60 +1,31 @@
 {   
     "LargeInstance" : {
         "compute" : {
-            "vm_size" : "Standard_D8s_v3",
-            "swap_size_gb" : 2
         },
         "storage" : [
             {
-                "name" : "os",
-                "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadWrite"
-            },
-            {
                 "name" : "data",
                 "count" : 1,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 512,
-                "caching" : "None",
-                "write_accelerator" : false,
                 "mount_point" : "/hana/data"
             },
             {
                 "name" : "log",
                 "count" : 1,
-                "disk_type" : "Premium_LRS",
-                "size_gb" : 512,
-                "caching" : "None",
-                "write_accelerator" : false,
                 "mount_point" : "/hana/log"
             },
             {
                 "name" : "shared",
                 "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false,
                 "mount_point" : "/hana/shared"
             },
             {
                 "name" : "sap",
                 "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 64,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false,
                 "mount_point" : "/usr/sap"
             },
             {
                 "name" : "backup",
                 "count" : 1,
-                "disk_type" : "StandardSSD_LRS",
-                "size_gb" : 512,
-                "caching" : "ReadOnly",
-                "write_accelerator" : false,
                 "mount_point" : "/hana/backup"
             }
         ]
