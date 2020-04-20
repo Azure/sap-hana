@@ -19,9 +19,24 @@
   stat: path={{ hana_software_loc }}
   register: extract_path_status
 
+- debug:
+    var=inventory_hostname
+
 - name: Download installation media
   shell: "python3 {{ playbook_dir }}/../python/downloader/basket.py --config /home/{{ ansible_user}}/output.json --dir {{ azure_files_mount_path }}"
-  when: extract_path_status.stat.exists == false
+  when: 
+    - extract_path_status.stat.exists == false
+    - inventory_hostname not in hanadbnodes
+
+- name: Copy installation media to hanadbnodes
+  become: true
+  become_user: root
+  copy:
+    src: "{{ item }}"
+    dest: "{{ azure_files_mount_path }}/DB/"
+    with_fileglob:
+      - "{{ azure_files_mount_path }}/DB/*.ZIP" 
+      - inventory_hostname in hanadbnodes
 
 - name: Identify media archive
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
