@@ -26,20 +26,52 @@ variable "random-id" {
   description = "Random hex for creating unique Azure key vault name"
 }
 
-# RTI IP and authentication details
 locals {
   output-tf = jsondecode(var.output-json.content)
-  rti-info = [
-    for jumpbox-linux in local.output-tf.jumpboxes.linux : {
-      public_ip_address = jumpbox-linux.public_ip_address,
-      authentication    = jumpbox-linux.authentication
-    }
-    if jumpbox-linux.destroy_after_deploy == "true"
+
+  # Linux jumpbox information
+  vm-jump-linux = [
+    for jumpbox in var.jumpboxes.linux : jumpbox
+    if jumpbox.destroy_after_deploy != "true"
   ]
+
+  # Windows jumpbox information
+  vm-jump-win = [
+    for jumpbox in var.jumpboxes.windows : jumpbox
+  ]
+
+  # RTI information with default count 1
+  rti = length([
+    for jumpbox in var.jumpboxes.linux : jumpbox
+    if jumpbox.destroy_after_deploy == "true"
+    ]) > 0 ? [
+    for jumpbox in var.jumpboxes.linux : jumpbox
+    if jumpbox.destroy_after_deploy == "true"
+    ] : [
+    {
+      "name"                 = "rti",
+      "destroy_after_deploy" = "true",
+      "size"                 = "Standard_D2s_v3",
+      "disk_type"            = "StandardSSD_LRS",
+      "os" = {
+        "publisher" = "Canonical",
+        "offer"     = "UbuntuServer",
+        "sku"       = "18.04-LTS"
+      },
+      "authentication" = {
+        "type"     = "key",
+        "username" = "azureadm"
+      },
+      "components" = [
+        "ansible"
+      ]
+    }
+  ]
+
   hana-sid = length([
     for database in var.databases : database
     if database.platform == "HANA"
-  ]) > 0 ? element([
+    ]) > 0 ? element([
     for database in var.databases : database.instance.sid
     if database.platform == "HANA"
   ], 0) : ""

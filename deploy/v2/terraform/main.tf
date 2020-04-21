@@ -69,6 +69,7 @@ module "output_files" {
   nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux
   public-ips-jumpboxes-windows = module.jumpbox.public-ips-jumpboxes-windows
   public-ips-jumpboxes-linux   = module.jumpbox.public-ips-jumpboxes-linux
+  jumpboxes-linux              = module.jumpbox.jumpboxes-linux
   nics-dbnodes-admin           = module.hdb_node.nics-dbnodes-admin
   nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
   loadbalancers                = module.hdb_node.loadbalancers
