@@ -3,5 +3,5 @@
 |                                   OUTPUTS                                    |
 |                                                                              |
 +--------------------------------------4--------------------------------------*/
-output rgName                           { value = module.library.rgName   }
-output repoPrimaryBlobEndpoint          { value = module.library.repoPrimaryBlobEndpoint }
+output rgName                           { value = module.sap_library.rgName   }
+output repoPrimaryBlobEndpoint          { value = module.sap_library.repoPrimaryBlobEndpoint }
