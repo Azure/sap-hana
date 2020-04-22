@@ -1,4 +1,35 @@
-{
+{   
+    "LargeInstance" : {
+        "compute" : {
+        },
+        "storage" : [
+            {
+                "name" : "data",
+                "count" : 1,
+                "mount_point" : "/hana/data"
+            },
+            {
+                "name" : "log",
+                "count" : 1,
+                "mount_point" : "/hana/log"
+            },
+            {
+                "name" : "shared",
+                "count" : 1,
+                "mount_point" : "/hana/shared"
+            },
+            {
+                "name" : "sap",
+                "count" : 1,
+                "mount_point" : "/usr/sap"
+            },
+            {
+                "name" : "backup",
+                "count" : 1,
+                "mount_point" : "/hana/backup"
+            }
+        ]
+    },
     "Demo" : {
         "compute" : {
             "vm_size" : "Standard_D8s_v3",

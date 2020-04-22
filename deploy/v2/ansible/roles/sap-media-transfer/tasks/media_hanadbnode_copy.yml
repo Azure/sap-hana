@@ -1,25 +1,20 @@
 ---
 
-# This is temperary solution to get bits from SMP
-
-# Due to the file permission limitation with blob (always 770), we currently only support using azure files.
 - name: Install unzip
-  package: 
+  package:
     name: unzip
     state: latest
-
-# Explicitly install bs4 with python3
-- name: Install beautifulsoup4
-  command: |
-    pip3 install beautifulsoup4
-  become: true
 
 - name: Check whether the installation media already exists and has been extracted
   stat: path={{ hana_software_loc }}
   register: extract_path_status
 
-- name: Download installation media
-  shell: "python3 {{ playbook_dir }}/../python/downloader/basket.py --config {{ inventory_dir }}/output.json --dir {{ azure_files_mount_path }}"
+- name: transfer installation media to hanadbnodes
+  copy:
+    src: "{{ item }}"
+    dest: "{{ azure_files_mount_path }}/DB/"
+  with_fileglob:
+    - "{{ azure_files_mount_path }}/DB/*.ZIP" 
   when: extract_path_status.stat.exists == false
 
 - name: Identify media archive
