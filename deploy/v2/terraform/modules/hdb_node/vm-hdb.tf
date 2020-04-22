@@ -1,46 +1,14 @@
-##################################################################################################################
-# HANA DB Node
-##################################################################################################################
-
-# NETWORK SECURITY RULES =========================================================================================
-
-# Creates network security rule to deny external traffic for SAP db subnet
-resource "azurerm_network_security_rule" "nsr-db" {
-  count                       = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1
-  name                        = "deny-inbound-traffic"
-  resource_group_name         = var.nsg-db[0].resource_group_name
-  network_security_group_name = var.nsg-db[0].name
-  priority                    = 102
-  direction                   = "Inbound"
-  access                      = "deny"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = var.infrastructure.vnets.sap.subnet_admin.prefix
-}
-
-# Creates network security rule for SAP admin subnet
-resource "azurerm_network_security_rule" "nsr-admin" {
-  count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
-  name                        = "nsr-subnet-db"
-  resource_group_name         = var.nsg-admin[0].resource_group_name
-  network_security_group_name = var.nsg-admin[0].name
-  priority                    = 102
-  direction                   = "Inbound"
-  access                      = "allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = var.infrastructure.vnets.management.subnet_mgmt.prefix
-  destination_address_prefix  = var.infrastructure.vnets.sap.subnet_db.prefix
-}
+/*-----------------------------------------------------------------------------8
+|                                                                              |
+|                                 HANA - VMs                                   |
+|                                                                              |
++--------------------------------------4--------------------------------------*/
 
 # NICS ============================================================================================================
 
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-admin" {
-  count                        = length(local.dbnodes)
+  count                         = length(local.dbnodes)
   name                          = "${local.dbnodes[count.index].name}-admin-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -56,7 +24,7 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 
 # Creates the DB traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-db" {
-  count                        = length(local.dbnodes)
+  count                         = length(local.dbnodes)
   name                          = "${local.dbnodes[count.index].name}-db-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -73,13 +41,13 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
 
 # Manages the association between NIC and NSG.
 resource "azurerm_network_interface_security_group_association" "nic-dbnodes-admin-nsg" {
-  count                    = length(local.dbnodes)
+  count                     = length(local.dbnodes)
   network_interface_id      = azurerm_network_interface.nics-dbnodes-admin[count.index].id
   network_security_group_id = var.nsg-admin[0].id
 }
 
 resource "azurerm_network_interface_security_group_association" "nic-dbnodes-db-nsg" {
-  count                    = length(local.dbnodes)
+  count                     = length(local.dbnodes)
   network_interface_id      = azurerm_network_interface.nics-dbnodes-db[count.index].id
   network_security_group_id = var.nsg-db[0].id
 }
@@ -168,7 +136,7 @@ resource "azurerm_managed_disk" "data-disk" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
-  count              = length(local.dbnodes)
+  count               = length(local.dbnodes)
   name                = local.dbnodes[count.index].name
   computer_name       = local.dbnodes[count.index].name
   location            = var.resource-group[0].location
