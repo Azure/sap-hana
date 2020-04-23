@@ -6,9 +6,16 @@
   set_fact:
     distro: "SLE_{{ ansible_facts['distribution_major_version'] }}_SP{{ ansible_facts['distribution_release'] }}"
 
-- name: Add repository
+- name: Check if server_monitoring.repo is present
+  stat:
+    path: /etc/zypp/repos.d/server_monitoring.repo
+  register: monitor_repo
+
+- name: Add monitoring repository if it does not exist 
   zypper_repository:
     repo: "https://download.opensuse.org/repositories/server:/monitoring/{{ distro }}/server:monitoring.repo"
+    state: present
+  when: monitor_repo.stat.exists == false
 
 - name: Install Prometheus with Node and HA Cluster exporters
   zypper:
