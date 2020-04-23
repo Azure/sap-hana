@@ -25,7 +25,7 @@
     dest: /etc/smbcredentials/{{ output.software.storage_account_sapbits.name }}.cred
     mode: 0700
 
-- name: Mount storage for SAP bits on RTI and DB nodes
+- name: Mount storage for SAP bits on Linux VM
   mount:
     path: "{{ azure_files_mount_path }}"
     fstype: cifs

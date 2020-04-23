@@ -121,7 +121,6 @@
 - hosts: hdb0,hdb1
   become: true
   roles:
-    - hotfix
     - saphana-install
     - { role: xsa-install, when: install_xsa == true }
     - { role: cockpit-download, when: install_xsa == true and install_cockpit == true }

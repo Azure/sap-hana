@@ -37,10 +37,10 @@ ${ips-jumpboxes-linux[index(jumpboxes-linux, jumpbox-linux)]}  ansible_connectio
 %{~ endfor }
 %{~ for jumpbox-linux in jumpboxes-linux }
 %{~ if jumpbox-linux.destroy_after_deploy == "true" && jumpbox-linux.authentication.type == "key" }
-localhost  ansible_connection=ssh  ansible_user=${jumpbox-linux.authentication.username}
+localhost  ansible_connection=local  ansible_user=${jumpbox-linux.authentication.username}
 %{~ endif }
 %{~ if jumpbox-linux.destroy_after_deploy == "true" && jumpbox-linux.authentication.type == "password" }
-localhost  ansible_connection=ssh  ansible_user=${jumpbox-linux.authentication.username}  ansible_ssh_pass=${jumpbox-linux.authentication.password}  ansible_become_pass=${jumpbox-linux.authentication.password}
+localhost  ansible_connection=local  ansible_user=${jumpbox-linux.authentication.username}  ansible_ssh_pass=${jumpbox-linux.authentication.password}  ansible_become_pass=${jumpbox-linux.authentication.password}
 %{~ endif }
 %{~ endfor }
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }
