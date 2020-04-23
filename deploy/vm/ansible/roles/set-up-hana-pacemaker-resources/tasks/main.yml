@@ -11,7 +11,7 @@
 
 - name: Configure clone resource SAPHanaTopology
   shell: crm configure clone cln_SAPHanaTopology_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} rsc_SAPHanaTopology_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} \
-     meta is-managed="true" clone-node-max="1" target-role="Started" interleave="true"
+     meta clone-node-max="1" target-role="Started" interleave="true"
 
 - name: Configure primitive resource SAPHana
   shell: crm configure primitive rsc_SAPHana_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} ocf:suse:SAPHana \
@@ -26,12 +26,12 @@
     
 - name: Configure master/slave resource SAPHana
   shell: crm configure ms msl_SAPHana_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} rsc_SAPHana_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} \
-         meta is-managed="true" notify="true" clone-max="2" clone-node-max="1" \
+         meta notify="true" clone-max="2" clone-node-max="1" \
          target-role="Started" interleave="true"
     
 - name: Configure primitive resource ip
   shell: crm configure primitive rsc_ip_{{ sap_sid|upper }}_HDB{{ sap_instancenum }} ocf:heartbeat:IPaddr2 \
-         meta target-role="Started" is-managed="true" \
+         meta target-role="Started" \
          operations \$id="rsc_ip_{{ sap_sid|upper }}_HDB{{ sap_instancenum }}-operations" \
          op monitor interval="10s" timeout="20s" \
          params ip="{{ lb_frontend_ip }}"

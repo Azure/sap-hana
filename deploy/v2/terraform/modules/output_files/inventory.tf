@@ -2,17 +2,9 @@
 # OUTPUT Files
 ##################################################################################################################
 
-# Get the Azure Target Subscription and Tenant IDs
-data "azurerm_client_config" "azure_config" {
-}
-
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
-    "azure_config" = {
-      subscription_id = data.azurerm_client_config.azure_config.subscription_id
-      tenant_id       = data.azurerm_client_config.azure_config.tenant_id
-    },
     "infrastructure" = var.infrastructure,
     "jumpboxes" = {
       "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
@@ -27,7 +19,7 @@ resource "local_file" "output-json" {
         public_ip_address    = local.public-ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
         }
       ],
-      "linux" = [for jumpbox-linux in var.jumpboxes.linux : {
+      "linux" = [for jumpbox-linux in var.jumpboxes-linux : {
         name                 = jumpbox-linux.name,
         destroy_after_deploy = jumpbox-linux.destroy_after_deploy,
         size                 = jumpbox-linux.size,
@@ -35,8 +27,8 @@ resource "local_file" "output-json" {
         os                   = jumpbox-linux.os,
         authentication       = jumpbox-linux.authentication,
         components           = jumpbox-linux.components,
-        private_ip_address   = local.ips-jumpboxes-linux[index(var.jumpboxes.linux, jumpbox-linux)]
-        public_ip_address    = local.public-ips-jumpboxes-linux[index(var.jumpboxes.linux, jumpbox-linux)]
+        private_ip_address   = local.ips-jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
+        public_ip_address    = local.public-ips-jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
         }
       ]
     },
@@ -60,7 +52,7 @@ resource "local_file" "output-json" {
         role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ],
-      loadbalancer      = {
+      loadbalancer = {
         frontend_ip = var.loadbalancers[index(var.databases, database)].private_ip_address
       }
       }
@@ -84,7 +76,7 @@ resource "local_file" "output-json" {
 resource "local_file" "ansible-inventory" {
   content = templatefile("${path.module}/ansible_inventory.tmpl", {
     jumpboxes-windows     = var.jumpboxes.windows,
-    jumpboxes-linux       = var.jumpboxes.linux,
+    jumpboxes-linux       = var.jumpboxes-linux,
     ips-jumpboxes-windows = local.ips-jumpboxes-windows,
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,

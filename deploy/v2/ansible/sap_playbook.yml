@@ -60,6 +60,16 @@
   roles:
     - role: sap-media-download
 
+# When scenario is Large Instance, sap bits will be transferred to hanadbnodes
+- hosts: hanadbnodes
+  become: true
+  become_user: root
+  tasks:
+  - include_role:
+      name: sap-media-transfer
+      tasks_from: media_hanadbnode_copy.yml
+    when: hana_database.size == "LargeInstance"
+
 # Hana DB components install
 - hosts: hanadbnodes
   become: true

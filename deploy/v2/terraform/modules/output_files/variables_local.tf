@@ -14,6 +14,10 @@ variable "public-ips-jumpboxes-windows" {
   description = "Public IPs of the Windows jumpboxes"
 }
 
+variable "jumpboxes-linux" {
+  description = "linux jumpboxes with rti"
+}
+
 variable "nics-dbnodes-admin" {
   description = "Admin NICs of HANA database nodes"
 }
@@ -37,7 +41,7 @@ locals {
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
-  dbnodes                      = flatten([
+  dbnodes = flatten([
     for database in var.databases : flatten([
       [
         for dbnode in database.dbnodes : {
