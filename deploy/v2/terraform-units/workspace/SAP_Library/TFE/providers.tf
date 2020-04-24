@@ -25,5 +25,8 @@ terraform                               { required_version = ">= 0.12"  }
 |                                  PROVIDERS                                   |
 |                                                                              |
 +--------------------------------------4--------------------------------------*/
-provider azurerm                        { version = "~> 1.0" }
+provider azurerm                        {
+                                          version = "~> 2.0" 
+                                          features {}
+                                        }
 provider random                         { version = "~> 2.0" }

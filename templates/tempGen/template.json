@@ -122,8 +122,8 @@
       "account_kind": "FileStorage",
       "file_share_name": "bits",
       "container_access_type": "private",
-      "Storage_account_name": "sapbitsforpipeline",
-      "Storage_access_key": "var-sa-access-key",
+      "storage_account_name": "sapbitsforpipeline",
+      "storage_access_key": "var-sa-access-key",
       "arm_id": "var-sa-arm-id"
     },
     "downloader": {

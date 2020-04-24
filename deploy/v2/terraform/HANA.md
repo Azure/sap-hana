@@ -19,11 +19,11 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 ### Available
 
-- [HANA Scale-Out Stand Alone](/deploy/v2/template_samples/single_node_hana.json)
+- [HANA Scale-Up Stand Alone](/deploy/v2/template_samples/single_node_hana.json)
 
 ### Coming Soon
 
-- HANA Scale-Out High Availability
+- HANA Scale-Up High Availability
 
 <br>
 

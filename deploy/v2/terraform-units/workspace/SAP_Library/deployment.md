@@ -5,7 +5,7 @@
 *This step may have been previously completed*
 1. Create an SAP Automation root directory and descend into the newly created <automation_root>
 
-   > `mkdir SAP_Automation_Deployment && cd $_`
+   > `mkdir <automation_root> && cd $_`
 
 2. Clone the Repository.
 
