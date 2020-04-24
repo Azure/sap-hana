@@ -113,3 +113,26 @@ function edit_json_template_for_path()
 	# replace original JSON template file with temporary edited one
 	mv "${temp_template_json}" "${target_json}"
 }
+
+
+# This helper funciton checks if a JSON key is set to a non-empty string
+# the json_path argument must be in jq dot notation, e.g. '.software.downloader.credentials.sap_user'
+function check_json_value_is_not_empty()
+{
+	local json_path="$1"
+	local json_template_name="$2"
+	local target_json="${target_template_dir}/${json_template_name}.json"
+
+	check_file_exists "${target_json}"
+
+	check_command_installed 'jq' 'Try: https://stedolan.github.io/jq/download/'
+
+	local json_value=
+	json_value=$(jq "${json_path}" "${target_json}")
+
+	if [ "${json_value}" == '""' ]; then
+		return 1
+	else
+		return 0
+	fi
+}
