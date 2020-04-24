@@ -73,17 +73,17 @@ function list_available_offers()
 
 function edit_json_template_for_sap_os()
 {
-  local sap_os="$1"
+  local sap_os="$(echo $1 | tr '[A-Z]' '[a-z]')"
   local json_template_name="$2"
   local target_json="${target_template_dir}/${json_template_name}.json"
   local temp_template_json="${target_json}.tmp"
 
   # This sets stored values from the sap_os_offers.json
   # Check if the passed in value is known
-  if list_available_offers | grep -q "^  - ${sap_os,,}$" 2>/dev/null; then
-    local sap_os_publisher=$(jq ".${sap_os,,}.publisher" "${list_of_offers}")
-    local sap_os_offer=$(jq ".${sap_os,,}.offer" "${list_of_offers}")
-    local sap_os_sku=$(jq ".${sap_os,,}.sku" "${list_of_offers}")
+  if list_available_offers | grep -q "^  - ${sap_os}$" 2>/dev/null; then
+    local sap_os_publisher=$(jq ".${sap_os}.publisher" "${list_of_offers}")
+    local sap_os_offer=$(jq ".${sap_os}.offer" "${list_of_offers}")
+    local sap_os_sku=$(jq ".${sap_os}.sku" "${list_of_offers}")
 
   else
     # Passed in value is unknown
