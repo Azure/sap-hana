@@ -16,11 +16,17 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 *This step may have been previously completed*
 1. Create an SAP Automation root directory and descend into the newly created <automation_root>
 
-   > `mkdir SAP_Automation_Testing && cd $_`
+   > `mkdir SAP_Automation_Deployment && cd $_`
 
 2. Clone the Repository.
 
-   >`git clone git@github.com:Azure/sap-hana.git`
+   - HTTPS
+
+     > `git clone https://github.com/Azure/sap-hana.git`
+
+   - SSH
+
+     > `git clone git@github.com:Azure/sap-hana.git`
 
 <br>
 

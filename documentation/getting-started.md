@@ -24,15 +24,18 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
    * [Terraform](https://www.terraform.io/downloads.html)
 
-   *(**Note**: The scripts have been tested with Terraform `v0.12.12` and Ansible `2.8`)*
+   *(**Note**: The scripts have been tested with Terraform `v0.12.12` and Ansible `2.8`)* <!-- TODO: Update Versions -->
 
-3. Log into your Azure subscription:
+3. Install the [Azure Command-Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (If required)
+
+4. Log into your Azure subscription:
 
     ```sh
     az login
     ```
 
-4. Create a service principal that will be used to manage Azure resources on your behalf:
+<!-- TODO: SPN process needs to be improved -->
+5. Create a service principal that will be used to manage Azure resources on your behalf:
 
     ```sh
     az ad sp create-for-rbac --name <service-principal-name>
@@ -40,7 +43,7 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
     
    *(**Note**: You can find additional information on creating service principals on [this page](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest).)*
 
-5. You will see an output similar to this:
+6. You will see an output similar to this:
 
    ```{
      "appId": "<service-principal-app-id>",
@@ -51,7 +54,7 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
    }
    ```
 
-6. Set the details of the service principal as environment variables:
+7. Set the details of the service principal as environment variables:
 
     ```sh
     # configure service principal for Terraform on Linux/MacOS

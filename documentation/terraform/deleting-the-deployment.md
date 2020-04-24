@@ -13,15 +13,15 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 ## Deleting the Deployment
 
-1. If you don't need the deployment anymore, you can remove it just as easily.
-From the Workspace directory, run the following command to remove all deployed resources:
+- If you don't need the deployment anymore, you can remove it just as easily.
+  <br>From the Workspace directory, run the following command to remove all deployed resources:
+
+  ```bash
+  terraform destroy -var-file=<JSON configuration file> <automation_root>/sap-hana/deploy/v2/terraform
+  ```
 
 - To automatically confirm, add the `--auto-approve` switch.
 
-```
-terraform destroy -var-file=<JSON configuration file> <automation_root>/sap-hana/deploy/v2/terraform
-
-or
-
-terraform destroy --auto-approve -var-file=<JSON configuration file> <automation_root>/sap-hana/deploy/v2/terraform
-```
+  ```bash
+  terraform destroy --auto-approve -var-file=<JSON configuration file> <automation_root>/sap-hana/deploy/v2/terraform
+  ```

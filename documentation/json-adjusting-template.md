@@ -14,9 +14,42 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 1. In the Workspace directory, Create the JSON template.
 
-   - For complete JSON samples, please check [template-daily](/templates/tempGen/template-daily.json) which is used in our daily test, or [template](/templates/tempGen/template.json) which is used for all PRs. `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested.
+   - For complete JSON samples, please check one of the following:
+
+     - [template](/templates/tempGen/template.json) which is used for all PRs.
+
+         > `cp <automation_root>/sap-hana/templates/tempGen/template.json .`
+
+     - [template-daily](/templates/tempGen/template-daily.json) which is used in our daily test.
+
+         > `cp <automation_root>/sap-hana/templates/tempGen/template-daily.json .`
+
+   -  `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested.
+
+<br>
 
 2. Use a text editor to edit the JSON configuration file.  Full version of supported JSON configuration see below:
+
+  - Fields to watch for if using a template
+    - infrastructure.region
+    - infrastructure.resource_group.name
+    - databases.os
+
+      ```json
+            "os": {
+              "publisher": "SUSE",
+              "offer": "SLES-SAP",
+              "sku": "12-SP4",
+              "version": "latest"
+            },
+      ```
+
+    - software.storage_account_sapbits.Storage_account_name
+    - software.storage_account_sapbits.arm_id
+    - software.downloader.credentials.sap_user
+    - software.downloader.credentials.sap_password
+
+<br>
 
 | Section                                                         | Key                                           | Type              | Explain                                                                                                                                                                                                                                                                                                                                                                                                                |
 |-----------------------------------------------------------------|-----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
