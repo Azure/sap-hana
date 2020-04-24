@@ -115,9 +115,9 @@
       "platform": "HANA",
       "db_version": "2.00.043",
       "os": {
-        "publisher": "Redhat",
-        "offer": "RHEL-SAP-HANA",
-        "sku": "7.3"
+        "publisher": "suse",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
       },
       "size": "Demo",
       "filesystem": "xfs",

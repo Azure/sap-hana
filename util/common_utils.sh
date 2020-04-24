@@ -134,5 +134,33 @@ function check_json_value_is_not_empty()
 		return 1
 	else
 		return 0
+  fi
+}
+
+
+# This function is used to compare semver strings
+# It takes two parameters, each a semver string /\d+(\.\d+(\.\d+)?)?/
+# For example, 1, 1.2, 1.2.3 and compares them
+# It echos ">" if string1 > string2, "=" if string1 == string2 and "<" if string1 < string2
+function test_semver()
+{
+	local actual_semver="$1"
+	local required_semver="$2"
+
+	IFS=. read -r -a actual_semver_parts <<< "${actual_semver}"
+	IFS=. read -r -a required_semver_parts <<< "${required_semver}"
+
+	(( major=${actual_semver_parts[0]:-0} - ${required_semver_parts[0]:-0} ))
+	if [[ ${major} -ne 0 ]]; then
+		[[ ${major} -gt 0 ]] && echo -n ">" || echo -n "<"
+	else
+		(( minor=${actual_semver_parts[1]:-0} - ${required_semver_parts[1]:-0} ))
+		if [[ ${minor} -ne 0 ]]; then
+			[[ ${minor} -gt 0 ]] && echo -n ">" || echo -n "<"
+		else
+			(( patch=${actual_semver_parts[2]:-0} - ${required_semver_parts[2]:-0} ))
+			# shellcheck disable=SC2015
+			[[ ${patch} -gt 0 ]] && echo -n ">" || ( [[ ${patch} -eq 0 ]] && echo -n "=" || echo -n "<" )
+		fi
 	fi
 }
