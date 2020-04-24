@@ -73,7 +73,8 @@ function list_available_offers()
 
 function edit_json_template_for_sap_os()
 {
-  local sap_os="$(echo $1 | tr '[:upper:]' '[:lower:]')"
+  local sap_os
+  sap_os="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
   local json_template_name="$2"
   local target_json="${target_template_dir}/${json_template_name}.json"
   local temp_template_json="${target_json}.tmp"
@@ -81,9 +82,12 @@ function edit_json_template_for_sap_os()
   # This sets stored values from the sap_os_offers.json
   # Check if the passed in value is known
   if list_available_offers | grep -q "^  - ${sap_os}$" 2>/dev/null; then
-    local sap_os_publisher=$(jq ".${sap_os}.publisher" "${list_of_offers}")
-    local sap_os_offer=$(jq ".${sap_os}.offer" "${list_of_offers}")
-    local sap_os_sku=$(jq ".${sap_os}.sku" "${list_of_offers}")
+    local sap_os_publisher
+    local sap_os_offer
+    local sap_os_sku
+    sap_os_publisher=$(jq ".${sap_os}.publisher" "${list_of_offers}")
+    sap_os_offer=$(jq ".${sap_os}.offer" "${list_of_offers}")
+    sap_os_sku=$(jq ".${sap_os}.sku" "${list_of_offers}")
 
   else
     # Passed in value is unknown
@@ -101,11 +105,13 @@ function edit_json_template_for_sap_os()
   fi
 
   # We need the jq "walk" function from v1.6: https://stedolan.github.io/jq/manual/#walk(f)
-  local jq_version=$(jq --version | cut -f2 -d-)
+  local jq_version
+  jq_version=$(jq --version | cut -f2 -d-)
   local jq_def_walk
   if [[ $(test_semver "${jq_version}" "1.6") == "<" ]]; then
     # Build it by hand if jq is pre-1.6
     # https://github.com/stedolan/jq/blob/ccc79e592cfe1172db5f2def5a24c2f7cfd418bf/src/builtin.jq#L255-L262
+    # shellcheck disable=2016
     jq_def_walk='def walk(f):
       . as $in | if type == "object" then
         reduce keys_unsorted[] as $key ( {}; . + { ($key): ($in[$key] | walk(f)) } ) | f
@@ -127,7 +133,7 @@ function edit_json_template_for_sap_os()
             publisher: ${sap_os_publisher},
             offer: ${sap_os_offer},
             sku: ${sap_os_sku} } )
-        else . end)" ${target_json} >${temp_template_json} && mv ${temp_template_json} ${target_json}
+        else . end)" "${target_json}" >"${temp_template_json}" && mv "${temp_template_json}" "${target_json}"
 }
 
 # Execute the main program flow with all arguments
