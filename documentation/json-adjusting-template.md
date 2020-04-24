@@ -12,13 +12,11 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 ## Adjusting the templates
 
-1. Change into the root directory:
+1. In the Workspace directory, Create the JSON template.
 
-    ```bash
-    cd sap-hana/deploy/v2
-    ```
+   - For complete JSON samples, please check [template-daily](/templates/tempGen/template-daily.json) which is used in our daily test, or [template](/templates/tempGen/template.json) which is used for all PRs. `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested.
 
-2. Use a text editor to create a JSON configuration file. For complete JSON samples, please check [template-daily](/templates/tempGen/template-daily.json) which is used in our daily test, or [template](/templates/tempGen/template.json) which is used for all PRs. `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested. Full version of supported JSON configuration see below:
+2. Use a text editor to edit the JSON configuration file.  Full version of supported JSON configuration see below:
 
 | Section                                                         | Key                                           | Type              | Explain                                                                                                                                                                                                                                                                                                                                                                                                                |
 |-----------------------------------------------------------------|-----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
