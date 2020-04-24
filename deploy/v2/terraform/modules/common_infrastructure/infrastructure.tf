@@ -192,7 +192,7 @@ resource "azurerm_storage_account" "storage-sapbits" {
   account_replication_type  = "LRS"
   account_tier              = var.software.storage_account_sapbits.account_tier
   account_kind              = var.software.storage_account_sapbits.account_kind
-  enable_https_traffic_only = [for sku in distinct([for database in var.databases : tonumber(database.os.sku) if lower(database.os.publisher) == "redhat"]) : sku if sku < 7.5] == [] ? true : false
+  enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }
 
 # Creates the storage container inside the storage account for SAP bits
@@ -224,5 +224,5 @@ resource "azurerm_storage_account" "storage-bootdiag" {
   location                  = var.infrastructure.region
   account_replication_type  = "LRS"
   account_tier              = "Standard"
-  enable_https_traffic_only = [for sku in distinct([for database in var.databases : tonumber(database.os.sku) if lower(database.os.publisher) == "redhat"]) : sku if sku < 7.5] == [] ? true : false
+enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }
