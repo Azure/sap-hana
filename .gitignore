@@ -9,7 +9,7 @@
 *.tfvars
 
 # .tfvars files - Allow in new structure
-!/**/v2/terraform2/**/*.tfvars
+!/**/v2/terraform-units/**/*.tfvars
 
 # ignore key files
 **/tmp
