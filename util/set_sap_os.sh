@@ -73,7 +73,7 @@ function list_available_offers()
 
 function edit_json_template_for_sap_os()
 {
-  local sap_os="$(echo $1 | tr '[A-Z]' '[a-z]')"
+  local sap_os="$(echo $1 | tr '[:upper:]' '[:lower:]')"
   local json_template_name="$2"
   local target_json="${target_template_dir}/${json_template_name}.json"
   local temp_template_json="${target_json}.tmp"
