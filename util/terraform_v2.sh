@@ -143,6 +143,14 @@ function terraform_apply()
 
 	check_json_template_exists "${target_json_template}"
 
+	# Check if the sap_user and sap_password values have been set
+	if ! check_json_value_is_not_empty ".software.downloader.credentials.sap_user" "${target_json_template}"; then
+		error_and_exit "sap_user is not set, run util/set_sap_download_credentials.sh"
+	fi
+	if ! check_json_value_is_not_empty ".software.downloader.credentials.sap_password" "${target_json_template}"; then
+		error_and_exit "sap_password is not set, run util/set_sap_download_credentials.sh"
+	fi
+
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
 	run_terraform_command "apply -auto-approve -var-file=${target_json} ${target_code}"
