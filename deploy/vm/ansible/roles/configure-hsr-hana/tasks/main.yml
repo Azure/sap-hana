@@ -34,9 +34,8 @@
 
 - name: Copy SSFS key storage to hdb1
   shell: |
-      . ~/.bashrc
-      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
-      scp /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/SSFS_{{ sap_sid }}.KEY "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/
+      scp -oStrictHostKeyChecking=no /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/SSFS_{{ sap_sid }}.DAT "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/data/
+      scp -oStrictHostKeyChecking=no /usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/SSFS_{{ sap_sid }}.KEY "{{ groups['hdb1'][0] }}":/usr/sap/{{ sap_sid }}/SYS/global/security/rsecssfs/key/
   args: 
     executable: '/bin/bash'
   become: true

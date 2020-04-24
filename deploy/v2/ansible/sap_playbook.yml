@@ -33,7 +33,8 @@
       when:
         - output.options.enable_prometheus == True
         - ansible_facts['distribution_file_variety'] == 'SUSE'
-        - ansible_facts['distribution_version'] is regex("(12.[3-4]|15.\d)")
+        - ansible_facts['distribution_version'] is regex("(12\.[3-5]|15\.\d)")
+        - hana_database.size != "LargeInstance"
 
 # Mount Azure File share on all linux jumpboxes including rti
 - hosts: localhost:jumpboxes_linux
