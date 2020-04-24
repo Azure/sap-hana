@@ -192,7 +192,7 @@ resource "azurerm_storage_account" "storage-sapbits" {
   account_replication_type  = "LRS"
   account_tier              = var.software.storage_account_sapbits.account_tier
   account_kind              = var.software.storage_account_sapbits.account_kind
-  enable_https_traffic_only = true
+  enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }
 
 # Creates the storage container inside the storage account for SAP bits
