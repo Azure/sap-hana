@@ -113,3 +113,54 @@ function edit_json_template_for_path()
 	# replace original JSON template file with temporary edited one
 	mv "${temp_template_json}" "${target_json}"
 }
+
+
+# This helper funciton checks if a JSON key is set to a non-empty string
+# the json_path argument must be in jq dot notation, e.g. '.software.downloader.credentials.sap_user'
+function check_json_value_is_not_empty()
+{
+	local json_path="$1"
+	local json_template_name="$2"
+	local target_json="${target_template_dir}/${json_template_name}.json"
+
+	check_file_exists "${target_json}"
+
+	check_command_installed 'jq' 'Try: https://stedolan.github.io/jq/download/'
+
+	local json_value=
+	json_value=$(jq "${json_path}" "${target_json}")
+
+	if [ "${json_value}" == '""' ]; then
+		return 1
+	else
+		return 0
+  fi
+}
+
+
+# This function is used to compare semver strings
+# It takes two parameters, each a semver string /\d+(\.\d+(\.\d+)?)?/
+# For example, 1, 1.2, 1.2.3 and compares them
+# It echos ">" if string1 > string2, "=" if string1 == string2 and "<" if string1 < string2
+function test_semver()
+{
+	local actual_semver="$1"
+	local required_semver="$2"
+
+	IFS=. read -r -a actual_semver_parts <<< "${actual_semver}"
+	IFS=. read -r -a required_semver_parts <<< "${required_semver}"
+
+	(( major=${actual_semver_parts[0]:-0} - ${required_semver_parts[0]:-0} ))
+	if [[ ${major} -ne 0 ]]; then
+		[[ ${major} -gt 0 ]] && echo -n ">" || echo -n "<"
+	else
+		(( minor=${actual_semver_parts[1]:-0} - ${required_semver_parts[1]:-0} ))
+		if [[ ${minor} -ne 0 ]]; then
+			[[ ${minor} -gt 0 ]] && echo -n ">" || echo -n "<"
+		else
+			(( patch=${actual_semver_parts[2]:-0} - ${required_semver_parts[2]:-0} ))
+			# shellcheck disable=SC2015
+			[[ ${patch} -gt 0 ]] && echo -n ">" || ( [[ ${patch} -eq 0 ]] && echo -n "=" || echo -n "<" )
+		fi
+	fi
+}

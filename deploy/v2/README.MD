@@ -1,311 +1,70 @@
-# Automated SAP Deployments in Azure Cloud
+### <img src="../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V2 <!-- omit in toc -->
+# Automated SAP Deployments in Azure Cloud <!-- omit in toc -->
 Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana.v2?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
 
 This repository contains code that can be used to automatically deploy SAP landscapes in the Azure Cloud.
 
 The templates are split into:
-* **Terraform modules**
+- **Terraform modules**
 which deploy the infrastructure components (such as VMs, network, storage) in Azure.
-* **Ansible playbooks**
+- **Ansible playbooks**
 which run different roles to configure and VMs and install SAP HANA and required applications on the already deployed infrastructure.
 
-## Table of contents
+<br>
 
-- [Supported Scenarios](#scenarios)
+## Table of contents <!-- omit in toc -->
+
 - [Usage](#usage)
-- [Getting Started](#getting-started)
+- [Terraform Deployment Units](#terraform-deployment-units)
 - [Contributions](#contributions)
 - [License & Copyright](#license--copyright)
 - [Contact](#contact)
 
-## Supported Scenarios
-
-#### [HANA single-node instance](https://github.com/Azure/sap-hana/blob/master/deploy/v2/template_samples/single_node_hana.json)
-
-## What will be deployed
-
-| <sub>NAME   (Examples)</sub>         | <sub>TYPE</sub>                   | <sub>Explain</sub>                                                                                                                                     |
-|--------------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| <sub>hdb01</sub>                     | <sub>Virtual machine</sub>        | <sub>HANA database server(s)</sub>                                                                                                                     |
-| <sub>hdb01-admin-nic</sub>           | <sub>Network interface</sub>      | <sub>Nic to admin IP</sub>                                                                                                                             |
-| <sub>hdb01-backup-0</sub>            | <sub>Disk</sub>                   | <sub>Disks attach to HANA database server(s) (e.g. os, sap, data,   log, shared, backup)</sub>                                                         |
-| <sub>hdb01-db-nic</sub>              | <sub>Network interface</sub>      | <sub>Nic to database</sub>                                                                                                                             |
-| <sub>jumpbox-linux</sub>             | <sub>Virtual machine</sub>        | <sub>Linux jumpboxe(s) [1..n]. At least one linux jumpbox is   required to execute ansible-playbook, which has destroy_after_deployed to   true.</sub> |
-| <sub>jumpbox-linux-nic1</sub>        | <sub>Network interface</sub>      | <sub>Nic for linux jumpboxe(s)</sub>                                                                                                                   |
-| <sub>jumpbox-linux-osdisk</sub>      | <sub>Disk</sub>                   | <sub>Disks for linux jumpboxe(s)</sub>                                                                                                                 |
-| <sub>jumpbox-linux-public-ip</sub>   | <sub>Public IP address</sub>      | <sub>Public IP for linux jumpboxe(s)</sub>                                                                                                             |
-| <sub>jumpbox-windows</sub>           | <sub>Virtual machine</sub>        | <sub>Windows jumpboxe(s) [0..n]</sub>                                                                                                                  |
-| <sub>jumpbox-windows-nic1</sub>      | <sub>Network interface</sub>      | <sub>Nic for Windows jumpboxe(s)</sub>                                                                                                                 |
-| <sub>jumpbox-windows-osdisk</sub>    | <sub>Disk</sub>                   | <sub>Disks for Windows jumpboxe(s)</sub>                                                                                                               |
-| <sub>jumpbox-windows-public-ip</sub> | <sub>Public IP address</sub>      | <sub>Public IP for Windows jumpboxe(s)</sub>                                                                                                           |
-| <sub>nsg-admin</sub>                 | <sub>Network security group</sub> | <sub>NSG for admin vnet</sub>                                                                                                                          |
-| <sub>nsg-db</sub>                    | <sub>Network security group</sub> | <sub>NSG for db vnet</sub>                                                                                                                             |
-| <sub>nsg-mgmt</sub>                  | <sub>Network security group</sub> | <sub>NSG for management vnet</sub>                                                                                                                     |
-| <sub>sabootdiag5f49a971</sub>        | <sub>Storage account</sub>        | <sub>Storage account for all VMs</sub>                                                                                                                 |
-| <sub>sapbits5f49a971</sub>           | <sub>Storage account</sub>        | <sub>Storage account for download SAP media</sub>                                                                                                      |
-| <sub>vnet-mgmt</sub>                 | <sub>Virtual network</sub>        | <sub>Vnet for management (jumpboxes)</sub>                                                                                                             |
-| <sub>vnet-sap</sub>                  | <sub>Virtual network</sub>        | <sub>Vnet for sap (HANA database servers)</sub>                                                                                                        |
-                                        
+<br>
 
 ## Usage
 
 A typical deployment lifecycle will require the following steps:
-* [**Preparing your environment**](#preparing-your-environment) (this has to be done only once)
-* [**Adjusting the templates**](#adjusting-the-templates)
-* [**Running Terraform deployment**](#running-terraform-deployment)
-* [**Running Ansible Playbook**](#running-ansible-playbook)
-* [**Deleting the deployment**](#deleting-the-deployment) (optional)
+
+Step 1) [**Preparing your environment**](/documentation/getting-started.md#preparing-your-environment) (this has to be done only once)
+
+Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
 
    *(**Note**: There are some script under [sap-hana/util](https://github.com/Azure/sap-hana/tree/master/util) would help if you are using Linux based workstation)*
-   
-## Getting Started
 
-#### Preparing your environment
-1. You have several options from where to run the automated deployment:
-   * **Local deployments:** Open a shell on your local machine (Works on a Unix based system (i.e. MacOS, Linux, Cygwin, or Windows Subsystem for Linux)).
-   * **VM deployment:** Connect to your VM using an SSH client.
-   * **Cloud Shell deployment:** From your Azure Portal, open your Cloud Shell (`>_` button in top bar).
-   
-   *(**Note**: Cloud Shell comes pre-installed with Terraform 0.12 which is now compatible with our scripts.)*
-   
-2. Install the following software on your deployment machine as needed (not required for deployments on Cloud Shell):
-   * [Terraform](https://www.terraform.io/downloads.html)
+<br>
 
-   *(**Note**: The scripts have been tested with Terraform `v0.12.12` and Ansible `2.8`)*
+## Terraform Deployment Units
 
-3. Clone this repository:
-
-    ```sh
-    git clone https://github.com/Azure/sap-hana.git
-    ```
-
-4. Log into your Azure subscription:
-
-    ```sh
-    az login
-    ```
-
-5. Create a service principal that will be used to manage Azure resources on your behalf:
-
-    ```sh
-    az ad sp create-for-rbac --name <service-principal-name>
-    ```
-    
-   *(**Note**: You can find additional information on creating service principals on [this page](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?toc=%2Fen-us%2Fazure%2Fazure-resource-manager%2Ftoc.json&bc=%2Fen-us%2Fazure%2Fbread%2Ftoc.json&view=azure-cli-latest).)*
-
-6. You will see an output similar to this:
-
-   ```{
-     "appId": "<service-principal-app-id>",
-     "displayName": "<service-principal-name>",
-     "name": "http://<service-principal-name>",
-     "password": "<service-principal-password>",
-     "tenant": "<service-principal-tenant-id>"
-   }
-   ```
-
-7. Set the details of the service principal as environment variables:
-
-    ```sh
-    # configure service principal for Terraform on Linux/MacOS
-    export ARM_SUBSCRIPTION_ID='<azure-subscription-id>'
-    export ARM_CLIENT_ID='<service-principal-app-id>'
-    export ARM_CLIENT_SECRET='<service-principal-password>'
-    export ARM_TENANT_ID='<service-principal-tenant-id>'
-    ```
-
-    ```powershell
-    # configure service principal for Terraform on Windows
-    SETX ARM_SUBSCRIPTION_ID <azure-subscription-id>
-    SETX ARM_CLIENT_ID <service-principal-app-id>
-    SETX ARM_CLIENT_SECRET <service-principal-password>
-    SETX ARM_TENANT_ID <service-principal-tenant-id>
-    ```    
-
-   *(**Note**: While you set the environment variables every time, the recommended way is to create a file ```set-sp.sh``` or ```set-sp.cmd``` and copy the above contents into it; this way, you can just run the script by executing ```source set-sp.sh``` or ```set-sp.cmd```.)*
+- [HANA single-node instance](terraform/HANA.md) (Primary Entry Point)
+- [SAP Library](terraform-units/workspace/SAP_Library/Readme.md)
+- Deployment Portal (Coming Soon)
+- Logical SAP Network Foundation (Coming Soon)
+- SDU - SAP Deployment Unit (Coming Soon)
 
 
-#### Adjusting the templates
+<br><br><br><br>  
 
-8. Change into the root directory:
-
-    ```sh
-    cd sap-hana/deploy/v2
-    ```
-
-9. Use a text editor to create a JSON configuration file. For complete JSON samples, please check [template-daily](https://github.com/Azure/sap-hana/blob/master/templates/tempGen/template-daily.json) which is used in our daily test, or [template](https://github.com/Azure/sap-hana/blob/master/templates/tempGen/template.json) which is used for all PRs. `sap-hana/deploy/v2/template_samples` also contains some examples, but those are not actively tested. Full version of supported JSON configuration see below:
-
-| Section                                                         | Key                                           | Type              | Explain                                                                                                                                                                                                                                                                                                                                                                                                                |
-|-----------------------------------------------------------------|-----------------------------------------------|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| <sub>infrastructure</sub>                                       | <sub>region</sub>                             | <sub>string</sub> | <sub>(Required) The location where the resource group should be   created. For a list of all Azure locations, please consult this link or run   az account list-locations --output table.</sub>                                                                                                                                                                                                                        |
-| <sub></sub>                                                     | <sub>boot_diagnostics     _account_name</sub> | <sub>string</sub> | <sub>(Optional) Account name for for boot diagonstics account. If   not provided, will be "sabootdiag" with 4 bytes   random_id.</sub>                                                                                                                                                                                                                                                                                 |
-| <sub>infrastructure.resource_group</sub>                        | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing resource group,   otherwise new resource group will be created. Default false.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the resource group. Must be unique on   your Azure subscription.</sub>                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub>infrastructure.vnets.management</sub>                      | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing vnets for management.   Default false.</sub>                                                                                                                                                                                                                                                                                                                               |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the virtual network for management   vnet.</sub>                                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>address_space</sub>                      | <sub>list</sub>   | <sub>(Required) The address space that is used by this virtual   network. You can supply more than one address space. </sub>                                                                                                                                                                                                                                                                                           |
-| <sub>infrastructure.vnets.     management.subnet_mgmt</sub>     | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing management vnet.   Default false.</sub>                                                                                                                                                                                                                                                                                                                                    |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for management   vnet.</sub>                                                                                                                                                                                                                                                                                                                                                    |
-| <sub></sub>                                                     | <sub>prefix</sub>                             | <sub>string</sub> | <sub>(Required) The address prefix to use for the   subnet.</sub>                                                                                                                                                                                                                                                                                                                                                      |
-| <sub>infrastructure.vnets.     management.subnet_mgmt.nsg</sub> | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing network security group.   Default false.</sub>                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for nsg used for management   subnet.</sub>                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>allowed_ips</sub>                        | <sub>list</sub>   | <sub>(Optional) List of source address prefixes.</sub>                                                                                                                                                                                                                                                                                                                                                                 |
-| <sub>infrastructure.vnets.sap</sub>                             | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing sap vnet. Default   false.</sub>                                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the virtual network for sap   vnet.</sub>                                                                                                                                                                                                                                                                                                                                                  |
-| <sub></sub>                                                     | <sub>address_space</sub>                      | <sub>list</sub>   | <sub>(Required) The address space that is used by this virtual   network. You can supply more than one address space. </sub>                                                                                                                                                                                                                                                                                           |
-| <sub>infrastructure.vnets.     sap.subnet_admin</sub>           | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing sap vnet. Default   false.</sub>                                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for sap vnet.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>prefix</sub>                             | <sub>string</sub> | <sub>(Required) The address prefix to use for the   subnet.</sub>                                                                                                                                                                                                                                                                                                                                                      |
-| <sub>infrastructure.vnets.     sap.subnet_admin.nsg</sub>       | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing network security group.   Default false.</sub>                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for nsg used for sap admin   subnet.</sub>                                                                                                                                                                                                                                                                                                                                      |
-| <sub>infrastructure.vnets.     sap.subnet_db</sub>              | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing sap vnet. Default   false.</sub>                                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for sap vnet.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>prefix</sub>                             | <sub>string</sub> | <sub>(Required) The address prefix to use for the   subnet.</sub>                                                                                                                                                                                                                                                                                                                                                      |
-| <sub>infrastructure.vnets.     sap.subnet_db.nsg</sub>          | <sub>is_existing</sub>                        | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing network security group.   Default false.</sub>                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>arm_id</sub>                             | <sub>string</sub> | <sub>(Optional) Required if is_exsiting set to true.</sub>                                                                                                                                                                                                                                                                                                                                                             |
-| <sub></sub>                                                     | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) The name of the subnet for nsg used for sap admin   subnet.</sub>                                                                                                                                                                                                                                                                                                                                      |
-| <sub>jumpboxes.windows</sub>                                    | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) Specifies the name of the Virtual   Machine.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>destroy_after_deploy</sub>               | <sub>bool</sub>   | <sub>(Optional) The jumpbox should be destroyed after the   deployment if set to true.</sub>                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>size</sub>                               | <sub>string</sub> | <sub>(Required) Specifies the size of the Virtual   Machine.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>private_ip_address</sub>                 | <sub>string</sub> | <sub>(Optional) Static IP Address for jumpbox VM. Will be assigned   according to its order under jumpboxes if left empty.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>components</sub>                         | <sub>list</sub>   | <sub>(Optional) List of components to be installed on jumpbox VM,   options: [hana_studio, hana_client]</sub>                                                                                                                                                                                                                                                                                                          |
-| <sub>jumpboxes.windows.*.os</sub>                               | <sub>publisher</sub>                          | <sub>string</sub> | <sub>(Required) Specifies the publisher of the image used to create   the virtual machine.</sub>                                                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>offer</sub>                              | <sub>string</sub> | <sub>(Required) Specifies the offer of the image used to create the   virtual machine.</sub>                                                                                                                                                                                                                                                                      |
-| <sub></sub>                                                     | <sub>sku</sub>                                | <sub>string</sub> | <sub>(Required) Specifies the SKU of the image used to create the   virtual machine.</sub>                                                                                                                                                                                                                                                                        |
-| <sub>jumpboxes.windows.*.authentication</sub>                   | <sub>type</sub>                               | <sub>string</sub> | <sub>(Required) Authentication method for windows jumpbox VM. Options:   [password]</sub>                                                                                                                                                                                                                                                                                                                                 |
-| <sub></sub>                                                     | <sub>username</sub>                           | <sub>string</sub> | <sub>(Required) Specifies the name of the local administrator   account.</sub>                                                                                                                                                                                                                                                                                                                                         |
-| <sub></sub>                                                     | <sub>password</sub>                           | <sub>string</sub> | <sub>(Required) The password associated with the local   administrator account.</sub>                                                                                                                                                                                                                                                                                                                                  |
-| <sub>jumpboxes.linux</sub>                                      | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) Specifies the name of the Virtual   Machine.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>destroy_after_deploy</sub>               | <sub>bool</sub>   | <sub>(Optional) The jumpbox should be destroyed after the   deployment if set to true.</sub>                                                                                                                                                                                                                                                                                                                           |
-| <sub></sub>                                                     | <sub>size</sub>                               | <sub>string</sub> | <sub>(Required) Specifies the size of the Virtual   Machine.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>private_ip_address</sub>                 | <sub>string</sub> | <sub>(Optional) Static IP Address for jumpbox VM. Will be assigned   according to its order under jumpboxes if left empty.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>components</sub>                         | <sub>list</sub>   | <sub>(Optional) List of components to be installed on jumpbox VM,   options: [hana_studio, hana_client].</sub>                                                                                                                                                                                                                                                                                                         |
-| <sub>jumpboxes.linux.*.os</sub>                               | <sub>publisher</sub>                          | <sub>string</sub> | <sub>(Required) Specifies the publisher of the image used to create   the virtual machine.</sub>                                                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>offer</sub>                              | <sub>string</sub> | <sub>(Required) Specifies the offer of the image used to create the   virtual machine.</sub>                                                                                                                                                                                                                                                                      |
-| <sub></sub>                                                     | <sub>sku</sub>                                | <sub>string</sub> | <sub>(Required) Specifies the SKU of the image used to create the   virtual machine.</sub>                                                                                                                                                                                                                                                                        |
-| <sub>jumpboxes.linux.*.authentication</sub>                   | <sub>type</sub>                               | <sub>string</sub> | <sub>(Required) Authentication method for windows jumpbox VM. Options:   [key]</sub>                                                                                                                                                                                                                                                                                                                                 |
-| <sub></sub>                                                     | <sub>username</sub>                           | <sub>string</sub> | <sub>(Required) Specifies the name of the local administrator   account.</sub>                                                                                                                                                                                                                                                                                                                                         |
-| <sub>databases</sub>                                            | <sub>platform</sub>                           | <sub>string</sub> | <sub>(Required) Type of database, options: [HANA].</sub>                                                                                                                                                                                                                                                                                                                                                               |
-| <sub></sub>                                                     | <sub>db_version</sub>                         | <sub>string</sub> | <sub>(Required) Revision of database. We currently only support the   HANA versions from HANA Database 1.0/2.0 Platform Media.</sub>                                                                                                                                                                                                                                                                                   |
-| <sub></sub>                                                     | <sub>filesystem</sub>                         | <sub>string</sub> | <sub>(Requred) Filesystem type, options: [XFS].</sub>                                                                                                                                                                                                                                                                                                                                                                  |
-| <sub></sub>                                                     | <sub>high_availability</sub>                  | <sub>bool</sub>   | <sub>(Reserved for HA pair scenario) </sub>                                                                                                                                                                                                                                                                                                                                                                            |
-| <sub></sub>                                                     | <sub>components</sub>                         | <sub>list</sub>   | <sub>(Required) List of components to be installed on HANA VM,   options: [hana_database, hana_studio, hana_client, xs, shine]. xs component   is a list, options: [all, none, xsac_alm_pi_ui, xsac_file_proc,   xsac_hana_ea_d, xsac_hrtt, xsac_mess_srv, xsac_portal_serv, xsac_sap_web_ide,   xsac_services, xsac_ui5_fesv5, xsac_ui5_sb, xsac_xsa_cockpit]. The please   include all required xs components.</sub> |
-| <sub>databases.*.os</sub>                                       | <sub>publisher</sub>                          | <sub>string</sub> | <sub>(Required) Specifies the publisher of the image used to create the virtual machine.</sub>                                                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>offer</sub>                              | <sub>string</sub> | <sub>(Required) Specifies the offer of the image used to create the virtual machine.</sub>                                                                                                                                                                                                                                                                      |
-| <sub></sub>                                                     | <sub>sku</sub>                                | <sub>string</sub> | <sub>(Required) Specifies the SKU of the image used to create the   virtual machine.<sup>[1](#myfootnote1)</sup>
-| <sub>databases.*.authentication</sub>                           | <sub>type</sub>                               | <sub>string</sub> | <sub>(Required) Authentication method for HANA database VM. Options:   [key].</sub>                                                                                                                                                                                                                                                                                                                                |
-| <sub></sub>                                                     | <sub>username</sub>                           | <sub>string</sub> | <sub>(Required) Specifies the name of the local administrator   account.</sub>                                                                                                                                                                                                                                                                                                                                         |
-| <sub>databases.*.instance</sub>                                 | <sub>sid</sub>                                | <sub>string</sub> | <sub>(Required) SID for SAP instance (For reserved SID, check SAP   Note 1979280).</sub>                                                                                                                                                                                                                                                                                                                               |
-| <sub></sub>                                                     | <sub>instance_number</sub>                    | <sub>string</sub> | <sub>(Required) Instance number for SAP instance.</sub>                                                                                                                                                                                                                                                                                                                                                                |
-| <sub>databases.*.credentials</sub>                              | <sub>db_systemdb_password</sub>               | <sub>string</sub> | <sub>(Required) SYSTEM user password for SYSTEMDB.</sub>                                                                                                                                                                                                                                                                                                                                                               |
-| <sub></sub>                                                     | <sub>db_tenant_password</sub>                 | <sub>string</sub> | <sub>(Required) SYSTEM user password for tenant.</sub>                                                                                                                                                                                                                                                                                                                                                                 |
-| <sub></sub>                                                     | <sub>os_sidadm_password</sub>                 | <sub>string</sub> | <sub>(Required) sidadm user password.</sub>                                                                                                                                                                                                                                                                                                                                                                            |
-| <sub></sub>                                                     | <sub>os_sapadm_password</sub>                 | <sub>string</sub> | <sub>(Required) sapadm user password.</sub>                                                                                                                                                                                                                                                                                                                                                                            |
-| <sub></sub>                                                     | <sub>xsa_admin_password</sub>                 | <sub>string</sub> | <sub>(Optional) XSA_ADMIN user password if xs is in   databases.*.components.</sub>                                                                                                                                                                                                                                                                                                                                    |
-| <sub></sub>                                                     | <sub>cockpit_admin_password</sub>             | <sub>string</sub> | <sub>(Optional) COCKPIT_ADMIN user password if xsac_xsa_cockpit is   in databases.*.components.</sub>                                                                                                                                                                                                                                                                                                                  |
-| <sub>databases.*.xsa</sub>                                      | <sub>routing</sub>                            | <sub>string</sub> | <sub>(Optional) Routing method. Required if xs is in   databases.*.components.</sub>                                                                                                                                                                                                                                                                                                                                   |
-| <sub>databases.*.nodes.*</sub>                                  | <sub>name</sub>                               | <sub>string</sub> | <sub>(Required) Specifies the name of the Virtual   Machine.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>admin_nic_ips</sub>                         | <sub>list</sub> | <sub>(Optional) List of up to 2 static IP Addresses of HANA database VM for traffic from jumpboxes (1 IP for single HANA deployment and 2 IPs for HA pair). Will be assigned   according to its order under jumpboxes if left empty.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>db_nic_ips</sub>                         | <sub>list</sub> | <sub>(Optional) List of up to 2 static IP Addresses of HANA database VM for inter nodes traffic (1 IP for single HANA deployment and 2 IPs for HA pair). Will be assigned   according to its order under jumpboxes if left empty.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>role</sub>                               | <sub>string</sub> | <sub>(Reserved for scale-out scenario, options:[worker,   standby])</sub>                                                                                                                                                                                                                                                                                                                                              |
-| <sub>databases.*.loadbalancer</sub>                             | <sub>frontend_ip</sub>                        | <sub>string</sub> | <sub>(Optional) Specifies the IP Address to use for the Loadbalancer Frontend IP Configuration.</sub>                                                                                                                                                                                                                                                                                                                                                     |
-| <sub>software.storage_account</sub>                             | <sub>use_existing</sub>                       | <sub>bool</sub>   | <sub>(Optional) Set to true to use existing storage account,   otherwise new storage account will be created. Default false.</sub>                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>Storage_account_name</sub>               | <sub>string</sub> | <sub>(Required) Specifies the name of the storage account. This   must be unique across the entire Azure service, not just within the resource   group.</sub>                                                                                                                                                                                                                                                          |
-| <sub></sub>                                                     | <sub>Storage_access_key</sub>                 | <sub>string</sub> | <sub>(Optional) The primary access key for the storage account. It   is required if is_existing set to true.</sub>                                                                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>account_tier</sub>                       | <sub>string</sub> | <sub>(Required) Defines the Tier to use for this storage account.   Valid options are Standard and Premium. For FileStorage accounts only Premium   is valid</sub>                                                                                                                                                                                                                                                     |
-| <sub></sub>                                                     | <sub>account_replication_type</sub>           | <sub>string</sub> | <sub>(Required) Defines the type of replication to use for this   storage account. Valid options are LRS, GRS, RAGRS and ZRS.</sub>                                                                                                                                                                                                                                                                                    |
-| <sub></sub>                                                     | <sub>account_kind</sub>                       | <sub>string</sub> | <sub>(Optional) Defines the Kind of account. Valid options are   BlobStorage, BlockBlobStorage, FileStorage, Storage and StorageV2. Defaults   to Storage.</sub>                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>blob_container_name</sub>                | <sub>string</sub> | <sub>(Required) The name of the Container which should be created   within the Storage Account.</sub>                                                                                                                                                                                                                                                                                                                  |
-| <sub></sub>                                                     | <sub>file_share_name</sub>                    | <sub>string</sub> | <sub>(Required) The name of the share. Must be unique within the   storage account where the share is located.</sub>                                                                                                                                                                                                                                                                                                   |
-| <sub></sub>                                                     | <sub>container_access_type</sub>              | <sub>string</sub> | <sub>(Optional) The Access Level configured for this Container.   Possible values are blob, container or private. Defaults to   private.</sub>                                                                                                                                                                                                                                                                         |
-| <sub>software.smp_cridential</sub>                              | <sub>sap_user</sub>                           | <sub>string</sub> | <sub>(Required) The username for SAP service market   place</sub>                                                                                                                                                                                                                                                                                                                                                      |
-| <sub></sub>                                                     | <sub>sap_password</sub>                       | <sub>string</sub> | <sub>(Required) The password for SAP service market   place</sub>                                                                                                                                                                                                                                                                                                                                                      |
-| <sub>sshkey</sub>                                               | <sub>path_to_private_key</sub>                | <sub>string</sub> | <sub>(Optional) Path to private key. Reuiqred if key is used as   Authentication.type for any virtual machine. All deployed virtual machine   will share the same SSH key pair. Only PEM file extension is accepted due to   limitation from Terrafrom.</sub>                                                                                                                                                          |
-| <sub></sub>                                                     | <sub>path_to_public_key</sub>                 | <sub>string</sub> | <sub>(Optional) Path to public key. Reuiqred if key is used as   Authentication.type for any virtual machine. All deployed virtual machine   will share the same SSH key pair.</sub>                                                                                                                                                                                                                                   |
-| <sub>options</sub>                                              | <sub>enable_secure_transfer</sub>             | <sub>bool</sub>   | <sub>(Optional) Default true. If se to true, secure transfer will   be enabled.</sub>                                                                                                                                                                                                                                                                                                                                  |
-| <sub></sub>                                                     | <sub>ansible_execution</sub>                  | <sub>bool</sub>   | <sub>(Optional) Default true. If set to true, Ansible playbook will   be executed from jumpbox from terraform deployment.</sub>                                                                                                                                                                                                                                                                                       |
-| <sub></sub>                                                     | <sub>enable_prometheus</sub>                  | <sub>bool</sub>   | <sub>(Optional) Default true. If set to true, Ansible playbook will enable prometheus<sup>[2](#myfootnote2)</sup> on the VM.</sub>                                                                                                                                                                                                                                                                                       |
-
-
-<sup>[1](#myfootnote1)</sup>: Current Ansible playbook suppports images for SAP applications, e.g. SLES-SAP, RHEL-SAP-HANA. 
-
-And we only include OS configuration for:
-- SLES 12
-- RHEL 7.
-
-<sup>[2](#myfootnote2)</sup>: Enabling [promethus](https://prometheus.io/) will enrich the set of telemetry even more when you monitor your Hana Instance using Azure Monitor for SAP Solutions
-
-If you use BYOS image, the Ansible playbook will throw error during the OS configuration. 
-
-#### Running Terraform deployment
-10. Step into terraform folder sap-hana/deploy/v2/terraform, initialize a working directory containing Terraform configuration files:
-    ```sh
-    
-    terraform init
-    ```
-
-11. Trigger the deployment:
-
-    ```sh
-    
-    terraform apply -var-file=<JSON configuration file>
-    ```
-    Optionally, you could auto approve the deployment by:
-    ```sh
-    terraform apply -auto-approve -var-file=<JSON configuration file>
-    ```   
-    This way, you can skip step 12.
-
-12. When prompted if you want to deploy the resources, answer `yes`.
-13. After the deployment finishes, you will see message like below:
-    ```sh
-    Apply complete! Resources: 34 added, 0 changed, 0 destroyed.
-    
-    Outputs:
-
-    jumpbox-public-ip-address = xx.xxx.xx.xxx
-    jumpbox-username = xxx
-    ``` 
-#### Running Ansible Playbook
-
-14. If you set `options.ansible_execution` to `true`, the Ansible deployment will be triggered as part of Terrafrom deployment. Otherwise, logon to the jumpbox which is already prepared with Ansible enviorment (the logon information is recorded in the ouputs of step 13), start ansible playbook<sup>[2](#myfootnote2)</sup>:
-    ```sh
-    ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml 
-    ``` 
-
-<sup>[2](#myfootnote2)</sup>: The ansible playbook currently configure the VMs without HANA installation.
-
-#### Deleting the deployment
-
-15. If you don't need the deployment anymore, you can remove it just as easily.
-In your Azure Cloud Shell, run the following command to remove all deployed resources:
-
-    ```sh
-    terraform destroy -var-file=<JSON configuration file>
-    ```
+---
 
 ## Contributions
 
-If you want to contribute to our project, be sure to review the [contributing guidelines](CONTRIBUTING.md).
+If you want to contribute to our project, be sure to review the [contributing guidelines](/CONTRIBUTING.md).
 
 We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
 
+<br>
+
 ## License & Copyright
 
-Copyright © 2018-2019 Microsoft Azure.
+Copyright © 2018-2020 Microsoft Azure.
 
 Licensed under the [MIT License](LICENSE).
+
+<br>
 
 ## Contact
 
 We look forward to your feedback and welcome any contributions!
 
-Please feel free to reach out to our team at ![image](http://safemail.justlikeed.net/e/3149a6fc0a17ff3863440aa38a16501b.png).
+Please feel free to reach out to our team at ![image](/documentation/assets/contact.png).
