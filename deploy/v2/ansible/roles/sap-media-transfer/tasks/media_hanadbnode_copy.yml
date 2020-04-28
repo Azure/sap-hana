@@ -3,7 +3,7 @@
 - name: Install unzip
   package:
     name: unzip
-    state: latest
+    state: present
 
 - name: Check whether the installation media already exists and has been extracted
   stat: path={{ hana_software_loc }}

@@ -13,3 +13,10 @@
      path_status_flag: "{{ item.stat.exists }}"
   loop: "{{ path_status.results }}"
   when: item.stat.exists == False
+
+- name: Check the paths status in Large Instance
+  fail:
+    msg: "Not all paths are ready in Large Instance"
+  when: 
+    - hana_database.size == "LargeInstance"
+    - path_status_flag is defined
