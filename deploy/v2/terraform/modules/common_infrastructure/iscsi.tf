@@ -31,7 +31,7 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   resource_group_name             = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   network_interface_ids           = [azurerm_network_interface.iscsi[count.index].id]
   size                            = local.iscsi.size
-  computer_name                   = "iscsi-${count.index}"
+  computer_name                   = "iscsi-${format("%02d", count.index)}"
   admin_username                  = local.iscsi.authentication.username
   admin_password                  = lookup(local.iscsi.authentication, "password", null)
   disable_password_authentication = local.iscsi.authentication.type != "password" ? true : false
