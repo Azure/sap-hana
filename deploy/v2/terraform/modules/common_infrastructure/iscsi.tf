@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------8
 |                                                                              |
-|                                    ISCSI                                     |
+|                                    iSCSI                                     |
 |                                                                              |
 +--------------------------------------4--------------------------------------*/
 
@@ -8,7 +8,7 @@
 TODO:  Fix Naming convention and document in the Naming Convention Doc
 +--------------------------------------4--------------------------------------*/
 
-# Creates the NIC and IP address for ISCSI device
+# Creates the NIC and IP address for iSCSI device
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi.iscsi_count
   name                = "iscsi-${format("%02d", count.index)}-nic"
@@ -23,7 +23,7 @@ resource "azurerm_network_interface" "iscsi" {
   }
 }
 
-# Manages Linux Virtual Machine for ISCSI
+# Manages Linux Virtual Machine for iSCSI
 resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi.iscsi_count
   name                            = "iscsi-${count.index}"
@@ -59,6 +59,6 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   }
 
   tags = {
-    iscsiName = "ISCSI-${count.index}"
+    iscsiName = "iSCSI-${count.index}"
   }
 }

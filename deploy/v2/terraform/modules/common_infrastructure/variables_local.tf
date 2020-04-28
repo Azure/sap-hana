@@ -44,13 +44,13 @@ locals {
     ]
   ])
 
-  # ISCSI target device(s) is only created when below conditions met:
+  # iSCSI target device(s) is only created when below conditions met:
   # - iscsi is defined in input JSON
   # - AND
   #   - HANA database has high_availability set to true
   #   - HANA database uses SUSE
   iscsi_count = lookup(var.infrastructure, "iscsi", {}) != {} && (length(local.hana-databases) > 0 ? (local.hana-databases[0].high_availability && upper(local.hana-databases[0].os.publisher) == "SUSE") : false) ? var.infrastructure.iscsi.iscsi_count : 0
 
-  # Shortcut to ISCSI definition
+  # Shortcut to iSCSI definition
   iscsi = merge(lookup(var.infrastructure, "iscsi", {}), { "iscsi_count" = "${local.iscsi_count}" })
 }
