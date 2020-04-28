@@ -26,7 +26,7 @@ resource "azurerm_network_interface" "iscsi" {
 # Manages Linux Virtual Machine for iSCSI
 resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi.iscsi_count
-  name                            = "iscsi-${count.index}"
+  name                            = "iscsi-${format("%02d", count.index)}"
   location                        = var.infrastructure.region
   resource_group_name             = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   network_interface_ids           = [azurerm_network_interface.iscsi[count.index].id]
@@ -37,7 +37,7 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   disable_password_authentication = local.iscsi.authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = "iscsi-${count.index}-osdisk"
+    name                 = "iscsi-${format("%02d", count.index)}-osdisk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -59,6 +59,6 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   }
 
   tags = {
-    iscsiName = "iSCSI-${count.index}"
+    iscsiName = "iSCSI-${format("%02d", count.index)}"
   }
 }
