@@ -1,0 +1,5 @@
+---
+
+cluster_status_cmd:
+  RedHat: "pcs status"
+  Suse: "crm status"
