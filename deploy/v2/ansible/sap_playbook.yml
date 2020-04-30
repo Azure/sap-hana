@@ -88,7 +88,7 @@
     - role: hana-os-clustering
       when: hana_database.high_availability
       vars:
-        ha_cluster_password: "ASecurePa55w0rd"   # @TODO Determine source of truth for this value
+        ha_cluster_password: "{{ hana_database.credentials.ha_cluster_pass }}"
         sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
         sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"

@@ -1,8 +1,5 @@
 ---
 
-clustering_service:
-  Suse: "corosync"
-
 crm_totem:
   token: 30000
   retransmits: 10
