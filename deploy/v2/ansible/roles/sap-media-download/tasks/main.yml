@@ -6,7 +6,7 @@
 - name: Install unzip
   package: 
     name: unzip
-    state: latest
+    state: present
 
 # Explicitly install bs4 with python3
 - name: Install beautifulsoup4
