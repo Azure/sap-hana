@@ -61,7 +61,7 @@
         pcs stonith create rsc_st_azure fence_azure_arm
         login="{{ sap_hana_fencing_agent_client_id }}"
         passwd="{{ sap_hana_fencing_agent_client_password }}"
-        resourceGroup="{{output.infrastructure.resource_group.name  }}"
+        resourceGroup="{{ output.infrastructure.resource_group.name }}"
         tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         power_timeout=240
@@ -96,10 +96,12 @@
         SID={{ hana_database.instance.sid | upper }} InstanceNumber={{ hana_database.instance.instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
-        op start timeout=3600 op stop timeout=3600
-        op monitor interval=61 role="Slave" timeout=700
-        op monitor interval=59 role="Master" timeout=700
-        op promote timeout=3600 op demote timeout=3600
+        op start timeout={{ cluster_SAPHana_timeouts.start }}
+        op stop timeout={{ cluster_SAPHana_timeouts.stop }}
+        op monitor interval=59 role="Master" timeout={{ cluster_SAPHana_timeouts.monitor_master }}
+        op monitor interval=61 role="Slave" timeout={{ cluster_SAPHana_timeouts.monitor_slave }}
+        op promote timeout={{ cluster_SAPHana_timeouts.promote }}
+        op demote timeout={{ cluster_SAPHana_timeouts.demote }}
         master notify=true clone-max=2 clone-node-max=1 interleave=true
 
     - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created

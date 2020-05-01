@@ -10,3 +10,13 @@ crm_totem:
 crm_quorum:
   expected_votes: 2
   two_node: 1
+
+# These are the default timeouts used for the SAP HANA OS clustering. Depending on the
+# SAP HANA System, these may need to be adjusted if the operation takes longer than expected.
+cluster_SAPHana_timeouts:
+  start: 3600
+  stop: 3600
+  monitor_master: 700
+  monitor_slave: 700
+  promote: 3600
+  demote: 3600

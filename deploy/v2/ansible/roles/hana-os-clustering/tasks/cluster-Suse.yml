@@ -105,11 +105,11 @@
         crm configure primitive rsc_SAPHana_{{ hana_database.instance.sid | upper }}_HDB{{ hana_database.instance.instance_number }}
         ocf:suse:SAPHana
         operations \$id="rsc_sap_{{ hana_database.instance.sid | upper }}_HDB{{ hana_database.instance.instance_number }}-operations"
-        op start interval="0" timeout="3600"
-        op stop interval="0" timeout="3600"
-        op promote interval="0" timeout="3600"
-        op monitor interval="60" role="Master" timeout="700"
-        op monitor interval="61" role="Slave" timeout="700"
+        op start interval="0" timeout="{{ cluster_SAPHana_timeouts.start }}"
+        op stop interval="0" timeout="{{ cluster_SAPHana_timeouts.stop }}"
+        op promote interval="0" timeout="{{ cluster_SAPHana_timeouts.promote }}"
+        op monitor interval="60" role="Master" timeout="{{ cluster_SAPHana_timeouts.monitor_master }}"
+        op monitor interval="61" role="Slave" timeout="{{ cluster_SAPHana_timeouts.monitor_slave }}"
         params
         SID="{{ hana_database.instance.sid | upper }}"
         InstanceNumber="{{ hana_database.instance.instance_number }}"
