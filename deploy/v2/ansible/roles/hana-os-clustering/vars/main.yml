@@ -22,5 +22,7 @@ cluster_SAPHana_timeouts:
   demote: 3600
 
 cluster_status_cmd:
-  RedHat: "pcs status"
-  Suse: "crm status"
+  RedHat: "pcs status --full"
+  Suse: "crm status full"
+
+cluster_status_report_wait_in_s: 60
