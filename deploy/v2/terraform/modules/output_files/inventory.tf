@@ -5,7 +5,7 @@
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
-    "infrastructure" = var.infrastructure,
+    "infrastructure" = merge(var.infrastructure, { "iscsi" = { "iscsi_nic_ips" = [local.ips-iscsi] } })
     "jumpboxes" = {
       "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
         name                 = jumpbox-windows.name,
@@ -75,8 +75,10 @@ resource "local_file" "output-json" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible-inventory" {
   content = templatefile("${path.module}/ansible_inventory.tmpl", {
+    iscsi                 = lookup(var.infrastructure, "iscsi", {}),
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
+    ips-iscsi             = local.ips-iscsi,
     ips-jumpboxes-windows = local.ips-jumpboxes-windows,
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,

@@ -1,4 +1,5 @@
 resource "null_resource" "ansible_playbook" {
+  count      = var.options.ansible_execution ? 1 : 0
   depends_on = [module.hdb_node.dbnode-data-disk-att, module.jumpbox.prepare-rti, module.jumpbox.vm-windows]
   connection {
     type        = "ssh"
@@ -17,7 +18,7 @@ resource "null_resource" "ansible_playbook" {
       "export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
       "source ~/export-clustering-sp-details.sh",
-      var.options.ansible_execution ? "ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml" : "ansible-playbook --version"
+      "ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml"
     ]
   }
 }

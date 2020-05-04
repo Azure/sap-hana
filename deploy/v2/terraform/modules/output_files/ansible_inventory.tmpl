@@ -1,3 +1,13 @@
+[iscsi]
+%{~ for ip-iscsi in ips-iscsi }
+%{~ if iscsi.authentication.type == "key" }
+${ip-iscsi}  ansible_connection=ssh  ansible_user=${iscsi.authentication.username}
+%{~ endif }
+%{~ if iscsi.authentication.type == "password" }
+${ip-iscsi}  ansible_connection=ssh  ansible_user=${iscsi.authentication.username} ansible_ssh_pass=${iscsi.authentication.password}  ansible_become_pass=${iscsi.authentication.password}
+%{~ endif }
+%{~ endfor }
+
 [jumpboxes_windows]
 %{~ for jumpbox-windows in jumpboxes-windows }
 ${ips-jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}  ansible_connection=winrm  ansible_user=${jumpbox-windows.authentication.username} ansible_ssh_pass=${jumpbox-windows.authentication.password}  ansible_ssh_port=5986 ansible_winrm_transport=ntlm ansible_winrm_server_cert_validation=ignore

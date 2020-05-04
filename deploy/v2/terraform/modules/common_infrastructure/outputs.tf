@@ -37,3 +37,7 @@ output "storage-sapbits" {
 output "random-id" {
   value = random_id.random-id
 }
+
+output "nics-iscsi" {
+  value = azurerm_network_interface.iscsi
+}
