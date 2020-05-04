@@ -176,7 +176,7 @@ In HA systems, you must set the password to be used for the cluster user in the 
 1. Run the following utility script to configure the `hacluster` user password:
 
    ```text
-   util/set_ha_cluster_pass.sh <ha_cluster_pass> <template_name>
+   util/set_ha_cluster_password.sh <ha_cluster_password> <template_name>
    ```
 
    **Note:** This value will only be used in deployments where the SAP HANA Database definition has `high_availability` set to `true`.

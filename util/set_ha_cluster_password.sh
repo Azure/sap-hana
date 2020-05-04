@@ -23,10 +23,10 @@ function main()
 {
 	check_command_line_arguments "$@"
 
-	local ha_cluster_pass="$1"
+	local ha_cluster_password="$1"
 	local template_name="$2"
 
-	edit_json_template_for_ha_cluster_pass "${ha_cluster_pass}" "${template_name}"
+	edit_json_template_for_ha_cluster_password "${ha_cluster_password}" "${template_name}"
 }
 
 
@@ -49,17 +49,17 @@ function list_available_templates()
 }
 
 
-function edit_json_template_for_ha_cluster_pass()
+function edit_json_template_for_ha_cluster_password()
 {
-	local ha_cluster_pass="$1"
+	local ha_cluster_password="$1"
 	local json_template_name="$2"
 
 	# the JSON path to update in jq format
-	local ha_cluster_pass_path='"databases", ( .databases | map(.platform) | index("HANA") ), "credentials", "ha_cluster_pass"'
+	local ha_cluster_password_path='"databases", ( .databases | map(.platform) | index("HANA") ), "credentials", "ha_cluster_password"'
 
 	# Only attempt to set for non-empty password values
-	if [[ "${ha_cluster_pass}" != "" ]]; then
-		edit_json_template_for_path "${ha_cluster_pass_path}" "${ha_cluster_pass}" "${json_template_name}"
+	if [[ "${ha_cluster_password}" != "" ]]; then
+		edit_json_template_for_path "${ha_cluster_password_path}" "${ha_cluster_password}" "${json_template_name}"
 	fi
 }
 

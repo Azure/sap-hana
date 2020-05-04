@@ -8,7 +8,7 @@
     {
       "high_availability" : true,
       "credentials":{
-        "ha_cluster_pass": "ASecurePa55w0rd"
+        "ha_cluster_password": "ASecurePa55w0rd"
       },
       "dbnodes": [
         {
