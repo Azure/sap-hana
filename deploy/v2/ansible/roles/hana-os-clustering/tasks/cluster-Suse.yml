@@ -3,6 +3,18 @@
 # SLES Clustering
 # Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
 
+- name: Ensure a list of package version is available for checking the cloud-netconfig-azure version
+  package_facts:
+
+# eth1 is the "db" NIC
+- name: Ensure clustering can manage Virtual IPs on the Database Interface
+  when: ansible_facts.packages["cloud-netconfig-azure"] and (ansible_facts.packages["cloud-netconfig-azure"][0].version | float) < 1.3
+  lineinfile:
+    path: /etc/sysconfig/network/ifcfg-eth1
+    state: present
+    regexp: "^#?\\s*CLOUD_NETCONFIG_MANAGE="
+    line: "CLOUD_NETCONFIG_MANAGE='no'"
+
 # https://rpm.pbone.net/index.php3/stat/45/idpl/27916721/numer/8/nazwa/ha-cluster-init
 - name: Ensure Primary node initiates the Cluster
   when: ansible_hostname == hana_database.nodes[0].dbname
