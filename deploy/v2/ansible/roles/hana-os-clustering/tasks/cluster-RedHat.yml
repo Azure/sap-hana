@@ -33,7 +33,7 @@
 
     # Ref https://docs.microsoft.com/en-us/azure/virtual-machines/maintenance-and-updates#maintenance-that-doesnt-require-a-reboot
     - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
-      shell: "pcs cluster setup --name {{ hana_database.instance.sid | upper }}_hana_cluster {{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }} --token 30000"
+      shell: "pcs cluster setup --name {{ hana_database.instance.sid | upper }}_hana_cluster {{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }} --token {{ cluster_totem.token }}"
 
     - name: Ensure the cluster is starting on all nodes
       shell: pcs cluster start --all
@@ -46,7 +46,7 @@
       until: "'{{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }}' in cluster_stable_check.stdout or '{{ hana_database.nodes[1].dbname }} {{ hana_database.nodes[0].dbname }}' in cluster_stable_check.stdout"
 
 - name: Ensure the expected quorum votes is set for the cluster
-  shell: pcs quorum expected-votes 2
+  shell: "pcs quorum expected-votes {{ cluster_quorum.expected_votes }}"
 
 - name: Configure the cluster STONITH device on the primary node
   when: ansible_hostname == hana_database.nodes[0].dbname

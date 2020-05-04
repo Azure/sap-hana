@@ -1,13 +1,13 @@
 ---
 
-crm_totem:
+cluster_totem:
   token: 30000
   retransmits: 10
   join: 60
   consensus: 36000
   max_messages: 20
 
-crm_quorum:
+cluster_quorum:
   expected_votes: 2
   two_node: 1
 
