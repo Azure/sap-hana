@@ -75,6 +75,7 @@
 - hosts: hanadbnodes
   become: true
   become_user: root
+  any_errors_fatal: true
   vars_files:
     - "vars/ha-packages.yml"
   roles:
