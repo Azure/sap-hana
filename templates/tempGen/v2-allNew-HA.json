@@ -7,6 +7,9 @@
   "databases" : [
     {
       "high_availability" : true,
+      "credentials":{
+        "ha_cluster_password": "ASecurePa55w0rd"
+      },
       "dbnodes": [
         {
           "name": "hdb-node1",

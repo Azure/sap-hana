@@ -8,11 +8,11 @@ totem {
     cluster_name:        hacluster
     clear_node_high_bit: yes
 
-    token:                               {{ crm_totem.token }}
-    token_retransmits_before_loss_const: {{ crm_totem.retransmits }}
-    join:                                {{ crm_totem.join }}
-    consensus:                           {{ crm_totem.consensus }}
-    max_messages:                        {{ crm_totem.max_messages }}
+    token:                               {{ cluster_totem.token }}
+    token_retransmits_before_loss_const: {{ cluster_totem.retransmits }}
+    join:                                {{ cluster_totem.join }}
+    consensus:                           {{ cluster_totem.consensus }}
+    max_messages:                        {{ cluster_totem.max_messages }}
 
     interface {
         ringnumber: 0
@@ -30,9 +30,9 @@ totem {
 logging {
     fileline:   off
     to_stderr:  no
-    to_logfile: no
+    to_logfile: yes
     logfile:    /var/log/cluster/corosync.log
-    to_syslog:  yes
+    to_syslog:  no
     debug:      off
     timestamp:  on
     logger_subsys {
@@ -56,6 +56,6 @@ quorum {
     # Enable and configure quorum subsystem (default: off)
     # see also corosync.conf.5 and votequorum.5
     provider: corosync_votequorum
-    expected_votes: {{ crm_quorum.expected_votes }}
-    two_node: {{ crm_quorum.two_node }}
+    expected_votes: {{ cluster_quorum.expected_votes }}
+    two_node: {{ cluster_quorum.two_node }}
 }

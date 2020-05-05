@@ -142,7 +142,8 @@
         "os_sidadm_password": "",
         "os_sapadm_password": "",
         "xsa_admin_password": "",
-        "cockpit_admin_password": ""
+        "cockpit_admin_password": "",
+        "ha_cluster_password": ""
       },
       "components": {
         "hana_database": [],
