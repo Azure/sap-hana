@@ -1,0 +1,17 @@
+---
+
+- name: Ensure SBD device for clusters is created
+  vars:
+    cluster_name: "{{ item.key }}"
+    storage_object: sbd{{ cluster_name }}
+    target: "{{ iscsi_object }}.{{ cluster_name }}.local:{{ cluster_name }}"
+    initiator1: "{{ iscsi_object }}.{{ item.value[0] | default(hana_database.nodes[0].dbname) }}.local:{{ item.value[0] | default(hana_database.nodes[0].dbname) }}"
+    initiator2: "{{ iscsi_object }}.{{ item.value[1] | default(hana_database.nodes[1].dbname) }}.local:{{ item.value[1] | default(hana_database.nodes[1].dbname) }}"
+  shell: |
+    targetcli backstores/fileio create {{ storage_object }} /sbd/{{ storage_object }} 50M write_back=false
+    targetcli iscsi/ create {{ target }}
+    targetcli iscsi/{{ target }}/tpg1/luns/ create /backstores/fileio/{{ storage_object }}
+    targetcli iscsi/{{ target }}/tpg1/acls/ create {{ initiator1 }}
+    targetcli iscsi/{{ target }}/tpg1/acls/ create {{ initiator2 }}
+    targetcli saveconfig
+  loop: "{{ clusters | dict2items }}"

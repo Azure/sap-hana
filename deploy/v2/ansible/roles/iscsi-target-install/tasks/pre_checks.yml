@@ -1,0 +1,9 @@
+---
+
+- name: Check if iSCSI target servers are provisioned
+  assert:
+    that: groups['iscsi'] | length > 0
+
+- name: Check if Linux distro of iSCSI target virtual machines is Suse 
+  assert:
+    that: ansible_os_family == 'Suse'

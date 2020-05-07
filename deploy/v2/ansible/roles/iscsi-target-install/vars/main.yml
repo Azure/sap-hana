@@ -1,0 +1,21 @@
+---
+# Configure the clusters using following format
+#
+# clusters:
+#   cluster_name:
+#     - hostname of the first node
+#     - hostname of the second node
+#
+# eg:
+# clusters:
+#   db{{ hana_database.instance.sid | lower }}:
+#     - "{{ hana_database.nodes[0].dbname }}"
+#     - "{{ hana_database.nodes[1].dbname }}"
+#   nfs:
+#   ascs{{ hana_database.instance.sid | lower }}:
+# 
+# hostnames can be omitted, then hana_database nodes will be default values
+clusters:
+  db{{ hana_database.instance.sid | lower }}:
+    - "{{ hana_database.nodes[0].dbname }}"
+    - "{{ hana_database.nodes[1].dbname }}"

@@ -1,0 +1,10 @@
+---
+
+- name: Check the SBD devices status
+  shell: targetcli ls
+  register: device_info
+  changed_when: false
+
+- name: Output SBD devices status
+  debug:
+    msg: "{{ device_info.stdout }}"

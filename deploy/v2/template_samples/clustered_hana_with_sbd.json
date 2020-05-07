@@ -95,9 +95,8 @@
           "sku": "16.04-LTS"
         },
         "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
+          "type": "key",
+          "username": "azureadm"
         },
         "components": [
           "hana_studio_linux"

@@ -13,3 +13,15 @@
 - name: Output cluster status
   debug:
     msg: "{{ cluster_status_report.stdout }}"
+
+- name: Check the SBD devices status
+  when: ansible_os_family == 'Suse'
+  shell: crm_mon -1 | grep sbd
+  register: sbd_status_report
+  changed_when: False
+  failed_when: False
+
+- name: Output SBD status
+  when: ansible_os_family == 'Suse'
+  debug:
+    msg: "{{ sbd_status_report.stdout }}"
