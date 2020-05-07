@@ -14,7 +14,7 @@
   loop: "{{ shine.variants }}"
 
 - name: Log into XSA
-  shell: "{{ shine_install_path}} login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ hana_database.instance.instance_number }}30/ -s SAP -u XSA_ADMIN  -p {{ hana_database.credentials.db_systemdb_password }}"
+  shell: "{{ shine_install_path}} login --skip-ssl-validation -a https://{{ ansible_fqdn }}:3{{ hana_database.instance.instance_number }}30/ -s SAP -u XSA_ADMIN  -p {{ hana_database.credentials.xsa_admin_password }}"
 
 - name: Identify SHINE Media
   shell: "ls {{ hana_software_loc }}/{{ item.media_loc }}|grep SHINE"

@@ -145,7 +145,6 @@
       },
       "credentials": {
         "db_systemdb_password": "Manager1",
-        "db_tenant_password": "Manager1",
         "os_sidadm_password": "Help4you",
         "os_sapadm_password": "Help4you",
         "xsa_admin_password": "Manager1",

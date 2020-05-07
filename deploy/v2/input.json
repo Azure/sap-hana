@@ -138,7 +138,6 @@
       },
       "credentials": {
         "db_systemdb_password": "",
-        "db_tenant_password": "",
         "os_sidadm_password": "",
         "os_sapadm_password": "",
         "xsa_admin_password": "",
