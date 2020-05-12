@@ -8,25 +8,13 @@
 hana_group: "sapsys"
 hana_dir: "/hana"
 sap_dir: "/usr/sap"
-tmp_ssfs_dir: "/tmp"
 
 sid_admin_user: "{{ sid | lower }}adm"
-
-hsr_dat_name: "SSFS_{{ sid | upper }}.DAT"
-hsr_key_name: "SSFS_{{ sid | upper }}.KEY"
-
-tmp_ssfs_dat: "{{ tmp_ssfs_dir }}/{{ hsr_dat_name }}"
-tmp_ssfs_key: "{{ tmp_ssfs_dir }}/{{ hsr_key_name }}"
 
 hana_data_dir: "{{ hana_dir }}/data"
 hana_backup_dir: "{{ hana_dir }}/backup"
 hana_shared_dir: "{{ hana_dir }}/shared"
-hana_global_dir: "{{ hana_shared_dir }}/{{ sid | upper }}/global"
 hana_instance_executable_dir: "{{ sap_dir }}/{{ sid | upper }}/HDB{{ instance_number }}/exe"
-
-path_ssfs_dat: "{{ hana_global_dir }}/security/rsecssfs/data/{{ hsr_dat_name }}"
-path_ssfs_key: "{{ hana_global_dir }}/security/rsecssfs/key/{{ hsr_key_name }}"
-path_global_ini: "{{ hana_global_dir }}/hdb/custom/config/global.ini"
 
 path_sys_rep_status: "{{ hana_instance_executable_dir }}/python_support/systemReplicationStatus.py"
 

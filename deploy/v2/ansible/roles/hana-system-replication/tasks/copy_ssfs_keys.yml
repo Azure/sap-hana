@@ -1,69 +1,66 @@
 ---
 
+- name: Ensure the Primary node SSFS files are present on the primary node
+  when: ansible_hostname == hana_database.nodes[0].dbname
+  block:
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists
+      when: ansible_hostname == hana_database.nodes[0].dbname
+      stat:
+        path: "{{ path_ssfs_dat }}"
+      register: primary_dat_file_result
+      failed_when: primary_dat_file_result.failed
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.KEY file exists
+      stat:
+        path: "{{ path_ssfs_key }}"
+      register: primary_key_file_result
+      failed_when: primary_key_file_result.failed
+
+- name: Ensure the Primary node XSA SSFS_{{ sid | upper }}.DAT file exists
+  stat:
+    path: "{{ path_xsa_ssfs_dat }}"
+  register: primary_xsa_dat_file_result
+  failed_when: false
+
+- name: Ensure the Primary node XSA SSFS_{{ sid | upper }}.KEY file exists
+  stat:
+    path: "{{ path_xsa_ssfs_key }}"
+  register: primary_xsa_key_file_result
+  failed_when: false
+
+- name: Ensure XSA install fact set
+  set_fact:
+    xsa_installed: "{{ (primary_xsa_dat_file_result.stat.exists and primary_xsa_key_file_result.stat.exists) | bool }}"
+    # Note. Both files need to be present to confirm xsa has been installed.
+    # If both files are missing, we skip the xsa file copy tasks.
+    # If only one file is present, the copy tasks will fail, which is sensible.
+
 - name: Ensure key files are in place
   # If HSR is already enabled, we don't need to do this
   when: not hana_system_replication_enabled
   block:
 
-    - name: Ensure the secondary node SSFS files are backed up and removed
-      when: ansible_hostname != hana_database.nodes[0].dbname
+    - name: Ensure {{ path_ssfs_dat }} file is copied
+      import_tasks: copy_single_ssfs_key.yml
+      vars:
+        ssfs_file_path: "{{ path_ssfs_dat }}"
+
+    - name: Ensure {{ path_ssfs_key }} file is copied
+      import_tasks: copy_single_ssfs_key.yml
+      vars:
+        ssfs_file_path: "{{ path_ssfs_key }}"
+
+    - name: Ensure XSA key files are copied if they exist
+      when: xsa_installed
       block:
 
-        - name: Check SSFS_{{ sid | upper }}.DAT backup file exists on the secondary node
-          stat:
-            path: "{{ path_ssfs_dat }}.bak"
-          register: dat_backup_result
+        - name: Ensure {{ path_xsa_ssfs_dat }} file is copied
+          import_tasks: copy_single_ssfs_key.yml
+          vars:
+            ssfs_file_path: "{{ path_xsa_ssfs_dat }}"
 
-        - name: Ensure SSFS_{{ sid | upper }}.DAT file is backed up on the secondary node
-          file:
-            src: "{{ path_ssfs_dat }}"
-            path: "{{ path_ssfs_dat }}.bak"
-            state: hard
-          when: dat_backup_result.stat.exists == false
-
-        - name: Check SSFS_{{ sid | upper }}.KEY backup file exists on the secondary node
-          stat:
-            path: "{{ path_ssfs_key }}.bak"
-          register: key_backup_result
-
-        - name: Ensure SSFS_{{ sid | upper }}.KEY file is backed up on the secondary node
-          file:
-            src: "{{ path_ssfs_key }}"
-            path: "{{ path_ssfs_key }}.bak"
-            state: hard
-          when: key_backup_result.stat.exists == false
-
-        - name: Ensure original SSFS_{{ sid | upper }}.DAT file is removed on the secondary node
-          file:
-            path: "{{ path_ssfs_dat }}"
-            state: absent
-
-        - name: Ensure original SSFS_{{ sid | upper }}.KEY file is removed on the secondary node
-          file:
-            path: "{{ path_ssfs_key }}"
-            state: absent
-
-    - name: Ensure the primary node SSFS files are placed on the secondary node
-      when: ansible_hostname == hana_database.nodes[1].dbname
-      block:
-
-        # Note that we use the IP of the primary node and not its hostname, because
-        # it appears that the RTI attempts to resolve the hostname itself and fails.
-
-        - name: Ensure the primary node SSFS_{{ sid | upper }}.DAT file is placed on the secondary node
-          synchronize:
-            set_remote_user: false
-            src: "{{ path_ssfs_dat }}"
-            dest: "{{ path_ssfs_dat }}"
-            mode: push
-            archive: true
-          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
-
-        - name: Ensure the primary node SSFS_{{ sid | upper }}.KEY file is placed on the secondary node
-          synchronize:
-            set_remote_user: false
-            src: "{{ path_ssfs_key }}"
-            dest: "{{ path_ssfs_key }}"
-            mode: push
-            archive: true
-          delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
+        - name: Ensure {{ path_xsa_ssfs_key }} file is copied
+          import_tasks: copy_single_ssfs_key.yml
+          vars:
+            ssfs_file_path: "{{ path_xsa_ssfs_key }}"

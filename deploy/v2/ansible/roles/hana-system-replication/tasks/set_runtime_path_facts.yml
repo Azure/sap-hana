@@ -1,0 +1,36 @@
+---
+
+- name: Check runtime value of SAP global path
+  become_user: "{{ sid_admin_user }}"
+  shell: >
+    set -o pipefail && grep '^alias cdglo=' ~/.sapenv.sh | sed -e 's/^.* //' -e 's/$SAPSYSTEMNAME/{{ sid | upper }}/' -e "s/'//"
+  register: global_path_status
+  changed_when: false
+
+- name: Set SAP global directory fact
+  set_fact:
+    hana_global_dir: "{{ global_path_status.stdout_lines[0] }}"
+
+- name: Set associated SAP global directory facts
+  set_fact:
+    path_global_ini: "{{ hana_global_dir }}/hdb/custom/config/global.ini"
+    path_ssfs_dat: "{{ hana_global_dir }}/security/rsecssfs/data/SSFS_{{ sid | upper }}.DAT"
+    path_ssfs_key: "{{ hana_global_dir }}/security/rsecssfs/key/SSFS_{{ sid | upper }}.KEY"
+    path_xsa_ssfs_dat: "{{ hana_global_dir }}/xsa/security/ssfs/data/SSFS_{{ sid | upper }}.DAT"
+    path_xsa_ssfs_key: "{{ hana_global_dir }}/xsa/security/ssfs/key/SSFS_{{ sid | upper }}.KEY"
+
+- name: Ensure the Primary node SSFS files are present on the primary node
+  when: ansible_hostname == hana_database.nodes[0].dbname
+  block:
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists
+      stat:
+        path: "{{ path_ssfs_dat }}"
+      register: primary_dat_file_result
+      failed_when: primary_dat_file_result.failed
+
+    - name: Ensure the Primary node SSFS_{{ sid | upper }}.KEY file exists
+      stat:
+        path: "{{ path_ssfs_key }}"
+      register: primary_key_file_result
+      failed_when: primary_key_file_result.failed

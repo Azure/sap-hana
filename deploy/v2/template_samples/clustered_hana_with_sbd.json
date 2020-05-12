@@ -46,12 +46,63 @@
           }
         }
       }
+    },
+    "iscsi": {
+      "iscsi_count": 1,
+      "size":"Standard_D2s_v3",
+      "os": {
+        "publisher": "SUSE",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
+      },
+      "authentication": {
+        "type": "key",
+        "username": "azureadm"
+      }
     }
   },
   "jumpboxes": {
     "windows": [
+      {
+        "name": "jumpbox-windows",
+        "destroy_after_deploy": "false",
+        "size": "Standard_D2s_v3",
+        "disk_type": "StandardSSD_LRS",
+        "os": {
+          "publisher": "MicrosoftWindowsServer",
+          "offer": "WindowsServer",
+          "sku": "2016-Datacenter"
+        },
+        "authentication": {
+          "type": "password",
+          "username": "azureadm",
+          "password": "Sap@hana2019!"
+        },
+        "components": [
+          "hana_studio_windows"
+        ]
+      }
     ],
     "linux": [
+      {
+        "name": "jumpbox-linux",
+        "destroy_after_deploy": "false",
+        "size": "Standard_D2s_v3",
+        "disk_type": "StandardSSD_LRS",
+        "os": {
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "16.04-LTS"
+        },
+        "authentication": {
+          "type": "password",
+          "username": "azureadm",
+          "password": "Sap@hana2019!"
+        },
+        "components": [
+          "hana_studio_linux"
+        ]
+      },
       {
         "name": "rti",
         "destroy_after_deploy": "true",
@@ -76,10 +127,14 @@
     {
       "platform": "HANA",
       "db_version": "2.00.043",
-      "os": {var-os-image},
+      "os": {
+        "publisher": "suse",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
+      },
       "size": "Demo",
       "filesystem": "xfs",
-      "high_availability": false,
+      "high_availability": true,
       "authentication": {
         "type": "key",
         "username": "azureadm"
@@ -93,11 +148,20 @@
         "os_sidadm_password": "Help4you",
         "os_sapadm_password": "Help4you",
         "xsa_admin_password": "Manager1",
-        "cockpit_admin_password": "Manager1",
-        "ha_cluster_password": ""
+        "cockpit_admin_password": "Manager1"
       },
       "components": {
-        "hana_database": []
+        "hana_database": [],
+        "hana_client_linux": [],
+        "xs": [
+          "xsac_alm_pi_ui",
+          "xsac_portal_serv",
+          "xsac_services",
+          "xsac_ui5_fesv5",
+          "xsac_ui5_sb",
+          "xsac_xsa_cockpit"
+        ],
+        "shine": []
       },
       "xsa": {
         "routing": "ports"
@@ -107,7 +171,7 @@
       },
       "dbnodes": [
         {
-          "name": "hdb-node1",
+          "name": "hdb1",
           "role": "worker"
         }
       ],
@@ -116,20 +180,16 @@
   ],
   "software": {
     "storage_account_sapbits": {
-      "is_existing": true,
+      "is_existing": false,
       "account_tier": "Premium",
       "account_replication_type": "LRS",
       "account_kind": "FileStorage",
-      "file_share_name": "bits",
-      "container_access_type": "private",
-      "storage_account_name": "sapbitsforpipeline",
-      "storage_access_key": "var-sa-access-key",
-      "arm_id": "var-sa-arm-id"
+      "file_share_name": "bits"
     },
     "downloader": {
       "credentials": {
-        "sap_user": "var-sap-user",
-        "sap_password": "var-sap-password"
+        "sap_user": "",
+        "sap_password": ""
       },
       "scenarios": [
         {
@@ -167,12 +227,12 @@
     }
   },
   "sshkey": {
-    "path_to_public_key": "/tmp/sshkey.pub",
-    "path_to_private_key": "/tmp/sshkey"
+    "path_to_public_key": "~/.ssh/id_rsa.pub",
+    "path_to_private_key": "~/.ssh/id_rsa"
   },
   "options": {
-    "enable_secure_transfer": true,
     "ansible_execution": false,
+    "enable_secure_transfer": true,
     "enable_prometheus": true
   }
 }

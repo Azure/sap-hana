@@ -65,6 +65,7 @@ module "output_files" {
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
   storage-sapbits              = module.common_infrastructure.storage-sapbits
+  nics-iscsi                   = module.common_infrastructure.nics-iscsi
   nics-jumpboxes-windows       = module.jumpbox.nics-jumpboxes-windows
   nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux
   public-ips-jumpboxes-windows = module.jumpbox.public-ips-jumpboxes-windows

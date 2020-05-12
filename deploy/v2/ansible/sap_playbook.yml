@@ -50,7 +50,7 @@
   become_user: root
   roles:
     - role: mount-azure-files
-      when: 
+      when:
         - output.software.storage_account_sapbits.file_share_name != ""
         - hana_database.size != "LargeInstance"
 
@@ -75,6 +75,7 @@
 - hosts: hanadbnodes
   become: true
   become_user: root
+  any_errors_fatal: true
   vars_files:
     - "vars/ha-packages.yml"
   roles:
@@ -88,7 +89,7 @@
     - role: hana-os-clustering
       when: hana_database.high_availability
       vars:
-        ha_cluster_password: "ASecurePa55w0rd"   # @TODO Determine source of truth for this value
+        ha_cluster_password: "{{ hana_database.credentials.ha_cluster_password }}"
         sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
         sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"

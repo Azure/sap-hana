@@ -171,6 +171,16 @@ You can programatically set the deployment's resource group name in Azure using 
 
    In any case, this opens up scope for programatically setting the HANA deployment resource group using something personal to your user (e.g. $USER variable), which helps to avoid clashes with others that might be sharing the same Azure subscription.
 
+In HA systems, you must set the password to be used for the cluster user in the template you intend to deploy. You can programatically set this using a utility script:
+
+1. Run the following utility script to configure the `hacluster` user password:
+
+   ```text
+   util/set_ha_cluster_password.sh <ha_cluster_password> <template_name>
+   ```
+
+   **Note:** This value will only be used in deployments where the SAP HANA Database definition has `high_availability` set to `true`.
+
 ## Build/Update/Destroy Lifecycle
 
 In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\
