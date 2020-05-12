@@ -1,0 +1,9 @@
+---
+
+- hosts: hanadbnodes
+  become: yes
+  become_user: root
+  roles:
+    - role: test-failover
+      vars:
+        failover_type: "{{ failover_test_type | lower }}"
