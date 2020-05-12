@@ -1,0 +1,11 @@
+---
+
+- name: Check for required variables
+  assert:
+    that:
+      - failover_type is defined
+
+- name: Fail if failover_type is not allowed
+  when: failover_type not in allowed_failover_types
+  fail:
+    msg: "Failover type '{{ failover_type }}' not allowed, must be one of {{ allowed_failover_types | join(', ') }}"
