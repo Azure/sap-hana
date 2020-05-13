@@ -26,7 +26,7 @@
             {
                 "name" : "backup",
                 "count" : 1,
-                "mount_point" : "/hana/backup"
+                "mount_point" : "/hana/logbackups"
             }
         ]
     },
