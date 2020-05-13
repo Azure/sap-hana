@@ -1,22 +1,18 @@
 ---
 
-- name: Ensure correct hostnames are set and not changed for SLES
-  become: true
-  become_user: root
-  when:
-    - ansible_os_family|upper == 'SUSE'
-  block:
+- name: Create dictionary with installation variant for Hana Database
+  set_fact:
+    hdb_variants: "{{ item.variants }}"
+  loop: "{{ components }}"
+  when: item.component == 'hana_database'
 
-  #SUSE bug 1167134
-  - name: Ensure DHCLIENT_SET_HOSTNAME is set to no
-    lineinfile:
-      path: /etc/sysconfig/network/dhcp
-      regexp: '^DHCLIENT_SET_HOSTNAME='
-      line: DHCLIENT_SET_HOSTNAME="no"
+- name: Ensure the variant for LINUX is used
+  set_fact:
+    hdb_media_facts: "{{ item }}"
+  loop: "{{ hdb_variants|flatten(levels=1) }}"
+  when: item.os == 'LINUX'
 
-  # This is workaround for https://github.com/Azure/WALinuxAgent/pull/1832
-  - name: Ensure the correct hostnames are set on HANA VMs
-    hostname:
-      name: "{{ item.dbname }}"
-    when: item.ip_admin_nic == ansible_default_ipv4.address
-    loop: "{{ hana_database.nodes }}"
+- name: Check if a HANA database with the same SID has already been installed
+  shell: "{{ hana_software_loc }}/{{ hdb_media_facts.media_loc }}/{{ hdb_media_facts.installer }} --list_systems | grep {{ hana_database.instance.sid }}"
+  register: sid_existence_check_result
+  failed_when: false

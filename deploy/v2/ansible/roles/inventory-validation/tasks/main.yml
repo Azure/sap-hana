@@ -1,0 +1,7 @@
+---
+
+- name: Check configurations on HANA VMs
+  any_errors_fatal: true
+  block:
+    - import_tasks: hostname_validation.yml
+    - import_tasks: repo_validation.yml

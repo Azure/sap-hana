@@ -24,7 +24,7 @@
   template:
     src: hdbserver_hana2.j2 
     dest: "{{ hana_install_path }}/hdbserver_{{ hana_database.instance.sid }}_install.cfg"
-  when: hana_database.db_version is regex("2.\d{2}.0([4-9]\d|[0-9]\d{2,})") 
+  when: hana_database.db_version is regex("2.\d{2}.0([0-9]\d|[0-9]\d{2,})") 
 
 - name: Create password file for hdblcm installer
   template:

@@ -2,3 +2,4 @@
 
 - import_tasks: hdb_pre_checks.yml
 - import_tasks: hana_server_installation.yml
+  when: sid_existence_check_result.rc != 0
