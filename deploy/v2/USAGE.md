@@ -341,12 +341,12 @@ Connect to the RTI: `ssh <username>@<public_ip_address>`
 
 ### Running a Failover Test
 
-A helper script for running a Cluster test has been provided, `~/sap-hana/deploy/v2/test_cluster.sh`
+A helper script for running a Cluster test has been provided, `~/sap-hana/util/test_cluster.sh`
 
 To see the available cluster tests, run the script with no arguments:
 
 ```text
-$ ~/sap-hana/deploy/v2/test_cluster.sh
+$ ~/sap-hana/util/test_cluster.sh
 You must specify a single command line argument for the failover test type. Valid types:
   - migrate      - Test migration of Master node
   - fence_agent  - Test the Fencing Agent by making the network interface unavailable
@@ -356,7 +356,7 @@ You must specify a single command line argument for the failover test type. Vali
 To run a test, add the test type as the only argument to the script:
 
 ```text
-$ ~/sap-hana/deploy/v2/test_cluster.sh migrate
+$ ~/sap-hana/util/test_cluster.sh migrate
 ```
 
 This will check if the deployment is in a suitable state for testing by checking that:
