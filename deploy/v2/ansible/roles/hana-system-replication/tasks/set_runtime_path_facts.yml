@@ -1,23 +1,34 @@
 ---
 
-- name: Check runtime value of SAP global path
+- name: Determine runtime value of SAP global path
   become_user: "{{ sid_admin_user }}"
   shell: >
     set -o pipefail && grep '^alias cdglo=' ~/.sapenv.sh | sed -e 's/^.* //' -e 's/$SAPSYSTEMNAME/{{ sid | upper }}/' -e "s/'//"
   register: global_path_status
   changed_when: false
 
-- name: Set SAP global directory fact
+- name: Ensure SAP global directory fact is set
   set_fact:
     hana_global_dir: "{{ global_path_status.stdout_lines[0] }}"
 
-- name: Set associated SAP global directory facts
+- name: Ensure associated SAP global directory facts are set
   set_fact:
     path_global_ini: "{{ hana_global_dir }}/hdb/custom/config/global.ini"
     path_ssfs_dat: "{{ hana_global_dir }}/security/rsecssfs/data/SSFS_{{ sid | upper }}.DAT"
     path_ssfs_key: "{{ hana_global_dir }}/security/rsecssfs/key/SSFS_{{ sid | upper }}.KEY"
     path_xsa_ssfs_dat: "{{ hana_global_dir }}/xsa/security/ssfs/data/SSFS_{{ sid | upper }}.DAT"
     path_xsa_ssfs_key: "{{ hana_global_dir }}/xsa/security/ssfs/key/SSFS_{{ sid | upper }}.KEY"
+
+- name: Determine path of SID backup directory from hdb_sizes.json
+  set_fact:
+    sid_backup_dir: "{{ item.mount_point }}/{{ sid | upper }}"
+  loop: "{{ hdb_sizes[hana_database.size].storage }}"
+  when: item.name == "backup"
+
+- name: Ensure HANA backup file names are set
+  set_fact:
+    backup_file_for_systemdb_full_path: "{{ sid_backup_dir }}/INITIAL_SYSTEMDB_BACKUP"
+    backup_file_for_tenant_full_path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP"
 
 - name: Ensure the Primary node SSFS files are present on the primary node
   when: ansible_hostname == hana_database.nodes[0].dbname
