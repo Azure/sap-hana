@@ -113,7 +113,7 @@
   "databases": [
     {
       "platform": "HANA",
-      "db_version": "1.122.23",
+      "db_version": "122.23",
       "os": {
         "publisher": "suse",
         "offer": "sles-sap-12-sp5",

@@ -96,7 +96,7 @@ locals {
         sid             = database.instance.sid
         instance_number = database.instance.instance_number
         ports = [
-          for port in local.lb_ports[split(".", database.db_version)[0]] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
+          for port in local.lb_ports[split(".", database.db_version)[0] == 2 ? 2 : 1] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
         ]
         frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
       }
