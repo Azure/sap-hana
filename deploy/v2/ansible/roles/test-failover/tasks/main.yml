@@ -9,15 +9,15 @@
 # RHEL: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability-rhel#test-the-cluster-setup
 #
 
-- include_tasks: pre_checks.yml
-- include_tasks: 1_check_cluster_available.yml
+- import_tasks: pre_checks.yml
+- import_tasks: 1_check_cluster_available.yml
 
 - name: Further failover tests
   when: failover_cluster_available | bool
   block:
-    - include_tasks: 2_gather_cluster_facts.yml
-    - include_tasks: 3_trigger_failover.yml
+    - import_tasks: 2_gather_cluster_facts.yml
+    - import_tasks: 3_trigger_failover.yml
       when: ansible_hostname == failover_master_hostname
-    - include_tasks: 4_wait_for_failover.yml
-    - include_tasks: 5_recover_from_test.yml
+    - import_tasks: 4_wait_for_failover.yml
+    - import_tasks: 5_recover_from_test.yml
       when: ansible_hostname == failover_master_hostname
