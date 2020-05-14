@@ -78,6 +78,11 @@
   any_errors_fatal: true
   vars_files:
     - "vars/ha-packages.yml"
+  pre_tasks:
+    - name: Include SAP HANA DB sizes
+      include_vars:
+        file: ../hdb_sizes.json
+        name: hdb_sizes
   roles:
     - role: hdb-server-install
     - role: hana-system-replication

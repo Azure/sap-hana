@@ -11,18 +11,6 @@ sap_dir: "/usr/sap"
 
 sid_admin_user: "{{ sid | lower }}adm"
 
-hana_data_dir: "{{ hana_dir }}/data"
-hana_backup_dir: "{{ hana_dir }}/backup"
-hana_shared_dir: "{{ hana_dir }}/shared"
-hana_instance_executable_dir: "{{ sap_dir }}/{{ sid | upper }}/HDB{{ instance_number }}/exe"
-
-path_sys_rep_status: "{{ hana_instance_executable_dir }}/python_support/systemReplicationStatus.py"
-
-# HANA Backup directory
-sid_backup_dir: "{{ hana_backup_dir }}/{{ sid | upper }}"
-backup_file_for_systemdb_full_path: "{{ sid_backup_dir }}/INITIAL_SYSTEMDB_BACKUP"
-backup_file_for_tenant_full_path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP"
-
 # HANA
 hana_container_address: "localhost:3{{ instance_number }}13"
 hana_tenant_address: "localhost:3{{ instance_number }}15"
