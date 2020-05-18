@@ -1,0 +1,23 @@
+---
+
+#
+# This role will perform some simple failover tests as defined in the Microsoft SAP High Availability
+# architecture documentation:
+#
+# SLES: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability#test-the-cluster-setup
+#
+# RHEL: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability-rhel#test-the-cluster-setup
+#
+
+- import_tasks: pre_checks.yml
+- import_tasks: 1_check_cluster_available.yml
+
+- name: Further failover tests
+  when: failover_cluster_available | bool
+  block:
+    - import_tasks: 2_gather_cluster_facts.yml
+    - import_tasks: 3_trigger_failover.yml
+      when: ansible_hostname == failover_master_hostname
+    - import_tasks: 4_wait_for_failover.yml
+    - import_tasks: 5_recover_from_test.yml
+      when: ansible_hostname == failover_master_hostname

@@ -1,0 +1,63 @@
+---
+
+allowed_failover_types:
+  - "migrate"
+  - "fence_agent"
+  - "service"
+
+failover_wait_times_mins:
+  migrate: 3
+  fence_agent: 15
+  service: 15
+
+cluster_availability_cmds:
+  Suse:
+    status: "crm status"
+    secondary_sok: "SAPHanaSR-showAttr | grep DEMOTED | grep SOK"
+  RedHat:
+    status: "pcs status"
+    secondary_sok: "pcs status --full | grep -A10 DEMOTED | grep _sync_state | grep SOK"
+
+cluster_detail_cmds:
+  Suse:
+    master_hostname: "SAPHanaSR-showAttr | grep PROMOTED | cut -d' ' -f1"
+    master_site_name: "SAPHanaSR-showAttr | grep PROMOTED | tr -s ' ' | cut -d' ' -f9"
+    secondary_hostname: "SAPHanaSR-showAttr | grep DEMOTED | cut -d' ' -f1"
+    msl_name: "crm status | grep '^ Master' | cut -d' ' -f4"
+    sid: "crm configure show | grep -m1 SID= | grep -oP 'SID=\\K([a-zA-Z0-9]{3})'"
+    instance_number: "crm configure show | grep -m1 InstanceNumber= | grep -oP 'InstanceNumber=\\K(\\d{2})'"
+    db_ip: "ip addr show eth1 | grep -m1 inet | grep -oP 'inet \\K([0-9]+\\.){3}[0-9]+'"
+  RedHat:
+    master_hostname: "pcs status --full | grep -B1 PROMOTED | grep -oP '^\\* Node \\K([a-zA-Z0-9\\-\\.]*)'"
+    master_site_name: "pcs status --full | grep -A10 PROMOTED | grep -m1 _site | grep -oP ': \\K([a-zA-Z0-9\\-\\.\\_]+)'"
+    secondary_hostname: "pcs status --full | grep -B1 DEMOTED | grep -oP '^\\* Node \\K([a-zA-Z0-9\\-\\.]*)'"
+    msl_name: "pcs resource show --full | grep -oP '^ Master: \\K.*'"
+    sid: "pcs resource show --full | grep -m1 SID | grep -oP 'SID=\\K([a-zA-Z0-9]{3})'"
+    instance_number: "pcs resource show --full | grep -m1 InstanceNumber | grep -oP 'InstanceNumber=\\K(\\d{2})'"
+    db_ip: "ip addr show eth1 | grep -m1 inet | grep -oP 'inet \\K([0-9]+\\.){3}[0-9]+'"
+
+cluster_failover_cmds:
+  Suse:
+    migrate: "crm resource migrate {{ failover_msl_name }} {{ failover_secondary_hostname }}"
+    fence_agent: "sleep 3 ; ifdown eth1" # eth1 is the DB NIC motitored by the cluster configuration
+    service: "service pacemaker stop"
+  RedHat:
+    migrate: "pcs resource move {{ failover_msl_name }}"
+    fence_agent: "/root/net_breaker.sh BreakCommCmd {{ failover_db_ip }}" # IP Address for eth1
+    service: "pcs cluster stop"
+
+cluster_recovery_cmds:
+  Suse:
+    migrate: "crm resource unmigrate {{ failover_msl_name }}"
+    fence_agent: "ifup eth1" # Interface should be up after restart, just in case
+    service: "service pacemaker start"
+    cleanup: "crm resource cleanup {{ failover_msl_name }} {{ failover_master_hostname }}"
+  RedHat:
+    migrate: "pcs resource clear {{ failover_msl_name }}"
+    fence_agent: "/root/net_breaker.sh FixCommCmd {{ failover_db_ip }}" # IP Address for eth1
+    service: "pcs cluster start"
+    cleanup: "pcs resource cleanup {{ failover_msl_name }}"
+
+cluster_monitoring_cmds:
+  Suse: "crm_mon -r"
+  RedHat: "watch -n 10 pcs status --full"

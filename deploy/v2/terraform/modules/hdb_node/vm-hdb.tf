@@ -107,6 +107,7 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
   frontend_ip_configuration_name = "hana-${local.loadbalancers[0].sid}-lb-feip"
   backend_address_pool_id        = azurerm_lb_backend_address_pool.hana-lb-back-pool[0].id
   probe_id                       = azurerm_lb_probe.hana-lb-health-probe[0].id
+  enable_floating_ip             = true
 }
 
 # AVAILABILITY SET ================================================================================================

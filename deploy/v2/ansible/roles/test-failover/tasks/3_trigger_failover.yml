@@ -1,0 +1,15 @@
+---
+
+# net_breaker.sh is used for RedHat fence_agent tests, source:
+# https://access.redhat.com/solutions/79523
+- name: Ensure the net_breaker.sh script is available
+  when: ansible_os_family == 'RedHat'
+  copy:
+    src: "net_breaker.sh"
+    dest: "/root/net_breaker.sh"
+    owner: "root"
+    group: "root"
+    mode: "0744"
+
+- name: "Ensure the failover is triggered for type: {{ failover_type }}"
+  shell: "{{ cluster_failover_cmds[ansible_os_family][failover_type] }}"
