@@ -1,0 +1,17 @@
+---
+
+- name: Check a cluster is available
+  shell: "{{ cluster_availability_cmds[ansible_os_family].status }}"
+  changed_when: false
+  failed_when: false
+  register: check_cluster_available
+
+- name: Check the secondary (DEMOTED) node has status SOK
+  shell: "{{ cluster_availability_cmds[ansible_os_family].secondary_sok }}"
+  changed_when: false
+  failed_when: false
+  register: check_secondary_status_sok
+
+- name: Set fact for cluster availability
+  set_fact:
+    failover_cluster_available: "{{ (check_cluster_available.rc == 0) and (check_secondary_status_sok.rc == 0) }}"

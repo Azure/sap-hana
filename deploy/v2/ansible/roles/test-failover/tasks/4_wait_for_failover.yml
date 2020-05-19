@@ -1,0 +1,13 @@
+---
+
+- name: Ensure user knows how and where to monitor failover progress
+  run_once: True
+  debug:
+    msg: "To monitor failover progress, on {{ failover_secondary_hostname }} as root run '{{ cluster_monitoring_cmds[ansible_os_family] }}'"
+
+- name: Wait for user confirmation of desired state
+  pause:
+    prompt: >
+      Failover migration test in progress, approx {{ failover_wait_times_mins[failover_type] }} minutes.
+      Expect to see 'Masters: [ {{ failover_secondary_hostname }} ]' and 'Stopped: [ {{ failover_master_hostname }} ]'.
+      Press Enter to reestablish the cluster, or CTRL+C to abort

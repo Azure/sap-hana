@@ -1,0 +1,41 @@
+---
+
+# Note: The cluster is started after every test, as if the VM has been rebooted, the cluster
+# requires starting on RHEL, but not SLES. Starting when already running has no issues.
+- name: Ensure the service is restarted (service failover test)
+  shell: "{{ cluster_recovery_cmds[ansible_os_family].service }}"
+
+- name: Ensure network interface is available (fence_agent failover test)
+  when: failover_type == 'fence_agent'
+  shell: "{{ cluster_recovery_cmds[ansible_os_family].fence_agent }}"
+
+- name: Ensure the SAP instance is stopped
+  become_user: "{{ failover_sid | lower }}adm"
+  shell: >
+    source ~/.bashrc ;
+    sapcontrol -nr {{ failover_instance_number }} -function StopWait 600 10
+
+- name: Ensure the Stopped node is registered as a secondary
+  become_user: "{{ failover_sid | lower }}adm"
+  shell: >
+    source ~/.bashrc ;
+    hdbnsutil -sr_register
+    --remoteHost={{ failover_secondary_hostname }}
+    --remoteInstance={{ failover_instance_number }}
+    --replicationMode=sync
+    --name={{ failover_master_site_name }}
+
+- name: Ensure the migration constraint is removed (migrate failover test)
+  when: failover_type == 'migrate'
+  shell: "{{ cluster_recovery_cmds[ansible_os_family].migrate }}"
+
+- name: Ensure the Master/Slave resource is cleaned up on the restarted node
+  shell: "{{ cluster_recovery_cmds[ansible_os_family].cleanup }}"
+
+- name: Ensure the user understands the clean resource locations
+  debug:
+    msg: "Cleaning up resources after migration test, monitor on {{ failover_secondary_hostname }} as root with '{{ cluster_monitoring_cmds[ansible_os_family] }}'"
+
+- name: Wait for user confirmation of desired state
+  pause:
+    prompt: "Expect to see 'Masters: [ {{ failover_secondary_hostname }} ]' and 'Slaves: [ {{ failover_master_hostname }} ]'"
