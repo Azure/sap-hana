@@ -13,28 +13,32 @@
   block:
     - name: Check whether backup exists for SYSTEMDB database for System Identifier {{ sid }}
       shell: >
-        . ~/.bashrc && {{ hdbsql_command }} -n {{ hana_container_address }} "{{ backup_exists_cmd_for_systemdb }}"
+        . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_exists_cmd_for_systemdb }}"
       register: backup_exists_cmd_for_systemdb_result
       changed_when: false
 
     - name: Ensure backup exists for SYSTEMDB database for System Identifier {{ sid }}
       shell: >
-        . ~/.bashrc && {{ hdbsql_command }} -n {{ hana_container_address }} "{{ backup_cmd_for_systemdb }}"
+        . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_cmd_for_systemdb }}"
       vars:
         # Note. Conditional bare variables deprecation notice is supressed here by ansible.cfg
         backup_required: "'{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_systemdb_result.stdout"
       when: backup_required
 
-    - name: Check whether backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
-      shell: >
-        . ~/.bashrc && {{ hdbsql_command }} -n {{ hana_tenant_address }} "{{ backup_exists_cmd_for_tenant }}"
-      register: backup_exists_cmd_for_tenant_result
-      changed_when: false
+    - name: Check if there is a tenant db needing backup
+      when: hana_has_tenant_db
+      block:
 
-    - name: Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
-      shell: >
-        . ~/.bashrc && {{ hdbsql_command }} -n {{ hana_container_address }} "{{ backup_cmd_for_tenant }}"
-      vars:
-        # Note. Conditional bare variables deprecation notice is supressed here by ansible.cfg
-        backup_required: "'{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_tenant_result.stdout"
-      when: backup_required
+        - name: Check whether backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
+          shell: >
+            . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_exists_cmd_for_tenant }}"
+          register: backup_exists_cmd_for_tenant_result
+          changed_when: false
+
+        - name: Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
+          shell: >
+            . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_cmd_for_tenant }}"
+          vars:
+            # Note. Conditional bare variables deprecation notice is supressed here by ansible.cfg
+            backup_required: "'{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_tenant_result.stdout"
+          when: backup_required
