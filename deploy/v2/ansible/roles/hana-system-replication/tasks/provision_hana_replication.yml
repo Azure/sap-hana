@@ -1,5 +1,26 @@
 ---
 
+- name: Ensure HANA 1.0 is configured for System Replication
+  become_user: "{{ sid_admin_user }}"
+  when:
+    - ansible_hostname == hana_database.nodes[0].dbname
+    - hana_database.db_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
+    - not hana_system_replication_enabled
+  block:
+
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability#configure-sap-hana-10-system-replication
+    - name: Ensure replication user exists
+      shell: |
+        source ~/.bashrc
+        {{ hdbsql_systemdb_command }} 'CREATE USER {{ hana_1_hsr_user }} PASSWORD "{{ hana_1_hsr_password }}"'
+        {{ hdbsql_systemdb_command }} 'GRANT DATA ADMIN TO {{ hana_1_hsr_user }}'
+        {{ hdbsql_systemdb_command }} 'ALTER USER {{ hana_1_hsr_user }} DISABLE PASSWORD LIFETIME'
+
+    - name: Ensure keystore entry exists
+      shell: |
+        source ~/.bashrc
+        hdbuserstore SET hdbhaloc localhost:3{{ instance_number }}15 {{ hana_1_hsr_user }} {{ hana_1_hsr_password }}
+
 - name: Perform pre-flight backup checks
   become_user: "{{ sid_admin_user }}"
   when: ansible_hostname == hana_database.nodes[0].dbname
@@ -13,6 +34,7 @@
       changed_when: false
 
     - name: Check backup file exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ sid }}
+      when: hana_has_tenant_db
       stat:
         path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP_databackup_0_1"
       register: tenant_backup_file
@@ -23,6 +45,7 @@
   become_user: "{{ sid_admin_user }}"
   when: ansible_hostname == hana_database.nodes[0].dbname and not hana_system_replication_enabled
   block:
+
     - name: Ensure Primary node is configured for System Replication
       shell: >
         source ~/.bashrc ;
@@ -55,7 +78,7 @@
       shell: >
         source ~/.bashrc ;
         {{ hdbnsutil_command }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
-        --remoteInstance={{ instance_number }} --replicationMode={{  hana_replication_mode }}
+        --remoteInstance={{ instance_number }} --replicationMode={{ hana_replication_mode }}
         --operationMode={{ hana_operation_mode }} --name=SITEB
       tags:
         - skip_ansible_lint
