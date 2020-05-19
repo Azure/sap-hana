@@ -52,6 +52,14 @@ fi
 rpm -q kexec-tools
 ExitIfFailed $? "kxec-tools required to enable kdump, please install"
 
+# check if the GRUB_CMDLINE_LINUX_DEFAULT parameter exist in /etc/default/grub file
+# missing command line options will be appended to GRUB_CMDLINE_LINUX_DEFAULT
+egrep "^GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub
+if [[ "$?" == "1" ]]; then # in this case append the parameter to the file
+    echo "GRUB_CMDLINE_LINUX_DEFAULT=\"\"" >> /etc/default/grub
+    ExitIfFailed $? "Enable to add GRUB_CMDLINE_LINUX_DEFAULT parameter in /etc/default/grub"
+fi
+
 ReplaceLowHighInGrubFile()
 {
     # get low and high value reported by kdumptool calibrate
@@ -82,13 +90,6 @@ ReplaceLowHighInGrubFile()
     # load /etc/default/grub value in env variables to append crashkernel high, low value
     source /etc/default/grub
 
-    #check if the GRUB_CMDLINE_LINUX_DEFAULT parameter exist in /etc/default/grub file
-    egrep "^GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub
-    if [[ "$?" == "1" ]]; then # in this case append the parameter to the file
-        echo "GRUB_CMDLINE_LINUX_DEFAULT=\"\"" >> /etc/default/grub
-        ExitIfFailed $? "Enable to add GRUB_CMDLINE_LINUX_DEFAULT parameter in /etc/default/grub"
-    fi
-
     # append crashkernel high,low value to GRUB_CMDLINE_LINUX_DEFAULT
     GRUB_CMDLINE_LINUX_DEFAULT="\"$GRUB_CMDLINE_LINUX_DEFAULT crashkernel=$high_to_use\M,high crashkernel=$Low\M,low\""
 
@@ -96,10 +97,6 @@ ReplaceLowHighInGrubFile()
     # using seperator # because / can already exist in GRUB_CMDLINE_LINUX_DEFAULT then sed command will not work
     sed -i "s#^GRUB_CMDLINE_LINUX_DEFAULT=.*#GRUB_CMDLINE_LINUX_DEFAULT=$GRUB_CMDLINE_LINUX_DEFAULT#gI" /etc/default/grub
     ExitIfFailed $? "Enable to change crashkernel parameters in /etc/default/grub"
-
-    # update the changes in /boot/grub2/grub.cfg so that after reboot these changes reflect in /proc/cmdline
-    grub2-mkconfig -o /boot/grub2/grub.cfg
-    ExitIfFailed $? "Enable to update /boot/grub2/grub.cfg"
 }
 
 # there can be 4 cases for crashkernel parameter in /pro/cmdline
@@ -116,19 +113,60 @@ if [[ "$?" == "1" ]]; then # can be case 2,3,4
     ReplaceLowHighInGrubFile
 fi
 
-# set KDUMP_SAVEDIR in /etc/sysconfig/kdump
-sed -i "s/^KDUMP_SAVEDIR=\".*\"/KDUMP_SAVEDIR=\"\/var\/crash\"/gI" /etc/sysconfig/kdump
+# commandline parameters which must be present in order to make sure
+# that kdump works
+commandline_params=(
+    "splash=verbose"
+    "mce=ignore_ce"
+    "nomodeset"
+    "numa_balancing=disable"
+    "transparent_hugepage=never"
+    "intel_idle.max_cstate=1"
+    "processor.max_cstate=1"
+    "quiet"
+    "showopts"
+    "rw"
+)
+
+# load /etc/default/grub value in env variables to append commandline params
+source /etc/default/grub
+for i in "${commandline_params[@]}"; do
+    grep $i /proc/cmdline
+    if [[ "$?" == "1" ]]; then # this option is not present in cmdline
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT $i"
+    fi
+done
+
+# replace old value of GRUB_CMDLINE_LINUX_DEFAULT with new value
+GRUB_CMDLINE_LINUX_DEFAULT="\"$GRUB_CMDLINE_LINUX_DEFAULT\""
+sed -i "s#^GRUB_CMDLINE_LINUX_DEFAULT=.*#GRUB_CMDLINE_LINUX_DEFAULT=$GRUB_CMDLINE_LINUX_DEFAULT#gI" /etc/default/grub
+ExitIfFailed $? "Enable to change commandline parameters in /etc/default/grub"
+
+# set KDUMP_SAVEDIR to file:///var/crash in /etc/sysconfig/kdump
+sed -i "s#^KDUMP_SAVEDIR=\".*\"#KDUMP_SAVEDIR=\"file:\/\/\/var\/crash\"#gI" /etc/sysconfig/kdump
 
 # set KDUMP_DUMPLEVEL to 31(recommended)
 sed -i "s/^KDUMP_DUMPLEVEL=[0-9]*/KDUMP_DUMPLEVEL=31/gI" /etc/sysconfig/kdump
 
-# enable kdump service
-systemctl enable kdump
-ExitIfFailed $? "Failed to enable kdump service"
-
 # set kernel.sysrq to 184(recommended)
 echo 184 > /proc/sys/kernel/sysrq
 ExitIfFailed $? "Failed to set kernel.sysrq value to 184"
+
+# update the changes in /boot/grub2/grub.cfg so that after reboot these changes reflect in /proc/cmdline
+grub2-mkconfig -o /boot/grub2/grub.cfg
+ExitIfFailed $? "Unable to update /boot/grub2/grub.cfg"
+
+# stop kdump service
+systemctl stop kdump.service
+ExitIfFailed $? "Failed to stop kdump service"
+
+# create new kdump initrd
+mkdumprd -f
+ExitIfFailed $? "Unable to create kdump initrd"
+
+# enable kdump service so that on system reboot kdump service is automatically start
+systemctl enable kdump.service
+ExitIfFailed $? "Error in enabling kdump service"
 
 echo "KDUMP is successfully enabled, please reboot the system to apply the change"
 exit 0
