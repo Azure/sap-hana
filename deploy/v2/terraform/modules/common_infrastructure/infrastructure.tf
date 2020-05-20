@@ -59,7 +59,7 @@ resource "azurerm_subnet" "subnet-mgmt" {
   name                 = var.infrastructure.vnets.management.subnet_mgmt.name
   resource_group_name  = var.infrastructure.vnets.management.is_existing ? data.azurerm_virtual_network.vnet-management[0].resource_group_name : azurerm_virtual_network.vnet-management[0].resource_group_name
   virtual_network_name = var.infrastructure.vnets.management.is_existing ? data.azurerm_virtual_network.vnet-management[0].name : azurerm_virtual_network.vnet-management[0].name
-  address_prefix       = var.infrastructure.vnets.management.subnet_mgmt.prefix
+  address_prefixes     = [var.infrastructure.vnets.management.subnet_mgmt.prefix]
 }
 
 # Creates admin subnet of SAP VNET
@@ -68,7 +68,7 @@ resource "azurerm_subnet" "subnet-sap-admin" {
   name                 = var.infrastructure.vnets.sap.subnet_admin.name
   resource_group_name  = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
-  address_prefix       = var.infrastructure.vnets.sap.subnet_admin.prefix
+  address_prefixes     = [var.infrastructure.vnets.sap.subnet_admin.prefix]
 }
 
 # Creates db subnet of SAP VNET
@@ -77,7 +77,7 @@ resource "azurerm_subnet" "subnet-sap-db" {
   name                 = var.infrastructure.vnets.sap.subnet_db.name
   resource_group_name  = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
-  address_prefix       = var.infrastructure.vnets.sap.subnet_db.prefix
+  address_prefixes     = [var.infrastructure.vnets.sap.subnet_db.prefix]
 }
 
 # Creates app subnet of SAP VNET
@@ -86,7 +86,7 @@ resource "azurerm_subnet" "subnet-sap-app" {
   name                 = var.infrastructure.vnets.sap.subnet_app.name
   resource_group_name  = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
-  address_prefix       = var.infrastructure.vnets.sap.subnet_app.prefix
+  address_prefixes     = [var.infrastructure.vnets.sap.subnet_app.prefix]
 }
 
 # Imports data of existing mgmt subnet
@@ -224,5 +224,5 @@ resource "azurerm_storage_account" "storage-bootdiag" {
   location                  = var.infrastructure.region
   account_replication_type  = "LRS"
   account_tier              = "Standard"
-enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
+  enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }

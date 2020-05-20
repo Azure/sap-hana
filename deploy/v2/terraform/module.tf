@@ -1,9 +1,3 @@
-# Initalizes Azure rm provider
-provider "azurerm" {
-  version = "~> 2.0"
-  features {}
-}
-
 # Setup common infrastructure
 module "common_infrastructure" {
   source              = "./modules/common_infrastructure"
