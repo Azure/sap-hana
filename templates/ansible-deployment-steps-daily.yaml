@@ -41,3 +41,4 @@ steps:
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+      ANSIBLE_CONDITIONAL_BARE_VARS: false  # supresses conditional bare variables deprecation warning

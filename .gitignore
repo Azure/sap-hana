@@ -25,3 +25,6 @@ set-sp.sh
 
 # ignore any clustering auth scripts
 set-clustering-auth*.sh
+
+# Ignore Terraform generated files
+deploy/v2/ansible_config_files

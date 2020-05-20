@@ -1,0 +1,60 @@
+---
+
+- name: Determine the Master node (PROMOTED) hostname
+  shell: "{{ cluster_detail_cmds[ansible_os_family].master_hostname }}"
+  changed_when: false
+  failed_when: false
+  register: get_master_hostname
+
+- name: Determine the Master node site name
+  shell: "{{ cluster_detail_cmds[ansible_os_family].master_site_name }}"
+  changed_when: false
+  failed_when: false
+  register: get_master_site_name
+
+- name: Determine the secondary node hostname
+  shell: "{{ cluster_detail_cmds[ansible_os_family].secondary_hostname }}"
+  changed_when: false
+  register: get_secondary_hostname
+
+- name: Determine the Master/Slave set name
+  shell: "{{ cluster_detail_cmds[ansible_os_family].msl_name }}"
+  changed_when: false
+  register: get_msl_name
+
+- name: Determine the SID
+  shell: "{{ cluster_detail_cmds[ansible_os_family].sid }}"
+  changed_when: false
+  register: get_sid
+
+- name: Determine the Instance Number
+  shell: "{{ cluster_detail_cmds[ansible_os_family].instance_number }}"
+  changed_when: false
+  register: get_instance_number
+
+- name: Determine the DB NIC IP address
+  shell: "{{ cluster_detail_cmds[ansible_os_family].db_ip }}"
+  changed_when: false
+  register: get_db_ip
+
+- name: Ensure facts for failover variables are set
+  set_fact:
+    failover_master_hostname: "{{ get_master_hostname.stdout_lines[0] }}"
+    failover_secondary_hostname: "{{ get_secondary_hostname.stdout_lines[0] }}"
+    failover_master_site_name: "{{ get_master_site_name.stdout_lines[0] }}"
+    failover_msl_name: "{{ get_msl_name.stdout_lines[0] }}"
+    failover_sid: "{{ get_sid.stdout_lines[0] }}"
+    failover_instance_number: "{{ get_instance_number.stdout_lines[0] }}"
+    failover_db_ip: "{{ get_db_ip.stdout_lines[0] }}"
+
+- name: Debug information being used
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - "Master host: {{ failover_master_hostname }}"
+    - "Slave host: {{ failover_secondary_hostname }}"
+    - "Master site name: {{ failover_master_site_name }}"
+    - "Master/Slave set name: {{ failover_msl_name }}"
+    - "SID: {{ failover_sid }}"
+    - "Instance Number: {{ failover_instance_number }}"
+    - "DB NIC IP: {{ failover_db_ip }}"

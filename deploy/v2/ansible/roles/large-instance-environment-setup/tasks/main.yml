@@ -1,0 +1,18 @@
+---
+
+# Set up Hosts entries for the cluster nodes
+- name: Ensure the Primary node hosts entry exists
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: EOF
+    regexp: "{{ hana_database.nodes[0].dbname }}"
+    line: "{{ hana_database.nodes[0].ip_db_nic }} {{ hana_database.nodes[0].dbname }}"
+
+- name: Ensure the Secondary node hosts entry exists
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: EOF
+    regexp: "{{ hana_database.nodes[1].dbname }}"
+    line: "{{ hana_database.nodes[1].ip_db_nic }} {{ hana_database.nodes[1].dbname }}"
