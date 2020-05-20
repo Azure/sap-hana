@@ -48,12 +48,12 @@
 - name: Ensure failure with meaningful message if no {{ sid | upper }} tenant db
   fail:
     msg: |
-      Automated HANA System Replication configuration is not supported for single container systems or tenant
-      databases not named as {{ sid | upper }} or systems without a SYSTEMDB.
-      If this is a requirement, please raise a GitHub issue: https://github.com/Azure/sap-hana/issues/new/choose
-  when:
-    - not hana_has_system_db
-    - hana_has_tenant_db
+      Automated HANA System Replication configuration is only supported for systems with a SYSTEMDB
+      and multi-container systems where the tenant database is named as {{ sid | upper }}.
+      If your requirements differ, please raise a GitHub issue: https://github.com/Azure/sap-hana/issues/new/choose
+  # At the moment it's sufficient to check for a missing SYSTEMDB, since the
+  # code will cope with a missing tenant DB.
+  when: not hana_has_system_db
 
 - name: Check whether replication has already been set up
   become_user: "{{ sid_admin_user }}"
