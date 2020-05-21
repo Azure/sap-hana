@@ -123,11 +123,11 @@ resource "azurerm_linux_virtual_machine" "rti" {
 
 /*-----------------------------------------------------------------------------8
   Prepare RTI:
-    1. Copy folder ansible_config_files over to RTI
-    2. Install Git/Ansible and clone GitHub repo on RTI
+    1. Install Git/Ansible and clone GitHub repo on RTI
 +--------------------------------------4--------------------------------------*/
 resource "null_resource" "prepare-rti" {
   depends_on = [azurerm_linux_virtual_machine.rti]
+
   connection {
     type        = "ssh"
     host        = azurerm_public_ip.rti[0].ip_address
@@ -135,20 +135,6 @@ resource "null_resource" "prepare-rti" {
     private_key = local.rti[0].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
     password    = lookup(local.rti[0].authentication, "password", null)
     timeout     = var.ssh-timeout
-  }
-
-  # Copies output.json and inventory file for ansbile on RTI.
-  provisioner "file" {
-    source      = "${path.root}/../ansible_config_files/"
-    destination = "/home/${local.rti[0].authentication.username}"
-  }
-
-  # Copies Clustering Service Principal for ansbile on RTI.
-  provisioner "file" {
-    # Note: We provide a default empty clustering auth script content so this provisioner succeeds.
-    # Later in the execution, the script is sourced, but will have no impact if it has been defaulted
-    content     = fileexists("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") ? file("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") : "# default empty clustering auth script"
-    destination = "/home/${local.rti[0].authentication.username}/export-clustering-sp-details.sh"
   }
 
   # Installs Git, Ansible and clones repository on RTI

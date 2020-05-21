@@ -12,3 +12,16 @@ variable "scenario" {
   description = "Deployment Scenario"
   default     = "HANA Database"
 }
+
+locals {
+  hana-sid = length([
+    for database in var.databases : database
+    if database.platform == "HANA"
+    ]) > 0 ? element([
+    for database in var.databases : database.instance.sid
+    if database.platform == "HANA"
+  ], 0) : ""
+
+  file_hosts  = fileexists("${terraform.workspace}/ansible_config_files/hosts") ? file("${terraform.workspace}/ansible_config_files/hosts") : ""
+  file_output = fileexists("${terraform.workspace}/ansible_config_files/output.json") ? file("${terraform.workspace}/ansible_config_files/output.json") : ""
+}

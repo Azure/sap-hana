@@ -13,7 +13,7 @@ steps:
       az network vnet subnet update -g ${{parameters.testCaseName}} -n subnet-mgmt --vnet-name vnet-mgmt --network-security-group nsg-mgmt --output none
     displayName: 'Update NSG for subnet subnet-mgmt'
   - script: |
-      cd deploy/v2/ansible_config_files
+      cd deploy/v2/terraform/default/ansible_config_files
       rti_user=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .authentication.username')
       rti_public_ip=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .public_ip_address')
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" '
