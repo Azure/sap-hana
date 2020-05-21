@@ -11,9 +11,11 @@
 # These defaults are commonly overridden by the user
 sid: "HN1"
 instance_number: "00"
-hana_system_user_password: "PassWord"
+hana_system_user_password: "Manager1"
 hana_replication_mode: "sync"
 hana_operation_mode: "logreplay"
+hana_1_hsr_user: "hdbhasync"
+hana_1_hsr_password: "HSRpassw0rd"
 
 # For low spec Dev instances the timeout needs to be high
 # A delay of 2 seconds is also recommended
