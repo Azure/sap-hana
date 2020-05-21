@@ -1,0 +1,30 @@
+---
+
+- name: Ensure zypper repo is configured on HANA VMs for SLES
+  when: ansible_os_family == 'Suse'
+  block:
+    - name: Check zypper repo on HANA VMs
+      command: zypper lr
+  rescue:
+    # Attempt to configure the repo by re-register SLE
+    - name: Ensure to re-register SLE instance against the Public Cloud Update Infrastructure servers
+      shell: |
+        rm /etc/SUSEConnect
+        rm -f /etc/zypp/{repos,services,credentials}.d/*
+        rm -f /usr/lib/zypp/plugins/services/*
+        sed -i '/^# Added by SMT reg/,+1d' /etc/hosts
+        export PYTHONWARNINGS="ignore:Unverified HTTPS request"
+        /usr/sbin/registercloudguest --force-new
+      register: reg_result
+      # registercloudguest rc == 1 when successful
+      failed_when: reg_result.rc > 1
+
+    - name: Check if zypper repo is configured on HANA VMs post re-register SLE instance
+      command: zypper lr
+
+- name: Ensure zypper repo is configured on HANA VMs for RedHat
+  when: ansible_os_family == 'RedHat'
+  block:
+    - name: Check yum repo on HANA VMs
+      command: yum repolist
+
