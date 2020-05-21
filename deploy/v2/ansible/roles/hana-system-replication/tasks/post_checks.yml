@@ -16,4 +16,4 @@
   delay: 30
   when: ansible_hostname == hana_database.nodes[0].dbname
   tags:
-  - skip_ansible_lint
+    - skip_ansible_lint

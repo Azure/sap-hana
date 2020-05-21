@@ -12,12 +12,11 @@ sap_dir: "/usr/sap"
 sid_admin_user: "{{ sid | lower }}adm"
 
 # HANA
-hana_container_address: "localhost:3{{ instance_number }}13"
-hana_tenant_address: "localhost:3{{ instance_number }}15"
 hana_tenant_database_name: "{{ sid | upper }}"
 
 # HANA utility commands
-hdbsql_command: "hdbsql -n localhost -i {{ instance_number }} -u SYSTEM -p {{ hana_system_user_password }}"
+hdbsql_systemdb_command: "hdbsql -n localhost -i {{ instance_number }} -d SYSTEMDB -u SYSTEM -p {{ hana_system_user_password }}"
+hdbsql_tenant_command: "hdbsql -n localhost -i {{ instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ hana_system_user_password }}"
 hdbnsutil_command: "hdbnsutil"
 sapcontrol_command: "sapcontrol -nr {{ instance_number }}"
 
@@ -37,7 +36,7 @@ get_log_mode_cmd: "SELECT VALUE FROM M_INIFILE_CONTENTS
 backup_cmd_for_systemdb: "BACKUP DATA USING FILE ('{{ backup_file_for_systemdb_full_path }}')"
 
 # SQL to take a tenant DB full backup
-backup_cmd_for_tenant: "BACKUP DATA FOR {{ hana_tenant_database_name }} USING FILE ('{{ backup_file_for_tenant_full_path }}')"
+backup_cmd_for_tenant: "BACKUP DATA USING FILE ('{{ backup_file_for_tenant_full_path }}')"
 
 # SQL to confirm a system backup has been taken for SYSTEMDB
 backup_exists_cmd_for_systemdb: "SELECT SYS.M_BACKUP_CATALOG.BACKUP_ID FROM SYS.M_BACKUP_CATALOG

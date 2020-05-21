@@ -15,6 +15,15 @@
       loop: "{{ output.databases|flatten(levels=1) }}"
       when: item.platform == 'HANA'
 
+# Inventory validation for HANA VMs
+- hosts: hanadbnodes
+  become: true
+  become_user: root
+  roles:
+    - role: inventory-validation
+      when:
+        - hana_database.size != "LargeInstance"   
+
 # Prepare os, disks and mount points on Hana Database servers
 - hosts: hanadbnodes
   become: true
