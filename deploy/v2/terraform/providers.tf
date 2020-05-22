@@ -1,5 +1,13 @@
 /*-----------------------------------------------------------------------------8
 |                                                                              |
+|                              TERRAFORM VERSION                               |
+|                                                                              |
++--------------------------------------4--------------------------------------*/
+terraform           { required_version = ">= 0.12"  }
+
+
+/*-----------------------------------------------------------------------------8
+|                                                                              |
 |                                  PROVIDERS                                   |
 |                                                                              |
 +--------------------------------------4--------------------------------------*/
@@ -19,11 +27,11 @@ Description:
                         ~> 0.8.4 is equivalent to >= 0.8.4, < 0.9
 */
 
-provider azurerm {
-  version = "~> 2.10"
-  features {}
-}
-provider external { version = "~> 1.2" }
-provider local { version = "~> 1.4" }
-provider random { version = "~> 2.2" }
-provider null { version = "~> 2.1" }
+provider azurerm    {
+                      version = "~> 2.10"
+                      features {}
+                    }
+provider external   { version = "~> 1.2"  }
+provider local      { version = "~> 1.4"  }
+provider random     { version = "~> 2.2"  }
+provider null       { version = "~> 2.1"  }
