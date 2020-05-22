@@ -69,7 +69,7 @@ resource "local_file" "output-json" {
     "options" = var.options
     }
   )
-  filename = "${path.root}/../ansible_config_files/output.json"
+  filename = "${terraform.workspace}/ansible_config_files/output.json"
 }
 
 # Generates the Ansible Inventory file
@@ -86,5 +86,5 @@ resource "local_file" "ansible-inventory" {
     dbnodes               = local.dbnodes
     }
   )
-  filename = "${path.root}/../ansible_config_files/hosts"
+  filename = "${terraform.workspace}/ansible_config_files/hosts"
 }
