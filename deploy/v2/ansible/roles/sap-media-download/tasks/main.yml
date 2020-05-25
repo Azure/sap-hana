@@ -26,6 +26,17 @@
   shell: "ls {{ azure_files_mount_path }}/DB|grep ZIP"
   register: bits_file
 
+- name: Check if media is uncorrupted
+  when: bits_file.rc == 0
+  shell: unzip -tq {{ azure_files_mount_path }}/DB/{{ bits_file.stdout }}
+  register: media_status
+
+- assert:
+    that: 
+      - bits_file.rc == 0
+      - media_status.rc == 0
+    fail_msg: "Downloaded SAP media is not correct"
+    
 - name: Extract media archive
   unarchive: 
     src: "{{ azure_files_mount_path }}/DB/{{ bits_file.stdout }}"
