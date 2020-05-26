@@ -1,6 +1,5 @@
 ---
 
-
 - name: Check the required Clustering configuration variables are set
   assert:
     that:

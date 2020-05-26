@@ -12,3 +12,4 @@ ha_packages:
     - corosync
     - resource-agents
     - fence-agents
+    - cloud-netconfig-azure

@@ -79,6 +79,16 @@
     - role: large-instance-environment-setup
       when: hana_database.size == "LargeInstance"
 
+# Only SLES support SBD fencing
+- hosts: iscsi
+  become: true
+  become_user: root
+  roles:
+   - role: iscsi-target-install
+     when: 
+       - hana_database.high_availability
+       - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
+
 # Hana DB components install
 - hosts: hanadbnodes
   become: true

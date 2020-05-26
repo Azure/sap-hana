@@ -1,0 +1,39 @@
+---
+
+- name: Update SLES
+  zypper:
+    name: '*'
+    state: latest
+    disable_recommends: no
+
+- name: Remove packages
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - lio-utils
+    - python-rtslib
+    - python-configshell
+    - targetcli
+
+# Note: dbus-1-python is recommended by Azure official reference but it is obsolete
+- name: Install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: 
+    - targetcli-fb
+
+- name: Ensure the iSCSI target service is enabled
+  service: name=targetcli enabled=yes state=started
+
+- name: Ensure iSCSI device on iSCSI target server is created
+  block:
+    - name: Ensure the root folder for all SBD devices is created
+      file: 
+        path: /sbd
+        state: directory
+      register: root_folder_status
+
+    - when: root_folder_status is not failed
+      import_tasks: iscsi_device_create.yml
