@@ -62,7 +62,7 @@
 - pause:
     seconds: 20
 
-- name: Ensure the Corosync service is restarted
+- name: Ensure the Corosync service is restarted on secondary node
   when: inventory_hostname == hana_database.nodes[1].ip_admin_nic
   systemd:
     name: corosync
