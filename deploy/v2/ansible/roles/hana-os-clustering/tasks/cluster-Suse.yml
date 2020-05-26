@@ -53,7 +53,7 @@
     dest: /etc/corosync/corosync.conf
     mode: 0600
 
-- name: Ensure the Corosync service is restarted
+- name: Ensure the Corosync service is restarted on primary node.
   when: inventory_hostname == hana_database.nodes[0].ip_admin_nic
   systemd:
     name: corosync
