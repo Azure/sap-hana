@@ -6,7 +6,7 @@ jobs:
 - job: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew-SN
+    scenario: sap-allNew-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml
@@ -22,7 +22,7 @@ jobs:
 - job: createAllNew_HA_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew-HA
+    scenario: sap-allNew-HA
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml
@@ -41,7 +41,7 @@ jobs:
 - job: reuseRG_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-reuseRG-SN
+    scenario: sap-reuseRG-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
@@ -71,12 +71,12 @@ jobs:
   dependsOn: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-reuseVNET-SN
+    scenario: sap-reuseVNET-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group v2-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
+      echo '##vso[task.setvariable variable=arm_id]$(az network vnet show --resource-group sap-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name vnet-mgmt --query id --output tsv)'
   - template: test-case-template-update.yaml
     parameters:
       scenario: $(scenario)
@@ -97,12 +97,12 @@ jobs:
   timeoutInMinutes: 180
   dependsOn: createAllNew_SN_${{parameters.osVersion}}
   variables:
-    scenario: v2-reuseNSG-SN
+    scenario: sap-reuseNSG-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      echo '##vso[task.setvariable variable=arm_id]$(az network nsg show --resource-group v2-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name nsg-mgmt --query id --output tsv)' 
+      echo '##vso[task.setvariable variable=arm_id]$(az network nsg show --resource-group sap-allNew-SN-${{parameters.osVersion}}-$(Build.BuildId) --name nsg-mgmt --query id --output tsv)' 
   - template: test-case-template-update.yaml
     parameters:
       scenario: $(scenario)

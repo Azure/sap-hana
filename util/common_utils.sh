@@ -10,7 +10,7 @@
 ###############################################################################
 
 
-readonly target_path="deploy/v2"
+readonly target_path="deploy"
 # location of the input JSON templates
 readonly target_template_dir="${target_path}/template_samples"
 

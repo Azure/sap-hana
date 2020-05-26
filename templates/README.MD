@@ -2,7 +2,7 @@
 
 
 # Azure Pipeline Test
-This is Azure pipeline test created for deploy/v2
+This is Azure pipeline test created for sap-hana/deploy
 
 ## Table of contents
 - [Supported Scenarios](#supported-scenarios)
@@ -20,12 +20,12 @@ This is Azure pipeline test created for deploy/v2
 
 ## Design
 
-![pipeline_v2_workflow](https://user-images.githubusercontent.com/38501271/63207042-ac3e1580-c074-11e9-808b-f7bd037bc42b.jpg)
+![pipeline_workflow](https://user-images.githubusercontent.com/38501271/63207042-ac3e1580-c074-11e9-808b-f7bd037bc42b.jpg)
 
-- All PRs against master and include code change in deploy/v2 will trigger this pipeline test.
-- Each scenario will create a testcase with name that contains name of the testcase, os version and buildId, eg. v2-allNew-SN-SLES12-289.
-- Each testcase will create resources under it's own resource group, which has the same name as the testcase, eg. resource group v2-allNew-SN-SLES12-289.
-- Terraform will run with varible file generated during the test, which has name as the testcase as well, eg. v2-allNew-SN-SLES12-289.json
+- All PRs against master and include code change in sap-hana/deploy will trigger this pipeline test.
+- Each scenario will create a testcase with name that contains name of the testcase, os version and buildId, eg. sap-allNew-SN-SLES12-289.
+- Each testcase will create resources under it's own resource group, which has the same name as the testcase, eg. resource group sap-allNew-SN-SLES12-289.
+- Terraform will run with varible file generated during the test, which has name as the testcase as well, eg. sap-allNew-SN-SLES12-289.json
 - After the deployment is done (successful/fail), cleanup job will delete the resource group
 ## Add New Scenario
 ### 1. Maintain custom JSON
@@ -56,7 +56,7 @@ This is Azure pipeline test created for deploy/v2
     ```yaml
     - job: reuseRG${{parameters.osVersion}}
       variables:
-        scenario: v2-reuseRG
+        scenario: sap-reuseRG
         testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
       steps:
       - script: |
@@ -86,7 +86,7 @@ This is Azure pipeline test created for deploy/v2
   - add the new scenario to `stage: DestroyingResources` -> `job: cleanUp` -> varible `scenario_list`.
 
 ## Add new OS verification
-### 1. Maintain azure-pipeline-v2.yaml
+### 1. Maintain azure-pipeline.yaml
   - create a new job with template under `jobs` with `osVersion` and string for `osImage`
   - sample:
     ```yaml

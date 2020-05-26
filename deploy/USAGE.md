@@ -152,7 +152,7 @@ Configuring your SAP Launchpad credentials for a JSON template requires you to p
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
 
-   **Note:** The current templates are located in `deploy/v2/template_samples/` and you do not need to specify the `.json` extension.
+   **Note:** The current templates are located in `deploy/template_samples/` and you do not need to specify the `.json` extension.
 
 You can programatically set the deployment's resource group name in Azure using another utility script.  This needs to be done for each template you intend to deploy.
 

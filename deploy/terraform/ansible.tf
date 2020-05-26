@@ -47,7 +47,7 @@ resource "null_resource" "ansible_playbook" {
       "export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES",
       "export ANSIBLE_HOST_KEY_CHECKING=False",
       "source ~/export-clustering-sp-details.sh",
-      "ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml"
+      "ansible-playbook -i hosts ~/sap-hana/deploy/ansible/sap_playbook.yml"
     ]
   }
 }

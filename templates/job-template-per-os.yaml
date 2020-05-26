@@ -6,7 +6,7 @@ jobs:
 - job: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew-SN
+    scenario: sap-allNew-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml
@@ -25,7 +25,7 @@ jobs:
 - job: createAllNew_HA_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
-    scenario: v2-allNew-HA
+    scenario: sap-allNew-HA
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
   steps:
   - template: test-case-template-update.yaml

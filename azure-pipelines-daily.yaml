@@ -1,20 +1,26 @@
-# This Azure pipeline YAML contains tests to validate and verify the pull requests made for automated deployment of SAP landscape.
-# This pipeline will only run all the tests if the PR is made from a branch of Azure/sap-hana repo.
-# Branches from forked repositories will fail in the Azure provider authentication phase due to security reason
+# This Azure pipeline YAML contains tests the daily full test on the master branch
+# It includes:
+# - Terraform deployments:
+#   + single HANA server
+#   + RTI
+#   + 1 Linux jumpbox
+#   + 1 Windows jumpbox
+# - Ansible playbook execution:
+#   + SAP Bits download
+#   + HANA installation including XSA and SHINE
+#   + HANA Client/Studio installation on Linux/Windows jumpboxes
+
 # A pipeline with no CI trigger
 trigger: none
-# Only trigger build when a PR is opened for code under deploy/v2
-pr:
+# A pipeline with no PR triggers
+pr: none
+schedules:
+- cron: '0 12 * * *'
+  displayName: Daily full test at noon (UTC)
   branches:
     include:
     - master
-  paths:
-    include:
-    - deploy/v2/*
-    exclude:
-    - README.md
-    - monitor/*
-    - deploy/*
+  always: true
 variables:
   - group: azure-config-variables
   - group: azure-sap-hana-pipeline-secrets
@@ -47,13 +53,13 @@ stages:
 - stage: CreatingResources
   dependsOn: SetEnv
   jobs:
-  - template: templates/job-template-allReuseCases.yaml
+  - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "SLES12"
       osImage: '\"offer\": \"sles-sap-12-sp5\", 
                 \"publisher\": \"SUSE\", 
                 \"sku\": \"gen1\"'
-  - template: templates/job-template-per-os.yaml
+  - template: templates/job-template-per-os-daily.yaml
     parameters:
       osVersion: "RHEL7"
       osImage: '\"offer\": \"RHEL-SAP-HA\", 
@@ -80,11 +86,11 @@ stages:
             RHEL7
           )
           scenario_list=(
-            v2-allNew-SN
-            v2-allNew-HA
-            v2-reuseRG-SN
-            v2-reuseVNET-SN
-            v2-reuseNSG-SN
+            sap-allNew-SN
+            sap-allNew-HA
+            sap-reuseRG-SN
+            sap-reuseVNET-SN
+            sap-reuseNSG-SN
           )
           for scenario in "${scenario_list[@]}"
           do

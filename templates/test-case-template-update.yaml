@@ -3,8 +3,8 @@
 
 parameters:
 #####################################################################
-# Eg:  scenario: test scenario, eg: v2-reuseVNET-SN                 #
-#      testCaseName: current test case name eg: v2-reuseVNET-SN-777 #
+# Eg:  scenario: test scenario, eg: sap-reuseVNET-SN                 #
+#      testCaseName: current test case name eg: sap-reuseVNET-SN-777 #
 #      placeHolder: the place holder in JSON eg: vnet-arm-id        #
 #      value: the value to replace in JSON eg: /subscriptions/***/..#
 #####################################################################

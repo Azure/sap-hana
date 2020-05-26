@@ -8,7 +8,7 @@ DLM stands for Download Manager
 - [Workflow](#Workflow)
 
 ## HowToRun
-- add SMP credentials to `deploy/v2/input.json` -> `software` -> `downloader` (`hdb.json`, `s4.json` are examples to adjust downloader configuration for different scenarios).
+- add SMP credentials to `deploy/input.json` -> `software` -> `downloader` (`hdb.json`, `s4.json` are examples to adjust downloader configuration for different scenarios).
 - `python3 basket.py --help` : check required inputs
 - `--config <name of the json>` : Mandatory. It triggers download of bits according to SAP_Scenarios.py and JSON input files
 - `--dir <absolute path to download the bits`: Optional. The downloader will use this dir to store downloaded bits instead of default path, which is the same folder as the python script

@@ -40,7 +40,7 @@
 
 1. Copy the parameter template
 
-    > `cp <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE/variables.auto.tfvars .`
+    > `cp <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE/variables.auto.tfvars .`
 
 2. Edit the parameter file
 
@@ -69,13 +69,13 @@
 - Initializes the Workspace by linking in the path to the runtime code and downloading execution Providers.
 
   ```bash
-  terraform init <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform init <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```
 
 - To re-initialize, add the `--upgrade=true` switch.
 
   ```bash
-  terraform init --upgrade=true <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform init --upgrade=true <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```
 
 <br>
@@ -86,7 +86,7 @@
 - If a Statefile exists, it will compare the *code*, the *statefile*, and the *resources* in Azure in order to detect drift and will display any changes or corrections that will result, and the actions that will be performed.
 
 ```
-terraform plan  <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+terraform plan  <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
 ```
 
 <br>
@@ -97,13 +97,13 @@ terraform plan  <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/S
 - A Plan is also an implicit step in the Apply that will ask for confirmation.
 
   ```bash
-  terraform apply <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform apply <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```
 
 - To automatically confirm, add the `--auto-approve` switch.
 
   ```bash
-  terraform apply --auto-approve <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform apply --auto-approve <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```
 
 <br>
@@ -114,12 +114,12 @@ terraform plan  <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/S
   <br>From the Workspace directory, run the following command to remove all deployed resources:
 
   ```bash
-  terraform destroy <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform destroy <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```
 
 - To automatically confirm, add the `--auto-approve` switch.xs
 
 
   ```bash
-  terraform destroy --auto-approve <automation_root>/sap-hana/deploy/v2/terraform-units/workspace/SAP_Library/TFE
+  terraform destroy --auto-approve <automation_root>/sap-hana/deploy/terraform-units/workspace/SAP_Library/TFE
   ```

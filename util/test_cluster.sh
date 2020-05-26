@@ -4,7 +4,7 @@
 #
 # This script acts as a simple interface to a playbook to test the cluster after deployment.
 #
-# This script assumes the cluster has been deployed via the v2 Terraform, and is being run
+# This script assumes the cluster has been deployed via the Terraform, and is being run
 # on the RTI instance.
 #
 ############################################################################################
@@ -19,7 +19,7 @@ function main()
 	local FAILOVER_TYPE="$1"
 
 	# Playbook converts failover_test_type to lower case
-	ansible-playbook -i ~/hosts ~/sap-hana/deploy/v2/ansible/test_failover.yml -e "failover_test_type=${FAILOVER_TYPE}"
+	ansible-playbook -i ~/hosts ~/sap-hana/deploy/ansible/test_failover.yml -e "failover_test_type=${FAILOVER_TYPE}"
 }
 
 
