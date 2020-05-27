@@ -59,7 +59,7 @@ resource "azurerm_network_interface_security_group_association" "nic-dbnodes-db-
 # LOAD BALANCER ===================================================================================================
 
 /*-----------------------------------------------------------------------------8
-Load balancer front IP address range: .10 - .20
+Load balancer front IP address range: .10 - .19
 +--------------------------------------4--------------------------------------*/
 
 resource "azurerm_lb" "hana-lb" {
