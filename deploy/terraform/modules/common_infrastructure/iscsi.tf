@@ -8,6 +8,9 @@
 TODO:  Fix Naming convention and document in the Naming Convention Doc
 +--------------------------------------4--------------------------------------*/
 
+/*-----------------------------------------------------------------------------8
+iSCSI device IP address range: .4 - .9
++--------------------------------------4--------------------------------------*/
 # Creates the NIC and IP address for iSCSI device
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi.iscsi_count
@@ -18,7 +21,7 @@ resource "azurerm_network_interface" "iscsi" {
   ip_configuration {
     name                          = "ipconfig-iscsi"
     subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.iscsi.iscsi_nic_ips[count.index] : lookup(local.iscsi, "iscsi_nic_ips", false) != false ? local.iscsi.iscsi_nic_ips[count.index] : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4 + length(local.dbnodes) + length(local.hana-databases))
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.iscsi.iscsi_nic_ips[count.index] : lookup(local.iscsi, "iscsi_nic_ips", false) != false ? local.iscsi.iscsi_nic_ips[count.index] : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4)
     private_ip_address_allocation = "static"
   }
 }
