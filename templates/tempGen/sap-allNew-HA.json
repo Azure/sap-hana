@@ -3,6 +3,19 @@
       "resource_group" : {
           "name" : "var-rg-name"
       },
+      "vnets": {
+        "sap": {
+          "subnet_iscsi": {
+            "is_existing": "false",
+            "name": "subnet-iscsi",
+            "prefix": "10.1.3.0/24",
+            "nsg": {
+              "is_existing": "false",
+              "name": "nsg-iscsi"
+            }
+          }
+        }
+      },
       "iscsi": {
       "iscsi_count": 3,
       "size":"Standard_D2s_v3",
