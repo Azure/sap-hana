@@ -20,4 +20,7 @@ locals {
 
   # Shortcut to iSCSI definition
   iscsi = merge(lookup(var.infrastructure, "iscsi", {}), { "iscsi_count" = "${local.iscsi_count}" })
+
+  # Shortcut to subnet block for iSCSI in input JSON
+  subnet_iscsi = merge({ "is_existing" = "false" }, lookup(var.infrastructure.vnets.sap, "subnet_iscsi", {}))
 }
