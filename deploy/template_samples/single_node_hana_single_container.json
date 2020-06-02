@@ -44,6 +44,15 @@
             "is_existing": "false",
             "name": "nsg-db"
           }
+        },
+        "subnet_app": {
+          "is_existing": "false",
+          "name": "subnet-app",
+          "prefix": "10.1.3.0/24",
+          "nsg": {
+            "is_existing": "false",
+            "name": "nsg-app"
+          }
         }
       }
     }

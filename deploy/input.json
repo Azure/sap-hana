@@ -53,6 +53,17 @@
             "arm_id": "",
             "name": ""
           }
+        },
+        "subnet_app": {
+          "is_existing": "",
+          "arm_id": "",
+          "name": "",
+          "prefix": "",
+          "nsg": {
+            "is_existing": "",
+            "arm_id": "",
+            "name": ""
+          }
         }
       }
     },
