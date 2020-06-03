@@ -8,7 +8,7 @@ resource "azurerm_network_interface" "nics-app" {
 
   ip_configuration {
     name                          = "app${count.index}-${local.sid}-nic-ip"
-    subnet_id                     = var.subnet-app[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
     private_ip_address            = "10.1.3.2${count.index}"
     private_ip_address_allocation = "static"
   }
@@ -18,7 +18,7 @@ resource "azurerm_network_interface" "nics-app" {
 resource "azurerm_network_interface_security_group_association" "nic-app-nsg" {
   count                     = 2
   network_interface_id      = azurerm_network_interface.nics-app[count.index].id
-  network_security_group_id = var.nsg-app[0].id
+  network_security_group_id = var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? data.azurerm_network_security_group.nsg-app[0].id : azurerm_network_security_group.nsg-app[0].id
 }
 
 

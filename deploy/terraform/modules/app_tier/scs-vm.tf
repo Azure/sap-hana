@@ -8,7 +8,7 @@ resource "azurerm_network_interface" "nics-scs" {
 
   ip_configuration {
     name                          = "scs-${local.sid}-nic-${count.index}-ip"
-    subnet_id                     = var.subnet-app[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
     private_ip_address            = "10.1.3.1${count.index}"
     private_ip_address_allocation = "static"
   }
@@ -18,7 +18,7 @@ resource "azurerm_network_interface" "nics-scs" {
 resource "azurerm_network_interface_security_group_association" "nic-scs-nsg" {
   count                     = 2
   network_interface_id      = azurerm_network_interface.nics-scs[count.index].id
-  network_security_group_id = var.nsg-app[0].id
+  network_security_group_id = var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? data.azurerm_network_security_group.nsg-app[0].id : azurerm_network_security_group.nsg-app[0].id
 }
 
 # Create the SCS Load Balancer
@@ -30,7 +30,7 @@ resource "azurerm_lb" "scs-lb" {
 
   frontend_ip_configuration {
     name                          = "scs-${local.sid}-lb-feip"
-    subnet_id                     = var.subnet-app[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = "10.1.3.5"
   }
@@ -38,7 +38,7 @@ resource "azurerm_lb" "scs-lb" {
   # TODO: Base this on the HA parameter
   frontend_ip_configuration {
     name                          = "ers-${local.sid}-lb-feip"
-    subnet_id                     = var.subnet-app[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = "10.1.3.6"
   }
