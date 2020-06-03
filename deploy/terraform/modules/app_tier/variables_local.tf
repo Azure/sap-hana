@@ -2,12 +2,8 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-app" {
-  description = "Details of the SAP Application subnet"
-}
-
-variable "nsg-app" {
-  description = "Details of the SAP Application subnet NSG"
+variable "vnet-sap" {
+  description = "Details of the SAP VNet"
 }
 
 variable "app-tier" {

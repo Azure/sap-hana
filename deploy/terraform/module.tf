@@ -59,8 +59,7 @@ module "app_tier" {
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
-  subnet-app       = module.common_infrastructure.subnet-sap-app
-  nsg-app          = module.common_infrastructure.nsg-app
+  vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
 }
 
