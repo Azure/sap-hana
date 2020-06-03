@@ -2,6 +2,10 @@ output "resource-group" {
   value = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group : azurerm_resource_group.resource-group
 }
 
+output "vnet-sap" {
+  value = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap : azurerm_virtual_network.vnet-sap
+}
+
 output "subnet-mgmt" {
   value = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? data.azurerm_subnet.subnet-mgmt : azurerm_subnet.subnet-mgmt
 }
@@ -24,14 +28,6 @@ output "subnet-sap-db" {
 
 output "nsg-db" {
   value = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db : azurerm_network_security_group.nsg-db
-}
-
-output "subnet-sap-app" {
-  value = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app : azurerm_subnet.subnet-sap-app
-}
-
-output "nsg-app" {
-  value = var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? data.azurerm_network_security_group.nsg-app : azurerm_network_security_group.nsg-app
 }
 
 output "storage-bootdiag" {
