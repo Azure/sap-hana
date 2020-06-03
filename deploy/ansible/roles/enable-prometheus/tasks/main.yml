@@ -20,8 +20,7 @@
   ignore_errors: yes
 
 - name: Ensure Prometheus is installed and configured
-  when: (add_repo_status.failed is defined and add_repo_status.failed == false) or
-        (add_repo_status.skipped is defined and add_repo_status.skipped == True)
+  when: not (add_repo_status.failed is defined and add_repo_status.failed == true)
   block:
   - name: Install Prometheus with Node and HA Cluster exporters
     zypper:
