@@ -1,4 +1,4 @@
-### <img src="../../../../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > Terraform > Units > SAP Library
+### <img src="../../../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > Terraform > Units > SAP Library
 # SAP Library
 
 ## Deployment
@@ -25,4 +25,4 @@ The purpose of the SAP Library is to provide a storage location for the SAP inst
 <br><br><br>
 
 
-***TODO***<img src="../../../../../documentation/assets/TODO.png" width="320px">***TODO***
+***TODO***<img src="../../../../documentation/assets/TODO.png" width="320px">***TODO***

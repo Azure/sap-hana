@@ -339,7 +339,7 @@ The following commands should be run on the RTI as the logon user. This will tri
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 export ANSIBLE_HOST_KEY_CHECKING=False
 source ~/export-clustering-sp-details.sh
-ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml
+ansible-playbook -i hosts ~/sap-hana/deploy/ansible/sap_playbook.yml
 ```
 
 ### Connecting to the Runtime Instance VM

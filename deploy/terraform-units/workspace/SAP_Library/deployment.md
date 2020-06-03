@@ -1,4 +1,4 @@
-### <img src="../../../../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > Terraform > Units > SAP Library
+### <img src="../../../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > Terraform > Units > SAP Library
 # Deployment
 
 ## Common Setup

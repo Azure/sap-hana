@@ -1,4 +1,4 @@
-### <img src="../../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V2 <!-- omit in toc -->
+### <img src="../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V2 <!-- omit in toc -->
 # Automated SAP Deployments in Azure Cloud <!-- omit in toc -->
 
 Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana.v2?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
@@ -19,7 +19,7 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 ### Available
 
-- [HANA Scale-Up Stand Alone](/deploy/v2/template_samples/single_node_hana.json)
+- [HANA Scale-Up Stand Alone](/deploy/template_samples/single_node_hana.json)
 
 ### Coming Soon
 
