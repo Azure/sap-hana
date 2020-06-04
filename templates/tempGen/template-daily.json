@@ -5,6 +5,10 @@
       "is_existing": "false",
       "name": "test-rg"
     },
+    "ppg": {
+      "is_existing": "false",
+      "name": "test-ppg"
+    },
     "vnets": {
       "management": {
         "is_existing": "false",
