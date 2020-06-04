@@ -2,8 +2,8 @@
 resource "azurerm_subnet" "subnet-sap-admin" {
   count                = var.infrastructure.vnets.sap.subnet_admin.is_existing ? 0 : 1
   name                 = var.infrastructure.vnets.sap.subnet_admin.name
-  resource_group_name  = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
-  virtual_network_name = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
+  resource_group_name  = var.vnet-sap[0].resource_group_name
+  virtual_network_name = var.vnet-sap[0].name
   address_prefixes     = [var.infrastructure.vnets.sap.subnet_admin.prefix]
 }
 
@@ -11,8 +11,8 @@ resource "azurerm_subnet" "subnet-sap-admin" {
 resource "azurerm_subnet" "subnet-sap-db" {
   count                = var.infrastructure.vnets.sap.subnet_db.is_existing ? 0 : 1
   name                 = var.infrastructure.vnets.sap.subnet_db.name
-  resource_group_name  = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
-  virtual_network_name = var.infrastructure.vnets.sap.is_existing ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
+  resource_group_name  = var.vnet-sap[0].resource_group_name
+  virtual_network_name = var.vnet-sap[0].name
   address_prefixes     = [var.infrastructure.vnets.sap.subnet_db.prefix]
 }
 
@@ -37,7 +37,7 @@ resource "azurerm_network_security_group" "nsg-admin" {
   count               = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1
   name                = var.infrastructure.vnets.sap.subnet_admin.nsg.name
   location            = var.infrastructure.region
-  resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  resource_group_name = var.vnet-sap[0].resource_group_name
 }
 
 # Creates SAP db subnet nsg
@@ -45,7 +45,7 @@ resource "azurerm_network_security_group" "nsg-db" {
   count               = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
   name                = var.infrastructure.vnets.sap.subnet_db.nsg.name
   location            = var.infrastructure.region
-  resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  resource_group_name = var.vnet-sap[0].resource_group_name
 }
 
 # Imports the SAP admin subnet nsg data
