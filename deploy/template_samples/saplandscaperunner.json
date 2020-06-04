@@ -45,7 +45,7 @@
                         "name":"nsg-db"
                     }
                 },
-		"subnet_iscsi": {
+		        "subnet_iscsi": {
                     "is_existing": "false",
                     "name": "subnet-iscsi",
                     "prefix": "10.1.4.0/24",
@@ -129,16 +129,16 @@
 
                 ]
             },
-	    "xsa": {
-        	"routing": "ports"
-      	    },
-      	    "shine": {
-        	"email": "shinedemo@microsoft.com"
-      	    },
+    	    "xsa": {
+            	"routing": "ports"
+          	 },
+          	 "shine": {
+            	"email": "shinedemo@microsoft.com"
+          	 },
             "dbnodes":[
                 {
-                    "name":"node01",
-                    "role":"worker"
+                        "name":"node01",
+                        "role":"worker"
                 }
             ]
         }
@@ -155,7 +155,9 @@
             "Storage_access_key":"",
             "arm_id":""
         },
-	"downloader": {}
+	"downloader": {
+        
+    }
     },
     "sshkey":{
         "path_to_public_key":"/tmp/sshkey.pub",
