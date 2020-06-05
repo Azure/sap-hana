@@ -47,13 +47,6 @@ resource "azurerm_network_interface" "rti" {
   }
 }
 
-# Manages the association between NIC and NSG for RTI
-resource "azurerm_network_interface_security_group_association" "rti" {
-  count                     = length(local.rti)
-  network_interface_id      = azurerm_network_interface.rti[count.index].id
-  network_security_group_id = var.nsg-mgmt[0].id
-}
-
 # Manages Linux Virtual Machine for RTI
 resource "azurerm_linux_virtual_machine" "rti" {
   count                           = length(local.rti)
