@@ -11,9 +11,6 @@ variable "storage-bootdiag" {
 }
 
 locals {
-  # Determind if we should deploy the Application layer
-  deploy-app-tier = var.application.enable_deployment ? true : false
-
   # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [

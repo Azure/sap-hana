@@ -1,6 +1,6 @@
 # Create SCS NICs
 resource "azurerm_network_interface" "nics-scs" {
-  count                         = local.deploy-app-tier ? (var.application.scs_high_availability ? 2 : 1) : 0
+  count                         = var.application.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
   name                          = "scs${count.index}-${var.application.sid}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
@@ -16,7 +16,7 @@ resource "azurerm_network_interface" "nics-scs" {
 
 # Create the SCS Load Balancer
 resource "azurerm_lb" "scs-lb" {
-  count               = local.deploy-app-tier ? 1 : 0
+  count               = var.application.enable_deployment ? 1 : 0
   name                = "scs-${var.application.sid}-lb"
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
@@ -33,14 +33,14 @@ resource "azurerm_lb" "scs-lb" {
 }
 
 resource "azurerm_lb_backend_address_pool" "scs-lb-back-pool" {
-  count               = local.deploy-app-tier ? 1 : 0
+  count               = var.application.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.scs-lb[0].id
   name                = "scs-${var.application.sid}-lb-bep"
 }
 
 resource "azurerm_lb_probe" "scs-lb-health-probe" {
-  count               = local.deploy-app-tier ? (var.application.scs_high_availability ? 2 : 1) : 0
+  count               = var.application.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.scs-lb[0].id
   name                = "${count.index == 0 ? "scs" : "ers"}-${var.application.sid}-lb-hp"
@@ -52,7 +52,7 @@ resource "azurerm_lb_probe" "scs-lb-health-probe" {
 
 # Create the SCS Load Balancer Rules
 resource "azurerm_lb_rule" "scs-lb-rules" {
-  count                          = local.deploy-app-tier ? length(local.lb-ports.scs) : 0
+  count                          = var.application.enable_deployment ? length(local.lb-ports.scs) : 0
   resource_group_name            = var.resource-group[0].name
   loadbalancer_id                = azurerm_lb.scs-lb[0].id
   name                           = "SCS_${var.application.sid}_${local.lb-ports.scs[count.index]}"
@@ -67,7 +67,7 @@ resource "azurerm_lb_rule" "scs-lb-rules" {
 
 # Create the ERS Load balancer rules only in High Availability configurations
 resource "azurerm_lb_rule" "ers-lb-rules" {
-  count                          = local.deploy-app-tier ? (var.application.scs_high_availability ? length(local.lb-ports.ers) : 0) : 0
+  count                          = var.application.enable_deployment ? (var.application.scs_high_availability ? length(local.lb-ports.ers) : 0) : 0
   resource_group_name            = var.resource-group[0].name
   loadbalancer_id                = azurerm_lb.scs-lb[0].id
   name                           = "ERS_${var.application.sid}_${local.lb-ports.ers[count.index]}"
@@ -82,7 +82,7 @@ resource "azurerm_lb_rule" "ers-lb-rules" {
 
 # Associate SCS VM NICs with the Load Balancer Backend Address Pool
 resource "azurerm_network_interface_backend_address_pool_association" "scs-lb-nic-bep" {
-  count                   = local.deploy-app-tier ? length(azurerm_network_interface.nics-scs) : 0
+  count                   = var.application.enable_deployment ? length(azurerm_network_interface.nics-scs) : 0
   network_interface_id    = azurerm_network_interface.nics-scs[count.index].id
   ip_configuration_name   = azurerm_network_interface.nics-scs[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.scs-lb-back-pool[0].id
@@ -90,7 +90,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs-lb-ni
 
 # Create the SCS Availability Set
 resource "azurerm_availability_set" "scs-as" {
-  count                        = local.deploy-app-tier ? 1 : 0
+  count                        = var.application.enable_deployment ? 1 : 0
   name                         = "scs-${var.application.sid}-as"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -101,7 +101,7 @@ resource "azurerm_availability_set" "scs-as" {
 
 # Create the SCS VM(s)
 resource "azurerm_linux_virtual_machine" "vm-scs" {
-  count               = local.deploy-app-tier ? (var.application.scs_high_availability ? 2 : 1) : 0
+  count               = var.application.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
   name                = "scs${count.index}-${var.application.sid}-vm"
   computer_name       = "${lower(var.application.sid)}scs${format("%02d", count.index)}"
   location            = var.resource-group[0].location
