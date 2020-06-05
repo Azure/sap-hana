@@ -18,6 +18,7 @@ set -o errexit
 set -o nounset
 
 # import common functions that are reused across scripts
+
 source util/common_utils.sh
 
 # name of the script where the auth info should be saved

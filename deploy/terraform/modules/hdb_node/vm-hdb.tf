@@ -43,19 +43,6 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   }
 }
 
-# Manages the association between NIC and NSG.
-resource "azurerm_network_interface_security_group_association" "nic-dbnodes-admin-nsg" {
-  count                     = length(local.dbnodes)
-  network_interface_id      = azurerm_network_interface.nics-dbnodes-admin[count.index].id
-  network_security_group_id = var.nsg-admin[0].id
-}
-
-resource "azurerm_network_interface_security_group_association" "nic-dbnodes-db-nsg" {
-  count                     = length(local.dbnodes)
-  network_interface_id      = azurerm_network_interface.nics-dbnodes-db[count.index].id
-  network_security_group_id = var.nsg-db[0].id
-}
-
 # LOAD BALANCER ===================================================================================================
 
 /*-----------------------------------------------------------------------------8
