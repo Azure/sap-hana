@@ -1,3 +1,7 @@
+variable "application" {
+  description = "Details of the Application layer"
+}
+
 variable "databases" {
   description = "Details of the HANA database nodes"
 }

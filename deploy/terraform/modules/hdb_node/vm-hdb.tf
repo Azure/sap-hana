@@ -7,7 +7,7 @@
 # NICS ============================================================================================================
 
 /*-----------------------------------------------------------------------------8
-HANA DB Linux Server private IP range: .10 - 
+HANA DB Linux Server private IP range: .10 -
 +--------------------------------------4--------------------------------------*/
 
 # Creates the admin traffic NIC and private IP address for database nodes
@@ -20,7 +20,7 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 
   ip_configuration {
     name                          = "${local.dbnodes[count.index].name}-admin-nic-ip"
-    subnet_id                     = var.subnet-sap-admin[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_admin.is_existing ? data.azurerm_subnet.subnet-sap-admin[0].id : azurerm_subnet.subnet-sap-admin[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_admin.is_existing ? local.dbnodes[count.index].admin_nic_ip : lookup(local.dbnodes[count.index], "admin_nic_ip", false) != false ? local.dbnodes[count.index].admin_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_admin.prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   ip_configuration {
     primary                       = true
     name                          = "${local.dbnodes[count.index].name}-db-nic-ip"
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.dbnodes[count.index].db_nic_ip : lookup(local.dbnodes[count.index], "db_nic_ip", false) != false ? local.dbnodes[count.index].db_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
@@ -57,7 +57,7 @@ resource "azurerm_lb" "hana-lb" {
 
   frontend_ip_configuration {
     name                          = "hana-${each.value.sid}-lb-feip"
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.frontend_ip : lookup(each.value, "frontend_ip", false) != false ? each.value.frontend_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4)
   }

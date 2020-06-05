@@ -8,8 +8,8 @@
 resource "azurerm_network_security_rule" "nsr-internal-db" {
   count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
   name                        = "allow-internal-traffic"
-  resource_group_name         = var.nsg-db[0].resource_group_name
-  network_security_group_name = var.nsg-db[0].name
+  resource_group_name         = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].resource_group_name : azurerm_network_security_group.nsg-db[0].resource_group_name
+  network_security_group_name = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].name : azurerm_network_security_group.nsg-db[0].name
   priority                    = 101
   direction                   = "Inbound"
   access                      = "allow"
@@ -24,8 +24,8 @@ resource "azurerm_network_security_rule" "nsr-internal-db" {
 resource "azurerm_network_security_rule" "nsr-external-db" {
   count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
   name                        = "deny-inbound-traffic"
-  resource_group_name         = var.nsg-db[0].resource_group_name
-  network_security_group_name = var.nsg-db[0].name
+  resource_group_name         = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].resource_group_name : azurerm_network_security_group.nsg-db[0].resource_group_name
+  network_security_group_name = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].name : azurerm_network_security_group.nsg-db[0].name
   priority                    = 102
   direction                   = "Inbound"
   access                      = "deny"
@@ -40,8 +40,8 @@ resource "azurerm_network_security_rule" "nsr-external-db" {
 resource "azurerm_network_security_rule" "nsr-admin" {
   count                       = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1
   name                        = "nsr-subnet-admin"
-  resource_group_name         = var.nsg-admin[0].resource_group_name
-  network_security_group_name = var.nsg-admin[0].name
+  resource_group_name         = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].resource_group_name : azurerm_network_security_group.nsg-admin[0].resource_group_name
+  network_security_group_name = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].name : azurerm_network_security_group.nsg-admin[0].name
   priority                    = 102
   direction                   = "Inbound"
   access                      = "allow"

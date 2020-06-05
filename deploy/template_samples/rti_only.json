@@ -44,6 +44,15 @@
             "is_existing": "false",
             "name": "nsg-db"
           }
+        },
+        "subnet_app": {
+          "is_existing": "false",
+          "name": "subnet-app",
+          "prefix": "10.1.3.0/24",
+          "nsg": {
+            "is_existing": "false",
+            "name": "nsg-app"
+          }
         }
       }
     }
@@ -81,6 +90,14 @@
       "file_share_name": "bits"
     },
     "downloader": {}
+  },
+  "application": {
+    "sid": "HN1",
+    "enable_deployment": false,
+    "scs_instance_number": "01",
+    "ers_instance_number": "02",
+    "scs_high_availability": false,
+    "application_server_count": 1
   },
   "sshkey": {
     "path_to_public_key": "~/.ssh/id_rsa.pub",

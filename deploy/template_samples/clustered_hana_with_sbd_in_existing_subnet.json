@@ -149,6 +149,14 @@
       }
     }
   ],
+  "application": {
+    "sid": "HN1",
+    "enable_deployment": true,
+    "scs_instance_number": "01",
+    "ers_instance_number": "02",
+    "scs_high_availability": true,
+    "application_server_count": 1
+  },
   "software": {
     "storage_account_sapbits": {
       "is_existing": false,
