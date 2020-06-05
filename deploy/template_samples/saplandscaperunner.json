@@ -1,0 +1,165 @@
+{
+    "infrastructure": {
+        "region": "westus2",
+        "resource_group": {
+            "is_existing": "false",
+            "name": "saplandscaperunner-rg"
+        },
+        "vnets": {
+            "management": {
+                "is_existing": "false",
+                "name": "vnet-mgmt",
+                "address_space": "10.0.0.0/16",
+                "subnet_mgmt": {
+                    "is_existing": "false",
+                    "name": "subnet-mgmt",
+                    "prefix": "10.0.1.0/24",
+                    "nsg": {
+                        "is_existing": "false",
+                        "name": "nsg-mgmt",
+                        "allowed_ips": [
+                            ""
+                        ]
+                    }
+                }
+            },
+            "sap": {
+                "is_existing": "false",
+                "name": "vnet-sap",
+                "address_space": "10.1.0.0/16",
+                "subnet_admin": {
+                    "is_existing": "false",
+                    "name": "subnet-admin",
+                    "prefix": "10.1.1.0/24",
+                    "nsg": {
+                        "is_existing": "false",
+                        "name": "nsg-admin"
+                    }
+                },
+                "subnet_db": {
+                    "is_existing": "false",
+                    "name": "subnet-db",
+                    "prefix": "10.1.2.0/24",
+                    "nsg": {
+                        "is_existing": "false",
+                        "name": "nsg-db"
+                    }
+                },
+                "subnet_iscsi": {
+                    "is_existing": "false",
+                    "name": "subnet-iscsi",
+                    "prefix": "10.1.4.0/24",
+                    "nsg": {
+                        "is_existing": "false",
+                        "name": "nsg-iscsi"
+                    }
+                }
+            }
+        },
+        "iscsi": {
+            "iscsi_count": 1,
+            "size": "Standard_D2s_v3",
+            "os": {
+                "publisher": "SUSE",
+                "offer": "sles-sap-12-sp5",
+                "sku": "gen1"
+            },
+            "authentication": {
+                "type": "key",
+                "username": "azureadm"
+            }
+        }
+    },
+    "jumpboxes": {
+        "windows": [],
+        "linux": [
+            {
+                "name": "rti",
+                "destroy_after_deploy": "true",
+                "size": "Standard_D2s_v3",
+                "disk_type": "StandardSSD_LRS",
+                "os": {
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "18.04-LTS"
+                },
+                "authentication": {
+                    "type": "key",
+                    "username": "azureadm"
+                },
+                "components": [
+                    "ansible"
+                ]
+            }
+        ]
+    },
+    "databases": [
+        {
+            "platform": "HANA",
+            "db_version": "2.00.040",
+            "os": {
+                "publisher": "SUSE",
+                "offer": "sles-sap-12-sp5",
+                "sku": "gen1"
+            },
+            "size": "Demo",
+            "filesystem": "xfs",
+            "high_availability": true,
+            "authentication": {
+                "type": "key",
+                "username": "azureadm"
+            },
+            "instance": {
+                "sid": "HA1",
+                "instance_number": "01"
+            },
+            "credentials": {
+                "db_systemdb_password": "",
+                "db_tenant_password": "",
+                "os_sidadm_password": "",
+                "os_sapadm_password": "",
+                "xsa_admin_password": "",
+                "cockpit_admin_password": "",
+                "ha_cluster_password": ""
+            },
+            "components": {
+                "hana_database": []
+            },
+            "xsa": {
+                "routing": "ports"
+            },
+            "shine": {
+                "email": "shinedemo@microsoft.com"
+            },
+            "dbnodes": [
+                {
+                    "name": "node01",
+                    "role": "worker"
+                }
+            ]
+        }
+    ],
+    "software": {
+        "storage_account_sapbits": {
+            "file_share_name": "bits",
+            "is_existing": true,
+            "account_tier": "Premium",
+            "account_replication_type": "LRS",
+            "account_kind": "FileStorage",
+            "container_access_type": "private",
+            "Storage_account_name": "",
+            "Storage_access_key": "",
+            "arm_id": ""
+        },
+        "downloader": {}
+    },
+    "sshkey": {
+        "path_to_public_key": "/tmp/sshkey.pub",
+        "path_to_private_key": "/tmp/sshkey"
+    },
+    "options": {
+        "enable_secure_transfer": true,
+        "ansible_execution": false,
+        "enable_prometheus": true
+    }
+}
