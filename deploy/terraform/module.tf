@@ -46,6 +46,7 @@ module "hdb_node" {
   subnet-sap-db    = module.common_infrastructure.subnet-sap-db
   nsg-db           = module.common_infrastructure.nsg-db
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
+  ppg              = module.common_infrastructure.ppg
 }
 
 # Generate output files

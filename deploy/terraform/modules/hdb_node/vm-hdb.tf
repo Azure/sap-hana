@@ -114,6 +114,7 @@ resource "azurerm_availability_set" "hana-as" {
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
   platform_fault_domain_count  = 2
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   managed                      = true
 }
 
@@ -132,13 +133,14 @@ resource "azurerm_managed_disk" "data-disk" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
-  count               = length(local.dbnodes)
-  name                = local.dbnodes[count.index].name
-  computer_name       = local.dbnodes[count.index].name
-  location            = var.resource-group[0].location
-  resource_group_name = var.resource-group[0].name
-  availability_set_id = azurerm_availability_set.hana-as[0].id
-  network_interface_ids = [
+  count                           = length(local.dbnodes)
+  name                            = local.dbnodes[count.index].name
+  computer_name                   = local.dbnodes[count.index].name
+  location                        = var.resource-group[0].location
+  resource_group_name             = var.resource-group[0].name
+  availability_set_id             = azurerm_availability_set.hana-as[0].id
+  proximity_placement_group_id    =  lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  network_interface_ids           = [
     azurerm_network_interface.nics-dbnodes-admin[count.index].id,
     azurerm_network_interface.nics-dbnodes-db[count.index].id
   ]

@@ -226,3 +226,20 @@ resource "azurerm_storage_account" "storage-bootdiag" {
   account_tier              = "Standard"
   enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }
+
+
+# PROXIMITY PLACEMENT GROUP ===============================================================================================
+
+resource "azurerm_proximity_placement_group" "ppg" {
+  count               = lookup(var.infrastructure, "ppg", false) != false ? (var.infrastructure.ppg.is_existing ? 0 : 1) : 0
+  name                = var.infrastructure.ppg.name
+  resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
+}
+
+
+data "azurerm_proximity_placement_group" "ppg" {
+  count               = lookup(var.infrastructure, "ppg", false) != false ? (var.infrastructure.ppg.is_existing ? 1 : 0) : 0
+  name                = var.infrastructure.ppg.name
+  resource_group_name = azurerm_resource_group.resource-group[0].name
+}
