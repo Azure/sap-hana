@@ -7,7 +7,8 @@
     },
     "ppg": {
       "is_existing": "false",
-      "name": "test-ppg"
+      "name": "test-ppg",
+      "arm_id": ""
     },
     "vnets": {
       "management": {
