@@ -1,5 +1,6 @@
 variable "databases" {
   description = "Details of the HANA database nodes"
+  default     = []
 }
 
 variable "infrastructure" {
