@@ -11,7 +11,9 @@ steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
       az network vnet subnet update -g ${{parameters.testCaseName}} -n subnet-mgmt --vnet-name vnet-mgmt --network-security-group nsg-mgmt --output none
-    displayName: 'Update NSG for subnet subnet-mgmt'
+      az network vnet subnet update -g ${{parameters.testCaseName}} -n subnet-admin --vnet-name vnet-sap --network-security-group nsg-admin --output none
+      az network vnet subnet update -g ${{parameters.testCaseName}} -n subnet-db --vnet-name vnet-sap --network-security-group nsg-db --output none
+    displayName: 'Update NSG for subnets'
   - script: |
       cd deploy/terraform/default/ansible_config_files
       rti_user=$(cat output.json | jq -r '.jumpboxes.linux[] | select(.destroy_after_deploy == "true") | .authentication.username')

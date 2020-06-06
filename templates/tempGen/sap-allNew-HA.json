@@ -17,7 +17,7 @@
         }
       },
       "iscsi": {
-      "iscsi_count": 3,
+      "iscsi_count": 1,
       "size":"Standard_D2s_v3",
       "os": {
         "publisher": "SUSE",

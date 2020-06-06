@@ -41,3 +41,7 @@ output "random-id" {
 output "nics-iscsi" {
   value = azurerm_network_interface.iscsi
 }
+
+output "ppg" {
+  value =azurerm_proximity_placement_group.ppg
+}

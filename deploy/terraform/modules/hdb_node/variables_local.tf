@@ -22,6 +22,9 @@ variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
+variable "ppg" {
+  description = "Details of the proximity placement group"
+}
 # Imports HANA database sizing information
 locals {
   sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))
