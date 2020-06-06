@@ -11,6 +11,8 @@ variable "storage-bootdiag" {
 }
 
 locals {
+  enable_deployment = lookup(var.application, "enable_deployment", false)
+
   # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [

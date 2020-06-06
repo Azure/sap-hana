@@ -1,5 +1,6 @@
 variable "application" {
   description = "Details of the Application layer"
+  default     = {}
 }
 
 variable "databases" {
