@@ -9,7 +9,7 @@ resource "azurerm_network_interface" "nics-scs" {
   ip_configuration {
     name                          = "scs${count.index}-${var.application.sid}-nic-ip"
     subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
-    private_ip_address            = "10.1.3.1${count.index}"
+    private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(count.index) + local.ip_offsets.scs_vm)
     private_ip_address_allocation = "static"
   }
 }
@@ -27,7 +27,7 @@ resource "azurerm_lb" "scs-lb" {
       name                          = "${frontend_ip_configuration.value == 0 ? "scs" : "ers"}-${var.application.sid}-lb-feip"
       subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
       private_ip_address_allocation = "Static"
-      private_ip_address            = "10.1.3.${5 + frontend_ip_configuration.value}"
+      private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(count.index) + local.ip_offsets.scs_lb)
     }
   }
 }
