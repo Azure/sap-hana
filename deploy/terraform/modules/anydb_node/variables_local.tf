@@ -84,15 +84,15 @@ locals {
 }
 
 locals {
-  size = local.any-databases[0].size
+  size = (length( local.any-databases) > 0) ? local.any-databases[0].size : 1024
 }
 
 locals {
-  prefix = local.any-databases[0].instance.sid
+  prefix = (length( local.any-databases) > 0) ? local.any-databases[0].instance.sid : "XXX"
 }
 
 locals {
-  vm_count = (local.any-databases[0].high_availability == true) ? 2 : 1
+  vm_count = (length( local.any-databases) > 0) ? ((local.any-databases[0].high_availability == true) ? 2 : 1) : 0
 }
 
 locals {

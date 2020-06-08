@@ -5,17 +5,16 @@ Load balancer front IP address range: .4 - .9
 +--------------------------------------4--------------------------------------*/
 
 resource "azurerm_lb" "anydb-lb" {
-  for_each            = local.loadbalancers
-  name                = format("%s-%s-lb", each.value.sid, var.role)
+  count               = local.vm_count
+  name                = format("%s-%s-lb", local.prefix, var.role)
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name = format("%s-%s-lb-feip", each.value.sid, var.role)
+    name = format("%s-%s-lb-feip", local.prefix, var.role)
 
     subnet_id                     = var.subnet-sap-db[0].id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.frontend_ip : lookup(each.value, "frontend_ip", false) != false ? each.value.frontend_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4)
+    private_ip_address_allocation = "Dynamic"
   }
   sku = "Standard"
 
@@ -30,10 +29,11 @@ resource "azurerm_lb_backend_address_pool" "anydb-lb-back-pool" {
 }
 
 resource "azurerm_lb_probe" "anydb-lb-health-probe" {
-  for_each            = local.loadbalancers
+  count               = local.vm_count
+  
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb-lb[0].id
-  name                = format("%s-%s-lb-hpp", each.value.sid, var.role)
+  name                = format("%s-%s-lb-hpp", local.prefix, var.role)
   port                = "443"
   protocol            = "Tcp"
   interval_in_seconds = 5
