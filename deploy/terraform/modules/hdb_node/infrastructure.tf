@@ -64,14 +64,14 @@ data "azurerm_network_security_group" "nsg-db" {
 
 # Associates SAP admin nsg to SAP admin subnet
 resource "azurerm_subnet_network_security_group_association" "Associate-nsg-admin" {
-  count                     = signum((var.infrastructure.vnets.sap.is_existing ? 0 : 1) + (var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1))
+  count                     = signum((var.infrastructure.vnets.sap.subnet_admin.is_existing ? 0 : 1) + (var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1))
   subnet_id                 = var.infrastructure.vnets.sap.subnet_admin.is_existing ? data.azurerm_subnet.subnet-sap-admin[0].id : azurerm_subnet.subnet-sap-admin[0].id
   network_security_group_id = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].id : azurerm_network_security_group.nsg-admin[0].id
 }
 
 # Associates SAP db nsg to SAP db subnet
 resource "azurerm_subnet_network_security_group_association" "Associate-nsg-db" {
-  count                     = signum((var.infrastructure.vnets.sap.is_existing ? 0 : 1) + (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1))
+  count                     = signum((var.infrastructure.vnets.sap.subnet_db.is_existing ? 0 : 1) + (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1))
   subnet_id                 = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
   network_security_group_id = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].id : azurerm_network_security_group.nsg-db[0].id
 }
