@@ -35,6 +35,7 @@
       include_vars:
         file: ../hdb_sizes.json
         name: hdb_sizes
+  max_fail_percentage: 0
   roles:
     - role: os-preparation
     - role: os-disk-setup
