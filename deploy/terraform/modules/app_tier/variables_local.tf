@@ -14,7 +14,7 @@ locals {
   enable_deployment = lookup(var.application, "enable_deployment", false)
 
   scs_instance_number = lookup(var.application, "scs_instance_number", "01")
-  ers_instance_number = lookup(var.application, "scs_instance_number", "02")
+  ers_instance_number = lookup(var.application, "ers_instance_number", "02")
 
   # Ports used for specific ASCS and ERS
   lb-ports = {
