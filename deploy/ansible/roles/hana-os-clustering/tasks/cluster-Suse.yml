@@ -60,7 +60,7 @@
     state: restarted
 
 - pause:
-    seconds: 20
+    seconds: 15
 
 - name: Ensure the Corosync service is restarted on secondary node
   when: inventory_hostname == hana_database.nodes[1].ip_admin_nic
@@ -69,7 +69,7 @@
     state: restarted
 
 - pause:
-    seconds: 20
+    seconds: 15
 
 - name: Ensure the STONITH SBD is created
   when: 
@@ -231,15 +231,6 @@
 
     - name: Ensure any required cluster resources are cleaned up
       shell: "crm resource cleanup rsc_SAPHana_{{ hana_database.instance.sid | upper }}_HDB{{ hana_database.instance.instance_number }}"
-
-    - name: Check current SBD status after clean resources
-      shell: crm_mon -1 | grep sbd
-      register: sbd_report_afterclean
-      changed_when: False
-      failed_when: False
-
-    - debug:
-        msg: "{{ sbd_report_afterclean.stdout }}" 
 
     - name: Ensure maintenance mode is disabled
       shell: "crm configure property maintenance-mode=false"
