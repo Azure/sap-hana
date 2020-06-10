@@ -191,7 +191,16 @@
     "scs_instance_number": "",
     "ers_instance_number": "",
     "scs_high_availability": true,
-    "application_server_count": 1
+    "application_server_count": 1,
+    "authentication": {
+      "type": "",
+      "username": ""
+    },
+    "os": {
+      "publisher": "",
+      "offer": "",
+      "sku": ""
+    }
   },
   "software": {
     "storage_account_sapbits": {

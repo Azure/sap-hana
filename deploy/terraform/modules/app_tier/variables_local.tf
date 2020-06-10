@@ -20,6 +20,21 @@ locals {
   scs_instance_number = lookup(var.application, "scs_instance_number", "01")
   ers_instance_number = lookup(var.application, "ers_instance_number", "02")
 
+  # Subnet IP Offsets
+  # Note: First 4 IP addresses in a subnet are reserved by Azure
+  ip_offsets = {
+    scs_lb = 4 + 1
+    scs_vm = 4 + 6
+    app_vm = 4 + 10
+  }
+
+  # OS image for all Application Tier VMs
+  os = lookup(var.application, "os", {
+    publisher = "suse"
+    offer     = "sles-sap-12-sp5"
+    sku       = "gen1"
+  })
+
   # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [
