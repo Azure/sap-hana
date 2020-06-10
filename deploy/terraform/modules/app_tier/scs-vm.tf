@@ -123,9 +123,9 @@ resource "azurerm_linux_virtual_machine" "vm-scs" {
   }
 
   source_image_reference {
-    publisher = "suse"
-    offer     = "sles-sap-12-sp5"
-    sku       = "gen1"
+    publisher = local.os.publisher
+    offer     = local.os.offer
+    sku       = local.os.sku
     version   = "latest"
   }
 

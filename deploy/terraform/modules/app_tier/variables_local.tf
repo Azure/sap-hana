@@ -28,6 +28,13 @@ locals {
     app_vm = 4 + 10
   }
 
+  # OS image for all Application Tier VMs
+  os = lookup(var.application, "os", {
+    publisher = "suse"
+    offer     = "sles-sap-12-sp5"
+    sku       = "gen1"
+  })
+
   # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [
