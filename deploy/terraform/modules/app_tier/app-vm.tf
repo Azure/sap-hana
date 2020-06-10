@@ -39,8 +39,7 @@ resource "azurerm_linux_virtual_machine" "vm-app" {
     azurerm_network_interface.nics-app[count.index].id
   ]
   size                            = "Standard_D8s_v3"
-  admin_username                  = "appadmin"
-  admin_password                  = "password"
+  admin_username                  = var.application.authentication.username
   disable_password_authentication = true
 
   os_disk {
@@ -57,7 +56,7 @@ resource "azurerm_linux_virtual_machine" "vm-app" {
   }
 
   admin_ssh_key {
-    username   = "appadmin"
+    username   = var.application.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 

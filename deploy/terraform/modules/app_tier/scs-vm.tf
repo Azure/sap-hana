@@ -113,8 +113,7 @@ resource "azurerm_linux_virtual_machine" "vm-scs" {
     azurerm_network_interface.nics-scs[count.index].id
   ]
   size                            = "Standard_D8s_v3"
-  admin_username                  = "scsadmin"
-  admin_password                  = "password"
+  admin_username                  = var.application.authentication.username
   disable_password_authentication = true
 
   os_disk {
@@ -131,7 +130,7 @@ resource "azurerm_linux_virtual_machine" "vm-scs" {
   }
 
   admin_ssh_key {
-    username   = "scsadmin"
+    username   = var.application.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 
