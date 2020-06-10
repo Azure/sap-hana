@@ -150,7 +150,11 @@
         "scs_instance_number": "01",
         "ers_instance_number": "02",
         "scs_high_availability": true,
-        "application_server_count": 1
+        "application_server_count": 1,
+        "authentication": {
+            "type": "key",
+            "username": "azureadm"
+        }
     },
     "software": {
         "storage_account_sapbits": {
