@@ -138,7 +138,7 @@
       "type": "key",
       "username": "azureadm"
     },
-    "os": {"var-os-image"}
+    "os": {var-os-image}
   },
   "software": {
     "storage_account_sapbits": {
