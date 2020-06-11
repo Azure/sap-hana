@@ -5,7 +5,7 @@
 # Purpose:
 # This script simplifies the user interaction with the JSON input templates so
 # the user does not need to manually edit JSON files when configuring the
-# required OS for their SAP HANA VMs.
+# required OS for their SAP VMs.
 #
 ###############################################################################
 
@@ -25,21 +25,28 @@ function main()
 {
 	check_command_line_arguments "$@"
 
+	local args_count=$#
 	local sap_os="$1"
 	local template_name="$2"
+	local section="all"
+	if [[ ${args_count} -eq 3 ]]; then
+		section="$3"
+	fi
 
-	edit_json_template_for_sap_os "${sap_os}" "${template_name}"
+	edit_json_template_for_sap_os "${sap_os}" "${template_name}" "${section}"
 }
 
 
 function check_command_line_arguments()
 {
 	local args_count=$#
-	local usage="Usage: ${0} \"<SAP OS offer>\" \"<template name>\""
+	local usage="Usage: ${0} \"<SAP OS offer>\" \"<template name>\" [app|hdb]"
 
 	# Check there are just two arguments provided
-	if [[ ${args_count} -ne 2 ]]; then
+	if [[ ${args_count} -ne 2 && ${args_count} -ne 3 ]]; then
 		echo "${usage}"
+		echo
+		echo "If 'app' or 'hdb' is specified as the third argument, then only the OS for that section is changed"
 		echo
 		echo "Available SAP OS offers:"
 		list_available_offers
@@ -61,7 +68,7 @@ function check_command_line_arguments()
 function list_available_templates()
 {
 	# shellcheck disable=SC2154
-	print_allowed_json_template_names "${target_template_dir}" | grep 'hana'
+	print_allowed_json_template_names "${target_template_dir}" | grep 'hana' | sort
 }
 
 
@@ -76,6 +83,7 @@ function edit_json_template_for_sap_os()
 	local sap_os
 	sap_os="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
 	local json_template_name="$2"
+	local section="$3"
 	local target_json="${target_template_dir}/${json_template_name}.json"
 	local temp_template_json="${target_json}.tmp"
 
@@ -121,19 +129,31 @@ function edit_json_template_for_sap_os()
 		jq_def_walk=""
 	fi
 
+	# For the HANA Database tier
 	# Always set new values, regardless of any values already present
 	# Using the "walk" function, follow the JSON tree looking for arrays
 	# When an array is found, map each element. For each element:
 	#   If it contains a "platform" property with the value "HANA", then:
 	#    If it has an "os" property having a "publisher"/"offer"/"sku" property, then:
 	#      Replace the value of the appropriate property.
-	jq "${jq_def_walk}
-			walk(if type == \"array\" then
-				map(select(.platform? == \"HANA\") .os?={
-						publisher: ${sap_os_publisher},
-						offer: ${sap_os_offer},
-						sku: ${sap_os_sku} } )
-				else . end)" "${target_json}" >"${temp_template_json}" && mv "${temp_template_json}" "${target_json}"
+	if [[ "${section}" == "all" || "${section}" == "hdb" ]]; then
+		jq "${jq_def_walk}
+				walk(if type == \"array\" then
+					map(select(.platform? == \"HANA\") .os?={
+							publisher: ${sap_os_publisher},
+							offer: ${sap_os_offer},
+							sku: ${sap_os_sku} } )
+					else . end)" "${target_json}" >"${temp_template_json}" && mv "${temp_template_json}" "${target_json}"
+	fi
+
+	# For the Application tier.
+	if [[ "${section}" == "all" || "${section}" == "app" ]]; then
+		jq ".application.os?={
+			publisher: ${sap_os_publisher},
+			offer: ${sap_os_offer},
+			sku: ${sap_os_sku}
+		}" "${target_json}" >"${temp_template_json}" && mv "${temp_template_json}" "${target_json}"
+	fi
 }
 
 # Execute the main program flow with all arguments
