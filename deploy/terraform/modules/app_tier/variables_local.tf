@@ -35,6 +35,22 @@ locals {
     sku       = "gen1"
   })
 
+  # Default VM config should be merged with any the user passes in
+  app_sku_map = merge(
+    {
+      app = "Standard_D4s_v3,false"
+      scs = "Standard_D4s_v3,false"
+    },
+    lookup(var.application, "vm_config", {})
+  )
+
+  app_vm_size                    = element(split(",", lookup(local.app_sku_map, "app", false)), 0)
+  app_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "app", false)), 1)
+
+  scs_vm_size                    = element(split(",", lookup(local.app_sku_map, "scs", false)), 0)
+  scs_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "scs", false)), 1)
+
+
   # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [

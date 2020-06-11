@@ -200,6 +200,10 @@
       "publisher": "",
       "offer": "",
       "sku": ""
+    },
+    "vm_config": {
+      "app": "",
+      "scs": ""
     }
   },
   "software": {
