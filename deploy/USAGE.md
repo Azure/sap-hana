@@ -220,7 +220,7 @@ In the following steps you will need to substitute a `<template_name>` for the t
    util/terraform_v2.sh plan <template_name>
    ```
 
-1. To easily discover which operating systems can be used to build HANA VMs, run the following utility script withput parameters:
+1. To easily discover which operating systems can be used to build the SAP VMs, run the following utility script withput parameters:
 
    ```text
    util/set_sap_os.sh
@@ -228,7 +228,7 @@ In the following steps you will need to substitute a `<template_name>` for the t
 
    :information_source: The specific versions of operating systems which are tied to the "convenience names" are defined in the `util/sap_os_offers.json` file. The names "SLES" and "RHEL" are preset to match the more specific `sles12sp5` (`offer: sles-sap-12-sp5`, `sku: gen1`) and `redhat76` (`offer: RHEL-SAP-HA`, `sku: 7.6`) respectively.
 
-1. To easily choose which operating system will be used to build HANA VMs, run the following utility script with the required SAP OS chosen from the above list:
+1. To easily choose which operating system will be used to build SAP VMs, run the following utility script with the required SAP OS chosen from the above list:
 
    ```text
    util/set_sap_os.sh <SAP OS> <template name>
