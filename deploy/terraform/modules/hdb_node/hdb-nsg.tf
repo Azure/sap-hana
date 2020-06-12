@@ -6,7 +6,7 @@
 
 # Creates network security rule to allow internal traffic for SAP db subnet
 resource "azurerm_network_security_rule" "nsr-internal-db" {
-  count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
+  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1) : 0
   name                        = "allow-internal-traffic"
   resource_group_name         = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].resource_group_name : azurerm_network_security_group.nsg-db[0].resource_group_name
   network_security_group_name = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].name : azurerm_network_security_group.nsg-db[0].name
@@ -22,7 +22,7 @@ resource "azurerm_network_security_rule" "nsr-internal-db" {
 
 # Creates network security rule to deny external traffic for SAP db subnet
 resource "azurerm_network_security_rule" "nsr-external-db" {
-  count                       = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1
+  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1) : 0
   name                        = "deny-inbound-traffic"
   resource_group_name         = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].resource_group_name : azurerm_network_security_group.nsg-db[0].resource_group_name
   network_security_group_name = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-db[0].name : azurerm_network_security_group.nsg-db[0].name
@@ -38,7 +38,7 @@ resource "azurerm_network_security_rule" "nsr-external-db" {
 
 # Creates network security rule for SAP admin subnet
 resource "azurerm_network_security_rule" "nsr-admin" {
-  count                       = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1
+  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1) : 0
   name                        = "nsr-subnet-admin"
   resource_group_name         = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].resource_group_name : azurerm_network_security_group.nsg-admin[0].resource_group_name
   network_security_group_name = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].name : azurerm_network_security_group.nsg-admin[0].name

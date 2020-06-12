@@ -26,6 +26,9 @@ locals {
     if database.platform == "HANA"
   ]
 
+  # Enable deployment based on length of local.hana-databases
+  enable_deployment = (length(local.hana-databases) > 0) ? true : false
+
   # Numerically indexed Hash of HANA DB nodes to be created
   dbnodes = flatten([
     [
