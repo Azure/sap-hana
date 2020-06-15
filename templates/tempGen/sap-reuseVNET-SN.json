@@ -20,6 +20,9 @@
                             },
                             "subnet_db" : {
                                     "prefix" : "10.2.2.0/24"
+                            },
+                            "subnet_app" : {
+                                    "prefix" : "10.2.3.0/24"
                             }
                     }
             }

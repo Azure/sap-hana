@@ -2,24 +2,16 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-sap-admin" {
-  description = "Details of the SAP admin subnet"
-}
-
-variable "subnet-sap-db" {
-  description = "Details of the SAP DB subnet"
-}
-
-variable "nsg-admin" {
-  description = "Details of the SAP admin subnet NSG"
-}
-
-variable "nsg-db" {
-  description = "Details of the SAP DB subnet NSG"
+variable "vnet-sap" {
+  description = "Details of the SAP VNet"
 }
 
 variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
+}
+
+variable "ppg" {
+  description = "Details of the proximity placement group"
 }
 
 # Imports HANA database sizing information
