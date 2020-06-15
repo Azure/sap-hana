@@ -9,13 +9,13 @@
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ packages[ansible_os_family] }}"
+  loop: "{{ packages[ansible_os_family] }}"
 
 - name: SAP Note 2593824 - Linux Running SAP applications compiled with GCC 7.x
   package:
     name: "{{ item }}"
     state: present
-  with_items:
+  loop:
     - libgcc_s1
     - libstdc++6
     - libatomic1

@@ -28,7 +28,7 @@
     file:
       path: "{{ item }}"
       state: directory
-    with_items:
+    loop:
       - "{{ hana_install_path }}/SAP_HANA_DATABASE"
 
   - name: Create install template for SAP HANA 1.0

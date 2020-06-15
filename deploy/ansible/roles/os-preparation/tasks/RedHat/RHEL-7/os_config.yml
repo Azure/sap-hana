@@ -9,7 +9,7 @@
   package:
     name: "{{ item }}" 
     state: present
-  with_items: 
+  loop: 
     - "{{ packages[ansible_os_family] }}"
 
 - name: Task 3.7 - Disable SELinux 1
@@ -41,7 +41,7 @@
     src: "{{ item.prop }}"
     dest: "{{ item.value }}"
     state: link
-  with_items:
+  loop:
     - { prop: '/usr/lib64/libssl.so.10', value: '/usr/lib64/libssl.so.1.0.1' }
     - { prop: '/usr/lib64/libcrypto.so.10', value: '/usr/lib64/libcrypto.so.1.0.1' }
 
@@ -68,7 +68,7 @@
   lineinfile:
     dest: /etc/security/limits.conf
     line: "{{ item }}"
-  with_items:
+  loop:
     - '* soft core 0'
     - '* hard core 0'
 
@@ -88,7 +88,7 @@
   package:
     name: "{{ item }}"
     state: present
-  with_items:
+  loop:
       - compat-sap-c++-7
       - libatomic
   when: hana_database.db_version is regex("2.\d{2}.0([4-9]\d|[0-9]\d{2,})")

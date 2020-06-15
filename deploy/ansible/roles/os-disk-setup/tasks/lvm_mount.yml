@@ -4,7 +4,7 @@
   lvg: 
     vg: "vg_{{ item.key }}"
     pvs: "{{ item.value.devices }}"
-  with_dict: "{{ disk_dict }}"
+  loop: "{{ disk_dict|dict2items }}"
   register: physical_vg
   failed_when: physical_vg is failed
   ignore_errors: true
@@ -15,7 +15,7 @@
     vg: "vg_{{ item.key }}"
     lv: "lv_hana_{{ item.key }}"
     size: 100%VG
-  with_dict: "{{ disk_dict }}"
+  loop: "{{ disk_dict|dict2items }}"
   register: logical_vg
   failed_when: logical_vg is failed
   ignore_errors: true
@@ -24,13 +24,13 @@
   file:
     path: "{{ item.value.mount_point }}"
     state: directory
-  with_dict: "{{ disk_dict }}"
+  loop: "{{ disk_dict|dict2items }}"
 
 - name: Create file systems
   filesystem:
      fstype: "{{ hana_database.filesystem | default('xfs') }}"
      dev: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
-  with_dict: "{{ disk_dict }}"
+  loop: "{{ disk_dict|dict2items }}"
   register: file_system
 
 - name: Mount volumes
@@ -40,5 +40,5 @@
     opts: "defaults,nofail"
     src: "/dev/vg_{{ item.key }}/lv_hana_{{ item.key }}"
     state: mounted
-  with_dict: "{{ disk_dict }}"
+  loop: "{{ disk_dict|dict2items }}"
   register: vol_mount

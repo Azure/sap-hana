@@ -29,7 +29,7 @@
       dest: /etc/waagent.conf
       regexp: "^{{ item.prop }}="
       line: "{{ item.prop }}={{ item.value }}"
-    with_items:
+    loop:
       - { prop: "ResourceDisk.Format", value: "y" }
       - { prop: "ResourceDisk.EnableSwap", value: "y" }
       - { prop: "ResourceDisk.SwapSizeMB", value: "{{ (hdb_sizes[hana_database.size].compute.swap_size_gb) * 1024|int }}" }

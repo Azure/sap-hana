@@ -11,7 +11,7 @@
       state: present
       option: "{{ item.option }}"
       value: "{{ item.value }}"
-    with_items:
+    loop:
       - option: enable
         value: "true"
       - option: interval
