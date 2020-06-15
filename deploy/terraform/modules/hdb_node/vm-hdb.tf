@@ -7,7 +7,7 @@
 # NICS ============================================================================================================
 
 /*-----------------------------------------------------------------------------8
-HANA DB Linux Server private IP range: .10 - 
+HANA DB Linux Server private IP range: .10 -
 +--------------------------------------4--------------------------------------*/
 
 # Creates the admin traffic NIC and private IP address for database nodes
@@ -20,7 +20,7 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 
   ip_configuration {
     name                          = "${local.dbnodes[count.index].name}-admin-nic-ip"
-    subnet_id                     = var.subnet-sap-admin[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_admin.is_existing ? data.azurerm_subnet.subnet-sap-admin[0].id : azurerm_subnet.subnet-sap-admin[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_admin.is_existing ? local.dbnodes[count.index].admin_nic_ip : lookup(local.dbnodes[count.index], "admin_nic_ip", false) != false ? local.dbnodes[count.index].admin_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_admin.prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
@@ -37,23 +37,10 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   ip_configuration {
     primary                       = true
     name                          = "${local.dbnodes[count.index].name}-db-nic-ip"
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.dbnodes[count.index].db_nic_ip : lookup(local.dbnodes[count.index], "db_nic_ip", false) != false ? local.dbnodes[count.index].db_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
-}
-
-# Manages the association between NIC and NSG.
-resource "azurerm_network_interface_security_group_association" "nic-dbnodes-admin-nsg" {
-  count                     = length(local.dbnodes)
-  network_interface_id      = azurerm_network_interface.nics-dbnodes-admin[count.index].id
-  network_security_group_id = var.nsg-admin[0].id
-}
-
-resource "azurerm_network_interface_security_group_association" "nic-dbnodes-db-nsg" {
-  count                     = length(local.dbnodes)
-  network_interface_id      = azurerm_network_interface.nics-dbnodes-db[count.index].id
-  network_security_group_id = var.nsg-db[0].id
 }
 
 # LOAD BALANCER ===================================================================================================
@@ -70,7 +57,7 @@ resource "azurerm_lb" "hana-lb" {
 
   frontend_ip_configuration {
     name                          = "hana-${each.value.sid}-lb-feip"
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? each.value.frontend_ip : lookup(each.value, "frontend_ip", false) != false ? each.value.frontend_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(each.key) + 4)
   }
@@ -127,6 +114,7 @@ resource "azurerm_availability_set" "hana-as" {
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
   platform_fault_domain_count  = 2
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   managed                      = true
 }
 
@@ -145,13 +133,14 @@ resource "azurerm_managed_disk" "data-disk" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
-  count               = length(local.dbnodes)
-  name                = local.dbnodes[count.index].name
-  computer_name       = local.dbnodes[count.index].name
-  location            = var.resource-group[0].location
-  resource_group_name = var.resource-group[0].name
-  availability_set_id = azurerm_availability_set.hana-as[0].id
-  network_interface_ids = [
+  count                           = length(local.dbnodes)
+  name                            = local.dbnodes[count.index].name
+  computer_name                   = local.dbnodes[count.index].name
+  location                        = var.resource-group[0].location
+  resource_group_name             = var.resource-group[0].name
+  availability_set_id             = azurerm_availability_set.hana-as[0].id
+  proximity_placement_group_id    =  lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  network_interface_ids           = [
     azurerm_network_interface.nics-dbnodes-admin[count.index].id,
     azurerm_network_interface.nics-dbnodes-db[count.index].id
   ]
