@@ -1,7 +1,7 @@
 # Create Application NICs
 resource "azurerm_network_interface" "app" {
   count                         = local.enable_deployment ? var.application.application_server_count : 0
-  name                          = "app${count.index}-${var.application.sid}-nic"
+  name                          = "${upper(var.application.sid)}_app${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
   enable_accelerated_networking = local.app_nic_accelerated_networking
@@ -17,7 +17,7 @@ resource "azurerm_network_interface" "app" {
 # Create the Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
   count                        = local.enable_deployment ? var.application.application_server_count : 0
-  name                         = "app${count.index}-${var.application.sid}-vm"
+  name                         = "${upper(var.application.sid)}_app${format("%02d", count.index)}"
   computer_name                = "${lower(var.application.sid)}app${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -31,7 +31,7 @@ resource "azurerm_linux_virtual_machine" "app" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = "app${count.index}-osdisk"
+    name                 = "${upper(var.application.sid)}_app${format("%02d", count.index)}-osDisk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
