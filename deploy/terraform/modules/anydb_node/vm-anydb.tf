@@ -56,7 +56,7 @@ locals {
 
 
 resource azurerm_network_interface "nic" {
-  count               = local.vm_count
+  count               = local.enable_deployment ? local.vm_count : 0
   name                = format("%s-%s%02d-nic", local.prefix, var.role, (count.index + 1))
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
@@ -74,7 +74,7 @@ resource azurerm_network_interface "nic" {
 # AVAILABILITY SET ================================================================================================
 
 resource "azurerm_availability_set" "db-as" {
-  count  = local.vm_count
+  count                        = local.enable_deployment ? 1 : 0
   name                         = format("%s-%s-lb", local.prefix, var.role)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -86,7 +86,7 @@ resource "azurerm_availability_set" "db-as" {
 
 
 resource azurerm_linux_virtual_machine "main" {
-  count                        = local.vm_count
+  count                        = local.enable_deployment ? local.vm_count : 0
   name                         = format("%s-%s%02d", local.prefix, var.role, (count.index + 1))
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name

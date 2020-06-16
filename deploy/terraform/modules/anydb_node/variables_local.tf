@@ -81,24 +81,16 @@ locals {
     for database in var.databases : database
     if database.platform != "HANA"
   ]
-}
 
-locals {
+# Enable deployment based on length of local.hana-databases
+  enable_deployment = (length(local.any-databases) > 0) ? true : false
+
   dbplatform = var.databases[0].platform
-}
-locals {
+
   size = (length(local.any-databases) > 0) ? local.any-databases[0].size : 1024
-}
-
-locals {
   prefix = (length(local.any-databases) > 0) ? local.any-databases[0].instance.sid : "XXX"
-}
-
-locals {
   vm_count = (length(local.any-databases) > 0) ? ((local.any-databases[0].high_availability == true) ? 2 : 1) : 0
-}
 
-locals {
   dbnodes = flatten([
     [
       for database in local.any-databases : [
