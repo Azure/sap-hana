@@ -64,7 +64,7 @@ resource azurerm_network_interface "nic" {
   ip_configuration {
     primary                       = true
     name                          = "${local.dbnodes[count.index].name}-db-nic-ip"
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-anydb[0].id : azurerm_subnet.subnet-anydb[0].id
     private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.dbnodes[count.index].db_nic_ip : lookup(local.dbnodes[count.index], "db_nic_ip", false) != false ? local.dbnodes[count.index].db_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
@@ -74,6 +74,7 @@ resource azurerm_network_interface "nic" {
 # AVAILABILITY SET ================================================================================================
 
 resource "azurerm_availability_set" "db-as" {
+  count  = local.vm_count
   name                         = format("%s-%s-lb", local.prefix, var.role)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -89,7 +90,7 @@ resource azurerm_linux_virtual_machine "main" {
   name                         = format("%s-%s%02d", local.prefix, var.role, (count.index + 1))
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.db-as.id
+  availability_set_id          = azurerm_availability_set.db-as[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku

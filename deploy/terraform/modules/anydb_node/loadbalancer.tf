@@ -13,7 +13,7 @@ resource "azurerm_lb" "anydb-lb" {
   frontend_ip_configuration {
     name = format("%s-%s-lb-feip", local.prefix, var.role)
 
-    subnet_id                     = var.subnet-sap-db[0].id
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-anydb[0].id : azurerm_subnet.subnet-anydb[0].id
     private_ip_address_allocation = "Dynamic"
   }
   sku = "Standard"
@@ -21,8 +21,8 @@ resource "azurerm_lb" "anydb-lb" {
 }
 
 resource "azurerm_lb_backend_address_pool" "anydb-lb-back-pool" {
-  for_each            = local.loadbalancers
-  name                = format("%s-%s-lb-bep", each.value.sid, var.role)
+  count               = local.vm_count
+  name                = format("%s-%s-lb-bep", local.prefix, var.role)
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb-lb[0].id
 
@@ -30,11 +30,10 @@ resource "azurerm_lb_backend_address_pool" "anydb-lb-back-pool" {
 
 resource "azurerm_lb_probe" "anydb-lb-health-probe" {
   count               = local.vm_count
-  
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb-lb[0].id
   name                = format("%s-%s-lb-hpp", local.prefix, var.role)
-  port                = "443"
+  port                = (local.dbplatform== "DB2") ? "62500" : "1521"
   protocol            = "Tcp"
   interval_in_seconds = 5
   number_of_probes    = 2

@@ -2,8 +2,8 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-sap-db" {
-  description = "Details of the SAP DB subnet"
+variable "vnet-sap" {
+  description = "Details of the SAP VNet"
 }
 
 variable "role" {
@@ -84,15 +84,18 @@ locals {
 }
 
 locals {
-  size = (length( local.any-databases) > 0) ? local.any-databases[0].size : 1024
+  dbplatform = var.databases[0].platform
+}
+locals {
+  size = (length(local.any-databases) > 0) ? local.any-databases[0].size : 1024
 }
 
 locals {
-  prefix = (length( local.any-databases) > 0) ? local.any-databases[0].instance.sid : "XXX"
+  prefix = (length(local.any-databases) > 0) ? local.any-databases[0].instance.sid : "XXX"
 }
 
 locals {
-  vm_count = (length( local.any-databases) > 0) ? ((local.any-databases[0].high_availability == true) ? 2 : 1) : 0
+  vm_count = (length(local.any-databases) > 0) ? ((local.any-databases[0].high_availability == true) ? 2 : 1) : 0
 }
 
 locals {
@@ -130,24 +133,20 @@ locals {
 
 
 
- # Ports used for specific HANA Versions
+  # Ports used for specific DB Versions
   lb_ports = {
-    "1" = [
-      "30015",
-      "30017",
+    "Oracle" = [
+      "80",
+      "1433"
     ]
 
-    "2" = [
-      "30013",
-      "30014",
-      "30015",
-      "30040",
-      "30041",
-      "30042",
+    "DB2" = [
+      "80",
+      "1433"
     ]
   }
 
-  # Hash of Load Balancers to create for anydb instances
+  # Hash of Load Balancers to create for HANA instances
   loadbalancers = zipmap(
     range(
       length([
@@ -157,12 +156,15 @@ locals {
     [
       for database in local.any-databases : {
         sid             = database.instance.sid
-        instance_number = database.instance.instance_number
         ports = [
-          for port in local.lb_ports[split(".", database.db_version)[0]] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
+          for port in local.lb_ports[database.platform] : tonumber(port)
         ]
         frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
       }
     ]
   )
+
+  # List of ports for load balancer
+  loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
 }
+
