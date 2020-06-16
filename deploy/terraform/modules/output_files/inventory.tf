@@ -53,7 +53,7 @@ resource "local_file" "output-json" {
         } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ],
       loadbalancer = {
-        frontend_ip = var.loadbalancers[index(var.databases, database)].private_ip_address
+        frontend_ip = var.loadbalancers[index(var.hdb-sids, database.instance.sid)].private_ip_address
       }
       }
     ],

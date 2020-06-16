@@ -87,4 +87,5 @@ module "output_files" {
   nics-dbnodes-admin           = module.hdb_node.nics-dbnodes-admin
   nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
   loadbalancers                = module.hdb_node.loadbalancers
+  hdb-sids                     = module.hdb_node.hdb-sids
 }

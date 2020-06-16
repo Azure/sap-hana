@@ -38,6 +38,10 @@ variable "loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
+variable "hdb-sids" {
+  description = "List of SIDs used when generating Load Balancers"
+}
+
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
@@ -55,6 +59,7 @@ locals {
           authentication = database.authentication,
           name           = "${dbnode.name}-0"
         }
+        if database.platform == "HANA"
       ],
       [
         for dbnode in database.dbnodes : {
@@ -63,7 +68,7 @@ locals {
           authentication = database.authentication,
           name           = "${dbnode.name}-1"
         }
-        if database.high_availability
+        if database.platform == "HANA" && database.high_availability
       ]
     ])
   ])
