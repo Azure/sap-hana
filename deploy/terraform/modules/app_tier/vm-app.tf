@@ -1,5 +1,5 @@
 # Create Application NICs
-resource "azurerm_network_interface" "nics-app" {
+resource "azurerm_network_interface" "app" {
   count                         = local.enable_deployment ? var.application.application_server_count : 0
   name                          = "app${count.index}-${var.application.sid}-nic"
   location                      = var.resource-group[0].location
@@ -15,7 +15,7 @@ resource "azurerm_network_interface" "nics-app" {
 }
 
 # Create the Application Availability Set
-resource "azurerm_availability_set" "app-as" {
+resource "azurerm_availability_set" "app" {
   count                        = local.enable_deployment ? 1 : 0
   name                         = "app-${var.application.sid}-as"
   location                     = var.resource-group[0].location
@@ -27,16 +27,16 @@ resource "azurerm_availability_set" "app-as" {
 }
 
 # Create the Application VM(s)
-resource "azurerm_linux_virtual_machine" "vm-app" {
+resource "azurerm_linux_virtual_machine" "app" {
   count                        = local.enable_deployment ? var.application.application_server_count : 0
   name                         = "app${count.index}-${var.application.sid}-vm"
   computer_name                = "${lower(var.application.sid)}app${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.app-as[0].id
+  availability_set_id          = azurerm_availability_set.app[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids        = [
-    azurerm_network_interface.nics-app[count.index].id
+    azurerm_network_interface.app[count.index].id
   ]
   size                            = local.app_vm_size
   admin_username                  = var.application.authentication.username
