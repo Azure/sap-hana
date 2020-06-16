@@ -88,3 +88,20 @@ resource "local_file" "ansible-inventory" {
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts"
 }
+
+# Generates the Ansible Inventory file
+resource "local_file" "ansible-inventory-yml" {
+  content = templatefile("${path.module}/ansible_inventory.yml.tmpl", {
+    iscsi                 = lookup(var.infrastructure, "iscsi", {}),
+    jumpboxes-windows     = var.jumpboxes.windows,
+    jumpboxes-linux       = var.jumpboxes-linux,
+    ips-iscsi             = local.ips-iscsi,
+    ips-jumpboxes-windows = local.ips-jumpboxes-windows,
+    ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
+    ips-dbnodes-admin     = local.ips-dbnodes-admin,
+    ips-dbnodes-db        = local.ips-dbnodes-db,
+    dbnodes               = local.dbnodes
+    }
+  )
+  filename = "${terraform.workspace}/ansible_config_files/hosts.yml"
+}
