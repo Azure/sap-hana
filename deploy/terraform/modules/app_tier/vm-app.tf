@@ -14,18 +14,6 @@ resource "azurerm_network_interface" "app" {
   }
 }
 
-# Create the Application Availability Set
-resource "azurerm_availability_set" "app" {
-  count                        = local.enable_deployment ? 1 : 0
-  name                         = "app-${var.application.sid}-as"
-  location                     = var.resource-group[0].location
-  resource_group_name          = var.resource-group[0].name
-  platform_update_domain_count = 20
-  platform_fault_domain_count  = 2
-  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  managed                      = true
-}
-
 # Create the Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
   count                        = local.enable_deployment ? var.application.application_server_count : 0
