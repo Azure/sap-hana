@@ -26,6 +26,14 @@ locals {
     if database.platform == "HANA"
   ]
 
+  # Enable deployment based on length of local.hana-databases
+  enable_deployment = (length(local.hana-databases) > 0) ? true : false
+
+  # List of SIDs from the Databases array for use as reference to LB/AS
+  hdb-sids = [
+    for hdb in local.hana-databases : hdb.instance.sid
+  ]
+
   # Numerically indexed Hash of HANA DB nodes to be created
   dbnodes = flatten([
     [
@@ -76,27 +84,22 @@ locals {
     ]
   }
 
-  # Hash of Load Balancers to create for HANA instances
-  loadbalancers = zipmap(
-    range(
-      length([
-        for database in local.hana-databases : database.instance.sid
-      ])
-    ),
-    [
-      for database in local.hana-databases : {
-        sid             = database.instance.sid
-        instance_number = database.instance.instance_number
-        ports = [
-          for port in local.lb_ports[split(".", database.db_version)[0]] : tonumber(port) + (tonumber(database.instance.instance_number) * 100)
-        ]
-        frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
+  sid-infra = [
+    for database in local.hana-databases : {
+      sid = database.instance.sid
+      instance_number = database.instance.instance_number
+      frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
+    }
+  ]
+
+  loadbalancer_ports = flatten([
+    for database in local.hana-databases : [
+      for port in local.lb_ports[split(".", database.db_version)[0]] : {
+        sid  = database.instance.sid
+        port = tonumber(port) + (tonumber(database.instance.instance_number) * 100)
       }
     ]
-  )
-
-  # List of ports for load balancer
-  loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
+  ])
 }
 
 # List of data disks to be created for HANA DB nodes
