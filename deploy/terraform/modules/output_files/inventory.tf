@@ -83,7 +83,10 @@ resource "local_file" "ansible-inventory" {
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,
     ips-dbnodes-db        = local.ips-dbnodes-db,
-    dbnodes               = local.dbnodes
+    dbnodes               = local.dbnodes,
+    application           = var.application,
+    ips-scs               = local.ips-scs,
+    ips-app               = local.ips-app
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts"
@@ -100,7 +103,10 @@ resource "local_file" "ansible-inventory-yml" {
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,
     ips-dbnodes-db        = local.ips-dbnodes-db,
-    dbnodes               = local.dbnodes
+    dbnodes               = local.dbnodes,
+    application           = var.application,
+    ips-scs               = local.ips-scs,
+    ips-app               = local.ips-app
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts.yml"

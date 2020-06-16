@@ -61,6 +61,22 @@ all:
 %{~ endif }
 %{~ endfor }
 
+    scs:
+      hosts:
+%{~ for ip-scs in ips-scs }
+        ${ip-scs}:
+          ansible_connection: "ssh"
+          ansible_user:       "${application.authentication.username}"
+%{~ endfor }
+
+    app:
+      hosts:
+%{~ for ip-app in ips-app }
+        ${ip-app}:
+          ansible_connection: "ssh"
+          ansible_user:       "${application.authentication.username}"
+%{~ endfor }
+
     # Groups below are collections of the above groups for easier refernce
     all_jumpboxes:
       children:
@@ -71,3 +87,5 @@ all:
       children:
         jumpboxes_linux:
         hanadbnodes:
+        scs:
+        app:
