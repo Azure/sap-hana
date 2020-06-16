@@ -6,7 +6,7 @@
   pre_tasks:
     - name: Include output JSON
       include_vars:
-        file: "{{ inventory_dir }}/output.json"
+        file: "{{ lookup('env', 'PWD') }}/output.json"
         name: output
 
     - name: Create dictionary with HANA database inforamtion from output.JSON
@@ -22,7 +22,7 @@
   roles:
     - role: inventory-validation
       when:
-        - hana_database.size != "LargeInstance"   
+        - hana_database.size != "LargeInstance"
 
 # Prepare os, disks and mount points on Hana Database servers
 - hosts: hanadbnodes
@@ -85,7 +85,7 @@
   become_user: root
   roles:
    - role: iscsi-target-install
-     when: 
+     when:
        - hana_database.high_availability
        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
 
