@@ -23,7 +23,7 @@ data "azurerm_resource_group" "resource-group" {
 resource "azurerm_virtual_network" "vnet-management" {
   count               = var.infrastructure.vnets.management.is_existing ? 0 : 1
   name                = var.infrastructure.vnets.management.name
-  location            = var.infrastructure.region
+  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   address_space       = [var.infrastructure.vnets.management.address_space]
 }
@@ -32,7 +32,7 @@ resource "azurerm_virtual_network" "vnet-management" {
 resource "azurerm_virtual_network" "vnet-sap" {
   count               = var.infrastructure.vnets.sap.is_existing ? 0 : 1
   name                = var.infrastructure.vnets.sap.name
-  location            = var.infrastructure.region
+  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   address_space       = [var.infrastructure.vnets.sap.address_space]
 }
@@ -116,7 +116,7 @@ resource "azurerm_storage_account" "storage-sapbits" {
   count                     = var.software.storage_account_sapbits.is_existing ? 0 : 1
   name                      = lookup(var.software.storage_account_sapbits, "name", false) ? var.software.storage_account_sapbits.name : "sapbits${random_id.random-id.hex}"
   resource_group_name       = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  location                  = var.infrastructure.region
+  location                  = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   account_replication_type  = "LRS"
   account_tier              = var.software.storage_account_sapbits.account_tier
   account_kind              = var.software.storage_account_sapbits.account_kind
@@ -149,7 +149,7 @@ data "azurerm_storage_account" "storage-sapbits" {
 resource "azurerm_storage_account" "storage-bootdiag" {
   name                      = lookup(var.infrastructure, "boot_diagnostics_account_name", false) == false ? "sabootdiag${random_id.random-id.hex}" : var.infrastructure.boot_diagnostics_account_name
   resource_group_name       = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  location                  = var.infrastructure.region
+  location                  = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   account_replication_type  = "LRS"
   account_tier              = "Standard"
   enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
