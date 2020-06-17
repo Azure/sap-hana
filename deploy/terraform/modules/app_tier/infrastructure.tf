@@ -19,8 +19,8 @@ data "azurerm_subnet" "subnet-sap-app" {
 resource "azurerm_network_security_group" "nsg-app" {
   count               = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? 0 : 1) : 0
   name                = var.infrastructure.vnets.sap.subnet_app.nsg.name
-  location            = var.infrastructure.region
-  resource_group_name = var.vnet-sap[0].resource_group_name
+  location            = var.resource-group[0].location
+  resource_group_name = var.resource-group[0].name
 }
 
 # Imports the SAP app subnet nsg data

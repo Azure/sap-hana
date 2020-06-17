@@ -1,4 +1,4 @@
-### <img src="../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V2 <!-- omit in toc -->
+### <img src="documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation <!-- omit in toc -->
 # Automated SAP Deployments in Azure Cloud <!-- omit in toc -->
 Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana.v2?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
 
@@ -36,8 +36,8 @@ Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
 
 ## Terraform Deployment Units
 
-- [HANA single-node instance](terraform/HANA.md) (Primary Entry Point)
-- [SAP Library](terraform-units/workspace/SAP_Library/Readme.md)
+- [HANA single-node instance](/deploy/terraform/HANA.md) (Primary Entry Point)
+- [SAP Library](/deploy/terraform-units/workspace/SAP_Library/Readme.md)
 - Deployment Portal (Coming Soon)
 - Logical SAP Network Foundation (Coming Soon)
 - SDU - SAP Deployment Unit (Coming Soon)
@@ -49,7 +49,7 @@ Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
 
 ## Contributions
 
-If you want to contribute to our project, be sure to review the [contributing guidelines](/CONTRIBUTING.md).
+If you want to contribute to our project, be sure to review the [contributing guidelines](/documentation/contributing.md).
 
 We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
 

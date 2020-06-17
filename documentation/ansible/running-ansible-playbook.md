@@ -1,7 +1,7 @@
-### <img src="../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V2 > HANA <!-- omit in toc -->
+### <img src="../../documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation > V1.0.0 > HANA <!-- omit in toc -->
 # Running the Ansible Playbook <!-- omit in toc -->
 
-Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana.v2?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
+Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana?branchName=master&api-version=5.1-preview.1)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
 
 <br>
 
@@ -17,7 +17,7 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
    - Start the ansible playbook<sup>[1](#myfootnote1)</sup>:
 
     ```bash
-    ansible-playbook -i hosts ~/sap-hana/deploy/v2/ansible/sap_playbook.yml 
+    ansible-playbook -i hosts ~/sap-hana/deploy/ansible/sap_playbook.yml 
     ``` 
 
 <sup>[1](#myfootnote1): The ansible playbook currently configures the VMs without HANA installation.</sup>
