@@ -87,6 +87,7 @@
   roles:
    - role: iscsi-target-install
      when:
+       - hana_database.size != "LargeInstance"
        - hana_database.high_availability
        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
 

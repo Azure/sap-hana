@@ -8,6 +8,7 @@
     name: "{{ item }}"
     state: present
   loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
+  when: hana_database.size != "LargeInstance"
 
 # Pacemaker can create a large number of processes
 - name: Ensure Process limit is raised
@@ -68,5 +69,12 @@
     line: "{{ hana_database.nodes[1].ip_db_nic }} {{ hana_database.nodes[1].dbname }}"
 
 # Clustering commands are based on the Host OS
-- name: Cluster based on OS
+- name: Cluster based on OS in VM
   include_tasks: "cluster-{{ ansible_os_family }}.yml"
+  when: hana_database.size != "LargeInstance"
+
+- name: Ensure cluster is configured in Large Instance
+  include_tasks: "cluster-{{ ansible_os_family }}-large-instance.yml"
+  when: 
+    - hana_database.size == "LargeInstance"
+    - ansible_os_family == "Suse"
