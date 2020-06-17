@@ -59,7 +59,7 @@ locals {
   web_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "web", false)), 1)
 
 
-  # Ports used for specific ASCS and ERS
+  # Ports used for specific ASCS, ERS and Web dispatcher
   lb-ports = {
     "scs" = [
       3200 + tonumber(local.scs_instance_number),          # e.g. 3201
@@ -82,6 +82,37 @@ locals {
     "web" = [
       80,
       3200
+    ]
+  }
+
+  # Ports used for ASCS, ERS and Web dispatcher NSG rules
+  nsg-ports = {
+    "web" = [
+      {
+        "priority" = "101",
+        "name"     = "SSH",
+        "port"     = "22"
+      },
+      {
+        "priority" = "102",
+        "name"     = "HTTP",
+        "port"     = "80"
+      },
+      {
+        "priority" = "103",
+        "name"     = "HTTPS",
+        "port"     = "443"
+      },
+      {
+        "priority" = "104",
+        "name"     = "sapinst",
+        "port"     = "4237"
+      },
+      {
+        "priority" = "105",
+        "name"     = "WebDispatcher",
+        "port"     = "44300"
+      }
     ]
   }
 
