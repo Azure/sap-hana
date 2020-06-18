@@ -84,6 +84,6 @@ ${ip-scs}  ansible_connection=ssh ansible_user=${application.authentication.user
 %{~ endfor }
 
 [app]
-%{ for ip-app in ips-app }
+%{~ for ip-app in ips-app }
 ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
