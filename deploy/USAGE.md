@@ -1,4 +1,4 @@
-# Usage Guide for V2
+# Usage Guide for V1.0.0
 
 This document aims to describe the basic process to get started with V2 of the codebase.
 It does not go into detail about how to customize the code, but instead focuses on demonstrating the end-to-end lifecycle.
