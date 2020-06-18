@@ -199,7 +199,8 @@
     "os": {
       "publisher": "",
       "offer": "",
-      "sku": ""
+      "sku": "",
+      "version": ""
     },
     "vm_config": {
       "app": "",

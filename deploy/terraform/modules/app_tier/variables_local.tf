@@ -29,11 +29,13 @@ locals {
   }
 
   # OS image for all Application Tier VMs
-  os = lookup(var.application, "os", {
+  os = merge({
+    version = "latest"
+  }, lookup(var.application, "os", {
     publisher = "suse"
     offer     = "sles-sap-12-sp5"
     sku       = "gen1"
-  })
+  }))
 
   # Default VM config should be merged with any the user passes in
   app_sku_map = merge(
