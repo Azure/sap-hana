@@ -80,4 +80,12 @@ locals {
     62000 + tonumber(local.scs_instance_number),
     62100 + tonumber(local.ers_instance_number)
   ]
+
+  # Define options for Data Disks
+  data-disk = {
+    size_gb           = 512
+    disk_type         = "Premium_LRS"
+    caching           = "None"
+    write_accelerator = false
+  }
 }

@@ -61,3 +61,23 @@ resource "azurerm_linux_virtual_machine" "scs" {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
+
+# Creates managed data disk
+resource "azurerm_managed_disk" "scs" {
+  count                = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
+  name                 = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-data"
+  location             = var.resource-group[0].location
+  resource_group_name  = var.resource-group[0].name
+  create_option        = "Empty"
+  storage_account_type = local.data-disk.disk_type
+  disk_size_gb         = local.data-disk.size_gb
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
+  count                     = local.enable_deployment ? length(azurerm_managed_disk.scs) : 0
+  managed_disk_id           = azurerm_managed_disk.scs[count.index].id
+  virtual_machine_id        = azurerm_linux_virtual_machine.scs[count.index].id
+  caching                   = local.data-disk.caching
+  write_accelerator_enabled = local.data-disk.write_accelerator
+  lun                       = 1
+}

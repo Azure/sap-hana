@@ -52,3 +52,23 @@ resource "azurerm_linux_virtual_machine" "app" {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
+
+# Creates managed data disk
+resource "azurerm_managed_disk" "app" {
+  count                = local.enable_deployment ? var.application.application_server_count : 0
+  name                 = "${upper(var.application.sid)}_app${format("%02d", count.index)}-data"
+  location             = var.resource-group[0].location
+  resource_group_name  = var.resource-group[0].name
+  create_option        = "Empty"
+  storage_account_type = local.data-disk.disk_type
+  disk_size_gb         = local.data-disk.size_gb
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "app" {
+  count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
+  managed_disk_id           = azurerm_managed_disk.app[count.index].id
+  virtual_machine_id        = azurerm_linux_virtual_machine.app[count.index].id
+  caching                   = local.data-disk.caching
+  write_accelerator_enabled = local.data-disk.write_accelerator
+  lun                       = 1
+}
