@@ -67,6 +67,9 @@ ${ip-scs}  ansible_connection=ssh ansible_user=${application.authentication.user
 %{ for ip-app in ips-app }
 ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
+%{ for ip-web in ips-web }
+${ip-web}  ansible_connection=ssh ansible_user=${application.authentication.username}
+%{~ endfor }
 
 [hanadbnodes]
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }
@@ -86,4 +89,9 @@ ${ip-scs}  ansible_connection=ssh ansible_user=${application.authentication.user
 [app]
 %{~ for ip-app in ips-app }
 ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.username}
+%{~ endfor }
+
+[web]
+%{~ for ip-web in ips-web }
+${ip-web}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
