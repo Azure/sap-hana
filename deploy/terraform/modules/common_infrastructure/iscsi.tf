@@ -32,7 +32,7 @@ data "azurerm_subnet" "iscsi" {
 resource "azurerm_network_security_group" "iscsi" {
   count               = local.iscsi.iscsi_count == 0 ? 0 : (local.subnet_iscsi.nsg.is_existing ? 0 : 1)
   name                = local.subnet_iscsi.nsg.name
-  location            = var.infrastructure.region
+  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
 }
 
@@ -66,7 +66,7 @@ iSCSI device IP address range: .4 -
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi.iscsi_count
   name                = "iscsi-${format("%02d", count.index)}-nic"
-  location            = var.infrastructure.region
+  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
 
   ip_configuration {
@@ -88,7 +88,7 @@ resource "azurerm_network_interface_security_group_association" "iscsi" {
 resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi.iscsi_count
   name                            = "iscsi-${format("%02d", count.index)}"
-  location                        = var.infrastructure.region
+  location                        = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name             = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
   network_interface_ids           = [azurerm_network_interface.iscsi[count.index].id]
   size                            = local.iscsi.size
