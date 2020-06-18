@@ -7,9 +7,9 @@ resource "null_resource" "prepare_rti_files" {
   depends_on = [module.output_files.ansible-inventory, module.output_files.output-json, module.jumpbox.prepare-rti]
 
   triggers = {
-    hosts  = sha1(local.file_hosts)
-    hosts2 = sha1(local.file_hosts2)
-    output = sha1(local.file_output)
+    hosts     = sha1(local.file_hosts)
+    hosts_yml = sha1(local.file_hosts_yml)
+    output    = sha1(local.file_output)
   }
 
   connection {
