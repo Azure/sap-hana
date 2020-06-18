@@ -87,3 +87,10 @@ all:
         hanadbnodes:
         scs:
         app:
+
+    # Localhost provisioning
+    local:
+      hosts:
+        localhost:
+          ansible_connection: "local"
+          ansible_user:       "azureadm"
