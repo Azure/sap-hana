@@ -8,6 +8,7 @@ resource "null_resource" "prepare-rti-files" {
 
   triggers = {
     hosts  = sha1(local.file_hosts)
+    hosts2 = sha1(local.file_hosts2)
     output = sha1(local.file_output)
   }
 
