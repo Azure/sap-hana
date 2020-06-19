@@ -187,6 +187,7 @@
     "ers_instance_number": "02",
     "scs_high_availability": false,
     "application_server_count": 1,
+    "webdispatcher_count": 1,
     "authentication": {
       "type": "key",
       "username": "azureadm"
