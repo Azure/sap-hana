@@ -9,8 +9,7 @@
 #
 ###############################################################################
 
-
-readonly target_path="deploy"
+readonly target_path="${SCRIPTPATH}/../deploy"
 # location of the input JSON templates
 readonly target_template_dir="${target_path}/template_samples"
 

@@ -16,7 +16,8 @@ set -o errexit
 set -o nounset
 
 # import common functions that are reused across scripts
-source util/common_utils.sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+source "${SCRIPTPATH}/common_utils.sh"
 
 
 function main()

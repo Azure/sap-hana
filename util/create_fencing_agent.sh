@@ -13,7 +13,8 @@
 set -o nounset
 
 # import common functions that are reused across scripts
-source util/common_utils.sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+source "${SCRIPTPATH}/common_utils.sh"
 
 # name of the script where the auth info will be saved
 readonly auth_script="set-clustering-auth-${1-}.sh"
@@ -72,7 +73,7 @@ function lookup_subscription_id()
 	local subscription_id_status=$?
 	continue_or_error_and_exit $subscription_id_status "There was a problem obtaining the Azure subscription ID. If you are logged into Azure CLI, then it could relate to lack of network connectivity."
 
-	# Return the result	
+	# Return the result
 	echo -e "${subscription_id}"
 }
 

@@ -16,7 +16,8 @@ set -o errexit
 set -o nounset
 
 # import common functions that are reused across scripts
-source util/common_utils.sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+source "${SCRIPTPATH}/common_utils.sh"
 
 
 function main()
@@ -43,7 +44,7 @@ function display_tool_version()
 	local tool="$1"
 
 	# The following filtering command should extract the tool name and a 3-part semantic version
-	# Note: Mac/OSX uses BSD sed by default that does not support [0-9]+ so use [0-9][0-9]* 
+	# Note: Mac/OSX uses BSD sed by default that does not support [0-9]+ so use [0-9][0-9]*
 	local filter_cmd="sed -e 's/^\([A-Za-z0-9-]*\).*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1 = \2/' -e 'tx' -e 'd' -e ':x'"
 
 	local tool_output
