@@ -28,35 +28,6 @@
   failed_when: hana_process_list_result.rc != 3
   changed_when: false
 
-- name: Check whether HANA has been installed as a single container (no SYSTEMDB)
-  become_user: "{{ sid_admin_user }}"
-  shell: >
-    source ~/.bashrc ;
-    {{ hdbsql_systemdb_command }} "SELECT DATABASE_NAME FROM SYS.M_DATABASES"
-  register: hana_container_status
-  changed_when: false
-  failed_when: false
-
-- name: Ensure systemdb fact is set
-  set_fact:
-    hana_has_system_db: "{{ ('SYSTEMDB' in hana_container_status.stdout) | bool }}"
-
-- name: Ensure tenant db fact is set
-  set_fact:
-    hana_has_tenant_db: "{{ (sid_upper in hana_container_status.stdout) | bool }}"
-  vars:
-    sid_upper: "{{ sid | upper }}"
-
-- name: Ensure failure with meaningful message if no {{ sid | upper }} tenant db
-  fail:
-    msg: |
-      Automated HANA System Replication configuration is only supported for systems with a SYSTEMDB
-      and multi-container systems where the tenant database is named as {{ sid | upper }}.
-      If your requirements differ, please raise a GitHub issue: https://github.com/Azure/sap-hana/issues/new/choose
-  # At the moment it's sufficient to check for a missing SYSTEMDB, since the
-  # code will cope with a missing tenant DB.
-  when: not hana_has_system_db
-
 - name: Check whether replication has already been set up
   become_user: "{{ sid_admin_user }}"
   shell: >
@@ -70,6 +41,39 @@
   set_fact:
     hana_system_replication_enabled: "{{ 'mode: none' not in hana_replication_status.stdout }}"
 
+- name: Check on the primary node whether installed HANA is single container or multi-container
+  # If HSR is already enabled, we cannot read from the secondary node
+  when: ansible_hostname == hana_database.nodes[0].dbname or not hana_system_replication_enabled
+  block:
+  - name: Check whether HANA has been installed as a single container (no SYSTEMDB)
+    become_user: "{{ sid_admin_user }}"
+    shell: >
+      source ~/.bashrc ;
+      {{ hdbsql_systemdb_command }} "SELECT DATABASE_NAME FROM SYS.M_DATABASES"
+    register: hana_container_status
+    changed_when: false
+    failed_when: false
+
+  - name: Ensure systemdb fact is set
+    set_fact:
+      hana_has_system_db: "{{ ('SYSTEMDB' in hana_container_status.stdout) | bool }}"
+
+  - name: Ensure tenant db fact is set
+    set_fact:
+      hana_has_tenant_db: "{{ (sid_upper in hana_container_status.stdout) | bool }}"
+    vars:
+      sid_upper: "{{ sid | upper }}"
+
+  - name: Ensure failure with meaningful message if no {{ sid | upper }} tenant db
+    fail:
+      msg: |
+        Automated HANA System Replication configuration is only supported for systems with a SYSTEMDB
+        and multi-container systems where the tenant database is named as {{ sid | upper }}.
+        If your requirements differ, please raise a GitHub issue: https://github.com/Azure/sap-hana/issues/new/choose
+    # At the moment it's sufficient to check for a missing SYSTEMDB, since the
+    # code will cope with a missing tenant DB.
+    when: not hana_has_system_db
+
 - name: Check that HANA DB SYSTEM user can access the SYSTEM database
   # If HSR is already enabled, we cannot read from the secondary node
   when: (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
@@ -82,7 +86,7 @@
 - name: Check that HANA DB SYSTEM user can access the tenant database {{ hana_tenant_database_name }}
   # If HSR is already enabled, we cannot read from the secondary node
   when:
-    - hana_has_tenant_db
+    - hana_has_tenant_db is defined and hana_has_tenant_db
     - (ansible_hostname == hana_database.nodes[0].dbname) or not hana_system_replication_enabled
   become_user: "{{ sid_admin_user }}"
   shell: >
