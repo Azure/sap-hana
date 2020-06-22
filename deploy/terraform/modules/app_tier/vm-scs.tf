@@ -49,7 +49,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
     publisher = local.os.publisher
     offer     = local.os.offer
     sku       = local.os.sku
-    version   = "latest"
+    version   = local.os.version
   }
 
   admin_ssh_key {
