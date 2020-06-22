@@ -17,7 +17,10 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 source "${SCRIPTPATH}/common_utils.sh"
 
 # name of the script where the auth info will be saved
-readonly auth_script="set-clustering-auth-${1-}.sh"
+readonly auth_script="export-clustering-sp-details.sh"
+
+# Terraform workspace to save the script into
+readonly terraform_workspace="$( terraform workspace show )"
 
 # link for service principal help
 readonly sp_link='https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli'
@@ -47,7 +50,7 @@ function main()
 	echo "A role has been created in the Azure subscription ${subscription_id}, with the name: ${service_principal_name}"
 	echo "A fencing agent has been created in Azure > App registrations, with the name: ${service_principal_name}"
 	echo "The role has been assigned to the fencing agent"
-	echo "The fencing agent authorization details can be found within the script: ${auth_script}"
+	echo "The fencing agent authorization details can be found within the script: ${terraform_workspace}/${auth_script}"
 	echo "The authorization details are copied to the RTI during Terraform provisioning for usage by Ansible."
 }
 
@@ -83,7 +86,7 @@ function create_fencing_agent_role()
 	local fencing_agent_role_name="$1"
 	local subscription_id="$2"
 
-	local fencing_agent_template_file='util/fencing_agent_role.json'
+	local fencing_agent_template_file="${SCRIPTPATH}/fencing_agent_role.json"
 
 	# Step 1 of 3: Replace tokens for ROLE_NAME and SUBSCRIPTION_ID in the role definition template
 
@@ -125,6 +128,8 @@ function create_service_principal_and_config_script()
 	local service_principal_name="$1"
 	local subscription_id="$2"
 
+	check_terraform_workspace_dir_does_not_exist
+
 	check_auth_script_does_not_exist
 
 	# ensure newlines in variable values are preserved
@@ -151,7 +156,7 @@ function create_service_principal_and_config_script()
 	client_secret=$(echo "${sp_details}" | grep password | sed -e 's/.*password.:.\(.*\),/\1/')
 
 	# create new script for authorization
-	cat <<- EOF > "${auth_script}"
+	cat <<- EOF > "${terraform_workspace}/${auth_script}"
 		export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=${subscription_id}
 		export SAP_HANA_FENCING_AGENT_TENANT_ID=${tenant_id}
 		export SAP_HANA_FENCING_AGENT_CLIENT_ID=${client_id}
@@ -185,11 +190,17 @@ function assign_fencing_agent_role_to_service_principal()
 }
 
 
+function check_terraform_workspace_dir_does_not_exist()
+{
+	[ ! -d "${terraform_workspace}" ]
+	mkdir -p "${terraform_workspace}"
+}
+
 function check_auth_script_does_not_exist()
 {
-	[ ! -f "${auth_script}" ]
+	[ ! -f "${terraform_workspace}/${auth_script}" ]
 	auth_exists=$?
-	continue_or_error_and_exit "$auth_exists" "Authorization file already exists: ${auth_script}. Please reuse, move, or remove it."
+	continue_or_error_and_exit "$auth_exists" "Authorization file already exists: ${terraform_workspace}/${auth_script}. Please reuse, move, or remove it."
 }
 
 
