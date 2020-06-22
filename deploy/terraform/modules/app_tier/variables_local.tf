@@ -29,11 +29,13 @@ locals {
   }
 
   # OS image for all Application Tier VMs
-  os = lookup(var.application, "os", {
+  os = merge({
+    version = "latest"
+  }, lookup(var.application, "os", {
     publisher = "suse"
     offer     = "sles-sap-12-sp5"
     sku       = "gen1"
-  })
+  }))
 
   # Default VM config should be merged with any the user passes in
   app_sku_map = merge(
@@ -80,4 +82,12 @@ locals {
     62000 + tonumber(local.scs_instance_number),
     62100 + tonumber(local.ers_instance_number)
   ]
+
+  # Define options for Data Disks
+  data-disk = {
+    size_gb           = 512
+    disk_type         = "Premium_LRS"
+    caching           = "None"
+    write_accelerator = false
+  }
 }

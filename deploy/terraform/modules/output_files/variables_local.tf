@@ -58,6 +58,10 @@ locals {
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
+  databases = [
+    for database in var.databases : database
+    if contains(["HANA"], database.platform)
+  ]
   dbnodes = flatten([
     for database in var.databases : flatten([
       [

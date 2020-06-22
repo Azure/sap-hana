@@ -32,7 +32,7 @@ resource "local_file" "output-json" {
         }
       ]
     },
-    "databases" = [for database in var.databases : {
+    "databases" = [for database in local.databases : {
       platform          = database.platform,
       db_version        = database.db_version,
       os                = database.os,
