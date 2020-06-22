@@ -1,7 +1,7 @@
 # NSG rule to deny internet access
 resource azurerm_network_security_rule webRule_internet {
   count                       = local.enable_deployment ? 1 : 0
-  name                        = "Internert"
+  name                        = "Internet"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Deny"
