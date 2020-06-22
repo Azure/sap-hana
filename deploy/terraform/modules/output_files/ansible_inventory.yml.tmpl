@@ -83,7 +83,7 @@ all:
           ansible_user:       "${application.authentication.username}"
 %{~ endfor }
 
-    # Groups below are collections of the above groups for easier refernce
+    # Groups below are collections of the above groups for easier reference
     all_jumpboxes:
       children:
         jumpboxes_windows:
