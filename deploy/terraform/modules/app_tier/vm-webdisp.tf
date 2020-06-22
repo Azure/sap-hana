@@ -98,7 +98,7 @@ resource "azurerm_linux_virtual_machine" "web" {
     publisher = local.os.publisher
     offer     = local.os.offer
     sku       = local.os.sku
-    version   = local.os.latest
+    version   = local.os.version
   }
 
   admin_ssh_key {

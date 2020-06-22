@@ -9,7 +9,3 @@ output "nics-app" {
 output "nics-web" {
   value = azurerm_network_interface.web
 }
-
-output "nics-web" {
-  value = azurerm_network_interface.web
-}
