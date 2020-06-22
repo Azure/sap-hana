@@ -55,9 +55,9 @@ locals {
 #############################################################################
 
 
-resource azurerm_network_interface "nic" {
+resource azurerm_network_interface "anydbnic" {
   count               = local.enable_deployment ? local.vm_count : 0
-  name                = format("%s-%s%02d-nic", local.prefix, var.role, (count.index + 1))
+  name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.prefix)
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
 
@@ -75,7 +75,7 @@ resource azurerm_network_interface "nic" {
 
 resource "azurerm_availability_set" "db-as" {
   count                        = local.enable_deployment ? 1 : 0
-  name                         = format("%s-%s-lb", local.prefix, var.role)
+  name                         = format("%s-%s-avset", var.role, local.prefix)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
@@ -87,12 +87,12 @@ resource "azurerm_availability_set" "db-as" {
 
 resource azurerm_linux_virtual_machine "main" {
   count                        = local.enable_deployment ? local.vm_count : 0
-  name                         = format("%s-%s%02d", local.prefix, var.role, (count.index + 1))
+  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.db-as[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
+  network_interface_ids        = [azurerm_network_interface.anydbnic[count.index].id]
   size                         = local.sku
 
   source_image_reference {
@@ -103,7 +103,7 @@ resource azurerm_linux_virtual_machine "main" {
   }
 
   os_disk {
-    name                 = format("%s-%s%02d-diskos", local.prefix, var.role, (count.index + 1))
+    name                 = format("%s-%s%02d-diskos", var.role, local.prefix, (count.index + 1))
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }

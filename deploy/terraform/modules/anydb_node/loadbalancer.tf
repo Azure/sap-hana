@@ -6,12 +6,12 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "anydb-lb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s-%s-lb", local.prefix, var.role)
+  name                = format("%s-%s-lb", var.role, local.prefix)
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name = format("%s-%s-lb-feip", local.prefix, var.role)
+    name = format("%s-%s-lb-feip", var.role, local.prefix)
 
     subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-anydb[0].id : azurerm_subnet.subnet-anydb[0].id
     private_ip_address_allocation = "Dynamic"
@@ -22,7 +22,7 @@ resource "azurerm_lb" "anydb-lb" {
 
 resource "azurerm_lb_backend_address_pool" "anydb-lb-back-pool" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s-%s-lb-bep", local.prefix, var.role)
+  name                = format("%s-%s-lb-bep", var.role, local.prefix)
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb-lb[0].id
 
@@ -32,8 +32,8 @@ resource "azurerm_lb_probe" "anydb-lb-health-probe" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb-lb[0].id
-  name                = format("%s-%s-lb-hpp", local.prefix, var.role)
-  port                = (local.dbplatform== "DB2") ? "62500" : "1521"
+  name                = format("%s-%s-lb-hpp", var.role, local.prefix)
+  port                = (local.dbplatform == "DB2") ? "62500" : "1521"
   protocol            = "Tcp"
   interval_in_seconds = 5
   number_of_probes    = 2
@@ -43,9 +43,9 @@ resource "azurerm_lb_probe" "anydb-lb-health-probe" {
 # Current behavior, it will try to add all VMs in the cluster into the backend pool, which would not work since we do not have availability sets created yet.
 # In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
 resource "azurerm_network_interface_backend_address_pool_association" "anydb-lb-nic-bep" {
-  count               = local.enable_deployment ? 1 : 0
-  network_interface_id    = azurerm_network_interface.nic[count.index].id
-  ip_configuration_name   = azurerm_network_interface.nic[count.index].ip_configuration[0].name
+  count                   = local.enable_deployment ? 1 : 0
+  network_interface_id    = azurerm_network_interface.anydbnic[count.index].id
+  ip_configuration_name   = azurerm_network_interface.anydbnic[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.anydb-lb-back-pool[0].id
 }
 
