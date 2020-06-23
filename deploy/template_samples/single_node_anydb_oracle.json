@@ -145,7 +145,16 @@
     "ers_instance_number": "02",
     "scs_high_availability": false,
     "application_server_count": 1,
-    "webdispatcher_count": 1
+    "webdispatcher_count": 1,
+    "authentication": {
+      "type": "key",
+      "username": "azureadm"
+    },
+    "os": {
+      "publisher": "suse",
+      "offer": "sles-sap-12-sp5",
+      "sku": "gen1"
+    }
   },
   "software": {
     "storage_account_sapbits": {
