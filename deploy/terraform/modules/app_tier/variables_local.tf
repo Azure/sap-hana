@@ -177,7 +177,7 @@ locals {
         disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
         size_gb           = lookup(disk_spec, "size_gb", 512)
         caching           = lookup(disk_spec, "caching", false)
-        write_accelerator = lookup(disk_spec, "wriate_accelerator", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
   ])
