@@ -50,6 +50,10 @@ variable "nics-app" {
   description = "List of NICs for the Application Instance VMs"
 }
 
+variable "nics-web" {
+  description = "List of NICs for the Web dispatcher VMs"
+}
+
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
@@ -86,4 +90,5 @@ locals {
   ])
   ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
   ips-app = [for key, value in var.nics-app : value.private_ip_address]
+  ips-web = [for key, value in var.nics-web : value.private_ip_address]
 }

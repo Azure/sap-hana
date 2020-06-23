@@ -90,4 +90,5 @@ module "output_files" {
   hdb-sids                     = module.hdb_node.hdb-sids
   nics-scs                     = module.app_tier.nics-scs
   nics-app                     = module.app_tier.nics-app
+  nics-web                     = module.app_tier.nics-web
 }
