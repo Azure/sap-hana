@@ -193,6 +193,7 @@
     "scs_high_availability": true,
     "application_server_count": 1,
     "webdispatcher_count": 1,
+    "vm_sizing": "",
     "authentication": {
       "type": "",
       "username": ""
@@ -202,10 +203,6 @@
       "offer": "",
       "sku": "",
       "version": ""
-    },
-    "vm_config": {
-      "app": "",
-      "scs": ""
     }
   },
   "software": {

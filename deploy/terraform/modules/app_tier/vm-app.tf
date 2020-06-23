@@ -4,7 +4,7 @@ resource "azurerm_network_interface" "app" {
   name                          = "${upper(var.application.sid)}_app${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  enable_accelerated_networking = local.app_nic_accelerated_networking
+  enable_accelerated_networking = local.app_sizing.compute.accelerated_networking
 
   ip_configuration {
     name                          = "IPConfig1"
@@ -26,7 +26,7 @@ resource "azurerm_linux_virtual_machine" "app" {
   network_interface_ids        = [
     azurerm_network_interface.app[count.index].id
   ]
-  size                            = local.app_vm_size
+  size                            = local.app_sizing.compute.vm_size
   admin_username                  = var.application.authentication.username
   disable_password_authentication = true
 
@@ -60,15 +60,15 @@ resource "azurerm_managed_disk" "app" {
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.data-disk.disk_type
-  disk_size_gb         = local.data-disk.size_gb
+  storage_account_type = local.app_sizing.storage.disk_type
+  disk_size_gb         = local.app_sizing.storage.size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
   virtual_machine_id        = azurerm_linux_virtual_machine.app[count.index].id
-  caching                   = local.data-disk.caching
-  write_accelerator_enabled = local.data-disk.write_accelerator
+  caching                   = local.app_sizing.storage.caching
+  write_accelerator_enabled = local.app_sizing.storage.write_accelerator
   lun                       = 1
 }

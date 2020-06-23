@@ -161,6 +161,7 @@
     "scs_high_availability": true,
     "application_server_count": 1,
     "webdispatcher_count": 1,
+    "vm_sizing": "Default",
     "authentication": {
       "type": "key",
       "username": "azureadm"
