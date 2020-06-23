@@ -52,12 +52,13 @@ locals {
       "vm_size": "Standard_D4s_v3",
       "accelerated_networking": false
     },
-    "storage": {
+    "storage": [{
+      "name": "data",
       "disk_type": "Premium_LRS",
       "size_gb": 512,
       "caching": "None",
       "write_accelerator": false
-    }
+    }]
   })
 
   scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {
@@ -65,12 +66,13 @@ locals {
       "vm_size": "Standard_D4s_v3",
       "accelerated_networking": false
     },
-    "storage": {
+    "storage": [{
+      "name": "data",
       "disk_type": "Premium_LRS",
       "size_gb": 512,
       "caching": "None",
       "write_accelerator": false
-    }
+    }]
   })
 
   web_sizing = lookup(local.sizes.web, local.vm_sizing, {
@@ -78,12 +80,13 @@ locals {
       "vm_size": "Standard_D4s_v3",
       "accelerated_networking": false
     },
-    "storage": {
+    "storage": [{
+      "name": "data",
       "disk_type": "Premium_LRS",
       "size_gb": 512,
       "caching": "None",
       "write_accelerator": false
-    }
+    }]
   })
 
   # Ports used for specific ASCS, ERS and Web dispatcher
@@ -151,4 +154,44 @@ locals {
     62000 + tonumber(local.scs_instance_number),
     62100 + tonumber(local.ers_instance_number)
   ]
+
+  # Create list of disks per VM
+  app-data-disks = flatten([
+    for vm_count in range(var.application.application_server_count) : [
+      for disk_spec in local.app_sizing.storage : {
+        vm_index          = vm_count
+        name              = "${upper(var.application.sid)}_app${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
+      }
+    ]
+  ])
+
+  scs-data-disks = flatten([
+    for vm_count in (var.application.scs_high_availability ? range(2) : range(1)) : [
+      for disk_spec in local.scs_sizing.storage : {
+        vm_index          = vm_count
+        name              = "${upper(var.application.sid)}_scs${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
+      }
+    ]
+  ])
+
+  web-data-disks = flatten([
+    for vm_count in range(var.application.webdispatcher_count) : [
+      for disk_spec in local.web_sizing.storage : {
+        vm_index          = vm_count
+        name              = "${upper(var.application.sid)}_web${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
+      }
+    ]
+  ])
 }
