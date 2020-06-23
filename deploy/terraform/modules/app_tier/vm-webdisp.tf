@@ -4,7 +4,7 @@ resource "azurerm_network_interface" "web" {
   name                          = "${upper(var.application.sid)}_web${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  enable_accelerated_networking = local.web_nic_accelerated_networking
+  enable_accelerated_networking = local.web_sizing.compute.accelerated_networking
 
   ip_configuration {
     name                          = "IPConfig1"
@@ -26,7 +26,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   network_interface_ids = [
     azurerm_network_interface.web[count.index].id
   ]
-  size                            = local.web_vm_size
+  size                            = local.web_sizing.compute.vm_size
   admin_username                  = var.application.authentication.username
   disable_password_authentication = true
 

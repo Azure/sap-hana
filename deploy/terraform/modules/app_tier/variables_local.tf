@@ -14,8 +14,15 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
+# Imports Disk sizing sizing information
+locals {
+  sizes = jsondecode(file("${path.root}/../app_sizes.json"))
+}
+
 locals {
   enable_deployment = lookup(var.application, "enable_deployment", false)
+
+  vm_sizing = lookup(var.application, "vm_sizing", "Default")
 
   scs_instance_number = lookup(var.application, "scs_instance_number", "01")
   ers_instance_number = lookup(var.application, "ers_instance_number", "02")
@@ -40,24 +47,44 @@ locals {
   }))
 
   # Default VM config should be merged with any the user passes in
-  app_sku_map = merge(
-    {
-      app = "Standard_D4s_v3,false"
-      scs = "Standard_D4s_v3,false"
-      web = "Standard_D4s_v3,false"
+  app_sizing = lookup(local.sizes.app, local.vm_sizing, {
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
     },
-    lookup(var.application, "vm_config", {})
-  )
+    "storage": {
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
+    }
+  })
 
-  app_vm_size                    = element(split(",", lookup(local.app_sku_map, "app", false)), 0)
-  app_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "app", false)), 1)
+  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
+    },
+    "storage": {
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
+    }
+  })
 
-  scs_vm_size                    = element(split(",", lookup(local.app_sku_map, "scs", false)), 0)
-  scs_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "scs", false)), 1)
-
-  web_vm_size                    = element(split(",", lookup(local.app_sku_map, "web", false)), 0)
-  web_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "web", false)), 1)
-
+  web_sizing = lookup(local.sizes.web, local.vm_sizing, {
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
+    },
+    "storage": {
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
+    }
+  })
 
   # Ports used for specific ASCS, ERS and Web dispatcher
   lb-ports = {
@@ -124,12 +151,4 @@ locals {
     62000 + tonumber(local.scs_instance_number),
     62100 + tonumber(local.ers_instance_number)
   ]
-
-  # Define options for Data Disks
-  data-disk = {
-    size_gb           = 512
-    disk_type         = "Premium_LRS"
-    caching           = "None"
-    write_accelerator = false
-  }
 }
