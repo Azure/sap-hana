@@ -64,24 +64,6 @@
   },
   "jumpboxes": {
     "windows": [
-      {
-        "name": "jumpbox-windows",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "MicrosoftWindowsServer",
-          "offer": "WindowsServer",
-          "sku": "2016-Datacenter"
-        },
-        "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
-        },
-        "components": [
-        ]
-      }
     ],
     "linux": [
       {
@@ -92,7 +74,7 @@
         "os": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "16.04-LTS"
+          "sku": "18.04-LTS"
         },
         "authentication": {
           "type": "password",
@@ -110,7 +92,7 @@
         "os": {
           "publisher": "Canonical",
           "offer": "UbuntuServer",
-          "sku": "16.04-LTS"
+          "sku": "18.04-LTS"
         },
         "authentication": {
           "type": "key",
@@ -143,7 +125,7 @@
         "instance_number": "00"
       },
       "credentials": {
-        "db_systemdb_password": "Manager1",
+        "db_systemdb_password": "Manager1"
       },
       "components": {
       },
@@ -180,7 +162,7 @@
       "scenarios": [
         {
           "scenario_type": "DB",
-          "product_name": "HANA",
+          "product_name": "Oracle",
           "product_version": "2.0",
           "os_type": "LINUX_X64",
           "os_version": "SLES12.3",

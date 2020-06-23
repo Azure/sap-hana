@@ -158,5 +158,57 @@ locals {
 
   # List of ports for load balancer
   loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
+
+  dataDisks            = lookup(var.datadisks, local.size)
+  dataDisksSettingList = split(";", local.dataDisks)
+  nrOfDataDisks        = local.dataDisksSettingList[0]
+
+  #Helper variable for disk name enumeration
+  disks                        = range(local.nrOfDataDisks)
+  sizeOfDataDisks              = local.dataDisksSettingList[1]
+  nameOfDataDisks              = local.dataDisksSettingList[2]
+  skuOfDataDisks               = local.dataDisksSettingList[3]
+  cachingOfDataDisks           = local.dataDisksSettingList[4]
+  writeAcceleratorForDataDisks = local.dataDisksSettingList[5]
+
+  #Data Disks
+
+  allDataDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.disks : {
+    name                    = format("%s%s%02d", vm.name, local.nameOfDataDisks, disk + 1)
+    sku                     = local.skuOfDataDisks
+    writeAcceleratorEnabled = local.writeAcceleratorForDataDisks
+    diskSizeGB              = local.sizeOfDataDisks
+    caching                 = local.cachingOfDataDisks
+    lun                     = disk
+    vmID                    = vm.id
+  }]])
+
+  #Log Disks
+
+  logDisksData        = lookup(var.logdisks, local.size)
+  logDisksSettingList = split(";", local.logDisksData)
+  nrOfLogDisks        = local.logDisksSettingList[0]
+  #Helper variable for disk name enumeration
+  logDisks                    = range(local.nrOfLogDisks)
+  sizeOfLogDisks              = local.logDisksSettingList[1]
+  nameOfLogDisks              = local.logDisksSettingList[2]
+  skuOfLogDisks               = local.logDisksSettingList[3]
+  cachingOfLogDisks           = local.logDisksSettingList[4]
+  writeAcceleratorForLogDisks = local.logDisksSettingList[5]
+
+  allLogDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.logDisks : {
+    name                    = format("%s%s%02d", vm.name, local.nameOfLogDisks, disk + 1)
+    sku                     = local.skuOfLogDisks
+    writeAcceleratorEnabled = local.writeAcceleratorForLogDisks
+    diskSizeGB              = local.sizeOfLogDisks
+    caching                 = local.cachingOfLogDisks
+    lun                     = disk + local.nrOfDataDisks
+    vmID                    = vm.id
+  }]])
+
+  #VM SKU
+
+  sku = lookup(var.skus, local.size)
+
 }
 
