@@ -64,20 +64,20 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "scs" {
-  count                = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                 = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-data"
+  count                = local.enable_deployment ? length(local.scs-data-disks) : 0
+  name                 = local.scs-data-disks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.scs_sizing.storage.disk_type
-  disk_size_gb         = local.scs_sizing.storage.size_gb
+  storage_account_type = local.scs-data-disks[count.index].disk_type
+  disk_size_gb         = local.scs-data-disks[count.index].size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
-  count                     = local.enable_deployment ? length(azurerm_managed_disk.scs) : 0
+  count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
   managed_disk_id           = azurerm_managed_disk.scs[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.scs[count.index].id
-  caching                   = local.scs_sizing.storage.caching
-  write_accelerator_enabled = local.scs_sizing.storage.write_accelerator
-  lun                       = 1
+  virtual_machine_id        = azurerm_linux_virtual_machine.scs[local.scs-data-disks[count.index].vm_index].id
+  caching                   = local.scs-data-disks[count.index].caching
+  write_accelerator_enabled = local.scs-data-disks[count.index].write_accelerator
+  lun                       = count.index
 }
