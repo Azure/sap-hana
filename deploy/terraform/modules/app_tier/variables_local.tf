@@ -40,52 +40,52 @@ locals {
   # OS image for all Application Tier VMs
   os = merge({
     version = "latest"
-    }, lookup(var.application, "os", {
-      publisher = "suse"
-      offer     = "sles-sap-12-sp5"
-      sku       = "gen1"
+  }, lookup(var.application, "os", {
+    publisher = "suse"
+    offer     = "sles-sap-12-sp5"
+    sku       = "gen1"
   }))
 
   # Default VM config should be merged with any the user passes in
   app_sizing = lookup(local.sizes.app, local.vm_sizing, {
-    "compute" : {
-      "vm_size" : "Standard_D4s_v3",
-      "accelerated_networking" : false
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
     },
-    "storage" : [{
-      "name" : "data",
-      "disk_type" : "Premium_LRS",
-      "size_gb" : 512,
-      "caching" : "None",
-      "write_accelerator" : false
+    "storage": [{
+      "name": "data",
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
     }]
   })
 
   scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {
-    "compute" : {
-      "vm_size" : "Standard_D4s_v3",
-      "accelerated_networking" : false
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
     },
-    "storage" : [{
-      "name" : "data",
-      "disk_type" : "Premium_LRS",
-      "size_gb" : 512,
-      "caching" : "None",
-      "write_accelerator" : false
+    "storage": [{
+      "name": "data",
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
     }]
   })
 
   web_sizing = lookup(local.sizes.web, local.vm_sizing, {
-    "compute" : {
-      "vm_size" : "Standard_D4s_v3",
-      "accelerated_networking" : false
+    "compute": {
+      "vm_size": "Standard_D4s_v3",
+      "accelerated_networking": false
     },
-    "storage" : [{
-      "name" : "data",
-      "disk_type" : "Premium_LRS",
-      "size_gb" : 512,
-      "caching" : "None",
-      "write_accelerator" : false
+    "storage": [{
+      "name": "data",
+      "disk_type": "Premium_LRS",
+      "size_gb": 512,
+      "caching": "None",
+      "write_accelerator": false
     }]
   })
 
@@ -156,7 +156,7 @@ locals {
   ]
 
   # Create list of disks per VM
-  app-data-disks = local.enable_deployment ? flatten([
+  app-data-disks = flatten([
     for vm_count in range(var.application.application_server_count) : [
       for disk_spec in local.app_sizing.storage : {
         vm_index          = vm_count
@@ -167,10 +167,10 @@ locals {
         write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
-  ]) : {}
+  ])
 
-  scs-data-disks = local.enable_deployment ? flatten([
-    for vm_count in(var.application.scs_high_availability ? range(2) : range(1)) : [
+  scs-data-disks = flatten([
+    for vm_count in (var.application.scs_high_availability ? range(2) : range(1)) : [
       for disk_spec in local.scs_sizing.storage : {
         vm_index          = vm_count
         name              = "${upper(var.application.sid)}_scs${format("%02d", vm_count)}-${disk_spec.name}"
@@ -180,9 +180,9 @@ locals {
         write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
-  ]) : {}
+  ])
 
-  web-data-disks = local.enable_deployment ? flatten([
+  web-data-disks = flatten([
     for vm_count in range(var.application.webdispatcher_count) : [
       for disk_spec in local.web_sizing.storage : {
         vm_index          = vm_count
@@ -193,5 +193,5 @@ locals {
         write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
-  ]) : {}
+  ])
 }
