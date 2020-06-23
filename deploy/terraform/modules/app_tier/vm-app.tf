@@ -55,20 +55,20 @@ resource "azurerm_linux_virtual_machine" "app" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
-  count                = local.enable_deployment ? var.application.application_server_count : 0
-  name                 = "${upper(var.application.sid)}_app${format("%02d", count.index)}-data"
+  count                = local.enable_deployment ? length(local.app-data-disks) : 0
+  name                 = local.app-data-disks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.app_sizing.storage.disk_type
-  disk_size_gb         = local.app_sizing.storage.size_gb
+  storage_account_type = local.app-data-disks[count.index].disk_type
+  disk_size_gb         = local.app-data-disks[count.index].size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.app[count.index].id
-  caching                   = local.app_sizing.storage.caching
-  write_accelerator_enabled = local.app_sizing.storage.write_accelerator
-  lun                       = 1
+  virtual_machine_id        = azurerm_linux_virtual_machine.app[local.app-data-disks[count.index].vm_index].id
+  caching                   = local.app-data-disks[count.index].caching
+  write_accelerator_enabled = local.app-data-disks[count.index].write_accelerator
+  lun                       = count.index
 }
