@@ -3,7 +3,7 @@
     "region": "westeurope",
     "resource_group": {
       "is_existing": "false",
-      "name": "test-we-anydb-rg"
+      "name": "test-anydb-ha-rg"
     },
     "ppg": {
       "is_existing": "false",
