@@ -1,4 +1,19 @@
 
+
+# AVAILABILITY SET ================================================================================================
+
+resource "azurerm_availability_set" "db-as" {
+  count                        = local.enable_deployment ? 1 : 0
+  name                         = format("%s-%s-avset", var.role, local.prefix)
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  platform_update_domain_count = 20
+  platform_fault_domain_count  = 2
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  managed                      = true
+}
+
+
 # Creates db subnet of SAP VNET
 resource "azurerm_subnet" "subnet-anydb" {
   count                = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_db.is_existing ? 0 : 1) : 0
@@ -37,3 +52,4 @@ resource "azurerm_subnet_network_security_group_association" "Associate-nsg-db" 
   subnet_id                 = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-anydb[0].id : azurerm_subnet.subnet-anydb[0].id
   network_security_group_id = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-anydb[0].id : azurerm_network_security_group.nsg-anydb[0].id
 }
+

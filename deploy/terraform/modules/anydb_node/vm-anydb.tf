@@ -21,21 +21,6 @@ resource azurerm_network_interface "anydbnic" {
   }
 }
 
-
-# AVAILABILITY SET ================================================================================================
-
-resource "azurerm_availability_set" "db-as" {
-  count                        = local.enable_deployment ? 1 : 0
-  name                         = format("%s-%s-avset", var.role, local.prefix)
-  location                     = var.resource-group[0].location
-  resource_group_name          = var.resource-group[0].name
-  platform_update_domain_count = 20
-  platform_fault_domain_count  = 2
-  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  managed                      = true
-}
-
-
 resource azurerm_linux_virtual_machine "main" {
   count                        = local.enable_deployment ? local.vm_count : 0
   name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
