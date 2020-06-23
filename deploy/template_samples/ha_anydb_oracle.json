@@ -118,7 +118,7 @@
   "databases": [
     {
       "platform": "Oracle",
-      "db_version": "2.00.043",
+      "db_version": "7.5.1",
       "os": {
         "publisher": "Oracle",
         "offer": "Oracle-Linux",
@@ -163,7 +163,7 @@
       "scenarios": [
         {
           "scenario_type": "DB",
-          "product_name": "HANA",
+          "product_name": "Oracle",
           "product_version": "2.0",
           "os_type": "LINUX_X64",
           "os_version": "SLES12.3",

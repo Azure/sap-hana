@@ -107,7 +107,7 @@
   "databases": [
     {
       "platform": "Oracle",
-      "db_version": "2.00.043",
+      "db_version": "7.5.1",
       "os": {
         "publisher": "Oracle",
         "offer": "Oracle-Linux",
@@ -131,7 +131,7 @@
       },
       "dbnodes": [
         {
-          "name": "hdb1",
+          "name": "odb1",
           "role": "worker"
         }
       ],
