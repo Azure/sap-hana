@@ -178,7 +178,7 @@
   ],
   "application": {
     "sid": "HN1",
-    "enable_deployment": false,
+    "enable_deployment": true,
     "scs_instance_number": "01",
     "ers_instance_number": "02",
     "scs_high_availability": false,
