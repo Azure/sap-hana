@@ -32,7 +32,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.scs[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  network_interface_ids        = [
+  network_interface_ids = [
     azurerm_network_interface.scs[count.index].id
   ]
   size                            = local.scs_sizing.compute.vm_size
@@ -74,7 +74,7 @@ resource "azurerm_managed_disk" "scs" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
-  count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
+  count                     = local.enable_deployment ? length(azurerm_managed_disk.scs) : 0
   managed_disk_id           = azurerm_managed_disk.scs[count.index].id
   virtual_machine_id        = azurerm_linux_virtual_machine.scs[local.scs-data-disks[count.index].vm_index].id
   caching                   = local.scs-data-disks[count.index].caching
