@@ -47,47 +47,11 @@ locals {
   }))
 
   # Default VM config should be merged with any the user passes in
-  app_sizing = lookup(local.sizes.app, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
-    },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
-    }]
-  })
+  app_sizing = lookup(local.sizes.app, local.vm_sizing, {})
 
-  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
-    },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
-    }]
-  })
+  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {})
 
-  web_sizing = lookup(local.sizes.web, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
-    },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
-    }]
-  })
+  web_sizing = lookup(local.sizes.web, local.vm_sizing, {})
 
   # Ports used for specific ASCS, ERS and Web dispatcher
   lb-ports = {
