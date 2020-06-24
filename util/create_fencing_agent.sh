@@ -61,7 +61,7 @@ function check_command_line_arguments()
 
 	# Check there's just a single argument provided
 	if [[ ${args_count} -ne 1 ]]; then
-		error_and_exit "You must specify a single command line argument for the SAP SID. For example: $0 HN1"
+		error_and_exit "You must specify a single command line argument for the SAP SID. For example: HN1"
 	fi
 }
 
