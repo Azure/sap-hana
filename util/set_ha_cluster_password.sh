@@ -55,6 +55,9 @@ function edit_json_template_for_ha_cluster_password()
 	local ha_cluster_password="$1"
 	local json_template_name="$2"
 
+	# Escape the ha_cluster_password
+	ha_cluster_password=$(get_escaped_string "${ha_cluster_password}")
+
 	# the JSON path to update in jq format
 	local ha_cluster_password_path='"databases", ( .databases | map(.platform) | index("HANA") ), "credentials", "ha_cluster_password"'
 
