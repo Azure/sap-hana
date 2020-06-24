@@ -61,6 +61,7 @@ locals {
   }])
   loadbalancer = try(local.hdb.loadbalancer, {})
 
+  # Update HANA database information with defaults
   hana_database = merge(local.hdb,
     { db_version = local.hdb_version },
     { os = local.hdb_os },
