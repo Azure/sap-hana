@@ -1,24 +1,24 @@
 {
-  "infrastructure" : {
-      "resource_group" : {
-          "name" : "var-rg-name"
-      },
-      "vnets": {
-        "sap": {
-          "subnet_iscsi": {
+  "infrastructure": {
+    "resource_group": {
+      "name": "var-rg-name"
+    },
+    "vnets": {
+      "sap": {
+        "subnet_iscsi": {
+          "is_existing": "false",
+          "name": "subnet-iscsi",
+          "prefix": "10.1.4.0/24",
+          "nsg": {
             "is_existing": "false",
-            "name": "subnet-iscsi",
-            "prefix": "10.1.4.0/24",
-            "nsg": {
-              "is_existing": "false",
-              "name": "nsg-iscsi"
-            }
+            "name": "nsg-iscsi"
           }
         }
-      },
-      "iscsi": {
+      }
+    },
+    "iscsi": {
       "iscsi_count": 1,
-      "size":"Standard_D2s_v3",
+      "size": "Standard_D2s_v3",
       "os": {
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
@@ -30,10 +30,10 @@
       }
     }
   },
-  "databases" : [
+  "databases": [
     {
-      "high_availability" : true,
-      "credentials":{
+      "high_availability": true,
+      "credentials": {
         "ha_cluster_password": "ASecurePa55w0rd"
       },
       "dbnodes": [
@@ -51,5 +51,10 @@
         }
       ]
     }
-  ]
+  ],
+  "application": {
+    "webdispatcher_count": 2,
+    "scs_high_availability": true
+  }
 }
+
