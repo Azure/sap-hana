@@ -133,7 +133,7 @@ function terraform_plan()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "plan -var-file=${target_json} ${target_code}"
+	run_terraform_command "plan -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -154,7 +154,7 @@ function terraform_apply()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "apply -auto-approve -var-file=${target_json} ${target_code}"
+	run_terraform_command "apply -auto-approve -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -167,7 +167,7 @@ function terraform_destroy()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "destroy -auto-approve -var-file=${target_json} ${target_code}"
+	run_terraform_command "destroy -auto-approve -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -248,7 +248,7 @@ function run_terraform_command()
 	echo "${command}"
 	echo
 
-	${command}
+	eval "${command}"
 }
 
 
