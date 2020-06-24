@@ -14,19 +14,37 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
+# Set defaults
+locals {
+  application_sid          = lookup(var.application, "sid", "HN1")
+  enable_deployment        = lookup(var.application, "enable_deployment", false)
+  scs_instance_number      = lookup(var.application, "scs_instance_number", "01")
+  ers_instance_number      = lookup(var.application, "ers_instance_number", "02")
+  scs_high_availability    = lookup(var.application, "scs_high_availability", false)
+  application_server_count = lookup(var.application, "application_server_count", 0)
+  webdispatcher_count      = lookup(var.application, "webdispatcher_count", 0)
+  vm_sizing                = lookup(var.application, "vm_sizing", "Default")
+  authentication = lookup(var.application, "authentication",
+    {
+      "type"     = "key"
+      "username" = "azureadm"
+  })
+  # OS image for all Application Tier VMs
+  os = merge({
+    version = "latest"
+    }, lookup(var.application, "os", {
+      publisher = "suse"
+      offer     = "sles-sap-12-sp5"
+      sku       = "gen1"
+  }))
+}
+
 # Imports Disk sizing sizing information
 locals {
   sizes = jsondecode(file("${path.root}/../app_sizes.json"))
 }
 
 locals {
-  enable_deployment = lookup(var.application, "enable_deployment", false)
-
-  vm_sizing = lookup(var.application, "vm_sizing", "Default")
-
-  scs_instance_number = lookup(var.application, "scs_instance_number", "01")
-  ers_instance_number = lookup(var.application, "ers_instance_number", "02")
-
   # Subnet IP Offsets
   # Note: First 4 IP addresses in a subnet are reserved by Azure
   ip_offsets = {
@@ -37,55 +55,46 @@ locals {
     web_vm = 4 + 20
   }
 
-  # OS image for all Application Tier VMs
-  os = merge({
-    version = "latest"
-  }, lookup(var.application, "os", {
-    publisher = "suse"
-    offer     = "sles-sap-12-sp5"
-    sku       = "gen1"
-  }))
-
   # Default VM config should be merged with any the user passes in
   app_sizing = lookup(local.sizes.app, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
+    "compute" : {
+      "vm_size" : "Standard_D4s_v3",
+      "accelerated_networking" : false
     },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
+    "storage" : [{
+      "name" : "data",
+      "disk_type" : "Premium_LRS",
+      "size_gb" : 512,
+      "caching" : "None",
+      "write_accelerator" : false
     }]
   })
 
   scs_sizing = lookup(local.sizes.scs, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
+    "compute" : {
+      "vm_size" : "Standard_D4s_v3",
+      "accelerated_networking" : false
     },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
+    "storage" : [{
+      "name" : "data",
+      "disk_type" : "Premium_LRS",
+      "size_gb" : 512,
+      "caching" : "None",
+      "write_accelerator" : false
     }]
   })
 
   web_sizing = lookup(local.sizes.web, local.vm_sizing, {
-    "compute": {
-      "vm_size": "Standard_D4s_v3",
-      "accelerated_networking": false
+    "compute" : {
+      "vm_size" : "Standard_D4s_v3",
+      "accelerated_networking" : false
     },
-    "storage": [{
-      "name": "data",
-      "disk_type": "Premium_LRS",
-      "size_gb": 512,
-      "caching": "None",
-      "write_accelerator": false
+    "storage" : [{
+      "name" : "data",
+      "disk_type" : "Premium_LRS",
+      "size_gb" : 512,
+      "caching" : "None",
+      "write_accelerator" : false
     }]
   })
 
@@ -157,10 +166,10 @@ locals {
 
   # Create list of disks per VM
   app-data-disks = flatten([
-    for vm_count in range(var.application.application_server_count) : [
+    for vm_count in range(local.application_server_count) : [
       for disk_spec in local.app_sizing.storage : {
         vm_index          = vm_count
-        name              = "${upper(var.application.sid)}_app${format("%02d", vm_count)}-${disk_spec.name}"
+        name              = "${upper(local.application_sid)}_app${format("%02d", vm_count)}-${disk_spec.name}"
         disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
         size_gb           = lookup(disk_spec, "size_gb", 512)
         caching           = lookup(disk_spec, "caching", false)
@@ -170,10 +179,10 @@ locals {
   ])
 
   scs-data-disks = flatten([
-    for vm_count in (var.application.scs_high_availability ? range(2) : range(1)) : [
+    for vm_count in(local.scs_high_availability ? range(2) : range(1)) : [
       for disk_spec in local.scs_sizing.storage : {
         vm_index          = vm_count
-        name              = "${upper(var.application.sid)}_scs${format("%02d", vm_count)}-${disk_spec.name}"
+        name              = "${upper(local.application_sid)}_scs${format("%02d", vm_count)}-${disk_spec.name}"
         disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
         size_gb           = lookup(disk_spec, "size_gb", 512)
         caching           = lookup(disk_spec, "caching", false)
@@ -183,10 +192,10 @@ locals {
   ])
 
   web-data-disks = flatten([
-    for vm_count in range(var.application.webdispatcher_count) : [
+    for vm_count in range(local.webdispatcher_count) : [
       for disk_spec in local.web_sizing.storage : {
         vm_index          = vm_count
-        name              = "${upper(var.application.sid)}_web${format("%02d", vm_count)}-${disk_spec.name}"
+        name              = "${upper(local.application_sid)}_web${format("%02d", vm_count)}-${disk_spec.name}"
         disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
         size_gb           = lookup(disk_spec, "size_gb", 512)
         caching           = lookup(disk_spec, "caching", false)
