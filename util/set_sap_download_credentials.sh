@@ -57,6 +57,10 @@ function edit_json_template_for_sap_credentials()
 	local sap_password="$2"
 	local json_template_name="$3"
 
+	# Escape the SAP Credentials
+	sap_username=$(get_escaped_string "${sap_username}")
+	sap_password=$(get_escaped_string "${sap_password}")
+
 	# these are the JSON path in jq format
 	local sap_username_json_path='"software", "downloader", "credentials", "sap_user"'
 	local sap_password_json_path='"software", "downloader", "credentials", "sap_password"'
