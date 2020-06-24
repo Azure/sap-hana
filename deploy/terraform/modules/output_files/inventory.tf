@@ -46,16 +46,17 @@ resource "local_file" "output-json" {
       xsa               = database.xsa,
       shine             = database.shine,
       nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
-        dbname       = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name
+        dbname       = local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name
         ip_admin_nic = ip-dbnode-admin,
         ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
-        role         = local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
-        } if local.dbnodes[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
+        role         = local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
+        } if local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ],
       loadbalancer = {
-        frontend_ip = var.loadbalancers[index(var.hdb-sids, database.instance.sid)].private_ip_address
+        frontend_ip = var.loadbalancers[0].private_ip_address
       }
       }
+      if database != {}
     ],
     "software" = {
       "storage_account_sapbits" = {
@@ -83,7 +84,7 @@ resource "local_file" "ansible-inventory" {
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,
     ips-dbnodes-db        = local.ips-dbnodes-db,
-    dbnodes               = local.dbnodes,
+    dbnodes               = local.hdb_vms,
     application           = var.application,
     ips-scs               = local.ips-scs,
     ips-app               = local.ips-app,
@@ -104,7 +105,7 @@ resource "local_file" "ansible-inventory-yml" {
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
     ips-dbnodes-admin     = local.ips-dbnodes-admin,
     ips-dbnodes-db        = local.ips-dbnodes-db,
-    dbnodes               = local.dbnodes,
+    dbnodes               = local.hdb_vms,
     application           = var.application,
     ips-scs               = local.ips-scs,
     ips-app               = local.ips-app,
