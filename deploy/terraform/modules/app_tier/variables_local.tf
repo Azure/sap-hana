@@ -166,7 +166,7 @@ locals {
 
   # Create list of disks per VM
   app-data-disks = flatten([
-    for vm_count in range(var.application.application_server_count) : [
+    for vm_count in range(local.application_server_count) : [
       for disk_spec in local.app_sizing.storage : {
         vm_index          = vm_count
         name              = "${upper(local.application_sid)}_app${format("%02d", vm_count)}-${disk_spec.name}"
@@ -192,7 +192,7 @@ locals {
   ])
 
   web-data-disks = flatten([
-    for vm_count in range(var.application.webdispatcher_count) : [
+    for vm_count in range(local.webdispatcher_count) : [
       for disk_spec in local.web_sizing.storage : {
         vm_index          = vm_count
         name              = "${upper(local.application_sid)}_web${format("%02d", vm_count)}-${disk_spec.name}"
