@@ -50,6 +50,9 @@ function display_tool_version()
 	# Note: Mac/OSX uses BSD sed by default that does not support [0-9]+ so use [0-9][0-9]*
 	local filter_cmd="sed -e 's/^\([A-Za-z0-9-]*\).*\([0-9][0-9]*\.[0-9][0-9]*[\.-][0-9][0-9]*\).*/\2/' -e 'tx' -e 'd' -e ':x'"
 
+	# jq does not conform to Semver
+	[[ "$tool" == "jq" ]] && filter_cmd="sed -e 's/^\jq-\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/' -e 'tx' -e 'd' -e ':x'"
+
 	local tool_output
 	# Get first line of version output and truncate spaces
 	tool_output=$(eval "${tool} --version | head -1 | tr -s ' ' | ${filter_cmd}")
