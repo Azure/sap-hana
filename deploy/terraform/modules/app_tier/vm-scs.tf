@@ -1,7 +1,7 @@
 # Create SCS NICs
 resource "azurerm_network_interface" "scs" {
-  count                         = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                          = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-nic"
+  count                         = local.enable_deployment ? (local.scs_high_availability ? 2 : 1) : 0
+  name                          = "${upper(local.application_sid)}_scs${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
   enable_accelerated_networking = local.scs_sizing.compute.accelerated_networking
@@ -25,9 +25,9 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
 
 # Create the SCS VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
-  count                        = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                         = "${upper(var.application.sid)}_scs${format("%02d", count.index)}"
-  computer_name                = "${lower(var.application.sid)}scs${format("%02d", count.index)}"
+  count                        = local.enable_deployment ? (local.scs_high_availability ? 2 : 1) : 0
+  name                         = "${upper(local.application_sid)}_scs${format("%02d", count.index)}"
+  computer_name                = "${lower(local.application_sid)}scs${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.scs[0].id
@@ -36,11 +36,11 @@ resource "azurerm_linux_virtual_machine" "scs" {
     azurerm_network_interface.scs[count.index].id
   ]
   size                            = local.scs_sizing.compute.vm_size
-  admin_username                  = var.application.authentication.username
+  admin_username                  = local.authentication.username
   disable_password_authentication = true
 
   os_disk {
-    name                 = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-osDisk"
+    name                 = "${upper(local.application_sid)}_scs${format("%02d", count.index)}-osDisk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -53,7 +53,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
   }
 
   admin_ssh_key {
-    username   = var.application.authentication.username
+    username   = local.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 
