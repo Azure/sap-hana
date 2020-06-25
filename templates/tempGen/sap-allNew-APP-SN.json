@@ -1,0 +1,15 @@
+{
+        "infrastructure": {
+                "resource_group": {
+                        "name": "var-rg-name"
+                }
+        },
+        "application": {
+                "enable_deployment": true
+        },
+        "databases": [
+                {
+                        "platform": "NONE"
+                }
+        ]
+}

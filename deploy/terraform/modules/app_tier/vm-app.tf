@@ -1,10 +1,10 @@
 # Create Application NICs
 resource "azurerm_network_interface" "app" {
-  count                         = local.enable_deployment ? var.application.application_server_count : 0
-  name                          = "${upper(var.application.sid)}_app${format("%02d", count.index)}-nic"
+  count                         = local.enable_deployment ? local.application_server_count : 0
+  name                          = "${upper(local.application_sid)}_app${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  enable_accelerated_networking = local.app_nic_accelerated_networking
+  enable_accelerated_networking = local.app_sizing.compute.accelerated_networking
 
   ip_configuration {
     name                          = "IPConfig1"
@@ -16,22 +16,22 @@ resource "azurerm_network_interface" "app" {
 
 # Create the Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
-  count                        = local.enable_deployment ? var.application.application_server_count : 0
-  name                         = "${upper(var.application.sid)}_app${format("%02d", count.index)}"
-  computer_name                = "${lower(var.application.sid)}app${format("%02d", count.index)}"
+  count                        = local.enable_deployment ? local.application_server_count : 0
+  name                         = "${upper(local.application_sid)}_app${format("%02d", count.index)}"
+  computer_name                = "${lower(local.application_sid)}app${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.app[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  network_interface_ids        = [
+  network_interface_ids = [
     azurerm_network_interface.app[count.index].id
   ]
-  size                            = local.app_vm_size
-  admin_username                  = var.application.authentication.username
+  size                            = local.app_sizing.compute.vm_size
+  admin_username                  = local.authentication.username
   disable_password_authentication = true
 
   os_disk {
-    name                 = "${upper(var.application.sid)}_app${format("%02d", count.index)}-osDisk"
+    name                 = "${upper(local.application_sid)}_app${format("%02d", count.index)}-osDisk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -44,7 +44,7 @@ resource "azurerm_linux_virtual_machine" "app" {
   }
 
   admin_ssh_key {
-    username   = var.application.authentication.username
+    username   = local.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 
@@ -55,20 +55,20 @@ resource "azurerm_linux_virtual_machine" "app" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
-  count                = local.enable_deployment ? var.application.application_server_count : 0
-  name                 = "${upper(var.application.sid)}_app${format("%02d", count.index)}-data"
+  count                = local.enable_deployment ? length(local.app-data-disks) : 0
+  name                 = local.app-data-disks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.data-disk.disk_type
-  disk_size_gb         = local.data-disk.size_gb
+  storage_account_type = local.app-data-disks[count.index].disk_type
+  disk_size_gb         = local.app-data-disks[count.index].size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.app[count.index].id
-  caching                   = local.data-disk.caching
-  write_accelerator_enabled = local.data-disk.write_accelerator
-  lun                       = 1
+  virtual_machine_id        = azurerm_linux_virtual_machine.app[local.app-data-disks[count.index].vm_index].id
+  caching                   = local.app-data-disks[count.index].caching
+  write_accelerator_enabled = local.app-data-disks[count.index].write_accelerator
+  lun                       = count.index
 }

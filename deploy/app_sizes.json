@@ -1,0 +1,47 @@
+{
+  "app": {
+    "Default": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [{
+        "name": "data",
+        "disk_type": "Premium_LRS",
+        "size_gb": 512,
+        "caching": "None",
+        "write_accelerator": false
+      }]
+    }
+  },
+  "scs": {
+    "Default": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [{
+        "name": "data",
+        "disk_type": "Premium_LRS",
+        "size_gb": 512,
+        "caching": "None",
+        "write_accelerator": false
+      }]
+    }
+  },
+  "web": {
+    "Default": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [{
+        "name": "data",
+        "disk_type": "Premium_LRS",
+        "size_gb": 512,
+        "caching": "None",
+        "write_accelerator": false
+      }]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+        "infrastructure": {
+                "resource_group": {
+                        "name": "var-rg-name"
+                }
+        },
+        "application": {
+                "enable_deployment": true,
+                "scs_high_availability": true,
+                "webdispatcher_count": 2
+        },
+        "databases": [
+                {
+                        "platform": "NONE"
+                }
+        ]
+}

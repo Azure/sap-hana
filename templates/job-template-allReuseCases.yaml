@@ -3,6 +3,38 @@ parameters:
   osImage: ''
 
 jobs:
+- job: createAllNew_APP_SN_${{parameters.osVersion}}
+  timeoutInMinutes: 60
+  variables:
+    scenario: sap-allNew-APP-SN
+    testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
+  steps:
+  - template: test-case-template-update.yaml
+    parameters:
+      scenario: $(scenario)
+      testCaseName: $(testcase)
+      placeHolder: var-rg-name
+      value: $(testcase)
+  - template: terraform-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
+      osImage: ${{parameters.osImage}}
+- job: createAllNew_APP_HA_${{parameters.osVersion}}
+  timeoutInMinutes: 60
+  variables:
+    scenario: sap-allNew-APP-HA
+    testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
+  steps:
+  - template: test-case-template-update.yaml
+    parameters:
+      scenario: $(scenario)
+      testCaseName: $(testcase)
+      placeHolder: var-rg-name
+      value: $(testcase)
+  - template: terraform-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
+      osImage: ${{parameters.osImage}}
 - job: createAllNew_SN_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
@@ -19,6 +51,9 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
+  - template: ansible-deployment-steps.yaml
+    parameters:
+      testCaseName: $(testcase)
 - job: createAllNew_HA_${{parameters.osVersion}}
   timeoutInMinutes: 180
   variables:
@@ -39,7 +74,7 @@ jobs:
     parameters:
       testCaseName: $(testcase)
 - job: reuseRG_SN_${{parameters.osVersion}}
-  timeoutInMinutes: 180
+  timeoutInMinutes: 60
   variables:
     scenario: sap-reuseRG-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
@@ -64,12 +99,9 @@ jobs:
     parameters:
       testCaseName: $(testcase)
       osImage: ${{parameters.osImage}}
-  - template: ansible-deployment-steps.yaml
-    parameters:
-      testCaseName: $(testcase)
 - job: reuseVnet_SN_${{parameters.osVersion}}
   dependsOn: createAllNew_SN_${{parameters.osVersion}}
-  timeoutInMinutes: 180
+  timeoutInMinutes: 60
   variables:
     scenario: sap-reuseVNET-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)

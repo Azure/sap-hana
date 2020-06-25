@@ -1,10 +1,10 @@
 # Create SCS NICs
 resource "azurerm_network_interface" "scs" {
-  count                         = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                          = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-nic"
+  count                         = local.enable_deployment ? (local.scs_high_availability ? 2 : 1) : 0
+  name                          = "${upper(local.application_sid)}_scs${format("%02d", count.index)}-nic"
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
-  enable_accelerated_networking = local.scs_nic_accelerated_networking
+  enable_accelerated_networking = local.scs_sizing.compute.accelerated_networking
 
   ip_configuration {
     name                          = "IPConfig1"
@@ -25,22 +25,22 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
 
 # Create the SCS VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
-  count                        = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                         = "${upper(var.application.sid)}_scs${format("%02d", count.index)}"
-  computer_name                = "${lower(var.application.sid)}scs${format("%02d", count.index)}"
+  count                        = local.enable_deployment ? (local.scs_high_availability ? 2 : 1) : 0
+  name                         = "${upper(local.application_sid)}_scs${format("%02d", count.index)}"
+  computer_name                = "${lower(local.application_sid)}scs${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.scs[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  network_interface_ids        = [
+  network_interface_ids = [
     azurerm_network_interface.scs[count.index].id
   ]
-  size                            = local.scs_vm_size
-  admin_username                  = var.application.authentication.username
+  size                            = local.scs_sizing.compute.vm_size
+  admin_username                  = local.authentication.username
   disable_password_authentication = true
 
   os_disk {
-    name                 = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-osDisk"
+    name                 = "${upper(local.application_sid)}_scs${format("%02d", count.index)}-osDisk"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -53,7 +53,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
   }
 
   admin_ssh_key {
-    username   = var.application.authentication.username
+    username   = local.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 
@@ -64,20 +64,20 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "scs" {
-  count                = local.enable_deployment ? (var.application.scs_high_availability ? 2 : 1) : 0
-  name                 = "${upper(var.application.sid)}_scs${format("%02d", count.index)}-data"
+  count                = local.enable_deployment ? length(local.scs-data-disks) : 0
+  name                 = local.scs-data-disks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.data-disk.disk_type
-  disk_size_gb         = local.data-disk.size_gb
+  storage_account_type = local.scs-data-disks[count.index].disk_type
+  disk_size_gb         = local.scs-data-disks[count.index].size_gb
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.scs) : 0
   managed_disk_id           = azurerm_managed_disk.scs[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.scs[count.index].id
-  caching                   = local.data-disk.caching
-  write_accelerator_enabled = local.data-disk.write_accelerator
-  lun                       = 1
+  virtual_machine_id        = azurerm_linux_virtual_machine.scs[local.scs-data-disks[count.index].vm_index].id
+  caching                   = local.scs-data-disks[count.index].caching
+  write_accelerator_enabled = local.scs-data-disks[count.index].write_accelerator
+  lun                       = count.index
 }

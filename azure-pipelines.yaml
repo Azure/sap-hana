@@ -78,6 +78,8 @@ stages:
             RHEL7
           )
           scenario_list=(
+            sap-allNew-APP-SN
+            sap-allNew-APP-HA
             sap-allNew-SN
             sap-allNew-HA
             sap-reuseRG-SN
