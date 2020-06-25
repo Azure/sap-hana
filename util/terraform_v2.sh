@@ -120,7 +120,7 @@ function check_command_line_arguments_for_template()
 # Initialize Terraform using the target code
 function terraform_init()
 {
-	run_terraform_command "init ${target_code}"
+	run_terraform_command "init \"${target_code}\""
 }
 
 
