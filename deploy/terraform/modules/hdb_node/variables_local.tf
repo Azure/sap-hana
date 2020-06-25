@@ -23,8 +23,9 @@ locals {
   enable_deployment = (length(local.hdb_list) > 0) ? true : false
 
   # Filter the list of databases to only HANA platform entries
-  hdb         = try(local.hdb_list[0], {})
-  hdb_version = try(local.hdb.db_version, "2.00.043")
+  hdb          = try(local.hdb_list[0], {})
+  hdb_platform = try(local.hdb.platform, "NONE")
+  hdb_version  = try(local.hdb.db_version, "2.00.043")
   hdb_os = try(local.hdb.os,
     {
       "publisher" = "suse",
@@ -63,6 +64,7 @@ locals {
 
   # Update HANA database information with defaults
   hana_database = merge(local.hdb,
+    { platform = local.hdb_platform },
     { db_version = local.hdb_version },
     { os = local.hdb_os },
     { size = local.hdb_size },

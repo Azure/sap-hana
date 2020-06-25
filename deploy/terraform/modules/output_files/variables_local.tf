@@ -90,6 +90,7 @@ locals {
         if try(database.platform, "NONE") == "HANA" && database.high_availability
       ]
     ])
+    if database != {}
   ])
   ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
   ips-app = [for key, value in var.nics-app : value.private_ip_address]
