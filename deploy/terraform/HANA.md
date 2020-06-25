@@ -9,9 +9,13 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
 
 - [Supported Scenarios](#supported-scenarios)
   - [Available](#available)
-  - [Coming Soon](#coming-soon)
 - [Usage](#usage)
 - [What will be deployed](#what-will-be-deployed)
+  - [Resources deployed](#resources-deployed)
+    - [Common Infrastructure Resources](common-infrastructure-resources)
+    - [HANA Database Resources](hana-database-resources)
+    - [Application Tier Resources](application-tier-resources)
+    - [Jumpbox Resources](jumpbox-resources)
 
 <br>
 
@@ -70,6 +74,7 @@ Depending on the configuration (for examples, see the [Sample Templates](/deploy
    - Linux based VM Jumpbox
    - Windows based VM Jumpbox
    - Run Time Instance VM for Ansible Configuration
+
      *(**Note:** The Run Time Instance is a Linux jumpbox configured with the Ansible component for configuring the other Virtual machines deployed)*
 
 ### Resources Deployed
@@ -78,7 +83,7 @@ Below is a table of resources as viewed in the [Azure Portal](https://portal.azu
 
 Note: SID below will be the 3-character SAP System Identifier specified in the input template.
 
-#### Common Infrastructure
+#### Common Infrastructure Resources
 
 | <sub>NAME   (Examples)</sub>   | <sub>TYPE</sub>                       | <sub>Description</sub>                                |
 |--------------------------------|---------------------------------------|-------------------------------------------------------|
@@ -92,7 +97,7 @@ Note: SID below will be the 3-character SAP System Identifier specified in the i
 | <sub>vnet-mgmt</sub>           | <sub>Virtual network</sub>            | <sub>Vnet for management (jumpboxes)</sub>            |
 | <sub>vnet-sap</sub>            | <sub>Virtual network</sub>            | <sub>Vnet for sap (HANA database servers)</sub>       |
 
-#### HANA Database
+#### HANA Database Resources
 
 | <sub>NAME   (Examples)</sub>  | <sub>TYPE</sub>                    | <sub>Description</sub>                                                                          |
 |-------------------------------|------------------------------------|-------------------------------------------------------------------------------------------------|
@@ -105,7 +110,7 @@ Note: SID below will be the 3-character SAP System Identifier specified in the i
 | <sub>nsg-db</sub>             | <sub>Network security group</sub>  | <sub>NSG for db SubNet</sub>                                                                    |
 | <sub>SID-as</sub>             | <sub>Availability Set</sub>        | <sub>Availability Set for HANA database server(s)</sub>                                         |
 
-#### Application Tier
+#### Application Tier Resources
 
 | <sub>NAME   (Examples)</sub>  | <sub>TYPE</sub>                    | <sub>Description</sub>                                               |
 |-------------------------------|------------------------------------|----------------------------------------------------------------------|
@@ -127,7 +132,7 @@ Note: SID below will be the 3-character SAP System Identifier specified in the i
 | <sub>nsg-db</sub>             | <sub>Network security group</sub>  | <sub>NSG for db vnet</sub>                                           |
 
 
-#### Jumpboxes
+#### Jumpbox Resources
 
 | <sub>NAME   (Examples)</sub>          | <sub>TYPE</sub>                   | <sub>Description</sub>                                                   |
 |---------------------------------------|-----------------------------------|--------------------------------------------------------------------------|
