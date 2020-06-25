@@ -26,15 +26,6 @@ variable "random-id" {
   description = "Random hex for creating unique Azure key vault name"
 }
 
-# Set defaults
-locals {
-  hdb_list = [
-    for db in var.databases : db
-    if try(db.platform, "NONE") == "HANA"
-  ]
-  hana-sid = try(local.hdb_list[0].instance.sid, "")
-}
-
 locals {
   output-tf = jsondecode(var.output-json.content)
 
