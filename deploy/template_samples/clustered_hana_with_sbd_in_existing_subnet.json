@@ -7,8 +7,7 @@
     },
     "ppg": {
       "is_existing": "false",
-      "name": "test-ppg",
-      "arm_id" :""
+      "name": "test-ppg"
     },
     "vnets": {
       "management": {
@@ -122,17 +121,7 @@
         "cockpit_admin_password": "Manager1"
       },
       "components": {
-        "hana_database": [],
-        "hana_client_linux": [],
-        "xs": [
-          "xsac_alm_pi_ui",
-          "xsac_portal_serv",
-          "xsac_services",
-          "xsac_ui5_fesv5",
-          "xsac_ui5_sb",
-          "xsac_xsa_cockpit"
-        ],
-        "shine": []
+        "hana_database": []
       },
       "xsa": {
         "routing": "ports"
@@ -154,25 +143,6 @@
       }
     }
   ],
-  "application": {
-    "sid": "HN1",
-    "enable_deployment": true,
-    "scs_instance_number": "01",
-    "ers_instance_number": "02",
-    "scs_high_availability": true,
-    "application_server_count": 1,
-    "webdispatcher_count": 1,
-    "vm_sizing": "Default",
-    "authentication": {
-      "type": "key",
-      "username": "azureadm"
-    },
-    "os": {
-      "publisher": "suse",
-      "offer": "sles-sap-12-sp5",
-      "sku": "gen1"
-    }
-  },
   "software": {
     "storage_account_sapbits": {
       "is_existing": false,
