@@ -14,56 +14,117 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
+# Set defaults
+locals {
+  hdb_list = [
+    for db in var.databases : db
+    if try(db.platform, "NONE") == "HANA"
+  ]
+  enable_deployment = (length(local.hdb_list) > 0) ? true : false
+
+  # Filter the list of databases to only HANA platform entries
+  hdb          = try(local.hdb_list[0], {})
+  hdb_platform = try(local.hdb.platform, "NONE")
+  hdb_version  = try(local.hdb.db_version, "2.00.043")
+  hdb_os = try(local.hdb.os,
+    {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+  })
+  hdb_size = try(local.hdb.size, "Demo")
+  hdb_fs   = try(local.hdb.filesystem, "xfs")
+  hdb_ha   = try(local.hdb.high_availability, "false")
+  hdb_auth = try(local.hdb.authentication,
+    {
+      "type"     = "key"
+      "username" = "azureadm"
+  })
+  hdb_ins = try(local.hdb.instance, {})
+  # HANA database sid from the Databases array for use as reference to LB/AS
+  hdb_sid                = try(local.hdb_ins.sid, "HN1")
+  hdb_nr                 = try(local.hdb_ins.instance_number, "01")
+  hdb_cred               = try(local.hdb.credentials, {})
+  db_systemdb_password   = try(local.hdb_cred.db_systemdb_password, "")
+  os_sidadm_password     = try(local.hdb_cred.os_sidadm_password, "")
+  os_sapadm_password     = try(local.hdb_cred.os_sapadm_password, "")
+  xsa_admin_password     = try(local.hdb_cred.xsa_admin_password, "")
+  cockpit_admin_password = try(local.hdb_cred.cockpit_admin_password, "")
+  ha_cluster_password    = try(local.hdb_cred.ha_cluster_password, "")
+  components             = merge({ hana_database = [] }, try(local.hdb.components, {}))
+  xsa                    = try(local.hdb.xsa, { routing = "ports" })
+  shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
+  dbnodes = try(local.hdb.dbnodes, [
+    {
+      "name" = "hdb1",
+      "role" = "worker"
+
+  }])
+  loadbalancer = try(local.hdb.loadbalancer, {})
+
+  # Update HANA database information with defaults
+  hana_database = merge(local.hdb,
+    { platform = local.hdb_platform },
+    { db_version = local.hdb_version },
+    { os = local.hdb_os },
+    { size = local.hdb_size },
+    { filesystem = local.hdb_fs },
+    { high_availability = local.hdb_ha },
+    { authentication = local.hdb_auth },
+    { instance = {
+      sid             = local.hdb_sid,
+      instance_number = local.hdb_nr
+      }
+    },
+    { credentials = {
+      db_systemdb_password   = local.db_systemdb_password,
+      os_sidadm_password     = local.os_sidadm_password,
+      os_sapadm_password     = local.os_sapadm_password,
+      xsa_admin_password     = local.xsa_admin_password,
+      cockpit_admin_password = local.cockpit_admin_password,
+      ha_cluster_password    = local.ha_cluster_password
+      }
+    },
+    { components = local.components },
+    { xsa = local.xsa },
+    { shine = local.shine },
+    { dbnodes = local.dbnodes },
+    { loadbalancer = local.loadbalancer }
+  )
+}
+
 # Imports HANA database sizing information
 locals {
   sizes = jsondecode(file("${path.root}/../hdb_sizes.json"))
 }
 
 locals {
-  # Filter the list of databases to only HANA platform entries
-  hana-databases = [
-    for database in var.databases : database
-    if database.platform == "HANA"
-  ]
-
-  # Enable deployment based on length of local.hana-databases
-  enable_deployment = (length(local.hana-databases) > 0) ? true : false
-
-  # List of SIDs from the Databases array for use as reference to LB/AS
-  hdb-sids = [
-    for hdb in local.hana-databases : hdb.instance.sid
-  ]
-
   # Numerically indexed Hash of HANA DB nodes to be created
-  dbnodes = flatten([
+  hdb_vms = flatten([
     [
-      for database in local.hana-databases : [
-        for dbnode in database.dbnodes : {
-          platform       = database.platform,
-          name           = "${dbnode.name}-0",
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0],
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
-          size           = database.size,
-          os             = database.os,
-          authentication = database.authentication
-          sid            = database.instance.sid
-        }
-      ]
+      for dbnode in local.hana_database.dbnodes : {
+        platform       = local.hana_database.platform,
+        name           = "${dbnode.name}-0",
+        admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0],
+        db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
+        size           = local.hana_database.size,
+        os             = local.hana_database.os,
+        authentication = local.hana_database.authentication
+        sid            = local.hana_database.instance.sid
+      }
     ],
     [
-      for database in local.hana-databases : [
-        for dbnode in database.dbnodes : {
-          platform       = database.platform,
-          name           = "${dbnode.name}-1",
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1],
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
-          size           = database.size,
-          os             = database.os,
-          authentication = database.authentication
-          sid            = database.instance.sid
-        }
-      ]
-      if database.high_availability
+      for dbnode in local.hana_database.dbnodes : {
+        platform       = local.hana_database.platform,
+        name           = "${dbnode.name}-1",
+        admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1],
+        db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
+        size           = local.hana_database.size,
+        os             = local.hana_database.os,
+        authentication = local.hana_database.authentication
+        sid            = local.hana_database.instance.sid
+      }
+      if local.hana_database.high_availability
     ]
   ])
 
@@ -84,30 +145,20 @@ locals {
     ]
   }
 
-  sid-infra = [
-    for database in local.hana-databases : {
-      sid = database.instance.sid
-      instance_number = database.instance.instance_number
-      frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
-    }
-  ]
-
   loadbalancer_ports = flatten([
-    for database in local.hana-databases : [
-      for port in local.lb_ports[split(".", database.db_version)[0]] : {
-        sid  = database.instance.sid
-        port = tonumber(port) + (tonumber(database.instance.instance_number) * 100)
-      }
-    ]
+    for port in local.lb_ports[split(".", local.hana_database.db_version)[0]] : {
+      sid  = local.hana_database.instance.sid
+      port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
+    }
   ])
 }
 
 # List of data disks to be created for HANA DB nodes
 locals {
   data-disk-per-dbnode = flatten(
-    length(local.dbnodes) > 0 ?
+    length(local.hdb_vms) > 0 ?
     [
-      for storage_type in lookup(local.sizes, local.dbnodes[0].size).storage : [
+      for storage_type in lookup(local.sizes, local.hdb_vms[0].size).storage : [
         for disk_count in range(storage_type.count) : {
           name                      = join("-", [storage_type.name, disk_count])
           storage_account_type      = storage_type.disk_type,
@@ -120,9 +171,9 @@ locals {
   ] : [])
 
   data-disk-list = flatten([
-    for dbnode in local.dbnodes : [
+    for hdb_vm in local.hdb_vms : [
       for datadisk in local.data-disk-per-dbnode : {
-        name                      = join("-", [dbnode.name, datadisk.name])
+        name                      = join("-", [hdb_vm.name, datadisk.name])
         caching                   = datadisk.caching
         storage_account_type      = datadisk.storage_account_type
         disk_size_gb              = datadisk.disk_size_gb
