@@ -33,7 +33,7 @@
 
     # Ref https://docs.microsoft.com/en-us/azure/virtual-machines/maintenance-and-updates#maintenance-that-doesnt-require-a-reboot
     - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
-      shell: "pcs cluster setup --name {{ hana_database.instance.sid | upper }}_hana_cluster {{ secondary_instance.name }} {{ secondary_instance.name }} --token {{ cluster_totem.token }}"
+      shell: "pcs cluster setup --name {{ sid | upper }}_hana_cluster {{ secondary_instance.name }} {{ secondary_instance.name }} --token {{ cluster_totem.token }}"
 
     - name: Ensure the cluster is starting on all nodes
       shell: pcs cluster start --all
@@ -83,8 +83,8 @@
 
     - name: Ensure the SAP HANA Topology resource is created
       shell: >
-        pcs resource create SAPHanaTopology_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} SAPHanaTopology
-        SID={{ hana_database.instance.sid | upper }} InstanceNumber={{ hana_database.instance.instance_number }}
+        pcs resource create SAPHanaTopology_{{ sid | upper }}_{{ instance_number }} SAPHanaTopology
+        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
         op start timeout=600
         op stop timeout=300
         op monitor interval=10 timeout=600
@@ -92,8 +92,8 @@
 
     - name: Ensure the SAP HANA resource is created
       shell: >
-        pcs resource create SAPHana_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} SAPHana
-        SID={{ hana_database.instance.sid | upper }} InstanceNumber={{ hana_database.instance.instance_number }}
+        pcs resource create SAPHana_{{ sid | upper }}_{{ instance_number }} SAPHana
+        SID={{ sid | upper }} InstanceNumber={{ instance_number }}
         PREFER_SITE_TAKEOVER=true DUPLICATE_PRIMARY_TIMEOUT=7200
         AUTOMATED_REGISTER=false
         op start timeout={{ cluster_SAPHana_timeouts.start }}
@@ -105,19 +105,19 @@
         master notify=true clone-max=2 clone-node-max=1 interleave=true
 
     - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created
-      shell: pcs resource create vip_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} IPaddr2 ip="{{ hana_database.loadbalancer.frontend_ip }}"
+      shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hana_database.loadbalancer.frontend_ip }}"
 
     - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
-      shell: pcs resource create nc_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} azure-lb port=625{{ hana_database.instance.instance_number }}
+      shell: pcs resource create nc_{{ sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}
 
     - name: Ensure the Virtual IP group resource is created
-      shell: pcs resource group add g_ip_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} nc_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} vip_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }}
+      shell: pcs resource group add g_ip_{{ sid | upper }}_{{ instance_number }} nc_{{ sid | upper }}_{{ instance_number }} vip_{{ sid | upper }}_{{ instance_number }}
 
     - name: Ensure the order constraint for the SAP HANA Topology is configured
-      shell: pcs constraint order SAPHanaTopology_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }}-clone then SAPHana_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }}-master symmetrical=false
+      shell: pcs constraint order SAPHanaTopology_{{ sid | upper }}_{{ instance_number }}-clone then SAPHana_{{ sid | upper }}_{{ instance_number }}-master symmetrical=false
 
     - name: Ensure the Virtual IP is configured to the Master node
-      shell: pcs constraint colocation add g_ip_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }} with master SAPHana_{{ hana_database.instance.sid | upper }}_{{ hana_database.instance.instance_number }}-master 4000
+      shell: pcs constraint colocation add g_ip_{{ sid | upper }}_{{ instance_number }} with master SAPHana_{{ sid | upper }}_{{ instance_number }}-master 4000
 
     - name: Disable Maintenance mode for the cluster
       shell: pcs property set maintenance-mode=false
