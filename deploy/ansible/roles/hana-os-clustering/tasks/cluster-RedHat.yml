@@ -105,7 +105,7 @@
         master notify=true clone-max=2 clone-node-max=1 interleave=true
 
     - name: Ensure the Virtual IP resource for the Load Balancer Front End IP is created
-      shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hana_database.loadbalancer.frontend_ip }}"
+      shell: pcs resource create vip_{{ sid | upper }}_{{ instance_number }} IPaddr2 ip="{{ hdb_lb_feip }}"
 
     - name: Ensure the netcat resource for the Load Balancer Healthprobe is created
       shell: pcs resource create nc_{{ sid | upper }}_{{ instance_number }} azure-lb port=625{{ instance_number }}

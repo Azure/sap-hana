@@ -125,6 +125,7 @@
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
         hdb_size: "{{ hana_database.size }}"
+        hdb_lb_feip: "{{ hana_database.loadbalancer.frontend_ip }}"
         ha_cluster_password: "{{ hana_database.credentials.ha_cluster_password }}"
         sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"

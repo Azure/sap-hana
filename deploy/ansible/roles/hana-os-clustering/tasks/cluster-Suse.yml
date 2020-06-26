@@ -200,7 +200,7 @@
         meta target-role="Started"
         operations \$id="rsc_ip_{{ sid | upper }}_HDB{{ instance_number }}-operations"
         op monitor interval="10s" timeout="20s"
-        params ip="{{ hana_database.loadbalancer.frontend_ip }}"
+        params ip="{{ hdb_lb_feip }}"
 
     # socat is recommended in place of netcat on Azure: https://www.suse.com/support/kb/doc/?id=000019536
     - name: Ensure SAP HANA Heartbeat socat resource is configured

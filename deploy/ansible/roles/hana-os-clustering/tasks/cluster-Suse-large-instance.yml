@@ -153,7 +153,7 @@
         meta target-role="Started"
         operations \$id="rsc_ip_{{ sid | upper }}_HDB{{ instance_number }}-operations"
         op monitor interval="10s" timeout="20s"
-        params ip="{{ hana_database.loadbalancer.frontend_ip }}"
+        params ip="{{ hdb_lb_feip }}"
 
     - name: Ensure SAP HANA Heartbeat netcat resource is configured
       shell: >
