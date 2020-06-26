@@ -111,6 +111,12 @@
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
         hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
+        primary_instance:
+          name: "{{ hana_database.nodes[0].name }}"
+          ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
+        secondary_instance:
+          name: "{{ hana_database.nodes[1].name }}"
+          ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
     - role: hana-os-clustering
       when: hana_database.high_availability
       vars:
@@ -119,6 +125,14 @@
         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
         sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"
         sap_hana_fencing_agent_client_password: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_SECRET') }}"
+        primary_instance:
+          name: "{{ hana_database.nodes[0].name }}"
+          ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
+          ip_db: "{{ hana_database.nodes[0].ip_db_nic }}"
+        secondary_instance:
+          name: "{{ hana_database.nodes[1].name }}"
+          ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
+          ip_db: "{{ hana_database.nodes[1].ip_db_nic }}"
 
 # Linux jumpboxes components install
 - hosts: jumpboxes_linux
