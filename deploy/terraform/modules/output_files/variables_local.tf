@@ -38,8 +38,12 @@ variable "loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
-variable "hdb-sids" {
+variable "hdb-sid" {
   description = "List of SIDs used when generating Load Balancers"
+}
+
+variable "hana-database-info" {
+  description = "Updated hana database json"
 }
 
 variable "nics-scs" {
@@ -63,11 +67,10 @@ locals {
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
   databases = [
-    for database in var.databases : database
-    if contains(["HANA"], database.platform)
+    var.hana-database-info
   ]
-  dbnodes = flatten([
-    for database in var.databases : flatten([
+  hdb_vms = flatten([
+    for database in local.databases : flatten([
       [
         for dbnode in database.dbnodes : {
           role           = dbnode.role,
@@ -75,7 +78,7 @@ locals {
           authentication = database.authentication,
           name           = "${dbnode.name}-0"
         }
-        if database.platform == "HANA"
+        if try(database.platform, "NONE") == "HANA"
       ],
       [
         for dbnode in database.dbnodes : {
@@ -84,9 +87,10 @@ locals {
           authentication = database.authentication,
           name           = "${dbnode.name}-1"
         }
-        if database.platform == "HANA" && database.high_availability
+        if try(database.platform, "NONE") == "HANA" && database.high_availability
       ]
     ])
+    if database != {}
   ])
   ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
   ips-app = [for key, value in var.nics-app : value.private_ip_address]

@@ -66,12 +66,4 @@ locals {
       "private_ip_address" = ""
     }
   ]
-
-  hana-sid = length([
-    for database in var.databases : database
-    if database.platform == "HANA"
-    ]) > 0 ? element([
-    for database in var.databases : database.instance.sid
-    if database.platform == "HANA"
-  ], 0) : ""
 }
