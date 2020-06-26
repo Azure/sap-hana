@@ -110,6 +110,8 @@
       vars:
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
+        hdb_version: "{{ hana_database.db_version }}"
+        hdb_disks: "{{ hdb_sizes[hana_database.size].storage }}"
         hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
         primary_instance:
           name: "{{ hana_database.nodes[0].dbname }}"

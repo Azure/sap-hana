@@ -4,7 +4,7 @@
   become_user: "{{ sid_admin_user }}"
   when:
     - ansible_hostname == secondary_instance.name
-    - hana_database.db_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
+    - hdb_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
     - not hana_system_replication_enabled
   block:
 

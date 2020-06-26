@@ -22,7 +22,7 @@
 - name: Determine path of SID backup directory from hdb_sizes.json
   set_fact:
     sid_backup_dir: "{{ item.mount_point }}/{{ sid | upper }}"
-  loop: "{{ hdb_sizes[hana_database.size].storage }}"
+  loop: "{{ hdb_disks }}"
   when: item.name == "backup"
 
 - name: Ensure HANA backup file names are set
