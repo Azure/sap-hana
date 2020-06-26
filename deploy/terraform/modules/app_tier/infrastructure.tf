@@ -27,14 +27,18 @@ resource "azurerm_lb" "scs" {
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
-  dynamic "frontend_ip_configuration" {
-    for_each = range(local.scs_high_availability ? 2 : 1)
-    content {
-      name                          = "${upper(local.application_sid)}_${frontend_ip_configuration.value == 0 ? "scs" : "ers"}-feip"
-      subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
-      private_ip_address_allocation = "Static"
-      private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(frontend_ip_configuration.value) + local.ip_offsets.scs_lb)
-    }
+  frontend_ip_configuration {
+    name                          = "${upper(local.application_sid)}_scs-feip"
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, 0 + local.ip_offsets.scs_lb)
+  }
+
+  frontend_ip_configuration {
+    name                          = "${upper(local.application_sid)}_ers-feip"
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, 1 + local.ip_offsets.scs_lb)
   }
 }
 
