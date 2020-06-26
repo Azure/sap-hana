@@ -174,8 +174,8 @@
     "path_to_private_key": "~/.ssh/id_rsa"
   },
   "options": {
-    "enable_secure_transfer": true,
     "ansible_execution": false,
+    "enable_secure_transfer": true,
     "enable_prometheus": true
   }
 }
