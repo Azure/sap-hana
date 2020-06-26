@@ -149,7 +149,7 @@
       shell: >
         crm configure primitive rsc_st_azure stonith:fence_azure_arm params
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
-        resourceGroup="{{ output.infrastructure.resource_group.name }}"
+        resourceGroup="{{ resource_group_name }}"
         tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
         login="{{ sap_hana_fencing_agent_client_id }}"
         passwd="{{ sap_hana_fencing_agent_client_password }}"

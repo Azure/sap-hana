@@ -122,6 +122,7 @@
     - role: hana-os-clustering
       when: hana_database.high_availability
       vars:
+        resource_group_name: "{{ output.infrastructure.resource_group.name }}"
         sid: "{{ hana_database.instance.sid }}"
         instance_number: "{{ hana_database.instance.instance_number }}"
         hdb_size: "{{ hana_database.size }}"

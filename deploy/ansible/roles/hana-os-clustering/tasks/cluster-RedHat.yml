@@ -61,7 +61,7 @@
         pcs stonith create rsc_st_azure fence_azure_arm
         login="{{ sap_hana_fencing_agent_client_id }}"
         passwd="{{ sap_hana_fencing_agent_client_password }}"
-        resourceGroup="{{ output.infrastructure.resource_group.name }}"
+        resourceGroup="{{ resource_group_name }}"
         tenantId="{{ sap_hana_fencing_agent_tenant_id }}"
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
         power_timeout=240
