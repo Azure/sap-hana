@@ -31,7 +31,7 @@ resource "null_resource" "prepare_rti_files" {
   provisioner "file" {
     # Note: We provide a default empty clustering auth script content so this provisioner succeeds.
     # Later in the execution, the script is sourced, but will have no impact if it has been defaulted
-    content     = fileexists("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") ? file("${path.cwd}/set-clustering-auth-${local.hana-sid}.sh") : "# default empty clustering auth script"
+    content     = fileexists("${terraform.workspace}/export-clustering-sp-details.sh") ? file("${terraform.workspace}/export-clustering-sp-details.sh") : "# default empty clustering auth script"
     destination = "/home/${module.jumpbox.rti-info.authentication.username}/export-clustering-sp-details.sh"
   }
 }

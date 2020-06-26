@@ -17,9 +17,10 @@ set -o nounset
 
 # import common functions that are reused across scripts
 # shellcheck disable=SC1091
-source util/common_utils.sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+source "${SCRIPTPATH}/common_utils.sh"
 
-readonly list_of_offers=$(dirname "$0")/sap_os_offers.json
+readonly list_of_offers="${SCRIPTPATH}/sap_os_offers.json"
 
 function main()
 {

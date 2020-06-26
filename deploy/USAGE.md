@@ -51,7 +51,19 @@ Before continuing you should first obtain a copy of the code, so that you can us
    cd sap-hana
    ```
 
-   **Note:** All of the following process steps should be run from the project root directory.
+### Adding Utility Scripts to the PATH
+
+A helper file to add the path of the utility scripts to the PATH of the workspace is available:
+
+```text
+source util/source_path.sh
+```
+
+This allows you to run the scripts from anywhere during this session. If your terminal is closed, or a new session is opened, this file must be sourced again.
+
+If this file is not used, then the you must use either the full or relevant path to the scripts.
+
+The following instructions assume you have sourced this file.
 
 ### Checking Tool Dependencies
 
@@ -62,11 +74,12 @@ Running the code requires the following tools with the minimal supported/tested 
 | Azure CLI | 2.0.63                             |
 | Terraform | 0.12.12                            |
 | Ansible   | 2.8.1 (see note below)             |
+| jq        | 1.5 (see note below)               |
 
 1. To easily check which tool versions you have installed, run the following utility script:
 
    ```text
-   util/check_workstation.sh
+   check_workstation.sh
    ```
 
    Example output:
@@ -75,9 +88,12 @@ Running the code requires the following tools with the minimal supported/tested 
    azure-cli = 2.0.77
    Terraform = 0.12.16
    ansible = 2.8.4
+   jq = 1.5-1
    ```
 
    **Note:** Ansible is only a prerequisite of the workstation if you opt to split the Terraform and Ansible stages, and intend to run Ansible from your workstation rather than the runtime instance (RTI) in Azure.
+
+   **Note:** JQ version 1.6+ is prefered, utility scripts have been tested with version 1.5
 
 ### Configuring the Target Azure Subscription
 
@@ -98,7 +114,7 @@ Before running any of the following code/scripts, you should login to the Azure 
 1. To easily check which Azure subscription is your current target, run the following utility script:
 
    ```text
-   util/check_subscription.sh
+   check_subscription.sh
    ```
 
    Example output:
@@ -116,7 +132,7 @@ This script can then be used (_sourced_) to configure the required environment v
 1. To easily create the service principal and authorization script, run the following command providing the name you wish to give the service principal as the only command line argument (here the name `sp-eng-test` is used):
 
    ```text
-   util/create_service_principal.sh sp-eng-test
+   create_service_principal.sh sp-eng-test
    ```
 
    Example output:
@@ -147,7 +163,7 @@ Configuring your SAP Launchpad credentials for a JSON template requires you to p
 1. Run the following utility script to configure your SAP download credentials:
 
    ```text
-   util/set_sap_download_credentials.sh <sap_user> <sap_password> <template_name>
+   set_sap_download_credentials.sh <sap_user> <sap_password> <template_name>
    ```
 
    **Note:** If your SAP Launchpad password has spaces in, you will need to enclose it in double quotes.
@@ -159,14 +175,14 @@ You can programatically set the deployment's resource group name in Azure using 
 1. Run the following utility script to configure your deployment resource group name:
 
    ```text
-   util/set_resource_group.sh <resource_group_name> <template_name>
+   set_resource_group.sh <resource_group_name> <template_name>
    ```
 
    **Note:** You can avoid this step by setting the environment variable `SAP_HANA_RESOURCE_GROUP` to your desired resource group name.
    This can be done in any of the standard ways, such as:
 
      - Setting in your current terminal session (e.g. `export SAP_HANA_RESOURCE_GROUP="rg-sap-hana-dev"`)
-     - Setting as a prefix of your script command (e.g. `SAP_HANA_RESOURCE_GROUP="rg-sap-hana-dev" util/terraform_v2.sh plan single_node_hana`)
+     - Setting as a prefix of your script command (e.g. `SAP_HANA_RESOURCE_GROUP="rg-sap-hana-dev" terraform_v2.sh plan single_node_hana`)
      - Setting in your dot files (e.g. in `.bash_profile`)
 
    In any case, this opens up scope for programatically setting the HANA deployment resource group using something personal to your user (e.g. $USER variable), which helps to avoid clashes with others that might be sharing the same Azure subscription.
@@ -176,7 +192,7 @@ In HA systems, you must set the password to be used for the cluster user in the 
 1. Run the following utility script to configure the `hacluster` user password:
 
    ```text
-   util/set_ha_cluster_password.sh <ha_cluster_password> <template_name>
+   set_ha_cluster_password.sh <ha_cluster_password> <template_name>
    ```
 
    **Note:** This value will only be used in deployments where the SAP HANA Database definition has `high_availability` set to `true`.
@@ -184,13 +200,13 @@ In HA systems, you must set the password to be used for the cluster user in the 
 ## Build/Update/Destroy Lifecycle
 
 In the following steps you will need to substitute a `<template_name>` for the template. To see the currently available tempaltes, run:\
-`util/terraform_v2.sh`
+`terraform_v2.sh`
 
 1. If you are provisioning a clustered system, then you must first create a fencing agent service principal for the SAP HANA SID you are provisioning.
    To easily create the service principal and authorization script, run the following command providing the HANA SID you wish to be included in the service principal name as the only command line argument (here the SID `HN1` is used):
 
    ```text
-   util/create_fencing_agent.sh HN1
+   create_fencing_agent.sh HN1
    ```
 
    Example output:
@@ -211,19 +227,19 @@ In the following steps you will need to substitute a `<template_name>` for the t
 1. To easily initialize Terraform, run the following utility script:
 
    ```text
-   util/terraform_v2.sh init
+   terraform_v2.sh init
    ```
 
 1. To easily check which resources will be deployed, run the following utility script:
 
    ```text
-   util/terraform_v2.sh plan <template_name>
+   terraform_v2.sh plan <template_name>
    ```
 
 1. To easily discover which operating systems can be used to build the SAP VMs, run the following utility script withput parameters:
 
    ```text
-   util/set_sap_os.sh
+   set_sap_os.sh
    ```
 
    :information_source: The specific versions of operating systems which are tied to the "convenience names" are defined in the `util/sap_os_offers.json` file. The names "SLES" and "RHEL" are preset to match the more specific `sles12sp5` (`offer: sles-sap-12-sp5`, `sku: gen1`) and `redhat76` (`offer: RHEL-SAP-HA`, `sku: 7.6`) respectively.
@@ -231,13 +247,13 @@ In the following steps you will need to substitute a `<template_name>` for the t
 1. To easily choose which operating system will be used to build SAP VMs, run the following utility script with the required SAP OS chosen from the above list:
 
    ```text
-   util/set_sap_os.sh <SAP OS> <template name>
+   set_sap_os.sh <SAP OS> <template name>
    ```
 
 1. To easily deploy the system, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh apply <template_name>
+   terraform_v2.sh apply <template_name>
    ```
 
    **Note:** This process can take in the region of 90 minutes to complete.
@@ -256,13 +272,13 @@ In the following steps you will need to substitute a `<template_name>` for the t
 1. To easily delete the provisioned resources, run the following utility script with an input template name (e.g. `single_node_hana`):
 
    ```text
-   util/terraform_v2.sh destroy <template_name>
+   terraform_v2.sh destroy <template_name>
    ```
 
 1. To easily clean up the working directries and files, run the following utility script:
 
    ```text
-   util/terraform_v2.sh clean
+   terraform_v2.sh clean
    ```
 
    :hand: This is a destructive and irreversible process. It list which files are to be removed, and will ask for confirmation.
@@ -278,27 +294,27 @@ git clone https://github.com/Azure/sap-hana.git
 cd sap-hana
 
 # Check Tool Dependencies: Takes under a minute and is performed once
-util/check_workstation.sh
+check_workstation.sh
 
 # Configure Target Azure Subscription: Tales under a minute and is performed once per subscription
 az login
-util/check_subscription.sh
+check_subscription.sh
 
 # Configure Azure Authorization: Takes under a minute and is performed once per subscription
-util/create_service_principal.sh sp-eng-test
+create_service_principal.sh sp-eng-test
 
 # Configure Deployment Template: Takes under a minute and is performed once per SAP system build
-util/set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
+set_sap_download_credentials.sh S123456789 MySAPpass single_node_hana
 
 # Build/Update Lifecycle: Takes about 90 minutes and is performed once per SAP system build/update
 
 # For Clustered systems Provision Fence Agent Service Principal
-util/create_fenching_agent.sh HN1
-util/terraform_v2.sh init
-util/terraform_v2.sh apply single_node_hana
+create_fenching_agent.sh HN1
+terraform_v2.sh init
+terraform_v2.sh apply single_node_hana
 
 # Destroy Lifecycle: Takes about 15 minutes and is performed once per SAP system build
-util/terraform_v2.sh destroy single_node_hana
+terraform_v2.sh destroy single_node_hana
 ```
 
 ## Testing the Cluster
