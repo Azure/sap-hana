@@ -145,7 +145,7 @@
         timeout="600"
 
     - name: Ensure the STONITH Azure fence agent is created
-      when: hana_database.size != "LargeInstance"
+      when: hdb_size != "LargeInstance"
       shell: >
         crm configure primitive rsc_st_azure stonith:fence_azure_arm params
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"
