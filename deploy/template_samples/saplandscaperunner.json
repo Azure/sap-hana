@@ -7,8 +7,7 @@
         },
         "ppg": {
           "is_existing": "false",
-          "name": "test-ppg",
-          "arm_id": ""
+          "name": "test-ppg"
         },
         "vnets": {
             "management": {
@@ -77,26 +76,7 @@
     },
     "jumpboxes": {
         "windows": [],
-        "linux": [
-            {
-                "name": "rti",
-                "destroy_after_deploy": "true",
-                "size": "Standard_D2s_v3",
-                "disk_type": "StandardSSD_LRS",
-                "os": {
-                    "publisher": "Canonical",
-                    "offer": "UbuntuServer",
-                    "sku": "18.04-LTS"
-                },
-                "authentication": {
-                    "type": "key",
-                    "username": "azureadm"
-                },
-                "components": [
-                    "ansible"
-                ]
-            }
-        ]
+        "linux": []
     },
     "databases": [
         {
@@ -144,25 +124,6 @@
             ]
         }
     ],
-    "application": {
-        "sid": "HN1",
-        "enable_deployment": false,
-        "scs_instance_number": "01",
-        "ers_instance_number": "02",
-        "scs_high_availability": true,
-        "application_server_count": 1,
-        "webdispatcher_count": 1,
-        "vm_sizing": "Default",
-        "authentication": {
-            "type": "key",
-            "username": "azureadm"
-        },
-        "os": {
-            "publisher": "suse",
-            "offer": "sles-sap-12-sp5",
-            "sku": "gen1"
-        }
-    },
     "software": {
         "storage_account_sapbits": {
             "file_share_name": "bits",

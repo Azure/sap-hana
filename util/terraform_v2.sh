@@ -18,7 +18,8 @@ set -o errexit
 set -o nounset
 
 # import common functions that are reused across scripts
-source util/common_utils.sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+source "${SCRIPTPATH}/common_utils.sh"
 
 # name of the script where the auth info should be saved
 readonly auth_script='set-sp.sh'
@@ -119,7 +120,7 @@ function check_command_line_arguments_for_template()
 # Initialize Terraform using the target code
 function terraform_init()
 {
-	run_terraform_command "init ${target_code}"
+	run_terraform_command "init \"${target_code}\""
 }
 
 
@@ -132,7 +133,7 @@ function terraform_plan()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "plan -var-file=${target_json} ${target_code}"
+	run_terraform_command "plan -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -153,7 +154,7 @@ function terraform_apply()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "apply -auto-approve -var-file=${target_json} ${target_code}"
+	run_terraform_command "apply -auto-approve -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -166,7 +167,7 @@ function terraform_destroy()
 
 	local target_json
 	target_json=$(get_json_template_path "${target_json_template}")
-	run_terraform_command "destroy -auto-approve -var-file=${target_json} ${target_code}"
+	run_terraform_command "destroy -auto-approve -var-file=\"${target_json}\" \"${target_code}\""
 }
 
 
@@ -247,7 +248,7 @@ function run_terraform_command()
 	echo "${command}"
 	echo
 
-	${command}
+	eval "${command}"
 }
 
 
