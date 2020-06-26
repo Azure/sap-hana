@@ -26,14 +26,14 @@
 # Basic Pacemaker cluster configuration:
 # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
 - name: Create the cluster on the primary node
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == secondary_instance.name
   block:
     - name: Ensure the cluster can authenticate nodes as hacluster
-      shell: "pcs cluster auth {{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }} -u hacluster -p {{ ha_cluster_password }}"
+      shell: "pcs cluster auth {{ secondary_instance.name }} {{ secondary_instance.name }} -u hacluster -p {{ ha_cluster_password }}"
 
     # Ref https://docs.microsoft.com/en-us/azure/virtual-machines/maintenance-and-updates#maintenance-that-doesnt-require-a-reboot
     - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
-      shell: "pcs cluster setup --name {{ hana_database.instance.sid | upper }}_hana_cluster {{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }} --token {{ cluster_totem.token }}"
+      shell: "pcs cluster setup --name {{ hana_database.instance.sid | upper }}_hana_cluster {{ secondary_instance.name }} {{ secondary_instance.name }} --token {{ cluster_totem.token }}"
 
     - name: Ensure the cluster is starting on all nodes
       shell: pcs cluster start --all
@@ -43,13 +43,13 @@
       register: cluster_stable_check
       retries: 30
       delay: 10
-      until: "'{{ hana_database.nodes[0].dbname }} {{ hana_database.nodes[1].dbname }}' in cluster_stable_check.stdout or '{{ hana_database.nodes[1].dbname }} {{ hana_database.nodes[0].dbname }}' in cluster_stable_check.stdout"
+      until: "'{{ secondary_instance.name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout or '{{ secondary_instance.name }} {{ secondary_instance.name }}' in cluster_stable_check.stdout"
 
 - name: Ensure the expected quorum votes is set for the cluster
   shell: "pcs quorum expected-votes {{ cluster_quorum.expected_votes }}"
 
 - name: Configure the cluster STONITH device on the primary node
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == secondary_instance.name
   block:
     - name: Ensure STONITH timeout is raised
       shell: pcs property set stonith-timeout=900
@@ -76,7 +76,7 @@
 # SAP HANA Cluster resources
 # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability-rhel#create-sap-hana-cluster-resources
 - name: Optimise the Pacemaker cluster for SAP HANA
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == secondary_instance.name
   block:
     - name: Enable Maintenance mode for the cluster
       shell: pcs property set maintenance-mode=true

@@ -4,7 +4,7 @@
 # Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
 # https://rpm.pbone.net/index.php3/stat/45/idpl/27916721/numer/8/nazwa/ha-cluster-init
 - name: Ensure Primary node initiates the Cluster
-  when: inventory_hostname == hana_database.nodes[0].ip_admin_nic
+  when: inventory_hostname == primary_instance.ip_admin
   block:
     - name: Ensure csync2 is configured
       shell: crm cluster init -y csync2
@@ -16,13 +16,13 @@
       shell: "crm cluster init -y cluster --name 'hdb_{{ hana_database.instance.sid | upper }}'"
 
 - name: Ensure Secondary node joins the Cluster
-  when: inventory_hostname == hana_database.nodes[1].ip_admin_nic
+  when: inventory_hostname == secondary_instance.ip_admin
   block:
     - name: Ensure the configuration files are synchronised
-      shell: "crm cluster join -y -c {{ hana_database.nodes[0].ip_db_nic }} csync2"
+      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} csync2"
 
     - name: Ensure the cluster is joined
-      shell: "crm cluster join -y -c {{ hana_database.nodes[0].ip_db_nic }} cluster"
+      shell: "crm cluster join -y -c {{ primary_instance.ip_db }} cluster"
 
 - name: Ensure HA Cluster password is set to something secure
   user:
@@ -36,7 +36,7 @@
     mode: 0600
 
 - name: Ensure the Corosync service is restarted on primary node.
-  when: inventory_hostname == hana_database.nodes[0].ip_admin_nic
+  when: inventory_hostname == primary_instance.ip_admin
   systemd:
     name: corosync
     state: restarted
@@ -45,7 +45,7 @@
     seconds: 15
 
 - name: Ensure the Corosync service is restarted on secondary node
-  when: inventory_hostname == hana_database.nodes[1].ip_admin_nic
+  when: inventory_hostname == secondary_instance.ip_admin
   systemd:
     name: corosync
     state: restarted
@@ -54,27 +54,27 @@
     seconds: 15
 
 - name: Ensure the cluster STONITH is created
-  when: inventory_hostname == hana_database.nodes[0].ip_admin_nic
+  when: inventory_hostname == primary_instance.ip_admin
   block:
 
     - name: Check if SBD resource exists
       shell: crm resource list | grep 'sbd' | awk '{ print $1; }'
       register: sbd_device
       failed_when: false
-    
+
     # "stonith-sbd" is the sbd device in most cases if there has already existed a SBD
     - name: Ensure current SBD device is stoped and removed if exists
       shell: |
         crm resource stop {{ sbd_device.stdout }}
         crm configure delete {{ sbd_device.stdout }}
       when: sbd_device.stdout | length > 0
-      
+
     - name: Ensure SBD disk STONITH resource is created
       shell: >
         crm configure primitive stonith-sbd stonith:external/sbd \
         params pcmk_delay_max="15" \
         op monitor interval="15" timeout="15"
-    
+
     - name: Check the current SBD status
       shell: crm_mon -1 | grep sbd
       register: sbd_report
@@ -82,7 +82,7 @@
       failed_when: False
 
     - debug:
-        msg: "{{ sbd_report.stdout }}" 
+        msg: "{{ sbd_report.stdout }}"
 
     - name: Ensure maintenance mode is enabled
       shell: "crm configure property maintenance-mode=true"
