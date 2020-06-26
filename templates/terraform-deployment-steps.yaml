@@ -25,7 +25,8 @@ steps:
     displayName: "Prepare input JSON"
   - script: |
       cd deploy/terraform
-      cat <<- EOF > set-clustering-auth-HN1.sh
+      mkdir default
+      cat <<- EOF > default/export-clustering-sp-details.sh
         export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
         export SAP_HANA_FENCING_AGENT_TENANT_ID=$(landscape-tenant)
         export SAP_HANA_FENCING_AGENT_CLIENT_ID=$(hana-pipeline-spn-id)
@@ -50,4 +51,3 @@ steps:
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
-
