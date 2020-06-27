@@ -9,8 +9,7 @@
 #
 ###############################################################################
 
-
-readonly target_path="deploy"
+readonly target_path="${SCRIPTPATH}/../deploy"
 # location of the input JSON templates
 readonly target_template_dir="${target_path}/template_samples"
 
@@ -105,7 +104,7 @@ function edit_json_template_for_path()
 	# in the future we could call a function here to translate simple dot-based paths into jq format paths
 	# For example: Translate 'infrastructure.resource_group.name' to '"infrastructure", "resource_group", "name"'
 	local jq_json_path="${json_path}"
-	local jq_command="jq --arg value ${json_value} 'setpath([${jq_json_path}]; \$value)' ${target_json}"
+	local jq_command="jq --arg value ${json_value} 'setpath([${jq_json_path}]; \$value)' \"${target_json}\""
 
 	# edit JSON template file contents and write to temp file
 	eval "${jq_command}" > "${temp_template_json}"
@@ -163,4 +162,13 @@ function test_semver()
 			[[ ${patch} -gt 0 ]] && echo -n ">" || ( [[ ${patch} -eq 0 ]] && echo -n "=" || echo -n "<" )
 		fi
 	fi
+}
+
+
+# This function takes a single bash string and escapes all special characters within it
+# Source: https://stackoverflow.com/a/20053121
+function get_escaped_string()
+{
+	local str="$1"
+	echo "$str" | sed -e 's/[^a-zA-Z0-9,._+@%/-]/\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/'
 }

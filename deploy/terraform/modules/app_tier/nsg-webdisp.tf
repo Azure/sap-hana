@@ -1,6 +1,6 @@
 # NSG rule to deny internet access
 resource azurerm_network_security_rule webRule_internet {
-  count                       = local.enable_deployment ? 1 : 0
+  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? 0 : 1) : 0
   name                        = "Internet"
   priority                    = 100
   direction                   = "Inbound"
@@ -16,7 +16,7 @@ resource azurerm_network_security_rule webRule_internet {
 
 # NSG rule to open ports for Web dispatcher
 resource azurerm_network_security_rule web {
-  count                       = local.enable_deployment ? length(local.nsg-ports.web) : 0
+  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_app.nsg.is_existing ? 0 : length(local.nsg-ports.web)) : 0
   name                        = local.nsg-ports.web[count.index].name
   priority                    = local.nsg-ports.web[count.index].priority
   direction                   = "Inbound"
