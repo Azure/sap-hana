@@ -53,5 +53,5 @@ We need to ensure quality along with agility. We need to move to everyone agreei
 1. Focus on the [PR Basics](#pr-basics). PRs have to adhere to Basics with no exceptions.
 1. In additional to Basics, PR reviews need to focus on the quality of a PR. eg. catching potential issues/bugs, semantic problems, nitpicks, etc...
 1.  Keep PRs in an open published state for at least one working day, which would allow everyone in other regions to review.
-1. For hotfixes, keep PRs open for at least 4 hrs.
+1. For hotfixes, keep PRs open for at least 4 business hrs.
 1. The maintainer is [here](https://github.com/Azure/sap-hana/blob/master/CODEOWNERS).
