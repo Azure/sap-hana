@@ -22,7 +22,7 @@
 - name: Determine path of SID backup directory from hdb_sizes.json
   set_fact:
     sid_backup_dir: "{{ item.mount_point }}/{{ sid | upper }}"
-  loop: "{{ hdb_sizes[hana_database.size].storage }}"
+  loop: "{{ hdb_disks }}"
   when: item.name == "backup"
 
 - name: Ensure HANA backup file names are set
@@ -31,7 +31,7 @@
     backup_file_for_tenant_full_path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP"
 
 - name: Ensure the Primary node SSFS files are present on the primary node
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == primary_instance.name
   block:
 
     - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists

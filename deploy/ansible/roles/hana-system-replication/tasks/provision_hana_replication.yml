@@ -3,8 +3,8 @@
 - name: Ensure HANA 1.0 is configured for System Replication
   become_user: "{{ sid_admin_user }}"
   when:
-    - ansible_hostname == hana_database.nodes[0].dbname
-    - hana_database.db_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
+    - ansible_hostname == primary_instance.name
+    - hdb_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
     - not hana_system_replication_enabled
   block:
 
@@ -23,7 +23,7 @@
 
 - name: Perform pre-flight backup checks
   become_user: "{{ sid_admin_user }}"
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == primary_instance.name
   block:
 
     - name: Check backup file exists for SYSTEMDB database for System Identifier {{ sid }}
@@ -43,7 +43,7 @@
 
 - name: Ensure HANA is configured for System Replication
   become_user: "{{ sid_admin_user }}"
-  when: ansible_hostname == hana_database.nodes[0].dbname and not hana_system_replication_enabled
+  when: ansible_hostname == primary_instance.name and not hana_system_replication_enabled
   block:
 
     - name: Ensure Primary node is configured for System Replication
@@ -68,7 +68,7 @@
 
 - name: Ensure System Replication is configured
   become_user: "{{ sid_admin_user }}"
-  when: ansible_hostname != hana_database.nodes[0].dbname and not hana_system_replication_enabled
+  when: ansible_hostname != primary_instance.name and not hana_system_replication_enabled
   block:
 
     - import_tasks: stop_hana.yml
@@ -77,7 +77,7 @@
     - name: Ensure Secondary node is registered as secondary in replication
       shell: >
         source ~/.bashrc ;
-        {{ hdbnsutil_command }} -sr_register --remoteHost={{ hana_database.nodes[0].dbname }}
+        {{ hdbnsutil_command }} -sr_register --remoteHost={{ primary_instance.name }}
         --remoteInstance={{ instance_number }} --replicationMode={{ hana_replication_mode }}
         --operationMode={{ hana_operation_mode }} --name=SITEB
       tags:
