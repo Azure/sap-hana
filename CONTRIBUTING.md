@@ -25,27 +25,28 @@ This document summarizes the deployment principles which govern our project.
   * we start building out the solution and iterate towards a grand plan.
 
 ## Coding Guidelines
-This repository integrates with [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/), which invokes build checks on the submitted pull requests aginst defined branch(eg. master). All pull requests are required to pass the Azure pipelines test before it can be merged.
+This repository integrates with [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/), which invokes build checks on the submitted pull requests aginst defined branch(eg. master). :exclamation: All pull requests are required to pass the Azure pipelines test before it can be merged.
 
 ### PR Basics
 This section captures fundamentals on how new features should be developed and fixes made to the codebase.
 
 1. **Close on design before sending PRs**
-	1. Add and describe design by creating an issue [here](https://github.com/Azure/sap-hana/issues). Discussions on the design will happen in the issue page. How? please take a look at the [example](https://github.com/Azure/sap-hana/issues/337).
-	1. For sizable features, please request a design meeting.
-	1. In the design meeting, the expectation is all attendees have reviewed the design. 
+	- Add and describe design by creating an issue [here](https://github.com/Azure/sap-hana/issues). Discussions on the design will happen in the issue page. How? please take a look at the [example](https://github.com/Azure/sap-hana/issues/337).
+	- For sizable features, please request a design meeting.
+	- In the design meeting, the expectation is all attendees have reviewed the design. 
 1. **Design for modularity, easy versioning, easy deployment and rollback**
-	1. The design has to make sure it is independent and has minimum impact on other modules.
-	1. There should be a set of test cases in places to prove the design works and will not break existing code.
-1. **PR guidelines**
-    1. Required information in PR ([example](https://github.com/Azure/sap-hana/pull/480)):
-	    1. Always link to the issue that is is trying to resolve with tag **Close**.
-	    1. Describe the **Problem** that it tries to resolve.
-	    1. Provide the **Solution** that this PR contains.
-	    1. Provide **Tests** that have been done to make sure this PR does not break existing code (either in master or branch). If the test requires certain instructions, please add that information as well.
-	1. The PRs should be easily tested independent of other projects in progress.
-	1. Submit PRs with small commits that make it easier to rollback in case of problem.
-	1. If it requires several PRs for a design, please create a feature branch, and submit PR against the feature branch instead of master (*Make sure you alert the admin of the github repo to add the feature branch into Azure pipeline so we make sure your PR will be tested*).
+	- The design has to make sure it is independent and has minimum impact on other modules.
+	- There should be a set of test cases in places to prove the design works and will not break existing code.
+
+**PR guidelines**
+1. Required information in PR ([example](https://github.com/Azure/sap-hana/pull/480)):
+    	- Always link to the issue that is is trying to resolve with tag **Closes**.
+	- Describe the **Problem** that it tries to resolve.
+	- Provide the **Solution** that this PR contains.
+	- Provide **Tests** that have been done to make sure this PR does not break existing code (either in master or branch). If the test requires certain instructions, please add that information as well.
+1. The PRs should be easily tested independent of other projects in progress.
+1. Submit PRs with small commits with descriptive comemnts, so that make it easier to rollback in case of problem.
+1. If it requires several PRs for a design, please create a feature branch, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo to add the feature branch into Azure pipeline so we make sure your PR will be tested*).
 
 ### PR reviews guidelines
 We need to ensure quality along with agility. We need to move to everyone agreeing on the base requirement and then relying on systems in place to catch and mitigate issues.
