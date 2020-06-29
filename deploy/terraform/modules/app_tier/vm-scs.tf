@@ -9,7 +9,7 @@ resource "azurerm_network_interface" "scs" {
   ip_configuration {
     name                          = "IPConfig1"
     subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
-    private_ip_address            = cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(count.index) + local.ip_offsets.scs_vm)
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_app.is_existing ? local.scs_nic_ips[count.index] : cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(count.index) + local.ip_offsets.scs_vm)
     private_ip_address_allocation = "static"
   }
 }
