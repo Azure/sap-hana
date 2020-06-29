@@ -14,6 +14,6 @@
   changed_when: false
   retries: 30
   delay: 30
-  when: ansible_hostname == secondary_instance.name
+  when: ansible_hostname == primary_instance.name
   tags:
     - skip_ansible_lint

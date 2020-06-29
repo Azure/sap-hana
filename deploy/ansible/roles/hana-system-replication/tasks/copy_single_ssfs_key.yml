@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure the secondary node {{ ssfs_file_path }} file is backed up and removed
-  when: ansible_hostname != secondary_instance.name
+  when: ansible_hostname != primary_instance.name
   block:
 
     - name: Check {{ ssfs_file_path }} backup file exists on the secondary node

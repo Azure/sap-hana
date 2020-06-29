@@ -57,8 +57,8 @@
     path: /etc/hosts
     state: present
     insertafter: EOF
-    regexp: "{{ secondary_instance.name }}"
-    line: "{{ primary_instance.ip_db }} {{ secondary_instance.name }}"
+    regexp: "{{ primary_instance.name }}"
+    line: "{{ primary_instance.ip_db }} {{ primary_instance.name }}"
 
 - name: Ensure the Secondary node hosts entry exists
   lineinfile:

@@ -9,7 +9,7 @@
 
 - name: Ensure initiator name is set
   vars:
-    currentHostName: "{{ secondary_instance.name if inventory_hostname == primary_instance.ip_admin else secondary_instance.name }}"
+    currentHostName: "{{ primary_instance.name if inventory_hostname == primary_instance.ip_admin else secondary_instance.name }}"
     initiatorName: "{{ iscsi_object }}.{{ currentHostName }}.local:{{ currentHostName }}"
   lineinfile:
     dest: '/etc/iscsi/initiatorname.iscsi'

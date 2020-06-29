@@ -31,7 +31,7 @@
     backup_file_for_tenant_full_path: "{{ sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP"
 
 - name: Ensure the Primary node SSFS files are present on the primary node
-  when: ansible_hostname == secondary_instance.name
+  when: ansible_hostname == primary_instance.name
   block:
 
     - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists
