@@ -36,7 +36,7 @@ This section captures fundamentals on how new features should be developed and f
 	- In the design meeting, the expectation is all attendees have reviewed the design. 
 1. **Design for modularity, easy versioning, easy deployment and rollback**
 	- The design has to make sure it is independent and has minimum impact on other modules.
-	- There should be a set of test cases in places to prove the design works and will not break existing code.
+	- There should be a set of test cases in place to prove the design works and will not break existing code.
 
 **PR guidelines**
 1. Required information in PR ([example](https://github.com/Azure/sap-hana/pull/480)):
