@@ -32,7 +32,7 @@ This section captures fundamentals on how new features should be developed and f
 
 1. **Close on design before sending PRs**
 	- Add and describe design by creating an issue [here](https://github.com/Azure/sap-hana/issues). Discussions on the design will happen in the issue page. How? please take a look at the [example](https://github.com/Azure/sap-hana/issues/337).
-	- For sizable features, please request a design meeting.
+	- For sizable features, please request a design meeting with our team at ![image](/documentation/assets/contact.png).
 	- In the design meeting, the expectation is all attendees have reviewed the design prior to the meeting. 
 1. **Design for modularity, easy versioning, easy deployment and rollback**
 	- The design has to make sure it is independent and has minimum impact on other modules.
@@ -46,7 +46,7 @@ This section captures fundamentals on how new features should be developed and f
 	- Provide **Tests** that have been done to make sure this PR does not break existing code (either in master or branch). If the test requires certain instructions, please add that information as well.
 1. The PRs should be easily tested independent of other projects in progress.
 1. Submit PRs with small commits with descriptive comemnts, so that make it easier to rollback in case of problem.
-1. If it requires several PRs for a design, please create a feature branch, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo to add the feature branch into Azure pipeline so we make sure your PR will be tested*).
+1. If it requires several PRs for a design, please create a feature branch, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo at ![image](/documentation/assets/contact.png) to add the feature branch into Azure pipeline so we make sure your PR will be tested*).
 
 ### PR reviews guidelines
 We need to ensure quality along with agility. We need to move to everyone agreeing on the base requirement and then relying on systems in place to catch and mitigate issues.
