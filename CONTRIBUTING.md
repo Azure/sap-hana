@@ -33,7 +33,7 @@ This section captures fundamentals on how new features should be developed and f
 1. **Close on design before sending PRs**
 	- Add and describe design by creating an issue [here](https://github.com/Azure/sap-hana/issues). Discussions on the design will happen in the issue page. How? please take a look at the [example](https://github.com/Azure/sap-hana/issues/337).
 	- For sizable features, please request a design meeting.
-	- In the design meeting, the expectation is all attendees have reviewed the design. 
+	- In the design meeting, the expectation is all attendees have reviewed the design prior to the meeting. 
 1. **Design for modularity, easy versioning, easy deployment and rollback**
 	- The design has to make sure it is independent and has minimum impact on other modules.
 	- There should be a set of test cases in place to prove the design works and will not break existing code.
