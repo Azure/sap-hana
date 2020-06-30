@@ -48,6 +48,7 @@ variable "skus" {
 variable "datadisks" {
   type = map
   default = {
+    "Demo"   = "1;255;-data;Premium_LRS;ReadWrite;false"
     "200"   = "1;255;-data;Premium_LRS;ReadWrite;false"
     "500"   = "1;511;-data;Premium_LRS;ReadWrite;false"
     "1024"  = "2;511;-data;Premium_LRS;ReadWrite;false"
@@ -62,6 +63,7 @@ variable "datadisks" {
 variable "logdisks" {
   type = map
   default = {
+    "Demo"   = "1;127;-log;Premium_LRS;ReadWrite;false"
     "200"   = "1;127;-log;Premium_LRS;ReadWrite;false"
     "500"   = "1;255;-log;Premium_LRS;ReadWrite;false"
     "1024"  = "2;255;-log;Premium_LRS;ReadWrite;false"
