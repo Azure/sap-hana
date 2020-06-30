@@ -82,7 +82,7 @@ locals {
   # Filter the list of databases to only HANA platform entries
   any-databases = [
     for database in var.databases : database
-    if ((database.platform != "HANA") && (database.platform = "NONE"))
+    if (database.platform != "HANA"  && database.platform != "NONE" )
   ]
 
   # Enable deployment based on length of local.hana-databases
