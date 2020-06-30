@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure the secondary node {{ ssfs_file_path }} file is backed up and removed
-  when: ansible_hostname != hana_database.nodes[0].dbname
+  when: ansible_hostname != primary_instance.name
   block:
 
     - name: Check {{ ssfs_file_path }} backup file exists on the secondary node
@@ -22,7 +22,7 @@
         state: absent
 
 - name: Ensure the primary node {{ ssfs_file_path }} file is placed on the secondary node
-  when: ansible_hostname == hana_database.nodes[1].dbname
+  when: ansible_hostname == secondary_instance.name
   block:
 
     # Note that we use the IP of the primary node and not its hostname, because
@@ -35,4 +35,4 @@
         dest: "{{ ssfs_file_path }}"
         mode: push
         archive: true
-      delegate_to: "{{ hana_database.nodes[0].ip_admin_nic }}"
+      delegate_to: "{{ primary_instance.ip_admin }}"

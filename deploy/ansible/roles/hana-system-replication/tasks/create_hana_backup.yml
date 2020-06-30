@@ -8,7 +8,7 @@
 
 - name: Ensure backup is taken on primary node
   # If HSR is already enabled, we don't need to do this
-  when: ansible_hostname == hana_database.nodes[0].dbname and not hana_system_replication_enabled
+  when: ansible_hostname == primary_instance.name and not hana_system_replication_enabled
   become_user: "{{ sid_admin_user }}"
   block:
     - name: Check whether backup exists for SYSTEMDB database for System Identifier {{ sid }}

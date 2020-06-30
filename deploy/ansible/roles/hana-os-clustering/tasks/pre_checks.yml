@@ -1,7 +1,7 @@
 ---
 
 - name: Check the fencing agent configuration variables are set
-  when: hana_database.size != "LargeInstance"
+  when: hdb_size != "LargeInstance"
   assert:
     that:
       - "sap_hana_fencing_agent_subscription_id is defined"
