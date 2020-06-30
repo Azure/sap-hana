@@ -22,6 +22,7 @@ variable "ppg" {
 variable "skus" {
   type = map
   default = {
+    "Demo"   = "Standard_E4s_v3"
     "200"   = "Standard_E4s_v3"
     "500"   = "Standard_E8s_v3"
     "1024"  = "Standard_E16s_v3"
@@ -138,6 +139,11 @@ locals {
       "80",
       "1433"
     ]
+
+    "NONE" = [
+    ]
+
+
   }
 
   # Hash of Load Balancers to create for HANA instances
