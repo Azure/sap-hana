@@ -66,7 +66,7 @@ resource azurerm_linux_virtual_machine "main" {
 
 # Creates managed data disks
 resource azurerm_managed_disk "data-disk" {
-  count                = length(local.allDataDisks)
+  count                = local.enable_deployment ? length(local.allDataDisks) : 0
   name                 = local.allDataDisks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
@@ -77,9 +77,8 @@ resource azurerm_managed_disk "data-disk" {
 
 # Manages attaching a Disk to a Virtual Machine
 resource azurerm_virtual_machine_data_disk_attachment "vm-data-disk" {
-  count           = length(local.allDataDisks)
-  managed_disk_id = azurerm_managed_disk.data-disk[count.index].id
-  #virtual_machine_id        = azurerm_virtual_machine.main[0].id
+  count                     = local.enable_deployment ? length(local.allDataDisks) : 0
+  managed_disk_id           = azurerm_managed_disk.data-disk[count.index].id
   virtual_machine_id        = local.allDataDisks[count.index].vmID
   caching                   = local.allDataDisks[count.index].caching
   write_accelerator_enabled = local.allDataDisks[count.index].writeAcceleratorEnabled
@@ -88,7 +87,7 @@ resource azurerm_virtual_machine_data_disk_attachment "vm-data-disk" {
 
 # Creates managed log disks
 resource azurerm_managed_disk "log-disk" {
-  count                = length(local.allLogDisks)
+  count                = local.enable_deployment ? length(local.allLogDisks) : 0
   name                 = local.allLogDisks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
@@ -99,9 +98,8 @@ resource azurerm_managed_disk "log-disk" {
 
 # Manages attaching a Disk to a Virtual Machine
 resource azurerm_virtual_machine_data_disk_attachment "vm-log-disk" {
-  count           = length(local.allLogDisks)
-  managed_disk_id = azurerm_managed_disk.log-disk[count.index].id
-  #virtual_machine_id        = azurerm_virtual_machine.main[0].id
+  count                     = local.enable_deployment ? length(local.allLogDisks) : 0
+  managed_disk_id           = azurerm_managed_disk.log-disk[count.index].id
   virtual_machine_id        = local.allLogDisks[count.index].vmID
   caching                   = local.allLogDisks[count.index].caching
   write_accelerator_enabled = local.allLogDisks[count.index].writeAcceleratorEnabled
