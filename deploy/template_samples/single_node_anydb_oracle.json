@@ -30,15 +30,6 @@
         "is_existing": "false",
         "name": "vnet-sap",
         "address_space": "10.1.0.0/16",
-        "subnet_admin": {
-          "is_existing": "false",
-          "name": "subnet-admin",
-          "prefix": "10.1.1.0/24",
-          "nsg": {
-            "is_existing": "false",
-            "name": "nsg-admin"
-          }
-        },
         "subnet_db": {
           "is_existing": "false",
           "name": "subnet-db",

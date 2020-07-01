@@ -13,8 +13,8 @@ resource "azurerm_lb" "anydb-lb" {
   frontend_ip_configuration {
     name = format("%s-%s-lb-feip", var.role, local.prefix)
 
-    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-anydb[0].id : azurerm_subnet.subnet-anydb[0].id
-    private_ip_address_allocation = "Dynamic"
+    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
+    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? try(local.any-databases.loadbalancer.frontend_ip, cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4)) : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4)
   }
   sku = "Standard"
 
