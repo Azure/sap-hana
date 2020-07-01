@@ -49,16 +49,16 @@ resource "azurerm_network_interface_backend_address_pool_association" "anydb-lb-
   backend_address_pool_id = azurerm_lb_backend_address_pool.anydb-lb-back-pool[0].id
 }
 
-# resource "azurerm_lb_rule" "anydb-lb-rules" {
-#   count                          = length(local.loadbalancers-ports)
-#   resource_group_name            = var.resource-group[0].name
-#   loadbalancer_id                = azurerm_lb.anydb-lb[0].id
-#   name                           = "anydb_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"
-#   protocol                       = "Tcp"
-#   frontend_port                  = local.loadbalancers[0].ports[count.index]
-#   backend_port                   = local.loadbalancers[0].ports[count.index]
-#   frontend_ip_configuration_name = "anydb-${local.loadbalancers[0].sid}-lb-feip"
-#   backend_address_pool_id        = azurerm_lb_backend_address_pool.anydb-lb-back-pool[0].id
-#   probe_id                       = azurerm_lb_probe.anydb-lb-health-probe[0].id
-#   enable_floating_ip             = true
-# }
+resource "azurerm_lb_rule" "anydb-lb-rules" {
+  count                          = length(local.loadbalancers-ports)
+  resource_group_name            = var.resource-group[0].name
+  loadbalancer_id                = azurerm_lb.anydb-lb[0].id
+  name                           = "anydb_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"
+  protocol                       = "Tcp"
+  frontend_port                  = local.loadbalancers[0].ports[count.index]
+  backend_port                   = local.loadbalancers[0].ports[count.index]
+  frontend_ip_configuration_name = "anydb-${local.loadbalancers[0].sid}-lb-feip"
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.anydb-lb-back-pool[0].id
+  probe_id                       = azurerm_lb_probe.anydb-lb-health-probe[0].id
+  enable_floating_ip             = true
+}
