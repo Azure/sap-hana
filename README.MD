@@ -36,7 +36,7 @@ Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
 
 ## Terraform Deployment Units
 
-- [HANA single-node instance](/deploy/terraform/HANA.md) (Primary Entry Point)
+- [SAP Landscape](/deploy/terraform/SAPLandscape.md) (Primary Entry Point)
 - [SAP Library](/deploy/terraform-units/workspace/SAP_Library/Readme.md)
 - Deployment Portal (Coming Soon)
 - Logical SAP Network Foundation (Coming Soon)

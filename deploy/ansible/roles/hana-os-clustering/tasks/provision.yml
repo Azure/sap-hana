@@ -8,7 +8,7 @@
     name: "{{ item }}"
     state: present
   loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
-  when: hana_database.size != "LargeInstance"
+  when: hdb_size != "LargeInstance"
 
 # Pacemaker can create a large number of processes
 - name: Ensure Process limit is raised
@@ -42,12 +42,12 @@
 - name: Ensure the Primary Node public key is authorized on all nodes, required for crm_clustering
   authorized_key:
     user: root
-    key: "{{ hostvars[hana_database.nodes[0].ip_admin_nic].cluster_public_ssh_key.stdout }}"
+    key: "{{ hostvars[primary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
 
 - name: Ensure the Secondary Node public key is authorized on all nodes, required for crm_clustering
   authorized_key:
     user: root
-    key: "{{ hostvars[hana_database.nodes[1].ip_admin_nic].cluster_public_ssh_key.stdout }}"
+    key: "{{ hostvars[secondary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
 
 # @TODO NTP server for datetime sync?
 
@@ -57,24 +57,24 @@
     path: /etc/hosts
     state: present
     insertafter: EOF
-    regexp: "{{ hana_database.nodes[0].dbname }}"
-    line: "{{ hana_database.nodes[0].ip_db_nic }} {{ hana_database.nodes[0].dbname }}"
+    regexp: "{{ primary_instance.name }}"
+    line: "{{ primary_instance.ip_db }} {{ primary_instance.name }}"
 
 - name: Ensure the Secondary node hosts entry exists
   lineinfile:
     path: /etc/hosts
     state: present
     insertafter: EOF
-    regexp: "{{ hana_database.nodes[1].dbname }}"
-    line: "{{ hana_database.nodes[1].ip_db_nic }} {{ hana_database.nodes[1].dbname }}"
+    regexp: "{{ secondary_instance.name }}"
+    line: "{{ secondary_instance.ip_db }} {{ secondary_instance.name }}"
 
 # Clustering commands are based on the Host OS
 - name: Cluster based on OS in VM
   include_tasks: "cluster-{{ ansible_os_family }}.yml"
-  when: hana_database.size != "LargeInstance"
+  when: hdb_size != "LargeInstance"
 
 - name: Ensure cluster is configured in Large Instance
   include_tasks: "cluster-{{ ansible_os_family }}-large-instance.yml"
-  when: 
-    - hana_database.size == "LargeInstance"
+  when:
+    - hdb_size == "LargeInstance"
     - ansible_os_family == "Suse"

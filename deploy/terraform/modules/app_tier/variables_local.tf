@@ -24,6 +24,11 @@ locals {
   application_server_count = try(var.application.application_server_count, 0)
   webdispatcher_count      = try(var.application.webdispatcher_count, 0)
   vm_sizing                = try(var.application.vm_sizing, "Default")
+  app_nic_ips              = try(var.application.app_nic_ips, [])
+  scs_lb_ips               = try(var.application.scs_lb_ips, [])
+  scs_nic_ips              = try(var.application.scs_nic_ips, [])
+  web_lb_ips               = try(var.application.web_lb_ips, [])
+  web_nic_ips              = try(var.application.web_nic_ips, [])
   authentication = try(var.application.authentication,
     {
       "type"     = "key"

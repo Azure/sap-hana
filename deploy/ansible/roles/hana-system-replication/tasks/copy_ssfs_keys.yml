@@ -1,11 +1,11 @@
 ---
 
 - name: Ensure the Primary node SSFS files are present on the primary node
-  when: ansible_hostname == hana_database.nodes[0].dbname
+  when: ansible_hostname == primary_instance.name
   block:
 
     - name: Ensure the Primary node SSFS_{{ sid | upper }}.DAT file exists
-      when: ansible_hostname == hana_database.nodes[0].dbname
+      when: ansible_hostname == primary_instance.name
       stat:
         path: "{{ path_ssfs_dat }}"
       register: primary_dat_file_result
