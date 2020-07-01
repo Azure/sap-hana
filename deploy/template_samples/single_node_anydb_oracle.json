@@ -3,7 +3,7 @@
     "region": "eastus",
     "resource_group": {
       "is_existing": "false",
-      "name": "test-rg"
+      "name": "test-anydb-rg"
     },
     "ppg": {
       "is_existing": "false",
@@ -22,13 +22,11 @@
           "nsg": {
             "is_existing": "false",
             "name": "nsg-mgmt",
-            "allowed_ips": [
-              "0.0.0.0/0"
-            ]
+            "allowed_ips": ["0.0.0.0/0"]
           }
         }
       },
-    "sap": {
+      "sap": {
         "is_existing": "false",
         "name": "vnet-sap",
         "address_space": "10.1.0.0/16",
@@ -63,8 +61,7 @@
     }
   },
   "jumpboxes": {
-    "windows": [
-    ],
+    "windows": [],
     "linux": [
       {
         "name": "jumpbox-linux",
@@ -81,8 +78,7 @@
           "username": "azureadm",
           "password": "Sap@hana2019!"
         },
-        "components": [
-        ]
+        "components": []
       },
       {
         "name": "rti",
@@ -98,9 +94,7 @@
           "type": "key",
           "username": "azureadm"
         },
-        "components": [
-          "ansible"
-        ]
+        "components": ["ansible"]
       }
     ]
   },
@@ -127,8 +121,7 @@
       "credentials": {
         "db_systemdb_password": "Manager1"
       },
-      "components": {
-      },
+      "components": {},
       "dbnodes": [
         {
           "name": "odb1",
@@ -138,72 +131,6 @@
       "loadbalancer": {}
     }
   ],
-  "application": {
-    "sid": "OR1",
-    "enable_deployment": true,
-    "scs_instance_number": "01",
-    "ers_instance_number": "02",
-    "scs_high_availability": false,
-    "application_server_count": 1,
-    "webdispatcher_count": 1,
-    "authentication": {
-      "type": "key",
-      "username": "azureadm"
-    },
-    "os": {
-      "publisher": "suse",
-      "offer": "sles-sap-12-sp5",
-      "sku": "gen1"
-    }
-  },
-  "software": {
-    "storage_account_sapbits": {
-      "is_existing": false,
-      "account_tier": "Premium",
-      "account_replication_type": "LRS",
-      "account_kind": "FileStorage",
-      "file_share_name": "bits"
-    },
-    "downloader": {
-      "credentials": {
-        "sap_user": "",
-        "sap_password": ""
-      },
-      "scenarios": [
-        {
-          "scenario_type": "DB",
-          "product_name": "Oracle",
-          "product_version": "2.0",
-          "os_type": "LINUX_X64",
-          "os_version": "SLES12.3",
-          "components": [
-            "PLATFORM"
-          ]
-        },
-        {
-          "scenario_type": "RTI",
-          "product_name": "RTI",
-          "os_type": "LINUX_X64"
-        },
-        {
-          "scenario_type": "BASTION",
-          "os_type": "NT_X64"
-        },
-        {
-          "scenario_type": "BASTION",
-          "os_type": "LINUX_X64"
-        }
-      ],
-      "debug": {
-        "enabled": false,
-        "cert": "charles.pem",
-        "proxies": {
-          "http": "http://127.0.0.1:8888",
-          "https": "https://127.0.0.1:8888"
-        }
-      }
-    }
-  },
   "sshkey": {
     "path_to_public_key": "~/.ssh/id_rsa.pub",
     "path_to_private_key": "~/.ssh/id_rsa"
