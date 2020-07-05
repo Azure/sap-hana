@@ -115,4 +115,6 @@ module "output_files" {
   nics-scs                     = module.app_tier.nics-scs
   nics-app                     = module.app_tier.nics-app
   nics-web                     = module.app_tier.nics-web
+  nics-anydb                   = module.anydb_node.nics-anydb
+  any-database-info            = module.anydb_node.any-database-info
 }

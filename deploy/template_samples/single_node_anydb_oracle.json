@@ -122,6 +122,16 @@
       "loadbalancer": {}
     }
   ],
+  "software": {
+    "storage_account_sapbits": {
+      "is_existing": false,
+      "account_tier": "Premium",
+      "account_replication_type": "LRS",
+      "account_kind": "FileStorage",
+      "file_share_name": "bits"
+    },
+    "downloader": {}
+  },
   "sshkey": {
     "path_to_public_key": "~/.ssh/id_rsa.pub",
     "path_to_private_key": "~/.ssh/id_rsa"

@@ -19,80 +19,49 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-variable "skus" {
-  type = map
-  default = {
-    "Demo"   = "Standard_E4s_v3"
-    "200"   = "Standard_E4s_v3"
-    "500"   = "Standard_E8s_v3"
-    "1024"  = "Standard_E16s_v3"
-    "2048"  = "Standard_E32s_v3"
-    "5120"  = "Standard_M64ls"
-    "10240" = "Standard_M64s"
-    "15360" = "Standard_M64s"
-    "20480" = "Standard_M64s"
-  }
-}
-
-
-#####################################################
-#
-# The schema for the value part of the map is
-# Number of disks
-# Size of the disks
-# name suffix of the disks
-# SKU of the disk
-# Caching setting of the disk
-# WriteAccelerator setting of the disk
-#
-#####################################################
-variable "datadisks" {
-  type = map
-  default = {
-    "Demo"   = "1;255;-data;Premium_LRS;ReadWrite;false"
-    "200"   = "1;255;-data;Premium_LRS;ReadWrite;false"
-    "500"   = "1;511;-data;Premium_LRS;ReadWrite;false"
-    "1024"  = "2;511;-data;Premium_LRS;ReadWrite;false"
-    "2048"  = "2;1023;-data;Premium_LRS;ReadWrite;false"
-    "5120"  = "5;1023;-data;Premium_LRS;ReadWrite;false"
-    "10240" = "5;2047;-data;Premium_LRS;ReadWrite;false"
-    "15360" = "4;4095;-data;Premium_LRS;ReadWrite;false"
-    "20480" = "4;4095;-data;Premium_LRS;ReadWrite;false"
-  }
-}
-
-variable "logdisks" {
-  type = map
-  default = {
-    "Demo"   = "1;127;-log;Premium_LRS;ReadWrite;false"
-    "200"   = "1;127;-log;Premium_LRS;ReadWrite;false"
-    "500"   = "1;255;-log;Premium_LRS;ReadWrite;false"
-    "1024"  = "2;255;-log;Premium_LRS;ReadWrite;false"
-    "2048"  = "2;511;-log;Premium_LRS;ReadWrite;false"
-    "5120"  = "2;511;-log;Premium_LRS;None;true"
-    "10240" = "2;511;-log;Premium_LRS;None;true"
-    "15360" = "2;511;-log;Premium_LRS;None;true"
-    "20480" = "2;511;-log;Premium_LRS;None;true"
-
-  }
-}
-
-
 locals {
+
+  # Imports database sizing information
+  sizes = jsondecode(file("${path.root}/../anydb_sizes.json"))
+
   # Filter the list of databases to only HANA platform entries
   any-databases = [
     for database in var.databases : database
-    if (database.platform != "HANA"  && database.platform != "NONE" )
+    if(database.platform != "HANA" && database.platform != "NONE")
   ]
 
-  # Enable deployment based on length of local.hana-databases
+  anydb          = try(local.any-databases[0], {})
+  anydb_platform = try(local.anydb.platform, "NONE")
+  anydb_version  = try(local.anydb.db_version, "7.5.1")
+  anydb_os = try(local.anydb.os,
+    {
+      "publisher" : "Oracle",
+      "offer" : "Oracle-Linux",
+  "sku" : "7.5" })
+  anydb_size = try(local.anydb.size, "500")
+  anydb_fs   = try(local.anydb.filesystem, "xfs")
+  anydb_ha   = try(local.anydb.high_availability, "false")
+  anydb_auth = try(local.anydb.authentication,
+    {
+      "type"     = "key"
+      "username" = "azureadm"
+  })
+  # Enable deployment based on length of local.any-databases
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 
-  dbplatform = var.databases[0].platform
+  size     = try(local.anydb.size, "500")
+  prefix   = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
+  vm_count = (length(local.any-databases) > 0) ? (try(local.anydb.high_availability, false) ? 2 : 1) : 0
+  sku      = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
 
-  size     = (length(local.any-databases) > 0) ? local.any-databases[0].size : 1024
-  prefix   = (length(local.any-databases) > 0) ? local.any-databases[0].instance.sid : "XXX"
-  vm_count = (length(local.any-databases) > 0) ? ((local.any-databases[0].high_availability == true) ? 2 : 1) : 0
+  #As we don't know if the server is a Windows or Linux Server we merge these
+  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver : {
+    name = vm.name
+    id   = vm.id
+    }], [for vm in azurerm_windows_virtual_machine.dbserver : {
+    name = vm.name
+    id   = vm.id
+  }]])
 
   dbnodes = flatten([
     [
@@ -165,56 +134,66 @@ locals {
   # List of ports for load balancer
   loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
 
-  dataDisks            = lookup(var.datadisks, local.size)
-  dataDisksSettingList = split(";", local.dataDisks)
-  nrOfDataDisks        = local.dataDisksSettingList[0]
+  # Update database information with defaults
+  anydb_database = merge(local.anydb,
+    { platform = local.anydb_platform },
+    { db_version = local.anydb_version },
+    { os = local.anydb_os },
+    { size = local.anydb_size },
+    { filesystem = local.anydb_fs },
+    { high_availability = local.anydb_ha },
+  { authentication = local.anydb_auth })
 
-  #Helper variable for disk name enumeration
-  disks                        = range(local.nrOfDataDisks)
-  sizeOfDataDisks              = local.dataDisksSettingList[1]
-  nameOfDataDisks              = local.dataDisksSettingList[2]
-  skuOfDataDisks               = local.dataDisksSettingList[3]
-  cachingOfDataDisks           = local.dataDisksSettingList[4]
-  writeAcceleratorForDataDisks = local.dataDisksSettingList[5]
+  data-disk-per-dbnode = flatten(
+    [
+      for storage_type in lookup(local.sizes, local.size).storage : [
+        for disk_count in range(storage_type.count) : {
+          name                      = format("%s%02d", storage_type.name, (disk_count + 1))
+          storage_account_type      = storage_type.disk_type
+          disk_size_gb              = storage_type.size_gb
+          caching                   = storage_type.caching
+          write_accelerator_enabled = storage_type.write_accelerator
+        }
+      ]
+      if storage_type.name != "os"
+  ])
 
-  #Data Disks
-
-  allDataDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.disks : {
-    name                    = format("%s%s%02d", vm.name, local.nameOfDataDisks, disk + 1)
-    sku                     = local.skuOfDataDisks
-    writeAcceleratorEnabled = local.writeAcceleratorForDataDisks
-    diskSizeGB              = local.sizeOfDataDisks
-    caching                 = local.cachingOfDataDisks
-    lun                     = disk
-    vmID                    = vm.id
+  #This is the combined list for all disks for all VMs
+  allDataDisks = flatten([for vm in local.vms : [for luncount in range(length(local.data-disk-per-dbnode)) : {
+    name                      = format("%s-%s", vm.name, local.data-disk-per-dbnode[luncount].name)
+    caching                   = local.data-disk-per-dbnode[luncount].caching
+    storage_account_type      = local.data-disk-per-dbnode[luncount].storage_account_type
+    disk_size_gb              = local.data-disk-per-dbnode[luncount].disk_size_gb
+    write_accelerator_enabled = local.data-disk-per-dbnode[luncount].write_accelerator_enabled
+    virtual_machine_id        = vm.id
+    lun                       = luncount
   }]])
 
-  #Log Disks
+  # #Log Disks
 
-  logDisksData        = lookup(var.logdisks, local.size)
-  logDisksSettingList = split(";", local.logDisksData)
-  nrOfLogDisks        = local.logDisksSettingList[0]
-  #Helper variable for disk name enumeration
-  logDisks                    = range(local.nrOfLogDisks)
-  sizeOfLogDisks              = local.logDisksSettingList[1]
-  nameOfLogDisks              = local.logDisksSettingList[2]
-  skuOfLogDisks               = local.logDisksSettingList[3]
-  cachingOfLogDisks           = local.logDisksSettingList[4]
-  writeAcceleratorForLogDisks = local.logDisksSettingList[5]
+  # logDisksData        = lookup(var.logdisks, local.size)
+  # logDisksSettingList = split(";", local.logDisksData)
+  # nrOfLogDisks        = local.logDisksSettingList[0]
+  # #Helper variable for disk name enumeration
+  # logDisks                    = range(local.nrOfLogDisks)
+  # sizeOfLogDisks              = local.logDisksSettingList[1]
+  # nameOfLogDisks              = local.logDisksSettingList[2]
+  # skuOfLogDisks               = local.logDisksSettingList[3]
+  # cachingOfLogDisks           = local.logDisksSettingList[4]
+  # writeAcceleratorForLogDisks = local.logDisksSettingList[5]
 
-  allLogDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.logDisks : {
-    name                    = format("%s%s%02d", vm.name, local.nameOfLogDisks, disk + 1)
-    sku                     = local.skuOfLogDisks
-    writeAcceleratorEnabled = local.writeAcceleratorForLogDisks
-    diskSizeGB              = local.sizeOfLogDisks
-    caching                 = local.cachingOfLogDisks
-    lun                     = disk + local.nrOfDataDisks
-    vmID                    = vm.id
-  }]])
+  # allLogDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.logDisks : {
+  #   name                    = format("%s%s%02d", vm.name, local.nameOfLogDisks, disk + 1)
+  #   sku                     = local.skuOfLogDisks
+  #   writeAcceleratorEnabled = local.writeAcceleratorForLogDisks
+  #   diskSizeGB              = local.sizeOfLogDisks
+  #   caching                 = local.cachingOfLogDisks
+  #   lun                     = disk + local.nrOfDataDisks
+  #   vmID                    = vm.id
+  # }]])
 
   #VM SKU
 
-  sku = lookup(var.skus, local.size)
+
 
 }
-

@@ -44,6 +44,21 @@ all:
 %{~ endif }
 %{~ endfor }
 
+    anydbnodes:
+      hosts:
+%{~ for ip-anydbnode in ips-anydbnodes }
+        ${ip-anydbnode}:
+          ansible_connection:  "ssh"
+%{~ if anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.type == "key" }
+          ansible_user:        "${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.username}"
+%{~ endif }
+%{~ if anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.type == "password" }
+          ansible_user:        "${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.username}"
+          ansible_ssh_pass:    "${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.password}"
+          ansible_become_pass: "${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.password}"
+%{~ endif }
+%{~ endfor }
+
     hanadbnodes:
       hosts:
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }

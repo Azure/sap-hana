@@ -71,6 +71,17 @@ ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.user
 ${ip-web}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
 
+[anydbnodes]
+%{~ for ip-anydbnode in ips-anydbnodes }
+%{~ if anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.type == "key" }
+${ip-anydbnode}  ansible_connection=ssh  ansible_user=${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.username}
+%{~ endif }
+%{~ if anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.type == "password" }
+${ip-anydbnode}  ansible_connection=ssh  ansible_user=${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.username}  ansible_ssh_pass=${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.password}  ansible_become_pass=${anydbnodes[index(ips-anydbnodes, ip-anydbnode)].authentication.password}
+%{~ endif }
+%{~ endfor }
+
+
 [hanadbnodes]
 %{~ for ip-dbnode-admin in ips-dbnodes-admin }
 %{~ if dbnodes[index(ips-dbnodes-admin, ip-dbnode-admin)].authentication.type == "key" }

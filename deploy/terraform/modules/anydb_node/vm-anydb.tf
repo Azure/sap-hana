@@ -6,7 +6,7 @@
 #############################################################################
 
 
-resource azurerm_network_interface "anydbnic" {
+resource azurerm_network_interface "nic" {
   count               = local.enable_deployment ? local.vm_count : 0
   name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.prefix)
   location            = var.resource-group[0].location
@@ -21,14 +21,14 @@ resource azurerm_network_interface "anydbnic" {
   }
 }
 
-resource azurerm_linux_virtual_machine "main" {
-  count                        = local.enable_deployment ? local.vm_count : 0
+resource azurerm_linux_virtual_machine "dbserver" {
+  count                        = local.enable_deployment ? (local.anydb_platform != "SQLSERVER" ? local.vm_count : 0) : 0
   name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.db-as[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-  network_interface_ids        = [azurerm_network_interface.anydbnic[count.index].id]
+  network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
   source_image_reference {
@@ -38,10 +38,15 @@ resource azurerm_linux_virtual_machine "main" {
     version   = "latest"
   }
 
-  os_disk {
-    name                 = format("%s-%s%02d-diskos", var.role, local.prefix, (count.index + 1))
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+  dynamic "os_disk" {
+    iterator = disk
+    for_each = flatten([for storage_type in lookup(local.sizes, local.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
+    content {
+      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.prefix)
+      caching              = disk.value.caching
+      storage_account_type = disk.value.disk_type
+      disk_size_gb         = disk.value.size_gb
+    }
   }
 
   computer_name                   = "${local.prefix}${var.role}vm${count.index}"
@@ -64,45 +69,87 @@ resource azurerm_linux_virtual_machine "main" {
   }
 }
 
+resource azurerm_windows_virtual_machine "dbserver" {
+  count                        = local.enable_deployment ? (local.anydb_platform == "SQLSERVER" ? local.vm_count : 0) : 0
+  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  availability_set_id          = azurerm_availability_set.db-as[0].id
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
+  size                         = local.sku
+
+  source_image_reference {
+    publisher = local.dbnodes[count.index].os.publisher
+    offer     = local.dbnodes[count.index].os.offer
+    sku       = local.dbnodes[count.index].os.sku
+    version   = "latest"
+  }
+
+  dynamic "os_disk" {
+    iterator = disk
+    for_each = flatten([for storage_type in lookup(local.sizes, local.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
+    content {
+      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.prefix)
+      caching              = disk.value.caching
+      storage_account_type = disk.value.disk_type
+      disk_size_gb         = disk.value.size_gb
+    }
+  }
+
+  computer_name  = "${local.prefix}${var.role}vm${count.index}"
+  admin_username = local.anydb_auth.username
+  admin_password = local.anydb_auth.password
+
+  boot_diagnostics {
+    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+  tags = {
+    environment = "SAP"
+    role        = var.role
+    SID         = local.prefix
+  }
+}
+
 # Creates managed data disks
-resource azurerm_managed_disk "data-disk" {
+resource azurerm_managed_disk "disks" {
   count                = local.enable_deployment ? length(local.allDataDisks) : 0
   name                 = local.allDataDisks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.skuOfDataDisks
-  disk_size_gb         = local.sizeOfDataDisks
+  storage_account_type = local.allDataDisks[count.index].storage_account_type
+  disk_size_gb         = local.allDataDisks[count.index].disk_size_gb
 }
 
 # Manages attaching a Disk to a Virtual Machine
-resource azurerm_virtual_machine_data_disk_attachment "vm-data-disk" {
+resource azurerm_virtual_machine_data_disk_attachment "vm-disks" {
   count                     = local.enable_deployment ? length(local.allDataDisks) : 0
-  managed_disk_id           = azurerm_managed_disk.data-disk[count.index].id
-  virtual_machine_id        = local.allDataDisks[count.index].vmID
+  managed_disk_id           = azurerm_managed_disk.disks[count.index].id
+  virtual_machine_id        = local.allDataDisks[count.index].virtual_machine_id
   caching                   = local.allDataDisks[count.index].caching
-  write_accelerator_enabled = local.allDataDisks[count.index].writeAcceleratorEnabled
+  write_accelerator_enabled = local.allDataDisks[count.index].write_accelerator_enabled
   lun                       = local.allDataDisks[count.index].lun
 }
 
-# Creates managed log disks
-resource azurerm_managed_disk "log-disk" {
-  count                = local.enable_deployment ? length(local.allLogDisks) : 0
-  name                 = local.allLogDisks[count.index].name
-  location             = var.resource-group[0].location
-  resource_group_name  = var.resource-group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.skuOfLogDisks
-  disk_size_gb         = local.sizeOfLogDisks
-}
+# # Creates managed log disks
+# resource azurerm_managed_disk "log-disk" {
+#   count                = local.enable_deployment ? length(local.allLogDisks) : 0
+#   name                 = local.allLogDisks[count.index].name
+#   location             = var.resource-group[0].location
+#   resource_group_name  = var.resource-group[0].name
+#   create_option        = "Empty"
+#   storage_account_type = local.skuOfLogDisks
+#   disk_size_gb         = local.sizeOfLogDisks
+# }
 
-# Manages attaching a Disk to a Virtual Machine
-resource azurerm_virtual_machine_data_disk_attachment "vm-log-disk" {
-  count                     = local.enable_deployment ? length(local.allLogDisks) : 0
-  managed_disk_id           = azurerm_managed_disk.log-disk[count.index].id
-  virtual_machine_id        = local.allLogDisks[count.index].vmID
-  caching                   = local.allLogDisks[count.index].caching
-  write_accelerator_enabled = local.allLogDisks[count.index].writeAcceleratorEnabled
-  lun                       = local.allLogDisks[count.index].lun
-}
+# # Manages attaching a Disk to a Virtual Machine
+# resource azurerm_virtual_machine_data_disk_attachment "vm-log-disk" {
+#   count                     = local.enable_deployment ? length(local.allLogDisks) : 0
+#   managed_disk_id           = azurerm_managed_disk.log-disk[count.index].id
+#   virtual_machine_id        = local.allLogDisks[count.index].vmID
+#   caching                   = local.allLogDisks[count.index].caching
+#   write_accelerator_enabled = local.allLogDisks[count.index].writeAcceleratorEnabled
+#   lun                       = local.allLogDisks[count.index].lun
+# }
 
