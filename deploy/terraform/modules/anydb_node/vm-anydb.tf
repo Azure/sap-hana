@@ -31,12 +31,16 @@ resource azurerm_linux_virtual_machine "dbserver" {
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
+  source_image_id  = local.customimageid
+
+  # storage_image_reference {
   source_image_reference {
-    publisher = local.dbnodes[count.index].os.publisher
-    offer     = local.dbnodes[count.index].os.offer
-    sku       = local.dbnodes[count.index].os.sku
+    publisher = local.anydb_os.publisher
+    offer     = local.anydb_os.offer
+    sku       = local.anydb_os.sku
     version   = "latest"
   }
+
 
   dynamic "os_disk" {
     iterator = disk
@@ -79,10 +83,13 @@ resource azurerm_windows_virtual_machine "dbserver" {
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
+  source_image_id = local.customimageid
+
+  # storage_image_reference {
   source_image_reference {
-    publisher = local.dbnodes[count.index].os.publisher
-    offer     = local.dbnodes[count.index].os.offer
-    sku       = local.dbnodes[count.index].os.sku
+    publisher = local.anydb_os.publisher
+    offer     = local.anydb_os.offer
+    sku       = local.anydb_os.sku
     version   = "latest"
   }
 

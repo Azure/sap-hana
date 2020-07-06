@@ -19,6 +19,8 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
+
+
 locals {
 
   # Imports database sizing information
@@ -37,7 +39,7 @@ locals {
     {
       "publisher" : "Oracle",
       "offer" : "Oracle-Linux",
-  "sku" : "7.5" })
+      "sku" : "7.5" })
   anydb_size = try(local.anydb.size, "500")
   anydb_fs   = try(local.anydb.filesystem, "xfs")
   anydb_ha   = try(local.anydb.high_availability, "false")
@@ -169,31 +171,19 @@ locals {
     lun                       = luncount
   }]])
 
-  # #Log Disks
+  customimageid = "/subscriptions/80d5ed43-1465-432b-8914-5e1f68d49330/resourceGroups/SharedImages/providers/Microsoft.Compute/galleries/CorpImageGalleryEMEA/images/NETWEAVER/versions/1.0.1"
 
-  # logDisksData        = lookup(var.logdisks, local.size)
-  # logDisksSettingList = split(";", local.logDisksData)
-  # nrOfLogDisks        = local.logDisksSettingList[0]
-  # #Helper variable for disk name enumeration
-  # logDisks                    = range(local.nrOfLogDisks)
-  # sizeOfLogDisks              = local.logDisksSettingList[1]
-  # nameOfLogDisks              = local.logDisksSettingList[2]
-  # skuOfLogDisks               = local.logDisksSettingList[3]
-  # cachingOfLogDisks           = local.logDisksSettingList[4]
-  # writeAcceleratorForLogDisks = local.logDisksSettingList[5]
+  marketplaceimage = {
+    "publisher" : local.anydb_os.publisher,
+    "offer" : local.anydb_os.offer,
+    "sku" : local.anydb_os.sku
+  }
 
-  # allLogDisks = flatten([for vm in azurerm_linux_virtual_machine.main : [for disk in local.logDisks : {
-  #   name                    = format("%s%s%02d", vm.name, local.nameOfLogDisks, disk + 1)
-  #   sku                     = local.skuOfLogDisks
-  #   writeAcceleratorEnabled = local.writeAcceleratorForLogDisks
-  #   diskSizeGB              = local.sizeOfLogDisks
-  #   caching                 = local.cachingOfLogDisks
-  #   lun                     = disk + local.nrOfDataDisks
-  #   vmID                    = vm.id
-  # }]])
-
-  #VM SKU
+  customimage = {
+    "id" = local.customimageid
+  }
 
 
+  storage_ref = length(local.customimageid) > 0 ? local.customimage : local.marketplaceimage
 
 }
