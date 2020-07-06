@@ -75,7 +75,7 @@ jobs:
       testCaseName: $(testcase)
 - job: createAllNew_AnyDB_SN_${{parameters.osVersion}}
   timeoutInMinutes: 60
-  condition: eq(variables['branchName'], 'feature/anydb')
+  condition: eq(variables['targetBranchName'], 'feature/anydb')
   variables:
     scenario: sap-allNew-AnyDB-SN
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)
@@ -92,7 +92,7 @@ jobs:
       osImage: ${{parameters.osImage}}
 - job: createAllNew_AnyDB_HA_${{parameters.osVersion}}
   timeoutInMinutes: 60
-  condition: eq(variables['branchName'], 'feature/anydb')
+  condition: eq(variables['targetBranchName'], 'feature/anydb')
   variables:
     scenario: sap-allNew-AnyDB-HA
     testcase: $(scenario)-${{parameters.osVersion}}-$(Build.BuildId)

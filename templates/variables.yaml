@@ -3,3 +3,7 @@ variables:
     branchName: $[ replace(variables['Build.SourceBranch'], 'refs/heads/', '') ]
   ${{ if startsWith(variables['Build.SourceBranch'], 'refs/pull/') }}:
     branchName: $[ replace(variables['System.PullRequest.SourceBranch'], 'refs/heads/', '') ]
+  ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    targetBranchName: $(System.PullRequest.TargetBranch)
+  ${{ if not eq(variables['Build.Reason'], 'PullRequest') }}:
+    targetBranchName: $(branchName)
