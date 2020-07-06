@@ -39,10 +39,12 @@ locals {
     {
       "publisher" : "Oracle",
       "offer" : "Oracle-Linux",
-      "sku" : "7.5" })
-  anydb_size = try(local.anydb.size, "500")
-  anydb_fs   = try(local.anydb.filesystem, "xfs")
-  anydb_ha   = try(local.anydb.high_availability, "false")
+  "sku" : "7.5" })
+  anydb_customimageid = try(local.anydb.image_id, "")
+  anydb_ostype        = try(local.anydb.os_type, "Linux")
+  anydb_size          = try(local.anydb.size, "500")
+  anydb_fs            = try(local.anydb.filesystem, "xfs")
+  anydb_ha            = try(local.anydb.high_availability, "false")
   anydb_auth = try(local.anydb.authentication,
     {
       "type"     = "key"
@@ -57,12 +59,19 @@ locals {
   sku      = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
 
   #As we don't know if the server is a Windows or Linux Server we merge these
-  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver : {
+  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver_marketplace : {
     name = vm.name
     id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.dbserver : {
+    }], [for vm in azurerm_windows_virtual_machine.dbserver_marketplace : {
     name = vm.name
     id   = vm.id
+    }],
+    [for vm in azurerm_linux_virtual_machine.dbserver_customimage : {
+      name = vm.name
+      id   = vm.id
+      }], [for vm in azurerm_windows_virtual_machine.dbserver_customimage : {
+      name = vm.name
+      id   = vm.id
   }]])
 
   dbnodes = flatten([
@@ -171,19 +180,6 @@ locals {
     lun                       = luncount
   }]])
 
-  customimageid = "/subscriptions/80d5ed43-1465-432b-8914-5e1f68d49330/resourceGroups/SharedImages/providers/Microsoft.Compute/galleries/CorpImageGalleryEMEA/images/NETWEAVER/versions/1.0.1"
 
-  marketplaceimage = {
-    "publisher" : local.anydb_os.publisher,
-    "offer" : local.anydb_os.offer,
-    "sku" : local.anydb_os.sku
-  }
-
-  customimage = {
-    "id" = local.customimageid
-  }
-
-
-  storage_ref = length(local.customimageid) > 0 ? local.customimage : local.marketplaceimage
 
 }
