@@ -9,7 +9,7 @@
 
 - name: Ensure initiator name is set
   vars:
-    currentHostName: "{{ hana_database.nodes[0].dbname if inventory_hostname == hana_database.nodes[0].ip_admin_nic else hana_database.nodes[1].dbname }}"
+    currentHostName: "{{ primary_instance.name if inventory_hostname == primary_instance.ip_admin else secondary_instance.name }}"
     initiatorName: "{{ iscsi_object }}.{{ currentHostName }}.local:{{ currentHostName }}"
   lineinfile:
     dest: '/etc/iscsi/initiatorname.iscsi'
@@ -29,7 +29,7 @@
     iscsiadm -m discovery --type=st --portal={{ item }}:{{ iscsi_port }}
     iscsiadm -m node -T {{ target }} --login --portal={{ item }}:{{ iscsi_port }}
     iscsiadm -m node -p {{ item }}:{{ iscsi_port }} --op=update --name=node.startup --value=automatic
-  loop: "{{ groups['iscsi'] }}" 
+  loop: "{{ groups['iscsi'] }}"
   register: login_iscsi_device
 
 - name: Call lsscsi and get devices names
@@ -54,12 +54,12 @@
     success_msg: "There are {{ iscsi_devices_ids.results | length }} iSCSI devices ID fetched"
 
 - name: Get SBD devices list
-  set_fact: 
+  set_fact:
     sbd_devices: "{{ item.stdout }};{{ sbd_devices | default('') }}"
   loop: "{{ iscsi_devices_ids.results }}"
 
 - name: Ensure SBD device is created on the first cluster node
-  when: inventory_hostname == hana_database.nodes[0].ip_admin_nic
+  when: inventory_hostname == primary_instance.ip_admin
   command: sbd -d {{ item.stdout }} -1 60 -4 120 create
   loop: "{{ iscsi_devices_ids.results }}"
 
@@ -83,7 +83,7 @@
     regexp: 'SBD_STARTMODE='
     line: "SBD_STARTMODE=always"
     state: 'present'
-  
+
 - name: Ensure softdog config is created
   shell: echo softdog | sudo tee /etc/modules-load.d/softdog.conf
 

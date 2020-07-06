@@ -25,29 +25,29 @@
       changed_when: false
 
     - name: Ensure the primary node public key is on the secondary node
-      when: ansible_hostname == hana_database.nodes[1].dbname
+      when: ansible_hostname == secondary_instance.name
       authorized_key:
         user: "root"
-        key: "{{ hostvars[hana_database.nodes[0].ip_admin_nic].public_ssh_key.stdout }}"
+        key: "{{ hostvars[primary_instance.ip_admin].public_ssh_key.stdout }}"
 
     - name: Ensure the secondary node public key is on the primary node
-      when: ansible_hostname == hana_database.nodes[0].dbname
+      when: ansible_hostname == primary_instance.name
       authorized_key:
         user: "root"
-        key: "{{ hostvars[hana_database.nodes[1].ip_admin_nic].public_ssh_key.stdout }}"
+        key: "{{ hostvars[secondary_instance.ip_admin].public_ssh_key.stdout }}"
 
     - name: Ensure trust relationship is working from primary to secondary
-      when: ansible_hostname == hana_database.nodes[0].dbname
+      when: ansible_hostname == primary_instance.name
       shell: >
-        ssh -oStrictHostKeyChecking=no {{ hana_database.nodes[1].ip_admin_nic }} "hostname -s"
+        ssh -oStrictHostKeyChecking=no {{ secondary_instance.ip_admin }} "hostname -s"
       register: primary_to_secondary_ssh_result
       changed_when: false
-      failed_when: primary_to_secondary_ssh_result.stdout_lines[0] != hana_database.nodes[1].dbname
+      failed_when: primary_to_secondary_ssh_result.stdout_lines[0] != secondary_instance.name
 
     - name: Ensure trust relationship is working from secondary to primary
-      when: ansible_hostname == hana_database.nodes[1].dbname
+      when: ansible_hostname == secondary_instance.name
       shell: >
-        ssh -oStrictHostKeyChecking=no {{ hana_database.nodes[0].ip_admin_nic }} "hostname -s"
+        ssh -oStrictHostKeyChecking=no {{ primary_instance.ip_admin }} "hostname -s"
       register: secondary_to_primary_ssh_result
       changed_when: false
-      failed_when: secondary_to_primary_ssh_result.stdout_lines[0] != hana_database.nodes[0].dbname
+      failed_when: secondary_to_primary_ssh_result.stdout_lines[0] != primary_instance.name

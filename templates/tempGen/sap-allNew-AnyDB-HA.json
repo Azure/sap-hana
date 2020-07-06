@@ -1,0 +1,57 @@
+{
+  "infrastructure": {
+    "resource_group": {
+      "name": "var-rg-name"
+    },
+    "vnets": {
+      "sap": {
+        "subnet_iscsi": {
+          "is_existing": "false",
+          "name": "subnet-iscsi",
+          "prefix": "10.1.4.0/24",
+          "nsg": {
+            "is_existing": "false",
+            "name": "nsg-iscsi"
+          }
+        }
+      }
+    },
+    "iscsi": {
+      "iscsi_count": 1,
+      "size": "Standard_D2s_v3",
+      "os": {
+        "publisher": "SUSE",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
+      },
+      "authentication": {
+        "type": "key",
+        "username": "azureadm"
+      }
+    }
+  },
+  "databases": [
+    {
+      "platform": "AnyDB",
+      "high_availability": true,
+      "credentials": {
+        "ha_cluster_password": "ASecurePa55w0rd"
+      },
+      "dbnodes": [
+        {
+          "name": "db-node1",
+          "role": "worker",
+          "admin_nic_ips": [
+            "10.1.1.14",
+            "10.1.1.15"
+          ],
+          "db_nic_ips": [
+            "10.1.2.14",
+            "10.1.2.15"
+          ]
+        }
+      ]
+    }
+  ]
+}
+
