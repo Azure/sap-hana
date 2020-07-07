@@ -21,7 +21,7 @@ steps:
       ssh -i /tmp/sshkey -o StrictHostKeyChecking=no "${rti_user}"@"${rti_public_ip}" '
       ansible-playbook --version
       cd sap-hana
-      git checkout $(System.PullRequest.SourceBranch)
+      git checkout $(branchName)
       cd ~
       export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
       export ANSIBLE_HOST_KEY_CHECKING=False
