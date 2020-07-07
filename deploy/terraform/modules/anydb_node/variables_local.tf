@@ -45,7 +45,7 @@ locals {
       "sku" : "7.5",
   "version" : "latest" })
 
-  anydb_image = try(var.application.os.source_image_id, null) == null ? local.anydb_marketplaceimage : local.anydb_customimage
+  anydb_image = try(local.anydb.os.source_image_id, null) == null ? local.anydb_marketplaceimage : local.anydb_customimage
 
 
   anydb_ostype = try(local.anydb.os.type, "Linux")
