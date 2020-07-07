@@ -35,16 +35,21 @@ locals {
   anydb          = try(local.any-databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "7.5.1")
-  anydb_os = try(local.anydb.os,
+
+  anydb_customimage = { "source_image_id" : try(local.anydb.os.source_image_id, "") }
+  anydb_marketplaceimage = try(local.anydb.os,
     {
       "publisher" : "Oracle",
       "offer" : "Oracle-Linux",
-  "sku" : "7.5" })
-  anydb_customimageid = try(local.anydb.image_id, "")
-  anydb_ostype        = try(local.anydb.os_type, "Linux")
-  anydb_size          = try(local.anydb.size, "500")
-  anydb_fs            = try(local.anydb.filesystem, "xfs")
-  anydb_ha            = try(local.anydb.high_availability, "false")
+      "sku" : "7.5",
+  "version" : "latest" })
+
+  anydb_image = length(try(local.anydb.os.source_image_id, "")) > 0 ? local.anydb_customimage : local.anydb_marketplaceimage
+
+  anydb_ostype = try(local.anydb.os.type, "Linux")
+  anydb_size   = try(local.anydb.size, "500")
+  anydb_fs     = try(local.anydb.filesystem, "xfs")
+  anydb_ha     = try(local.anydb.high_availability, "false")
   anydb_auth = try(local.anydb.authentication,
     {
       "type"     = "key"
@@ -59,20 +64,22 @@ locals {
   sku      = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
 
   #As we don't know if the server is a Windows or Linux Server we merge these
-  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver_marketplace : {
+  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver : {
     name = vm.name
     id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.dbserver_marketplace : {
+    }], [for vm in azurerm_windows_virtual_machine.dbserver : {
     name = vm.name
     id   = vm.id
-    }],
-    [for vm in azurerm_linux_virtual_machine.dbserver_customimage : {
-      name = vm.name
-      id   = vm.id
-      }], [for vm in azurerm_windows_virtual_machine.dbserver_customimage : {
-      name = vm.name
-      id   = vm.id
-  }]])
+    }]
+    #   ,
+    #   [for vm in azurerm_linux_virtual_machine.dbserver_customimage : {
+    #     name = vm.name
+    #     id   = vm.id
+    #     }], [for vm in azurerm_windows_virtual_machine.dbserver_customimage : {
+    #     name = vm.name
+    #     id   = vm.id
+    # }]
+  ])
 
   dbnodes = flatten([
     [
@@ -149,7 +156,7 @@ locals {
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
     { db_version = local.anydb_version },
-    { os = local.anydb_os },
+    { os = local.anydb_ostype },
     { size = local.anydb_size },
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
