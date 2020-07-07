@@ -117,6 +117,9 @@ locals {
 
   # Ports used for specific DB Versions
   lb_ports = {
+    "AnyDB" = [
+      "1433"
+    ]
     "Oracle" = [
       "80",
       "1433"
