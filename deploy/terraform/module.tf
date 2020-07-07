@@ -73,6 +73,7 @@ module "app_tier" {
 # Create anydb database nodes
 module "anydb_node" {
   source           = "./modules/anydb_node"
+  application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
   jumpboxes        = var.jumpboxes
