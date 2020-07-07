@@ -39,12 +39,14 @@ locals {
   anydb_customimage = { "source_image_id" : try(local.anydb.os.source_image_id, "") }
   anydb_marketplaceimage = try(local.anydb.os,
     {
+      "os_type" : "Linux"
       "publisher" : "Oracle",
       "offer" : "Oracle-Linux",
       "sku" : "7.5",
   "version" : "latest" })
 
-  anydb_image = length(try(local.anydb.os.source_image_id, "")) > 0 ? local.anydb_customimage : local.anydb_marketplaceimage
+  anydb_image = try(var.application.os.source_image_id, null) == null ? local.anydb_marketplaceimage : local.anydb_customimage
+
 
   anydb_ostype = try(local.anydb.os.type, "Linux")
   anydb_size   = try(local.anydb.size, "500")

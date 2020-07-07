@@ -42,7 +42,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
-  source_image_id = try(local.anydb_image.source_image_id, null)
+  source_image_id = try(local.anydb.os.source_image_id, null)
 
   dynamic "source_image_reference" {
     for_each = range(try(local.anydb_image.publisher, null) == null ? 0 : 1)
