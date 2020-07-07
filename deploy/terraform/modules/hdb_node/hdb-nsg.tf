@@ -35,19 +35,3 @@ resource "azurerm_network_security_rule" "nsr-external-db" {
   source_address_prefix       = "*"
   destination_address_prefix  = var.infrastructure.vnets.sap.subnet_db.prefix
 }
-
-# Creates network security rule for SAP admin subnet
-resource "azurerm_network_security_rule" "nsr-admin" {
-  count                       = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? 0 : 1) : 0
-  name                        = "nsr-subnet-admin"
-  resource_group_name         = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].resource_group_name : azurerm_network_security_group.nsg-admin[0].resource_group_name
-  network_security_group_name = var.infrastructure.vnets.sap.subnet_admin.nsg.is_existing ? data.azurerm_network_security_group.nsg-admin[0].name : azurerm_network_security_group.nsg-admin[0].name
-  priority                    = 102
-  direction                   = "Inbound"
-  access                      = "allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = var.infrastructure.vnets.management.subnet_mgmt.prefix
-  destination_address_prefix  = var.infrastructure.vnets.sap.subnet_admin.prefix
-}
