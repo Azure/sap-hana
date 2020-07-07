@@ -44,7 +44,7 @@ resource "azurerm_linux_virtual_machine" "web" {
       publisher = try(local.app_image.publisher, null)
       offer     = try(local.app_image.offer, null)
       sku       = try(local.app_image.sku, null)
-      version   = try(local.app_image.version, null)
+      version   = try(local.app_image.version, "latest")
     }
   }
   admin_ssh_key {
@@ -87,7 +87,7 @@ resource "azurerm_windows_virtual_machine" "web" {
       publisher = try(local.app_image.publisher, null)
       offer     = try(local.app_image.offer, null)
       sku       = try(local.app_image.sku, null)
-      version   = try(local.app_image.version, null)
+      version   = try(local.app_image.version, "latest")
     }
   }
 
