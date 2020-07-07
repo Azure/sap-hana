@@ -27,6 +27,7 @@ locals {
   #   - HANA database has high_availability set to true
   #   - HANA database uses SUSE
   iscsi_count = lookup(var.infrastructure, "iscsi", {}) != {} && (length(local.hana-databases) > 0 ? (local.hdb_ha && upper(local.hdb_os.publisher) == "SUSE") : false) ? var.infrastructure.iscsi.iscsi_count : 0
+
   # Shortcut to iSCSI definition
   iscsi = merge(lookup(var.infrastructure, "iscsi", {}), { "iscsi_count" = "${local.iscsi_count}" })
 
