@@ -14,9 +14,9 @@ resource "azurerm_network_interface" "app" {
   }
 }
 
-# Create the Application VM(s)
+# Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
-  count                        = local.enable_deployment ? local.application_server_count : 0
+  count                        = local.enable_deployment ? (local.app_ostype == "Linux" ? local.application_server_count : 0) : 0
   name                         = "${upper(local.application_sid)}_app${format("%02d", count.index)}"
   computer_name                = "${lower(local.application_sid)}app${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
@@ -36,11 +36,16 @@ resource "azurerm_linux_virtual_machine" "app" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_reference {
-    publisher = local.os.publisher
-    offer     = local.os.offer
-    sku       = local.os.sku
-    version   = local.os.version
+  source_image_id = try(local.app_image.source_image_id, null)
+
+  dynamic "source_image_reference" {
+    for_each = range(try(local.app_image.publisher, null) == null ? 0 : 1)
+    content {
+      publisher = try(local.app_image.publisher, null)
+      offer     = try(local.app_image.offer, null)
+      sku       = try(local.app_image.sku, null)
+      version   = try(local.app_image.version, null)
+    }
   }
 
   admin_ssh_key {
@@ -52,6 +57,47 @@ resource "azurerm_linux_virtual_machine" "app" {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
+
+# Create the Windows Application VM(s)
+resource "azurerm_windows_virtual_machine" "app" {
+  count                        = local.enable_deployment ? (local.app_ostype == "Windows" ? local.application_server_count : 0) : 0
+  name                         = "${upper(local.application_sid)}_app${format("%02d", count.index)}"
+  computer_name                = "${lower(local.application_sid)}app${format("%02d", count.index)}"
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  availability_set_id          = azurerm_availability_set.app[0].id
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  network_interface_ids = [
+    azurerm_network_interface.app[count.index].id
+  ]
+  size           = local.app_sizing.compute.vm_size
+  admin_username = local.authentication.username
+  admin_password = local.authentication.password
+
+  os_disk {
+    name                 = "${upper(local.application_sid)}_app${format("%02d", count.index)}-osDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_id = try(local.app_image.source_image_id, null)
+
+  dynamic "source_image_reference" {
+    for_each = range(try(local.app_image.publisher, null) == null ? 0 : 1)
+    content {
+      publisher = try(local.app_image.publisher, null)
+      offer     = try(local.app_image.offer, null)
+      sku       = try(local.app_image.sku, null)
+      version   = try(local.app_image.version, null)
+    }
+  }
+
+
+  boot_diagnostics {
+    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+  }
+}
+
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
@@ -67,7 +113,7 @@ resource "azurerm_managed_disk" "app" {
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.app[local.app-data-disks[count.index].vm_index].id
+  virtual_machine_id        = local.app-data-disks[count.index].virtual_machine_id
   caching                   = local.app-data-disks[count.index].caching
   write_accelerator_enabled = local.app-data-disks[count.index].write_accelerator
   lun                       = count.index
