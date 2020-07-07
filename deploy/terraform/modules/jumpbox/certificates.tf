@@ -12,6 +12,7 @@ data "external" "current-user" {
 
 # Creates Azure key vault
 resource "azurerm_key_vault" "key-vault" {
+  count               = length(local.vm-jump-win) > 0 ? 1 : 0
   name                = "winrm-kv-${var.random-id.hex}"
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
@@ -42,7 +43,7 @@ resource "azurerm_key_vault" "key-vault" {
 resource "azurerm_key_vault_certificate" "key-vault-cert" {
   count        = length(var.jumpboxes.windows)
   name         = "${var.jumpboxes.windows[count.index].name}-cert"
-  key_vault_id = azurerm_key_vault.key-vault.id
+  key_vault_id = try(azurerm_key_vault.key-vault[0].id, null)
 
   certificate_policy {
     issuer_parameters {
