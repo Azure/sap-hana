@@ -30,13 +30,12 @@ locals {
   web_lb_ips               = try(var.application.web_lb_ips, [])
   web_nic_ips              = try(var.application.web_nic_ips, [])
 
-  authenticationLinux = try(var.application.authentication,
+  authentication = try(var.application.authentication, 
     {
-      "type"     = "key"
+      "type"     = upper(local.app_ostype) == "LINUX" ? "key" : "password"
       "username" = "azureadm"
+      "password" = "Sap@hana2019!"
   })
-
-  authenticationWindows = try(var.application.authentication,
     {
       "type" : "password",
       "username" : "azureadm",
