@@ -76,7 +76,7 @@ resource "azurerm_windows_virtual_machine" "jump-win" {
       store = "My"
       url   = azurerm_key_vault_certificate.key-vault-cert[count.index].secret_id
     }
-    key_vault_id = azurerm_key_vault.key-vault.id
+    key_vault_id = try(azurerm_key_vault.key-vault[0].id, null)
   }
 
   winrm_listener {

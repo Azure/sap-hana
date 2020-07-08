@@ -160,11 +160,17 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
     }
   }
 
-  source_image_reference {
-    publisher = local.hdb_vms[count.index].os.publisher
-    offer     = local.hdb_vms[count.index].os.offer
-    sku       = local.hdb_vms[count.index].os.sku
-    version   = "latest"
+  source_image_id = local.hdb_vms[count.index].os.source_image_id != "" ? local.hdb_vms[count.index].os.source_image_id : null
+
+  # If source_image_id is not defined, deploy with source_image_reference
+  dynamic "source_image_reference" {
+    for_each = range(local.hdb_vms[count.index].os.source_image_id == "" ? 1 : 0)
+    content {
+      publisher = local.hdb_vms[count.index].os.publisher
+      offer     = local.hdb_vms[count.index].os.offer
+      sku       = local.hdb_vms[count.index].os.sku
+      version   = "latest"
+    }
   }
 
   admin_ssh_key {
