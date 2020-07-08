@@ -78,6 +78,7 @@
     },
     "os": {
       "source_image_id": "/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Compute/images/xxx",
+      "//": "os_type is required if source_image_id is used. Possible value: Linux, Windows"
       "os_type": "Linux"
     }
   },
