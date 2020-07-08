@@ -50,7 +50,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
       publisher = try(local.anydb_image.publisher, null)
       offer     = try(local.anydb_image.offer, null)
       sku       = try(local.anydb_image.sku, null)
-      version   = try(local.anydb_image.version, null)
+      version   = try(local.anydb_image.version, "latest")
     }
   }
 
@@ -105,7 +105,7 @@ resource azurerm_windows_virtual_machine "dbserver" {
       publisher = try(local.anydb_image.publisher, null)
       offer     = try(local.anydb_image.offer, null)
       sku       = try(local.anydb_image.sku, null)
-      version   = try(local.anydb_image.version, null)
+      version   = try(local.anydb_image.version, "latest")
     }
   }
 
