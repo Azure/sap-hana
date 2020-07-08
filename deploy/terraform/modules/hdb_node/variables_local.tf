@@ -26,12 +26,14 @@ locals {
   hdb          = try(local.hdb_list[0], {})
   hdb_platform = try(local.hdb.platform, "NONE")
   hdb_version  = try(local.hdb.db_version, "2.00.043")
-  hdb_os = try(local.hdb.os,
-    {
-      "publisher" = "suse",
-      "offer"     = "sles-sap-12-sp5",
-      "sku"       = "gen1"
-  })
+  # If custom image is used, we do not overwrite os reference with default value
+  hdb_custom_image = try(local.hdb.os.source_image_id, "") != "" ? true : false
+  hdb_os = {
+    "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
+    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
+    "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
+    "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
+  }
   hdb_size = try(local.hdb.size, "Demo")
   hdb_fs   = try(local.hdb.filesystem, "xfs")
   hdb_ha   = try(local.hdb.high_availability, "false")
