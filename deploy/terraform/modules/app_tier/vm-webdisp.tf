@@ -16,7 +16,7 @@ resource "azurerm_network_interface" "web" {
 
 # Create the Linux Web dispatcher VM(s)
 resource "azurerm_linux_virtual_machine" "web" {
-  count                        = local.enable_deployment ? (upper(local.app_ostype == "LINUX") ? local.webdispatcher_count : 0) : 0
+  count                        = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
   name                         = "${upper(local.application_sid)}_web${format("%02d", count.index)}"
   computer_name                = "${upper(local.application_sid)}web${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
@@ -60,7 +60,7 @@ resource "azurerm_linux_virtual_machine" "web" {
 
 # Create the Windows Web dispatcher VM(s)
 resource "azurerm_windows_virtual_machine" "web" {
-  count                        = local.enable_deployment ? (upper(local.app_ostype == "WINDOWS") ? local.webdispatcher_count : 0) : 0
+  count                        = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
   name                         = "${upper(local.application_sid)}_web${format("%02d", count.index)}"
   computer_name                = "${upper(local.application_sid)}web${format("%02d", count.index)}"
   location                     = var.resource-group[0].location

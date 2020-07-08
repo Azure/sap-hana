@@ -69,7 +69,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
 # Create the SCS Windows VM(s)
 resource "azurerm_windows_virtual_machine" "scs" {
-  count                        = local.enable_deployment ? (upper(local.app_ostype == "WINDOWS") ? (local.scs_high_availability ? 2 : 1) : 0) : 0
+  count                        = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? (local.scs_high_availability ? 2 : 1) : 0) : 0
   name                         = "${upper(local.application_sid)}_scs${format("%02d", count.index)}"
   computer_name                = "${lower(local.application_sid)}scs${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
