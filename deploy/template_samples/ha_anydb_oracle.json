@@ -1,6 +1,6 @@
 {
   "infrastructure": {
-    "region": "westeurope",
+    "region": "eastus",
     "resource_group": {
       "is_existing": "false",
       "name": "test-anydb-ha-rg"
@@ -43,60 +43,8 @@
     }
   },
   "jumpboxes": {
-    "windows": [
-      {
-        "name": "jumpbox-windows",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "MicrosoftWindowsServer",
-          "offer": "WindowsServer",
-          "sku": "2016-Datacenter"
-        },
-        "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
-        },
-        "components": ["hana_studio_windows"]
-      }
-    ],
-    "linux": [
-      {
-        "name": "jumpbox-linux",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18.04-LTS"
-        },
-        "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
-        },
-        "components": ["hana_studio_linux"]
-      },
-      {
-        "name": "rti",
-        "destroy_after_deploy": "true",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18.04-LTS"
-        },
-        "authentication": {
-          "type": "key",
-          "username": "azureadm"
-        },
-        "components": ["ansible"]
-      }
-    ]
+    "windows": [],
+    "linux": []
   },
   "databases": [
     {

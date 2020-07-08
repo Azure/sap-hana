@@ -97,15 +97,15 @@ resource azurerm_windows_virtual_machine "dbserver" {
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
-  source_image_id = try(local.anydb_image.source_image_id, null)
+  source_image_id = local.anydb_custom_image ? local.anydb_os.source_image_id : null
 
   dynamic "source_image_reference" {
-    for_each = range(try(local.anydb_image.publisher, null) == null ? 0 : 1)
+    for_each = range(local.anydb_custom_image ? 0 : 1)
     content {
-      publisher = try(local.anydb_image.publisher, null)
-      offer     = try(local.anydb_image.offer, null)
-      sku       = try(local.anydb_image.sku, null)
-      version   = try(local.anydb_image.version, "latest")
+      publisher = local.anydb_os.publisher
+      offer     = local.anydb_os.offer
+      sku       = local.anydb_os.sku
+      version   = local.anydb_os.version
     }
   }
 

@@ -62,7 +62,7 @@ locals {
 
   size     = try(local.anydb.size, "500")
   prefix   = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
-  vm_count = (length(local.any-databases) > 0) ? (try(local.anydb.high_availability, false) ? 2 : 1) : 0
+  vm_count = (length(local.any-databases) > 0) ? (try(local.anydb.high_availability, true) ? 2 : 1) : 0
   sku      = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
 
   dbnodes = flatten([
@@ -150,7 +150,7 @@ locals {
       for storage_type in lookup(local.sizes, local.size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
-          name                      = format("%s%02d", storage_type.name, (disk_count + 1))
+          name                      = format("%s%02d-%s-%s%02d", var.role, (vm_counter + 1), local.prefix,storage_type.name, (disk_count + 1))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
           caching                   = storage_type.caching
