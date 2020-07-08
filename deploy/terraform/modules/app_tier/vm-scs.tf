@@ -22,7 +22,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
   backend_address_pool_id = azurerm_lb_backend_address_pool.scs[0].id
 }
 
-
 # Create the SCS Linux VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
   count                        = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? (local.scs_high_availability ? 2 : 1) : 0) : 0
@@ -105,8 +104,6 @@ resource "azurerm_windows_virtual_machine" "scs" {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
-
-
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "scs" {
