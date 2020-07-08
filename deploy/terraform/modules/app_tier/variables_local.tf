@@ -30,33 +30,26 @@ locals {
   web_lb_ips               = try(var.application.web_lb_ips, [])
   web_nic_ips              = try(var.application.web_nic_ips, [])
 
+  app_ostype = try(var.application.os.os_type, "Linux")
+
   authentication = try(var.application.authentication, 
     {
       "type"     = upper(local.app_ostype) == "LINUX" ? "key" : "password"
       "username" = "azureadm"
       "password" = "Sap@hana2019!"
   })
-    {
-      "type" : "password",
-      "username" : "azureadm",
-      "password" : "Sap@hana2019!"
-  })
 
   # OS image for all Application Tier VMs
   # If custom image is used, we do not overwrite os reference with default value
-  app_custom_image = try(local.application.os.source_image_id, "") != "" ? true : false
+  app_custom_image = try(var.application.os.source_image_id, "") != "" ? true : false
 
   app_os = {
-    "source_image_id" = local.app_custom_image ? local.application.os.source_image_id : ""
-    "publisher"       = try(local.application.os.publisher, local.app_custom_image ? "" : "suse")
-    "offer"           = try(local.application.os.offer, local.app_custom_image ? "" : "sles-sap-12-sp5")
-    "sku"             = try(local.application.os.sku, local.app_custom_image ? "" : "gen1")
-    "version"         = try(local.application.os.version, local.app_custom_image ? "" : "latest")
+    "source_image_id" = local.app_custom_image ? var.application.os.source_image_id : ""
+    "publisher"       = try(var.application.os.publisher, local.app_custom_image ? "" : "suse")
+    "offer"           = try(var.application.os.offer, local.app_custom_image ? "" : "sles-sap-12-sp5")
+    "sku"             = try(var.application.os.sku, local.app_custom_image ? "" : "gen1")
+    "version"         = try(var.application.os.version, local.app_custom_image ? "" : "latest")
   }
-
-  app_ostype = try(var.application.os.os_type, "Linux")
-
-  authentication = local.app_ostype == "Linux" ? local.authenticationLinux : local.authenticationWindows
 
 }
 
