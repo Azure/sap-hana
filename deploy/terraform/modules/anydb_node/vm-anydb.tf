@@ -33,7 +33,7 @@ resource azurerm_network_interface "nic" {
 
 # Section for Linux Virtual machine 
 resource azurerm_linux_virtual_machine "dbserver" {
-  count                        = local.enable_deployment ? ((local.anydb_ostype == "Linux") ? local.vm_count : 0) : 0
+  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.vm_count : 0) : 0
   name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -88,7 +88,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
 
 # Section for Windows Virtual machine based on a marketplace image 
 resource azurerm_windows_virtual_machine "dbserver" {
-  count                        = local.enable_deployment ? ((local.anydb_ostype == "Windows") ? local.vm_count : 0) : 0
+  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.vm_count : 0) : 0
   name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
