@@ -77,7 +77,7 @@
       "username": "azureadm"
     },
     "os": {
-      "source_image_id": "/subscriptions/80d5ed43-1465-432b-8914-5e1f68d49330/resourceGroups/SharedImages/providers/Microsoft.Compute/galleries/CorpImageGalleryEMEA/images/NETWEAVER/versions/1.0.1",
+      "source_image_id": "/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Compute/images/xxx",
       "os_type": "Linux"
     }
   },

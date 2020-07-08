@@ -36,17 +36,18 @@ resource "azurerm_linux_virtual_machine" "web" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_id = try(local.app_image.source_image_id, null)
+  source_image_id = local.app_custom_image ? local.app_os.source_image_id : null
 
   dynamic "source_image_reference" {
-    for_each = range(try(local.app_image.publisher, null) == null ? 0 : 1)
+    for_each = range(local.app_custom_image ? 0 : 1)
     content {
-      publisher = try(local.app_image.publisher, null)
-      offer     = try(local.app_image.offer, null)
-      sku       = try(local.app_image.sku, null)
-      version   = try(local.app_image.version, "latest")
+      publisher = local.app_os.publisher
+      offer     = local.app_os.offer
+      sku       = local.app_os.sku
+      version   = local.app_os.version
     }
   }
+
   admin_ssh_key {
     username   = local.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
@@ -79,15 +80,15 @@ resource "azurerm_windows_virtual_machine" "web" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_id = try(local.app_image.source_image_id, null)
+  source_image_id = local.app_custom_image ? local.app_os.source_image_id : null
 
   dynamic "source_image_reference" {
-    for_each = range(try(local.app_image.publisher, null) == null ? 0 : 1)
+    for_each = range(local.app_custom_image ? 0 : 1)
     content {
-      publisher = try(local.app_image.publisher, null)
-      offer     = try(local.app_image.offer, null)
-      sku       = try(local.app_image.sku, null)
-      version   = try(local.app_image.version, "latest")
+      publisher = local.app_os.publisher
+      offer     = local.app_os.offer
+      sku       = local.app_os.sku
+      version   = local.app_os.version
     }
   }
 
@@ -95,7 +96,6 @@ resource "azurerm_windows_virtual_machine" "web" {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
   }
 }
-
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "web" {
@@ -111,7 +111,7 @@ resource "azurerm_managed_disk" "web" {
 resource "azurerm_virtual_machine_data_disk_attachment" "web" {
   count                     = local.enable_deployment ? length(azurerm_managed_disk.web) : 0
   managed_disk_id           = azurerm_managed_disk.web[count.index].id
-  virtual_machine_id        = local.web-data-disks[count.index].virtual_machine_id
+  virtual_machine_id        = upper(local.app_ostype) == "LINUX" ? azurerm_linux_virtual_machine.web[local.web-data-disks[count.index].vm_index].id : azurerm_windows_virtual_machine.web[local.web-data-disks[count.index].vm_index].id
   caching                   = local.web-data-disks[count.index].caching
   write_accelerator_enabled = local.web-data-disks[count.index].write_accelerator
   lun                       = count.index

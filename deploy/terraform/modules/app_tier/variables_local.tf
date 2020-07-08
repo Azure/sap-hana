@@ -44,18 +44,16 @@ locals {
   })
 
   # OS image for all Application Tier VMs
+  # If custom image is used, we do not overwrite os reference with default value
+  app_custom_image = try(local.application.os.source_image_id, "") != "" ? true : false
 
-  app_customimage = { "source_image_id" : try(var.application.os.source_image_id, "") }
-
-  app_marketplaceimage = try(var.application.os,
-    {
-      os_type   = "Linux"
-      publisher = "suse"
-      offer     = "sles-sap-12-sp5"
-      sku       = "gen1"
-  "version" : "latest" })
-
-  app_image = try(var.application.os.source_image_id, null) == null ? local.app_marketplaceimage : local.app_customimage 
+  app_os = {
+    "source_image_id" = local.app_custom_image ? local.application.os.source_image_id : ""
+    "publisher"       = try(local.application.os.publisher, local.app_custom_image ? "" : "suse")
+    "offer"           = try(local.application.os.offer, local.app_custom_image ? "" : "sles-sap-12-sp5")
+    "sku"             = try(local.application.os.sku, local.app_custom_image ? "" : "gen1")
+    "version"         = try(local.application.os.version, local.app_custom_image ? "" : "latest")
+  }
 
   app_ostype = try(var.application.os.os_type, "Linux")
 
@@ -152,73 +150,42 @@ locals {
     62100 + tonumber(local.ers_instance_number)
   ]
 
-  #As we don't know if the server is a Windows or Linux Server we merge these
-  app_vms = flatten([[for vm in azurerm_linux_virtual_machine.app : {
-    name = vm.name
-    id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.app : {
-    name = vm.name
-    id   = vm.id
-    }]
-  ])
-
   # Create list of disks per VM
   app-data-disks = flatten([
-    for vm in local.app_vms : [
+    for vm_count in range(local.application_server_count) : [
       for disk_spec in local.app_sizing.storage : {
-        virtual_machine_id = vm.id
-        name               = format("%s-%s", vm.name, disk_spec.name)
-        disk_type          = lookup(disk_spec, "disk_type", "Premium_LRS")
-        size_gb            = lookup(disk_spec, "size_gb", 512)
-        caching            = lookup(disk_spec, "caching", false)
-        write_accelerator  = lookup(disk_spec, "write_accelerator", false)
+        vm_index          = vm_count
+        name              = "${upper(local.application_sid)}_app${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
-  ])
-
-  #As we don't know if the server is a Windows or Linux Server we merge these
-  scs_vms = flatten([[for vm in azurerm_linux_virtual_machine.scs : {
-    name = vm.name
-    id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.scs : {
-    name = vm.name
-    id   = vm.id
-    }]
   ])
 
   scs-data-disks = flatten([
-    for vm in local.scs_vms : [
+    for vm_count in(local.scs_high_availability ? range(2) : range(1)) : [
       for disk_spec in local.scs_sizing.storage : {
-        virtual_machine_id = vm.id
-        name               = format("%s-%s", vm.name, disk_spec.name)
-        disk_type          = lookup(disk_spec, "disk_type", "Premium_LRS")
-        size_gb            = lookup(disk_spec, "size_gb", 512)
-        caching            = lookup(disk_spec, "caching", false)
-        write_accelerator  = lookup(disk_spec, "write_accelerator", false)
+        vm_index          = vm_count
+        name              = "${upper(local.application_sid)}_scs${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
   ])
 
-  #As we don't know if the server is a Windows or Linux Server we merge these
-  webdisp_vms = flatten([[for vm in azurerm_linux_virtual_machine.web : {
-    name = vm.name
-    id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.web : {
-    name = vm.name
-    id   = vm.id
-    }]
-  ])
-
-
   web-data-disks = flatten([
-    for vm in local.webdisp_vms : [
+    for vm_count in range(local.webdispatcher_count) : [
       for disk_spec in local.web_sizing.storage : {
-        virtual_machine_id = vm.id
-        name               = format("%s-%s", vm.name, disk_spec.name)
-        disk_type          = lookup(disk_spec, "disk_type", "Premium_LRS")
-        size_gb            = lookup(disk_spec, "size_gb", 512)
-        caching            = lookup(disk_spec, "caching", false)
-        write_accelerator  = lookup(disk_spec, "write_accelerator", false)
+        vm_index          = vm_count
+        name              = "${upper(local.application_sid)}_web${format("%02d", vm_count)}-${disk_spec.name}"
+        disk_type         = lookup(disk_spec, "disk_type", "Premium_LRS")
+        size_gb           = lookup(disk_spec, "size_gb", 512)
+        caching           = lookup(disk_spec, "caching", false)
+        write_accelerator = lookup(disk_spec, "write_accelerator", false)
       }
     ]
   ])
