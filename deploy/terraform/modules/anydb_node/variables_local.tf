@@ -36,17 +36,17 @@ locals {
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "7.5.1")
 
-  anydb_customimage = { "source_image_id" : try(local.anydb.os.source_image_id, "") }
-  anydb_marketplaceimage = try(local.anydb.os,
-    {
-      "os_type" : "Linux"
-      "publisher" : "Oracle",
-      "offer" : "Oracle-Linux",
-      "sku" : "7.5",
-  "version" : "latest" })
+  # OS image for all Application Tier VMs
+  # If custom image is used, we do not overwrite os reference with default value
+  anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
-  anydb_image = try(local.anydb.os.source_image_id, null) == null ? local.anydb_marketplaceimage : local.anydb_customimage
-
+  anydb_os = {
+    "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
+    "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : "suse")
+    "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : "sles-sap-12-sp5")
+    "sku"             = try(local.anydb.os.sku, local.anydb_custom_image ? "" : "gen1")
+    "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : "latest")
+  }
 
   anydb_ostype = try(local.anydb.os.type, "Linux")
   anydb_size   = try(local.anydb.size, "500")
@@ -64,24 +64,6 @@ locals {
   prefix   = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
   vm_count = (length(local.any-databases) > 0) ? (try(local.anydb.high_availability, false) ? 2 : 1) : 0
   sku      = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
-
-  #As we don't know if the server is a Windows or Linux Server we merge these
-  vms = flatten([[for vm in azurerm_linux_virtual_machine.dbserver : {
-    name = vm.name
-    id   = vm.id
-    }], [for vm in azurerm_windows_virtual_machine.dbserver : {
-    name = vm.name
-    id   = vm.id
-    }]
-    #   ,
-    #   [for vm in azurerm_linux_virtual_machine.dbserver_customimage : {
-    #     name = vm.name
-    #     id   = vm.id
-    #     }], [for vm in azurerm_windows_virtual_machine.dbserver_customimage : {
-    #     name = vm.name
-    #     id   = vm.id
-    # }]
-  ])
 
   dbnodes = flatten([
     [
@@ -113,8 +95,6 @@ locals {
     ]
   ])
 
-
-
   # Ports used for specific DB Versions
   lb_ports = {
     "AnyDB" = [
@@ -132,8 +112,6 @@ locals {
 
     "NONE" = [
     ]
-
-
   }
 
   # Hash of Load Balancers to create for HANA instances
@@ -167,10 +145,11 @@ locals {
     { high_availability = local.anydb_ha },
   { authentication = local.anydb_auth })
 
-  data-disk-per-dbnode = flatten(
-    [
+  anydb_disks = flatten([
+    for vm_counter in range(local.vm_count) : [
       for storage_type in lookup(local.sizes, local.size).storage : [
         for disk_count in range(storage_type.count) : {
+          vm_index                  = vm_counter
           name                      = format("%s%02d", storage_type.name, (disk_count + 1))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
@@ -179,19 +158,5 @@ locals {
         }
       ]
       if storage_type.name != "os"
-  ])
-
-  #This is the combined list for all disks for all VMs
-  allDataDisks = flatten([for vm in local.vms : [for luncount in range(length(local.data-disk-per-dbnode)) : {
-    name                      = format("%s-%s", vm.name, local.data-disk-per-dbnode[luncount].name)
-    caching                   = local.data-disk-per-dbnode[luncount].caching
-    storage_account_type      = local.data-disk-per-dbnode[luncount].storage_account_type
-    disk_size_gb              = local.data-disk-per-dbnode[luncount].disk_size_gb
-    write_accelerator_enabled = local.data-disk-per-dbnode[luncount].write_accelerator_enabled
-    virtual_machine_id        = vm.id
-    lun                       = luncount
-  }]])
-
-
-
+  ]])
 }

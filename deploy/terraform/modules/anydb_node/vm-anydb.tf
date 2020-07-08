@@ -42,15 +42,15 @@ resource azurerm_linux_virtual_machine "dbserver" {
   network_interface_ids        = [azurerm_network_interface.nic[count.index].id]
   size                         = local.sku
 
-  source_image_id = try(local.anydb.os.source_image_id, null)
+  source_image_id = local.anydb_custom_image ? local.anydb_os.source_image_id : null
 
   dynamic "source_image_reference" {
-    for_each = range(try(local.anydb_image.publisher, null) == null ? 0 : 1)
+    for_each = range(local.anydb_custom_image ? 0 : 1)
     content {
-      publisher = try(local.anydb_image.publisher, null)
-      offer     = try(local.anydb_image.offer, null)
-      sku       = try(local.anydb_image.sku, null)
-      version   = try(local.anydb_image.version, "latest")
+      publisher = local.anydb_os.publisher
+      offer     = local.anydb_os.offer
+      sku       = local.anydb_os.sku
+      version   = local.anydb_os.version
     }
   }
 
@@ -137,43 +137,21 @@ resource azurerm_windows_virtual_machine "dbserver" {
 
 # Creates managed data disks
 resource azurerm_managed_disk "disks" {
-  count                = local.enable_deployment ? length(local.allDataDisks) : 0
-  name                 = local.allDataDisks[count.index].name
+  count                = local.enable_deployment ? length(local.anydb_disks) : 0
+  name                 = local.anydb_disks[count.index].name
   location             = var.resource-group[0].location
   resource_group_name  = var.resource-group[0].name
   create_option        = "Empty"
-  storage_account_type = local.allDataDisks[count.index].storage_account_type
-  disk_size_gb         = local.allDataDisks[count.index].disk_size_gb
+  storage_account_type = local.anydb_disks[count.index].storage_account_type
+  disk_size_gb         = local.anydb_disks[count.index].disk_size_gb
 }
 
 # Manages attaching a Disk to a Virtual Machine
 resource azurerm_virtual_machine_data_disk_attachment "vm-disks" {
-  count                     = local.enable_deployment ? length(local.allDataDisks) : 0
+  count                     = local.enable_deployment ? length(azurerm_managed_disk.disks) : 0
   managed_disk_id           = azurerm_managed_disk.disks[count.index].id
-  virtual_machine_id        = local.allDataDisks[count.index].virtual_machine_id
-  caching                   = local.allDataDisks[count.index].caching
-  write_accelerator_enabled = local.allDataDisks[count.index].write_accelerator_enabled
-  lun                       = local.allDataDisks[count.index].lun
+  virtual_machine_id        = upper(local.anydb_ostype) == "LINUX" ? azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].id : azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].id
+  caching                   = local.anydb_disks[count.index].caching
+  write_accelerator_enabled = local.anydb_disks[count.index].write_accelerator_enabled
+  lun                       = count.index
 }
-
-# # Creates managed log disks
-# resource azurerm_managed_disk "log-disk" {
-#   count                = local.enable_deployment ? length(local.allLogDisks) : 0
-#   name                 = local.allLogDisks[count.index].name
-#   location             = var.resource-group[0].location
-#   resource_group_name  = var.resource-group[0].name
-#   create_option        = "Empty"
-#   storage_account_type = local.skuOfLogDisks
-#   disk_size_gb         = local.sizeOfLogDisks
-# }
-
-# # Manages attaching a Disk to a Virtual Machine
-# resource azurerm_virtual_machine_data_disk_attachment "vm-log-disk" {
-#   count                     = local.enable_deployment ? length(local.allLogDisks) : 0
-#   managed_disk_id           = azurerm_managed_disk.log-disk[count.index].id
-#   virtual_machine_id        = local.allLogDisks[count.index].vmID
-#   caching                   = local.allLogDisks[count.index].caching
-#   write_accelerator_enabled = local.allLogDisks[count.index].writeAcceleratorEnabled
-#   lun                       = local.allLogDisks[count.index].lun
-# }
-
