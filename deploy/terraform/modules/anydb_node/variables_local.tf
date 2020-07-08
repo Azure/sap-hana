@@ -19,14 +19,12 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-
-
 locals {
 
   # Imports database sizing information
   sizes = jsondecode(file("${path.root}/../anydb_sizes.json"))
 
-  # Filter the list of databases to only HANA platform entries
+  # Filter the list of databases to only AnyDB platform entries
   any-databases = [
     for database in var.databases : database
     if(database.platform != "HANA" && database.platform != "NONE")
@@ -57,6 +55,7 @@ locals {
       "type"     = "key"
       "username" = "azureadm"
   })
+  
   # Enable deployment based on length of local.any-databases
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 

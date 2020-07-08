@@ -1,16 +1,3 @@
-locals {
-  os = {
-    source_image_id = "/subscriptions/c4106f40-4f28-442e-b67f-a24d892bf7ad/resourceGroups/nancyc-image/providers/Microsoft.Compute/images/nancyc-ubuntu-20200706"
-    #publisher = "Canonical"
-    #offer     = "UbuntuServer"
-    #sku       = "18.04-LTS"
-    #version   = "latest"
-  }
-
-}
-
-
-
 #############################################################################
 # RESOURCES
 #############################################################################
@@ -85,7 +72,6 @@ resource azurerm_linux_virtual_machine "dbserver" {
   }
 }
 
-
 # Section for Windows Virtual machine based on a marketplace image 
 resource azurerm_windows_virtual_machine "dbserver" {
   count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.vm_count : 0) : 0
@@ -133,7 +119,6 @@ resource azurerm_windows_virtual_machine "dbserver" {
     SID         = local.prefix
   }
 }
-
 
 # Creates managed data disks
 resource azurerm_managed_disk "disks" {
