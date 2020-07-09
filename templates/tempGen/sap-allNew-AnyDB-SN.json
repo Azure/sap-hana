@@ -1,0 +1,13 @@
+{
+  "infrastructure": {
+    "resource_group": {
+      "name": "var-rg-name"
+    }
+  },
+  "databases": [
+    {
+      "platform": "AnyDB"
+    }
+  ]
+}
+

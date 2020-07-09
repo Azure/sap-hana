@@ -46,7 +46,7 @@ This section captures fundamentals on how new features should be developed and f
 	- Provide **Tests** that have been done to make sure this PR does not break existing code (either in master or branch). If the test requires certain instructions, please add that information as well.
 1. The PRs should be easily tested independent of other projects in progress.
 1. Submit PRs with small commits with descriptive comemnts, so that make it easier to rollback in case of problem.
-1. If it requires several PRs for a design, please create a feature branch, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo at ![image](/documentation/assets/contact.png) to add the feature branch into Azure pipeline so we make sure your PR will be tested*).
+1. If it requires several PRs for a design, please create a feature branch (name must follow feature/<feature_name> pattern, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo at ![image](/documentation/assets/contact.png) to testcase for that feature branch into Azure pipeline so we make sure your PR will be tested properly*).
 
 ### PR reviews guidelines
 We need to ensure quality along with agility. We need to move to everyone agreeing on the base requirement and then relying on systems in place to catch and mitigate issues.

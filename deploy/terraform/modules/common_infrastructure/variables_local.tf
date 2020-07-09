@@ -12,12 +12,14 @@ locals {
   ]
   hdb    = try(local.hana-databases[0], {})
   hdb_ha = try(local.hdb.high_availability, "false")
-  hdb_os = try(local.hdb.os,
-    {
-      "publisher" = "suse",
-      "offer"     = "sles-sap-12-sp5",
-      "sku"       = "gen1"
-  })
+  # If custom image is used, we do not overwrite os reference with default value
+  hdb_custom_image = try(local.hdb.os.source_image_id, "") != "" ? true : false
+  hdb_os = {
+    "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
+    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
+    "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
+    "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
+  }
 
   # iSCSI target device(s) is only created when below conditions met:
   # - iscsi is defined in input JSON

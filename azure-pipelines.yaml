@@ -8,7 +8,7 @@ pr:
   branches:
     include:
     - master
-    - support-anydb
+    - feature/*
   paths:
     include:
     - deploy/*
@@ -17,6 +17,7 @@ pr:
 variables:
   - group: azure-config-variables
   - group: azure-sap-hana-pipeline-secrets
+  - template: templates/variables.yaml
 stages:
 - stage: SetEnv
   jobs:
@@ -83,6 +84,8 @@ stages:
             sap-allNew-APP-HA
             sap-allNew-SN
             sap-allNew-HA
+            sap-allNew-AnyDB-SN
+            sap-allNew-AnyDB-HA
             sap-reuseRG-SN
             sap-reuseVNET-SN
             sap-reuseNSG-SN
