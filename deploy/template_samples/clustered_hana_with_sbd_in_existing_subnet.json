@@ -143,8 +143,6 @@
       }
     }
   ],
-<<<<<<< HEAD
-=======
   "application": {
     "sid": "HN1",
     "enable_deployment": true,
@@ -162,7 +160,6 @@
       "sku": "gen1"
     }
   },
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
   "software": {
     "storage_account_sapbits": {
       "is_existing": false,
