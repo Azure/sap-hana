@@ -127,7 +127,6 @@ resource "local_file" "ansible-inventory-yml" {
     ips-web               = local.ips-web
     anydbnodes            = local.anydb_vms
     ips-anydbnodes        = local.ips-anydbnodes
-
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts.yml"
