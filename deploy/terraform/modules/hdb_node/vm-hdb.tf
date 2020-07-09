@@ -20,8 +20,8 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 
   ip_configuration {
     name                          = "${local.hdb_vms[count.index].name}-admin-nic-ip"
-    subnet_id                     = var.infrastructure.vnets.sap.subnet_admin.is_existing ? data.azurerm_subnet.subnet-sap-admin[0].id : azurerm_subnet.subnet-sap-admin[0].id
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_admin.is_existing ? local.hdb_vms[count.index].admin_nic_ip : lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? local.hdb_vms[count.index].admin_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_admin.prefix, tonumber(count.index) + 10)
+    subnet_id                     = local.sub_admin_exists ? data.azurerm_subnet.subnet-sap-admin[0].id : azurerm_subnet.subnet-sap-admin[0].id
+    private_ip_address            = local.sub_admin_exists ? local.hdb_vms[count.index].admin_nic_ip : lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? local.hdb_vms[count.index].admin_nic_ip : cidrhost(local.sub_admin_prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
 }
@@ -37,8 +37,8 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
   ip_configuration {
     primary                       = true
     name                          = "${local.hdb_vms[count.index].name}-db-nic-ip"
-    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? local.hdb_vms[count.index].db_nic_ip : lookup(local.hdb_vms[count.index], "db_nic_ip", false) != false ? local.hdb_vms[count.index].db_nic_ip : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 10)
+    subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
+    private_ip_address            = local.sub_db_exists ? local.hdb_vms[count.index].db_nic_ip : lookup(local.hdb_vms[count.index], "db_nic_ip", false) != false ? local.hdb_vms[count.index].db_nic_ip : cidrhost(local.sub_db_prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
   }
 }
@@ -57,9 +57,9 @@ resource "azurerm_lb" "hana-lb" {
 
   frontend_ip_configuration {
     name                          = "hana-${local.hana_database.instance.sid}-lb-feip"
-    subnet_id                     = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
+    subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_db.is_existing ? try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4)) : cidrhost(var.infrastructure.vnets.sap.subnet_db.prefix, tonumber(count.index) + 4)
+    private_ip_address            = local.sub_db_exists ? try(local.hana_database.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
   }
 }
 

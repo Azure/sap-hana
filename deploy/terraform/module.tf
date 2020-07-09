@@ -6,10 +6,11 @@ module "common_infrastructure" {
   databases           = var.databases
   infrastructure      = var.infrastructure
   jumpboxes           = var.jumpboxes
-  options             = var.options
+  options             = local.options
   software            = var.software
   ssh-timeout         = var.ssh-timeout
   sshkey              = var.sshkey
+  subnet-sap-admin    = module.hdb_node.subnet-sap-admin
 }
 
 # Create Jumpboxes and RTI box
@@ -19,7 +20,7 @@ module "jumpbox" {
   databases         = var.databases
   infrastructure    = var.infrastructure
   jumpboxes         = var.jumpboxes
-  options           = var.options
+  options           = local.options
   software          = var.software
   ssh-timeout       = var.ssh-timeout
   sshkey            = var.sshkey
@@ -39,11 +40,13 @@ module "hdb_node" {
   databases        = var.databases
   infrastructure   = var.infrastructure
   jumpboxes        = var.jumpboxes
-  options          = var.options
+  options          = local.options
   software         = var.software
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
+  subnet-mgmt      = module.common_infrastructure.subnet-mgmt
+  nsg-mgmt         = module.common_infrastructure.nsg-mgmt
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
@@ -56,11 +59,12 @@ module "app_tier" {
   databases        = var.databases
   infrastructure   = var.infrastructure
   jumpboxes        = var.jumpboxes
-  options          = var.options
+  options          = local.options
   software         = var.software
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
+  subnet-mgmt      = module.common_infrastructure.subnet-mgmt
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
@@ -73,12 +77,14 @@ module "output_files" {
   databases                    = var.databases
   infrastructure               = var.infrastructure
   jumpboxes                    = var.jumpboxes
-  options                      = var.options
+  options                      = local.options
   software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
   storage-sapbits              = module.common_infrastructure.storage-sapbits
   nics-iscsi                   = module.common_infrastructure.nics-iscsi
+  infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
+  software_w_defaults          = module.common_infrastructure.software_w_defaults
   nics-jumpboxes-windows       = module.jumpbox.nics-jumpboxes-windows
   nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux
   public-ips-jumpboxes-windows = module.jumpbox.public-ips-jumpboxes-windows

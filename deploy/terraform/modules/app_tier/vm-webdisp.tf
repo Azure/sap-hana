@@ -8,8 +8,8 @@ resource "azurerm_network_interface" "web" {
 
   ip_configuration {
     name                          = "IPConfig1"
-    subnet_id                     = var.infrastructure.vnets.sap.subnet_app.is_existing ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
-    private_ip_address            = var.infrastructure.vnets.sap.subnet_app.is_existing ? local.web_nic_ips[count.index] : cidrhost(var.infrastructure.vnets.sap.subnet_app.prefix, tonumber(count.index) + local.ip_offsets.web_vm)
+    subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
+    private_ip_address            = cidrhost(local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0].address_prefixes[0] : azurerm_subnet.subnet-sap-app[0].address_prefixes[0], tonumber(count.index) + local.ip_offsets.web_vm)
     private_ip_address_allocation = "static"
   }
 }

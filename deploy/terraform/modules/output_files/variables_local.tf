@@ -1,3 +1,11 @@
+variable "infrastructure_w_defaults" {
+  description = "infrasturcture dict with default values"
+}
+
+variable "software_w_defaults" {
+  description = "software dect with default values"
+}
+
 variable "nics-jumpboxes-linux" {
   description = "NICs of the Linux jumpboxes"
 }

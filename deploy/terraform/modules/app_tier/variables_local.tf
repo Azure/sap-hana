@@ -2,6 +2,10 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
+variable "subnet-mgmt" {
+  description = "Details of the management subnet"
+}
+
 variable "vnet-sap" {
   description = "Details of the SAP VNet"
 }
@@ -16,6 +20,20 @@ variable "ppg" {
 
 # Set defaults
 locals {
+
+  # APP subnet
+  var_sub_app    = try(var.infrastructure.vnets.sap.subnet_app, {})
+  sub_app_exists = try(local.var_sub_app.is_existing, false)
+  sub_app_arm_id = local.sub_app_exists ? try(local.var_sub_app.arm_id, "") : ""
+  sub_app_name   = local.sub_app_exists ? "" : try(local.var_sub_app.name, "subnet-app")
+  sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "10.1.4.0/24")
+
+  # APP NSG
+  var_sub_app_nsg    = try(local.var_sub_app.nsg, {})
+  sub_app_nsg_exists = try(local.var_sub_app_nsg.is_existing, false)
+  sub_app_nsg_arm_id = local.sub_app_nsg_exists ? try(local.var_sub_app_nsg.arm_id, "") : ""
+  sub_app_nsg_name   = local.sub_app_nsg_exists ? "" : try(local.var_sub_app_nsg.name, "nsg-app")
+
   application_sid          = try(var.application.sid, "HN1")
   enable_deployment        = try(var.application.enable_deployment, false)
   scs_instance_number      = try(var.application.scs_instance_number, "01")

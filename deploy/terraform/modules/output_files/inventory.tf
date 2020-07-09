@@ -5,7 +5,7 @@
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
-    "infrastructure" = merge(var.infrastructure, { "iscsi" = { "iscsi_nic_ips" = [local.ips-iscsi] } })
+    "infrastructure" = merge(var.infrastructure_w_defaults, { "iscsi" = { "iscsi_nic_ips" = [local.ips-iscsi] } })
     "jumpboxes" = {
       "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
         name                 = jumpbox-windows.name,
@@ -58,15 +58,14 @@ resource "local_file" "output-json" {
       }
       if database != {}
     ],
-    "software" = {
-      "storage_account_sapbits" = {
-        "name"                = var.storage-sapbits[0].name,
-        "storage_access_key"  = var.storage-sapbits[0].primary_access_key,
-        "blob_container_name" = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
-        "file_share_name"     = lookup(var.software.storage_account_sapbits, "file_share_name", null)
-      },
-      "downloader" = var.software.downloader
-    }
+    "software" = merge(var.software_w_defaults, {
+      storage_account_sapbits = {
+        name                = var.storage-sapbits[0].name,
+        storage_access_key  = var.storage-sapbits[0].primary_access_key,
+        file_share_name     = var.software_w_defaults.storage_account_sapbits.file_share_name
+        blob_container_name = var.software_w_defaults.storage_account_sapbits.blob_container_name
+      }
+    })
     "options" = var.options
     }
   )
@@ -76,7 +75,7 @@ resource "local_file" "output-json" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible-inventory" {
   content = templatefile("${path.module}/ansible_inventory.tmpl", {
-    iscsi                 = lookup(var.infrastructure, "iscsi", {}),
+    iscsi                 = var.infrastructure_w_defaults.iscsi,
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips-iscsi             = local.ips-iscsi,
@@ -97,7 +96,7 @@ resource "local_file" "ansible-inventory" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible-inventory-yml" {
   content = templatefile("${path.module}/ansible_inventory.yml.tmpl", {
-    iscsi                 = lookup(var.infrastructure, "iscsi", {}),
+    iscsi                 = var.infrastructure_w_defaults.iscsi,
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips-iscsi             = local.ips-iscsi,

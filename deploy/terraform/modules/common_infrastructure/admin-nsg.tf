@@ -8,15 +8,15 @@
 
 # Creates mgmt subnet nsg
 resource "azurerm_network_security_group" "nsg-mgmt" {
-  count               = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 0 : 1
-  name                = var.infrastructure.vnets.management.subnet_mgmt.nsg.name
-  location            = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  resource_group_name = var.infrastructure.resource_group.is_existing ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  count               = local.sub_mgmt_nsg_exists ? 0 : 1
+  name                = local.sub_mgmt_nsg_name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
 }
 
 # Imports the mgmt subnet nsg data
 data "azurerm_network_security_group" "nsg-mgmt" {
-  count               = var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing ? 1 : 0
-  name                = split("/", var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id)[8]
-  resource_group_name = split("/", var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id)[4]
+  count               = local.sub_mgmt_nsg_exists ? 1 : 0
+  name                = split("/", local.sub_mgmt_nsg_arm_id)[8]
+  resource_group_name = split("/", local.sub_mgmt_nsg_arm_id)[4]
 }

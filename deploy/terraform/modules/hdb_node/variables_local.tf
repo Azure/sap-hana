@@ -2,6 +2,14 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
+variable "subnet-mgmt" {
+  description = "Details of the management subnet"
+}
+
+variable "nsg-mgmt" {
+  description = "Details of the NSG for management subnet"
+}
+
 variable "vnet-sap" {
   description = "Details of the SAP VNet"
 }
@@ -16,6 +24,33 @@ variable "ppg" {
 
 # Set defaults
 locals {
+
+  # Admin subnet
+  var_sub_admin    = try(var.infrastructure.vnets.sap.subnet_admin, {})
+  sub_admin_exists = try(local.var_sub_admin.is_existing, false)
+  sub_admin_arm_id = local.sub_admin_exists ? try(local.var_sub_admin.arm_id, "") : ""
+  sub_admin_name   = local.sub_admin_exists ? "" : try(local.var_sub_admin.name, "subnet-admin")
+  sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "10.1.1.0/24")
+
+  # Admin NSG
+  var_sub_admin_nsg    = try(var.infrastructure.vnets.sap.subnet_admin.nsg, {})
+  sub_admin_nsg_exists = try(local.var_sub_admin_nsg.is_existing, false)
+  sub_admin_nsg_arm_id = local.sub_admin_nsg_exists ? try(local.var_sub_admin_nsg.arm_id, "") : ""
+  sub_admin_nsg_name   = local.sub_admin_nsg_exists ? "" : try(local.var_sub_admin_nsg.name, "nsg-admin")
+
+  # DB subnet
+  var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
+  sub_db_exists = try(local.var_sub_db.is_existing, false)
+  sub_db_arm_id = local.sub_db_exists ? try(local.var_sub_db.arm_id, "") : ""
+  sub_db_name   = local.sub_db_exists ? "" : try(local.var_sub_db.name, "subnet-db")
+  sub_db_prefix = local.sub_db_exists ? "" : try(local.var_sub_db.prefix, "10.1.2.0/24")
+
+  # DB NSG
+  var_sub_db_nsg    = try(var.infrastructure.vnets.sap.subnet_db.nsg, {})
+  sub_db_nsg_exists = try(local.var_sub_db_nsg.is_existing, false)
+  sub_db_nsg_arm_id = local.sub_db_nsg_exists ? try(local.var_sub_db_nsg.arm_id, "") : ""
+  sub_db_nsg_name   = local.sub_db_nsg_exists ? "" : try(local.var_sub_db_nsg.name, "nsg-db")
+
   hdb_list = [
     for db in var.databases : db
     if try(db.platform, "NONE") == "HANA"

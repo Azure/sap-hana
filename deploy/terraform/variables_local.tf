@@ -20,6 +20,18 @@ locals {
     if try(db.platform, "NONE") == "HANA"
   ]
   hana-sid = try(local.hdb_list[0].instance.sid, "")
+
+  # Options
+  enable_secure_transfer = try(var.options.enable_secure_transfer, true)
+  ansible_execution      = try(var.options.ansible_execution, false)
+  enable_prometheus      = try(var.options.enable_prometheus, true)
+
+  # Update options with defaults
+  options = merge(var.options, {
+    enable_secure_transfer = local.enable_secure_transfer,
+    ansible_execution      = local.ansible_execution,
+    enable_prometheus      = local.enable_prometheus
+  })
 }
 
 locals {

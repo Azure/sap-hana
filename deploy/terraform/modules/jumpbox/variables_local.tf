@@ -26,6 +26,18 @@ variable "random-id" {
   description = "Random hex for creating unique Azure key vault name"
 }
 
+# Set defaults
+locals {
+
+  # Management subnet
+  sub_mgmt_exists = try(var.infrastructure.vnets.management.subnet_mgmt.is_existing, false)
+
+  # Management NSG
+  sub_mgmt_nsg_exists      = try(var.infrastructure.vnets.management.subnet_mgmt.nsg.is_existing, false)
+  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, ["0.0.0.0/0"])
+
+}
+
 locals {
   output-tf = jsondecode(var.output-json.content)
 

@@ -37,7 +37,7 @@ resource "null_resource" "prepare_rti_files" {
 }
 
 resource "null_resource" "ansible_playbook" {
-  count      = var.options.ansible_execution ? 1 : 0
+  count      = local.ansible_execution ? 1 : 0
   depends_on = [null_resource.prepare_rti_files, module.hdb_node.dbnode-data-disk-att, module.jumpbox.vm-windows]
 
   connection {
