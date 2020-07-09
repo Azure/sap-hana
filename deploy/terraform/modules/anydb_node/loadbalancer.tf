@@ -4,8 +4,8 @@
 Load balancer front IP address range: .4 - .9
 +--------------------------------------4--------------------------------------*/
 
-resource "azurerm_lb" "lb" {
-  count               = local.enable_deployment ? (local.vm_count > 1 ? 1 : 0) : 0
+resource "azurerm_lb" "anydb" {
+  count               = local.enable_deployment ? 1 : 0
   name                = format("%s-%s-lb", var.role, local.prefix)
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
@@ -21,17 +21,17 @@ resource "azurerm_lb" "lb" {
 }
 
 resource "azurerm_lb_backend_address_pool" "lb-back-pool" {
-  count               = local.enable_deployment ? (local.vm_count > 1 ? 1 : 0) : 0
+  count               = local.enable_deployment ? 1 : 0
   name                = format("%s-%s-lb-bep", var.role, local.prefix)
   resource_group_name = var.resource-group[0].name
-  loadbalancer_id     = azurerm_lb.lb[0].id
+  loadbalancer_id     = azurerm_lb.anydb[0].id
 
 }
 
 resource "azurerm_lb_probe" "lb-health-probe" {
-  count               = local.enable_deployment ? (local.vm_count > 1 ? 1 : 0) : 0
+  count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
-  loadbalancer_id     = azurerm_lb.lb[0].id
+  loadbalancer_id     = azurerm_lb.anydb[0].id
   name                = format("%s-%s-lb-hpp", var.role, local.prefix)
   port                = (local.anydb_platform == "DB2") ? "62500" : "1521"
   protocol            = "Tcp"
@@ -40,16 +40,16 @@ resource "azurerm_lb_probe" "lb-health-probe" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "lb-nic-bep" {
-  count                   = local.enable_deployment ? (local.vm_count > 1 ? 1 : 0) : 0
-  network_interface_id    = azurerm_network_interface.nic[count.index].id
-  ip_configuration_name   = azurerm_network_interface.nic[count.index].ip_configuration[0].name
+  count                   = local.enable_deployment ? 1 : 0
+  network_interface_id    = azurerm_network_interface.anydb[count.index].id
+  ip_configuration_name   = azurerm_network_interface.anydb[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.lb-back-pool[0].id
 }
 
 resource "azurerm_lb_rule" "lb-rules" {
-  count                          = local.enable_deployment ? (local.vm_count > 1 ? 1 : 0) : 0
+  count                          = local.enable_deployment ? 1 : 0
   resource_group_name            = var.resource-group[0].name
-  loadbalancer_id                = azurerm_lb.lb[0].id
+  loadbalancer_id                = azurerm_lb.anydb[0].id
   name                           = "anydb_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"
   protocol                       = "Tcp"
   frontend_port                  = local.loadbalancers[0].ports[count.index]

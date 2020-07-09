@@ -1,9 +1,9 @@
 output "loadbalancers" {
-  value = azurerm_lb.lb
+  value = azurerm_lb.anydb
 }
 
 output "nics-anydb" {
-  value = azurerm_network_interface.nic
+  value = azurerm_network_interface.anydb
 }
 
 output "any-database-info" {
