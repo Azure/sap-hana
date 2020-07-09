@@ -2,6 +2,7 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
+<<<<<<< HEAD
 variable "subnet-mgmt" {
   description = "Details of the management subnet"
 }
@@ -10,6 +11,8 @@ variable "nsg-mgmt" {
   description = "Details of the NSG for management subnet"
 }
 
+=======
+>>>>>>> Revert "Delete variables_local.tf"
 variable "vnet-sap" {
   description = "Details of the SAP VNet"
 }
@@ -24,6 +27,7 @@ variable "ppg" {
 
 # Set defaults
 locals {
+<<<<<<< HEAD
 
   # Admin subnet
   var_sub_admin    = try(var.infrastructure.vnets.sap.subnet_admin, {})
@@ -51,6 +55,8 @@ locals {
   sub_db_nsg_arm_id = local.sub_db_nsg_exists ? try(local.var_sub_db_nsg.arm_id, "") : ""
   sub_db_nsg_name   = local.sub_db_nsg_exists ? "" : try(local.var_sub_db_nsg.name, "nsg-db")
 
+=======
+>>>>>>> Revert "Delete variables_local.tf"
   hdb_list = [
     for db in var.databases : db
     if try(db.platform, "NONE") == "HANA"
@@ -91,6 +97,7 @@ locals {
   components             = merge({ hana_database = [] }, try(local.hdb.components, {}))
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
+<<<<<<< HEAD
 
   dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, []) : {
     "name" = try(dbnode.name, format("%s_%s_hdb%02d", local.sap_sid, local.hdb_sid, idx)),
@@ -98,6 +105,14 @@ locals {
     }
   ]
 
+=======
+  dbnodes = try(local.hdb.dbnodes, [
+    {
+      "name" = "hdb1",
+      "role" = "worker"
+
+  }])
+>>>>>>> Revert "Delete variables_local.tf"
   loadbalancer = try(local.hdb.loadbalancer, {})
 
   # Update HANA database information with defaults
@@ -129,10 +144,13 @@ locals {
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
+<<<<<<< HEAD
 
   # SAP SID used in HDB resource naming convention
   sap_sid = try(var.application.sid, "HN1")
 
+=======
+>>>>>>> Revert "Delete variables_local.tf"
 }
 
 # Imports HANA database sizing information
@@ -189,7 +207,11 @@ locals {
 
   loadbalancer_ports = flatten([
     for port in local.lb_ports[split(".", local.hana_database.db_version)[0]] : {
+<<<<<<< HEAD
       sid  = local.sap_sid
+=======
+      sid  = local.hana_database.instance.sid
+>>>>>>> Revert "Delete variables_local.tf"
       port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
     }
   ])
