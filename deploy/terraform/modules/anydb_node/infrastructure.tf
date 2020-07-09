@@ -47,7 +47,7 @@ data "azurerm_network_security_group" "anydb" {
 }
 
 # Associates SAP db nsg to SAP db subnet
-resource "azurerm_subnet_network_security_group_association" "Associate-nsg-db" {
+resource "azurerm_subnet_network_security_group_association" "anydb" {
   count                     = local.enable_deployment ? signum((var.infrastructure.vnets.sap.subnet_db.is_existing ? 0 : 1) + (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1)) : 0
   subnet_id                 = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
   network_security_group_id = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-anydb[0].id : azurerm_network_security_group.nsg-anydb[0].id
