@@ -146,7 +146,7 @@ locals {
   )
 
   anydb_disks = flatten([
-    for vm_counter in range(local.vm_count) : [
+    for vm_counter in range(length(local.anydb_disks)) : [
       for storage_type in lookup(local.sizes, local.size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
