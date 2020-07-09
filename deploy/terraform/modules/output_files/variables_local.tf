@@ -62,7 +62,6 @@ variable "nics-app" {
   description = "List of NICs for the Application Instance VMs"
 }
 
-<<<<<<< HEAD
 variable "nics-web" {
   description = "List of NICs for the Web dispatcher VMs"
 }
@@ -74,8 +73,6 @@ variable "nics-anydb" {
 variable "any-database-info" {
   description = "Updated any database json"
 }
-=======
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
@@ -130,10 +127,7 @@ locals {
     if adatabase != {}
 
   ])
-<<<<<<< HEAD
 
-=======
   ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
   ips-app = [for key, value in var.nics-app : value.private_ip_address]
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
 }

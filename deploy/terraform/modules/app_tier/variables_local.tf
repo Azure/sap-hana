@@ -86,7 +86,6 @@ locals {
   }
 
   # Default VM config should be merged with any the user passes in
-<<<<<<< HEAD
   app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))
 
   scs_sizing = lookup(local.sizes.scs, local.vm_sizing, lookup(local.sizes.scs, "Default"))
@@ -94,7 +93,6 @@ locals {
   web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
 
   # Ports used for specific ASCS, ERS and Web dispatcher
-=======
   app_sku_map = merge(
     {
       app = "Standard_D4s_v3,false"
@@ -111,7 +109,6 @@ locals {
 
 
   # Ports used for specific ASCS and ERS
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
   lb-ports = {
     "scs" = [
       3200 + tonumber(local.scs_instance_number),           # e.g. 3201
