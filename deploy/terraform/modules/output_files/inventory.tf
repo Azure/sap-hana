@@ -68,7 +68,6 @@ resource "local_file" "output-json" {
       "downloader" = var.software.downloader
     }
     "options" = var.options,
-
     "anyDBdatabases" = [for database in local.anydatabases : {
       platform          = database.platform,
       db_version        = database.db_version,
