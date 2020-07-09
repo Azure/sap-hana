@@ -3,7 +3,7 @@
 #############################################################################
 
 
-resource azurerm_network_interface "nic" {
+resource azurerm_network_interface "anydb" {
   count               = local.enable_deployment ? length(local.dbnodes) : 0
   name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.sid)
   location            = var.resource-group[0].location
@@ -27,7 +27,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
   availability_set_id          = azurerm_availability_set.anydb[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids        = [azurerm_network_interface.anydb[count.index].id]
-  size                         = local.sku
+  size                         = try(lookup(local.sizes, local.size).compute.vm_size, "Standard_E4s_v3")
 
   source_image_id = local.anydb_custom_image ? local.anydb_os.source_image_id : null
 

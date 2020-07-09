@@ -63,7 +63,7 @@ locals {
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 
   size   = try(local.anydb.size, "500")
-  prefix = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
+  sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
 
   dbnodes = flatten([
     [
@@ -142,15 +142,15 @@ locals {
     { size = local.anydb_size },
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
-    { authentication = local.anydb_auth }
+    { authentication = local.authentication }
   )
 
   anydb_disks = flatten([
-    for vm_counter in range(length(local.anydb_disks)) : [
+    for vm_counter in range(length(local.dbnodes)) : [
       for storage_type in lookup(local.sizes, local.size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
-          name                      = format("%s%02d-%s-%s%02d", var.role, (vm_counter + 1), local.sid, storage_type.name, (disk_count + 1))
+          name                      = format("%s%02d-%s-%s%02d", var.role, vm_counter, local.sid, storage_type.name, (disk_count))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
           caching                   = storage_type.caching
