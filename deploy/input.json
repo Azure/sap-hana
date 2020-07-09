@@ -192,7 +192,6 @@
     "ers_instance_number": "",
     "scs_high_availability": true,
     "application_server_count": 1,
-<<<<<<< HEAD
     "webdispatcher_count": 1,
     "vm_sizing": "",
     "app_nic_ips": [],
@@ -200,8 +199,6 @@
     "scs_nic_ips": [],
     "web_lb_ips": [],
     "web_nic_ips": [],
-=======
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
     "authentication": {
       "type": "",
       "username": ""
