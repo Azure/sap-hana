@@ -94,8 +94,9 @@
       "platform": "Oracle",
       "db_version": "7.5.1",
       "os": {
-        "source_image_id": "",
-        "type": "Linux"
+        "source_image_id": "/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Compute/images/xxx",
+        "//": "os_type is required if source_image_id is used. Possible value: Linux, Windows",
+        "os_type": "Linux"
       },
       "size": "1024",
       "filesystem": "xfs",

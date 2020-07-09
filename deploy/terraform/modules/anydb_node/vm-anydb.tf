@@ -3,9 +3,9 @@
 #############################################################################
 
 
-resource azurerm_network_interface "anydb" {
-  count               = local.enable_deployment ? local.vm_count : 0
-  name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.prefix)
+resource azurerm_network_interface "nic" {
+  count               = local.enable_deployment ? length(local.dbnodes) : 0
+  name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.sid)
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
 
@@ -20,8 +20,8 @@ resource azurerm_network_interface "anydb" {
 
 # Section for Linux Virtual machine 
 resource azurerm_linux_virtual_machine "dbserver" {
-  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.vm_count : 0) : 0
-  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
+  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? length(local.dbnodes) : 0) : 0
+  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.sid)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.anydb[0].id
@@ -45,20 +45,20 @@ resource azurerm_linux_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.prefix)
+      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.sid)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name                   = "${local.prefix}${var.role}vm${count.index}"
-  admin_username                  = local.dbnodes[count.index].authentication.username
-  admin_password                  = lookup(local.dbnodes[count.index].authentication, "password", null)
-  disable_password_authentication = local.dbnodes[count.index].authentication.type != "password" ? true : false
+  computer_name                   = "${local.sid}${var.role}vm${count.index}"
+  admin_username                  = local.authentication.username
+  admin_password                  = local.authentication.password
+  disable_password_authentication = local.authentication.type != "password" ? true : false
 
   admin_ssh_key {
-    username   = local.dbnodes[count.index].authentication.username
+    username   = local.authentication.username
     public_key = file(var.sshkey.path_to_public_key)
   }
 
@@ -68,14 +68,14 @@ resource azurerm_linux_virtual_machine "dbserver" {
   tags = {
     environment = "SAP"
     role        = var.role
-    SID         = local.prefix
+    SID         = local.sid
   }
 }
 
 # Section for Windows Virtual machine based on a marketplace image 
 resource azurerm_windows_virtual_machine "dbserver" {
-  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.vm_count : 0) : 0
-  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.prefix)
+  count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? length(local.dbnodes) : 0) : 0
+  name                         = format("%s%02d-%s-vm", var.role, (count.index + 1), local.sid)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.anydb[0].id
@@ -99,16 +99,16 @@ resource azurerm_windows_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.prefix)
+      name                 = format("%s%02d-%s-vm-osdisk", var.role, (count.index + 1), local.sid)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name  = "${local.prefix}${var.role}vm${count.index}"
-  admin_username = local.anydb_auth.username
-  admin_password = local.anydb_auth.password
+  computer_name  = "${local.sid}${var.role}vm${count.index}"
+  admin_username = local.authentication.username
+  admin_password = local.authentication.password
 
   boot_diagnostics {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
@@ -116,7 +116,7 @@ resource azurerm_windows_virtual_machine "dbserver" {
   tags = {
     environment = "SAP"
     role        = var.role
-    SID         = local.prefix
+    SID         = local.sid
   }
 }
 

@@ -4,7 +4,7 @@
 
 resource "azurerm_availability_set" "anydb" {
   count                        = local.enable_deployment ? 1 : 0
-  name                         = format("%s-%s-avset", var.role, local.prefix)
+  name                         = format("%s-%s-avset", var.role, local.sid)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
