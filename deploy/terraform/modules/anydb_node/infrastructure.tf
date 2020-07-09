@@ -40,7 +40,7 @@ resource "azurerm_network_security_group" "anydb" {
 }
 
 # Imports the SAP db subnet nsg data
-data "azurerm_network_security_group" "nsg-anydb" {
+data "azurerm_network_security_group" "anydb" {
   count               = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 1 : 0) : 0
   name                = split("/", var.infrastructure.vnets.sap.subnet_db.nsg.arm_id)[8]
   resource_group_name = split("/", var.infrastructure.vnets.sap.subnet_db.nsg.arm_id)[4]
