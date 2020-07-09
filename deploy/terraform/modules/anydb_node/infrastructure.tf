@@ -2,7 +2,7 @@
 
 # AVAILABILITY SET ================================================================================================
 
-resource "azurerm_availability_set" "db-as" {
+resource "azurerm_availability_set" "anydb" {
   count                        = local.enable_deployment ? 1 : 0
   name                         = format("%s-%s-avset", var.role, local.prefix)
   location                     = var.resource-group[0].location
@@ -52,4 +52,3 @@ resource "azurerm_subnet_network_security_group_association" "Associate-nsg-db" 
   subnet_id                 = var.infrastructure.vnets.sap.subnet_db.is_existing ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
   network_security_group_id = var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? data.azurerm_network_security_group.nsg-anydb[0].id : azurerm_network_security_group.nsg-anydb[0].id
 }
-
