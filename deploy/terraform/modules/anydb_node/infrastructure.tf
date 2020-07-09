@@ -32,7 +32,7 @@ data "azurerm_subnet" "anydb" {
 }
 
 # Creates SAP db subnet nsg
-resource "azurerm_network_security_group" "nsg-anydb" {
+resource "azurerm_network_security_group" "anydb" {
   count               = local.enable_deployment ? (var.infrastructure.vnets.sap.subnet_db.nsg.is_existing ? 0 : 1) : 0
   name                = var.infrastructure.vnets.sap.subnet_db.nsg.name
   location            = var.infrastructure.region
