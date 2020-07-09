@@ -5,7 +5,3 @@ output "nics-scs" {
 output "nics-app" {
   value = azurerm_network_interface.app
 }
-
-output "nics-web" {
-  value = azurerm_network_interface.web
-}

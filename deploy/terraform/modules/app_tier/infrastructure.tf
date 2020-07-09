@@ -15,11 +15,6 @@ data "azurerm_subnet" "subnet-sap-app" {
   virtual_network_name = split("/", local.sub_app_arm_id)[8]
 }
 
-/*
- SCS Load Balancer
- SCS Availability Set
-*/
-
 # Create the SCS Load Balancer
 resource "azurerm_lb" "scs" {
   count               = local.enable_deployment ? 1 : 0
@@ -102,10 +97,6 @@ resource "azurerm_availability_set" "scs" {
   managed                      = true
 }
 
-/*
- Application Availability Set
-*/
-
 # Create the Application Availability Set
 resource "azurerm_availability_set" "app" {
   count                        = local.enable_deployment ? 1 : 0
@@ -117,6 +108,7 @@ resource "azurerm_availability_set" "app" {
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   managed                      = true
 }
+<<<<<<< HEAD
 
 /*
  Web dispatcher Load Balancer
@@ -180,3 +172,5 @@ resource "azurerm_availability_set" "web" {
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   managed                      = true
 }
+=======
+>>>>>>> parent of 5b346da... Add webdispatcher module (#576)
