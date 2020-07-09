@@ -3,7 +3,7 @@
 #############################################################################
 
 
-resource azurerm_network_interface "nic" {
+resource azurerm_network_interface "anydb" {
   count               = local.enable_deployment ? local.vm_count : 0
   name                = format("%s%02d-%s-nic", var.role, (count.index + 1), local.prefix)
   location            = var.resource-group[0].location
