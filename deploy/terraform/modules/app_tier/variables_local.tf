@@ -81,8 +81,10 @@ locals {
   # Note: First 4 IP addresses in a subnet are reserved by Azure
   ip_offsets = {
     scs_lb = 4 + 1
+    web_lb = 4 + 3
     scs_vm = 4 + 6
     app_vm = 4 + 10
+    web_vm = 4 + 20
   }
 
   # Default VM config should be merged with any the user passes in
@@ -93,31 +95,15 @@ locals {
   web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
 
   # Ports used for specific ASCS, ERS and Web dispatcher
-  app_sku_map = merge(
-    {
-      app = "Standard_D4s_v3,false"
-      scs = "Standard_D4s_v3,false"
-    },
-    lookup(var.application, "vm_config", {})
-  )
-
-  app_vm_size                    = element(split(",", lookup(local.app_sku_map, "app", false)), 0)
-  app_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "app", false)), 1)
-
-  scs_vm_size                    = element(split(",", lookup(local.app_sku_map, "scs", false)), 0)
-  scs_nic_accelerated_networking = element(split(",", lookup(local.app_sku_map, "scs", false)), 1)
-
-
-  # Ports used for specific ASCS and ERS
   lb-ports = {
     "scs" = [
-      3200 + tonumber(local.scs_instance_number),           # e.g. 3201
-      3600 + tonumber(local.scs_instance_number),           # e.g. 3601
-      3900 + tonumber(local.scs_instance_number),           # e.g. 3901
-      8100 + tonumber(local.scs_instance_number),           # e.g. 8101
-      50013 + (tonumber(local.scs_instance_number) * 100),  # e.g. 50113
-      50014 + (tonumber(local.scs_instance_number) * 100),  # e.g. 50114
-      50016 + (tonumber(local.scs_instance_number) * 100),  # e.g. 50116
+      3200 + tonumber(local.scs_instance_number),          # e.g. 3201
+      3600 + tonumber(local.scs_instance_number),          # e.g. 3601
+      3900 + tonumber(local.scs_instance_number),          # e.g. 3901
+      8100 + tonumber(local.scs_instance_number),          # e.g. 8101
+      50013 + (tonumber(local.scs_instance_number) * 100), # e.g. 50113
+      50014 + (tonumber(local.scs_instance_number) * 100), # e.g. 50114
+      50016 + (tonumber(local.scs_instance_number) * 100), # e.g. 50116
     ]
 
     "ers" = [
@@ -126,6 +112,42 @@ locals {
       50013 + (tonumber(local.ers_instance_number) * 100), # e.g. 50213
       50014 + (tonumber(local.ers_instance_number) * 100), # e.g. 50214
       50016 + (tonumber(local.ers_instance_number) * 100), # e.g. 50216
+    ]
+
+    "web" = [
+      80,
+      3200
+    ]
+  }
+
+  # Ports used for ASCS, ERS and Web dispatcher NSG rules
+  nsg-ports = {
+    "web" = [
+      {
+        "priority" = "101",
+        "name"     = "SSH",
+        "port"     = "22"
+      },
+      {
+        "priority" = "102",
+        "name"     = "HTTP",
+        "port"     = "80"
+      },
+      {
+        "priority" = "103",
+        "name"     = "HTTPS",
+        "port"     = "443"
+      },
+      {
+        "priority" = "104",
+        "name"     = "sapinst",
+        "port"     = "4237"
+      },
+      {
+        "priority" = "105",
+        "name"     = "WebDispatcher",
+        "port"     = "44300"
+      }
     ]
   }
 

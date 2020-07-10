@@ -21,7 +21,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   computer_name                = "${upper(local.application_sid)}web${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.web[0].id
+  availability_set_id          = azurerm_availability_set.app[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids = [
     azurerm_network_interface.web[count.index].id
@@ -65,7 +65,7 @@ resource "azurerm_windows_virtual_machine" "web" {
   computer_name                = "${upper(local.application_sid)}web${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.web[0].id
+  availability_set_id          = azurerm_availability_set.app[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids = [
     azurerm_network_interface.web[count.index].id
