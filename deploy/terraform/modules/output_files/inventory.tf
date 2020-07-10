@@ -101,14 +101,8 @@ resource "local_file" "ansible-inventory" {
     dbnodes               = local.hdb_vms,
     application           = var.application,
     ips-scs               = local.ips-scs,
-<<<<<<< HEAD
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
-    anydbnodes            = local.anydb_vms
-    ips-anydbnodes        = local.ips-anydbnodes
-=======
-    ips-app               = local.ips-app
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts"
@@ -128,14 +122,8 @@ resource "local_file" "ansible-inventory-yml" {
     dbnodes               = local.hdb_vms,
     application           = var.application,
     ips-scs               = local.ips-scs,
-<<<<<<< HEAD
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
-    anydbnodes            = local.anydb_vms
-    ips-anydbnodes        = local.ips-anydbnodes
-=======
-    ips-app               = local.ips-app
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts.yml"

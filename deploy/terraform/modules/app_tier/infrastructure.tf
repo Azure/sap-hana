@@ -15,6 +15,25 @@ data "azurerm_subnet" "subnet-sap-app" {
   virtual_network_name = split("/", local.sub_app_arm_id)[8]
 }
 
+# Creates app subnet of SAP VNET
+
+resource "azurerm_subnet" "subnet-sap-web" {
+  count                = local.enable_deployment && local.var_sub_web_defined ? (local.sub_web_exists ? 0 : 1) : 0
+  name                 = local.sub_web_name
+  resource_group_name  = var.vnet-sap[0].resource_group_name
+  virtual_network_name = var.vnet-sap[0].name
+  address_prefixes     = [local.sub_web_prefix]
+}
+
+# Imports data of existing SAP app subnet
+data "azurerm_subnet" "subnet-sap-web" {
+  count                = local.enable_deployment && local.var_sub_web_defined ? (local.sub_web_exists ? 1 : 0) : 0
+  name                 = split("/", local.sub_web_arm_id)[10]
+  resource_group_name  = split("/", local.sub_web_arm_id)[4]
+  virtual_network_name = split("/", local.sub_web_arm_id)[8]
+}
+
+
 # Create the SCS Load Balancer
 resource "azurerm_lb" "scs" {
   count               = local.enable_deployment ? 1 : 0
@@ -101,6 +120,18 @@ resource "azurerm_availability_set" "scs" {
 resource "azurerm_availability_set" "app" {
   count                        = local.enable_deployment ? 1 : 0
   name                         = "${upper(local.application_sid)}_app-avset"
+  location                     = var.resource-group[0].location
+  resource_group_name          = var.resource-group[0].name
+  platform_update_domain_count = 20
+  platform_fault_domain_count  = 2
+  proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  managed                      = true
+}
+
+# Create the Application Availability Set
+resource "azurerm_availability_set" "web" {
+  count                        = local.enable_deployment && local.var_sub_web_defined ? 1 : 0
+  name                         = "${upper(local.application_sid)}_web-avset"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20

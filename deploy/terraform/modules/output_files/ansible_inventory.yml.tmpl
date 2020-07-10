@@ -75,7 +75,15 @@ all:
           ansible_user:       "${application.authentication.username}"
 %{~ endfor }
 
-    # Groups below are collections of the above groups for easier refernce
+    web:
+      hosts:
+%{~ for ip-web in ips-web }
+        ${ip-web}:
+          ansible_connection: "ssh"
+          ansible_user:       "${application.authentication.username}"
+%{~ endfor }
+
+    # Groups below are collections of the above groups for easier reference
     all_jumpboxes:
       children:
         jumpboxes_windows:

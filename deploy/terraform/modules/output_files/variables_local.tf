@@ -107,10 +107,12 @@ locals {
     ])
     if database != {}
   ])
+
   ips-scs        = [for key, value in var.nics-scs : value.private_ip_address]
   ips-app        = [for key, value in var.nics-app : value.private_ip_address]
   ips-web        = [for key, value in var.nics-web : value.private_ip_address]
   ips-anydbnodes = [for key, value in var.nics-anydb : value.private_ip_address]
+  
   anydatabases = [
     var.any-database-info
   ]
@@ -128,6 +130,4 @@ locals {
 
   ])
 
-  ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
-  ips-app = [for key, value in var.nics-app : value.private_ip_address]
 }
