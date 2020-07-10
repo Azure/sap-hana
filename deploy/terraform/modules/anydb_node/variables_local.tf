@@ -110,6 +110,7 @@ locals {
     ]
 
     "NONE" = [
+       "1433"
     ]
   }
 
@@ -133,6 +134,13 @@ locals {
 
   # List of ports for load balancer
   loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
+
+loadbalancer_ports = flatten([
+    for port in local.lb_ports[split(".", local.hana_database.db_version)[0]] : {
+      sid  = local.hana_database.instance.sid
+      port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
+    }
+  ])
 
   # Update database information with defaults
   anydb_database = merge(local.anydb,

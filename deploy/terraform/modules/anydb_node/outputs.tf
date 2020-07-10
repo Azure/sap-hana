@@ -1,6 +1,3 @@
-output "loadbalancers" {
-  value = azurerm_lb.anydb
-}
 
 output "nics-anydb" {
   value = azurerm_network_interface.anydb
