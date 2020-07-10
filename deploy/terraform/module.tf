@@ -115,10 +115,7 @@ module "output_files" {
   hana-database-info           = module.hdb_node.hana-database-info
   nics-scs                     = module.app_tier.nics-scs
   nics-app                     = module.app_tier.nics-app
-<<<<<<< HEAD
   nics-web                     = module.app_tier.nics-web
   nics-anydb                   = module.anydb_node.nics-anydb
   any-database-info            = module.anydb_node.any-database-info
-=======
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
 }
