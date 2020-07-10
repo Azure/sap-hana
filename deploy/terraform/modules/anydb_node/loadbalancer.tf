@@ -48,7 +48,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "lb-nic-be
 }
 
 resource "azurerm_lb_rule" "lb-rules" {
-  count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
+  count                          = local.enable_deployment ? length(local.loadbalancers-ports) : 0
   resource_group_name            = var.resource-group[0].name
   loadbalancer_id                = azurerm_lb.anydb[0].id
   name                           = "anydb_${local.loadbalancers[0].sid}_${local.loadbalancers[0].ports[count.index]}"
