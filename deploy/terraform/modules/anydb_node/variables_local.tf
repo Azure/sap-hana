@@ -6,11 +6,6 @@ variable "vnet-sap" {
   description = "Details of the SAP VNet"
 }
 
-variable "role" {
-  type    = string
-  default = "db"
-}
-
 variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
@@ -97,7 +92,7 @@ locals {
       for database in local.anydb-databases : [
         for dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
-          name           = format("%s-db%02d", local.sid, 0),
+          name           = format("%s-db%02d", local.anydb_sid, 0),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
           size           = local.anydb_size,
           os             = local.anydb_ostype,
@@ -110,7 +105,7 @@ locals {
       for database in local.anydb-databases : [
         for dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
-          name           = format("%s-db%02d", local.sid, 1),
+          name           = format("%s-db%02d", local.anydb_sid, 1),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
           size           = local.anydb_size,
           os             = local.anydb_ostype,
@@ -148,10 +143,10 @@ locals {
 
   anydb_disks = flatten([
     for vm_counter in range(length(local.dbnodes)) : [
-      for storage_type in lookup(local.sizes, local.size).storage : [
+      for storage_type in lookup(local.sizes, local.anydb_size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
-          name                      = format("%s%02d-%s-%s%02d", var.role, vm_counter, local.sid, storage_type.name, (disk_count))
+          name                      = format("db%02d-%s-%s%02d", vm_counter, local.anydb_sid, storage_type.name, (disk_count))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
           caching                   = storage_type.caching

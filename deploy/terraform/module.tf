@@ -87,7 +87,6 @@ module "anydb_node" {
   ppg              = module.common_infrastructure.ppg
 }
 
-
 # Generate output files
 module "output_files" {
   source                       = "./modules/output_files"
