@@ -4,13 +4,13 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "anydb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("db-%s-lb", local.sid)
+  name                = format("db-%s-lb", local.anydb_sid)
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name                          = format("db-%s-lb-feip", local.sid)
-    subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-anydb[0].id : azurerm_subnet.subnet-sap-anydb[0].id
+    name                          = format("db-%s-lb-feip", local.anydb_sid)
+    subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = local.sub_db_exists ? try(local.anydb.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
   }
@@ -20,15 +20,15 @@ resource "azurerm_lb_backend_address_pool" "lb-back-pool" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
-  name                = format("db-%s-bep", local.sid)
+  name                = format("db-%s-bep", local.anydb_sid)
 }
 
 resource "azurerm_lb_probe" "lb-health-probe" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
-  name                = format("db-%s-lb-hp", local.sid)
-  port                = loadbalancer_ports[0].port
+  name                = format("db-%s-lb-hp", local.anydb_sid)
+  port                = local.loadbalancer_ports[0].port
   protocol            = "Tcp"
   interval_in_seconds = 5
   number_of_probes    = 2
@@ -45,7 +45,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "lb-nic-be
 
 resource "azurerm_availability_set" "anydb" {
   count                        = local.enable_deployment ? 1 : 0
-  name                         = format("%s-%s-avset", var.role, local.sid)
+  name                         = format("db-%s-avset", local.anydb_sid)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
@@ -60,7 +60,7 @@ resource "azurerm_subnet" "anydb" {
   name                 = local.sub_db_name
   resource_group_name  = var.vnet-sap[0].resource_group_name
   virtual_network_name = var.vnet-sap[0].name
-  address_prefixes     = [local.subnet_db.prefix]
+  address_prefixes     = [local.sub_db_prefix]
 }
 
 # Imports data of existing any-db subnet
@@ -73,17 +73,17 @@ data "azurerm_subnet" "anydb" {
 
 # Creates SAP db subnet nsg
 resource "azurerm_network_security_group" "anydb" {
-  count                = local.enable_deployment ? (local.sub_db_nsg_exists ? 0 : 1) : 0
-  name                 = local.sub_db_nsg_name
-  resource_group_name  = var.vnet-sap[0].resource_group_name
-  virtual_network_name = var.vnet-sap[0].name
+  count               = local.enable_deployment ? (local.sub_db_nsg_exists ? 0 : 1) : 0
+  name                = local.sub_db_nsg_name
+  resource_group_name = var.vnet-sap[0].resource_group_name
+  location            = var.vnet-sap[0].location
 }
 
 # Imports the SAP db subnet nsg data
 data "azurerm_network_security_group" "anydb" {
   count               = local.enable_deployment ? (local.sub_db_nsg_exists ? 1 : 0) : 0
-  name                = split("/", sub_db_nsg_arm_id)[8]
-  resource_group_name = split("/", sub_db_nsg_arm_id)[4]
+  name                = split("/", local.sub_db_nsg_arm_id)[8]
+  resource_group_name = split("/", local.sub_db_nsg_arm_id)[4]
 }
 
 # Associates SAP db nsg to SAP db subnet
