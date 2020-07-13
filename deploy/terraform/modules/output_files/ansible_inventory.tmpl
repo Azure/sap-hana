@@ -87,11 +87,8 @@ ${ip-scs}  ansible_connection=ssh ansible_user=${application.authentication.user
 %{~ for ip-app in ips-app }
 ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
-<<<<<<< HEAD
 
 [web]
 %{~ for ip-web in ips-web }
 ${ip-web}  ansible_connection=ssh ansible_user=${application.authentication.username}
 %{~ endfor }
-=======
->>>>>>> parent of 5b346da... Add webdispatcher module (#576)
