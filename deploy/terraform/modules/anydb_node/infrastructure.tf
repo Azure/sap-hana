@@ -1,3 +1,46 @@
+/*-----------------------------------------------------------------------------8
+Load balancer front IP address range: .4 - .9
++--------------------------------------4--------------------------------------*/
+
+resource "azurerm_lb" "anydb" {
+  count               = local.enable_deployment ? 1 : 0
+  name                = format("db-%s-lb", local.sid)
+  resource_group_name = var.resource-group[0].name
+  location            = var.resource-group[0].location
+
+  frontend_ip_configuration {
+    name                          = format("db-%s-lb-feip", local.sid)
+    subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-anydb[0].id : azurerm_subnet.subnet-sap-anydb[0].id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = local.sub_db_exists ? try(local.anydb.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "lb-back-pool" {
+  count               = local.enable_deployment ? 1 : 0
+  resource_group_name = var.resource-group[0].name
+  loadbalancer_id     = azurerm_lb.anydb[count.index].id
+  name                = format("db-%s-bep", local.sid)
+}
+
+resource "azurerm_lb_probe" "lb-health-probe" {
+  count               = local.enable_deployment ? 1 : 0
+  resource_group_name = var.resource-group[0].name
+  loadbalancer_id     = azurerm_lb.anydb[count.index].id
+  name                = format("db-%s-lb-hp", local.sid)
+  port                = loadbalancer_ports[0].port
+  protocol            = "Tcp"
+  interval_in_seconds = 5
+  number_of_probes    = 2
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "lb-nic-bep" {
+  count                   = local.enable_deployment ? length(azurerm_network_interface.anydb) : 0
+  network_interface_id    = azurerm_network_interface.anydb[count.index].id
+  ip_configuration_name   = azurerm_network_interface.anydb[count.index].ip_configuration[0].name
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lb-back-pool[0].id
+}
+
 # AVAILABILITY SET ================================================================================================
 
 resource "azurerm_availability_set" "anydb" {
