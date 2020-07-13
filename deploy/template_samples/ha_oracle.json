@@ -53,7 +53,8 @@
       "os": {
         "publisher": "Oracle",
         "offer": "Oracle-Linux",
-        "sku": "7.5"
+        "sku": "7.5",
+        "version": "latest"
       },
       "size": "1024",
       "filesystem": "xfs",
