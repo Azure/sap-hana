@@ -91,12 +91,13 @@ locals {
   components             = merge({ hana_database = [] }, try(local.hdb.components, {}))
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
-  dbnodes = try(local.hdb.dbnodes, [
-    {
-      "name" = "hdb1",
-      "role" = "worker"
 
-  }])
+  dbnodes = [for dbnode in try(local.hdb.dbnodes, []) : {
+    "name" = try(dbnode.name, "hdb-${local.sap_sid}"),
+    "role" = try(dbnode.role, "worker")
+    }
+  ]
+
   loadbalancer = try(local.hdb.loadbalancer, {})
 
   # Update HANA database information with defaults
