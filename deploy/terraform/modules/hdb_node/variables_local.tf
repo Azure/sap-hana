@@ -128,6 +128,10 @@ locals {
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
+
+  # SAP SID used in HDB resource naming convention
+  sap_sid = try(var.application.sid, "HN1")
+
 }
 
 # Imports HANA database sizing information
@@ -184,7 +188,7 @@ locals {
 
   loadbalancer_ports = flatten([
     for port in local.lb_ports[split(".", local.hana_database.db_version)[0]] : {
-      sid  = local.hana_database.instance.sid
+      sid  = local.sap_sid
       port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
     }
   ])

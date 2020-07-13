@@ -51,12 +51,12 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "hana-lb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = "hana-${local.hana_database.instance.sid}-lb"
+  name                = "hana-${local.sap_sid}-lb"
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name                          = "hana-${local.hana_database.instance.sid}-lb-feip"
+    name                          = "hana-${local.sap_sid}-lb-feip"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = local.sub_db_exists ? try(local.hana_database.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
@@ -74,7 +74,7 @@ resource "azurerm_lb_probe" "hana-lb-health-probe" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.hana-lb[count.index].id
-  name                = "hana-${local.hana_database.instance.sid}-lb-hp"
+  name                = "hana-${local.sap_sid}-lb-hp"
   port                = "625${local.hana_database.instance.instance_number}"
   protocol            = "Tcp"
   interval_in_seconds = 5
@@ -109,7 +109,7 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
 
 resource "azurerm_availability_set" "hana-as" {
   count                        = local.enable_deployment ? 1 : 0
-  name                         = "${local.hana_database.instance.sid}-as"
+  name                         = "${local.sap_sid}-as"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
