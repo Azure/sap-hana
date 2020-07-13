@@ -11,7 +11,7 @@ output "nics-dbnodes-db" {
 }
 
 output "loadbalancers" {
-  value = azurerm_lb.hana-lb
+  value = azurerm_lb.hdb
 }
 
 output "hdb-sid" {

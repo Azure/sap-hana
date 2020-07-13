@@ -49,32 +49,32 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
 Load balancer front IP address range: .4 - .9
 +--------------------------------------4--------------------------------------*/
 
-resource "azurerm_lb" "hana-lb" {
+resource "azurerm_lb" "hdb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = "hana-${local.sap_sid}-lb"
+  name                = "upper(${local.sap_sid})_hdb-alb"
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name                          = "hana-${local.sap_sid}-lb-feip"
+    name                          = "upper(${local.sap_sid})_hdb-feip"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = local.sub_db_exists ? try(local.hana_database.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
   }
 }
 
-resource "azurerm_lb_backend_address_pool" "hana-lb-back-pool" {
+resource "azurerm_lb_backend_address_pool" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
-  loadbalancer_id     = azurerm_lb.hana-lb[count.index].id
-  name                = "hana-${local.hana_database.instance.sid}-lb-bep"
+  loadbalancer_id     = azurerm_lb.hdb[count.index].id
+  name                = "upper(${local.sap_sid}_hdbAlb-bePool"
 }
 
-resource "azurerm_lb_probe" "hana-lb-health-probe" {
+resource "azurerm_lb_probe" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
-  loadbalancer_id     = azurerm_lb.hana-lb[count.index].id
-  name                = "hana-${local.sap_sid}-lb-hp"
+  loadbalancer_id     = azurerm_lb.hdb[count.index].id
+  name                = "upper(${local.sap_sid})Alb-hp"
   port                = "625${local.hana_database.instance.instance_number}"
   protocol            = "Tcp"
   interval_in_seconds = 5
@@ -84,30 +84,30 @@ resource "azurerm_lb_probe" "hana-lb-health-probe" {
 # TODO:
 # Current behavior, it will try to add all VMs in the cluster into the backend pool, which would not work since we do not have availability sets created yet.
 # In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
-resource "azurerm_network_interface_backend_address_pool_association" "hana-lb-nic-bep" {
+resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
   count                   = local.enable_deployment ? length(azurerm_network_interface.nics-dbnodes-db) : 0
   network_interface_id    = azurerm_network_interface.nics-dbnodes-db[count.index].id
   ip_configuration_name   = azurerm_network_interface.nics-dbnodes-db[count.index].ip_configuration[0].name
-  backend_address_pool_id = azurerm_lb_backend_address_pool.hana-lb-back-pool[0].id
+  backend_address_pool_id = azurerm_lb_backend_address_pool.hdb[0].id
 }
 
 resource "azurerm_lb_rule" "hana-lb-rules" {
   count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
   resource_group_name            = var.resource-group[0].name
-  loadbalancer_id                = azurerm_lb.hana-lb[0].id
+  loadbalancer_id                = azurerm_lb.hdb[0].id
   name                           = "HANA_${local.loadbalancer_ports[count.index].sid}_${local.loadbalancer_ports[count.index].port}"
   protocol                       = "Tcp"
   frontend_port                  = local.loadbalancer_ports[count.index].port
   backend_port                   = local.loadbalancer_ports[count.index].port
   frontend_ip_configuration_name = "hana-${local.loadbalancer_ports[count.index].sid}-lb-feip"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.hana-lb-back-pool[0].id
-  probe_id                       = azurerm_lb_probe.hana-lb-health-probe[0].id
+  backend_address_pool_id        = azurerm_lb_backend_address_pool.hdb[0].id
+  probe_id                       = azurerm_lb_probe.hdb[0].id
   enable_floating_ip             = true
 }
 
 # AVAILABILITY SET ================================================================================================
 
-resource "azurerm_availability_set" "hana-as" {
+resource "azurerm_availability_set" "hdb" {
   count                        = local.enable_deployment ? 1 : 0
   name                         = "${local.sap_sid}-as"
   location                     = var.resource-group[0].location
@@ -138,7 +138,7 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   computer_name                = local.hdb_vms[count.index].name
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.hana-as[0].id
+  availability_set_id          = azurerm_availability_set.hdb[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids = [
     azurerm_network_interface.nics-dbnodes-admin[count.index].id,
