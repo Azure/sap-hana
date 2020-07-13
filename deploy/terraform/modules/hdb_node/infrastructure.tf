@@ -37,7 +37,7 @@ resource "azurerm_network_security_group" "nsg-admin" {
   count               = local.enable_deployment ? (local.sub_admin_nsg_exists ? 0 : 1) : 0
   name                = local.sub_admin_nsg_name
   resource_group_name  = var.vnet-sap[0].resource_group_name
-  virtual_network_name = var.vnet-sap[0].name
+  location             = var.vnet-sap[0].location
 }
 
 # Creates SAP db subnet nsg
@@ -45,7 +45,7 @@ resource "azurerm_network_security_group" "nsg-db" {
   count               = local.enable_deployment ? (local.sub_db_nsg_exists ? 0 : 1) : 0
   name                = local.sub_db_nsg_name
   resource_group_name  = var.vnet-sap[0].resource_group_name
-  virtual_network_name = var.vnet-sap[0].name
+  location             = var.vnet-sap[0].location
 }
 
 # Imports the SAP admin subnet nsg data
