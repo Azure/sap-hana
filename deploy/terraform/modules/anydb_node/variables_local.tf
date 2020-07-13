@@ -137,7 +137,7 @@ locals {
   }
 
   loadbalancer_ports = flatten([
-    for port in local.lb_ports[local.anydb_platform] : {
+    for port in local.lb_ports[upper(local.anydb_platform)] : {
       port = tonumber(port)
     }
   ])
