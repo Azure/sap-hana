@@ -34,19 +34,21 @@ locals {
   sub_db_nsg_arm_id = local.sub_db_nsg_exists ? try(local.var_sub_db_nsg.arm_id, "") : ""
   sub_db_nsg_name   = local.sub_db_nsg_exists ? "" : try(local.var_sub_db_nsg.name, "nsg-db")
 
+  # PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
-
-  # Imports database sizing information
-  sizes = jsondecode(file("${path.root}/../anydb_sizes.json"))
 
   # Filter the list of databases to only AnyDB platform entries
   # Supported databases: Oracle, DB2, SQLServer, ASE 
-  any-databases = [
+  anydb-databases = [
     for database in var.databases : database
-    if(upper(database.platform) in ["ORACLE", "DB2", "SQLSERVER", "ASE"]))
+    if(upper(try(database.platform), "NONE") == ("ORACLE" || "DB2" || "SQLSERVER" || "ASE"))
   ]
 
-  anydb          = try(local.any-databases[0], {})
+  # if(upper(database.platform) in ["ORACLE", "DB2", "SQLSERVER", "ASE"])
+  # Enable deployment based on length of local.anydb-databases
+  enable_deployment = (length(local.anydb-databases) > 0) ? true : false
+
+  anydb          = try(local.anydb-databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
 
@@ -66,6 +68,8 @@ locals {
   anydb_size   = try(local.anydb.size, "500")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, "false")
+  anydb_sid    = (length(local.anydb-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
+  loadbalancer = try(local.anydb.loadbalancer, {})
 
   authentication = try(var.application.authentication,
     {
@@ -74,36 +78,44 @@ locals {
       "password" = "Sap@hana2019!"
   })
 
-  # Enable deployment based on length of local.any-databases
-  enable_deployment = (length(local.any-databases) > 0) ? true : false
+  # Update database information with defaults
+  anydb_database = merge(local.anydb,
+    { platform = local.anydb_platform },
+    { db_version = local.anydb_version },
+    { size = local.anydb_size },
+    { os = local.anydb_ostype },
+    { filesystem = local.anydb_fs },
+    { high_availability = local.anydb_ha },
+    { authentication = local.authentication }
+  )
 
-  size   = try(local.anydb.size, "500")
-  anydb_sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
+  # Imports database sizing information
+  sizes = jsondecode(file("${path.root}/../anydb_sizes.json"))
 
   dbnodes = flatten([
     [
-      for database in local.any-databases : [
+      for database in local.anydb-databases : [
         for dbnode in database.dbnodes : {
-          platform       = database.platform,
-          name           = format("%s-%s%02d", local.sid, var.role, 0),
+          platform       = local.anydb_platform,
+          name           = format("%s-db%02d", local.sid, 0),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
-          size           = database.size,
-          os             = database.os,
-          authentication = database.authentication
-          sid            = database.instance.sid
+          size           = local.anydb_size,
+          os             = local.anydb_ostype,
+          authentication = local.authentication
+          sid            = local.anydb_sid
         }
       ]
     ],
     [
-      for database in local.any-databases : [
+      for database in local.anydb-databases : [
         for dbnode in database.dbnodes : {
-          platform       = database.platform,
-          name           = format("%s-%s%02d", local.sid, var.role, 1),
+          platform       = local.anydb_platform,
+          name           = format("%s-db%02d", local.sid, 1),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
-          size           = database.size,
-          os             = database.os,
-          authentication = database.authentication
-          sid            = database.instance.sid
+          size           = local.anydb_size,
+          os             = local.anydb_ostype,
+          authentication = local.authentication
+          sid            = local.anydb_sid
         }
       ]
       if database.high_availability
@@ -112,7 +124,7 @@ locals {
 
   # Ports used for specific DB Versions
   lb_ports = {
-    "AnyDB" = [
+    "ASE" = [
       "1433"
     ]
     "Oracle" = [
@@ -120,46 +132,19 @@ locals {
     ]
 
     "DB2" = [
-      "80",
-      "1433"
+      "62500"
     ]
 
-    "NONE" = [
-      "1433"
+    "SQLServer" = [
+      "59999"
     ]
   }
 
-  # Hash of Load Balancers to create for HANA instances
-  loadbalancers = zipmap(
-    range(
-      length([
-        for database in local.any-databases : database.instance.sid
-      ])
-    ),
-    [
-      for database in local.any-databases : {
-        sid = database.instance.sid
-        ports = [
-          for port in local.lb_ports[database.platform] : tonumber(port)
-        ]
-        frontend_ip = lookup(lookup(database, "loadbalancer", {}), "frontend_ip", false),
-      }
-    ]
-  )
-
-  # List of ports for load balancer
-  loadbalancers-ports = length(local.loadbalancers) > 0 ? local.loadbalancers[0].ports : []
-
-  # Update database information with defaults
-  anydb_database = merge(local.anydb,
-    { platform = local.anydb_platform },
-    { db_version = local.anydb_version },
-    { os = local.anydb_ostype },
-    { size = local.anydb_size },
-    { filesystem = local.anydb_fs },
-    { high_availability = local.anydb_ha },
-    { authentication = local.authentication }
-  )
+  loadbalancer_ports = flatten([
+    for port in local.lb_ports[local.anydb_platform] : {
+      port = tonumber(port)
+    }
+  ])
 
   anydb_disks = flatten([
     for vm_counter in range(length(local.dbnodes)) : [
