@@ -77,7 +77,8 @@ locals {
   # Enable deployment based on length of local.any-databases
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 
-  sid  = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
+  size   = try(local.anydb.size, "500")
+  anydb_sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
 
   dbnodes = flatten([
     [
