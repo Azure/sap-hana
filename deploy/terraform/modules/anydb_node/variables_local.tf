@@ -21,6 +21,21 @@ variable "ppg" {
 
 locals {
 
+  # DB subnet
+  var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
+  sub_db_exists = try(local.var_sub_db.is_existing, false)
+  sub_db_arm_id = local.sub_db_exists ? try(local.var_sub_db.arm_id, "") : ""
+  sub_db_name   = local.sub_db_exists ? "" : try(local.var_sub_db.name, "subnet-db")
+  sub_db_prefix = local.sub_db_exists ? "" : try(local.var_sub_db.prefix, "10.1.2.0/24")
+
+  # DB NSG
+  var_sub_db_nsg    = try(var.infrastructure.vnets.sap.subnet_db.nsg, {})
+  sub_db_nsg_exists = try(local.var_sub_db_nsg.is_existing, false)
+  sub_db_nsg_arm_id = local.sub_db_nsg_exists ? try(local.var_sub_db_nsg.arm_id, "") : ""
+  sub_db_nsg_name   = local.sub_db_nsg_exists ? "" : try(local.var_sub_db_nsg.name, "nsg-db")
+
+  ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+
   # Imports database sizing information
   sizes = jsondecode(file("${path.root}/../anydb_sizes.json"))
 
@@ -28,7 +43,7 @@ locals {
   # Supported databases: Oracle, DB2, SQLServer, ASE 
   any-databases = [
     for database in var.databases : database
-    if(database.platform != "HANA" && database.platform != "NONE")
+    if(upper(database.platform) in ["ORACLE", "DB2", "SQLSERVER", "ASE"]))
   ]
 
   anydb          = try(local.any-databases[0], {})
@@ -47,7 +62,7 @@ locals {
     "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : "latest")
   }
 
-  anydb_ostype = try(local.anydb.os.type, "Linux")
+  anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_size   = try(local.anydb.size, "500")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, "false")
@@ -62,8 +77,7 @@ locals {
   # Enable deployment based on length of local.any-databases
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 
-  size   = try(local.anydb.size, "500")
-  sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
+  sid  = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
 
   dbnodes = flatten([
     [
@@ -110,7 +124,7 @@ locals {
     ]
 
     "NONE" = [
-       "1433"
+      "1433"
     ]
   }
 
