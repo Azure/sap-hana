@@ -63,7 +63,7 @@ locals {
   enable_deployment = (length(local.any-databases) > 0) ? true : false
 
   size   = try(local.anydb.size, "500")
-  sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "ANY") : "ANY"
+  anydb_sid = (length(local.any-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
 
   dbnodes = flatten([
     [
