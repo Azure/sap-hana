@@ -51,12 +51,12 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "hdb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = "upper(${local.sap_sid})_hdb-alb"
+  name                = "${upper(local.sap_sid)}_hdb-alb"
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name                          = "upper(${local.sap_sid})_hdb-feip"
+    name                          = "${upper(local.sap_sid)}_hdb-feip"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.subnet-sap-db[0].id : azurerm_subnet.subnet-sap-db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = local.sub_db_exists ? try(local.hana_database.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
@@ -67,14 +67,14 @@ resource "azurerm_lb_backend_address_pool" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
-  name                = "upper(${local.sap_sid}_hdbAlb-bePool"
+  name                = "${upper(local.sap_sid)}_hdbAlb-bePool"
 }
 
 resource "azurerm_lb_probe" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
-  name                = "upper(${local.sap_sid})Alb-hp"
+  name                = "${upper(local.sap_sid)}Alb-hp"
   port                = "625${local.hana_database.instance.instance_number}"
   protocol            = "Tcp"
   interval_in_seconds = 5
@@ -91,15 +91,15 @@ resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
   backend_address_pool_id = azurerm_lb_backend_address_pool.hdb[0].id
 }
 
-resource "azurerm_lb_rule" "hana-lb-rules" {
+resource "azurerm_lb_rule" "hdb" {
   count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
   resource_group_name            = var.resource-group[0].name
   loadbalancer_id                = azurerm_lb.hdb[0].id
-  name                           = "HANA_${local.loadbalancer_ports[count.index].sid}_${local.loadbalancer_ports[count.index].port}"
+  name                           = "${upper(local.loadbalancer_ports[count.index].sid)}_HDB_${local.loadbalancer_ports[count.index].port}"
   protocol                       = "Tcp"
   frontend_port                  = local.loadbalancer_ports[count.index].port
   backend_port                   = local.loadbalancer_ports[count.index].port
-  frontend_ip_configuration_name = "hana-${local.loadbalancer_ports[count.index].sid}-lb-feip"
+  frontend_ip_configuration_name = "${upper(local.loadbalancer_ports[count.index].sid)}_hdb-feip"
   backend_address_pool_id        = azurerm_lb_backend_address_pool.hdb[0].id
   probe_id                       = azurerm_lb_probe.hdb[0].id
   enable_floating_ip             = true
@@ -109,7 +109,7 @@ resource "azurerm_lb_rule" "hana-lb-rules" {
 
 resource "azurerm_availability_set" "hdb" {
   count                        = local.enable_deployment ? 1 : 0
-  name                         = "${local.sap_sid}-as"
+  name                         = "${upper(local.sap_sid)}_hdb-avset"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   platform_update_domain_count = 20
@@ -135,7 +135,7 @@ resource "azurerm_managed_disk" "data-disk" {
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   count                        = local.enable_deployment ? length(local.hdb_vms) : 0
   name                         = local.hdb_vms[count.index].name
-  computer_name                = local.hdb_vms[count.index].name
+  computer_name                = replace(local.hdb_vms[count.index].name, "_", "")
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.hdb[0].id
