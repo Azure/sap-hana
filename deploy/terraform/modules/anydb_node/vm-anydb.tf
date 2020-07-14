@@ -4,7 +4,7 @@
 
 resource azurerm_network_interface "anydb" {
   count               = local.enable_deployment ? length(local.dbnodes) : 0
-  name                = format("db%02d-%s-nic", (count.index + 1), local.anydb_sid)
+  name                = format("%s_xdb_%02d-nic", local.anydb_sid, (count.index))
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
 
