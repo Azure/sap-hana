@@ -114,7 +114,7 @@ resource azurerm_windows_virtual_machine "dbserver" {
   tags = {
     environment = "SAP"
     role        = "db"
-    SID         = local.anydb_sid
+    SID         = upper(local.anydb_sid)
   }
 }
 
