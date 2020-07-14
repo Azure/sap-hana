@@ -27,7 +27,7 @@ resource "azurerm_lb_probe" "anydb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
-  name                = format("db-%s-lb-hp", local.anydb_sid)
+  name                = format("%s_xdb-hp", upper(local.anydb_sid))
   port                = local.loadbalancer_ports[0].port
   protocol            = "Tcp"
   interval_in_seconds = 5
