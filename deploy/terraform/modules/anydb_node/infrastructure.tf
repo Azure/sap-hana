@@ -9,7 +9,7 @@ resource "azurerm_lb" "anydb" {
   location            = var.resource-group[0].location
 
   frontend_ip_configuration {
-    name                          = format("db-%s-lb-feip", local.anydb_sid)
+    name                          = format("%s_xdb-feip", upper(local.anydb_sid))
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
     private_ip_address_allocation = "Static"
     private_ip_address            = local.sub_db_exists ? try(local.anydb.loadbalancer.frontend_ip, cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)) : cidrhost(local.sub_db_prefix, tonumber(count.index) + 4)
