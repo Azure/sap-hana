@@ -44,14 +44,14 @@ resource azurerm_linux_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s_xdb%02d-OsDisk", upper(local.anydb_sid), (count.index))
+      name                 = format("%s-OsDisk", local.dbnodes[count.index].name)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name                   = "${local.anydb_sid}dlwm${count.index}"
+  computer_name                   = "${local.anydb_sid}dbl${count.index}"
   admin_username                  = local.authentication.username
   disable_password_authentication = local.authentication.type != "password" ? true : false
 
@@ -65,7 +65,6 @@ resource azurerm_linux_virtual_machine "dbserver" {
   }
   tags = {
     environment = "SAP"
-    role        = "db"
     SID         = local.anydb_sid
   }
 }
@@ -97,14 +96,14 @@ resource azurerm_windows_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("db%02d-%s-vm-osdisk", (count.index + 1), local.anydb_sid)
+      name                 = format("%s-OsDisk", local.dbnodes[count.index].name)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name  = "${local.anydb_sid}dbwm${count.index}"
+  computer_name  = "${local.anydb_sid}dbl${count.index}"
   admin_username = local.authentication.username
   admin_password = local.authentication.password
 
