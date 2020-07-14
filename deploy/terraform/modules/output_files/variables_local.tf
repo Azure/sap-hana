@@ -73,7 +73,10 @@ variable "nics-anydb" {
 variable "any-database-info" {
   description = "Updated any database json"
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9bc9f51b04fd03058725955a864a83ffe5446fbc
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
@@ -129,3 +132,4 @@ locals {
 
   ])
 }
+
