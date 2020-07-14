@@ -53,41 +53,7 @@
   },
   "jumpboxes": {
     "windows": [],
-    "linux": [
-      {
-        "name": "jumpbox-linux",
-        "destroy_after_deploy": "false",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18.04-LTS"
-        },
-        "authentication": {
-          "type": "password",
-          "username": "azureadm",
-          "password": "Sap@hana2019!"
-        },
-        "components": []
-      },
-      {
-        "name": "rti",
-        "destroy_after_deploy": "true",
-        "size": "Standard_D2s_v3",
-        "disk_type": "StandardSSD_LRS",
-        "os": {
-          "publisher": "Canonical",
-          "offer": "UbuntuServer",
-          "sku": "18.04-LTS"
-        },
-        "authentication": {
-          "type": "key",
-          "username": "azureadm"
-        },
-        "components": ["ansible"]
-      }
-    ]
+    "linux": []
   },
   "databases": [
     {
