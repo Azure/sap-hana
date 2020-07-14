@@ -20,7 +20,7 @@ resource azurerm_network_interface "anydb" {
 # Section for Linux Virtual machine 
 resource azurerm_linux_virtual_machine "dbserver" {
   count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? length(local.dbnodes) : 0) : 0
-  name                         = format("db%02d-%s-vml", (count.index + 1), local.anydb_sid)
+  name                         = local.dbnodes[count.index].name
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.anydb[0].id
