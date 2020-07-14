@@ -92,7 +92,7 @@ locals {
       for database in local.anydb-databases : [
         for idx, dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
-          name           = format("%s-db%02d", local.anydb_sid, 0),
+          name           = try(dbnode.name, format("%s_xdb%02d-0", upper(local.anydb_sid), idx)),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
           size           = local.anydb_size,
           os             = local.anydb_ostype,
