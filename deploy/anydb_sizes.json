@@ -19,7 +19,7 @@
                 "size_gb" : 255,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -28,7 +28,7 @@
                 "size_gb" : 127,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -52,7 +52,7 @@
                 "size_gb" : 255,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -61,7 +61,7 @@
                 "size_gb" : 127,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -85,7 +85,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -94,7 +94,7 @@
                 "size_gb" : 255,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -118,7 +118,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -127,7 +127,7 @@
                 "size_gb" : 255,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -151,7 +151,7 @@
                 "size_gb" : 1023,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -160,7 +160,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -184,7 +184,7 @@
                 "size_gb" : 1023,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -193,7 +193,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : true,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -217,7 +217,7 @@
                 "size_gb" : 2047,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -226,7 +226,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : true,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -250,7 +250,7 @@
                 "size_gb" : 4095,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -259,7 +259,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : true,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     },
@@ -283,7 +283,7 @@
                 "size_gb" : 4095,
                 "caching" : "None",
                 "write_accelerator" : false,
-                "mount_point" : "/hana/data"
+                "mount_point" : "/data"
             },
             {
                 "name" : "log",
@@ -292,7 +292,7 @@
                 "size_gb" : 511,
                 "caching" : "None",
                 "write_accelerator" : true,
-                "mount_point" : "/hana/log"
+                "mount_point" : "/log"
             }
         ]
     }
