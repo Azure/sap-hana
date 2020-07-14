@@ -58,15 +58,30 @@ resource "local_file" "output-json" {
       }
       if database != {}
     ],
-    "software" = merge(var.software_w_defaults, {
-      storage_account_sapbits = {
-        name                = var.storage-sapbits[0].name,
-        storage_access_key  = var.storage-sapbits[0].primary_access_key,
-        file_share_name     = var.software_w_defaults.storage_account_sapbits.file_share_name
-        blob_container_name = var.software_w_defaults.storage_account_sapbits.blob_container_name
+    "software" = {
+      "storage_account_sapbits" = {
+        "name"                = var.storage-sapbits[0].name,
+        "storage_access_key"  = var.storage-sapbits[0].primary_access_key,
+        "blob_container_name" = lookup(var.software.storage_account_sapbits, "blob_container_name", null)
+        "file_share_name"     = lookup(var.software.storage_account_sapbits, "file_share_name", null)
+      },
+      "downloader" = var.software.downloader
+    }
+    "options" = var.options,
+    "anyDBdatabases" = [for database in local.anydatabases : {
+      platform          = database.platform,
+      db_version        = database.db_version,
+      os                = database.os,
+      size              = database.size,
+      filesystem        = database.filesystem,
+      high_availability = database.high_availability,
+      instance          = database.instance,
+      authentication    = database.authentication,
+      credentials       = database.credentials,
       }
-    })
-    "options" = var.options
+      if database != {}
+    ]
+
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/output.json"
@@ -88,6 +103,9 @@ resource "local_file" "ansible-inventory" {
     ips-scs               = local.ips-scs,
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
+    anydbnodes            = local.anydb_vms
+    ips-anydbnodes        = local.ips-anydbnodes
+    ips-app               = local.ips-app
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts"
@@ -109,6 +127,8 @@ resource "local_file" "ansible-inventory-yml" {
     ips-scs               = local.ips-scs,
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
+    anydbnodes            = local.anydb_vms
+    ips-anydbnodes        = local.ips-anydbnodes
     }
   )
   filename = "${terraform.workspace}/ansible_config_files/hosts.yml"

@@ -66,6 +66,13 @@ variable "nics-web" {
   description = "List of NICs for the Web dispatcher VMs"
 }
 
+variable "nics-anydb" {
+  description = "List of NICs for the AnyDB Instance VMs"
+}
+
+variable "any-database-info" {
+  description = "Updated any database json"
+}
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
@@ -100,7 +107,25 @@ locals {
     ])
     if database != {}
   ])
-  ips-scs = [for key, value in var.nics-scs : value.private_ip_address]
-  ips-app = [for key, value in var.nics-app : value.private_ip_address]
-  ips-web = [for key, value in var.nics-web : value.private_ip_address]
+  ips-scs        = [for key, value in var.nics-scs : value.private_ip_address]
+  ips-app        = [for key, value in var.nics-app : value.private_ip_address]
+  ips-web        = [for key, value in var.nics-web : value.private_ip_address]
+  ips-anydbnodes = [for key, value in var.nics-anydb : value.private_ip_address]
+  anydatabases = [
+    var.any-database-info
+  ]
+  anydb_vms = flatten([
+    for adatabase in local.anydatabases : {
+      platform          = adatabase.platform
+      authentication    = adatabase.authentication
+      version           = adatabase.db_version
+      os                = adatabase.os
+      size              = adatabase.size
+      filesystem        = adatabase.filesystem
+      high_availability = adatabase.high_availability
+    }
+    if adatabase != {}
+
+  ])
 }
+
