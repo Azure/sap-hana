@@ -16,7 +16,7 @@ resource "azurerm_lb" "anydb" {
   }
 }
 
-resource "azurerm_lb_backend_address_pool" "lb-back-pool" {
+resource "azurerm_lb_backend_address_pool" "anydb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource-group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
