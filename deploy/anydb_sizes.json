@@ -1,0 +1,398 @@
+{
+  "Demo": {
+    "compute": {
+      "vm_size": "Standard_E4s_v3",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 64,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 255,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "200": {
+    "compute": {
+      "vm_size": "Standard_E4s_v3",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 64,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 255,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "500": {
+    "compute": {
+      "vm_size": "Standard_E8s_v3",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 64,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 255,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "1024": {
+    "compute": {
+      "vm_size": "Standard_E16s_v3",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 255,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "2048": {
+    "compute": {
+      "vm_size": "Standard_E32s_v3",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 1023,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "5120": {
+    "compute": {
+      "vm_size": "Standard_M64ls",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 5,
+        "disk_type": "Premium_LRS",
+        "size_gb": 1023,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "10240": {
+    "compute": {
+      "vm_size": "Standard_M64s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 5,
+        "disk_type": "Premium_LRS",
+        "size_gb": 2047,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "15360": {
+    "compute": {
+      "vm_size": "Standard_M64s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 4,
+        "disk_type": "Premium_LRS",
+        "size_gb": 4095,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "20480": {
+    "compute": {
+      "vm_size": "Standard_M64s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 5,
+        "disk_type": "Premium_LRS",
+        "size_gb": 4095,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 511,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "30720": {
+    "compute": {
+      "vm_size": "Standard_M128s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 8,
+        "disk_type": "Premium_LRS",
+        "size_gb": 4095,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 2047,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "40960": {
+    "compute": {
+      "vm_size": "Standard_M128s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 10,
+        "disk_type": "Premium_LRS",
+        "size_gb": 4095,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 2,
+        "disk_type": "Premium_LRS",
+        "size_gb": 2047,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  },
+  "51200": {
+    "compute": {
+      "vm_size": "Standard_M128s",
+      "swap_size_gb": 2
+    },
+    "storage": [
+      {
+        "name": "os",
+        "count": 1,
+        "disk_type": "Premium_LRS",
+        "size_gb": 127,
+        "caching": "ReadWrite"
+      },
+      {
+        "name": "data",
+        "count": 13,
+        "disk_type": "Premium_LRS",
+        "size_gb": 4095,
+        "caching": "None",
+        "write_accelerator": false,
+        "mount_point": "/data"
+      },
+      {
+        "name": "log",
+        "count": 3,
+        "disk_type": "Premium_LRS",
+        "size_gb": 2047,
+        "caching": "None",
+        "write_accelerator": true,
+        "mount_point": "/log"
+      }
+    ]
+  }
+}

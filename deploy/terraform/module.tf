@@ -70,6 +70,23 @@ module "app_tier" {
   ppg              = module.common_infrastructure.ppg
 }
 
+# Create anydb database nodes
+module "anydb_node" {
+  source           = "./modules/anydb_node"
+  application      = var.application
+  databases        = var.databases
+  infrastructure   = var.infrastructure
+  jumpboxes        = var.jumpboxes
+  options          = var.options
+  software         = var.software
+  ssh-timeout      = var.ssh-timeout
+  sshkey           = var.sshkey
+  resource-group   = module.common_infrastructure.resource-group
+  vnet-sap         = module.common_infrastructure.vnet-sap
+  storage-bootdiag = module.common_infrastructure.storage-bootdiag
+  ppg              = module.common_infrastructure.ppg
+}
+
 # Generate output files
 module "output_files" {
   source                       = "./modules/output_files"
