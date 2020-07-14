@@ -34,7 +34,7 @@ resource "azurerm_lb_probe" "anydb" {
   number_of_probes    = 2
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "lb-nic-bep" {
+resource "azurerm_network_interface_backend_address_pool_association" "anydb" {
   count                   = local.enable_deployment ? length(azurerm_network_interface.anydb) : 0
   network_interface_id    = azurerm_network_interface.anydb[count.index].id
   ip_configuration_name   = azurerm_network_interface.anydb[count.index].ip_configuration[0].name
