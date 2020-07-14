@@ -90,7 +90,7 @@ locals {
   dbnodes = flatten([
     [
       for database in local.anydb-databases : [
-        for dbnode in database.dbnodes : {
+        for idx, dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
           name           = format("%s-db%02d", local.anydb_sid, 0),
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
