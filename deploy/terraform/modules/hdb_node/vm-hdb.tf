@@ -133,8 +133,9 @@ resource "azurerm_managed_disk" "data-disk" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
-  count                        = local.enable_deployment ? length(local.hdb_vms) : 0
-  name                         = local.hdb_vms[count.index].name
+  count = local.enable_deployment ? length(local.hdb_vms) : 0
+  // Workaround for issue with dbus-org.freedesktop.hostname1.service
+  name                         = replace(local.hdb_vms[count.index].name, "_", "")
   computer_name                = replace(local.hdb_vms[count.index].name, "_", "")
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
