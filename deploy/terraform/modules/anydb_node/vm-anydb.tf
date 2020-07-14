@@ -26,7 +26,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
   availability_set_id          = azurerm_availability_set.anydb[0].id
   proximity_placement_group_id = local.ppgId
   network_interface_ids        = [azurerm_network_interface.anydb[count.index].id]
-  size                         = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
+  size                         = local.dbnodes.size
 
   source_image_id = local.anydb_custom_image ? local.anydb_os.source_image_id : null
 
