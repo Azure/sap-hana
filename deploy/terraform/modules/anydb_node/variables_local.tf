@@ -107,7 +107,6 @@ locals {
       "sku"       = "gen1"
       "version"   = "latest"
     }
-
   }
 
   anydb_os = {
