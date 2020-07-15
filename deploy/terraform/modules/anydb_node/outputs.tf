@@ -1,4 +1,3 @@
-
 output "nics-anydb" {
   value = azurerm_network_interface.anydb
 }

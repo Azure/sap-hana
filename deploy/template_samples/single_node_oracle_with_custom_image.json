@@ -70,7 +70,6 @@
       },
       "dbnodes": [
         {
-          "name": "odb1",
           "role": "db"
         }
       ],

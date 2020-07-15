@@ -14,6 +14,44 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
+#TODO move to central
+variable "region_mapping" {
+  type        = map(string)
+  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
+  # 28 Regions 
+  default = {
+    westus             = "weus"
+    westus2            = "wus2"
+    centralus          = "ceus"
+    eastus             = "eaus"
+    eastus2            = "eus2"
+    northcentralus     = "ncus"
+    southcentralus     = "scus"
+    westcentralus      = "wcus"
+    northeurope        = "noeu"
+    westeurope         = "weeu"
+    eastasia           = "eaas"
+    southeastasia      = "seas"
+    brazilsouth        = "brso"
+    japaneast          = "jpea"
+    japanwest          = "jpwe"
+    centralindia       = "cein"
+    southindia         = "soin"
+    westindia          = "wein"
+    uksouth2           = "uks2"
+    uknorth            = "ukno"
+    canadacentral      = "cace"
+    canadaeast         = "caea"
+    australiaeast      = "auea"
+    australiasoutheast = "ause"
+    uksouth            = "ukso"
+    ukwest             = "ukwe"
+    koreacentral       = "koce"
+    koreasouth         = "koso"
+  }
+}
+
+
 locals {
 
   # DB subnet
@@ -49,6 +87,8 @@ locals {
   anydb          = try(local.anydb-databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
+  #TODO Add the rest of the naming convention once implemented
+  anydb_nameprefix = replace(try(var.resource-group[0].name, upper(join("-", ["Test", var.region_mapping[var.resource-group[0].location], "code", local.anydb_sid]))), "-rg", "")
 
   # OS image for all Application Tier VMs
   # If custom image is used, we do not overwrite os reference with default value
@@ -64,7 +104,7 @@ locals {
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_size   = try(local.anydb.size, "500")
-  anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vmsize,"Standard_E4s_v3")
+  anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vmsize, "Standard_E4s_v3")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, "false")
   anydb_sid    = (length(local.anydb-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
@@ -93,7 +133,7 @@ locals {
       for database in local.anydb-databases : [
         for idx, dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
-          name           = upper(local.anydb_ostype) == "WINDOWS" ? format("%s_xdbw%02d-0", upper(local.anydb_sid), idx) : format("%s_xdbl%02d-0", upper(local.anydb_sid), idx),
+          name           = "${local.anydb_nameprefix}-${upper(local.anydb_ostype) == "WINDOWS" ? format("%sxdb%02dw", lower(local.anydb_sid), 0) : format("%sxdb%02dl", lower(local.anydb_sid), 0)}",
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
           size           = local.anydb_sku
           os             = local.anydb_ostype,
@@ -106,7 +146,7 @@ locals {
       for database in local.anydb-databases : [
         for idx, dbnode in database.dbnodes : {
           platform       = local.anydb_platform,
-          name           = upper(local.anydb_ostype) == "WINDOWS" ? format("%s_xdbw%02d-1", upper(local.anydb_sid), idx) : format("%s_xdbl%02d-1", upper(local.anydb_sid), idx),
+          name           = "${local.anydb_nameprefix}-${upper(local.anydb_ostype) == "WINDOWS" ? format("%sxdb%02dw", lower(local.anydb_sid), 1) : format("%sxdb%02dl", lower(local.anydb_sid), 1)}",
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
           size           = local.anydb_sku,
           os             = local.anydb_ostype,
@@ -144,11 +184,11 @@ locals {
   ])
 
   anydb_disks = flatten([
-    for vm_counter in range(length(local.dbnodes)) : [
+    for vm_counter, dbnode in local.dbnodes : [
       for storage_type in lookup(local.sizes, local.anydb_size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
-          name                      = format("db%02d-%s-%s%02d", vm_counter, local.anydb_sid, storage_type.name, (disk_count))
+          name                      = format("%s-%s%02d", dbnode.name, storage_type.name, (disk_count))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
           caching                   = storage_type.caching

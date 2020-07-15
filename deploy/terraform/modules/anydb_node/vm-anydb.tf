@@ -4,13 +4,13 @@
 
 resource azurerm_network_interface "anydb" {
   count               = local.enable_deployment ? length(local.dbnodes) : 0
-  name                = format("%s_xdb_%02d-nic", local.anydb_sid, (count.index))
+  name                = "${local.dbnodes[count.index].name}-nic"
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
 
   ip_configuration {
     primary                       = true
-    name                          = "${local.dbnodes[count.index].name}-db-nic-ip"
+    name                          = "${local.dbnodes[count.index].name}-nic-ip"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
     private_ip_address            = local.sub_db_exists ? local.dbnodes[count.index].db_nic_ip : lookup(local.dbnodes[count.index], "db_nic_ip", false) != false ? local.dbnodes[count.index].db_nic_ip : cidrhost(local.sub_db_prefix, tonumber(count.index) + 10)
     private_ip_address_allocation = "static"
@@ -44,14 +44,14 @@ resource azurerm_linux_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s-OsDisk", local.dbnodes[count.index].name)
+      name                 = format("%s-osdisk", local.dbnodes[count.index].name)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name                   = "${local.anydb_sid}dbl${count.index}"
+  computer_name                   = lower(format("%sxdb%02dl", upper(local.anydb_sid), count.index))
   admin_username                  = local.authentication.username
   disable_password_authentication = local.authentication.type != "password" ? true : false
 
@@ -65,7 +65,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
   }
   tags = {
     environment = "SAP"
-    SID         = local.anydb_sid
+    SID         = upper(local.anydb_sid)
   }
 }
 
@@ -96,14 +96,14 @@ resource azurerm_windows_virtual_machine "dbserver" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s-OsDisk", local.dbnodes[count.index].name)
+      name                 = format("%s-osdisk", local.dbnodes[count.index].name)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb
     }
   }
 
-  computer_name  = "${local.anydb_sid}dbl${count.index}"
+  computer_name  = lower(format("%sxdb%02dw", upper(local.anydb_sid), count.index))
   admin_username = local.authentication.username
   admin_password = local.authentication.password
 
@@ -112,7 +112,6 @@ resource azurerm_windows_virtual_machine "dbserver" {
   }
   tags = {
     environment = "SAP"
-    role        = "db"
     SID         = upper(local.anydb_sid)
   }
 }
