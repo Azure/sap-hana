@@ -95,6 +95,18 @@ locals {
       "sku"       = "standard-gen2",
       "version"   = "latest"
     }
+    NONE = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
+    HANA = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
   }
 
   anydb_os = {
@@ -110,7 +122,7 @@ locals {
     { platform = local.anydb_platform },
     { db_version = local.anydb_version },
     { size = local.anydb_size },
-    { os = merge( {os_type = local.anydb_ostype}, local.anydb_os },
+    { os = merge( {os_type = local.anydb_ostype}, local.anydb_os )},
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
     { authentication = local.authentication }
