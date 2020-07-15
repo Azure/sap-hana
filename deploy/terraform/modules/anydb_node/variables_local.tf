@@ -45,10 +45,10 @@ locals {
     for database in var.databases : database
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(local.anydb_platform))
   ]
-      
+
   # Enable deployment based on length of local.anydb-databases
   enable_deployment = (length(local.anydb-databases) > 0) ? true : false
-  
+
   # If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
@@ -68,12 +68,12 @@ locals {
   })
 
   # Default values in case not provided
-  os_defaults = { 
+  os_defaults = {
     ORACLE = {
-    "publisher" = "Oracle",
-    "offer"     = "Oracle-Linux",
-    "sku"       = "77",
-    "version"   = "latest"
+      "publisher" = "Oracle",
+      "offer"     = "Oracle-Linux",
+      "sku"       = "77",
+      "version"   = "latest"
     }
     DB2 = {
       "publisher" = "suse",
@@ -101,20 +101,20 @@ locals {
     }
   }
 
-  anydb_os = local.enable_deployment ? {
+  anydb_os = {
     "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
     "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].publisher)
     "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].offer)
     "sku"             = try(local.anydb.os.sku, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].sku)
     "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].version)
-  } : {}
+  }
 
   # Update database information with defaults
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
     { db_version = local.anydb_version },
     { size = local.anydb_size },
-    { os = merge( {os_type = local.anydb_ostype}, local.anydb_os )},
+    { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
     { authentication = local.authentication }
