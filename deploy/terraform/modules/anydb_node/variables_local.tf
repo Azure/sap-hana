@@ -91,6 +91,12 @@ locals {
       "sku"       = "standard-gen2",
       "version"   = "latest"
     }
+    NONE = {
+      "publisher" = "",
+      "offer"     = "",
+      "sku"       = "",
+      "version"   = ""
+    }
   }
 
   anydb_os = local.enable_deployment ? {
