@@ -95,6 +95,19 @@ locals {
       "sku"       = "standard-gen2",
       "version"   = "latest"
     }
+    NONE = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
+    HANA = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
+
   }
 
   anydb_os = {
