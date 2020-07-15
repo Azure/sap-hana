@@ -110,7 +110,7 @@ locals {
     { platform = local.anydb_platform },
     { db_version = local.anydb_version },
     { size = local.anydb_size },
-    { os = merge( {os_type = local.anydb_ostype}, local.anydb_os },
+    { os = local.anydb_ostype },
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
     { authentication = local.authentication }
