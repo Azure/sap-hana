@@ -43,7 +43,7 @@ locals {
   # Supported databases: Oracle, DB2, SQLServer, ASE 
   anydb-databases = [
     for database in var.databases : database
-    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(local.anydb_platform))
+    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
   ]
       
   # Enable deployment based on length of local.anydb-databases
