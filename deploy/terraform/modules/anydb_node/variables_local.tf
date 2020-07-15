@@ -97,7 +97,7 @@ locals {
     }
   }
 
-  anydb_os = {
+  anydb_os = local.enable_deployment ? {} : {
     "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
     "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].publisher)
     "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].offer)
