@@ -35,23 +35,19 @@ locals {
   # PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
 
-  # Filter the list of databases to only AnyDB platform entries
-  # Supported databases: Oracle, DB2, SQLServer, ASE 
-  anydb-databases = [
-    for database in var.databases : database
-    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
-  ]
-
-  # if(upper(database.platform) in )
-  # Enable deployment based on length of local.anydb-databases
-  enable_deployment = (length(local.anydb-databases) > 0) ? true : false
-
   anydb          = try(local.anydb-databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
 
-  # OS image for all Application Tier VMs
-  # If custom image is used, we do not overwrite os reference with default value
+  # Filter the list of databases to only AnyDB platform entries
+  # Supported databases: Oracle, DB2, SQLServer, ASE 
+  anydb-databases = [
+    for database in var.databases : database
+    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], local.anydb_platform)
+  ]
+      
+  # Enable deployment based on length of local.anydb-databases
+  enable_deployment = (length(local.anydb-databases) > 0) ? true : false# If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
@@ -97,13 +93,13 @@ locals {
     }
   }
 
-  anydb_os = local.enable_deployment ? {} : {
+  anydb_os = local.enable_deployment ? {
     "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
     "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].publisher)
     "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].offer)
     "sku"             = try(local.anydb.os.sku, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].sku)
     "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].version)
-  }
+  } : {}
 
   # Update database information with defaults
   anydb_database = merge(local.anydb,
