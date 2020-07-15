@@ -43,11 +43,13 @@ locals {
   # Supported databases: Oracle, DB2, SQLServer, ASE 
   anydb-databases = [
     for database in var.databases : database
-    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], local.anydb_platform)
+    if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(local.anydb_platform))
   ]
       
   # Enable deployment based on length of local.anydb-databases
-  enable_deployment = (length(local.anydb-databases) > 0) ? true : false# If custom image is used, we do not overwrite os reference with default value
+  enable_deployment = (length(local.anydb-databases) > 0) ? true : false
+  
+  # If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
