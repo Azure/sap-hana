@@ -70,12 +70,12 @@ locals {
   })
 
   # Default values in case not provided
-  os_defaults = {
+  os_defaults = { 
     ORACLE = {
-      "publisher" = "Oracle",
-      "offer"     = "Oracle-Linux",
-      "sku"       = "77",
-      "version"   = "latest"
+    "publisher" = "Oracle",
+    "offer"     = "Oracle-Linux",
+    "sku"       = "77",
+    "version"   = "latest"
     }
     DB2 = {
       "publisher" = "suse",
@@ -122,7 +122,7 @@ locals {
     { platform = local.anydb_platform },
     { db_version = local.anydb_version },
     { size = local.anydb_size },
-    { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
+    { os = merge( {os_type = local.anydb_ostype}, local.anydb_os },
     { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
     { authentication = local.authentication }
