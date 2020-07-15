@@ -14,44 +14,6 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-#TODO move to central
-variable "region_mapping" {
-  type        = map(string)
-  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
-  # 28 Regions 
-  default = {
-    westus             = "weus"
-    westus2            = "wus2"
-    centralus          = "ceus"
-    eastus             = "eaus"
-    eastus2            = "eus2"
-    northcentralus     = "ncus"
-    southcentralus     = "scus"
-    westcentralus      = "wcus"
-    northeurope        = "noeu"
-    westeurope         = "weeu"
-    eastasia           = "eaas"
-    southeastasia      = "seas"
-    brazilsouth        = "brso"
-    japaneast          = "jpea"
-    japanwest          = "jpwe"
-    centralindia       = "cein"
-    southindia         = "soin"
-    westindia          = "wein"
-    uksouth2           = "uks2"
-    uknorth            = "ukno"
-    canadacentral      = "cace"
-    canadaeast         = "caea"
-    australiaeast      = "auea"
-    australiasoutheast = "ause"
-    uksouth            = "ukso"
-    ukwest             = "ukwe"
-    koreacentral       = "koce"
-    koreasouth         = "koso"
-  }
-}
-
-
 locals {
 
   # DB subnet
@@ -87,20 +49,10 @@ locals {
   anydb          = try(local.anydb-databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
-  #TODO Add the rest of the naming convention once implemented
-  anydb_nameprefix = replace(try(var.resource-group[0].name, upper(join("-", ["Test", var.region_mapping[var.resource-group[0].location], "code", local.anydb_sid]))), "-rg", "")
 
   # OS image for all Application Tier VMs
   # If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
-
-  anydb_os = {
-    "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
-    "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : "")
-    "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : "")
-    "sku"             = try(local.anydb.os.sku, local.anydb_custom_image ? "" : "")
-    "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : "latest")
-  }
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_size   = try(local.anydb.size, "500")
@@ -117,6 +69,42 @@ locals {
       "password" = "Sap@hana2019!"
   })
 
+  # Default values in case not provided
+  os_defaults = { 
+    ORACLE = {
+    "publisher" = "Oracle",
+    "offer"     = "Oracle-Linux",
+    "sku"       = "77",
+    "version"   = "latest"
+    }
+    DB2 = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
+    ASE = {
+      "publisher" = "suse",
+      "offer"     = "sles-sap-12-sp5",
+      "sku"       = "gen1"
+      "version"   = "latest"
+    }
+    SQLSERVER = {
+      "publisher" = "MicrosoftSqlServer",
+      "offer"     = "SQL2017-WS2016",
+      "sku"       = "standard-gen2",
+      "version"   = "latest"
+    }
+  }
+
+  anydb_os = {
+    "source_image_id" = local.anydb_custom_image ? local.anydb.os.source_image_id : ""
+    "publisher"       = try(local.anydb.os.publisher, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].publisher)
+    "offer"           = try(local.anydb.os.offer, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].offer)
+    "sku"             = try(local.anydb.os.sku, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].sku)
+    "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].version)
+  }
+
   # Update database information with defaults
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
@@ -128,12 +116,18 @@ locals {
     { authentication = local.authentication }
   )
 
-  dbnodes = flatten([
+  dbnodes = [for idx, dbnode in try(local.anydb.dbnodes, []) : {
+    "name" = try(dbnode.name, upper(local.anydb_ostype) == "WINDOWS" ? format("%sxdbw", lower(local.anydb_sid)) : format("%sxdbl", lower(local.anydb_sid)))
+    "role" = try(dbnode.role, "worker")
+    }
+  ]
+
+  anydb_vms = flatten([
     [
       for database in local.anydb-databases : [
-        for idx, dbnode in database.dbnodes : {
+        for idx, dbnode in local.dbnodes : {
           platform       = local.anydb_platform,
-          name           = "${local.anydb_nameprefix}-${upper(local.anydb_ostype) == "WINDOWS" ? format("%sxdb%02dw", lower(local.anydb_sid), 0) : format("%sxdb%02dl", lower(local.anydb_sid), 0)}",
+          name           = "${dbnode.name}-00",
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0],
           size           = local.anydb_sku
           os             = local.anydb_ostype,
@@ -144,9 +138,9 @@ locals {
     ],
     [
       for database in local.anydb-databases : [
-        for idx, dbnode in database.dbnodes : {
+        for idx, dbnode in local.dbnodes : {
           platform       = local.anydb_platform,
-          name           = "${local.anydb_nameprefix}-${upper(local.anydb_ostype) == "WINDOWS" ? format("%sxdb%02dw", lower(local.anydb_sid), 1) : format("%sxdb%02dl", lower(local.anydb_sid), 1)}",
+          name           = "${dbnode.name}-01",
           db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1],
           size           = local.anydb_sku,
           os             = local.anydb_ostype,
