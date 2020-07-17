@@ -32,10 +32,10 @@
   },
   "databases": [
     {
-      "platform": "AnyDB",
+      "platform": "Oracle",
       "high_availability": true,
       "credentials": {
-        "ha_cluster_password": "ASecurePa55w0rd"
+        "db_systemdb_password": "Manager1"
       },
       "dbnodes": [
         {

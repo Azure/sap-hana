@@ -46,9 +46,10 @@ resource "local_file" "output-json" {
       xsa               = database.xsa,
       shine             = database.shine,
       nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
-        dbname       = local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name
+        // Hostname is required for Ansible, therefore set dbname from resource name to hostname
+        dbname       = replace(local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name, "_", "")
         ip_admin_nic = ip-dbnode-admin,
-        ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)],
+        ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)]
         role         = local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
         } if local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
       ],
