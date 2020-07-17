@@ -24,6 +24,7 @@ locals {
     "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
     "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
     "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
+    "version"         = try(local.hdb.os.version, local.hdb_custom_image ? "" : "latest")
   }
 
   var_infra = try(var.infrastructure, {})
@@ -56,9 +57,10 @@ locals {
   iscsi_size = try(local.var_iscsi.size, "Standard_D2s_v3")
   iscsi_os = try(local.var_iscsi.os,
     {
-      "publisher" = "SUSE",
-      "offer"     = "sles-sap-12-sp5",
-      "sku"       = "gen1"
+      "publisher" = try(local.var_iscsi.os.publisher, "SUSE")
+      "offer"     = try(local.var_iscsi.os.offer, "sles-sap-12-sp5")
+      "sku"       = try(local.var_iscsi.os.sku, "gen1")
+      "version"   = try(local.var_iscsi.os.version, "latest")
   })
   iscsi_auth_type     = try(local.var_iscsi.authentication.type, "key")
   iscsi_auth_username = try(local.var_iscsi.authentication.username, "azureadm")
@@ -171,7 +173,7 @@ locals {
       size = local.iscsi_size,
       os   = local.iscsi_os,
       authentication = {
-        type     = local.iscsi_auth_type,
+        type     = local.iscsi_auth_type
         username = local.iscsi_auth_username
       }
     },

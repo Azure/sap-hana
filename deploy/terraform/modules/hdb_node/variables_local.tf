@@ -91,12 +91,13 @@ locals {
   components             = merge({ hana_database = [] }, try(local.hdb.components, {}))
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
-  dbnodes = try(local.hdb.dbnodes, [
-    {
-      "name" = "hdb1",
-      "role" = "worker"
 
-  }])
+  dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, []) : {
+    "name" = try(dbnode.name, format("%s_%s_hdb%02d", local.sap_sid, local.hdb_sid, idx)),
+    "role" = try(dbnode.role, "worker")
+    }
+  ]
+
   loadbalancer = try(local.hdb.loadbalancer, {})
 
   # Update HANA database information with defaults
@@ -128,6 +129,10 @@ locals {
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
+
+  # SAP SID used in HDB resource naming convention
+  sap_sid = try(var.application.sid, "HN1")
+
 }
 
 # Imports HANA database sizing information
@@ -184,7 +189,7 @@ locals {
 
   loadbalancer_ports = flatten([
     for port in local.lb_ports[split(".", local.hana_database.db_version)[0]] : {
-      sid  = local.hana_database.instance.sid
+      sid  = local.sap_sid
       port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
     }
   ])
