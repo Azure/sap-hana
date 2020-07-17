@@ -3,7 +3,7 @@
     "region": "eastus",
     "resource_group": {
       "is_existing": "false",
-      "name": "test-anydb-ha-rg"
+      "name": "test-anydb-rg"
     },
     "ppg": {
       "is_existing": "false",
