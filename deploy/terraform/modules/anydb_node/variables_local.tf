@@ -60,7 +60,7 @@ locals {
   anydb_sid    = (length(local.anydb-databases) > 0) ? try(local.anydb.instance.sid, "OR1") : "OR1"
   loadbalancer = try(local.anydb.loadbalancer, {})
 
-  authentication = try(var.anydb.authentication,
+  authentication = try(local.anydb.authentication,
     {
       "type"     = upper(local.anydb_ostype) == "LINUX" ? "key" : "password"
       "username" = "azureadm"
