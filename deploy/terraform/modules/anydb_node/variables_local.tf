@@ -182,11 +182,11 @@ locals {
   ])
 
   anydb_disks = flatten([
-    for vm_counter, dbnode in local.dbnodes : [
+    for vm_counter, anydb_vm in local.anydb_vms : [
       for storage_type in lookup(local.sizes, local.anydb_size).storage : [
         for disk_count in range(storage_type.count) : {
           vm_index                  = vm_counter
-          name                      = format("%s-%s%02d", dbnode.name, storage_type.name, (disk_count))
+          name                      = format("%s-%s%02d", anydb_vm.name, storage_type.name, (disk_count))
           storage_account_type      = storage_type.disk_type
           disk_size_gb              = storage_type.size_gb
           caching                   = storage_type.caching
