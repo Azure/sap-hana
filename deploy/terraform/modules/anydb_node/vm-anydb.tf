@@ -53,6 +53,7 @@ resource azurerm_linux_virtual_machine "dbserver" {
 
   computer_name                   = lower(format("%sxdbl%02d", upper(local.anydb_sid), count.index))
   admin_username                  = local.authentication.username
+  admin_password                  = local.authentication.password
   disable_password_authentication = local.authentication.type != "password" ? true : false
 
   admin_ssh_key {
