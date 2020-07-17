@@ -106,7 +106,7 @@ resource azurerm_windows_virtual_machine "dbserver" {
 
   computer_name  = lower(format("%sxdbw%02d", upper(local.anydb_sid), count.index))
   admin_username = local.authentication.username
-  admin_password = local.authentication.password
+  admin_password = try(local.authentication.password,null)
 
   boot_diagnostics {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
