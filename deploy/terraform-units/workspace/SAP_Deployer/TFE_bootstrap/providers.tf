@@ -13,16 +13,20 @@ Description:
                         ~> 0.8.4 is equivalent to >= 0.8.4, < 0.9
 */
 
-terraform {
-  required_version = ">= 0.12"
-}
-
-provider azurerm {
+provider "azurerm" {
   version = "~> 2.10"
   features {}
 }
 
-provider external { version = "~> 1.2" }
-provider local { version = "~> 1.4" }
-provider random { version = "~> 2.2" }
-provider null { version = "~> 2.1" }
+terraform {
+  required_version = ">= 0.12"
+  required_providers {
+    azurerm = {
+      version = "~> 2.10"
+    }
+    external = { version = "~> 1.2" }
+    local    = { version = "~> 1.4" }
+    random   = { version = "~> 2.2" }
+    null     = { version = "~> 2.1" }
+  }
+}
