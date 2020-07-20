@@ -41,10 +41,7 @@ locals {
   region  = try(var.infrastructure.region, "westus2")
 
   // Deployer(s) information from input
-  deployer_input = [
-    for jumpbox in var.jumpboxes.linux : jumpbox
-    if jumpbox.destroy_after_deploy == true
-  ]
+  deployer_input = var.deployers
 
   // Deployer(s) information with default override
   deployer_list = length(local.deployer_input) > 0 ? local.deployer_input : [{ "destroy_after_deploy" = true }]

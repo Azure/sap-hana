@@ -62,24 +62,3 @@ resource "azurerm_storage_account" "deployer" {
   account_tier              = "Standard"
   enable_https_traffic_only = local.enable_secure_transfer
 }
-
-// Creates storage account with container for remote state files, soft deletion enabled
-resource "azurerm_storage_account" "tfstate" {
-  name                      = "sapdeployer${local.postfix}"
-  resource_group_name       = azurerm_resource_group.deployer.name
-  location                  = azurerm_resource_group.deployer.location
-  account_replication_type  = "LRS"
-  account_tier              = "Standard"
-  enable_https_traffic_only = local.enable_secure_transfer
-  blob_properties {
-    delete_retention_policy {
-      days = 7
-    }
-  }
-}
-
-resource "azurerm_storage_container" "container" {
-  name                  = "tfstate"
-  storage_account_name  = azurerm_storage_account.tfstate.name
-  container_access_type = "private"
-}

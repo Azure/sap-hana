@@ -4,17 +4,14 @@ Description:
   Define input variables.
 */
 
+variable "deployers" {
+  description = "Details of the list of deployer(s)"
+  default     = []
+}
+
 variable "infrastructure" {
   description = "Details of the Azure infrastructure to deploy the SAP landscape into"
   default     = {}
-}
-
-variable "jumpboxes" {
-  description = "Details of the jumpboxes and RTI box"
-  default = {
-    windows = [],
-    linux   = []
-  }
 }
 
 variable "options" {
