@@ -28,6 +28,7 @@ resource "azurerm_network_interface" "deployer" {
   }
 }
 
+<<<<<<< HEAD
 // User defined identity for all Deployer, assign contributor to the current subscription
 resource "azurerm_user_assigned_identity" "deployer" {
   resource_group_name = azurerm_resource_group.deployer[0].name
@@ -43,6 +44,15 @@ resource "azurerm_role_assignment" "deployer" {
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
 }
 
+=======
+// User defined identity for all Deployer
+resource "azurerm_user_assigned_identity" "deployer" {
+  resource_group_name = azurerm_resource_group.deployer.name
+  location            = azurerm_resource_group.deployer.location
+  name                = format("%s-msi-%s", "deployer", local.postfix)
+}
+
+>>>>>>> add UAI to deployers
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
