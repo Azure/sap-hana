@@ -44,21 +44,20 @@ locals {
   deployer_input = var.deployers
 
   // Deployer(s) information with default override
-  deployer_list = length(local.deployer_input) > 0 ? local.deployer_input : [{ "destroy_after_deploy" = true }]
+  deployer_list = length(local.deployer_input) > 0 ? local.deployer_input : [{}]
   deployers = [
     for idx, deployer in local.deployer_list : {
       "name"                 = "deployer",
       "destroy_after_deploy" = true,
       "size"                 = try(deployer.size, "Standard_D2s_v3"),
       "disk_type"            = try(deployer.disk_type, "StandardSSD_LRS")
-      "os" = try(deployer.os,
-        {
-          "publisher" = "Canonical",
-          "offer"     = "UbuntuServer",
-          "sku"       = "18.04-LTS",
-          "version"   = "latest"
-        }
-      ),
+      "os" = {
+        "source_image_id" = try(deployer.os.source_image_id, "")
+        "publisher"       = try(deployer.os.source_image_id, "") == "" ? "Canonical" : ""
+        "offer"           = try(deployer.os.source_image_id, "") == "" ? "UbuntuServer" : ""
+        "sku"             = try(deployer.os.source_image_id, "") == "" ? "18.04-LTS" : ""
+        "version"         = try(deployer.os.source_image_id, "") == "" ? "latest" : ""
+      },
       "authentication" = {
         "type"     = "key",
         "username" = try(deployer.authentication.username, "azureadm")

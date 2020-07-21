@@ -47,11 +47,16 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     storage_account_type = local.deployers[count.index].disk_type
   }
 
-  source_image_reference {
-    publisher = local.deployers[count.index].os.publisher
-    offer     = local.deployers[count.index].os.offer
-    sku       = local.deployers[count.index].os.sku
-    version   = local.deployers[count.index].os.version
+  source_image_id = local.deployers[count.index].os.source_image_id != "" ? local.deployers[count.index].os.source_image_id : null
+
+  dynamic "source_image_reference" {
+    for_each = range(local.deployers[count.index].os.source_image_id == "" ? 1 : 0)
+    content {
+      publisher = local.deployers[count.index].os.publisher
+      offer     = local.deployers[count.index].os.offer
+      sku       = local.deployers[count.index].os.sku
+      version   = local.deployers[count.index].os.version
+    }
   }
 
   admin_ssh_key {
@@ -110,7 +115,7 @@ resource "null_resource" "prepare-deployer" {
   }
 
   provisioner "remote-exec" {
-    inline = [
+    inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
       // Install terraform
       "sudo apt-get install unzip",
       "wget https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip",
