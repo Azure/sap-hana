@@ -1,0 +1,3 @@
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~
+%{ endfor ~}
