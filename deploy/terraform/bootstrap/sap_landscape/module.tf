@@ -55,7 +55,6 @@ module "hdb_node" {
   ppg              = module.common_infrastructure.ppg
 }
 
-<<<<<<< HEAD:deploy/terraform/bootstrap/sap_landscape/module.tf
 // Create anydb database nodes
 module "anydb_node" {
   source           = "../../run/modules/anydb_node"
@@ -73,8 +72,6 @@ module "anydb_node" {
   ppg              = module.common_infrastructure.ppg
 }
 
-=======
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/module.tf
 // Create Application Tier nodes
 module "app_tier" {
   source           = "../../run/modules/app_tier"
