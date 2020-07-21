@@ -27,7 +27,7 @@ locals {
 
     // Storage account for tfstate, json and deployer
     sa_tfstate_exists                   = try(var.storage_account_tfstate.is_existing, false)
-    sa_tfstate_account_tier             = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_tier, "Premium")
+    sa_tfstate_account_tier             = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_tier, "Standard")
     sa_tfstate_account_replication_type = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_replication_type, "LRS")
     sa_tfstate_account_kind             = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_kind, "StorageV2")
     sa_tfstate_container_access_type    = "private"
@@ -38,4 +38,5 @@ locals {
     sa_tfstate_container_name           = "tfstate"
     sa_json_container_name              = "json"
     sa_deployer_container_name          = "deployer"
+    sa_saplibrary_container_name        = "saplibrary"
 }

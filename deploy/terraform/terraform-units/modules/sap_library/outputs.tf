@@ -1,9 +1,11 @@
-output rgName { 
-    value = azurerm_resource_group.library[0].name 
+output "rgName" { 
+    value = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name 
 }
-output tfstateBlobEndpoint {
-    value = azurerm_storage_account.storage-tfstate[0].primary_blob_endpoint 
+
+output "tfstate-storage-account-name" {
+    value = local.sa_tfstate_exists ? data.azurerm_storage_account.storage-tfstate[0].name : azurerm_storage_account.storage-tfstate[0].name 
 }
-output sapbitsBlobEndpoint { 
-    value = azurerm_storage_account.storage-sapbits[0].primary_blob_endpoint 
+
+output "sapbits-storage-account-name" {
+    value = local.sa_sapbits_exists ? data.azurerm_storage_account.storage-sapbits[0].name : azurerm_storage_account.storage-sapbits[0].name 
 }

@@ -46,6 +46,14 @@ resource "azurerm_storage_container" "storagecontainer-deployer" {
   container_access_type = local.sa_tfstate_container_access_type
 }
 
+// Creates the storage container inside the storage account for saplibrary
+resource "azurerm_storage_container" "storagecontainer-saplibrary" {
+  count                 = local.sa_tfstate_exists ? 0 : 1
+  name                  = local.sa_saplibrary_container_name
+  storage_account_name  = local.sa_tfstate_exists ? data.azurerm_storage_account.storage-tfstate[0].name : azurerm_storage_account.storage-tfstate[0].name
+  container_access_type = local.sa_tfstate_container_access_type
+}
+
 // Imports existing storage account to use for SAP bits
 data "azurerm_storage_account" "storage-sapbits" {
   count               = local.sa_sapbits_exists ? 1 : 0
@@ -80,7 +88,7 @@ resource "azurerm_storage_share" "fileshare-sapbits" {
   storage_account_name = azurerm_storage_account.storage-sapbits[0].name
 }
 
-// Generates random text for boot diagnostics storage account name
+// Generates random text for storage account name
 resource "random_id" "random-id" {
   keepers = {
     # Generate a new id only when a new resource group is defined
@@ -88,3 +96,5 @@ resource "random_id" "random-id" {
   }
   byte_length = 4
 }
+
+

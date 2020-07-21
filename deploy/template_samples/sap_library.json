@@ -18,7 +18,7 @@
     "storage_account_tfstate": {
         "is_existing": "false",
         "arm_id": "",
-        "account_tier": "Premium",
+        "account_tier": "Standard",
         "account_replication_type": "LRS",
         "account_kind": "StorageV2"
     }
