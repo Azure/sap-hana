@@ -1,0 +1,27 @@
+{
+    "infrastructure": {
+        "region": "",
+        "resource_group": {
+            "is_existing": "",
+            "arm_id": "",
+            "name": ""
+        }
+    },
+    "storage_account_sapbits": {
+        "is_existing": "",
+        "arm_id": "",
+        "account_tier": "",
+        "account_replication_type": "",
+        "account_kind": "",
+        "file_share_name": "",
+        "container_access_type": ""
+    },
+    "storage_account_tfstate": {
+        "is_existing": "",
+        "arm_id": "",
+        "account_tier": "",
+        "account_replication_type": "",
+        "account_kind": "",
+        "container_access_type": ""
+    }
+}

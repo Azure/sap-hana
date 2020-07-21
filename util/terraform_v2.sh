@@ -28,7 +28,6 @@ readonly input_file_term='<JSON template name>'
 
 readonly target_code="${target_path}/terraform/run/sap_landscape"
 
-
 function main()
 {
 	# default to empty string when 0 args supplied
@@ -61,7 +60,7 @@ function dispatch_terraform_template_action()
 
 	# default to empty string when 1 or less args supplied
 	local template_name=''
-	[ $# -le 1 ] || template_name="$2"
+	[ $# -le 1 ] || template_name="$2" 
 
 	check_command_line_arguments_for_template "$@"
 
