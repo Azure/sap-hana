@@ -28,6 +28,21 @@ resource "azurerm_network_interface" "deployer" {
   }
 }
 
+// User defined identity for all Deployer, assign contributor to the current subscription
+resource "azurerm_user_assigned_identity" "deployer" {
+  resource_group_name = azurerm_resource_group.deployer[0].name
+  location            = azurerm_resource_group.deployer[0].location
+  name                = format("%s-msi-%s", "deployer", local.postfix)
+}
+
+data "azurerm_subscription" "primary" {}
+data "azurerm_client_config" "current" {}
+resource "azurerm_role_assignment" "deployer" {
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.deployer.principal_id
+}
+
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
@@ -57,6 +72,11 @@ resource "azurerm_linux_virtual_machine" "deployer" {
       sku       = local.deployers[count.index].os.sku
       version   = local.deployers[count.index].os.version
     }
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.deployer.id]
   }
 
   admin_ssh_key {
