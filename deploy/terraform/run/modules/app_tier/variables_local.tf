@@ -94,7 +94,7 @@ locals {
 
 # Imports Disk sizing sizing information
 locals {
-  sizes = jsondecode(file("${path.root}/../../configs/app_sizes.json"))
+  sizes = jsondecode(file("${path.module}/../../../../configs/app_sizes.json"))
 }
 
 locals {

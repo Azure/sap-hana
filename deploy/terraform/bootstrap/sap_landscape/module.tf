@@ -3,7 +3,7 @@
   Setup common infrastructure
 */
 module "common_infrastructure" {
-  source              = "../run/modules/common_infrastructure"
+  source              = "../../run/modules/common_infrastructure"
   is_single_node_hana = "true"
   application         = var.application
   databases           = var.databases
@@ -18,7 +18,7 @@ module "common_infrastructure" {
 
 // Create Jumpboxes and RTI box
 module "jumpbox" {
-  source            = "../run/modules/jumpbox"
+  source            = "../../run/modules/jumpbox"
   application       = var.application
   databases         = var.databases
   infrastructure    = var.infrastructure
@@ -38,7 +38,7 @@ module "jumpbox" {
 
 // Create HANA database nodes
 module "hdb_node" {
-  source           = "../run/modules/hdb_node"
+  source           = "../../run/modules/hdb_node"
   application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
@@ -57,7 +57,7 @@ module "hdb_node" {
 
 // Create Application Tier nodes
 module "app_tier" {
-  source           = "../run/modules/app_tier"
+  source           = "../../run/modules/app_tier"
   application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
@@ -75,7 +75,7 @@ module "app_tier" {
 
 // Generate output files
 module "output_files" {
-  source                       = "../run/modules/output_files"
+  source                       = "../../run/modules/output_files"
   application                  = var.application
   databases                    = var.databases
   infrastructure               = var.infrastructure

@@ -26,7 +26,7 @@ steps:
       cat ${{parameters.testCaseName}}.json
     displayName: "Prepare input JSON"
   - script: |
-      cd deploy/terraform
+      cd deploy/terraform/run/sap_landscape
       mkdir default
       cat <<- EOF > default/export-clustering-sp-details.sh
         export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
@@ -37,10 +37,10 @@ steps:
     displayName: 'Prepare SP for fencing agent'
   - script: |
       echo "Terraform Deployment in Progress..."
-      cd deploy/terraform/run
+      cd deploy/terraform/run/sap_landscape
       terraform -version
       terraform init
-      terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
+      terraform apply -auto-approve -var-file=../../../../templates/tempGen/${{parameters.testCaseName}}.json
     displayName: 'Terraform Deployment'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)

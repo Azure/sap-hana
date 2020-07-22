@@ -137,7 +137,7 @@ locals {
 
 # Imports HANA database sizing information
 locals {
-  sizes = jsondecode(file("${path.root}/../../configs/hdb_sizes.json"))
+  sizes = jsondecode(file("${path.module}/../../../../configs/hdb_sizes.json"))
 }
 
 locals {
