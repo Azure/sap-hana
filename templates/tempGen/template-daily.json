@@ -22,7 +22,7 @@
             "is_existing": "false",
             "name": "nsg-mgmt",
             "allowed_ips": [
-              "0.0.0.0/0"
+              "var-agent-ip"
             ]
           }
         }

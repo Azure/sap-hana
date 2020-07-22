@@ -10,6 +10,9 @@ parameters:
     osImage: ''
 steps:
   - script: |
+      echo '##vso[task.setvariable variable=agent_ip]$(curl -s https://ipinfo.io/json | jq -r .ip)'
+    displayName: "Set agent ip"
+  - script: |
       ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
       echo "Update ${{parameters.testCaseName}}.json"
       cd templates/tempGen
@@ -18,6 +21,7 @@ steps:
       sed -i "s|var-os-image|${{parameters.osImage}}|g" template.json
       sed -i "s|var-sa-access-key|$(hana-pipeline-sa-access-key)|g" template.json
       sed -i "s|var-sa-arm-id|$(hana-pipeline-sa-arm-id)|g" template.json
+      sed -i "s|var-agent-ip|$(agent_ip)|g" template.json
       cat template.json
       python tempGen.py --custom=${{parameters.testCaseName}}.json --template=template.json --output=${{parameters.testCaseName}}.json
       echo "Input JSON for terraform ready:"
