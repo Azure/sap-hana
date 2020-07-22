@@ -116,11 +116,14 @@ resource "null_resource" "prepare-deployer" {
 
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
-      // Install terraform
+      // Install terraform for all users
       "sudo apt-get install unzip",
-      "wget https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip",
-      "unzip terraform_0.12.28_linux_amd64.zip",
-      "sudo mv terraform /usr/local/bin/terraform",
+      "sudo mkdir -p /opt/terraform/terraform_0.12.28",
+      "sudo mkdir -p /opt/terraform/bin/",
+      "sudo wget -P /opt/terraform/terraform_0.12.28 https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip",
+      "sudo unzip /opt/terraform/terraform_0.12.28/terraform_0.12.28_linux_amd64.zip -d /opt/terraform/terraform_0.12.28/",
+      "sudo mv /opt/terraform/terraform_0.12.28/terraform /opt/terraform/bin/terraform",
+      "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
       // Installs Git

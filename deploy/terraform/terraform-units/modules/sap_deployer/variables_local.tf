@@ -18,14 +18,14 @@ locals {
   vnet_mgmt_exists = try(local.vnet_mgmt.is_existing, false)
   vnet_mgmt_arm_id = local.vnet_mgmt_exists ? try(local.vnet_mgmt.arm_id, "") : ""
   vnet_mgmt_name   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.name, "vnet-mgmt")
-  vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "10.0.0.0/16")
+  vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "10.0.0.0/24")
 
   // Management subnet
   sub_mgmt          = try(local.vnet_mgmt.subnet_mgmt, {})
   sub_mgmt_exists   = try(local.sub_mgmt.is_existing, false)
   sub_mgmt_arm_id   = local.sub_mgmt_exists ? try(local.sub_mgmt.arm_id, "") : ""
   sub_mgmt_name     = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.name, "subnet-mgmt")
-  sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "10.0.1.0/24")
+  sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "10.0.0.16/28")
   sub_mgmt_deployed = local.sub_mgmt_exists ? data.azurerm_subnet.subnet-mgmt[0] : azurerm_subnet.subnet-mgmt[0]
 
   // Management NSG
