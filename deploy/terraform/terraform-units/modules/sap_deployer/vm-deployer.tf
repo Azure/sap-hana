@@ -1,23 +1,23 @@
 /*
 Description:
 
-  Define 1..n Deployer(s).
+  Define 0..n Deployer(s).
 */
 
 // Public IP addresse and nic for Deployer
 resource "azurerm_public_ip" "deployer" {
   count               = length(local.deployers)
   name                = format("%s%02d-pip-%s", local.deployers[count.index].name, count.index, local.postfix)
-  location            = azurerm_resource_group.deployer.location
-  resource_group_name = azurerm_resource_group.deployer.name
+  location            = azurerm_resource_group.deployer[0].location
+  resource_group_name = azurerm_resource_group.deployer[0].name
   allocation_method   = "Static"
 }
 
 resource "azurerm_network_interface" "deployer" {
   count               = length(local.deployers)
   name                = format("%s%02d-nic-%s", local.deployers[count.index].name, count.index, local.postfix)
-  location            = azurerm_resource_group.deployer.location
-  resource_group_name = azurerm_resource_group.deployer.name
+  location            = azurerm_resource_group.deployer[0].location
+  resource_group_name = azurerm_resource_group.deployer[0].name
 
   ip_configuration {
     name                          = "ipconfig1"
@@ -33,8 +33,8 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
   name                            = format("%s%02d-vm-%s", local.deployers[count.index].name, count.index, local.postfix)
   computer_name                   = format("%s%02d-vm-%s", local.deployers[count.index].name, count.index, local.postfix)
-  location                        = azurerm_resource_group.deployer.location
-  resource_group_name             = azurerm_resource_group.deployer.name
+  location                        = azurerm_resource_group.deployer[0].location
+  resource_group_name             = azurerm_resource_group.deployer[0].name
   network_interface_ids           = [azurerm_network_interface.deployer[count.index].id]
   size                            = local.deployers[count.index].size
   admin_username                  = local.deployers[count.index].authentication.username
@@ -65,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.deployer.primary_blob_endpoint
+    storage_account_uri = azurerm_storage_account.deployer[0].primary_blob_endpoint
   }
 
   tags = {

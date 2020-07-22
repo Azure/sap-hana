@@ -6,7 +6,7 @@ Description:
 
 variable "deployers" {
   description = "Details of the list of deployer(s)"
-  default     = []
+  default     = [{}]
 }
 
 variable "infrastructure" {

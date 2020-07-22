@@ -21,9 +21,6 @@ provider "azurerm" {
 terraform {
   required_version = ">= 0.12"
   required_providers {
-    azurerm = {
-      version = "~> 2.10"
-    }
     external = { version = "~> 1.2" }
     local    = { version = "~> 1.4" }
     random   = { version = "~> 2.2" }
