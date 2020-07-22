@@ -94,11 +94,7 @@ locals {
 
 # Imports Disk sizing sizing information
 locals {
-<<<<<<< HEAD:deploy/terraform/terraform-units/modules/sap_system/app_tier/variables_local.tf
-  sizes = jsondecode(file("${path.module}/../../../../../configs/app_sizes.json"))
-=======
-  sizes = jsondecode(file("${path.root}/../../configs/app_sizes.json"))
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/modules/app_tier/variables_local.tf
+  sizes = jsondecode(file("${path.module}/../../../../configs/app_sizes.json"))
 }
 
 locals {
