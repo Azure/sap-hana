@@ -33,7 +33,7 @@
   pre_tasks:
     - name: Include SAP HANA DB sizes
       include_vars:
-        file: ../hdb_sizes.json
+        file: "{{ configs_path }}/hdb_sizes.json"
         name: hdb_sizes
   max_fail_percentage: 0
   roles:
@@ -101,7 +101,7 @@
   pre_tasks:
     - name: Include SAP HANA DB sizes
       include_vars:
-        file: ../hdb_sizes.json
+        file: "{{ configs_path }}/hdb_sizes.json"
         name: hdb_sizes
   roles:
     - role: hdb-server-install
