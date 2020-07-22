@@ -24,8 +24,6 @@ variable "ppg" {
 
 # Set defaults
 locals {
-  # Name of the landscape
-  landscape_id = try(var.infrastructure.landscape, "DEMO")
 
   # Admin subnet
   var_sub_admin    = try(var.infrastructure.vnets.sap.subnet_admin, {})
@@ -94,7 +92,7 @@ locals {
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
-  dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
+  dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, []) : {
     "name" = try(dbnode.name, format("%s_%s_hdb%02d", local.sap_sid, local.hdb_sid, idx)),
     "role" = try(dbnode.role, "worker")
     }
@@ -139,11 +137,7 @@ locals {
 
 # Imports HANA database sizing information
 locals {
-<<<<<<< HEAD:deploy/terraform/terraform-units/modules/sap_system/hdb_node/variables_local.tf
-  sizes = jsondecode(file("${path.module}/../../../../../configs/hdb_sizes.json"))
-=======
-  sizes = jsondecode(file("${path.root}/../../configs/hdb_sizes.json"))
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/modules/hdb_node/variables_local.tf
+  sizes = jsondecode(file("${path.module}/../../../../configs/hdb_sizes.json"))
 }
 
 locals {
