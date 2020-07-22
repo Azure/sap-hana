@@ -37,10 +37,17 @@ steps:
     displayName: 'Prepare SP for fencing agent'
   - script: |
       echo "Terraform Deployment in Progress..."
+<<<<<<< HEAD
       cd deploy/terraform/run/sap_landscape
       terraform -version
       terraform init
       terraform apply -auto-approve -var-file=../../../../templates/tempGen/${{parameters.testCaseName}}.json
+=======
+      cd deploy/terraform/run
+      terraform -version
+      terraform init
+      terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
+>>>>>>> Restructure the codebase (#657)
     displayName: 'Terraform Deployment'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
