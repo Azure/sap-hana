@@ -2,8 +2,13 @@
 resource "azurerm_network_security_group" "nsg-web" {
   count               = local.enable_deployment && local.sub_web_defined ? (local.sub_web_nsg_exists ? 0 : 1) : 0
   name                = local.sub_web_nsg_name
+<<<<<<< HEAD
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
+=======
+  location            = var.vnet-sap[0].location
+  resource_group_name = var.vnet-sap[0].resource_group_name
+>>>>>>> Restructure the codebase (#657)
 }
 
 # Imports the SAP web subnet nsg data
@@ -44,7 +49,11 @@ resource "azurerm_network_security_rule" "web" {
   direction                    = "Inbound"
   access                       = "Allow"
   protocol                     = "Tcp"
+<<<<<<< HEAD
   source_address_prefixes      = var.subnet-mgmt[0].address_prefixes
+=======
+  source_address_prefixes      = var.subnet-mgmt.address_prefixes
+>>>>>>> Restructure the codebase (#657)
   source_port_range            = "*"
   destination_address_prefixes = local.sub_web_deployed.address_prefixes
   destination_port_range       = local.nsg-ports.web[count.index].port
