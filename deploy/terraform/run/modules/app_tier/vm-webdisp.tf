@@ -8,8 +8,8 @@ resource "azurerm_network_interface" "web" {
 
   ip_configuration {
     name                          = "IPConfig1"
-    subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0].id : azurerm_subnet.subnet-sap-app[0].id
-    private_ip_address            = cidrhost(local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0].address_prefixes[0] : azurerm_subnet.subnet-sap-app[0].address_prefixes[0], tonumber(count.index) + local.ip_offsets.web_vm)
+    subnet_id                     = local.sub_web_deployed.id
+    private_ip_address            = cidrhost(local.sub_web_defined ? local.sub_web_prefix : local.sub_app_prefix, tonumber(count.index) + local.ip_offsets.web_vm)
     private_ip_address_allocation = "static"
   }
 }
@@ -21,7 +21,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   computer_name                = "${upper(local.application_sid)}web${format("%02d", count.index)}"
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
-  availability_set_id          = azurerm_availability_set.web[0].id
+  availability_set_id          = azurerm_availability_set.app[0].id
   proximity_placement_group_id = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
   network_interface_ids = [
     azurerm_network_interface.web[count.index].id

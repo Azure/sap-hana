@@ -34,6 +34,27 @@ locals {
   sub_app_nsg_arm_id = local.sub_app_nsg_exists ? try(local.var_sub_app_nsg.arm_id, "") : ""
   sub_app_nsg_name   = local.sub_app_nsg_exists ? "" : try(local.var_sub_app_nsg.name, "nsg-app")
 
+  # WEB subnet
+  #If subnet_web is not specified deploy into app subnet
+  sub_web_defined = try(var.infrastructure.vnets.sap.subnet_web, null) == null ? false : true
+  sub_web         = try(var.infrastructure.vnets.sap.subnet_web, {})
+  sub_web_exists  = try(local.sub_web.is_existing, false)
+  sub_web_arm_id  = local.sub_web_exists ? try(local.sub_web.arm_id, "") : ""
+  sub_web_name    = local.sub_web_exists ? "" : try(local.sub_web.name, "subnet-web")
+  sub_web_prefix  = local.sub_web_exists ? "" : try(local.sub_web.prefix, "10.1.5.0/24")
+  sub_web_deployed = try(local.sub_web_defined ? (
+    local.sub_web_exists ? data.azurerm_subnet.subnet-sap-web[0] : azurerm_subnet.subnet-sap-web[0]) : (
+  local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0] : azurerm_subnet.subnet-sap-app[0]), null)
+
+  # WEB NSG
+  sub_web_nsg        = try(local.sub_web.nsg, {})
+  sub_web_nsg_exists = try(local.sub_web_nsg.is_existing, false)
+  sub_web_nsg_arm_id = local.sub_web_nsg_exists ? try(local.sub_web_nsg.arm_id, "") : ""
+  sub_web_nsg_name   = local.sub_web_nsg_exists ? "" : try(local.sub_web_nsg.name, "nsg-web")
+  sub_web_nsg_deployed = try(local.sub_web_defined ? (
+    local.sub_web_nsg_exists ? data.azurerm_network_security_group.nsg-web[0] : azurerm_network_security_group.nsg-web[0]) : (
+  local.sub_app_nsg_exists ? data.azurerm_network_security_group.nsg-app[0] : azurerm_network_security_group.nsg-app[0]), null)
+
   application_sid          = try(var.application.sid, "HN1")
   enable_deployment        = try(var.application.enable_deployment, false)
   scs_instance_number      = try(var.application.scs_instance_number, "01")
@@ -50,7 +71,7 @@ locals {
 
   app_ostype = try(var.application.os.os_type, "Linux")
 
-  authentication = try(var.application.authentication, 
+  authentication = try(var.application.authentication,
     {
       "type"     = upper(local.app_ostype) == "LINUX" ? "key" : "password"
       "username" = "azureadm"
