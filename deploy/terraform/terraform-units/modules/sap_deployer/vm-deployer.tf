@@ -47,8 +47,8 @@ resource "azurerm_role_assignment" "deployer" {
 =======
 // User defined identity for all Deployer
 resource "azurerm_user_assigned_identity" "deployer" {
-  resource_group_name = azurerm_resource_group.deployer.name
-  location            = azurerm_resource_group.deployer.location
+  resource_group_name = azurerm_resource_group.deployer[0].name
+  location            = azurerm_resource_group.deployer[0].location
   name                = format("%s-msi-%s", "deployer", local.postfix)
 }
 
