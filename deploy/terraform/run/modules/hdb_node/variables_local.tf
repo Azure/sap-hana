@@ -137,7 +137,11 @@ locals {
 
 # Imports HANA database sizing information
 locals {
+<<<<<<< HEAD:deploy/terraform/run/modules/hdb_node/variables_local.tf
   sizes = jsondecode(file("${path.module}/../../../../configs/hdb_sizes.json"))
+=======
+  sizes = jsondecode(file("${path.root}/../../configs/hdb_sizes.json"))
+>>>>>>> Restructure the codebase (#657):deploy/terraform/modules/hdb_node/variables_local.tf
 }
 
 locals {
