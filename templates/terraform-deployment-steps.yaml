@@ -29,10 +29,14 @@ steps:
     displayName: "Prepare input JSON"
   - script: |
 <<<<<<< HEAD
+<<<<<<< HEAD
       cd deploy/terraform/run/sap_landscape
 =======
       cd deploy/terraform/run
 >>>>>>> Restructure the codebase (#657)
+=======
+      cd deploy/terraform/run/sap_landscape
+>>>>>>> restructure the codebase (#659)
       mkdir default
       cat <<- EOF > default/export-clustering-sp-details.sh
         export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
@@ -44,6 +48,7 @@ steps:
   - script: |
       echo "Terraform Deployment in Progress..."
 <<<<<<< HEAD
+<<<<<<< HEAD
       cd deploy/terraform/run/sap_landscape
       terraform -version
       terraform init
@@ -54,6 +59,12 @@ steps:
       terraform init
       terraform apply -auto-approve -var-file=../../../templates/tempGen/${{parameters.testCaseName}}.json
 >>>>>>> Restructure the codebase (#657)
+=======
+      cd deploy/terraform/run/sap_landscape
+      terraform -version
+      terraform init
+      terraform apply -auto-approve -var-file=../../../../templates/tempGen/${{parameters.testCaseName}}.json
+>>>>>>> restructure the codebase (#659)
     displayName: 'Terraform Deployment'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
