@@ -27,10 +27,14 @@ readonly auth_script='set-sp.sh'
 readonly input_file_term='<JSON template name>'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 readonly target_code="${target_path}/terraform/run/sap_landscape"
 =======
 readonly target_code="${target_path}/terraform/run/"
 >>>>>>> Restructure the codebase (#657)
+=======
+readonly target_code="${target_path}/terraform/run/sap_landscape"
+>>>>>>> restructure the codebase (#659)
 
 
 function main()
