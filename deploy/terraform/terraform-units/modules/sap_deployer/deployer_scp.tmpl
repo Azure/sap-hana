@@ -1,0 +1,7 @@
+%{~ for index, deployer in deployers ~}
+ssh -i ${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]} "mkdir -p ~/.deployer/"
+%{ endfor ~}
+
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/.deployer/deployer_terraform.tfstate
+%{ endfor ~}
