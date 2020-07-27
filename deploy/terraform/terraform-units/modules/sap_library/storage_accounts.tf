@@ -20,7 +20,11 @@ resource "azurerm_storage_account" "storage-tfstate" {
   account_tier              = local.sa_tfstate_account_tier
   account_kind              = local.sa_tfstate_account_kind
   enable_https_traffic_only = local.sa_tfstate_enable_secure_transfer
-  delete_retention_policy   = local.sa_tfstate_delete_retention_policy
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+  }
 }
 
 // Creates the storage container inside the storage account for tfstate
@@ -72,7 +76,7 @@ resource "azurerm_storage_account" "storage-sapbits" {
   account_tier              = local.sa_sapbits_account_tier
   account_kind              = local.sa_sapbits_account_kind
   enable_https_traffic_only = local.sa_sapbits_enable_secure_transfer
-  delete_retention_policy   = local.sa_sapbits_delete_retention_policy
+  // TODO: soft delete for file share
 }
 
 // Creates the storage container inside the storage account for SAP bits
