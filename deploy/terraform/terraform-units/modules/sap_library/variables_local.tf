@@ -24,6 +24,7 @@ locals {
     sa_sapbits_key                      = local.sa_sapbits_exists ? try(var.storage_account_sapbits.Storage_access_key, "") : ""
     sa_sapbits_arm_id                   = local.sa_sapbits_exists ? try(var.storage_account_sapbits.arm_id, "") : ""
     sa_sapbits_enable_secure_transfer   = true
+    sa_sapbits_delete_retention_policy  = 7
 
     // Storage account for tfstate, json and deployer
     sa_tfstate_exists                   = try(var.storage_account_tfstate.is_existing, false)
@@ -35,6 +36,7 @@ locals {
     sa_tfstate_key                      = local.sa_sapbits_exists ? try(var.storage_account_tfstate.Storage_access_key, "") : ""
     sa_tfstate_arm_id                   = local.sa_sapbits_exists ? try(var.storage_account_tfstate.arm_id, "") : ""
     sa_tfstate_enable_secure_transfer   = true
+    sa_tfstate_delete_retention_policy  = 7
     sa_tfstate_container_name           = "tfstate"
     sa_json_container_name              = "json"
     sa_deployer_container_name          = "deployer"
