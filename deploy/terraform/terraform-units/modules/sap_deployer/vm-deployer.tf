@@ -37,9 +37,18 @@ resource "azurerm_user_assigned_identity" "deployer" {
 
 data "azurerm_subscription" "primary" {}
 data "azurerm_client_config" "current" {}
-resource "azurerm_role_assignment" "deployer" {
+
+// Add role to be able to deploy resources
+resource "azurerm_role_assignment" "sub_contributor" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.deployer.principal_id
+}
+
+// Add role to be able to create lock on rg 
+resource "azurerm_role_assignment" "sub_user_admin" {
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "User Access Administrator"
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
 }
 
@@ -150,9 +159,11 @@ resource "null_resource" "prepare-deployer" {
       "sudo sh -c \"echo export ARM_TENANT_ID=${data.azurerm_subscription.primary.tenant_id} >> /etc/profile.d/deploy_server.sh\"",
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
-      // Installs Git
+      // Install Git
       "sudo apt update",
       "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      // install jq
+      "sudo apt -y install jq=1.5+dfsg-2",
       // Install pip3
       "sudo apt -y install python3-pip",
       // Installs Ansible
