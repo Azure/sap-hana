@@ -30,7 +30,7 @@ locals {
   sub_db_nsg_name   = local.sub_db_nsg_exists ? "" : try(local.var_sub_db_nsg.name, "nsg-db")
 
   # Imports database sizing information
-  sizes = jsondecode(file("${path.module}/../../../../configs/anydb_sizes.json"))
+  sizes = jsondecode(file("${path.module}/../../../../../configs/anydb_sizes.json"))
 
   # PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null

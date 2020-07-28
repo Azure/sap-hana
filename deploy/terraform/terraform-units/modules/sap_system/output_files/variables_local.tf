@@ -79,6 +79,10 @@ variable "any-database-info" {
   description = "Updated anydb database json"
 }
 
+variable "deployers" {
+  description = "Details of the deployer(s)"
+}
+
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address

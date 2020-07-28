@@ -13,7 +13,6 @@ variable "scenario" {
   default     = "HANA Database"
 }
 
-
 # Set defaults
 locals {
   hdb_list = [
@@ -39,4 +38,9 @@ locals {
   file_hosts     = fileexists("${terraform.workspace}/ansible_config_files/hosts") ? file("${terraform.workspace}/ansible_config_files/hosts") : ""
   file_hosts_yml = fileexists("${terraform.workspace}/ansible_config_files/hosts.yml") ? file("${terraform.workspace}/ansible_config_files/hosts.yml") : ""
   file_output    = fileexists("${terraform.workspace}/ansible_config_files/output.json") ? file("${terraform.workspace}/ansible_config_files/output.json") : ""
+}
+
+// Import deployer information for ansible.tf
+locals {
+  import_deployer = module.deployer.import_deployer
 }

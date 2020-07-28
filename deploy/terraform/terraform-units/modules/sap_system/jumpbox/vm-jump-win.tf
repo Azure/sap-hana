@@ -30,8 +30,8 @@ resource "azurerm_network_interface" "jump-win" {
 
   ip_configuration {
     name                          = "${local.vm-jump-win[count.index].name}-nic1-ip"
-    subnet_id                     = var.subnet-mgmt[0].id
-    private_ip_address            = local.sub_mgmt_exists ? local.vm-jump-win[count.index].private_ip_address : lookup(local.vm-jump-win[count.index], "private_ip_address", false) != false ? local.vm-jump-win[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4))
+    subnet_id                     = var.subnet-mgmt.id
+    private_ip_address            = local.vm-jump-win[count.index].private_ip_address
     private_ip_address_allocation = "static"
     public_ip_address_id          = azurerm_public_ip.jump-win[count.index].id
   }
@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "jump-win" {
 resource "azurerm_network_interface_security_group_association" "jump-win" {
   count                     = length(local.vm-jump-win)
   network_interface_id      = azurerm_network_interface.jump-win[count.index].id
-  network_security_group_id = var.nsg-mgmt[0].id
+  network_security_group_id = var.nsg-mgmt.id
 }
 
 # Manages Windows Virtual Machine for Windows jumpboxes

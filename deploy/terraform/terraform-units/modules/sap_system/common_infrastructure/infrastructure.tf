@@ -19,15 +19,6 @@ data "azurerm_resource_group" "resource-group" {
 
 # VNETs ==========================================================================================================
 
-# Creates the management VNET
-resource "azurerm_virtual_network" "vnet-management" {
-  count               = local.vnet_mgmt_exists ? 0 : 1
-  name                = local.vnet_mgmt_name
-  location            = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  address_space       = [local.vnet_mgmt_addr]
-}
-
 # Creates the SAP VNET
 resource "azurerm_virtual_network" "vnet-sap" {
   count               = local.vnet_sap_exists ? 0 : 1
@@ -37,13 +28,6 @@ resource "azurerm_virtual_network" "vnet-sap" {
   address_space       = [local.vnet_sap_addr]
 }
 
-# Imports data of existing management VNET
-data "azurerm_virtual_network" "vnet-management" {
-  count               = local.vnet_mgmt_exists ? 1 : 0
-  name                = split("/", local.vnet_mgmt_arm_id)[8]
-  resource_group_name = split("/", local.vnet_mgmt_arm_id)[4]
-}
-
 # Imports data of existing SAP VNET
 data "azurerm_virtual_network" "vnet-sap" {
   count               = local.vnet_sap_exists ? 1 : 0
@@ -51,51 +35,23 @@ data "azurerm_virtual_network" "vnet-sap" {
   resource_group_name = split("/", local.vnet_sap_arm_id)[4]
 }
 
-# SUBNETs ========================================================================================================
-
-# Creates mgmt subnet of management VNET
-resource "azurerm_subnet" "subnet-mgmt" {
-  count                = local.sub_mgmt_exists ? 0 : 1
-  name                 = local.sub_mgmt_name
-  resource_group_name  = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].resource_group_name : azurerm_virtual_network.vnet-management[0].resource_group_name
-  virtual_network_name = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].name : azurerm_virtual_network.vnet-management[0].name
-  address_prefixes     = [local.sub_mgmt_prefix]
-}
-
-# Imports data of existing mgmt subnet
-data "azurerm_subnet" "subnet-mgmt" {
-  count                = local.sub_mgmt_exists ? 1 : 0
-  name                 = split("/", local.sub_mgmt_arm_id)[10]
-  resource_group_name  = split("/", local.sub_mgmt_arm_id)[4]
-  virtual_network_name = split("/", local.sub_mgmt_arm_id)[8]
-}
-
-# Associates mgmt nsg to mgmt subnet
-resource "azurerm_subnet_network_security_group_association" "Associate-nsg-mgmt" {
-  count                     = signum((local.vnet_mgmt_exists ? 0 : 1) + (local.sub_mgmt_nsg_exists ? 0 : 1))
-  subnet_id                 = local.sub_mgmt_exists ? data.azurerm_subnet.subnet-mgmt[0].id : azurerm_subnet.subnet-mgmt[0].id
-  network_security_group_id = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg-mgmt[0].id : azurerm_network_security_group.nsg-mgmt[0].id
-}
-
 # VNET PEERINGs ==================================================================================================
 
 # Peers management VNET to SAP VNET
 resource "azurerm_virtual_network_peering" "peering-management-sap" {
-  count                        = signum((local.vnet_mgmt_exists ? 0 : 1) + (local.vnet_sap_exists ? 0 : 1))
-  name                         = substr("${local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].resource_group_name : azurerm_virtual_network.vnet-management[0].resource_group_name}_${local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].name : azurerm_virtual_network.vnet-management[0].name}-${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name}_${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name}",0,80)
-  resource_group_name          = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].resource_group_name : azurerm_virtual_network.vnet-management[0].resource_group_name
-  virtual_network_name         = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].name : azurerm_virtual_network.vnet-management[0].name
+  name                         = substr("${var.vnet-mgmt.resource_group_name}_${var.vnet-mgmt.name}-${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name}_${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name}", 0, 80)
+  resource_group_name          = var.vnet-mgmt.resource_group_name
+  virtual_network_name         = var.vnet-mgmt.name
   remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].id : azurerm_virtual_network.vnet-sap[0].id
   allow_virtual_network_access = true
 }
 
 # Peers SAP VNET to management VNET
 resource "azurerm_virtual_network_peering" "peering-sap-management" {
-  count                        = signum((local.vnet_mgmt_exists ? 0 : 1) + (local.vnet_sap_exists ? 0 : 1))
-  name                         = substr("${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name}_${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name}-${local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].resource_group_name : azurerm_virtual_network.vnet-management[0].resource_group_name}_${local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].name : azurerm_virtual_network.vnet-management[0].name}",0,80)
+  name                         = substr("${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name}_${local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name}-${var.vnet-mgmt.resource_group_name}_${var.vnet-mgmt.name}", 0, 80)
   resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name         = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
-  remote_virtual_network_id    = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-management[0].id : azurerm_virtual_network.vnet-management[0].id
+  remote_virtual_network_id    = var.vnet-mgmt.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }

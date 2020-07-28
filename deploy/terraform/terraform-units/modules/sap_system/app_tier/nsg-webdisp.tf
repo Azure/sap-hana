@@ -44,7 +44,7 @@ resource "azurerm_network_security_rule" "web" {
   direction                    = "Inbound"
   access                       = "Allow"
   protocol                     = "Tcp"
-  source_address_prefixes      = var.subnet-mgmt[0].address_prefixes
+  source_address_prefixes      = var.subnet-mgmt.address_prefixes
   source_port_range            = "*"
   destination_address_prefixes = local.sub_web_deployed.address_prefixes
   destination_port_range       = local.nsg-ports.web[count.index].port

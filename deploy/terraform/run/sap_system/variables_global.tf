@@ -14,7 +14,7 @@ variable "infrastructure" {
 }
 
 variable "jumpboxes" {
-  description = "Details of the jumpboxes and RTI box"
+  description = "Details of the jumpboxes"
 }
 
 variable "options" {
