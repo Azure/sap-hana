@@ -7,6 +7,10 @@ module "deployer" {
   source = "../../terraform-units/modules/sap_system/deployer"
 }
 
+module "saplibrary" {
+  source = "../../terraform-units/modules/sap_system/saplibrary"
+}
+
 module "common_infrastructure" {
   source              = "../../terraform-units/modules/sap_system/common_infrastructure"
   is_single_node_hana = "true"
@@ -110,7 +114,9 @@ module "output_files" {
   software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
-  storage-sapbits              = module.common_infrastructure.storage-sapbits
+  storage-sapbits              = module.saplibrary.saplibrary
+  file_share_name              = module.saplibrary.file_share_name
+  storagecontainer-sapbits     = module.saplibrary.storagecontainer-sapbits
   nics-iscsi                   = module.common_infrastructure.nics-iscsi
   infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
   software_w_defaults          = module.common_infrastructure.software_w_defaults

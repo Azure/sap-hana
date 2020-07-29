@@ -18,10 +18,6 @@ output "storage-bootdiag" {
   value = azurerm_storage_account.storage-bootdiag
 }
 
-output "storage-sapbits" {
-  value = local.sa_sapbits_exists ? data.azurerm_storage_account.storage-sapbits : azurerm_storage_account.storage-sapbits
-}
-
 output "random-id" {
   value = random_id.random-id
 }

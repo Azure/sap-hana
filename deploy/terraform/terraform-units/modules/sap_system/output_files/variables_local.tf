@@ -38,6 +38,14 @@ variable "storage-sapbits" {
   description = "Details of the storage account for SAP bits"
 }
 
+variable "file_share_name" {
+  description = "Name of the file share for SAP bits"
+}
+
+variable "storagecontainer-sapbits" {
+  description = "Details of the storage container for SAP bits"
+}
+
 variable "nics-iscsi" {
   description = "NICs of ISCSI target servers"
 }

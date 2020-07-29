@@ -88,10 +88,10 @@ resource "local_file" "output-json" {
     ),
     "software" = merge(var.software_w_defaults, {
       storage_account_sapbits = {
-        name                = var.storage-sapbits[0].name,
-        storage_access_key  = var.storage-sapbits[0].primary_access_key,
-        file_share_name     = var.software_w_defaults.storage_account_sapbits.file_share_name
-        blob_container_name = var.software_w_defaults.storage_account_sapbits.blob_container_name
+        name                = var.storage-sapbits.name,
+        storage_access_key  = var.storage-sapbits.primary_access_key,
+        file_share_name     = var.file_share_name
+        blob_container_name = try(var.storagecontainer-sapbits.name, null)
       }
     })
     "options" = var.options

@@ -67,40 +67,6 @@ resource "random_id" "random-id" {
   byte_length = 4
 }
 
-# Creates storage account for storing SAP Bits
-resource "azurerm_storage_account" "storage-sapbits" {
-  count                     = local.sa_sapbits_exists ? 0 : 1
-  name                      = local.sa_name
-  resource_group_name       = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  location                  = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  account_replication_type  = "LRS"
-  account_tier              = local.sa_account_tier
-  account_kind              = local.sa_account_kind
-  enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
-}
-
-# Creates the storage container inside the storage account for SAP bits
-resource "azurerm_storage_container" "storagecontainer-sapbits" {
-  count                 = local.sa_sapbits_exists ? 0 : (local.sa_blob_container_name == "null" ? 0 : 1)
-  name                  = local.sa_blob_container_name
-  storage_account_name  = azurerm_storage_account.storage-sapbits[0].name
-  container_access_type = local.sa_container_access_type
-}
-
-# Creates file share inside the storage account for SAP bits
-resource "azurerm_storage_share" "fileshare-sapbits" {
-  count                = local.sa_sapbits_exists ? 0 : (local.sa_file_share_name == "" ? 0 : 1)
-  name                 = local.sa_file_share_name
-  storage_account_name = azurerm_storage_account.storage-sapbits[0].name
-}
-
-# Imports existing storage account to use for SAP bits
-data "azurerm_storage_account" "storage-sapbits" {
-  count               = local.sa_sapbits_exists ? 1 : 0
-  name                = split("/", var.software.storage_account_sapbits.arm_id)[8]
-  resource_group_name = split("/", var.software.storage_account_sapbits.arm_id)[4]
-}
-
 # Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storage-bootdiag" {
   name                      = "sabootdiag${random_id.random-id.hex}"

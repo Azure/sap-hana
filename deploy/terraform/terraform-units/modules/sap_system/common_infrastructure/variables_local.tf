@@ -222,18 +222,6 @@ locals {
     }
   }
 
-  # Storage account for sapbits
-  sa_sapbits_exists           = try(var.software.storage_account_sapbits.is_existing, false)
-  sa_account_tier             = local.sa_sapbits_exists ? "" : try(var.software.storage_account_sapbits.account_tier, "Premium")
-  sa_account_replication_type = local.sa_sapbits_exists ? "" : try(var.software.storage_account_sapbits.account_replication_type, "LRS")
-  sa_account_kind             = local.sa_sapbits_exists ? "" : try(var.software.storage_account_sapbits.account_kind, "FileStorage")
-  sa_file_share_name          = "bits"
-  sa_blob_container_name      = "null"
-  sa_container_access_type    = "blob"
-  sa_name                     = local.sa_sapbits_exists ? try(var.software.storage_account_sapbits.Storage_account_name, "") : "sapbits${random_id.random-id.hex}"
-  sa_key                      = local.sa_sapbits_exists ? try(var.software.storage_account_sapbits.Storage_access_key, "") : ""
-  sa_arm_id                   = local.sa_sapbits_exists ? try(var.software.storage_account_sapbits.arm_id, "") : ""
-
   # Downloader
   sap_user     = try(var.software.downloader.credentials.sap_user, "sap_smp_user")
   sap_password = try(var.software.downloader.credentials.sap_password, "sap_smp_password")
@@ -287,17 +275,6 @@ locals {
 
   //---- Update software with defaults ----//
   software = merge(var.software, {
-    storage_account_sapbits = {
-      is_existing              = local.sa_sapbits_exists,
-      account_tier             = local.sa_account_tier,
-      account_replication_type = local.sa_account_replication_type,
-      account_kind             = local.sa_account_kind,
-      file_share_name          = local.sa_file_share_name,
-      blob_container_name      = local.sa_blob_container_name,
-      Storage_account_name     = local.sa_name,
-      Storage_access_key       = local.sa_key,
-      arm_id                   = local.sa_arm_id
-    },
     downloader = local.downloader
   })
 }
