@@ -31,7 +31,7 @@ resource "azurerm_network_interface" "jump-linux" {
   ip_configuration {
     name                          = "${local.vm-jump-linux[count.index].name}-nic1-ip"
     subnet_id                     = var.subnet-mgmt[0].id
-    private_ip_address            = var.infrastructure.vnets.management.subnet_mgmt.is_existing ? local.vm-jump-linux[count.index].private_ip_address : lookup(local.vm-jump-linux[count.index], "private_ip_address", false) != false ? local.vm-jump-linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4 + length(local.vm-jump-win)))
+    private_ip_address            = local.sub_mgmt_exists ? local.vm-jump-linux[count.index].private_ip_address : lookup(local.vm-jump-linux[count.index], "private_ip_address", false) != false ? local.vm-jump-linux[count.index].private_ip_address : cidrhost(var.infrastructure.vnets.management.subnet_mgmt.prefix, (count.index + 4 + length(local.vm-jump-win)))
     private_ip_address_allocation = "static"
     public_ip_address_id          = azurerm_public_ip.jump-linux[count.index].id
   }
