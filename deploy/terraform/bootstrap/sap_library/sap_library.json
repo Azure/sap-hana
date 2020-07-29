@@ -10,16 +10,37 @@
     "storage_account_sapbits": {
         "is_existing": "false",
         "arm_id": "",
-        "account_tier": "Premium",
+        "account_tier": "Standard",
         "account_replication_type": "LRS",
-        "account_kind": "FileStorage",
-        "file_share_name": "bits"
+        "account_kind": "StorageV2",
+        "file_share": {
+            "enable_deployment": true,
+            "is_existing": "false",
+            "name": "bits"
+        },
+        "sapbits_blob_container": {
+            "enable_deployment": false,
+            "is_existing": "false",
+            "name": "bits-container"
+        }
     },
     "storage_account_tfstate": {
         "is_existing": "false",
         "arm_id": "",
         "account_tier": "Standard",
         "account_replication_type": "LRS",
-        "account_kind": "StorageV2"
+        "account_kind": "StorageV2",
+        "json_blob_container": {
+            "is_existing": "false"
+        },
+        "saplibrary_blob_container": {
+            "is_existing": "false"
+        },
+        "deployer_blob_container": {
+            "is_existing": "false"
+        },
+        "tfstate_blob_container": {
+            "is_existing": "false"
+        }
     }
 }

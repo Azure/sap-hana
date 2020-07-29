@@ -28,12 +28,12 @@ function sap_library_remote_backend_init(){
     cd ..
 
     terraform init -force-copy \
-    -backend-config "resource_group_name=${saplibrary-resource-group}" \
-    -backend-config "storage_account_name=${tfstate-storage-account-name}" \
-    -backend-config "container_name=saplibrary" \
-    -backend-config "key=saplibrary.terraform.tfstate"
+    -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
+    -backend-config "storage_account_name=${tfstate_storage_account_name}" \
+    -backend-config "container_name=${storagecontainer_saplibrary_name}" \
+    -backend-config "key=${saplibrary_tfstate_name}"
 
-    terraform state push "saplibrary.terraform.tfstate"
+    terraform state push "${saplibrary_tfstate_name}"
 }
 
 main "$@"

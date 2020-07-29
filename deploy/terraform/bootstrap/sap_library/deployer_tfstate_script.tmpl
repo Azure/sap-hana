@@ -27,12 +27,12 @@ function deployer_remote_backend_init(){
     cd ..
 
     terraform init -force-copy \
-    -backend-config "resource_group_name=${saplibrary-resource-group}" \
-    -backend-config "storage_account_name=${tfstate-storage-account-name}" \
-    -backend-config "container_name=deployer" \
-    -backend-config "key=deployer.terraform.tfstate"
+    -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
+    -backend-config "storage_account_name=${tfstate_storage_account_name}" \
+    -backend-config "container_name=${storagecontainer_deployer_name}" \
+    -backend-config "key=${deployer_tfstate_name}"
 
-    terraform state push "deployer.terraform.tfstate"
+    terraform state push "${deployer_tfstate_name}"
 }
 
 main "$@"
