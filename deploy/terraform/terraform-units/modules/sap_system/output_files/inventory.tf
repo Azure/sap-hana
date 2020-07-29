@@ -119,7 +119,8 @@ resource "local_file" "ansible-inventory" {
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes
+    ips-anydbnodes        = local.ips-anydbnodes,
+    deployers             = var.deployers
     }
   )
   filename             = "${terraform.workspace}/ansible_config_files/hosts"
@@ -144,7 +145,8 @@ resource "local_file" "ansible-inventory-yml" {
     ips-app               = local.ips-app,
     ips-web               = local.ips-web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes
+    ips-anydbnodes        = local.ips-anydbnodes,
+    deployers             = var.deployers
     }
   )
   filename             = "${terraform.workspace}/ansible_config_files/hosts.yml"

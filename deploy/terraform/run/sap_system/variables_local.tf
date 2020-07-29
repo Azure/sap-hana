@@ -13,14 +13,19 @@ variable "scenario" {
   default     = "HANA Database"
 }
 
-
 # Set defaults
 locals {
-  hdb_list = [
+  db_list = [
     for db in var.databases : db
-    if try(db.platform, "NONE") == "HANA"
+    if try(db.platform, "NONE") != "NONE"
   ]
-  hana-sid = try(local.hdb_list[0].instance.sid, "")
+
+  db-sid = length(local.db_list) == 0 ? "" : try(local.db_list[0].instance.sid, local.db_list[0].platform == "HANA" ? "HN1" : "OR1")
+
+  app-sid = try(var.application.enable_deployment, false) ? try(var.application.sid, "") : ""
+
+  // TODO: add sap_lansdscape ENV to the path if stored local, or remote in sap_libarary
+  ansible_path = local.app-sid != "" ? local.app-sid : (local.db-sid != "" ? local.db-sid : ".")
 
   # Options
   enable_secure_transfer = try(var.options.enable_secure_transfer, true)
@@ -39,4 +44,9 @@ locals {
   file_hosts     = fileexists("${terraform.workspace}/ansible_config_files/hosts") ? file("${terraform.workspace}/ansible_config_files/hosts") : ""
   file_hosts_yml = fileexists("${terraform.workspace}/ansible_config_files/hosts.yml") ? file("${terraform.workspace}/ansible_config_files/hosts.yml") : ""
   file_output    = fileexists("${terraform.workspace}/ansible_config_files/output.json") ? file("${terraform.workspace}/ansible_config_files/output.json") : ""
+}
+
+// Import deployer information for ansible.tf
+locals {
+  import_deployer = module.deployer.import_deployer
 }

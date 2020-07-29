@@ -7,6 +7,18 @@ variable "subnet-sap-admin" {
   description = "Information about SAP admin subnet"
 }
 
+variable "vnet-mgmt" {
+  description = "Details about management vnet of deployer(s)"
+}
+
+variable "subnet-mgmt" {
+  description = "Details about management subnet of deployer(s)"
+}
+
+variable "nsg-mgmt" {
+  description = "Details about management nsg of deployer(s)"
+}
+
 # Set defaults
 locals {
 
@@ -76,27 +88,6 @@ locals {
     },
     iscsi_nic_ips = local.iscsi_nic_ips
   })
-
-  # Management vnet
-  var_vnet_mgmt    = try(local.var_infra.vnets.management, {})
-  vnet_mgmt_exists = try(local.var_vnet_mgmt.is_existing, false)
-  vnet_mgmt_arm_id = local.vnet_mgmt_exists ? try(local.var_vnet_mgmt.arm_id, "") : ""
-  vnet_mgmt_name   = local.vnet_mgmt_exists ? "" : try(local.var_vnet_mgmt.name, "vnet-mgmt")
-  vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.var_vnet_mgmt.address_space, "10.0.0.0/16")
-
-  # Management subnet
-  var_sub_mgmt    = try(local.var_vnet_mgmt.subnet_mgmt, {})
-  sub_mgmt_exists = try(local.var_sub_mgmt.is_existing, false)
-  sub_mgmt_arm_id = local.sub_mgmt_exists ? try(local.var_sub_mgmt.arm_id, "") : ""
-  sub_mgmt_name   = local.sub_mgmt_exists ? "" : try(local.var_sub_mgmt.name, "subnet-mgmt")
-  sub_mgmt_prefix = local.sub_mgmt_exists ? "" : try(local.var_sub_mgmt.prefix, "10.0.1.0/24")
-
-  # Management NSG
-  var_sub_mgmt_nsg         = try(local.var_sub_mgmt.nsg, {})
-  sub_mgmt_nsg_exists      = try(local.var_sub_mgmt_nsg.is_existing, false)
-  sub_mgmt_nsg_arm_id      = local.sub_mgmt_nsg_exists ? try(local.var_sub_mgmt_nsg.arm_id, "") : ""
-  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.var_sub_mgmt_nsg.name, "nsg-mgmt")
-  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.var_sub_mgmt_nsg.allowed_ips, [])
 
   # SAP vnet
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
@@ -178,24 +169,6 @@ locals {
       }
     },
     vnets = {
-      management = {
-        is_existing   = local.vnet_mgmt_exists,
-        arm_id        = local.vnet_mgmt_arm_id,
-        name          = local.vnet_mgmt_name,
-        address_space = local.vnet_mgmt_addr,
-        subnet_mgmt = {
-          is_existing = local.sub_mgmt_exists,
-          arm_id      = local.sub_mgmt_arm_id,
-          name        = local.sub_mgmt_name,
-          prefix      = local.sub_mgmt_prefix,
-          nsg = {
-            is_existing = local.sub_mgmt_nsg_exists,
-            arm_id      = local.sub_mgmt_nsg_arm_id,
-            name        = local.sub_mgmt_nsg_name,
-            allowed_ips = local.sub_mgmt_nsg_allowed_ips
-          }
-        }
-      },
       sap = {
         is_existing   = local.vnet_sap_exists,
         arm_id        = local.vnet_sap_arm_id,

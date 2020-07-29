@@ -1,5 +1,5 @@
 output "nics-jumpboxes-linux" {
-  value = concat(azurerm_network_interface.jump-linux, azurerm_network_interface.rti)
+  value = azurerm_network_interface.jump-linux
 }
 
 output "nics-jumpboxes-windows" {
@@ -7,7 +7,7 @@ output "nics-jumpboxes-windows" {
 }
 
 output "public-ips-jumpboxes-linux" {
-  value = concat(azurerm_public_ip.jump-linux, azurerm_public_ip.rti)
+  value = azurerm_public_ip.jump-linux
 }
 
 output "public-ips-jumpboxes-windows" {
@@ -15,19 +15,7 @@ output "public-ips-jumpboxes-windows" {
 }
 
 output "jumpboxes-linux" {
-  value = concat(local.vm-jump-linux, local.rti)
-}
-
-output "rti-info" {
-  value = {
-    authentication    = local.rti[0].authentication,
-    public_ip_address = azurerm_public_ip.rti[0].ip_address
-  }
-}
-
-# Workaround to create dependency betweeen ../main.tf ansible_execution and module jumpbox
-output "prepare-rti" {
-  value = null_resource.prepare-rti
+  value = local.vm-jump-linux
 }
 
 output "vm-windows" {

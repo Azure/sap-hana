@@ -5,11 +5,6 @@
 # Imports current user or service principal profile details
 data "azurerm_client_config" "current" {}
 
-data "external" "current-user" {
-  count   = data.azurerm_client_config.current.object_id == "" ? 1 : 0
-  program = ["az", "ad", "signed-in-user", "show", "--query", "{displayName: displayName,objectId: objectId,objectType: objectType}"]
-}
-
 # Creates Azure key vault
 resource "azurerm_key_vault" "key-vault" {
   count               = length(local.vm-jump-win) > 0 ? 1 : 0
@@ -25,7 +20,7 @@ resource "azurerm_key_vault" "key-vault" {
 
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id == "" ? data.external.current-user[0].result.objectId : data.azurerm_client_config.current.object_id
+    object_id = var.deployer-uai.principal_id
 
     certificate_permissions = [
       "create",
