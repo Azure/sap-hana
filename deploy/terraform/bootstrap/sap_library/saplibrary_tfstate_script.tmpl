@@ -23,6 +23,8 @@ function sap_library_remote_backend_init(){
 
     echo "Start initialize remote backend for sap library"
 
+    cp ${saplibrary_terraform_tfstate_path} ../
+
     cd ..
 
     terraform init -force-copy \
@@ -30,6 +32,8 @@ function sap_library_remote_backend_init(){
     -backend-config "storage_account_name=${tfstate-storage-account-name}" \
     -backend-config "container_name=saplibrary" \
     -backend-config "key=saplibrary.terraform.tfstate"
+
+    terraform state push "saplibrary.terraform.tfstate"
 }
 
 main "$@"

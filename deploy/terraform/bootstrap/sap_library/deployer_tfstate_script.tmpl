@@ -22,7 +22,7 @@ function deployer_remote_backend_init(){
 
     echo "Start initialize remote backend for deployer"
 
-    cp ~/.deployer/terraform.tfstate ../
+    cp ${deployer_terraform_tfstate_path} ../
 
     cd ..
 
@@ -31,6 +31,8 @@ function deployer_remote_backend_init(){
     -backend-config "storage_account_name=${tfstate-storage-account-name}" \
     -backend-config "container_name=deployer" \
     -backend-config "key=deployer.terraform.tfstate"
+
+    terraform state push "deployer.terraform.tfstate"
 }
 
 main "$@"

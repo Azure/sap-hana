@@ -5,6 +5,6 @@
 */
 terraform {
   backend "local" {
-    path = "../../run/sap_library/terraform.tfstate"
+    path = "../../../../../.config/saplibrary.terraform.tfstate"
   }
 }
