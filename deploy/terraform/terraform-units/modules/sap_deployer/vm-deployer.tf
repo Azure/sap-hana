@@ -145,6 +145,8 @@ resource "null_resource" "prepare-deployer" {
 
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
+      // Create config folder
+      "mkdir -p $HOME/.config",
       // Install terraform for all users
       "sudo apt-get install unzip",
       "sudo mkdir -p /opt/terraform/terraform_0.12.28",
