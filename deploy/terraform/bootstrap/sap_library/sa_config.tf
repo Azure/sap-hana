@@ -8,6 +8,6 @@ resource "local_file" "sa-config" {
     tfstate-storage-account-name = module.sap_library.tfstate-storage-account-name
     }
   )
-  filename        = "${path.root}/../.deploy/sa_config.json"
+  filename        = pathexpand("~/.config/sa_config.json")
   file_permission = "0660"
 }
