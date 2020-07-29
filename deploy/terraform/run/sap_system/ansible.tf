@@ -22,10 +22,17 @@ resource "null_resource" "prepare_deployer" {
     timeout     = var.ssh-timeout
   }
 
+  // Create path if not exists
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /home/${local.import_deployer[count.index].authentication.username}/${local.ansible_path}"
+    ]
+  }
+
   // Copies output.json and inventory file for ansbile on deployer(s).
   provisioner "file" {
     source      = "${terraform.workspace}/ansible_config_files/"
-    destination = "/home/${local.import_deployer[count.index].authentication.username}"
+    destination = "/home/${local.import_deployer[count.index].authentication.username}/${local.ansible_path}/"
   }
 
   // Copies Clustering Service Principal for ansbile on deployer(s).
@@ -35,7 +42,7 @@ resource "null_resource" "prepare_deployer" {
       Later in the execution, the script is sourced, but will have no impact if it has been defaulted
     */
     content     = fileexists("${terraform.workspace}/export-clustering-sp-details.sh") ? file("${terraform.workspace}/export-clustering-sp-details.sh") : "# default empty clustering auth script"
-    destination = "/home/${local.import_deployer[count.index].authentication.username}/export-clustering-sp-details.sh"
+    destination = "/home/${local.import_deployer[count.index].authentication.username}/${local.ansible_path}/export-clustering-sp-details.sh"
   }
 }
 
@@ -59,7 +66,7 @@ resource "null_resource" "ansible_playbook" {
       "curl -i -H \"Metadata: \"true\"\" -H \"user-agent: SAP AutoDeploy/${var.auto-deploy-version}; scenario=${var.scenario}; deploy-status=Terraform_finished\" http://169.254.169.254/metadata/instance?api-version=${var.api-version}",
       "export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES",
       "source ~/export-clustering-sp-details.sh",
-      "ansible-playbook -i hosts.yml ~/sap-hana/deploy/ansible/sap_playbook.yml"
+      "ansible-playbook -i ${local.ansible_path}/hosts.yml ~/sap-hana/deploy/ansible/sap_playbook.yml"
     ]
   }
 }
