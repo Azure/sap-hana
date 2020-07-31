@@ -5,3 +5,7 @@ ssh -i ${deployer-ppk}  -o StrictHostKeyChecking=no ${deployer.authentication.us
 %{~ for index, deployer in deployers ~}
 scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../deployer.terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.terraform.tfstate
 %{ endfor ~}
+
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../deployer.json ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.json
+%{ endfor ~}
