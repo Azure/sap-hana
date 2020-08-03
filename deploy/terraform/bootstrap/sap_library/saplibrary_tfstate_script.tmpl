@@ -38,6 +38,16 @@ function validate_saplibrary_tfstate(){
     fi
 }
 
+function validate_saplibrary_remote_state(){
+
+    az login --identity > /dev/null
+    remote_state_exists=$(az storage blob exists -c ${storagecontainer_saplibrary_name} --name ${saplibrary_tfstate_name} --account-name ${tfstate_storage_account_name} | jq -r .exists)
+    if $remote_state_exists; then
+        echo "remote state ${saplibrary_tfstate_name} already exists"
+        exit 0
+    fi
+}
+
 function sap_library_remote_backend_init(){
 
     echo "Start initialize remote backend for sap library"
@@ -45,12 +55,16 @@ function sap_library_remote_backend_init(){
     cp ${saplibrary_terraform_tfstate_path} ../
 
     cd ..
+    
+    rm -r .terraform
 
     terraform init -force-copy \
     -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
     -backend-config "storage_account_name=${tfstate_storage_account_name}" \
     -backend-config "container_name=${storagecontainer_saplibrary_name}" \
     -backend-config "key=${saplibrary_tfstate_name}"
+
+    validate_saplibrary_remote_state
 
     terraform state push "${saplibrary_tfstate_name}"
 }
