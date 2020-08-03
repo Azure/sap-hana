@@ -67,5 +67,5 @@ locals {
     storagecontainer_saplibrary         = local.sa_saplibrary_container_exists ? data.azurerm_storage_container.storagecontainer_saplibrary[0] : azurerm_storage_container.storagecontainer_saplibrary[0]
     storagecontainer_deployer           = local.sa_deployer_container_exists ? data.azurerm_storage_container.storagecontainer_deployer[0] : azurerm_storage_container.storagecontainer_deployer[0]
     storagecontainer_sapbits            = ! local.sa_sapbits_blob_container_enable? null : (local.sa_sapbits_blob_container_exists ? data.azurerm_storage_container.storagecontainer_sapbits[0] : azurerm_storage_container.storagecontainer_sapbits[0])
-    fileshare_sapbits_name              = local.sa_sapbits_file_share_enable? local.sa_sapbits_file_share_name : ""
+    fileshare_sapbits_name              = local.sa_sapbits_file_share_enable? local.sa_sapbits_file_share_name : null
 }

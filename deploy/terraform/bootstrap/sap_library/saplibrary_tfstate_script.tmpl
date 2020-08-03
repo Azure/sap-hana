@@ -34,6 +34,8 @@ function sap_library_remote_backend_init(){
     -backend-config "key=${saplibrary_tfstate_name}"
 
     terraform state push "${saplibrary_tfstate_name}"
+
+    rm "${saplibrary_tfstate_name}"
 }
 
 main "$@"
