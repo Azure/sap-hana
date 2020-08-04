@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# exit immediately if a command fails
+set -o errexit
+
+# exit immediately if an unset variable is used
+set -o nounset
+
+readonly local_file_dir=$(dirname "$BASH_SOURCE")
+
+function main(){
+
+    validate_saplibrary_tfstate
+    validate_saplibrary_remote_state
+    fetch_input_file
+    sap_library_remote_backend_init
+}
+
+function validate_saplibrary_tfstate(){
+
+    printf "%s\n" "Check if terraform.tfstate of sap library exists:"
+
+    if [ ! -f "${saplibrary_terraform_tfstate_path}" ]; then
+        printf "%s\n" "ERROR: ${saplibrary_terraform_tfstate_path} does not exist. Please follow guidance to create or recover it." >&2
+        exit 2
+    else 
+        printf "%s\n" "INFO: ${saplibrary_terraform_tfstate_path} exists."
+    fi
+}
+
+function validate_saplibrary_remote_state(){
+
+    az login --identity > /dev/null
+    remote_state_exists=$(az storage blob exists -c ${storagecontainer_saplibrary_name} --name ${saplibrary_tfstate_name} --account-name ${tfstate_storage_account_name} | jq -r .exists)
+    if $remote_state_exists; then
+        printf "%s\n" "ERROR: remote state ${saplibrary_tfstate_name} already exists. It's only allowed to be pushed once." >&2
+        exit 1
+    fi
+}
+
+function fetch_input_file(){
+    
+    local file_path="${saplibrary_input_path}"
+    
+    if [ ! -f "$${file_path}" ]; then
+        printf "%s\n" "ERROR: File $${file_path} does not exist." >&2
+        exit 1
+    else
+        cp $${file_path} $${local_file_dir}/../
+    fi
+    
+}
+
+function sap_library_remote_backend_init(){
+
+    printf "%s\n" "Start initializing remote backend for sap library"
+
+    cd $${local_file_dir}/../
+
+    cp ${saplibrary_terraform_tfstate_path} ./
+    
+    printf "%s\n" "Clean local .terraform if exists:"
+    
+    rm -rf .terraform
+
+    terraform init -force-copy \
+    -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
+    -backend-config "storage_account_name=${tfstate_storage_account_name}" \
+    -backend-config "container_name=${storagecontainer_saplibrary_name}" \
+    -backend-config "key=${saplibrary_tfstate_name}"
+
+    terraform state push "${saplibrary_tfstate_name}"
+
+<<<<<<< HEAD
+    terraform state rm 'local_file.output_saplibrary_script' 'local_file.output_deployer_script'
+
+    terraform apply -auto-approve -var-file="${storagecontainer_saplibrary_name}.json"
+
+=======
+>>>>>>> Clean local tfstate files after uploading (#680)
+    rm "${saplibrary_tfstate_name}"
+}
+
+main "$@"
