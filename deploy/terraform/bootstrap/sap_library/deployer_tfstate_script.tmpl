@@ -35,6 +35,7 @@ function validate_deployer_tfstate(){
         exit 2
     else 
         echo "${deployer_terraform_tfstate_path} exists."
+        validate_deployer_remote_state
         deployer_remote_backend_init
     fi
 }
@@ -57,6 +58,8 @@ function deployer_remote_backend_init(){
 
     cd ..
 
+    echo "Clean .terraform if exists:"
+
     rm -r .terraform
 
     terraform init -force-copy \
@@ -64,8 +67,6 @@ function deployer_remote_backend_init(){
     -backend-config "storage_account_name=${tfstate_storage_account_name}" \
     -backend-config "container_name=${storagecontainer_deployer_name}" \
     -backend-config "key=${deployer_tfstate_name}"
-
-    validate_deployer_remote_state
 
     terraform state push "${deployer_tfstate_name}"
 

@@ -34,6 +34,7 @@ function validate_saplibrary_tfstate(){
         exit 2
     else 
         echo "${saplibrary_terraform_tfstate_path} exists."
+        validate_saplibrary_remote_state
         sap_library_remote_backend_init
     fi
 }
@@ -56,6 +57,8 @@ function sap_library_remote_backend_init(){
 
     cd ..
     
+    echo "Clean .terraform if exists:"
+    
     rm -r .terraform
 
     terraform init -force-copy \
@@ -64,9 +67,9 @@ function sap_library_remote_backend_init(){
     -backend-config "container_name=${storagecontainer_saplibrary_name}" \
     -backend-config "key=${saplibrary_tfstate_name}"
 
-    validate_saplibrary_remote_state
-
     terraform state push "${saplibrary_tfstate_name}"
+
+    terraform state rm 'local_file.sa_config' 'local_file.output_saplibrary_script' 'local_file.output_deployer_script' 'null_resource.copy_input'
 
     rm "${saplibrary_tfstate_name}"
 }
