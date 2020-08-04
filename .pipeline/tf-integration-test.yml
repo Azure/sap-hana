@@ -63,6 +63,7 @@ stages:
         parameters:
           branch_name: $(sourceBranchName)
           deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          saplib_rg_name: "$(Build.BuildId)-eaus-sap_library"
           sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:

@@ -1,0 +1,28 @@
+steps:
+  - script: |
+      echo "=== Run ansible playbook from deployer ==="
+      ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
+      source /etc/profile.d/deploy_server.sh
+
+      sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
+      repo_dir=$HOME/azure_sap_automated_deployment/sap-hana
+      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg_name}
+
+      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
+      cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
+      
+      echo "=== Run ansible playbook ==="
+      echo "=== This may take quite a while, please be patient ==="
+      ansible-playbook --version
+      export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+      export ANSIBLE_HOST_KEY_CHECKING=False
+      source ${ws_dir}/export-clustering-sp-details.sh
+      cd ~/azure_sap_automated_deployment
+      ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml ${repo_dir}/deploy/ansible/sap_playbook.yml
+      '
+    displayName: "Run Ansible-playbook: Branch ${{parameters.branch_name}}"
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)

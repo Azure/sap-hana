@@ -6,16 +6,12 @@ steps:
 
       sapsystem_rg=${{parameters.sapsystem_rg_name}}
       deployer_rg=${{parameters.deployer_rg_name}}
+      saplib_rg_name=${{parameters.saplib_rg_name}}
 
       #If no osImage provided, deploy SLES12SP5
-      if [ -z "${{parameters.osImage}}" ] 
-      then
-        osImage="'"\"offer\": \"sles-sap-12-sp5\", 
-                \"publisher\": \"SUSE\", 
-                \"sku\": \"gen1\""'"
-      else
-        osImage=${{parameters.osImage}}
-      fi
+      [ -z "${{parameters.osImage_offer}}" ] && osImage_offer="sles-sap-12-sp5" || osImage_offer=${{parameters.osImage_offer}}
+      [ -z "${{parameters.osImage_publisher}}" ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
+      [ -z "${{parameters.osImage_sku}}" ] && osImage_sku="gen1" || osImage_sku=${{parameters.osImage_sku}}
       
       repo_dir=$HOME/$sapsystem_rg/sap-hana
       ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg}
@@ -23,31 +19,55 @@ steps:
       input=${ws_dir}/${sapsystem_rg}.json
       
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
-      mkdir $HOME/${sapsystem_rg}; cd $_
-      git clone https://github.com/Azure/sap-hana.git
-      cd sap-hana && git checkout ${{parameters.branch_name}}
+      if [ ! -d "${repo_dir}" ]
+      then
+        mkdir $HOME/${sapsystem_rg}; cd $_
+        git clone https://github.com/Azure/sap-hana.git
+      fi
+      cd $repo_dir && git checkout ${{parameters.branch_name}}
 
       echo "=== Create workspace ${ws_dir} ==="
       mkdir -p ${ws_dir}; cd $_
       cp ${deployer_ws_dir}/ssh* .
 
-      saplib_rg_name="unit-eaus-sap_library"
+      cat <<- EOF > export-clustering-sp-details.sh
+        export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
+        export SAP_HANA_FENCING_AGENT_TENANT_ID=$(landscape-tenant)
+        export SAP_HANA_FENCING_AGENT_CLIENT_ID=$(hana-pipeline-spn-id)
+        export SAP_HANA_FENCING_AGENT_CLIENT_SECRET=$(hana-pipeline-spn-pw)
+      EOF
+
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg_name} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
-      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
-      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
+      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
 
       buildId=$(Build.BuildId)
-      idx1=${buildId: -1}
-      idx2=${buildId: -2:1}
+      isRelease=${sapsystem_rg%%$buildId*}
+      isSles=${sapsystem_rg%%sles*}
+      
+      # subnet is decided by buildId if it is unit test.
+      # Otherwise, use 10.10.0.0 for sles and 10.10.1.0 for rhel
+      if [ -z "${isRelease}" ]
+      then 
+        idx1=${buildId: -1}
+        idx2=${buildId: -2:1}
+        landscape="$(Build.BuildId)"
+        ha="false"
+      else
+        idx1=10
+        landscape="unit"
+        ha="true"
+        if [ -z "${isSles}" ]
+        then idx2=0
+        else idx2=1
+        fi
+      fi
       sap_vnet_address_space="10.${idx2}.${idx1}.0/25"
       subnet_admin_prefix="10.${idx2}.${idx1}.0/27"
       subnet_db_prefix="10.${idx2}.${idx1}.32/27"
       subnet_iscsi_prefix="10.${idx2}.${idx1}.64/27"
       subnet_app_prefix="10.${idx2}.${idx1}.96/27"
-
-      isIntegrationTest=${sapsystem_rg#ad-sap-system}
-      [ -z "${isIntegrationTest}" ] && landscape="TEST" || landscape="$(Build.BuildId)"
 
       cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
       cat ${ws_dir}/sapsystem.json \
@@ -61,7 +81,10 @@ steps:
       | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
       | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
       | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
-      | jq --arg os "${osImage}" .database[]?.os\ =\ \$os \
+      | jq --arg ha "${ha}" .databases[].high_availability\ =\ \$ha \
+      | jq --arg osImage_offer "${osImage_offer}" .databases[].os.offer\ =\ \$osImage_offer \
+      | jq --arg osImage_publisher "${osImage_publisher}" .databases[].os.publisher\ =\ \$osImage_publisher \
+      | jq --arg osImage_sku "${osImage_sku}" .databases[].os.sku\ =\ \$osImage_sku \
       | jq --arg db_systemdb_password "$(hana-pipeline-db-pwd)" .databases[].credentials.db_systemdb_password\ =\ \$db_systemdb_password \
       | jq --arg os_sidadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sidadm_password\ =\ \$os_sidadm_password \
       | jq --arg os_sapadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sapadm_password\ =\ \$os_sapadm_password \
@@ -74,6 +97,8 @@ steps:
       | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
       | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
       > ${input}
+
+      cat ${input}
       
       echo "=== Deploy sap system from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
