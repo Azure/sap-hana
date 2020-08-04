@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function main(){
+
+    validate_saplibrary_tfstate
+
+}
+
+function validate_saplibrary_tfstate(){
+
+    echo "Check if terraform.tfstate of sap library exists:"
+
+    if [ ! -f "${saplibrary_terraform_tfstate_path}" ]; then
+        echo "${saplibrary_terraform_tfstate_path} does not exist."
+        exit 2
+    else 
+        echo "${saplibrary_terraform_tfstate_path} exists."
+        sap_library_remote_backend_init
+    fi
+}
+
+function sap_library_remote_backend_init(){
+
+    echo "Start initialize remote backend for sap library"
+
+    cp ${saplibrary_terraform_tfstate_path} ../
+
+    cd ..
+
+    terraform init -force-copy \
+    -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
+    -backend-config "storage_account_name=${tfstate_storage_account_name}" \
+    -backend-config "container_name=${storagecontainer_saplibrary_name}" \
+    -backend-config "key=${saplibrary_tfstate_name}"
+
+    terraform state push "${saplibrary_tfstate_name}"
+
+    rm "${saplibrary_tfstate_name}"
+}
+
+main "$@"
