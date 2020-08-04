@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# exit immediately if a command fails
+set -o errexit
+
+# exit immediately if an unset variable is used
+set -o nounset
+
+readonly local_file_dir=$(dirname "$BASH_SOURCE")
+
+function main(){
+
+    validate_deployer_tfstate
+    validate_deployer_remote_state
+    fetch_input_file
+    deployer_remote_backend_init
+}
+
+function validate_deployer_tfstate(){
+
+    printf "%s\n" "Check if terraform.tfstate of deployer exists:"
+
+    if [ ! -f "${deployer_terraform_tfstate_path}" ]; then
+        printf "%s\n" "ERROR: ${deployer_terraform_tfstate_path} does not exist. Please follow guidance to create or recover it." >&2
+        exit 2
+    else 
+        printf "%s\n" "INFO: ${deployer_terraform_tfstate_path} exists."
+    fi
+}
+
+function validate_deployer_remote_state(){
+
+    az login --identity > /dev/null
+    remote_state_exists=$(az storage blob exists -c ${storagecontainer_deployer_name} --name ${deployer_tfstate_name} --account-name ${tfstate_storage_account_name} | jq -r .exists)
+    if $remote_state_exists; then
+        printf "%s\n" "ERROR: remote state ${deployer_tfstate_name} already exists. It's only allowed to be pushed once." >&2
+        exit 1
+    fi
+}
+
+function fetch_input_file(){
+    
+    local file_path="${deployer_input_path}"
+    
+    if [ ! -f "$${file_path}" ]; then
+        printf "%s\n" "ERROR: File $${file_path} does not exist." >&2
+        exit 1
+    else
+        cp $${file_path} $${local_file_dir}/../
+    fi
+    
+}
+
+function deployer_remote_backend_init(){
+
+    printf "%s\n" "Start initializing remote backend for deployer"
+
+    cd $${local_file_dir}/../
+
+    cp ${deployer_terraform_tfstate_path} ./
+
+    printf "%s\n" "Clean local .terraform if exists:"
+
+    rm -rf .terraform
+
+    terraform init -force-copy \
+    -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
+    -backend-config "storage_account_name=${tfstate_storage_account_name}" \
+    -backend-config "container_name=${storagecontainer_deployer_name}" \
+    -backend-config "key=${deployer_tfstate_name}"
+
+    terraform state push "${deployer_tfstate_name}"
+
+<<<<<<< HEAD
+    terraform apply -auto-approve -var-file="${storagecontainer_deployer_name}.json"
+
+    rm "${deployer_tfstate_name}"
+
+=======
+    rm "${deployer_tfstate_name}"
+>>>>>>> Clean local tfstate files after uploading (#680)
+}
+
+main "$@"
