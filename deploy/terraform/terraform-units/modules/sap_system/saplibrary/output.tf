@@ -9,3 +9,11 @@ output "file_share_name" {
 output "storagecontainer-sapbits" {
   value = local.blob_container_exists ? data.azurerm_storage_container.storagecontainer-sapbits[0] : null
 }
+
+output "sid" {
+  value = local.sid
+}
+
+output "landscape_id" {
+  value = local.landscape_id
+}

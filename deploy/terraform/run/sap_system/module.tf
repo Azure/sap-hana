@@ -8,7 +8,15 @@ module "deployer" {
 }
 
 module "saplibrary" {
-  source = "../../terraform-units/modules/sap_system/saplibrary"
+  application    = var.application
+  databases      = var.databases
+  infrastructure = var.infrastructure
+  jumpboxes      = var.jumpboxes
+  options        = var.options
+  software       = var.software
+  ssh-timeout    = var.ssh-timeout
+  sshkey         = var.sshkey
+  source         = "../../terraform-units/modules/sap_system/saplibrary"
 }
 
 module "common_infrastructure" {

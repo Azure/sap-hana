@@ -1,0 +1,67 @@
+{
+  "infrastructure": {
+    "landscape": "PROD",
+    "region": "eastus",
+    "resource_group": {
+      "is_existing": "false",
+      "arm_id": "",
+      "name": "azure-sap-system-rg"
+    }
+  },
+  "jumpboxes": {
+    "windows": [],
+    "linux": []
+  },
+  "databases": [
+    {
+      "platform": "HANA",
+      "high_availability": false,
+      "db_version": "2.00.050",
+      "credentials": {
+        "db_systemdb_password": "<db_systemdb_password>",
+        "os_sidadm_password": "<os_sidadm_password>",
+        "os_sapadm_password": "<os_sapadm_password>",
+        "xsa_admin_password": "<xsa_admin_password>",
+        "cockpit_admin_password": "<cockpit_admin_password>",
+        "ha_cluster_password": "<ha_cluster_password>"
+      }
+    }
+  ],
+  "application": {
+    "enable_deployment": false,
+    "sid": "PRD",
+    "scs_instance_number": "01",
+    "ers_instance_number": "02",
+    "scs_high_availability": false,
+    "application_server_count": 1,
+    "webdispatcher_count": 1,
+    "authentication" : {
+      "type": "key",
+      "username": "azureadm"
+    }
+  },
+  "software": {
+    "downloader": {
+      "credentials": {
+        "sap_user": "<sap_user>",
+        "sap_password": "<sap_password>"
+      },
+      "scenarios": [
+        {
+          "scenario_type": "DB",
+          "product_name": "HANA",
+          "product_version": "2.0"
+        }
+      ]
+    }
+  },
+  "sshkey": {
+    "path_to_public_key": "~/.ssh/id_rsa.pub",
+    "path_to_private_key": "~/.ssh/id_rsa"
+  },
+  "options": {
+    "enable_secure_transfer": true,
+    "ansible_execution": false,
+    "enable_prometheus": true
+  }
+}
