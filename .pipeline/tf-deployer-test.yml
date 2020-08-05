@@ -17,11 +17,16 @@ stages:
   pool:
     vmImage: "ubuntu-18.04"
   jobs:
+<<<<<<< HEAD
   - job: deployerTest
+=======
+  - job: createDeployer
+>>>>>>> add deployer pipeline
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/deployer/create-deployer-steps.yml
         parameters:
+<<<<<<< HEAD
           branch_name: $(targetBranchName)
           deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/deployer/validate-deployer-steps.yml
@@ -35,3 +40,9 @@ stages:
         parameters:
           branch_name: $(sourceBranchName)
           deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"
+=======
+          deployer_rg_name: "ad-sap-deployer-$(Build.BuildId)"
+      - template: templates/deployer/delete-deployer-steps.yml
+        parameters:
+          deployer_rg_name: "ad-sap-deployer-$(Build.BuildId)"
+>>>>>>> add deployer pipeline

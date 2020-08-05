@@ -1,5 +1,6 @@
 steps:
   - script: |
+<<<<<<< HEAD
       repo_path=$(pwd)
       deployer_rg=${{parameters.deployer_rg_name}}
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/$deployer_rg
@@ -10,6 +11,10 @@ steps:
       mkdir -p $ws_dir; cd $_
 
       cp $repo_path/deploy/terraform/bootstrap/sap_deployer/deployer.json deployer.json
+=======
+      cd deploy/terraform/bootstrap/sap_deployer
+      deployer_rg=${{parameters.deployer_rg_name}}
+>>>>>>> add deployer pipeline
       cat deployer.json | jq --arg allowed_ip "$(agent_ip)" --arg rg_name "$deployer_rg" '.infrastructure += {
         resource_group: {
           name: $rg_name
@@ -23,6 +28,7 @@ steps:
               }
             }
           }
+<<<<<<< HEAD
         }' > $input
       
       echo "=== Start terraform apply for new deployer ==="
@@ -31,8 +37,23 @@ steps:
       terraform apply -auto-approve -var-file=$input -state=$deployer_rg.terraform.tfstate $repo_path/deploy/terraform/bootstrap/sap_deployer/ 
     displayName: "Deploy deployer: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
+=======
+        }' > updated_deployer.json
+      cp -f updated_deployer.json deployer.json
+      
+      echo "=== Start terraform apply for new deployer ==="
+      terraform -version
+      terraform init
+      terraform apply -auto-approve -var-file=deployer.json
+    name: setDeployerRg
+    displayName: "Deploy new deployer"
+>>>>>>> add deployer pipeline
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
       ARM_TENANT_ID: $(landscape-tenant)
+<<<<<<< HEAD
       ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+=======
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+>>>>>>> add deployer pipeline

@@ -6,4 +6,8 @@ variables:
   ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
     targetBranchName: $[ variables['System.PullRequest.TargetBranch'] ]
   ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+<<<<<<< HEAD
     targetBranchName: $[ replace(variables['Build.SourceBranch'], 'refs/heads/', '') ]
+=======
+    targetBranchName: $[ variables['branchName'] ]
+>>>>>>> add deployer pipeline

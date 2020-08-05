@@ -4,6 +4,7 @@ steps:
       az group update --resource-group ${{parameters.deployer_rg_name}} --set tags.Delete=True
       az lock delete --name resource-group-level --resource-group ${{parameters.deployer_rg_name}}
     displayName: "Pre delete"
+<<<<<<< HEAD
     condition: or(succeededOrFailed(), always())
   - script: |
       git checkout ${{parameters.branch_name}}
@@ -18,6 +19,15 @@ steps:
       exit 0
     displayName: "Delete new deployer"
     condition: or(succeededOrFailed(), always())
+=======
+  - script: |
+      cd deploy/terraform/bootstrap/sap_deployer
+
+      echo "=== Start to delete deployer with terraform destroy ==="
+      terraform destroy -auto-approve -var-file=deployer.json
+      exit 0
+    displayName: "Delete new deployer"
+>>>>>>> add deployer pipeline
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
