@@ -37,7 +37,7 @@ locals {
   sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg-mgmt[0] : azurerm_network_security_group.nsg-mgmt[0], null)
 
   // Resource group and location
-  rg_name = try("${var.infrastructure.resource_group.name}-${local.postfix}", format("sapdeployer-rg-%s", local.postfix))
+  rg_name = try(var.infrastructure.resource_group.name, format("sapdeployer-rg-%s", local.postfix))
   region  = try(var.infrastructure.region, "westus2")
 
   // Deployer(s) information from input
