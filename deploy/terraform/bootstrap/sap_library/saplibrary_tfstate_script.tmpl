@@ -2,27 +2,7 @@
 
 function main(){
 
-    validate_saplibrary_input_json
     validate_saplibrary_tfstate
-}
-
-function validate_saplibrary_input_json(){
-
-    echo "Check if saplibrary.json for sap_library exists:"
-
-    if [ ! -f "${saplibrary_terraform_json_path}" ]; then
-        echo "${saplibrary_terraform_json_path} does not exist."
-        exit 2
-    else 
-        echo "${saplibrary_terraform_json_path} exists."
-        saplibrary_json_upload
-    fi
-}
-
-function saplibrary_json_upload(){
-
-    az login --identity > /dev/null
-    az storage blob upload -c ${storagecontainer_saplibrary_name} -f ${saplibrary_terraform_json_path} --name ${saplibrary_json_name} --account-name ${tfstate_storage_account_name}
 }
 
 function validate_saplibrary_tfstate(){
