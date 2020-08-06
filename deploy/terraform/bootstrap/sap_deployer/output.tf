@@ -4,24 +4,24 @@ Description:
   Output from sap_deployer module.
 */
 
-output "deployer-id" {
-  value = module.sap_deployer.deployer-id
+output "deployer_id" {
+  value = module.sap_deployer.deployer_id
 }
 
-output "vnet-mgmt" {
-  value = module.sap_deployer.vnet-mgmt
+output "vnet_mgmt" {
+  value = module.sap_deployer.vnet_mgmt
 }
 
-output "subnet-mgmt" {
-  value = module.sap_deployer.subnet-mgmt
+output "subnet_mgmt" {
+  value = module.sap_deployer.subnet_mgmt
 }
 
-output "nsg-mgmt" {
-  value = module.sap_deployer.nsg-mgmt
+output "nsg_mgmt" {
+  value = module.sap_deployer.nsg_mgmt
 }
 
-output "deployer-uai" {
-  value = module.sap_deployer.deployer-uai
+output "deployer_uai" {
+  value = module.sap_deployer.deployer_uai
 }
 
 output "deployer" {

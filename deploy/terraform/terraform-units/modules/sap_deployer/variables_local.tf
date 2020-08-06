@@ -26,7 +26,7 @@ locals {
   sub_mgmt_arm_id   = local.sub_mgmt_exists ? try(local.sub_mgmt.arm_id, "") : ""
   sub_mgmt_name     = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.name, "subnet-mgmt")
   sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "10.0.0.16/28")
-  sub_mgmt_deployed = try(local.sub_mgmt_exists ? data.azurerm_subnet.subnet-mgmt[0] : azurerm_subnet.subnet-mgmt[0], null)
+  sub_mgmt_deployed = try(local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0] : azurerm_subnet.subnet_mgmt[0], null)
 
   // Management NSG
   sub_mgmt_nsg             = try(local.sub_mgmt.nsg, {})
@@ -34,7 +34,7 @@ locals {
   sub_mgmt_nsg_arm_id      = local.sub_mgmt_nsg_exists ? try(local.sub_mgmt_nsg.arm_id, "") : ""
   sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.sub_mgmt_nsg.name, "nsg-mgmt")
   sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.sub_mgmt_nsg.allowed_ips, ["0.0.0.0/0"])
-  sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg-mgmt[0] : azurerm_network_security_group.nsg-mgmt[0], null)
+  sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0], null)
 
   // Resource group and location
   rg_name = try("${var.infrastructure.resource_group.name}-${local.postfix}", format("sapdeployer-rg-%s", local.postfix))
