@@ -8,6 +8,13 @@ set -o nounset
 
 readonly target_json="$HOME/.config/sa_config.json"
 
+SCRIPT=$(readlink -f "$0")
+# Absolute path this script
+SCRIPTPATH=$(dirname "$SCRIPT")
+
+# file will be put in the current working directory
+local_file_path="${SCRIPTPATH}/../saplibrary.json"
+
 function main(){
     
     check_jq_installed
@@ -17,7 +24,6 @@ function main(){
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name=$(read_json .saplibrary.container_name)
     local remote_file_name="saplibrary.json"
-    local local_file_path="../saplibrary.json"
 
     json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_name}    
 }
