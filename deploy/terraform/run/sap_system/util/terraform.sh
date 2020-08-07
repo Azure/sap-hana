@@ -22,7 +22,7 @@ function main(){
     local workspace=$1
     local sid=$2
 
-    local input_json_path="${local_file_dir}${workspace}-${sid}.json"
+    local input_json_path="${local_file_dir}${workspace}_${sid}.json"
 
     check_file_exists ${input_json_path} "Please prepare an input json ${input_json_path}"
 
@@ -33,7 +33,7 @@ function main(){
     local saplibrary_resource_group_name=$(read_json .saplibrary.resource_group_name)
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name="sapsystem"
-    local sid_tfstate_path="${workspace}/${workspace}-${sid}.terraform.tfstate"
+    local sid_tfstate_path="${workspace}/${sid}/${workspace}_${sid}.terraform.tfstate"
 
     terraform_execute ${saplibrary_resource_group_name} ${storage_account_name} ${container_name} ${input_json_path} ${sid_tfstate_path}
     
@@ -85,7 +85,7 @@ function check_jq_installed(){
 function read_json(){
 
     local key="$1"
-    local value=$(cat ${target_json} | jq "${key}")
+    local value=$(cat ${target_json} | jq -r "${key}")
 	
     echo $value
 }
