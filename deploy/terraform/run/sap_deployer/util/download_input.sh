@@ -21,9 +21,9 @@ function main(){
 
     check_file_exists ${target_json}
 
-    local storage_account_name=$(read_json .saplibrary.storage_account_name)
-    local container_name=$(read_json .saplibrary.container_name)
-    local remote_file_name="saplibrary.json"
+    local storage_account_name=$(read_json .deployer.storage_account_name)
+    local container_name=$(read_json .deployer.container_name)
+    local remote_file_name="deployer.json"
     local local_file_path="${local_file_dir}${remote_file_name}"
 
     json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_name}    

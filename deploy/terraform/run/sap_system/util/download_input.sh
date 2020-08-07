@@ -16,17 +16,31 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 local_file_dir="${SCRIPTPATH}/../"
 
 function main(){
+
+    validate_arguments "$@"
+
+    local workspace=$1
+    local sid=$2
     
     check_jq_installed
 
     check_file_exists ${target_json}
 
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
-    local container_name=$(read_json .saplibrary.container_name)
-    local remote_file_name="saplibrary.json"
+    local container_name="sapsystem"
+    local remote_file_name="${workspace}-${sid}.json"
+    local remote_file_path="${workspace}/${remote_file_name}"
     local local_file_path="${local_file_dir}${remote_file_name}"
 
-    json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_name}    
+    json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_path}    
+}
+
+function validate_arguments(){
+
+    if ["$#" -ne 2 ]: then
+        printf "%s\n" "ERROR: Both workspace and SID should be specified. Usage example: util/download_input.sh PROD HN1" >&2
+        exit 1
+    fi
 }
 
 function read_json(){
@@ -72,16 +86,15 @@ function check_jq_installed(){
 
 function json_download(){
 
+    echo "Start downloading file:"
     local local_file_path=$1
     local storage_account_name=$2
     local container_name=$3
-    local remote_file_name=$4
-
-    echo "Start downloading file: ${remote_file_name}"
+    local remote_file_path=$4
 
     az login --identity > /dev/null
 
-    local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_name} --account-name ${storage_account_name}"
+    local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_path} --account-name ${storage_account_name}"
     eval "$cmd"
 }
 
