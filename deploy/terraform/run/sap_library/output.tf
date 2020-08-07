@@ -6,12 +6,12 @@ output "sapbits_storage_account" {
     value = module.sap_library.sapbits_storage_account
 }
 
-output "storagecontainer_tfstate" {
-    value = module.sap_library.storagecontainer_tfstate
+output "storagecontainer_sapsystem" {
+    value = module.sap_library.storagecontainer_sapsystem
 }
 
-output "storagecontainer_json" {
-    value = module.sap_library.storagecontainer_json
+output "storagecontainer_saplandscape" {
+    value = module.sap_library.storagecontainer_saplandscape
 }
 
 output "storagecontainer_deployer" {

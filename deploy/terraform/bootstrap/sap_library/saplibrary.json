@@ -30,7 +30,7 @@
         "account_tier": "Standard",
         "account_replication_type": "LRS",
         "account_kind": "StorageV2",
-        "json_blob_container": {
+        "saplandscape_blob_container": {
             "is_existing": "false"
         },
         "saplibrary_blob_container": {
@@ -39,7 +39,7 @@
         "deployer_blob_container": {
             "is_existing": "false"
         },
-        "tfstate_blob_container": {
+        "sapsystem_blob_container": {
             "is_existing": "false"
         }
     }

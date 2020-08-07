@@ -28,30 +28,30 @@ resource "azurerm_storage_account" "storage_tfstate" {
   }
 }
 
-data "azurerm_storage_container" "storagecontainer_tfstate" {
-  count                = local.sa_tfstate_container_exists ? 1 : 0
-  name                 = local.sa_tfstate_container_name
+data "azurerm_storage_container" "storagecontainer_sapsystem" {
+  count                = local.sa_sapsystem_container_exists ? 1 : 0
+  name                 = local.sa_sapsystem_container_name
   storage_account_name = local.sa_tfstate.name
 }
 
-// Creates the storage container inside the storage account for tfstate
-resource "azurerm_storage_container" "storagecontainer_tfstate" {
-  count                 = local.sa_tfstate_container_exists ? 0 : 1
-  name                  = local.sa_tfstate_container_name
+// Creates the storage container inside the storage account for sapsystem
+resource "azurerm_storage_container" "storagecontainer_sapsystem" {
+  count                 = local.sa_sapsystem_container_exists ? 0 : 1
+  name                  = local.sa_sapsystem_container_name
   storage_account_name  = local.sa_tfstate.name
   container_access_type = local.sa_tfstate_container_access_type
 }
 
-data "azurerm_storage_container" "storagecontainer_json" {
-  count                = local.sa_json_container_exists ? 1 : 0
-  name                 = local.sa_json_container_name
+data "azurerm_storage_container" "storagecontainer_saplandscape" {
+  count                = local.sa_saplandscape_container_exists ? 1 : 0
+  name                 = local.sa_saplandscape_container_name
   storage_account_name = local.sa_tfstate.name
 }
 
-// Creates the storage container inside the storage account for json
-resource "azurerm_storage_container" "storagecontainer_json" {
-  count                 = local.sa_json_container_exists ? 0 : 1
-  name                  = local.sa_json_container_name
+// Creates the storage container inside the storage account for saplandscape
+resource "azurerm_storage_container" "storagecontainer_saplandscape" {
+  count                 = local.sa_saplandscape_container_exists ? 0 : 1
+  name                  = local.sa_saplandscape_container_name
   storage_account_name  = local.sa_tfstate.name
   container_access_type = local.sa_tfstate_container_access_type
 }
