@@ -28,16 +28,16 @@ function main(){
 
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name="sapsystem"
-    local remote_file_name="${workspace}-${sid}.json"
-    local remote_file_path="${workspace}/${remote_file_name}"
+    local remote_file_name="${workspace}_${sid}.json"
+    local remote_file_path="${workspace}/${sid}/${remote_file_name}"
     local local_file_path="${local_file_dir}${remote_file_name}"
 
-    json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_path}    
+    json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_path}
 }
 
 function validate_arguments(){
 
-    if ["$#" -ne 2 ]: then
+    if [ "$#" -ne 2 ]; then
         printf "%s\n" "ERROR: Both workspace and SID should be specified. Usage example: util/download_input.sh PROD HN1" >&2
         exit 1
     fi
@@ -85,14 +85,25 @@ function check_jq_installed(){
 }
 
 function json_download(){
-
-    echo "Start downloading file:"
+    
     local local_file_path=$1
     local storage_account_name=$2
     local container_name=$3
     local remote_file_path=$4
 
     az login --identity > /dev/null
+    
+    echo "Check if ${remote_file_path} exists in storage accounts"
+
+    remote_state_exists=$(az storage blob exists -c ${container_name} --name ${remote_file_path} --account-name ${storage_account_name} | jq -r .exists)
+    if [ $remote_state_exists = true ]; then
+        echo "remote file ${remote_file_path} exists"
+    else
+        echo "remote file ${remote_file_path} does not exist"
+        exit 1
+    fi
+
+    echo "Start downloading file:"
 
     local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_path} --account-name ${storage_account_name}"
     eval "$cmd"
