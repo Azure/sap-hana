@@ -92,7 +92,7 @@ locals {
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
-  dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, []) : {
+  dbnodes = [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
     "name" = try(dbnode.name, format("%s_%s_hdb%02d", local.sap_sid, local.hdb_sid, idx)),
     "role" = try(dbnode.role, "worker")
     }
