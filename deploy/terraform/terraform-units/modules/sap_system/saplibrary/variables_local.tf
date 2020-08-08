@@ -16,8 +16,9 @@ locals {
     for db in var.databases : db
     if try(db.platform, "NONE") != "NONE"
   ]
-  db_sid       = length(local.db_list) == 0 ? "" : try(local.db_list[0].instance.sid, local.db_list[0].platform == "HANA" ? "HN1" : "OR1")
-  app_sid      = try(var.application.enable_deployment, false) ? try(var.application.sid, "") : ""
+  db_sid  = length(local.db_list) == 0 ? "" : try(local.db_list[0].instance.sid, local.db_list[0].platform == "HANA" ? "HN1" : "OR1")
+  app_sid = try(var.application.enable_deployment, false) ? try(var.application.sid, "") : ""
+  // SID decided by application SID if exists, otherwise, use database SID, none provided, default to SID
   sid          = local.app_sid != "" ? local.app_sid : (local.db_sid != "" ? local.db_sid : "SID")
   landscape_id = try(var.infrastructure.landscape, "TEST")
 
