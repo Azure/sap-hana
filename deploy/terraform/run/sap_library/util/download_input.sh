@@ -93,7 +93,7 @@ function json_download(){
 
     printf "%s\n" "Start downloading file ${remote_file_path}:"
 
-    local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_path} --account-name ${storage_account_name}"
+    local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_path} --account-name ${storage_account_name} --output none"
     eval "$cmd"
 }
 
