@@ -29,6 +29,7 @@ function main(){
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name="sapsystem"
     local remote_file_name="${workspace}_${sid}.json"
+    # The path of remote file can be updated based on actual needs
     local remote_file_path="${workspace}/${sid}/${remote_file_name}"
     local local_file_path="${local_file_dir}${remote_file_name}"
 
@@ -93,17 +94,17 @@ function json_download(){
 
     az login --identity > /dev/null
     
-    echo "Check if ${remote_file_path} exists in storage accounts"
+    printf "%s\n" "Check if ${remote_file_path} exists in storage accounts"
 
     remote_state_exists=$(az storage blob exists -c ${container_name} --name ${remote_file_path} --account-name ${storage_account_name} | jq -r .exists)
     if [ $remote_state_exists = true ]; then
-        echo "remote file ${remote_file_path} exists"
+        printf "%s\n" "INFO: remote file ${remote_file_path} exists"
     else
-        echo "remote file ${remote_file_path} does not exist"
+        printf "%s\n" "ERROR: remote file ${remote_file_path} does not exist. storage account name = ${storage_account_name}; container name = ${container_name}" >&2
         exit 1
     fi
 
-    echo "Start downloading file:"
+    printf "%s\n" "Start downloading file ${remote_file_path}:"
 
     local cmd="az storage blob download --container-name ${container_name} --file ${local_file_path} --name ${remote_file_path} --account-name ${storage_account_name}"
     eval "$cmd"
