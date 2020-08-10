@@ -25,7 +25,7 @@ resource "azurerm_management_lock" "deployer" {
 }
 
 // Create/Import management vnet
-resource "azurerm_virtual_network" "vnet-mgmt" {
+resource "azurerm_virtual_network" "vnet_mgmt" {
   count               = local.enable_deployers && ! local.vnet_mgmt_exists ? 1 : 0
   name                = local.vnet_mgmt_name
   location            = azurerm_resource_group.deployer[0].location
@@ -33,22 +33,22 @@ resource "azurerm_virtual_network" "vnet-mgmt" {
   address_space       = [local.vnet_mgmt_addr]
 }
 
-data "azurerm_virtual_network" "vnet-mgmt" {
+data "azurerm_virtual_network" "vnet_mgmt" {
   count               = local.enable_deployers && local.vnet_mgmt_exists ? 1 : 0
   name                = split("/", local.vnet_mgmt_arm_id)[8]
   resource_group_name = split("/", local.vnet_mgmt_arm_id)[4]
 }
 
 // Create/Import management subnet
-resource "azurerm_subnet" "subnet-mgmt" {
+resource "azurerm_subnet" "subnet_mgmt" {
   count                = local.enable_deployers && ! local.sub_mgmt_exists ? 1 : 0
   name                 = local.sub_mgmt_name
-  resource_group_name  = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-mgmt[0].resource_group_name : azurerm_virtual_network.vnet-mgmt[0].resource_group_name
-  virtual_network_name = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet-mgmt[0].name : azurerm_virtual_network.vnet-mgmt[0].name
+  resource_group_name  = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].resource_group_name : azurerm_virtual_network.vnet_mgmt[0].resource_group_name
+  virtual_network_name = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].name : azurerm_virtual_network.vnet_mgmt[0].name
   address_prefixes     = [local.sub_mgmt_prefix]
 }
 
-data "azurerm_subnet" "subnet-mgmt" {
+data "azurerm_subnet" "subnet_mgmt" {
   count                = local.enable_deployers && local.sub_mgmt_exists ? 1 : 0
   name                 = split("/", local.sub_mgmt_arm_id)[10]
   resource_group_name  = split("/", local.sub_mgmt_arm_id)[4]

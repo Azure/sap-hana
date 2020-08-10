@@ -2,27 +2,7 @@
 
 function main(){
 
-    validate_saplibrary_input_json
     validate_saplibrary_tfstate
-}
-
-function validate_saplibrary_input_json(){
-
-    echo "Check if saplibrary.json for sap_library exists:"
-
-    if [ ! -f "${saplibrary_terraform_json_path}" ]; then
-        echo "${saplibrary_terraform_json_path} does not exist."
-        exit 2
-    else 
-        echo "${saplibrary_terraform_json_path} exists."
-        saplibrary_json_upload
-    fi
-}
-
-function saplibrary_json_upload(){
-
-    az login --identity > /dev/null
-    az storage blob upload -c ${storagecontainer_saplibrary_name} -f ${saplibrary_terraform_json_path} --name ${saplibrary_json_name} --account-name ${tfstate_storage_account_name}
 }
 
 function validate_saplibrary_tfstate(){
@@ -34,6 +14,7 @@ function validate_saplibrary_tfstate(){
         exit 2
     else 
         echo "${saplibrary_terraform_tfstate_path} exists."
+        validate_saplibrary_remote_state
         sap_library_remote_backend_init
     fi
 }
@@ -56,6 +37,8 @@ function sap_library_remote_backend_init(){
 
     cd ..
     
+    echo "Clean .terraform if exists:"
+    
     rm -r .terraform
 
     terraform init -force-copy \
@@ -64,9 +47,9 @@ function sap_library_remote_backend_init(){
     -backend-config "container_name=${storagecontainer_saplibrary_name}" \
     -backend-config "key=${saplibrary_tfstate_name}"
 
-    validate_saplibrary_remote_state
-
     terraform state push "${saplibrary_tfstate_name}"
+
+    terraform state rm 'local_file.sa_config' 'local_file.output_saplibrary_script' 'local_file.output_deployer_script' 'null_resource.copy_input'
 
     rm "${saplibrary_tfstate_name}"
 }

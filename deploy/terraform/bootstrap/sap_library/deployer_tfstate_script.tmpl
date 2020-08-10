@@ -2,28 +2,7 @@
 
 function main(){
 
-    validate_deployer_input_json
     validate_deployer_tfstate
-}
-
-function validate_deployer_input_json(){
-
-    echo "Check if deployer.json for deployer exists:"
-
-    if [ ! -f "${deployer_terraform_json_path}" ]; then
-        echo "${deployer_terraform_json_path} does not exist."
-        exit 2
-    else 
-        echo "${deployer_terraform_json_path} exists."
-        deployer_json_upload
-    fi
-}
-
-function deployer_json_upload(){
-
-    az login --identity > /dev/null
-    az storage blob upload -c ${storagecontainer_deployer_name} -f ${deployer_terraform_json_path} --name ${deployer_json_name} --account-name ${tfstate_storage_account_name}
-
 }
 
 function validate_deployer_tfstate(){
@@ -35,6 +14,7 @@ function validate_deployer_tfstate(){
         exit 2
     else 
         echo "${deployer_terraform_tfstate_path} exists."
+        validate_deployer_remote_state
         deployer_remote_backend_init
     fi
 }
@@ -57,6 +37,8 @@ function deployer_remote_backend_init(){
 
     cd ..
 
+    echo "Clean .terraform if exists:"
+
     rm -r .terraform
 
     terraform init -force-copy \
@@ -64,8 +46,6 @@ function deployer_remote_backend_init(){
     -backend-config "storage_account_name=${tfstate_storage_account_name}" \
     -backend-config "container_name=${storagecontainer_deployer_name}" \
     -backend-config "key=${deployer_tfstate_name}"
-
-    validate_deployer_remote_state
 
     terraform state push "${deployer_tfstate_name}"
 

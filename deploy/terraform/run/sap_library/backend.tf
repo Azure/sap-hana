@@ -1,6 +1,6 @@
 /*
   Description:
-  To use remote backend to deploy deployer(s).
+  To use remote backend to deploy sap library.
 */
 
 terraform {

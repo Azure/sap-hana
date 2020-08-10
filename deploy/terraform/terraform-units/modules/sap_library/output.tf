@@ -6,12 +6,12 @@ output "sapbits_storage_account" {
     value = local.sa_sapbits
 }
 
-output "storagecontainer_tfstate" {
-    value = local.storagecontainer_tfstate
+output "storagecontainer_sapsystem" {
+    value = local.storagecontainer_sapsystem
 }
 
-output "storagecontainer_json" {
-    value = local.storagecontainer_json
+output "storagecontainer_saplandscape" {
+    value = local.storagecontainer_saplandscape
 }
 
 output "storagecontainer_deployer" {
