@@ -3,11 +3,11 @@
 ###############################################################################
 #
 # Purpose:
-# This script enables the user modification of sap system related resources at
+# This script enables the user modification of sap library related resources at
 # post-deployment stage via Terraform.
 #
 # Usage:
-# util/terraform.sh PROD HN1
+# util/terraform.sh
 #
 ###############################################################################
 
@@ -28,12 +28,8 @@ local_file_dir="${SCRIPTPATH}/../"
 
 function main(){
 
-    validate_arguments "$@"
-
-    local workspace=$1
-    local sid=$2
-
-    local input_json_path="${local_file_dir}${workspace}_${sid}.json"
+    local input_json_name="saplibrary.json"
+    local input_json_path="${local_file_dir}${input_json_name}"
 
     check_file_exists ${input_json_path} "Please prepare an input json ${input_json_path}"
 
@@ -43,19 +39,11 @@ function main(){
 
     local saplibrary_resource_group_name=$(read_json .saplibrary.resource_group_name)
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
-    local container_name="sapsystem"
-    local sid_tfstate_path="${workspace}/${sid}/${workspace}_${sid}.terraform.tfstate"
+    local container_name="saplibrary"
+    local tfstate_path="saplibrary.terraform.tfstate"
 
-    terraform_execute ${saplibrary_resource_group_name} ${storage_account_name} ${container_name} ${input_json_path} ${sid_tfstate_path}
+    terraform_execute ${saplibrary_resource_group_name} ${storage_account_name} ${container_name} ${input_json_path} ${tfstate_path}
     
-}
-
-function validate_arguments(){
-
-    if [ "$#" -ne 2 ]; then
-        printf "%s\n" "ERROR: Both workspace and SID should be specified. Usage example: util/terraform.sh PROD HN1" >&2
-        exit 1
-    fi
 }
 
 function check_file_exists(){
@@ -107,7 +95,7 @@ function terraform_execute(){
     local storage_account_name=$2
     local container_name=$3
     local input_json_path=$4
-    local sid_tfstate_path=$5
+    local tfstate_path=$5
 
     cd ${local_file_dir}
 
@@ -117,7 +105,7 @@ function terraform_execute(){
     -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
     -backend-config "storage_account_name=${storage_account_name}" \
     -backend-config "container_name=${container_name}" \
-    -backend-config "key=${sid_tfstate_path}"
+    -backend-config "key=${tfstate_path}"
 
     terraform apply -var-file="${input_json_path}"
 }
