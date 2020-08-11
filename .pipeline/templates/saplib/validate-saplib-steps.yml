@@ -4,7 +4,6 @@ steps:
       source /etc/profile.d/deploy_server.sh
 
       saplib_rg=${{parameters.saplib_rg_name}}
-<<<<<<< HEAD
       repo_dir=$HOME/${saplib_rg}/sap-hana
       ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/${saplib_rg}
       input=${ws_dir}/${saplib_rg}.json
@@ -15,18 +14,6 @@ steps:
       echo "=== Enter workspace ${ws_dir} ==="
       cd ${ws_dir}
       terraform plan -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ > plan_output.log
-=======
-      repo_dir=$HOME/$saplib_rg/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/$saplib_rg
-      input=$ws_dir/${saplib_rg}.json
-
-      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
-      cd $HOME/$saplib_rg/sap-hana && git checkout ${{parameters.branch_name}}
-      
-      echo "=== Enter workspace $ws_dir ==="
-      cd $ws_dir
-      terraform plan -var-file=$input $repo_dir/deploy/terraform/bootstrap/sap_library/ > plan_output.log
->>>>>>> add saplib test pipeline
       cat plan_output.log
       
       if ! grep "No changes" plan_output.log; then exit 1; fi;

@@ -73,12 +73,7 @@ module "app_tier" {
   ppg              = module.common_infrastructure.ppg
 }
 
-<<<<<<< HEAD:deploy/terraform/run/sap_landscape/module.tf
 // Create anydb database nodes
-=======
-<<<<<<< HEAD:deploy/terraform/module.tf
-# Create anydb database nodes
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/module.tf
 module "anydb_node" {
   source           = "./../modules/anydb_node"
   application      = var.application
@@ -95,14 +90,7 @@ module "anydb_node" {
   ppg              = module.common_infrastructure.ppg
 }
 
-<<<<<<< HEAD:deploy/terraform/run/sap_landscape/module.tf
 // Generate output files
-=======
-# Generate output files
-=======
-// Generate output files
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/module.tf
->>>>>>> Restructure the codebase (#657):deploy/terraform/run/module.tf
 module "output_files" {
   source                       = "./../modules/output_files"
   application                  = var.application

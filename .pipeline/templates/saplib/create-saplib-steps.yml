@@ -6,7 +6,6 @@ steps:
       source /etc/profile.d/deploy_server.sh
 
       saplib_rg=${{parameters.saplib_rg_name}}
-<<<<<<< HEAD
       repo_dir=$HOME/${saplib_rg}/sap-hana
       ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/${saplib_rg}
       input=${ws_dir}/${saplib_rg}.json
@@ -24,38 +23,13 @@ steps:
       cat ${ws_dir}/saplibrary.json \
       | jq --arg rg_name "${saplib_rg}" .infrastructure.resource_group.name\ =\ \$rg_name \
       > ${input}
-=======
-      repo_dir=$HOME/$saplib_rg/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/$saplib_rg
-      input=$ws_dir/${saplib_rg}.json
-
-      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
-      mkdir $HOME/$saplib_rg; cd $_
-      git clone https://github.com/Azure/sap-hana.git
-      cd sap-hana && git checkout ${{parameters.branch_name}}
-      
-      echo "=== Create workspace $ws_dir ==="
-      mkdir -p $ws_dir; cd $_
-      
-      echo "=== Prepare input for saplibrary ==="
-      cp $repo_dir/deploy/terraform/bootstrap/sap_library/saplibrary.json $ws_dir/saplibrary.json
-      cat $ws_dir/saplibrary.json \
-      | jq --arg rg_name "$saplib_rg" .infrastructure.resource_group.name\ =\ \$rg_name \
-      > $input
->>>>>>> add saplib test pipeline
       
       echo "=== Create SAP library from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
       terraform -version
-<<<<<<< HEAD
       terraform init ${repo_dir}/deploy/terraform/bootstrap/sap_library/
       [ -d $HOME/.log ] || mkdir -p $HOME/.log
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>$HOME/.log/$(Build.BuildId)_apply_error.log 2>&1>$HOME/.log/$(Build.BuildId)_apply.log
-=======
-      terraform init $repo_dir/deploy/terraform/bootstrap/sap_library/
-      [ -d $HOME/.log ] || mkdir -p $HOME/.log
-      terraform apply -auto-approve -var-file=$input $repo_dir/deploy/terraform/bootstrap/sap_library/ 2>$HOME/.log/$(Build.BuildId)_apply_error.log 2>&1>$HOME/.log/$(Build.BuildId)_apply.log
->>>>>>> add saplib test pipeline
       if [ -s $HOME/.log/$(Build.BuildId)_apply_error.log ]; then cat $HOME/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
       '
 

@@ -7,7 +7,6 @@ steps:
       source /etc/profile.d/deploy_server.sh
 
       saplib_rg=${{parameters.saplib_rg_name}}
-<<<<<<< HEAD
       repo_dir=$HOME/${saplib_rg}/sap-hana
       ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/${saplib_rg}
       input=${ws_dir}/${saplib_rg}.json
@@ -17,22 +16,10 @@ steps:
 
       echo "=== Enter workspace ${ws_dir} ==="
       cd ${ws_dir}
-=======
-      repo_dir=$HOME/$saplib_rg/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/$saplib_rg
-      input=$ws_dir/${saplib_rg}.json
-
-      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
-      cd $repo_dir && git checkout ${{parameters.branch_name}}
-
-      echo "=== Enter workspace $ws_dir ==="
-      cd $ws_dir
->>>>>>> add saplib test pipeline
 
       echo "=== Delete SAP library from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
       [ -d ~/.log ] || mkdir -p ~/.log
-<<<<<<< HEAD
       terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
       cat ~/.log/$(Build.BuildId)_apply_error.log;
 
@@ -41,27 +28,12 @@ steps:
 
       echo "=== Delete worksapce ==="
       rm -rf ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/${saplib_rg}
-=======
-      terraform destroy -auto-approve -var-file=$input $repo_dir/deploy/terraform/bootstrap/sap_library/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
-      cat ~/.log/$(Build.BuildId)_apply_error.log;
-
-      echo "=== Delete git clone for the build from deployer ==="
-      rm -rf ~/$saplib_rg
-
-      echo "=== Delete worksapce ==="
-      rm -rf ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/$saplib_rg
->>>>>>> add saplib test pipeline
       '
       
       echo "=== Mark and try to delete rg  ==="
       az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-<<<<<<< HEAD
       az group update --resource-group ${saplib_rg} --set tags.Delete=True --output none
       az group delete -n ${saplib_rg} --no-wait -y
-=======
-      az group update --resource-group $saplib_rg --set tags.Delete=True --output none
-      az group delete -n $saplib_rg --no-wait -y
->>>>>>> add saplib test pipeline
 
       exit 0
     displayName: "Delete new saplibrary"
