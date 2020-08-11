@@ -1,0 +1,38 @@
+steps:
+  - script: |
+      ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
+      source /etc/profile.d/deploy_server.sh
+      
+      deployer_rg=${{parameters.deployer_rg_name}}
+      saplib_rg=${{parameters.saplib_rg_name}}
+      repo_dir=$HOME/${saplib_rg}/sap-hana
+
+      deployer_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
+      saplib_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/${saplib_rg}
+
+      tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
+      deployer_key="${deployer_rg}.terraform.tfstate"
+      saplib_key="${saplib_rg}.terraform.tfstate"
+
+      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
+      cd ${repo_dir} && git checkout ${{parameters.branch_name}}
+ 
+      echo "=== Upload deployer tfstate under ${deployer_ws_dir} to saplibrary ==="
+      cd ${deployer_ws_dir}
+      terraform init -force-copy \
+        --backend-config "resource_group_name=${saplib_rg}" \
+        --backend-config "storage_account_name=${tfstate_sa_name}" \
+        --backend-config "container_name=saplibrary" \
+        --backend-config "key=${deployer_key}" \
+        ${repo_dir}/deploy/terraform/run/sap_deployer/
+
+      echo "=== Upload saplib tfstate under ${saplib_ws_dir} to saplibrary ==="
+      cd ${saplib_ws_dir}
+      terraform init -force-copy \
+        --backend-config "resource_group_name=${saplib_rg}" \
+        --backend-config "storage_account_name=${tfstate_sa_name}" \
+        --backend-config "container_name=saplibrary" \
+        --backend-config "key=${saplib_key}" \
+        ${repo_dir}/deploy/terraform/run/sap_library/
+      '
+    displayName: "Post saplibrary"

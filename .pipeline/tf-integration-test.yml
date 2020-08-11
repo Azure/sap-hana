@@ -1,0 +1,97 @@
+trigger: none
+pr:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - deploy/terraform/*
+variables:
+  - group: azure-config-variables
+  - group: azure-sap-hana-pipeline-secrets
+  - template: templates/variables.yaml
+stages:
+- stage:
+  pool:
+    vmImage: "ubuntu-18.04"
+  variables:
+    ssh_timeout_s: 120
+  jobs:
+  - job: createDeployer
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/deployer/create-deployer-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+      - template: templates/deployer/post-deployer-steps.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+  - job: createSAPLib
+    dependsOn: createDeployer
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+      - template: templates/saplib/create-saplib-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          saplib_rg_name: "$(Build.BuildId)-eaus-sap_library"
+      - template: templates/saplib/post-saplib-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          saplib_rg_name: "$(Build.BuildId)-eaus-sap_library"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+  - job: createSAPSystem
+    dependsOn: createSAPLib
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+      - template: templates/sapsystem/create-sapsystem-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+  - job: deleteAll
+    dependsOn: createSAPSystem
+    condition: or(succeededOrFailed(), always())
+    steps:
+      - script: |
+          az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+          sapsystem_rg="$(Build.BuildId)-eaus-sap0-PRD"
+          echo "=== Mark and try to delete rg ${sapsystem_rg} ==="
+          az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
+          az group delete -n ${sapsystem_rg} --no-wait -y
+
+          saplib_rg="$(Build.BuildId)-eaus-sap_library"
+          echo "=== Mark and try to delete rg ${saplib_rg} ==="
+          az lock delete --name resource-group-level --resource-group ${saplib_rg}
+          az group update --resource-group ${saplib_rg} --set tags.Delete=True
+          az group delete -n ${saplib_rg} --no-wait -y
+
+          deployer_rg="$(Build.BuildId)-eaus-deployer-infrastructure"
+          echo "=== Mark and try to delete rg ${saplib_rg} ==="
+          az lock delete --name resource-group-level --resource-group ${deployer_rg}
+          az group update --resource-group ${deployer_rg} --set tags.Delete=True
+          az group delete -n ${deployer_rg} --no-wait -y
+        displayName: "Clean up"
+        env:
+          ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+          ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+          ARM_TENANT_ID: $(landscape-tenant)
+          ARM_SUBSCRIPTION_ID: $(landscape-subscription)

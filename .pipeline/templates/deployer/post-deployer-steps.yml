@@ -1,0 +1,8 @@
+steps:
+  - script: |
+      deployer_rg=${{parameters.deployer_rg_name}}
+      ws_dir=$(Agent.BuildDirectory)/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
+
+      cd ${ws_dir}
+      bash ${ws_dir}/post_deployment.sh
+    displayName: "Post deployment"
