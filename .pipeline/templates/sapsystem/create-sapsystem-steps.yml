@@ -1,0 +1,96 @@
+steps:
+  - script: |
+      echo "=== Logon deployer ==="
+      ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
+      source /etc/profile.d/deploy_server.sh
+
+      sapsystem_rg=${{parameters.sapsystem_rg_name}}
+      deployer_rg=${{parameters.deployer_rg_name}}
+
+      #If no osImage provided, deploy SLES12SP5
+      if [ -z "${{parameters.osImage}}" ] 
+      then
+        osImage="'"\"offer\": \"sles-sap-12-sp5\", 
+                \"publisher\": \"SUSE\", 
+                \"sku\": \"gen1\""'"
+      else
+        osImage=${{parameters.osImage}}
+      fi
+      
+      repo_dir=$HOME/$sapsystem_rg/sap-hana
+      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg}
+      deployer_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
+      input=${ws_dir}/${sapsystem_rg}.json
+      
+      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
+      mkdir $HOME/${sapsystem_rg}; cd $_
+      git clone https://github.com/Azure/sap-hana.git
+      cd sap-hana && git checkout ${{parameters.branch_name}}
+
+      echo "=== Create workspace ${ws_dir} ==="
+      mkdir -p ${ws_dir}; cd $_
+      cp ${deployer_ws_dir}/ssh* .
+
+      saplib_rg_name="unit-eaus-sap_library"
+      tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg_name} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
+      sap_system_key="${sapsystem_rg}.terraform.tfstate"
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
+      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
+
+      buildId=$(Build.BuildId)
+      idx1=${buildId: -1}
+      idx2=${buildId: -2:1}
+      sap_vnet_address_space="10.${idx2}.${idx1}.0/25"
+      subnet_admin_prefix="10.${idx2}.${idx1}.0/27"
+      subnet_db_prefix="10.${idx2}.${idx1}.32/27"
+      subnet_iscsi_prefix="10.${idx2}.${idx1}.64/27"
+      subnet_app_prefix="10.${idx2}.${idx1}.96/27"
+
+      isIntegrationTest=${sapsystem_rg#ad-sap-system}
+      [ -z "${isIntegrationTest}" ] && landscape="TEST" || landscape="$(Build.BuildId)"
+
+      cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
+      cat ${ws_dir}/sapsystem.json \
+      | jq --arg landscape "${landscape}" .infrastructure.landscape\ =\ \$landscape \
+      | jq --arg rg_name "${sapsystem_rg}" .infrastructure.resource_group.name\ =\ \$rg_name \
+      | jq --arg saplib_rg_name "${saplib_rg_name}" .infrastructure.vnets.management.saplib_resource_group_name\ =\ \$saplib_rg_name \
+      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .infrastructure.vnets.management.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
+      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
+      | jq --arg subnet_admin_prefix "${subnet_admin_prefix}" .infrastructure.vnets.sap.subnet_admin.prefix\ =\ \$subnet_admin_prefix \
+      | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
+      | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
+      | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
+      | jq --arg os "${osImage}" .database[]?.os\ =\ \$os \
+      | jq --arg db_systemdb_password "$(hana-pipeline-db-pwd)" .databases[].credentials.db_systemdb_password\ =\ \$db_systemdb_password \
+      | jq --arg os_sidadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sidadm_password\ =\ \$os_sidadm_password \
+      | jq --arg os_sapadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sapadm_password\ =\ \$os_sapadm_password \
+      | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
+      | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
+      | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
+      | jq --arg saplib_rg_name "${saplib_rg_name}" .software.storage_account_sapbits.saplib_resource_group_name\ =\ \$saplib_rg_name \
+      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .software.storage_account_sapbits.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
+      | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
+      | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
+      | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      > ${input}
+      
+      echo "=== Deploy sap system from deployer with terraform ==="
+      echo "=== This may take quite a while, please be patient ==="
+      terraform -version
+      terraform init -force-copy \
+        --backend-config "resource_group_name=${saplib_rg_name}" \
+        --backend-config "storage_account_name=${tfstate_sa_name}" \
+        --backend-config "container_name=saplibrary" \
+        --backend-config "key=${sap_system_key}" \
+        ${repo_dir}/deploy/terraform/run/sap_system/
+      [ -d ~/.log ] || mkdir -p ~/.log
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_apply_error.log 2>&1>~/.log/$(Build.BuildId)_apply.log
+      if [ -s ~/.log/$(Build.BuildId)_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
+      '
+    displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)

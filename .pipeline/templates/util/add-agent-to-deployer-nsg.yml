@@ -10,13 +10,13 @@ steps:
       vnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].name)
       subnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].subnets[].name)
       nsg_name=$(az network nsg list --resource-group ${rg_name} | jq -r --arg vnet_name "${vnet_name}" '.[] | select(.name | contains($vnet_name) | not) | .name')
-
-      echo "=== Assgin ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
-      az network vnet subnet update -g ${rg_name} -n ${subnet_name} --vnet-name ${vnet_name} --network-security-group ${nsg_name} --output none
-      
+     
       echo "=== Update deployer NSG source address with agent IP ==="
       prefix_list=$(az network nsg rule show  -g ${rg_name} --nsg-name ${nsg_name} -n ssh | jq -r '.sourceAddressPrefix, (.sourceAddressPrefixes | join(" ")) | select(.!=null)')
       az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n ssh --source-address-prefixes $(agent_ip) ${prefix_list} --output none
+ 
+      echo "=== Assgin ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
+      az network vnet subnet update -g ${rg_name} -n ${subnet_name} --vnet-name ${vnet_name} --network-security-group ${nsg_name} --output none
     displayName: "Add agent IP to deployer NSG"
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)

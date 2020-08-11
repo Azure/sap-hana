@@ -1,0 +1,46 @@
+steps:
+  - script: |
+      deployer_rg=${{parameters.deployer_rg_name}}
+      sapsystem_rg=${{parameters.sapsystem_rg_name}}
+
+      echo "=== Delete SAP system from deployer ==="
+      ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
+      source /etc/profile.d/deploy_server.sh
+
+      sapsystem_rg=${{parameters.sapsystem_rg_name}}
+      repo_dir=$HOME/$saplib_rg/sap-hana
+      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg}
+      input=${ws_dir}/${sapsystem_rg}.json
+
+      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
+      cd ${repo_dir} && git checkout ${{parameters.branch_name}}
+
+      echo "=== Enter workspace ${ws_dir} ==="
+      cd ${ws_dir}
+      
+      echo "=== Delete SAP system from deployer with terraform ==="
+      echo "=== This may take quite a while, please be patient ==="
+      [ -d ~/.log ] || mkdir -p ~/.log
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
+      cat ~/.log/$(Build.BuildId)_destroy_error.log
+
+      echo "=== Delete git clone for the build from deployer ==="
+      rm -rf ~/${sapsystem_rg}
+      '
+
+      echo "=== Remove vnet peering with vnet-mgmt in case deployment/destroy fails ==="
+      peering_name=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name vnet-mgmt | jq -r .[].name | grep $(Build.BuildId))
+      [ ! -z "$peering_name" ] && az network vnet peering delete --resource-group ${deployer_rg} --name $peering_name --vnet-name vnet-mgmt
+
+      echo "=== Mark and try to delete rg  ==="
+      az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
+      az group delete -n ${sapsystem_rg} --no-wait -y
+
+      exit 0
+    displayName: "Delete new sapsystem"
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)
