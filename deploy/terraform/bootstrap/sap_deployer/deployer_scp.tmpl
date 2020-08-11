@@ -1,11 +1,18 @@
-%{~ for index, deployer in deployers ~}
-ssh -i ${deployer-ppk}  -o StrictHostKeyChecking=no ${deployer.authentication.username}@${deployer-ips[index]} "mkdir -p ~/.deployer/"
-%{ endfor ~}
+local_file_dir=$(dirname "$BASH_SOURCE")
+
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../deployer.terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.terraform.tfstate
+ssh -i ${deployer-ppk}  -o StrictHostKeyChecking=no ${deployer.authentication.username}@${deployer-ips[index]} "mkdir -p ~/.config/"
 %{ endfor ~}
 
+printf "%s\n" "Start uploading deployer tfstate"
+
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no ../deployer.json ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.json
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/../deployer.terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.terraform.tfstate
+%{ endfor ~}
+
+printf "%s\n" "Start uploading deployer json"
+
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/../deployer.json ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.json
 %{ endfor ~}

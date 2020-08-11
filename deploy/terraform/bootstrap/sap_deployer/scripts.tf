@@ -11,7 +11,7 @@ resource "local_file" "scp" {
     deployer-ips = module.sap_deployer.deployer_pip[*].ip_address
   })
   filename             = "${terraform.workspace}/post_deployment.sh"
-  file_permission      = "0660"
+  file_permission      = "0770"
   directory_permission = "0770"
 }
 
