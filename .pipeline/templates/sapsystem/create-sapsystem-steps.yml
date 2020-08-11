@@ -34,8 +34,13 @@ steps:
       saplib_rg_name="unit-eaus-sap_library"
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg_name} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
+<<<<<<< HEAD
       deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
+=======
+      deployer_tfstate_key=$(az storage blob list --account-name uniteaustfstate1b60 --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
+      saplib_tfstate_key=$(az storage blob list --account-name uniteaustfstate1b60 --container-name saplibrary | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
+>>>>>>> add pipeline for sapsystem
 
       buildId=$(Build.BuildId)
       idx1=${buildId: -1}
