@@ -1,21 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# exit immediately if a command fails
+set -o errexit
+
+# exit immediately if an unset variable is used
+set -o nounset
+
+readonly local_file_dir=$(dirname "$BASH_SOURCE")
 
 function main(){
 
     validate_deployer_tfstate
+    validate_deployer_remote_state
+    deployer_remote_backend_init
 }
 
 function validate_deployer_tfstate(){
 
-    echo "Check if terraform.tfstate of deployer exists:"
+    printf "%s\n" "Check if terraform.tfstate of deployer exists:"
 
     if [ ! -f "${deployer_terraform_tfstate_path}" ]; then
-        echo "${deployer_terraform_tfstate_path} does not exist."
+        printf "%s\n" "ERROR: ${deployer_terraform_tfstate_path} does not exist. Please follow guidance to create or recover it." >&2
         exit 2
     else 
-        echo "${deployer_terraform_tfstate_path} exists."
-        validate_deployer_remote_state
-        deployer_remote_backend_init
+        printf "%s\n" "INFO: ${deployer_terraform_tfstate_path} exists."
     fi
 }
 
@@ -24,22 +32,22 @@ function validate_deployer_remote_state(){
     az login --identity > /dev/null
     remote_state_exists=$(az storage blob exists -c ${storagecontainer_deployer_name} --name ${deployer_tfstate_name} --account-name ${tfstate_storage_account_name} | jq -r .exists)
     if $remote_state_exists; then
-        echo "remote state ${deployer_tfstate_name} already exists"
-        exit 0
+        printf "%s\n" "ERROR: remote state ${deployer_tfstate_name} already exists. It's only allowed to be pushed once." >&2
+        exit 1
     fi
 }
 
 function deployer_remote_backend_init(){
 
-    echo "Start initialize remote backend for deployer"
+    printf "%s\n" "Start initializing remote backend for deployer"
 
-    cp ${deployer_terraform_tfstate_path} ../
+    cd $${local_file_dir}/../
 
-    cd ..
+    cp ${deployer_terraform_tfstate_path} ./
 
-    echo "Clean .terraform if exists:"
+    printf "%s\n" "Clean local .terraform if exists:"
 
-    rm -r .terraform
+    rm -rf .terraform
 
     terraform init -force-copy \
     -backend-config "resource_group_name=${saplibrary_resource_group_name}" \
@@ -51,7 +59,5 @@ function deployer_remote_backend_init(){
 
     rm "${deployer_tfstate_name}"
 }
-
-
 
 main "$@"
