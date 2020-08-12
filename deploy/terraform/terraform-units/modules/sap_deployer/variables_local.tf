@@ -33,7 +33,8 @@ locals {
   sub_mgmt_nsg_exists      = try(local.sub_mgmt_nsg.is_existing, false)
   sub_mgmt_nsg_arm_id      = local.sub_mgmt_nsg_exists ? try(local.sub_mgmt_nsg.arm_id, "") : ""
   sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.sub_mgmt_nsg.name, "nsg-mgmt")
-  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.sub_mgmt_nsg.allowed_ips, ["0.0.0.0/0"])
+  deployer_pip_list        = azurerm_public_ip.deployer[*].ip_address
+  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(concat(local.sub_mgmt_nsg.allowed_ips, local.deployer_pip_list), ["0.0.0.0/0"])
   sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0], null)
 
   // Resource group and location
