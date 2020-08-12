@@ -24,6 +24,8 @@ variable "ppg" {
 
 # Set defaults
 locals {
+  # Name of the landscape
+  landscape_id = try(var.infrastructure.landscape, "DEMO")
 
   # Admin subnet
   var_sub_admin    = try(var.infrastructure.vnets.sap.subnet_admin, {})

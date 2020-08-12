@@ -1,6 +1,6 @@
 {
   "infrastructure": {
-    "landscape": "PROD",
+    "landscape": "DEMO",
     "region": "eastus",
     "resource_group": {
       "is_existing": "false",
@@ -17,6 +17,7 @@
       "platform": "HANA",
       "high_availability": false,
       "db_version": "2.00.050",
+      "size": "Demo",
       "credentials": {
         "db_systemdb_password": "<db_systemdb_password>",
         "os_sidadm_password": "<os_sidadm_password>",
