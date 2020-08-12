@@ -149,11 +149,11 @@ resource "null_resource" "prepare-deployer" {
       "mkdir -p $HOME/.config",
       // Install terraform for all users
       "sudo apt-get install unzip",
-      "sudo mkdir -p /opt/terraform/terraform_0.12.28",
+      "sudo mkdir -p /opt/terraform/terraform_0.12.29",
       "sudo mkdir -p /opt/terraform/bin/",
-      "sudo wget -P /opt/terraform/terraform_0.12.28 https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip",
-      "sudo unzip /opt/terraform/terraform_0.12.28/terraform_0.12.28_linux_amd64.zip -d /opt/terraform/terraform_0.12.28/",
-      "sudo mv /opt/terraform/terraform_0.12.28/terraform /opt/terraform/bin/terraform",
+      "sudo wget -P /opt/terraform/terraform_0.12.29 https://releases.hashicorp.com/terraform/0.12.29/terraform_0.12.29_linux_amd64.zip",
+      "sudo unzip /opt/terraform/terraform_0.12.29/terraform_0.12.29_linux_amd64.zip -d /opt/terraform/terraform_0.12.29/",
+      "sudo mv /opt/terraform/terraform_0.12.29/terraform /opt/terraform/bin/terraform",
       "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Set env for MSI
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",
