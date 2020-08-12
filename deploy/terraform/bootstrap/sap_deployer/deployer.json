@@ -1,6 +1,6 @@
 {
   "infrastructure": {
-    "region": "westus2"
+    "region": "eastus"
   },
   "sshkey": {
     "path_to_public_key": "~/.ssh/id_rsa.pub",
