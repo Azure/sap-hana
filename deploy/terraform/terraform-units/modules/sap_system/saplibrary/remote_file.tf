@@ -1,6 +1,6 @@
 /*
   Description:
-  Upload json files to stroage account 
+  Upload json files to storage account 
 */
 
 // Upload sapsystem.json to json container

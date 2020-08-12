@@ -30,10 +30,10 @@ function main(){
 
     validate_arguments "$@"
 
-    local workspace=$1
+    local landscape=$1
     local sid=$2
 
-    local input_json_path="${local_file_dir}${workspace}_${sid}.json"
+    local input_json_path="${local_file_dir}${landscape}_${sid}.json"
 
     check_file_exists ${input_json_path} "Please prepare an input json ${input_json_path}"
 
@@ -44,7 +44,7 @@ function main(){
     local saplibrary_resource_group_name=$(read_json .saplibrary.resource_group_name)
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name="sapsystem"
-    local sid_tfstate_path="${workspace}/${sid}/${workspace}_${sid}.terraform.tfstate"
+    local sid_tfstate_path="${landscape}/${sid}/${landscape}_${sid}.terraform.tfstate"
 
     terraform_execute ${saplibrary_resource_group_name} ${storage_account_name} ${container_name} ${input_json_path} ${sid_tfstate_path}
     
@@ -53,7 +53,7 @@ function main(){
 function validate_arguments(){
 
     if [ "$#" -ne 2 ]; then
-        printf "%s\n" "ERROR: Both workspace and SID should be specified. Usage example: util/terraform.sh PROD HN1" >&2
+        printf "%s\n" "ERROR: Both LANDSCAPE and SID should be specified. Usage example: util/terraform.sh PROD HN1" >&2
         exit 1
     fi
 }

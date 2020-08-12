@@ -12,6 +12,7 @@ function main(){
 
     validate_saplibrary_tfstate
     validate_saplibrary_remote_state
+    fetch_input_file
     sap_library_remote_backend_init
 }
 
@@ -37,6 +38,19 @@ function validate_saplibrary_remote_state(){
     fi
 }
 
+function fetch_input_file(){
+    
+    local file_path="${saplibrary_input_path}"
+    
+    if [ ! -f "$${file_path}" ]; then
+        printf "%s\n" "ERROR: File $${file_path} does not exist." >&2
+        exit 1
+    else
+        cp $${file_path} $${local_file_dir}/../
+    fi
+    
+}
+
 function sap_library_remote_backend_init(){
 
     printf "%s\n" "Start initializing remote backend for sap library"
@@ -57,7 +71,9 @@ function sap_library_remote_backend_init(){
 
     terraform state push "${saplibrary_tfstate_name}"
 
-    terraform state rm 'local_file.sa_config' 'local_file.output_saplibrary_script' 'local_file.output_deployer_script'
+    terraform state rm 'local_file.output_saplibrary_script' 'local_file.output_deployer_script'
+
+    terraform apply -auto-approve -var-file="${storagecontainer_saplibrary_name}.json"
 
     rm "${saplibrary_tfstate_name}"
 }

@@ -19,7 +19,7 @@ function main(){
 
     validate_arguments "$@"
 
-    local workspace=$1
+    local landscape=$1
     local sid=$2
     
     check_jq_installed
@@ -28,9 +28,9 @@ function main(){
 
     local storage_account_name=$(read_json .saplibrary.storage_account_name)
     local container_name="sapsystem"
-    local remote_file_name="${workspace}_${sid}.json"
+    local remote_file_name="${landscape}_${sid}.json"
     # The path of remote file can be updated based on actual needs
-    local remote_file_path="${workspace}/${sid}/${remote_file_name}"
+    local remote_file_path="${landscape}/${sid}/${remote_file_name}"
     local local_file_path="${local_file_dir}${remote_file_name}"
 
     json_download ${local_file_path} ${storage_account_name} ${container_name} ${remote_file_path}
@@ -39,7 +39,7 @@ function main(){
 function validate_arguments(){
 
     if [ "$#" -ne 2 ]; then
-        printf "%s\n" "ERROR: Both workspace and SID should be specified. Usage example: util/download_input.sh PROD HN1" >&2
+        printf "%s\n" "ERROR: Both LANDSCAPE and SID should be specified. Usage example: util/download_input.sh PROD HN1" >&2
         exit 1
     fi
 }

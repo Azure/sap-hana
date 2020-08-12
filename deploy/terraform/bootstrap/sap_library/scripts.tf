@@ -11,6 +11,7 @@ resource "local_file" "output_saplibrary_script" {
     storagecontainer_saplibrary_name  = module.sap_library.storagecontainer_saplibrary.name
     saplibrary_tfstate_name           = "${module.sap_library.storagecontainer_saplibrary.name}.terraform.tfstate"
     saplibrary_terraform_tfstate_path = pathexpand("~/.config/${module.sap_library.storagecontainer_saplibrary.name}.terraform.tfstate")
+    saplibrary_input_path             = "${abspath(path.root)}/${module.sap_library.storagecontainer_saplibrary.name}.json"
     }
   )
   filename             = "../../run/sap_library/${terraform.workspace}/saplibrary_tfstate_script.sh"
@@ -26,6 +27,7 @@ resource "local_file" "output_deployer_script" {
     storagecontainer_deployer_name  = module.sap_library.storagecontainer_deployer.name
     deployer_tfstate_name           = "${module.sap_library.storagecontainer_deployer.name}.terraform.tfstate"
     deployer_terraform_tfstate_path = pathexpand("~/.config/${module.sap_library.storagecontainer_deployer.name}.terraform.tfstate")
+    deployer_input_path             = pathexpand("~/.config/${module.sap_library.storagecontainer_deployer.name}.json")
     }
   )
   filename             = "../../run/sap_deployer/${terraform.workspace}/deployer_tfstate_script.sh"

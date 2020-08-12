@@ -1,5 +1,5 @@
 output "tfstate_storage_account" {
-    value = module.sap_library.sapbits_storage_account
+    value = module.sap_library.tfstate_storage_account
 }
 
 output "sapbits_storage_account" {
