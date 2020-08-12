@@ -6,6 +6,23 @@
       "is_existing": "false",
       "arm_id": "",
       "name": "azure-sap-system-rg"
+    },
+    "vnets": {
+      "sap": {
+        "address_space": "10.1.0.0/16",
+        "subnet_admin": {
+          "prefix": "10.1.1.0/24"
+        },
+        "subnet_db": {
+          "prefix": "10.1.2.0/24"
+        },
+        "subnet_iscsi": {
+          "prefix": "10.1.3.0/24"
+        },
+        "subnet_app": {
+          "prefix": "10.1.4.0/24"
+        }
+      }
     }
   },
   "jumpboxes": {
