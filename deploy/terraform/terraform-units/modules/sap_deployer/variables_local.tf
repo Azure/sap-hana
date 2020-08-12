@@ -38,7 +38,7 @@ locals {
 
   // Resource group and location
   rg_name = try(var.infrastructure.resource_group.name, format("sapdeployer-rg-%s", local.postfix))
-  region  = try(var.infrastructure.region, "westus2")
+  region  = try(var.infrastructure.region, "eastus")
 
   // Deployer(s) information from input
   deployer_input = var.deployers
