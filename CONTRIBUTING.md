@@ -1,3 +1,4 @@
+
 ### <img src="documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation <!-- omit in toc -->
 # Contributing Guidelines <!-- omit in toc -->
 
@@ -38,15 +39,21 @@ This section captures fundamentals on how new features should be developed and f
 	- The design has to make sure it is independent and has minimum impact on other modules.
 	- There should be a set of test cases in place to prove the design works and will not break existing code.
 
-**PR guidelines**
+#### PR guidelines
 1. Required information in PR ([example](https://github.com/Azure/sap-hana/pull/480)):
     	- Always link to the issue that is is trying to resolve with tag **Closes**.
 	- Describe the **Problem** that it tries to resolve.
 	- Provide the **Solution** that this PR contains.
 	- Provide **Tests** that have been done to make sure this PR does not break existing code (either in master or branch). If the test requires certain instructions, please add that information as well.
 1. The PRs should be easily tested independent of other projects in progress.
-1. Submit PRs with small commits with descriptive comemnts, so that make it easier to rollback in case of problem.
-1. If it requires several PRs for a design, please create a feature branch (name must follow feature/<feature_name> pattern, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo at ![image](/documentation/assets/contact.png) to testcase for that feature branch into Azure pipeline so we make sure your PR will be tested properly*).
+1. Submit PRs with small commits with **descriptive but not random comments**, so that make it easier to rollback in case of problem.
+1. While the commits being small, please also make sure **do not stack up too many commits** (do squash if needed).
+5. If it requires several PRs for a design, please create a feature branch (name must follow feature/<feature_name> pattern, and submit PR against the feature branch instead of master (:exclamation: *Make sure you alert the admin of the github repo at ![image](/documentation/assets/contact.png) to testcase for that feature branch into Azure pipeline so we make sure your PR will be tested properly*).
+
+#### Terraform guidelines
+1. Use `//` for single line comment and `/* */` for block comment.
+1. Try to handle complex logic in `variables_local.tf` which comes in every module.
+1. Use underscore `_` instead of hyphen `-`. The only place hyphen is used is for resource naming convention. 
 
 ### PR reviews guidelines
 We need to ensure quality along with agility. We need to move to everyone agreeing on the base requirement and then relying on systems in place to catch and mitigate issues.
