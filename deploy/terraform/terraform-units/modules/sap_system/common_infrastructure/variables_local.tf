@@ -94,14 +94,14 @@ locals {
   vnet_sap_exists = try(local.var_vnet_sap.is_existing, false)
   vnet_sap_arm_id = local.vnet_sap_exists ? try(local.var_vnet_sap.arm_id, "") : ""
   vnet_sap_name   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.name, "vnet-sap")
-  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "10.1.0.0/16")
+  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
 
   # Admin subnet
   var_sub_admin    = try(local.var_vnet_sap.subnet_admin, {})
   sub_admin_exists = try(local.var_sub_admin.is_existing, false)
   sub_admin_arm_id = local.sub_admin_exists ? try(local.var_sub_admin.arm_id, "") : ""
   sub_admin_name   = local.sub_admin_exists ? "" : try(local.var_sub_admin.name, "subnet-admin")
-  sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "10.1.1.0/24")
+  sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "")
 
   # Admin NSG
   var_sub_admin_nsg    = try(local.var_sub_admin.nsg, {})
@@ -114,7 +114,7 @@ locals {
   sub_db_exists = try(local.var_sub_db.is_existing, false)
   sub_db_arm_id = local.sub_db_exists ? try(local.var_sub_db.arm_id, "") : ""
   sub_db_name   = local.sub_db_exists ? "" : try(local.var_sub_db.name, "subnet-db")
-  sub_db_prefix = local.sub_db_exists ? "" : try(local.var_sub_db.prefix, "10.1.2.0/24")
+  sub_db_prefix = local.sub_db_exists ? "" : try(local.var_sub_db.prefix, "")
 
   # DB NSG
   var_sub_db_nsg    = try(local.var_sub_db.nsg, {})
@@ -127,7 +127,7 @@ locals {
   sub_iscsi_exists = try(local.var_sub_iscsi.is_existing, false)
   sub_iscsi_arm_id = local.sub_iscsi_exists ? try(local.var_sub_iscsi.arm_id, "") : ""
   sub_iscsi_name   = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.name, "subnet-iscsi")
-  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.prefix, "10.1.3.0/24")
+  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.prefix, "")
 
   # iSCSI NSG
   var_sub_iscsi_nsg    = try(local.var_sub_iscsi.nsg, {})
@@ -140,7 +140,7 @@ locals {
   sub_app_exists = try(local.var_sub_app.is_existing, false)
   sub_app_arm_id = local.sub_app_exists ? try(local.var_sub_app.arm_id, "") : ""
   sub_app_name   = local.sub_app_exists ? "" : try(local.var_sub_app.name, "subnet-app")
-  sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "10.1.4.0/24")
+  sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "")
 
   # APP NSG
   var_sub_app_nsg    = try(local.var_sub_app.nsg, {})

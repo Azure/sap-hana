@@ -46,7 +46,7 @@
     }
   ],
   "application": {
-    "enable_deployment": false,
+    "enable_deployment": true,
     "sid": "PRD",
     "scs_instance_number": "01",
     "ers_instance_number": "02",
