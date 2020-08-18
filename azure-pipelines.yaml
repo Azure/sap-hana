@@ -8,7 +8,6 @@ pr:
   branches:
     include:
     - master
-    - feature/*
   paths:
     include:
     - deploy/*
