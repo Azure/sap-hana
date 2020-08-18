@@ -15,7 +15,7 @@ steps:
   - script: |
       ssh-keygen -b 4096 -t rsa -f /tmp/sshkey -q -N ""
       echo "Update ${{parameters.testCaseName}}.json"
-      cd templates/tempGen
+      cd templates/tempGen/
       sed -i "s|var-sap-user|$(hana-smp-nancyc-username)|g" template.json
       sed -i "s|var-sap-password|$(hana-smp-nancyc-password)|g" template.json
       sed -i "s|var-os-image|${{parameters.osImage}}|g" template.json
@@ -28,7 +28,7 @@ steps:
       cat ${{parameters.testCaseName}}.json
     displayName: "Prepare input JSON"
   - script: |
-      cd deploy/terraform/run/sap_landscape
+      cd deploy/terraform/
       mkdir default
       cat <<- EOF > default/export-clustering-sp-details.sh
         export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
@@ -39,10 +39,10 @@ steps:
     displayName: 'Prepare SP for fencing agent'
   - script: |
       echo "Terraform Deployment in Progress..."
-      cd deploy/terraform/run/sap_landscape
+      cd deploy/terraform/
       terraform -version
       terraform init
-      terraform apply -auto-approve -var-file=../../../../templates/tempGen/${{parameters.testCaseName}}.json
+      terraform apply -auto-approve -var-file=../../templates/tempGen/${{parameters.testCaseName}}.json
     displayName: 'Terraform Deployment'
     env:
       TF_VAR_azure_service_principal_id: $(hana-pipeline-spn-id)
