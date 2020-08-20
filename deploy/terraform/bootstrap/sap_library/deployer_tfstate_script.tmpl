@@ -71,14 +71,10 @@ function deployer_remote_backend_init(){
 
     terraform state push "${deployer_tfstate_name}"
 
-<<<<<<< HEAD
     terraform apply -auto-approve -var-file="${storagecontainer_deployer_name}.json"
 
     rm "${deployer_tfstate_name}"
 
-=======
-    rm "${deployer_tfstate_name}"
->>>>>>> Clean local tfstate files after uploading (#680)
 }
 
 main "$@"

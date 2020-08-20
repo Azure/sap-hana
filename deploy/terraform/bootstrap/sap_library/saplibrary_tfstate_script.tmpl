@@ -71,13 +71,10 @@ function sap_library_remote_backend_init(){
 
     terraform state push "${saplibrary_tfstate_name}"
 
-<<<<<<< HEAD
     terraform state rm 'local_file.output_saplibrary_script' 'local_file.output_deployer_script'
 
     terraform apply -auto-approve -var-file="${storagecontainer_saplibrary_name}.json"
 
-=======
->>>>>>> Clean local tfstate files after uploading (#680)
     rm "${saplibrary_tfstate_name}"
 }
 
