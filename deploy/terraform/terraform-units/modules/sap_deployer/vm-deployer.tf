@@ -1,6 +1,8 @@
 /*
 Description:
 
+  The deployer will be used to run Terraform and Anisbe tasks to create the SAP environments
+
   Define 0..n Deployer(s).
 */
 
@@ -32,7 +34,7 @@ resource "azurerm_network_interface" "deployer" {
 resource "azurerm_user_assigned_identity" "deployer" {
   resource_group_name = azurerm_resource_group.deployer[0].name
   location            = azurerm_resource_group.deployer[0].location
-  name                = format("%s-deployer-msi", local.prefix)
+  name                = format("%s-msi", local.prefix)
 }
 
 data "azurerm_subscription" "primary" {}
@@ -56,7 +58,7 @@ resource "azurerm_role_assignment" "sub_user_admin" {
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
   name                            = format("%s%02d-vm", local.deployers[count.index].name, count.index)
-  computer_name                   = format("%s%02dvm", replace(local.deployers[count.index].name,"-",""), count.index)
+  computer_name                   = format("%s%02dvm", replace(replace(local.deployers[count.index].name,"-",""),"_",""), count.index)
   location                        = azurerm_resource_group.deployer[0].location
   resource_group_name             = azurerm_resource_group.deployer[0].name
   network_interface_ids           = [azurerm_network_interface.deployer[count.index].id]
