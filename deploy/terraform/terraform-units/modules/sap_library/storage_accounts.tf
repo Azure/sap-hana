@@ -6,8 +6,8 @@
 // Imports existing storage account to use for tfstate
 data "azurerm_storage_account" "storage_tfstate" {
   count               = local.sa_tfstate_exists ? 1 : 0
-  name                = split("/", local.sa_tfstate_arm_id.arm_id)[8]
-  resource_group_name = split("/", local.sa_tfstate_arm_id.arm_id)[4]
+  name                = split("/", local.sa_tfstate_arm_id)[8]
+  resource_group_name = split("/", local.sa_tfstate_arm_id)[4]
 }
 
 // Creates storage account for storing tfstate
@@ -45,8 +45,8 @@ resource "azurerm_storage_container" "storagecontainer_saplibrary" {
 // Imports existing storage account for storing SAP bits
 data "azurerm_storage_account" "storage_sapbits" {
   count               = local.sa_sapbits_exists ? 1 : 0
-  name                = split("/", local.sa_sapbits_arm_id.arm_id)[8]
-  resource_group_name = split("/", local.sa_sapbits_arm_id.arm_id)[4]
+  name                = split("/", local.sa_sapbits_arm_id)[8]
+  resource_group_name = split("/", local.sa_sapbits_arm_id)[4]
 }
 
 // Creates storage account for storing SAP bits
