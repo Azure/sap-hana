@@ -4,7 +4,15 @@
 */
 
 module "deployer" {
-  source = "../../terraform-units/modules/sap_system/deployer"
+  source         = "../../terraform-units/modules/sap_system/deployer"
+  application    = var.application
+  databases      = var.databases
+  infrastructure = var.infrastructure
+  jumpboxes      = var.jumpboxes
+  options        = var.options
+  software       = var.software
+  ssh-timeout    = var.ssh-timeout
+  sshkey         = var.sshkey
 }
 
 module "saplibrary" {

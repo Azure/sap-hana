@@ -97,7 +97,7 @@ resource "local_file" "output-json" {
     "options" = var.options
     }
   )
-  filename             = "${terraform.workspace}/ansible_config_files/output.json"
+  filename             = "${path.cwd}/ansible_config_files/output.json"
   file_permission      = "0660"
   directory_permission = "0770"
 }
@@ -123,7 +123,7 @@ resource "local_file" "ansible-inventory" {
     deployers             = var.deployers
     }
   )
-  filename             = "${terraform.workspace}/ansible_config_files/hosts"
+  filename             = "${path.cwd}/ansible_config_files/hosts"
   file_permission      = "0660"
   directory_permission = "0770"
 }
@@ -149,7 +149,7 @@ resource "local_file" "ansible-inventory-yml" {
     deployers             = var.deployers
     }
   )
-  filename             = "${terraform.workspace}/ansible_config_files/hosts.yml"
+  filename             = "${path.cwd}/ansible_config_files/hosts.yml"
   file_permission      = "0660"
   directory_permission = "0770"
 }

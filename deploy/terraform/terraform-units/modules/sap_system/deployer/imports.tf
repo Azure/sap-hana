@@ -6,10 +6,10 @@
 data "terraform_remote_state" "deployer" {
   backend = "azurerm"
   config = {
-    resource_group_name  = local.deployer_config.deployer.resource_group_name
-    storage_account_name = local.deployer_config.deployer.storage_account_name
-    container_name       = local.deployer_config.deployer.container_name
-    key                  = local.deployer_config.deployer.key
+    resource_group_name  = local.saplib_resource_group_name
+    storage_account_name = local.tfstate_storage_account_name
+    container_name       = local.tfstate_container_name
+    key                  = local.deployer_tfstate_key
   }
 }
 

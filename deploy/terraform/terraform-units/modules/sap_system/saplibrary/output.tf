@@ -14,6 +14,6 @@ output "sid" {
   value = local.sid
 }
 
-output "landscape_id" {
-  value = local.landscape_id
+output "landscape" {
+  value = local.landscape
 }

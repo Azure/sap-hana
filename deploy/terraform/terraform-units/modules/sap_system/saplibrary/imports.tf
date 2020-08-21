@@ -1,15 +1,15 @@
 /*
     Description:
-      Import deployer resources
+      Import sapbits resources
 */
 
 data "terraform_remote_state" "saplibrary" {
   backend = "azurerm"
   config = {
-    resource_group_name  = local.deployer_config.saplibrary.resource_group_name
-    storage_account_name = local.deployer_config.saplibrary.storage_account_name
-    container_name       = local.deployer_config.saplibrary.container_name
-    key                  = local.deployer_config.saplibrary.key
+    resource_group_name  = local.saplib_resource_group_name
+    storage_account_name = local.tfstate_storage_account_name
+    container_name       = local.tfstate_container_name
+    key                  = local.saplib_tfstate_key
   }
 }
 
