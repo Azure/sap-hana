@@ -28,55 +28,13 @@ resource "azurerm_storage_account" "storage_tfstate" {
   }
 }
 
-data "azurerm_storage_container" "storagecontainer_sapsystem" {
-  count                = local.sa_sapsystem_container_exists ? 1 : 0
-  name                 = local.sa_sapsystem_container_name
-  storage_account_name = local.sa_tfstate.name
-}
-
-// Creates the storage container inside the storage account for sapsystem
-resource "azurerm_storage_container" "storagecontainer_sapsystem" {
-  count                 = local.sa_sapsystem_container_exists ? 0 : 1
-  name                  = local.sa_sapsystem_container_name
-  storage_account_name  = local.sa_tfstate.name
-  container_access_type = local.sa_tfstate_container_access_type
-}
-
-data "azurerm_storage_container" "storagecontainer_saplandscape" {
-  count                = local.sa_saplandscape_container_exists ? 1 : 0
-  name                 = local.sa_saplandscape_container_name
-  storage_account_name = local.sa_tfstate.name
-}
-
-// Creates the storage container inside the storage account for saplandscape
-resource "azurerm_storage_container" "storagecontainer_saplandscape" {
-  count                 = local.sa_saplandscape_container_exists ? 0 : 1
-  name                  = local.sa_saplandscape_container_name
-  storage_account_name  = local.sa_tfstate.name
-  container_access_type = local.sa_tfstate_container_access_type
-}
-
-data "azurerm_storage_container" "storagecontainer_deployer" {
-  count                = local.sa_deployer_container_exists ? 1 : 0
-  name                 = local.sa_deployer_container_name
-  storage_account_name = local.sa_tfstate.name
-}
-
-// Creates the storage container inside the storage account for deployer
-resource "azurerm_storage_container" "storagecontainer_deployer" {
-  count                 = local.sa_deployer_container_exists ? 0 : 1
-  name                  = local.sa_deployer_container_name
-  storage_account_name  = local.sa_tfstate.name
-  container_access_type = local.sa_tfstate_container_access_type
-}
-
 data "azurerm_storage_container" "storagecontainer_saplibrary" {
   count                = local.sa_saplibrary_container_exists ? 1 : 0
   name                 = local.sa_saplibrary_container_name
   storage_account_name = local.sa_tfstate.name
 }
 
-// Creates the storage container inside the storage account for saplibrary
+// Creates the storage container inside the storage account for sapsystem
 resource "azurerm_storage_container" "storagecontainer_saplibrary" {
   count                 = local.sa_saplibrary_container_exists ? 0 : 1
   name                  = local.sa_saplibrary_container_name
@@ -102,7 +60,7 @@ resource "azurerm_storage_account" "storage_sapbits" {
   account_kind              = local.sa_sapbits_account_kind
   enable_https_traffic_only = local.sa_sapbits_enable_secure_transfer
   // To support all access levels 'Blob' 'Private' and 'Container'
-  allow_blob_public_access  = true
+  allow_blob_public_access = true
   // TODO: soft delete for file share
 }
 
@@ -115,7 +73,7 @@ data "azurerm_storage_container" "storagecontainer_sapbits" {
 
 // Creates the storage container inside the storage account for SAP bits
 resource "azurerm_storage_container" "storagecontainer_sapbits" {
-  count                 = (local.sa_sapbits_blob_container_enable && !local.sa_sapbits_blob_container_exists) ? 1 : 0
+  count                 = (local.sa_sapbits_blob_container_enable && ! local.sa_sapbits_blob_container_exists) ? 1 : 0
   name                  = local.sa_sapbits_blob_container_name
   storage_account_name  = local.sa_sapbits.name
   container_access_type = local.sa_sapbits_container_access_type
@@ -123,7 +81,7 @@ resource "azurerm_storage_container" "storagecontainer_sapbits" {
 
 // Creates file share inside the storage account for SAP bits
 resource "azurerm_storage_share" "fileshare_sapbits" {
-  count                = (local.sa_sapbits_file_share_enable && !local.sa_sapbits_file_share_exists) ? 1 : 0
+  count                = (local.sa_sapbits_file_share_enable && ! local.sa_sapbits_file_share_exists) ? 1 : 0
   name                 = local.sa_sapbits_file_share_name
   storage_account_name = local.sa_sapbits.name
 }
