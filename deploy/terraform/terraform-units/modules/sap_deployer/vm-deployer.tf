@@ -1,13 +1,15 @@
 /*
 Description:
 
+  The deployer will be used to run Terraform and Anisbe tasks to create the SAP environments
+
   Define 0..n Deployer(s).
 */
 
 // Public IP addresse and nic for Deployer
 resource "azurerm_public_ip" "deployer" {
   count               = length(local.deployers)
-  name                = format("%s%02d-pip-%s", local.deployers[count.index].name, count.index, local.postfix)
+  name                = format("%s%02d-pip", local.deployers[count.index].name, count.index)
   location            = azurerm_resource_group.deployer[0].location
   resource_group_name = azurerm_resource_group.deployer[0].name
   allocation_method   = "Static"
@@ -15,7 +17,7 @@ resource "azurerm_public_ip" "deployer" {
 
 resource "azurerm_network_interface" "deployer" {
   count               = length(local.deployers)
-  name                = format("%s%02d-nic-%s", local.deployers[count.index].name, count.index, local.postfix)
+  name                = format("%s%02d-nic", local.deployers[count.index].name, count.index)
   location            = azurerm_resource_group.deployer[0].location
   resource_group_name = azurerm_resource_group.deployer[0].name
 
@@ -32,7 +34,7 @@ resource "azurerm_network_interface" "deployer" {
 resource "azurerm_user_assigned_identity" "deployer" {
   resource_group_name = azurerm_resource_group.deployer[0].name
   location            = azurerm_resource_group.deployer[0].location
-  name                = format("%s-msi-%s", "deployer", local.postfix)
+  name                = format("%s-msi", local.prefix)
 }
 
 data "azurerm_subscription" "primary" {}
@@ -55,8 +57,8 @@ resource "azurerm_role_assignment" "sub_user_admin" {
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
-  name                            = format("%s%02d-vm-%s", local.deployers[count.index].name, count.index, local.postfix)
-  computer_name                   = format("%s%02d-vm-%s", local.deployers[count.index].name, count.index, local.postfix)
+  name                            = format("%s%02d-vm", local.deployers[count.index].name, count.index)
+  computer_name                   = format("%s%02dvm", replace(replace(local.deployers[count.index].name,"-",""),"_",""), count.index)
   location                        = azurerm_resource_group.deployer[0].location
   resource_group_name             = azurerm_resource_group.deployer[0].name
   network_interface_ids           = [azurerm_network_interface.deployer[count.index].id]
@@ -66,7 +68,7 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   disable_password_authentication = local.deployers[count.index].authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = format("%s%02d-OsDisk-%s", local.deployers[count.index].name, count.index, local.postfix)
+    name                 = format("%s%02d-osdisk", local.deployers[count.index].name, count.index)
     caching              = "ReadWrite"
     storage_account_type = local.deployers[count.index].disk_type
   }
@@ -145,8 +147,14 @@ resource "null_resource" "prepare-deployer" {
 
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
-      // Create config folder
-      "mkdir -p $HOME/.config",
+      // Prepare folder structure
+      "mkdir -p $HOME/azure_sap_automated_deployment/workspaces/local/${azurerm_resource_group.deployer[0].name}",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_library",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_system",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_landscape",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/deployer",
+      // Clones project repository
+      "git clone https://github.com/Azure/sap-hana.git $HOME/azure_sap_automated_deployment/sap-hana",
       // Install terraform for all users
       "sudo apt-get install unzip",
       "sudo mkdir -p /opt/terraform/terraform_0.12.29",
@@ -159,6 +167,7 @@ resource "null_resource" "prepare-deployer" {
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_SUBSCRIPTION_ID=${data.azurerm_subscription.primary.subscription_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_TENANT_ID=${data.azurerm_subscription.primary.tenant_id} >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo az login --identity --output none >> /etc/profile.d/deploy_server.sh\"",
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
       // Install Git
@@ -171,9 +180,7 @@ resource "null_resource" "prepare-deployer" {
       // Installs Ansible
       "sudo -H pip3 install \"ansible>=2.8,<2.9\"",
       // Install pywinrm
-      "sudo -H pip3 install \"pywinrm>=0.3.0\"",
-      // Clones project repository
-      "git clone https://github.com/Azure/sap-hana.git"
+      "sudo -H pip3 install \"pywinrm>=0.3.0\""
     ]
   }
 }

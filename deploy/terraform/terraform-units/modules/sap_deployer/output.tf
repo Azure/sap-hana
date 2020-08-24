@@ -4,6 +4,11 @@ Description:
   Output from sap_deployer module.
 */
 
+// Deployer resource group name
+output "deployer_rg_name" {
+  value = azurerm_resource_group.deployer[0].name
+}
+
 // Unique ID for deployer
 output "deployer_id" {
   value = random_id.deployer

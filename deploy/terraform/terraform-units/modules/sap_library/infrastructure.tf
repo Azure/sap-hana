@@ -15,10 +15,4 @@ data "azurerm_resource_group" "library" {
   name  = split("/", local.rg_arm_id)[4]
 }
 
-resource "azurerm_management_lock" "library" {
-  count      = local.rg_exists ? 0 : 1
-  name       = "resource-group-level"
-  scope      = azurerm_resource_group.library[0].id
-  lock_level = "CanNotDelete"
-  notes      = "Locked because it's needed by Azure Automated Deployment"
-}
+// TODO: Add management lock when this issue is addressed https://github.com/terraform-providers/terraform-provider-azurerm/issues/5473

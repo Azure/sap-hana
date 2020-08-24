@@ -26,7 +26,7 @@ locals {
   sub_app_exists = try(local.var_sub_app.is_existing, false)
   sub_app_arm_id = local.sub_app_exists ? try(local.var_sub_app.arm_id, "") : ""
   sub_app_name   = local.sub_app_exists ? "" : try(local.var_sub_app.name, "subnet-app")
-  sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "10.1.4.0/24")
+  sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "")
 
   # APP NSG
   var_sub_app_nsg    = try(local.var_sub_app.nsg, {})
@@ -41,7 +41,7 @@ locals {
   sub_web_exists  = try(local.sub_web.is_existing, false)
   sub_web_arm_id  = local.sub_web_exists ? try(local.sub_web.arm_id, "") : ""
   sub_web_name    = local.sub_web_exists ? "" : try(local.sub_web.name, "subnet-web")
-  sub_web_prefix  = local.sub_web_exists ? "" : try(local.sub_web.prefix, "10.1.5.0/24")
+  sub_web_prefix  = local.sub_web_exists ? "" : try(local.sub_web.prefix, "")
   sub_web_deployed = try(local.sub_web_defined ? (
     local.sub_web_exists ? data.azurerm_subnet.subnet-sap-web[0] : azurerm_subnet.subnet-sap-web[0]) : (
   local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0] : azurerm_subnet.subnet-sap-app[0]), null)

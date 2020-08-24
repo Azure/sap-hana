@@ -1,18 +1,23 @@
 local_file_dir=$(dirname "$BASH_SOURCE")
 
-
-%{~ for index, deployer in deployers ~}
-ssh -i ${deployer-ppk}  -o StrictHostKeyChecking=no ${deployer.authentication.username}@${deployer-ips[index]} "mkdir -p ~/.config/"
-%{ endfor ~}
-
 printf "%s\n" "Start uploading deployer tfstate"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/../deployer.terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.terraform.tfstate
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}
 
 printf "%s\n" "Start uploading deployer json"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/../deployer.json ${deployer.authentication.username}@${deployer-ips[index]}:~/.config/deployer.json
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ws}.json ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+%{ endfor ~}
+
+printf "%s\n" "Start uploading deployer SSH keypair"
+
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+%{ endfor ~}
+
+%{~ for index, deployer in deployers ~}
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-pk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}

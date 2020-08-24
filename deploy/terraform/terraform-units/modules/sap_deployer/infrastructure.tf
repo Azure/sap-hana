@@ -16,13 +16,7 @@ resource "azurerm_resource_group" "deployer" {
   location = local.region
 }
 
-resource "azurerm_management_lock" "deployer" {
-  count      = local.enable_deployers ? 1 : 0
-  name       = "resource-group-level"
-  scope      = azurerm_resource_group.deployer[0].id
-  lock_level = "CanNotDelete"
-  notes      = "Locked because it's needed by Azure Automated Deployment"
-}
+// TODO: Add management lock when this issue is addressed https://github.com/terraform-providers/terraform-provider-azurerm/issues/5473
 
 // Create/Import management vnet
 resource "azurerm_virtual_network" "vnet_mgmt" {
@@ -58,7 +52,7 @@ data "azurerm_subnet" "subnet_mgmt" {
 // Creates boot diagnostics storage account for Deployer
 resource "azurerm_storage_account" "deployer" {
   count                     = local.enable_deployers ? 1 : 0
-  name                      = "sadiag${local.postfix}"
+  name                      = lower(format("%s%s",local.sa_prefix,substr(local.postfix,0,4)))
   resource_group_name       = azurerm_resource_group.deployer[0].name
   location                  = azurerm_resource_group.deployer[0].location
   account_replication_type  = "LRS"
