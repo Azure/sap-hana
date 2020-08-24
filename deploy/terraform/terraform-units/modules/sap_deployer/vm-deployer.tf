@@ -146,13 +146,13 @@ resource "null_resource" "prepare-deployer" {
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
       // Prepare folder structure
-      "mkdir -p $HOME/Azure_SAP_Automated_Deployment/workspaces/local/${azurerm_resource_group.deployer[0].name}",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/workspaces/sap_library",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/workspaces/sap_system",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/workspaces/sap_landscape",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/workspaces/deployer",
+      "mkdir -p $HOME/azure_sap_automated_deployment/workspaces/local/${azurerm_resource_group.deployer[0].name}",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_library",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_system",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/sap_landscape",
+      "mkdir $HOME/azure_sap_automated_deployment/workspaces/deployer",
       // Clones project repository
-      "git clone https://github.com/Azure/sap-hana.git $HOME/Azure_SAP_Automated_Deployment/sap-hana",
+      "git clone https://github.com/Azure/sap-hana.git $HOME/azure_sap_automated_deployment/sap-hana",
       // Install terraform for all users
       "sudo apt-get install unzip",
       "sudo mkdir -p /opt/terraform/terraform_0.12.29",

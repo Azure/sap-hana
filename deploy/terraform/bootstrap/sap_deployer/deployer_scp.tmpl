@@ -3,21 +3,21 @@ local_file_dir=$(dirname "$BASH_SOURCE")
 printf "%s\n" "Start uploading deployer tfstate"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/Azure_SAP_Automated_Deployment/workspaces/local/${deployer-ws}/
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}
 
 printf "%s\n" "Start uploading deployer json"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ws}.json ${deployer.authentication.username}@${deployer-ips[index]}:~/Azure_SAP_Automated_Deployment/workspaces/local/${deployer-ws}/
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ws}.json ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}
 
 printf "%s\n" "Start uploading deployer SSH keypair"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]}:~/Azure_SAP_Automated_Deployment/workspaces/local/${deployer-ws}/
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-pk} ${deployer.authentication.username}@${deployer-ips[index]}:~/Azure_SAP_Automated_Deployment/workspaces/local/${deployer-ws}/
+scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-pk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
 %{ endfor ~}
