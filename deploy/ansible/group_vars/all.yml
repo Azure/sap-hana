@@ -7,7 +7,7 @@ linux_comp_list: []
 windows_comp_list: []
 hana_install_path: "/hana/shared/{{ hana_database.instance.sid }}/install"
 hana_software_loc: "{{ azure_files_mount_path }}/DB/DATA_UNITS"
-configs_path: "~/sap-hana/deploy/configs"
+configs_path: "~/azure_sap_automated_deployment/sap-hana/deploy/configs"
 components: "{{ lookup('file', configs_path + '/components.json') }}"
 output: "{{ hostvars['localhost'].output }}"
 hana_database: "{{ hostvars['localhost'].hana_database }}"
