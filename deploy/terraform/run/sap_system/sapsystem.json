@@ -10,7 +10,6 @@
       "management": {
         "saplib_resource_group_name": "",
         "tfstate_storage_account_name": "",
-        "tfstate_container_name": "saplibrary",
         "deployer_tfstate_key": ""
       },
       "sap": {
@@ -74,7 +73,6 @@
     "storage_account_sapbits": {
       "saplib_resource_group_name": "",
       "tfstate_storage_account_name": "",
-      "tfstate_container_name": "saplibrary",
       "saplib_tfstate_key": ""
     },
     "downloader": {
