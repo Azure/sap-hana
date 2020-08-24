@@ -58,8 +58,8 @@ locals {
   location_short     = try(var.region_mapping[local.region], "unkn")
   vnet_mgmt_tempname = try(local.vnet_mgmt.name, "deployer")
   prefix             = try(var.infrastructure.resource_group.name, lower(format("%s-%s-%s", local.landscape, local.location_short, local.vnet_mgmt_tempname)))
-  sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape,0,5), local.location_short, substr(local.vnet_mgmt_tempname,0,7)))
-  rg_name            = format("%s-infrastructure", local.prefix)
+  sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape, 0, 5), local.location_short, substr(local.vnet_mgmt_tempname, 0, 7)))
+  rg_name            = try(var.infrastructure.resource_group.name, format("%s-infrastructure", local.prefix))
 
 
   // Management vnet
@@ -93,7 +93,7 @@ locals {
   enable_deployers = length(local.deployer_input) > 0 ? true : false
   deployers = [
     for idx, deployer in local.deployer_input : {
-      "name"                 = format("%s_deployer",local.prefix),
+      "name"                 = format("%s_deployer", local.prefix),
       "destroy_after_deploy" = true,
       "size"                 = try(deployer.size, "Standard_D2s_v3"),
       "disk_type"            = try(deployer.disk_type, "StandardSSD_LRS")
