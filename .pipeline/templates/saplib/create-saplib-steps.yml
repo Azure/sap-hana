@@ -32,8 +32,8 @@ steps:
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>$HOME/.log/$(Build.BuildId)_apply_error.log 2>&1>$HOME/.log/$(Build.BuildId)_apply.log
       if [ -s $HOME/.log/$(Build.BuildId)_apply_error.log ]; then cat $HOME/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
       '
-
     displayName: "Deploy saplibrary: Branch ${{parameters.branch_name}}"
+    condition: or(succeededOrFailed(), always())
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)
       ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
