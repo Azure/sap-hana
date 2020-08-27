@@ -1,23 +1,31 @@
-local_file_dir=$(dirname "$BASH_SOURCE")
+local_file_dir=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
+workspace=$(basename $${local_file_dir})
+remote_dir="~/azure_sap_automated_deployment/workspaces/local/$${workspace}"
+
+printf "%s\n" "Create remote workspace if not exists"
+
+%{~ for index, deployer in deployers ~}
+ssh -i $${local_file_dir}/${deployer-ppk}  -o StrictHostKeyChecking=no ${deployer.authentication.username}@${deployer-ips[index]} "[ -d $${remote_dir} ] && mkdir -p $${remote_dir}"
+%{ endfor ~}
 
 printf "%s\n" "Start uploading deployer tfstate"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+scp -i $${local_file_dir}/${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{ endfor ~}
 
 printf "%s\n" "Start uploading deployer json"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ws}.json ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+scp -i $${local_file_dir}/${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/$${workspace}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{ endfor ~}
 
 printf "%s\n" "Start uploading deployer SSH keypair"
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+scp -i $${local_file_dir}/${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-ppk} ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{ endfor ~}
 
 %{~ for index, deployer in deployers ~}
-scp -i ${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-pk} ${deployer.authentication.username}@${deployer-ips[index]}:~/azure_sap_automated_deployment/workspaces/local/${deployer-ws}/
+scp -i $${local_file_dir}/${deployer-ppk} -o StrictHostKeyChecking=no $${local_file_dir}/${deployer-pk} ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{ endfor ~}
