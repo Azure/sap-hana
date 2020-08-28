@@ -13,7 +13,7 @@ steps:
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       mkdir $HOME/${saplib_rg}; cd $_
       git clone https://github.com/Azure/sap-hana.git
-      cd sap-hana && git checkout ${{parameters.branch_name}}
+      cd sap-hana && git pull && git checkout ${{parameters.branch_name}}
       
       echo "=== Create workspace ${ws_dir} ==="
       mkdir -p ${ws_dir}; cd $_

@@ -8,7 +8,7 @@ steps:
       deployer_rg=${{parameters.deployer_rg_name}}
       saplib_rg_name=${{parameters.saplib_rg_name}}
 
-      #If no osImage provided, deploy SLES12SP5
+      # If no osImage provided, deploy SLES12SP5
       [ -z "${{parameters.osImage_offer}}" ] && osImage_offer="sles-sap-12-sp5" || osImage_offer=${{parameters.osImage_offer}}
       [ -z "${{parameters.osImage_publisher}}" ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
       [ -z "${{parameters.osImage_sku}}" ] && osImage_sku="gen1" || osImage_sku=${{parameters.osImage_sku}}
@@ -24,7 +24,7 @@ steps:
         mkdir $HOME/${sapsystem_rg}; cd $_
         git clone https://github.com/Azure/sap-hana.git
       fi
-      cd $repo_dir && git checkout ${{parameters.branch_name}}
+      cd $repo_dir && git pull && git checkout ${{parameters.branch_name}}
 
       echo "=== Create workspace ${ws_dir} ==="
       mkdir -p ${ws_dir}; cd $_
@@ -113,6 +113,10 @@ steps:
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_apply_error.log 2>&1>~/.log/$(Build.BuildId)_apply.log
       if [ -s ~/.log/$(Build.BuildId)_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
       '
+
+      if [ $? -ne 0 ]; then
+        exit 1
+      fi
     displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
     env:
