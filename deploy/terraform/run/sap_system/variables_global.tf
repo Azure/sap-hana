@@ -16,8 +16,8 @@ variable "infrastructure" {
 variable "jumpboxes" {
   description = "Details of the jumpboxes"
   default     = {
-    windows = {},
-    linux = {}
+    windows = [],
+    linux = []
   }
 }
 
