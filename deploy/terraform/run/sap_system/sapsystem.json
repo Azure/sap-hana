@@ -31,10 +31,6 @@
       }
     }
   },
-  "jumpboxes": {
-    "windows": [],
-    "linux": []
-  },
   "databases": [
     {
       "platform": "HANA",
