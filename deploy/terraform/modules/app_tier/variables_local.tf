@@ -102,10 +102,10 @@ locals {
   # Note: First 4 IP addresses in a subnet are reserved by Azure
   ip_offsets = {
     scs_lb = 4 + 1
-    web_lb = 4 + 3
+    web_lb = local.sub_web_defined ? (4 + 1) : (4 + 3)
     scs_vm = 4 + 6
     app_vm = 4 + 10
-    web_vm = 4 + 20
+    web_vm = local.sub_web_defined ? (4 + 2) : (4 + 20)
   }
 
   # Default VM config should be merged with any the user passes in
