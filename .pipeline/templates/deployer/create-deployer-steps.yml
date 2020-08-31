@@ -2,7 +2,7 @@ steps:
   - script: |
       repo_path=$(pwd)
       deployer_rg=${{parameters.deployer_rg_name}}
-      ws_dir=$(Agent.BuildDirectory)/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
+      ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       input=${ws_dir}/${deployer_rg}.json
 
       git checkout ${{parameters.branch_name}}

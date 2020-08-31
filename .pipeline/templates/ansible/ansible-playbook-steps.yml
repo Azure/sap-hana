@@ -5,8 +5,8 @@ steps:
       source /etc/profile.d/deploy_server.sh
 
       sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
-      repo_dir=$HOME/azure_sap_automated_deployment/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg_name}
+      repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
+      ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg_name}
 
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
@@ -17,7 +17,7 @@ steps:
       export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
       export ANSIBLE_HOST_KEY_CHECKING=False
       source ${ws_dir}/export-clustering-sp-details.sh
-      cd ~/azure_sap_automated_deployment
+      cd ~/Azure_SAP_Automated_Deployment
       ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml ${repo_dir}/deploy/ansible/sap_playbook.yml
       '
     displayName: "Run Ansible-playbook: Branch ${{parameters.branch_name}}"

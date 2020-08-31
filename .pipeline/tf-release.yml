@@ -21,22 +21,22 @@ stages:
     steps:
       - script: |
           az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-          sapsystem_rg="sles-eaus-sap0-PRD"
+          sapsystem_rg="SLES-EAUS-SAP0-PRD"
           echo "=== Mark and try to delete rg $sapsystem_rg ==="
           az group update --resource-group $sapsystem_rg --set tags.Delete=True
           az group delete -n $sapsystem_rg -y
 
-          sapsystem_rg="rhel-eaus-sap0-PRD"
+          sapsystem_rg="RHEL-EAUS-SAP0-PRD"
           echo "=== Mark and try to delete rg $sapsystem_rg ==="
           az group update --resource-group $sapsystem_rg --set tags.Delete=True
           az group delete -n $sapsystem_rg -y
 
-          saplib_rg="unit-eaus-sap_library"
+          saplib_rg="UNIT-EAUS-SAP_LIBRARY"
           echo "=== Mark and try to delete rg $saplib_rg ==="
           az group update --resource-group $saplib_rg --set tags.Delete=True
           az group delete -n $saplib_rg -y
 
-          deployer_rg="unit-eaus-deployer-infrastructure"
+          deployer_rg="UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
           echo "=== Mark and try to delete rg $deployer_rg ==="
           az group update --resource-group $deployer_rg --set tags.Delete=True
           az group delete -n $deployer_rg -y
@@ -54,75 +54,75 @@ stages:
       - template: templates/deployer/create-deployer-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: createSAPLib
     dependsOn: createDeployer
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/saplib/create-saplib-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          saplib_rg_name: "unit-eaus-sap_library"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
       - template: templates/saplib/post-saplib-steps.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          saplib_rg_name: "unit-eaus-sap_library"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: createSAPSystemSLES
     dependsOn: createSAPLib
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/sapsystem/create-sapsystem-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          saplib_rg_name: "unit-eaus-sap_library"
-          sapsystem_rg_name: "sles-eaus-sap0-PRD"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
+          sapsystem_rg_name: "SLES-EAUS-SAP0-PRD"
           osImage_offer: "sles-sap-12-sp5"
           osImage_publisher: "SUSE"
           osImage_sku: "gen1"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: createSAPSystemRHEL
     dependsOn: createSAPLib
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/sapsystem/create-sapsystem-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          saplib_rg_name: "unit-eaus-sap_library"
-          sapsystem_rg_name: "rhel-eaus-sap0-PRD"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
+          sapsystem_rg_name: "RHEL-EAUS-SAP0-PRD"
           osImage_offer: "RHEL-SAP-HA"
           osImage_publisher: "RedHat"
           osImage_sku: "7.6"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: runAnsibleSLES
     timeoutInMinutes: 120
     dependsOn: createSAPSystemSLES
@@ -130,14 +130,14 @@ stages:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          sapsystem_rg_name: "sles-eaus-sap0-PRD"
+          sapsystem_rg_name: "SLES-EAUS-SAP0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"

@@ -9,7 +9,7 @@ steps:
 
       sapsystem_rg=${{parameters.sapsystem_rg_name}}
       repo_dir=$HOME/$saplib_rg/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg}
+      ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg}
       input=${ws_dir}/${sapsystem_rg}.json
 
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="

@@ -23,15 +23,15 @@ stages:
       - template: templates/deployer/create-deployer-steps.yml
         parameters:
           branch_name: $(targetBranchName)
-          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/deployer/validate-deployer-steps.yml
         parameters:
-          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/deployer/create-deployer-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/deployer/delete-deployer-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "$(Build.BuildId)-eaus-deployer-infrastructure"
+          deployer_rg_name: "$(Build.BuildId)-EAUS-DEPLOYER-INFRASTRUCTURE"

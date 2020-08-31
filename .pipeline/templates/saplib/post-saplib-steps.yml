@@ -7,8 +7,8 @@ steps:
       saplib_rg=${{parameters.saplib_rg_name}}
       repo_dir=$HOME/${saplib_rg}/sap-hana
 
-      deployer_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
-      saplib_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_library/${saplib_rg}
+      deployer_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
+      saplib_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/${saplib_rg}
 
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       deployer_key="${deployer_rg}.terraform.tfstate"

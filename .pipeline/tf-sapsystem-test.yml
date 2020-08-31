@@ -23,29 +23,29 @@ stages:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/sapsystem/create-sapsystem-steps.yml
         parameters:
           branch_name: $(targetBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          saplib_rg_name: "unit-eaus-sap_library"
-          sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
+          sapsystem_rg_name: "$(Build.BuildId)-EAUS-SAP0-PRD"
       - template: templates/sapsystem/validate-sapsystem-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
+          sapsystem_rg_name: "$(Build.BuildId)-EAUS-SAP0-PRD"
       - template: templates/sapsystem/create-sapsystem-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          saplib_rg_name: "unit-eaus-sap_library"
-          sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
+          sapsystem_rg_name: "$(Build.BuildId)-EAUS-SAP0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: deleteSAPSystem
     dependsOn: createSAPSystem
     condition: or(succeededOrFailed(), always())
@@ -53,15 +53,15 @@ stages:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/sapsystem/delete-sapsystem-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
-          sapsystem_rg_name: "$(Build.BuildId)-eaus-sap0-PRD"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
+          sapsystem_rg_name: "$(Build.BuildId)-EAUS-SAP0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"

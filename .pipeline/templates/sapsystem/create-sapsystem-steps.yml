@@ -14,8 +14,8 @@ steps:
       [ -z "${{parameters.osImage_sku}}" ] && osImage_sku="gen1" || osImage_sku=${{parameters.osImage_sku}}
       
       repo_dir=$HOME/$sapsystem_rg/sap-hana
-      ws_dir=$HOME/azure_sap_automated_deployment/workspaces/sap_system/${sapsystem_rg}
-      deployer_ws_dir=$HOME/azure_sap_automated_deployment/workspaces/local/${deployer_rg}
+      ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg}
+      deployer_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       input=${ws_dir}/${sapsystem_rg}.json
       
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
@@ -39,12 +39,12 @@ steps:
 
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg_name} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
-      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"deployer\\\")).name"'")
-      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"library\\\")).name"'")
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"DEPLOYER\\\")).name"'")
+      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name saplibrary --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
 
       buildId=$(Build.BuildId)
       isRelease=${sapsystem_rg%%$buildId*}
-      isSles=${sapsystem_rg%%sles*}
+      [[ ${osImage_publisher} == "SUSE" ]] && isSles=true || isSles=false
       
       # subnet is decided by buildId if it is unit test.
       # Otherwise, use 10.10.0.0 for sles and 10.10.1.0 for rhel
@@ -58,7 +58,7 @@ steps:
         idx1=10
         landscape="unit"
         ha="true"
-        if [ -z "${isSles}" ]
+        if ${isSles}
         then idx2=0
         else idx2=1
         fi
