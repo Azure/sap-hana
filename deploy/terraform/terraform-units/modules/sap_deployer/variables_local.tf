@@ -59,7 +59,7 @@ locals {
   vnet_mgmt_tempname = try(local.vnet_mgmt.name, "deployer")
   prefix             = try(var.infrastructure.resource_group.name, upper(format("%s-%s-%s", local.landscape, local.location_short, local.vnet_mgmt_tempname)))
   sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape,0,5), local.location_short, substr(local.vnet_mgmt_tempname,0,7)))
-  rg_name            = format("%s-INFRASTRUCTURE", local.prefix)
+  rg_name            = try(var.infrastructure.resource_group.name,format("%s-INFRASTRUCTURE", local.prefix))
 
 
   // Management vnet
