@@ -151,7 +151,7 @@ resource "azurerm_lb" "web" {
     name                          = "sap${lower(local.application_sid)}web"
     subnet_id                     = local.sub_web_deployed.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = cidrhost(local.sub_web_defined ? local.sub_web_prefix : local.sub_app_prefix, local.ip_offsets.web_lb)
+    private_ip_address            = local.sub_web_defined ? cidrhost(local.sub_web_prefix, local.ip_offsets.web_lb) : cidrhost(local.sub_app_prefix, local.ip_offsets.web_lb)
   }
 }
 
