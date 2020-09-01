@@ -9,7 +9,7 @@ resource "azurerm_network_interface" "web" {
   ip_configuration {
     name                          = "IPConfig1"
     subnet_id                     = local.sub_web_deployed.id
-    private_ip_address            = cidrhost(local.sub_web_defined ? local.sub_web_prefix : local.sub_app_prefix, tonumber(count.index) + local.ip_offsets.web_vm)
+    private_ip_address            = local.sub_web_defined ? cidrhost(local.sub_web_prefix, (tonumber(count.index) + local.ip_offsets.web_vm)) : cidrhost(local.sub_app_prefix, (tonumber(count.index) * -1 + local.ip_offsets.web_vm))
     private_ip_address_allocation = "static"
   }
 }
