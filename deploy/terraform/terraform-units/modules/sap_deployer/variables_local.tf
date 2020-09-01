@@ -57,9 +57,9 @@ locals {
   landscape          = try(var.infrastructure.landscape, "")
   location_short     = try(var.region_mapping[local.region], "unkn")
   vnet_mgmt_tempname = try(local.vnet_mgmt.name, "deployer")
-  prefix             = try(var.infrastructure.resource_group.name, lower(format("%s-%s-%s", local.landscape, local.location_short, local.vnet_mgmt_tempname)))
-  sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape, 0, 5), local.location_short, substr(local.vnet_mgmt_tempname, 0, 7)))
-  rg_name            = try(var.infrastructure.resource_group.name, format("%s-infrastructure", local.prefix))
+  prefix             = try(var.infrastructure.resource_group.name, upper(format("%s-%s-%s", local.landscape, local.location_short, local.vnet_mgmt_tempname)))
+  sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape,0,5), local.location_short, substr(local.vnet_mgmt_tempname,0,7)))
+  rg_name            = format("%s-INFRASTRUCTURE", local.prefix)
 
 
   // Management vnet
@@ -81,7 +81,7 @@ locals {
   sub_mgmt_nsg             = try(local.sub_mgmt.nsg, {})
   sub_mgmt_nsg_exists      = try(local.sub_mgmt_nsg.is_existing, false)
   sub_mgmt_nsg_arm_id      = local.sub_mgmt_nsg_exists ? try(local.sub_mgmt_nsg.arm_id, "") : ""
-  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.sub_mgmt_nsg.name, format("%s_deployment-nsg", local.prefix))
+  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.sub_mgmt_nsg.name, format("%s_deploymentSubnet-nsg", local.prefix))
   deployer_pip_list        = azurerm_public_ip.deployer[*].ip_address
   sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(concat(local.sub_mgmt_nsg.allowed_ips, local.deployer_pip_list), ["0.0.0.0/0"])
   sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0], null)
@@ -93,7 +93,7 @@ locals {
   enable_deployers = length(local.deployer_input) > 0 ? true : false
   deployers = [
     for idx, deployer in local.deployer_input : {
-      "name"                 = format("%s_deployer", local.prefix),
+      "name"                 = "deployer",
       "destroy_after_deploy" = true,
       "size"                 = try(deployer.size, "Standard_D2s_v3"),
       "disk_type"            = try(deployer.disk_type, "StandardSSD_LRS")
