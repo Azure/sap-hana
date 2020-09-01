@@ -64,14 +64,14 @@ locals {
   sa_sapbits_arm_id                   = local.sa_sapbits_exists ? try(var.storage_account_sapbits.arm_id, "") : ""
 
   // File share for sapbits
-  sa_sapbits_file_share_enable = try(var.storage_account_sapbits.file_share.enable_deployment, false)
+  sa_sapbits_file_share_enable = try(var.storage_account_sapbits.file_share.enable_deployment, true)
   sa_sapbits_file_share_exists = try(var.storage_account_sapbits.file_share.is_existing, false)
-  sa_sapbits_file_share_name   = try(var.storage_account_sapbits.file_share.name, "")
+  sa_sapbits_file_share_name   = try(var.storage_account_sapbits.file_share.name, "sapbits")
 
   // Blob container for sapbits
-  sa_sapbits_blob_container_enable = try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, false)
+  sa_sapbits_blob_container_enable = try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, true)
   sa_sapbits_blob_container_exists = try(var.storage_account_sapbits.sapbits_blob_container.is_existing, false)
-  sa_sapbits_blob_container_name   = try(var.storage_account_sapbits.sapbits_blob_container.name, "")
+  sa_sapbits_blob_container_name   = try(var.storage_account_sapbits.sapbits_blob_container.name, "sapbits")
   sa_sapbits_container_access_type = "private"
 
   // Storage account for saplandscape, sapsystem, deployer, saplibrary
@@ -80,7 +80,7 @@ locals {
   sa_tfstate_account_replication_type = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_replication_type, "LRS")
   sa_tfstate_account_kind             = local.sa_sapbits_exists ? "" : try(var.storage_account_tfstate.account_kind, "StorageV2")
   sa_tfstate_container_access_type    = "private"
-  sa_tfstate_name                     = lower(format("%s%s.terraform.tfstate%s", substr(local.landscape, 0, 5), local.location_short, substr(random_id.post_fix.hex, 0, 4)))
+  sa_tfstate_name                     = lower(format("%s%stfstate%s", substr(local.landscape, 0, 5), local.location_short, substr(random_id.post_fix.hex, 0, 4)))
   sa_tfstate_arm_id                   = local.sa_sapbits_exists ? try(var.storage_account_tfstate.arm_id, "") : ""
   sa_tfstate_enable_secure_transfer   = true
   sa_tfstate_delete_retention_policy  = 7
