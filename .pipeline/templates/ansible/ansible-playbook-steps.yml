@@ -1,5 +1,7 @@
 steps:
   - script: |
+      set -e
+      
       echo "=== Run ansible playbook from deployer ==="
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh

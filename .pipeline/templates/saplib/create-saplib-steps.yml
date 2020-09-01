@@ -1,5 +1,6 @@
 steps:
   - script: |
+      set -e
 
       echo "=== Deploy SAP library from deployer ==="
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '

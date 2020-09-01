@@ -1,5 +1,7 @@
 steps:
   - script: |
+      set -e
+
       echo "=== Logon deployer ==="
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh
@@ -113,10 +115,6 @@ steps:
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_apply_error.log 2>&1>~/.log/$(Build.BuildId)_apply.log
       if [ -s ~/.log/$(Build.BuildId)_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
       '
-
-      if [ $? -ne 0 ]; then
-        exit 1
-      fi
     displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
     env:
