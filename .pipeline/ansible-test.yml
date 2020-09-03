@@ -24,31 +24,31 @@ stages:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          sapsystem_rg_name: "sles-eaus-sap0-PRD"
+          sapsystem_rg_name: "SLES-EAUS-SAP0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
   - job: runAnsibleRHEL
     timeoutInMinutes: 120
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          sapsystem_rg_name: "rhel-eaus-sap0-PRD"
+          sapsystem_rg_name: "RHEL-EAUS-SAP0-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "unit-eaus-deployer-infrastructure"
+          deployer_rg_name: "UNIT-EAUS-DEPLOYER-INFRASTRUCTURE"
