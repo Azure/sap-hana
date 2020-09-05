@@ -53,10 +53,9 @@ locals {
 
   // Resource group and location
 
-  region         = try(var.infrastructure.region, "")
-  environment    = try(var.infrastructure.environment, "")
-  location_short = try(var.region_mapping[local.region], "unkn")
-
+  region             = try(var.infrastructure.region, "")
+  environment        = try(var.infrastructure.environment, "")
+  location_short     = try(var.region_mapping[local.region], "unkn")
   vnet_mgmt_tempname = local.vnet_mgmt.name
   prefix             = try(var.infrastructure.resource_group.name, upper(format("%s-%s-%s", local.environment, local.location_short, substr(local.vnet_mgmt_tempname, 0, 7))))
   sa_prefix          = lower(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_mgmt_tempname, 0, 7)))
