@@ -81,14 +81,14 @@ locals {
 
   //Region and metadata
   region         = try(local.var_infra.region, "")
-  landscape      = lower(try(local.var_infra.landscape, ""))
+  environment    = lower(try(local.var_infra.environment, ""))
   sid            = upper(try(var.application.sid, ""))
   codename       = lower(try(local.var_infra.codename, ""))
   location_short = lower(try(var.region_mapping[local.region], "unkn"))
   // Using replace "--" with "-" and "_-" with "-" in case of one of the components like codename is empty
-  prefix      = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.landscape, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
-  sa_prefix   = lower(format("%s%s%s%sdiag", substr(local.landscape, 0, 5), local.location_short, substr(local.codename, 0, 7), local.sid))
-  vnet_prefix = try(local.var_infra.resource_group.name, upper(format("%s-%s-%s", local.landscape, local.location_short, local.vnet_sap_name_prefix)))
+  prefix      = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.environment, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
+  sa_prefix   = lower(format("%s%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7), local.sid))
+  vnet_prefix = try(local.var_infra.resource_group.name, upper(format("%s-%s-%s", local.environment, local.location_short, local.vnet_sap_name_prefix)))
 
   //Resource group
   var_rg    = try(local.var_infra.resource_group, {})
@@ -139,7 +139,7 @@ locals {
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
   vnet_sap_exists = try(local.var_vnet_sap.is_existing, false)
   vnet_sap_arm_id = local.vnet_sap_exists ? try(local.var_vnet_sap.arm_id, "") : ""
-  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, format("%s-%s-SAP-vnet", upper(local.landscape), upper(local.location_short)))
+  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, format("%s-%s-SAP-vnet", upper(local.environment), upper(local.location_short)))
   vnet_nr_parts   = length(split("-", local.vnet_sap_name))
   // Default naming of vnet has multiple parts. Taking the second-last part as the name 
   vnet_sap_name_prefix = local.vnet_nr_parts >= 3 ? split("-", upper(local.vnet_sap_name))[local.vnet_nr_parts - 1] == "VNET" ? split("-", local.vnet_sap_name)[local.vnet_nr_parts - 2] : local.vnet_sap_name : local.vnet_sap_name

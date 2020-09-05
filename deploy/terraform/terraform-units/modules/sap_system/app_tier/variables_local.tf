@@ -62,15 +62,15 @@ variable "region_mapping" {
 // Set defaults
 locals {
   region         = try(var.infrastructure.region, "")
-  landscape      = lower(try(var.infrastructure.landscape, ""))
+  environment    = lower(try(var.infrastructure.environment, ""))
   sid            = upper(try(var.application.sid, ""))
   codename       = lower(try(var.infrastructure.codename, ""))
   location_short = lower(try(var.region_mapping[local.region], "unkn"))
 
   // Using replace "--" with "-" and "_-" with "-" in case of one of the components like codename is empty
-  prefix      = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.landscape, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
-  sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.landscape, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
-  vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.landscape, local.location_short))
+  prefix      = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.environment, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
+  sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
+  vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.environment, local.location_short))
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})

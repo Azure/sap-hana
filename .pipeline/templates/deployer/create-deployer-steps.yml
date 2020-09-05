@@ -4,7 +4,7 @@ steps:
       deployer_rg=${{parameters.deployer_rg_name}}
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       input=${ws_dir}/${deployer_rg}.json
-
+      environment=$(Build.BuildId)
       git checkout ${{parameters.branch_name}}
 
       mkdir -p ${ws_dir}; cd $_
@@ -12,8 +12,9 @@ steps:
       cp $HOME/.ssh/id_rsa.pub sshkey.pub
 
       cp ${repo_path}/deploy/terraform/bootstrap/sap_deployer/deployer.json deployer.json
-      cat deployer.json | jq --arg allowed_ip "$(agent_ip)" --arg rg_name "${deployer_rg}" '.infrastructure += {
-        landscape: $(Build.BuildId),
+      cat deployer.json \
+      | jq --arg environment "${environment}" .infrastructure.environment\ =\ \$environment \
+      | jq --arg allowed_ip "$(agent_ip)" --arg rg_name "${deployer_rg}" '.infrastructure += {
         resource_group: {
           name: $rg_name
         },

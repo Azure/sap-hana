@@ -43,15 +43,15 @@ locals {
   sapbits_config = try(var.software.storage_account_sapbits, {})
 
   // Get info required for naming convention
-  landscape      = lower(substr(try(var.infrastructure.landscape, ""), 0, 5))
+  environment    = lower(substr(try(var.infrastructure.environment, ""), 0, 5))
   region         = lower(try(var.infrastructure.region, ""))
   location_short = lower(try(var.region_mapping[local.region], "unkn"))
 
   // Default value follows naming convention
-  saplib_resource_group_name   = try(local.sapbits_config.saplib_resource_group_name, "${local.landscape}-${local.location_short}-sap_library")
+  saplib_resource_group_name   = try(local.sapbits_config.saplib_resource_group_name, "${local.environment}-${local.location_short}-sap_library")
   tfstate_storage_account_name = try(local.sapbits_config.tfstate_storage_account_name, "")
   tfstate_container_name       = try(local.sapbits_config.tfstate_container_name, "saplibrary")
-  saplib_tfstate_key           = try(local.sapbits_config.saplib_tfstate_key, "${local.landscape}-${local.location_short}-sap_library.terraform.tfstate")
+  saplib_tfstate_key           = try(local.sapbits_config.saplib_tfstate_key, "${local.environment}-${local.location_short}-sap_library.terraform.tfstate")
 
 }
 

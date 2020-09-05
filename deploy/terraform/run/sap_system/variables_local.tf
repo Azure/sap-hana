@@ -16,7 +16,7 @@ variable "scenario" {
 # Set defaults
 locals {
 
-  ansible_path = "${module.saplibrary.landscape}_${module.saplibrary.sid}"
+  ansible_path = "${module.saplibrary.environment}_${module.saplibrary.sid}"
 
   # Options
   enable_secure_transfer = try(var.options.enable_secure_transfer, true)

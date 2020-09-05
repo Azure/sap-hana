@@ -1,7 +1,7 @@
 {
   "infrastructure": {
     "region": "eastus",
-    "landscape": "global",
+    "environment": "global",
     "vnets": {
       "management": {
         "address_space": "10.0.0.0/26",

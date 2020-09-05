@@ -14,6 +14,6 @@ output "sid" {
   value = local.sid
 }
 
-output "landscape" {
-  value = local.landscape
+output "environment" {
+  value = local.environment
 }

@@ -54,11 +54,11 @@ steps:
       then 
         idx1=${buildId: -1}
         idx2=${buildId: -2:1}
-        landscape="$(Build.BuildId)"
+        environment="$(Build.BuildId)"
         ha="false"
       else
         idx1=10
-        landscape="unit"
+        environment="unit"
         ha="true"
         if ${isSles}
         then idx2=0
@@ -73,7 +73,7 @@ steps:
 
       cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
       cat ${ws_dir}/sapsystem.json \
-      | jq --arg landscape "${landscape}" .infrastructure.landscape\ =\ \$landscape \
+      | jq --arg environment "${environment}" .infrastructure.environment\ =\ \$environment \
       | jq --arg rg_name "${sapsystem_rg}" .infrastructure.resource_group.name\ =\ \$rg_name \
       | jq --arg saplib_rg_name "${saplib_rg_name}" .infrastructure.vnets.management.saplib_resource_group_name\ =\ \$saplib_rg_name \
       | jq --arg tfstate_sa_name "${tfstate_sa_name}" .infrastructure.vnets.management.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
