@@ -28,16 +28,16 @@ resource "azurerm_storage_account" "storage_tfstate" {
   }
 }
 
-data "azurerm_storage_container" "storagecontainer_saplibrary" {
-  count                = local.sa_saplibrary_container_exists ? 1 : 0
-  name                 = local.sa_saplibrary_container_name
+data "azurerm_storage_container" "storagecontainer_tfstate" {
+  count                = local.sa_tfstate_container_exists ? 1 : 0
+  name                 = local.sa_tfstate_container_name
   storage_account_name = local.sa_tfstate.name
 }
 
 // Creates the storage container inside the storage account for sapsystem
-resource "azurerm_storage_container" "storagecontainer_saplibrary" {
-  count                 = local.sa_saplibrary_container_exists ? 0 : 1
-  name                  = local.sa_saplibrary_container_name
+resource "azurerm_storage_container" "storagecontainer_tfstate" {
+  count                 = local.sa_tfstate_container_exists ? 0 : 1
+  name                  = local.sa_tfstate_container_name
   storage_account_name  = local.sa_tfstate.name
   container_access_type = local.sa_tfstate_container_access_type
 }

@@ -6,8 +6,8 @@ output "sapbits_storage_account" {
   value = local.sa_sapbits
 }
 
-output "storagecontainer_saplibrary" {
-  value = local.storagecontainer_saplibrary
+output "storagecontainer_tfstate" {
+  value = local.storagecontainer_tfstate
 }
 
 output "storagecontainer_sapbits" {

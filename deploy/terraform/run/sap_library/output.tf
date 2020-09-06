@@ -8,9 +8,9 @@ output "sapbits_storage_account" {
   value     = module.sap_library.sapbits_storage_account
 }
 
-output "storagecontainer_saplibrary" {
+output "storagecontainer_tfstate" {
   sensitive = true
-  value     = module.sap_library.storagecontainer_saplibrary
+  value     = module.sap_library.storagecontainer_tfstate
 }
 
 output "storagecontainer_sapbits" {

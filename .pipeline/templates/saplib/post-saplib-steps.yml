@@ -24,7 +24,7 @@ steps:
       terraform init -force-copy \
         --backend-config "resource_group_name=${saplib_rg}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
-        --backend-config "container_name=saplibrary" \
+        --backend-config "container_name=tfstate" \
         --backend-config "key=${deployer_key}" \
         ${repo_dir}/deploy/terraform/run/sap_deployer/
 
@@ -33,7 +33,7 @@ steps:
       terraform init -force-copy \
         --backend-config "resource_group_name=${saplib_rg}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
-        --backend-config "container_name=saplibrary" \
+        --backend-config "container_name=tfstate" \
         --backend-config "key=${saplib_key}" \
         ${repo_dir}/deploy/terraform/run/sap_library/
       '
