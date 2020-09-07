@@ -74,7 +74,7 @@ locals {
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "sap")
   vnet_nr_parts   = length(split("-", local.vnet_sap_name))
   // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? substr(split("-", local.vnet_sap_name)[(local.vnet_nr_parts -2)],0,7) : local.vnet_sap_name
+  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? split("-", local.vnet_sap_name)[(local.vnet_nr_parts -2)] : local.vnet_sap_name
 
   // DB subnet
   var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
@@ -193,13 +193,13 @@ locals {
   customer_provided_names = try(local.anydb.dbnodes[0].name, "") == "" ? false : true
 
   dbnodes = flatten([[for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-    name      = try("${dbnode.name}-0", format("%sd%s%03d%s%d%s", lower(local.sid), local.anydb_sid, idx, local.anydb_oscode, idx, substr(var.random-id.hex, 0, 3))),
+    name      = try("${dbnode.name}-0", format("%sd%s%03d%s%d%s", local.sid, local.anydb_sid, idx, local.anydb_oscode, idx, substr(var.random-id.hex, 0, 3))),
     role      = try(dbnode.role, "worker"),
     db_nic_ip = lookup(dbnode, "db_nic_ips", [false, false])[0]
     }
     ],
     [for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-      name      = try("${dbnode.name}-1", format("%sd%s%03d%s%d%s", lower(local.sid), local.anydb_sid, idx + try(length(local.anydb.dbnodes), 1), local.anydb_oscode, idx + try(length(local.anydb.dbnodes), 1), substr(var.random-id.hex, 0, 3)))
+      name      = try("${dbnode.name}-1", format("%sd%s%03d%s%d%s", local.sid, local.anydb_sid, idx + try(length(local.anydb.dbnodes), 1), local.anydb_oscode, idx + try(length(local.anydb.dbnodes), 1), substr(var.random-id.hex, 0, 3)))
       role      = try(dbnode.role, "worker"),
       db_nic_ip = lookup(dbnode, "db_nic_ips", [false, false])[1],
       } if local.anydb_ha
