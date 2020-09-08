@@ -28,7 +28,7 @@ steps:
       echo "=== Create SAP library from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
       terraform -version
-      terraform init ${repo_dir}/deploy/terraform/bootstrap/sap_library/
+      terraform init -upgrade=true ${repo_dir}/deploy/terraform/bootstrap/sap_library/
       [ -d $HOME/.log ] || mkdir -p $HOME/.log
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>$HOME/.log/$(Build.BuildId)_apply_error.log 2>&1>$HOME/.log/$(Build.BuildId)_apply.log
       if [ -s $HOME/.log/$(Build.BuildId)_apply_error.log ]; then cat $HOME/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
