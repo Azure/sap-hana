@@ -68,7 +68,7 @@ variable "region_mapping" {
 locals {
   region         = try(var.infrastructure.region, "")
   landscape      = lower(try(var.infrastructure.landscape, ""))
-  sap_sid        = upper(try(var.application.sid, ""))
+  sid            = upper(try(var.application.sid, ""))
   codename       = lower(try(var.infrastructure.codename, ""))
   location_short = lower(try(var.region_mapping[local.region], "unkn"))
   // Using replace "--" with "-" and "_-" with "-" in case of one of the components like codename is empty
@@ -141,8 +141,8 @@ locals {
   })
 
   hdb_ins                = try(local.hdb.instance, {})
-  db_sid                 = try(local.hdb_ins.sid, "HDB") // HANA database sid from the Databases array for use as reference to LB/AS
-  hdb_nr                 = try(local.hdb_ins.instance_number, "00")
+  hdb_sid                = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
+  hdb_nr                 = try(local.hdb_ins.instance_number, "01")
   hdb_cred               = try(local.hdb.credentials, {})
   db_systemdb_password   = try(local.hdb_cred.db_systemdb_password, "")
   os_sidadm_password     = try(local.hdb_cred.os_sidadm_password, "")
@@ -157,14 +157,14 @@ locals {
   customer_provided_names = try(local.hdb.dbnodes[0].name, "") == "" ? false : true
 
   dbnodes = flatten([[for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%sd%s%02dl%d%s", lower(local.sap_sid), lower(local.db_sid), idx, 0, substr(var.random-id.hex, 0, 3))),
+    name         = try("${dbnode.name}-0", format("%sd%s%02dl%d%s", lower(local.sap_sid), lower(local.hdb_sid), idx, 0, substr(var.random-id.hex, 0, 3))),
     role         = try(dbnode.role, "worker"),
     admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0],
     db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
     }
     ],
     [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%sd%s%02dl%d%s", lower(local.sap_sid), lower(local.db_sid), idx, 1, substr(var.random-id.hex, 0, 3)))
+      name         = try("${dbnode.name}-1", format("%sd%s%02dl%d%s", lower(local.sap_sid), lower(local.hdb_sid), idx, 1, substr(var.random-id.hex, 0, 3)))
       role         = try(dbnode.role, "worker")
       admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1],
       db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1]
@@ -204,6 +204,9 @@ locals {
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
+
+  // SAP SID used in HDB resource naming convention
+  sap_sid = try(var.application.sid, local.sid)
 
   // Imports HANA database sizing information
   sizes = jsondecode(file("${path.module}/../../../../../configs/hdb_sizes.json"))
