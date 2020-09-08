@@ -8,6 +8,9 @@ steps:
       git checkout $(sourceBranchName)
 
       cd ${ws_dir}
+      cp ${repo_path}/deploy/terraform/bootstrap/sap_deployer/deployer.json deployer.json
+      merge_json=$(jq -s '.[0] * .[1]' deployer.json ${input})
+      echo ${merge_json} > ${input}
       terraform plan -var-file=${input} ${repo_path}/deploy/terraform/bootstrap/sap_deployer/ > plan_output.log
       cat plan_output.log
       

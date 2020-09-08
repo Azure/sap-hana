@@ -12,6 +12,7 @@ steps:
       cp $HOME/.ssh/id_rsa.pub sshkey.pub
 
       cp ${repo_path}/deploy/terraform/bootstrap/sap_deployer/deployer.json deployer.json
+      [[ -f ${input} ]] ||
       cat deployer.json | jq --arg allowed_ip "$(agent_ip)" --arg rg_name "${deployer_rg}" '.infrastructure += {
         landscape: $(Build.BuildId),
         resource_group: {
