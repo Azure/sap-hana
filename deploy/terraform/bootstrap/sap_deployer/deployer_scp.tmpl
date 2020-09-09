@@ -5,26 +5,55 @@ ssh_timeout_s=10
 
 temp_file=$(mktemp)
 vault_name=${user_vault_name}
+
 ppk_name=${ppk_name}
-ppk=$(az keyvault secret show --vault-name $${vault_name} --name $${ppk_name} | jq -r .value)
-echo "$${ppk}" > $${temp_file}
+if [ ! -z $${ppk_name} ]
+then
+  printf "%s\n" "Collecting secrets from KV"
+  ppk=$(az keyvault secret show --vault-name $${vault_name} --name $${ppk_name} | jq -r .value)
+  echo "$${ppk}" > $${temp_file}
+fi
 
 printf "%s\n" "Create remote workspace if not exists"
 
-%{~ for index, deployer in deployers ~}
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "key"  }
 ssh -i $${temp_file}  -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} ${deployer.authentication.username}@${deployer-ips[index]} "[ -d $${remote_dir} ] && mkdir -p $${remote_dir}"
-%{ endfor ~}
+%{~ endif }
+%{~ endfor }
+
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "password"  }
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} ${deployer.authentication.username}@${deployer-ips[index]} "[ -d $${remote_dir} ] && mkdir -p $${remote_dir}"
+%{~ endif }
+%{~ endfor }
 
 printf "%s\n" "Start uploading deployer tfstate"
 
-%{~ for index, deployer in deployers ~}
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "key"  }
 scp -i $${temp_file} -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
-%{ endfor ~}
+%{~ endif }
+%{~ endfor }
+
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "password"  }
+scp -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/terraform.tfstate ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
+%{~ endif }
+%{~ endfor }
 
 printf "%s\n" "Start uploading deployer json"
 
-%{~ for index, deployer in deployers ~}
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "key"  }
 scp -i $${temp_file} -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/$${workspace}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
-%{ endfor ~}
+%{~ endif }
+%{~ endfor }
+
+%{~ for index, deployer in deployers }
+%{~ if deployer.authentication.type == "password"  }
+scp -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/$${workspace}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
+%{~ endif }
+%{~ endfor }
 
 rm $${temp_file}

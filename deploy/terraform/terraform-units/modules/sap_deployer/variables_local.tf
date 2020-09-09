@@ -89,17 +89,23 @@ locals {
   // Deployer(s) information from input
   deployer_input = var.deployers
 
-  enable_key = contains(compact([
-    for deployer in local.deployer_input :
-    try(deployer.authentication.type, "key") == "key" ? true : false
-  ]), "true")
-
-  // By default use generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  public_key  = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh) : null
-  private_key = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem) : null
-
   // Deployer(s) information with default override
   enable_deployers = length(local.deployer_input) > 0 ? true : false
+
+  // Deployer(s) authentication method with default
+  enable_password = contains(compact([
+    for deployer in local.deployer_input :
+    try(deployer.authentication.type, "key") == "password" ? true : false
+  ]), "true")
+
+  // By default use generated password. Provide password under authentication overides it
+  input_pwd_list = compact([
+    for deployer in local.deployer_input :
+    try(deployer.authentication.password, "")
+  ])
+  input_pwd = length(local.input_pwd_list) > 0 ? local.input_pwd_list[0] : null
+  password  = (local.enable_deployers && local.enable_password) ? try(local.input_pwd_list[0], random_password.deployer[0].result) : null
+
   deployers = [
     for idx, deployer in local.deployer_input : {
       "name"                 = "deployer",
@@ -114,12 +120,13 @@ locals {
         "version"         = try(deployer.os.source_image_id, "") == "" ? "latest" : ""
       },
       "authentication" = {
-        "type"     = "key",
-        "username" = try(deployer.authentication.username, "azureadm"),
+        "type"     = try(deployer.authentication.type, "key")
+        "username" = try(deployer.authentication.username, "azureadm")
         "sshkey" = {
           "public_key"  = local.public_key
           "private_key" = local.private_key
         }
+        "password" = local.password
       },
       "components" = [
         "terraform",

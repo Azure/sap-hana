@@ -90,9 +90,12 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     identity_ids = [azurerm_user_assigned_identity.deployer.id]
   }
 
-  admin_ssh_key {
-    username   = local.deployers[count.index].authentication.username
-    public_key = local.deployers[count.index].authentication.sshkey.public_key
+  dynamic "admin_ssh_key" {
+    for_each = range(local.deployers[count.index].authentication.sshkey.public_key == null ? 0 : 1)
+    content {
+      username   = local.deployers[count.index].authentication.username
+      public_key = local.deployers[count.index].authentication.sshkey.public_key
+    }
   }
 
   boot_diagnostics {
