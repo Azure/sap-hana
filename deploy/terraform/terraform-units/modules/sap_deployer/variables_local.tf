@@ -95,8 +95,8 @@ locals {
   ]), "true")
 
   // By default use generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  public_key  = local.enable_deployers && local.enable_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh) : null
-  private_key = local.enable_deployers && local.enable_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem) : null
+  public_key  = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh) : null
+  private_key = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem) : null
 
   // Deployer(s) information with default override
   enable_deployers = length(local.deployer_input) > 0 ? true : false
