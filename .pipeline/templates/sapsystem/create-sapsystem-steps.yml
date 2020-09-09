@@ -105,7 +105,7 @@ steps:
       echo "=== Deploy sap system from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
       terraform -version
-      terraform init -force-copy \
+      terraform init -upgrade=true -force-copy \
         --backend-config "resource_group_name=${saplib_rg_name}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
         --backend-config "container_name=saplibrary" \

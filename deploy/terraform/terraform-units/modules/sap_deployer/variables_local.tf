@@ -56,24 +56,23 @@ locals {
   region             = try(var.infrastructure.region, "")
   environment        = try(var.infrastructure.environment, "")
   location_short     = try(var.region_mapping[local.region], "unkn")
-  vnet_mgmt_tempname = try(local.vnet_mgmt.name, "deployer")
-  prefix             = try(var.infrastructure.resource_group.name, upper(format("%s-%s-%s", local.environment, local.location_short, local.vnet_mgmt_tempname)))
-  sa_prefix          = lower(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_mgmt_tempname, 0, 7)))
-  rg_name            = try(var.infrastructure.resource_group.name, format("%s-INFRASTRUCTURE", local.prefix))
-
+  vnet_mgmt_tempname = local.vnet_mgmt.name
+  prefix             = try(var.infrastructure.resource_group.name, upper(format("%s-%s-%s", local.landscape, local.location_short, substr(local.vnet_mgmt_tempname,0,7))))
+  sa_prefix          = lower(format("%s%s%sdiag", substr(local.landscape,0,5), local.location_short, substr(local.vnet_mgmt_tempname,0,7)))
+  rg_name            = try(var.infrastructure.resource_group.name,format("%s-INFRASTRUCTURE", local.prefix))
 
   // Management vnet
   vnet_mgmt        = try(var.infrastructure.vnets.management, {})
-  vnet_mgmt_exists = try(local.vnet_mgmt.is_existing, false)
-  vnet_mgmt_arm_id = local.vnet_mgmt_exists ? try(local.vnet_mgmt.arm_id, "") : ""
-  vnet_mgmt_name   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.name, format("%s-vnet", local.prefix))
+  vnet_mgmt_arm_id = try(local.vnet_mgmt.arm_id, "") 
+  vnet_mgmt_exists = length(local.vnet_mgmt_arm_id) > 0 ? true : false
+  vnet_mgmt_name   = local.vnet_mgmt_exists ?  split("/", local.vnet_mgmt_arm_id)[8] : format("%s-vnet", local.prefix)
   vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "10.0.0.0/24")
 
   // Management subnet
   sub_mgmt          = try(local.vnet_mgmt.subnet_mgmt, {})
-  sub_mgmt_exists   = try(local.sub_mgmt.is_existing, false)
-  sub_mgmt_arm_id   = local.sub_mgmt_exists ? try(local.sub_mgmt.arm_id, "") : ""
-  sub_mgmt_name     = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.name, format("%s_deployment-subnet", local.prefix))
+  sub_mgmt_arm_id   = try(local.sub_mgmt.arm_id, "") 
+  sub_mgmt_exists   = length(local.sub_mgmt_arm_id) > 0 ? true : false
+  sub_mgmt_name     = local.sub_mgmt_exists ? split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s_deployment-subnet", local.prefix))
   sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "10.0.0.16/28")
   sub_mgmt_deployed = try(local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0] : azurerm_subnet.subnet_mgmt[0], null)
 

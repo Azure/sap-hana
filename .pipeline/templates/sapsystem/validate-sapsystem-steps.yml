@@ -15,6 +15,8 @@ steps:
       
       echo "=== Enter workspace ${ws_dir} ==="
       cd ${ws_dir}
+
+      terraform init -upgrade=true ${repo_path}/deploy/terraform/run/sap_system/
       terraform plan -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ > plan_output.log
       cat plan_output.log
       
