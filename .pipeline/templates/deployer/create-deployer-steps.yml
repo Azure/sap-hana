@@ -14,21 +14,16 @@ steps:
       cp ${repo_path}/deploy/terraform/bootstrap/sap_deployer/deployer.json deployer.json
 
       [[ -f ${input} ]] ||
-      cat deployer.json | jq --arg allowed_ip "$(agent_ip)" --arg rg_name "${deployer_rg}" '.infrastructure += {
-        landscape: $(Build.BuildId),
+      cat deployer.json | jq --arg rg_name "${deployer_rg}" '.infrastructure += {
+        environment: $(Build.BuildId),
         resource_group: {
           name: $rg_name
-        },
-        vnets: {
-          management: {
-            subnet_mgmt: {
-              nsg: {
-                allowed_ips: ["67.160.0.0/16", $allowed_ip]
-                }
-              }
-            }
-          }
-        }' > ${input}
+        }
+      }' | jq --arg allowed_ip "$(agent_ip)" '.infrastructure.vnets.management.subnet_mgmt += {
+        nsg: {
+          allowed_ips: ["67.160.0.0/16", $allowed_ip]
+        }
+      }' > ${input}
 
       cat ${input}
       
