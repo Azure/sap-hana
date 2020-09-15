@@ -85,6 +85,8 @@ module "hdb_node" {
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
+  deployer-uai     = module.deployer.deployer-uai
+  deployer_user    = module.deployer.deployer_user
 }
 
 // Create Application Tier nodes
