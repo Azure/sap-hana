@@ -43,6 +43,8 @@ data "azurerm_network_security_group" "iscsi" {
   resource_group_name = split("/", local.sub_iscsi_nsg_arm_id)[4]
 }
 
+// TODO: Add nsr of iSCSI's nsg
+
 /*-----------------------------------------------------------------------------8
 iSCSI device IP address range: .4 - 
 +--------------------------------------4--------------------------------------*/

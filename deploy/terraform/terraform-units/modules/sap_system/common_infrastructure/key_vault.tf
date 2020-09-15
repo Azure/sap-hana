@@ -70,7 +70,9 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
 
 // Using TF tls to generate SSH key pair for iscsi devices and store in user KV
 resource "tls_private_key" "iscsi" {
-  count = (local.iscsi_count > 0 && local.iscsi_auth_type == "key") ? 1 : 0
+  count = (
+  local.enable_iscsi_auth_key 
+  && try(file(var.sshkey.path_to_public_key), null) == null ) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
@@ -114,9 +116,8 @@ resource "azurerm_key_vault_secret" "iscsi_password" {
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "iscsi_password" {
   count = (
-  local.iscsi_count > 0 
-  && local.iscsi_auth_type == "password" 
-  && try(local.var_iscsi.authentication.password, "") == "" ) ? 1 : 0
+  local.enable_auth_password 
+  && try(local.var_iscsi.authentication.password, null) == null ) ? 1 : 0
   length           = 16
   special          = true
   override_special = "_%@"

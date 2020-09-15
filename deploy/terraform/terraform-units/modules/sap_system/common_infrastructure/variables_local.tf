@@ -139,11 +139,13 @@ locals {
   iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  iscsi_public_key  = (local.iscsi_count > 0 && local.iscsi_auth_type == "key") ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
-  iscsi_private_key = (local.iscsi_count > 0 && local.iscsi_auth_type == "key") ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
+  enable_iscsi_auth_key   = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
+  iscsi_public_key  = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
+  iscsi_private_key = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
 
   // Currently, only Linux VM is used as iSCSI target. The following password of Windows VM is a placeholder for potential future use.
-  iscsi_auth_password = (local.iscsi_count > 0 && local.iscsi_auth_type == "password") ? try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result) : ""
+  enable_iscsi_auth_password = local.iscsi_count > 0 && local.iscsi_auth_type == "password"
+  iscsi_auth_password = local.enable_iscsi_auth_password ? try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result) : null
 
   iscsi = merge(local.var_iscsi, {
     iscsi_count = local.iscsi_count,
