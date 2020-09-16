@@ -82,7 +82,6 @@ locals {
   // Using replace "--" with "-" and "_-" with "-" in case of one of the components like codename is empty
   prefix    = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.environment, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
   sa_prefix = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
-  rg_name   = local.prefix
 
   // Post fix for all deployed resources
   postfix = random_id.sapsystem.hex

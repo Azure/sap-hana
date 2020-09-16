@@ -9,7 +9,7 @@ data "azurerm_client_config" "deployer" {}
 resource "azurerm_key_vault" "kv_prvt" {
   name                       = local.kv_private_name
   location                   = local.region
-  resource_group_name        = local.rg_name
+  resource_group_name        = var.resource-group[0].name
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
@@ -32,7 +32,7 @@ resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
 resource "azurerm_key_vault" "kv_user" {
   name                       = local.kv_user_name
   location                   = local.region
-  resource_group_name        = local.rg_name
+  resource_group_name        = var.resource-group[0].name
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
