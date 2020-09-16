@@ -28,7 +28,8 @@ resource "azurerm_linux_virtual_machine" "app" {
   ]
   size                            = local.app_sizing.compute.vm_size
   admin_username                  = local.sid_auth_username
-  disable_password_authentication = true
+  disable_password_authentication = ! local.enable_auth_password
+  admin_password                  = local.sid_auth_password
 
   os_disk {
     name                 = format("%s_%sapp%02dl%s-osdisk", local.prefix, lower(local.sid), count.index, substr(var.random-id.hex,0,3))

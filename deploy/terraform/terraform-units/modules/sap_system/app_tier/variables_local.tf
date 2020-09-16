@@ -89,7 +89,7 @@ locals {
   kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_users        = [var.deployer_user]
   enable_auth_password = local.enable_deployment && local.authentication.type == "password"
-  sid_auth_username    = local.authentication.username
+  sid_auth_username    = try(local.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : null
 
   # SAP vnet
