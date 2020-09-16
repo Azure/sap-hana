@@ -102,6 +102,8 @@ module "app_tier" {
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
+  deployer-uai     = module.deployer.deployer-uai
+  deployer_user    = module.deployer.deployer_user
 }
 
 // Create anydb database nodes

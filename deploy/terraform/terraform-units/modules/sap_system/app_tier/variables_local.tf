@@ -22,6 +22,14 @@ variable "random-id" {
   description = "Random hex string"
 }
 
+variable "deployer-uai" {
+  description = "Details of the UAI used by deployer(s)"
+}
+
+variable "deployer_user"{
+  description = "Details of the users"
+}
+
 variable "region_mapping" {
   type        = map(string)
   description = "Region Mapping: Full = Single CHAR, 4-CHAR"
@@ -71,6 +79,18 @@ locals {
   prefix      = try(local.var_infra.resource_group.name, upper(replace(replace(format("%s-%s-%s_%s-%s", local.environment, local.location_short, substr(local.vnet_sap_name_prefix, 0, 7), local.codename, local.sid), "_-", "-"), "--", "-")))
   sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
   vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.environment, local.location_short))
+
+    // Post fix for all deployed resources
+  postfix = random_id.sapsystem.hex
+
+  // key vault for sap system
+  kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
+  kv_private_name = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_users        = [var.deployer_user]
+  enable_auth_password = local.enable_deployment && local.authentication.type == "password"
+  sid_auth_username    = local.authentication.username
+  sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : null
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})

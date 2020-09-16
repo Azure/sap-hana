@@ -27,7 +27,7 @@ resource "azurerm_linux_virtual_machine" "web" {
     azurerm_network_interface.web[count.index].id
   ]
   size                            = local.web_sizing.compute.vm_size
-  admin_username                  = local.authentication.username
+  admin_username                  = local.sid_auth_username
   disable_password_authentication = true
 
   os_disk {
@@ -48,9 +48,12 @@ resource "azurerm_linux_virtual_machine" "web" {
     }
   }
 
-  admin_ssh_key {
-    username   = local.authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+  dynamic "admin_ssh_key" {
+    for_each = range(local.enable_auth_password ? 0 : 1)
+    content {
+      username   = local.sid_auth_username
+      public_key = file(var.sshkey.path_to_public_key)
+    }
   }
 
   boot_diagnostics {
@@ -71,8 +74,8 @@ resource "azurerm_windows_virtual_machine" "web" {
     azurerm_network_interface.web[count.index].id
   ]
   size           = local.web_sizing.compute.vm_size
-  admin_username = local.authentication.username
-  admin_password = local.authentication.password
+  admin_username = local.sid_auth_username
+  admin_password = local.sid_auth_password
 
   os_disk {
     name                 = format("%s_%sweb%02dw%s-osdisk", local.prefix, lower(local.sid), count.index, substr(var.random-id.hex, 0, 3))
