@@ -91,9 +91,9 @@ locals {
   kv_private_name = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_users        = [var.deployer_user]
-  enable_auth_password = local.enable_deployment && local.hdb_auth.type == "password"
-  sid_auth_username    = local.hdb_auth.username
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb_auth.password, random_password.password[0].result) : null
+  enable_auth_password = local.enable_deployment && local.hdb.authentication.type == "password"
+  sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
+  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : null
   
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
@@ -153,11 +153,13 @@ locals {
   hdb_size = try(local.hdb.size, "Demo")
   hdb_fs   = try(local.hdb.filesystem, "xfs")
   hdb_ha   = try(local.hdb.high_availability, false)
-  hdb_auth = try(local.hdb.authentication,
+  hdb_auth = merge(try(local.hdb.authentication,
     {
       "type"     = "key"
       "username" = "azureadm"
-  })
+  }), 
+  { "username" = local.sid_auth_username,
+    "password" = local.sid_auth_password })
 
   hdb_ins                = try(local.hdb.instance, {})
   hdb_sid                = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
