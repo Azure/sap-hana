@@ -174,9 +174,12 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
     }
   }
 
-  admin_ssh_key {
-    username   = local.hdb_vms[count.index].authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+  dynamic "admin_ssh_key" {
+    for_each = range(local.hdb_vms[count.index].authentication.type == "password" ? 0 : 1)
+    content {
+      username   = local.hdb_vms[count.index].authentication.username
+      public_key = file(var.sshkey.path_to_public_key)
+    }
   }
 
   boot_diagnostics {
