@@ -26,3 +26,7 @@ output "hana-database-info" {
 output "dbnode-data-disk-att" {
   value = azurerm_virtual_machine_data_disk_attachment.vm-dbnode-data-disk
 }
+
+output "user_vault_name" {
+  value = azurerm_key_vault.kv_user
+}

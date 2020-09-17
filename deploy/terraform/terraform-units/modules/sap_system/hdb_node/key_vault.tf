@@ -72,7 +72,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
 resource "random_password" "password" {
   count = (
   local.enable_auth_password
-  && try(local.hdb.authentication.password, "") == "" ) ? 1 : 0
+  && try(local.hdb.authentication.password, null) == null ) ? 1 : 0
   length           = 16
   special          = true
   override_special = "_%@"
@@ -87,20 +87,20 @@ resource "random_id" "sapsystem" {
  To force dependency between kv access policy and secrets. Expected behavior:
  https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
 */
-// for logon use
+// store the logon username in KV
 resource "azurerm_key_vault_secret" "auth_username" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   count        = local.enable_auth_password ? 1 : 0
-  name         = format("%s-sid-logon-username", local.prefix)
+  name         = format("%s-sid-auth-username", local.prefix)
   value        = local.sid_auth_username
   key_vault_id = azurerm_key_vault.kv_user.id
 }
 
-// for logon use
+// store the logon password in KV
 resource "azurerm_key_vault_secret" "auth_password" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   count        = local.enable_auth_password ? 1 : 0
-  name         = format("%s-sid-logon-password", local.prefix)
+  name         = format("%s-sid-auth-password", local.prefix)
   value        = local.sid_auth_password
   key_vault_id = azurerm_key_vault.kv_user.id
 }
