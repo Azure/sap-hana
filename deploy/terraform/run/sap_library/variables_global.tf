@@ -14,3 +14,7 @@ variable "software" {
   description = "Details of software, downloader etc."
   default     = {}
 }
+variable "deployer" {
+  description = "Details of deployer"
+  default     = {}
+}

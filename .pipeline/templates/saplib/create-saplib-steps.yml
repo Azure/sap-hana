@@ -39,10 +39,10 @@ steps:
       cp ${repo_dir}/deploy/terraform/bootstrap/sap_library/saplibrary.json ${ws_dir}/saplibrary.json
       cat ${ws_dir}/saplibrary.json \
       | jq --arg environment "${saplib_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg deployer_rg_name "UNIT-EAUS-MGMT-INFRASTRUCTURE" .infrastructure.deployer.resource_group.name\ =\ \$deployer_rg_name \
-      | jq --arg msi_name "UNIT-EAUS-MGMT-msi" .infrastructure.deployer.msi.name\ =\ \$msi_name \
-      | jq --arg downloader_username "test_username1" .software.downloader.credentials.sap_user\ =\ \$downloader_username \
-      | jq --arg downloader_password "test_password1" .software.downloader.credentials.sap_password\ =\ \$downloader_password \
+      | jq --arg deployer_rg_name "UNIT-EAUS-MGMT-INFRASTRUCTURE" .deployer.resource_group.name\ =\ \$deployer_rg_name \
+      | jq --arg msi_name "UNIT-EAUS-MGMT-msi" .deployer.msi.name\ =\ \$msi_name \
+      | jq --arg downloader_username "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$downloader_username \
+      | jq --arg downloader_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$downloader_password \
       > ${input}
 
       cat ${input}

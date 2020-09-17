@@ -92,7 +92,7 @@ locals {
   sa_tfstate_container_name   = "tfstate"
 
   // deployer
-  deployer = try(local.var_infra.deployer, "")
+  deployer = try(var.deployer, "")
   deployer_rg_name = try(local.deployer.resource_group.name, "")
   deployer_msi = try(local.deployer.msi, "")
   deployer_msi_name = try(local.deployer_msi.name, "")
