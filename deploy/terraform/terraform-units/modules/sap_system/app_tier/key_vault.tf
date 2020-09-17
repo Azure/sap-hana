@@ -72,7 +72,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
 resource "random_password" "password" {
   count = (
   local.enable_auth_password
-  && try(local.authentication.password, "") == "" ) ? 1 : 0
+  && try(local.authentication.password, null) == null ) ? 1 : 0
   length           = 16
   special          = true
   override_special = "_%@"
