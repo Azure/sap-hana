@@ -140,12 +140,12 @@ locals {
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_iscsi_auth_key   = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
-  iscsi_public_key  = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
-  iscsi_private_key = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
+  iscsi_public_key        = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
+  iscsi_private_key       = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
   enable_iscsi_auth_password = local.iscsi_count > 0 && local.iscsi_auth_type == "password"
-  iscsi_auth_password = local.enable_iscsi_auth_password ? try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result) : null
+  iscsi_auth_password        = local.enable_iscsi_auth_password ? try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result) : null
 
   iscsi = merge(local.var_iscsi, {
     iscsi_count = local.iscsi_count,
