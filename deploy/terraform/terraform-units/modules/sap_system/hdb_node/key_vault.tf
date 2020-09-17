@@ -104,3 +104,55 @@ resource "azurerm_key_vault_secret" "auth_password" {
   value        = local.sid_auth_password
   key_vault_id = azurerm_key_vault.kv_user.id
 }
+
+
+// Generate random passwords as hana database credentials
+resource "random_password" "credentials" {
+  count            = 6
+  length           = 16
+  special          = true
+  override_special = "_%@"
+}
+
+// Store Hana database credentials as secrets in KV
+resource "azurerm_key_vault_secret" "db_systemdb" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-db-systemdb-password", local.prefix)
+  value        = local.db_systemdb_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
+
+resource "azurerm_key_vault_secret" "os_sidadm" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-os-sidadm-password", local.prefix)
+  value        = local.os_sidadm_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
+
+resource "azurerm_key_vault_secret" "os_sapadm" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-os-sapadm-password", local.prefix)
+  value        = local.os_sapadm_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
+
+resource "azurerm_key_vault_secret" "xsa_admin" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-xsa-admin-password", local.prefix)
+  value        = local.xsa_admin_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
+
+resource "azurerm_key_vault_secret" "cockpit_admin" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-cockpit-admin-password", local.prefix)
+  value        = local.cockpit_admin_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
+
+resource "azurerm_key_vault_secret" "ha_cluster" {
+  depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
+  name         = format("%s-ha-cluster-password", local.prefix)
+  value        = local.ha_cluster_password
+  key_vault_id = azurerm_key_vault.kv_user.id
+}
