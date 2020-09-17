@@ -79,7 +79,7 @@ resource "tls_private_key" "iscsi" {
 
 resource "azurerm_key_vault_secret" "iscsi_ppk" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
-  count        = (local.iscsi_count > 0 && local.iscsi_auth_type == "key") ? 1 : 0
+  count        = local.enable_iscsi_auth_key ? 1 : 0
   name         = format("%s-iscsi-sshkey", local.prefix)
   value        = local.iscsi_private_key
   key_vault_id = azurerm_key_vault.kv_user.id
@@ -87,7 +87,7 @@ resource "azurerm_key_vault_secret" "iscsi_ppk" {
 
 resource "azurerm_key_vault_secret" "iscsi_pk" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
-  count        = (local.iscsi_count > 0 && local.iscsi_auth_type == "key") ? 1 : 0
+  count        = local.enable_iscsi_auth_key ? 1 : 0
   name         = format("%s-iscsi-sshkey-pub", local.prefix)
   value        = local.iscsi_public_key
   key_vault_id = azurerm_key_vault.kv_user.id
@@ -99,7 +99,7 @@ resource "azurerm_key_vault_secret" "iscsi_pk" {
 */
 resource "azurerm_key_vault_secret" "iscsi_username" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
-  count        = (local.iscsi_count > 0 && local.iscsi_auth_type == "password") ? 1 : 0
+  count        = local.enable_iscsi_auth_password ? 1 : 0
   name         = format("%s-iscsi-username", local.prefix)
   value        = local.iscsi_auth_username
   key_vault_id = azurerm_key_vault.kv_user.id
@@ -107,7 +107,7 @@ resource "azurerm_key_vault_secret" "iscsi_username" {
 
 resource "azurerm_key_vault_secret" "iscsi_password" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
-  count        = (local.iscsi_count > 0 && local.iscsi_auth_type == "password") ? 1 : 0
+  count        = local.enable_iscsi_auth_password ? 1 : 0
   name         = format("%s-iscsi-password", local.prefix)
   value        = local.iscsi_auth_password
   key_vault_id = azurerm_key_vault.kv_user.id
@@ -116,7 +116,7 @@ resource "azurerm_key_vault_secret" "iscsi_password" {
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "iscsi_password" {
   count = (
-  local.enable_auth_password 
+  local.enable_iscsi_auth_password 
   && try(local.var_iscsi.authentication.password, null) == null ) ? 1 : 0
   length           = 16
   special          = true
@@ -125,7 +125,7 @@ resource "random_password" "iscsi_password" {
 
 // Using TF tls to generate SSH key pair for SID and store in user KV
 resource "tls_private_key" "sid" {
-  count     = try(file(var.sshkey.path_to_public_key), "") == "" ? 1 : 0
+  count     = try(file(var.sshkey.path_to_public_key), null) == null ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
