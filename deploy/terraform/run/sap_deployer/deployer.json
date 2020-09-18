@@ -12,15 +12,6 @@
       }
     }
   },
-  "deployers":[{
-    "users": {
-      "object_id": []
-    }
-  }],
-  "sshkey": {
-    "path_to_public_key": "sshkey.pub",
-    "path_to_private_key": "sshkey"
-  },
   "options": {
     "enable_secure_transfer": true
   }
