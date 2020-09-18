@@ -126,7 +126,10 @@ locals {
         "terraform",
         "ansible"
       ],
-      "private_ip_address" = try(deployer.private_ip_address, cidrhost(local.sub_mgmt_deployed.address_prefixes[0], idx + 4))
+      "private_ip_address" = try(deployer.private_ip_address, cidrhost(local.sub_mgmt_deployed.address_prefixes[0], idx + 4)),
+      "users" = {
+        "object_id" = try(deployer.users.object_id, [])
+      }
     }
   ]
 
@@ -137,4 +140,14 @@ locals {
     }, deployer)
   ]
 
+  // This is to be aligned with sap_library design.
+  // If no additonal user going to be supported, this part needs to be changed.
+  deployer_users_id = distinct(
+    flatten([
+      for deployer in local.deployers :
+      deployer.users.object_id
+    ])
+  )
+  curr_deployer_user_id  = try(data.azurerm_client_config.deployer.object_id, "")
+  deployer_users_id_list = distinct(compact(concat(local.deployer_users_id, [local.curr_deployer_user_id])))
 }

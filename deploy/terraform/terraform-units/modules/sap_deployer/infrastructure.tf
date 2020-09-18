@@ -118,11 +118,11 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_portal" {
-  count        = local.enable_deployers ? 1 : 0
+  count        = local.enable_deployers ? length(local.deployer_users_id_list) : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
-  object_id = data.azurerm_client_config.deployer.object_id
+  object_id = local.deployer_users_id_list[count.index]
 
   secret_permissions = [
     "delete",
