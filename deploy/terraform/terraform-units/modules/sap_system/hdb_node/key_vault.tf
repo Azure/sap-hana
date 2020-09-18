@@ -107,6 +107,10 @@ resource "azurerm_key_vault_secret" "auth_password" {
 
 
 // Generate random passwords as hana database credentials
+/* TODO: passwords generating enhancement. 
+   Currently, six passwords for hana database credentials are generated regardless of how many passwords populated in credentials block. 
+   If some of them is empty, one of these pre-generated passwords with a fixed index will be used.
+*/ 
 resource "random_password" "credentials" {
   count            = 6
   length           = 16
