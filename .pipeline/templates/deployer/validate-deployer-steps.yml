@@ -29,7 +29,7 @@ steps:
       terraform plan -var-file=${input} ${repo_path}/deploy/terraform/bootstrap/sap_deployer/ > plan_output.log
       cat plan_output.log
       
-      if ! grep "No changes" plan_output.log; then exit 1; fi;
+      if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then exit 1; fi;
     displayName: "Validate deployer new config"
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)
