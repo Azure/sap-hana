@@ -10,6 +10,7 @@ steps:
       deployer_env=${{parameters.deployer_env}}
       buildId=$(Build.BuildId)
       deployer_isRelease=${deployer_env%%$buildId*}
+
       if [ -z "${deployer_isRelease}" ]
       then 
         deployer_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
