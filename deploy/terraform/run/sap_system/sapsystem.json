@@ -6,6 +6,10 @@
       "is_existing": "false",
       "arm_id": ""
     },
+    "landscape" : {
+      "key_vault_id" : "",
+      "sid_public_key_secret_name" : ""
+    },
     "vnets": {
       "management": {
         "saplib_resource_group_name": "",

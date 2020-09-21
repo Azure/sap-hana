@@ -89,8 +89,17 @@ locals {
   kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_users        = [var.deployer_user]
   enable_auth_password = local.enable_deployment && local.authentication.type == "password"
+  enable_auth_key      = local.enable_deployment && local.authentication.type == "key"
   sid_auth_username    = try(local.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : null
+
+  /* 
+     TODO: currently sap landscape and sap system haven't been decoupled. 
+     The key vault information of sap landscape will be obtained via input json.
+     At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
+  */
+  kv_landscape_id     = try(local.var_infra.landscape.key_vault_id, "")
+  secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})

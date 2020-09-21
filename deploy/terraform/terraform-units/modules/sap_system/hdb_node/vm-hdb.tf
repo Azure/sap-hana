@@ -178,7 +178,7 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
       username   = local.hdb_vms[count.index].authentication.username
-      public_key = file(var.sshkey.path_to_public_key)
+      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
     }
   }
 
