@@ -32,6 +32,12 @@ steps:
         nsg: {
           allowed_ips: ["67.160.0.0/16", $allowed_ip]
         }
+      }' \
+      | jq '. += {
+        sshkey: {
+          path_to_public_key: "sshkey.pub",
+          path_to_private_key: "sshkey"
+        }
       }' > ${input}
 
       cat ${input}
