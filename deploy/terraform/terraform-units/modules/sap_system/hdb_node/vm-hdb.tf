@@ -12,9 +12,9 @@ HANA DB Linux Server private IP range: .10 -
 
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-admin" {
-  count                         = local.enable_deployment ? length(local.hdb_vms) : 0
-  name                          = local.customer_provided_names ? format("%s-admin-nic",local.hdb_vms[count.index].name) : format("%s_%s-adminnic", local.prefix,local.hdb_vms[count.index].name)
-  
+  count = local.enable_deployment ? length(local.hdb_vms) : 0
+  name  = local.customer_provided_names ? format("%s-admin-nic", local.hdb_vms[count.index].name) : format("%s_%s-adminnic", local.prefix, local.hdb_vms[count.index].name)
+
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
   enable_accelerated_networking = true
@@ -30,7 +30,7 @@ resource "azurerm_network_interface" "nics-dbnodes-admin" {
 # Creates the DB traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics-dbnodes-db" {
   count                         = local.enable_deployment ? length(local.hdb_vms) : 0
-  name                          = local.customer_provided_names ? format("%s-db-nic",local.hdb_vms[count.index].name) : format("%s_%s-dbnic", local.prefix,local.hdb_vms[count.index].name)
+  name                          = local.customer_provided_names ? format("%s-db-nic", local.hdb_vms[count.index].name) : format("%s_%s-dbnic", local.prefix, local.hdb_vms[count.index].name)
   location                      = var.resource-group[0].location
   resource_group_name           = var.resource-group[0].name
   enable_accelerated_networking = true
@@ -39,7 +39,7 @@ resource "azurerm_network_interface" "nics-dbnodes-db" {
     primary                       = true
     name                          = "ipconfig1"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.sap-db[0].id : azurerm_subnet.sap-db[0].id
-    private_ip_address            = try(local.hdb_vms[count.index].db_nic_ip,false) == false ? cidrhost(length(local.sub_db_arm_id) > 0? data.azurerm_subnet.sap-db[0].address_prefixes[0] : azurerm_subnet.sap-db[0].address_prefixes[0], tonumber(count.index) + 10) : local.hdb_vms[count.index].db_nic_ip
+    private_ip_address            = try(local.hdb_vms[count.index].db_nic_ip, false) == false ? cidrhost(length(local.sub_db_arm_id) > 0 ? data.azurerm_subnet.sap-db[0].address_prefixes[0] : azurerm_subnet.sap-db[0].address_prefixes[0], tonumber(count.index) + 10) : local.hdb_vms[count.index].db_nic_ip
     private_ip_address_allocation = "static"
   }
 }
@@ -60,7 +60,7 @@ resource "azurerm_lb" "hdb" {
     name                          = format("%s_db-alb-feip", local.prefix)
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.sap-db[0].id : azurerm_subnet.sap-db[0].id
     private_ip_address_allocation = "Static"
-    private_ip_address            = try(local.hana_database.loadbalancer.frontend_ip, (local.sub_db_exists ? cidrhost(data.azurerm_subnet.sap-db[0].address_prefixes[0] , tonumber(count.index) + 4) : cidrhost(azurerm_subnet.sap-db[0].address_prefixes[0] , tonumber(count.index) + 4)))
+    private_ip_address            = try(local.hana_database.loadbalancer.frontend_ip, (local.sub_db_exists ? cidrhost(data.azurerm_subnet.sap-db[0].address_prefixes[0], tonumber(count.index) + 4) : cidrhost(azurerm_subnet.sap-db[0].address_prefixes[0], tonumber(count.index) + 4)))
   }
 }
 
@@ -135,7 +135,7 @@ resource "azurerm_managed_disk" "data-disk" {
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   count                        = local.enable_deployment ? length(local.hdb_vms) : 0
-  name                         = local.customer_provided_names ? format("%s",local.hdb_vms[count.index].name) : format("%s_%s", local.prefix,local.hdb_vms[count.index].name)
+  name                         = local.customer_provided_names ? format("%s", local.hdb_vms[count.index].name) : format("%s_%s", local.prefix, local.hdb_vms[count.index].name)
   computer_name                = replace(local.hdb_vms[count.index].name, "_", "")
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
@@ -154,7 +154,7 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.hdb_vms[count.index].size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = local.customer_provided_names ? format("%s-osdisk",local.hdb_vms[count.index].name) : format("%s_%s-osdisk", local.prefix,local.hdb_vms[count.index].name)
+      name                 = local.customer_provided_names ? format("%s-osdisk", local.hdb_vms[count.index].name) : format("%s_%s-osdisk", local.prefix, local.hdb_vms[count.index].name)
       caching              = disk.value.caching
       storage_account_type = disk.value.disk_type
       disk_size_gb         = disk.value.size_gb

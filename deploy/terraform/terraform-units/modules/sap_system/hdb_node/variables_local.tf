@@ -93,7 +93,7 @@ locals {
   kv_users             = [var.deployer_user]
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
-  enable_auth_key = local.enable_deployment && local.sid_auth_type == "key"
+  enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
 
@@ -104,8 +104,8 @@ locals {
      The key vault information of sap landscape will be obtained via input json.
      At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
   */
-  kv_landscape_id     = try(local.var_infra.landscape.key_vault_arm_id, "")
-  secret_sid_pk_name  = try(local.var_infra.landscape.sid_public_key_secret_name, "")
+  kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
+  secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
 
 >>>>>>> d40e246... retrieve ssh key from landscape's KV and use it at VM's creation
   # SAP vnet
