@@ -111,7 +111,7 @@ locals {
   // SPN of Azure Fence Agent for Hana Database
   enable_fence_agent = local.enable_deployment && try(local.hdb.fence_agent, null) != null
   fence_agent_subscription_id = local.enable_fence_agent ? local.hdb.fence_agent.subscription_id : null
-  fence_agent_tenant_id = local.enable_fence_agent ? local.hdb.fence_agent.tenat_id : null
+  fence_agent_tenant_id = local.enable_fence_agent ? local.hdb.fence_agent.tenant_id : null
   fence_agent_client_id = local.enable_fence_agent ? local.hdb.fence_agent.client_id : null
   fence_agent_client_secret = local.enable_fence_agent ? local.hdb.fence_agent.client_secret : null
 >>>>>>> 00da377... Store SPN of Azure fence agent in KV

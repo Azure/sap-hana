@@ -34,7 +34,7 @@
   "databases": [
     {
       "platform": "HANA",
-      "high_availability": false,
+      "high_availability": true,
       "db_version": "2.00.050",
       "size": "Demo",
       "os": {
@@ -51,7 +51,7 @@
         "ha_cluster_password": "<ha_cluster_password>"
       },
       "fence_agent": {
-        "subscrption_id": "",
+        "subscription_id": "",
         "tenant_id": "",
         "client_id": "",
         "client_secret": ""
