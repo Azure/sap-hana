@@ -45,8 +45,12 @@ resource "azurerm_key_vault" "kv_user" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
+<<<<<<< HEAD
   count        = local.enable_deployment ? 1 : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
+=======
+  key_vault_id = azurerm_key_vault.kv_user.id
+>>>>>>> 594db2a... tf format
   tenant_id    = data.azurerm_client_config.deployer.tenant_id
   object_id    = var.deployer-uai.principal_id
 
@@ -59,8 +63,13 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_portal" {
+<<<<<<< HEAD
   count        = local.enable_deployment ? length(local.kv_users) : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
+=======
+  count        = length(local.kv_users)
+  key_vault_id = azurerm_key_vault.kv_user.id
+>>>>>>> 594db2a... tf format
   tenant_id    = data.azurerm_client_config.deployer.tenant_id
   object_id    = local.kv_users[count.index]
 

@@ -26,7 +26,7 @@ variable "deployer-uai" {
   description = "Details of the UAI used by deployer(s)"
 }
 
-variable "deployer_user"{
+variable "deployer_user" {
   description = "Details of the users"
 }
 
@@ -80,14 +80,14 @@ locals {
   sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
   vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.environment, local.location_short))
 
-    // Post fix for all deployed resources
+  // Post fix for all deployed resources
   postfix = random_id.sapsystem.hex
 
   // key vault for sap system
-  kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  kv_private_name = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_users        = [var.deployer_user]
+  kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
+  kv_private_name      = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_user_name         = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_users             = [var.deployer_user]
   enable_auth_password = local.enable_deployment && local.authentication.type == "password"
   enable_auth_key      = local.enable_deployment && local.authentication.type == "key"
   sid_auth_username    = try(local.authentication.username, "azureadm")
@@ -109,7 +109,7 @@ locals {
   vnet_sap_name   = local.vnet_sap_exists ? split("/", local.vnet_sap_arm_id)[8] : try(local.var_vnet_sap.name, "")
   vnet_nr_parts   = length(split("-", local.vnet_sap_name))
   // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? split("-", local.vnet_sap_name)[(local.vnet_nr_parts -2)] : local.vnet_sap_name
+  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)] : local.vnet_sap_name
 
   // APP subnet
   var_sub_app    = try(var.infrastructure.vnets.sap.subnet_app, {})
