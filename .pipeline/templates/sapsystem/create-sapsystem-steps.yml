@@ -123,6 +123,8 @@ steps:
       | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
       | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
       | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      | jq --arg landscape_kv_id "/subscriptions/91a338db-aa0d-4a34-aed0-dbbbc698de30/resourceGroups/UNIT-EAUS-SAP0-INFRASTRUCTURE/providers/Microsoft.KeyVault/vaults/UNITEAUSSAP0user973E" .infrastructure.landscape.key_vault_id\ =\ \$landscape_kv_id \
+      | jq --arg sid_public_key_secret_name "UNIT-EAUS-SAP0-INFRASTRUCTURE-sid-sshkey-pub" .infrastructure.landscape.sid_public_key_secret_name\ =\ \$sid_public_key_secret_name \
       > ${input}
 
       cat ${input}
