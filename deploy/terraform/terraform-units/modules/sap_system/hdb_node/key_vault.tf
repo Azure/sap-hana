@@ -177,7 +177,7 @@ resource "azurerm_key_vault_secret" "fence_agent_subscription_id" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   name         = format("%s-sap-hana-fencing-agent-subscription-id", local.prefix)
   value        = local.fence_agent_subscription_id
-  key_vault_id = azurerm_key_vault.kv_user.id
+  key_vault_id = azurerm_key_vault.kv_user[0].id
 }
 
 resource "azurerm_key_vault_secret" "fence_agent_tenant_id" {
@@ -185,7 +185,7 @@ resource "azurerm_key_vault_secret" "fence_agent_tenant_id" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   name         = format("%s-sap-hana-fencing-agent-tenant-id", local.prefix)
   value        = local.fence_agent_tenant_id
-  key_vault_id = azurerm_key_vault.kv_user.id
+  key_vault_id = azurerm_key_vault.kv_user[0].id
 }
 
 resource "azurerm_key_vault_secret" "fence_agent_client_id" {
@@ -193,7 +193,7 @@ resource "azurerm_key_vault_secret" "fence_agent_client_id" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   name         = format("%s-sap-hana-fencing-agent-client-id", local.prefix)
   value        = local.fence_agent_client_id
-  key_vault_id = azurerm_key_vault.kv_user.id
+  key_vault_id = azurerm_key_vault.kv_user[0].id
 }
 
 resource "azurerm_key_vault_secret" "fence_agent_client_secret" {
@@ -201,7 +201,7 @@ resource "azurerm_key_vault_secret" "fence_agent_client_secret" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_msi]
   name         = format("%s-sap-hana-fencing-agent-client-secret", local.prefix)
   value        = local.fence_agent_client_secret
-  key_vault_id = azurerm_key_vault.kv_user.id
+  key_vault_id = azurerm_key_vault.kv_user[0].id
 }
 
 // retrieve public key from sap landscape's Key vault
