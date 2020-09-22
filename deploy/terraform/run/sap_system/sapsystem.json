@@ -6,9 +6,9 @@
       "is_existing": "false",
       "arm_id": ""
     },
-    "landscape" : {
-      "key_vault_id" : "",
-      "sid_public_key_secret_name" : ""
+    "landscape": {
+      "key_vault_arm_id": "",
+      "sid_public_key_secret_name": ""
     },
     "vnets": {
       "management": {
@@ -41,11 +41,11 @@
       "high_availability": false,
       "db_version": "2.00.050",
       "size": "Demo",
-      "os": { 
+      "os": {
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
-      }, 
+      },
       "credentials": {
         "db_systemdb_password": "<db_systemdb_password>",
         "os_sidadm_password": "<os_sidadm_password>",
@@ -64,7 +64,7 @@
     "scs_high_availability": false,
     "application_server_count": 1,
     "webdispatcher_count": 1,
-    "authentication" : {
+    "authentication": {
       "type": "key",
       "username": "azureadm"
     }

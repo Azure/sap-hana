@@ -98,7 +98,7 @@ locals {
      The key vault information of sap landscape will be obtained via input json.
      At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
   */
-  kv_landscape_id     = try(local.var_infra.landscape.key_vault_id, "")
+  kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
   secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
 
   # SAP vnet
