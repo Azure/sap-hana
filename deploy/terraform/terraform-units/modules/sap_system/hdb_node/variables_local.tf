@@ -95,7 +95,6 @@ locals {
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
-<<<<<<< HEAD
   sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
 
   /* 
@@ -105,16 +104,13 @@ locals {
   */
   kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
   secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
-=======
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : null
-  
+
   // SPN of Azure Fence Agent for Hana Database
-  enable_fence_agent = local.enable_deployment && try(local.hdb.fence_agent, null) != null
+  enable_fence_agent          = local.enable_deployment && try(local.hdb.fence_agent, null) != null
   fence_agent_subscription_id = local.enable_fence_agent ? local.hdb.fence_agent.subscription_id : null
-  fence_agent_tenant_id = local.enable_fence_agent ? local.hdb.fence_agent.tenant_id : null
-  fence_agent_client_id = local.enable_fence_agent ? local.hdb.fence_agent.client_id : null
-  fence_agent_client_secret = local.enable_fence_agent ? local.hdb.fence_agent.client_secret : null
->>>>>>> 00da377... Store SPN of Azure fence agent in KV
+  fence_agent_tenant_id       = local.enable_fence_agent ? local.hdb.fence_agent.tenant_id : null
+  fence_agent_client_id       = local.enable_fence_agent ? local.hdb.fence_agent.client_id : null
+  fence_agent_client_secret   = local.enable_fence_agent ? local.hdb.fence_agent.client_secret : null
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
@@ -175,9 +171,10 @@ locals {
   hdb_fs   = try(local.hdb.filesystem, "xfs")
   hdb_ha   = try(local.hdb.high_availability, false)
   hdb_auth = {
-    "type"     = local.sid_auth_type,
-    "username" = local.sid_auth_username,
-  "password" = local.sid_auth_password }
+    "type"     = local.sid_auth_type
+    "username" = local.sid_auth_username
+    "password" = local.sid_auth_password
+  }
 
   hdb_ins                = try(local.hdb.instance, {})
   hdb_sid                = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
