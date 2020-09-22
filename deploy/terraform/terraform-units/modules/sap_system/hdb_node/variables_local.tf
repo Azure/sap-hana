@@ -30,7 +30,7 @@ variable "deployer-uai" {
   description = "Details of the UAI used by deployer(s)"
 }
 
-variable "deployer_user"{
+variable "deployer_user" {
   description = "Details of the users"
 }
 
@@ -85,17 +85,17 @@ locals {
 
   // Post fix for all deployed resources
   postfix = random_id.sapsystem.hex
-  
+
   // key vault for sap system
-  kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  kv_private_name = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_user_name    = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_users        = [var.deployer_user]
-  sid_auth_type   = try(local.hdb.authentication.type, "key")
+  kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
+  kv_private_name      = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_user_name         = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_users             = [var.deployer_user]
+  sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : null
-  
+
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
@@ -104,7 +104,7 @@ locals {
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "")
   vnet_nr_parts   = length(split("-", local.vnet_sap_name))
   // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? split("-", local.vnet_sap_name)[(local.vnet_nr_parts -2)] : local.vnet_sap_name
+  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)] : local.vnet_sap_name
 
   // Admin subnet
   var_sub_admin    = try(var.infrastructure.vnets.sap.subnet_admin, {})
@@ -157,7 +157,7 @@ locals {
   hdb_auth = {
     "type"     = local.sid_auth_type,
     "username" = local.sid_auth_username,
-    "password" = local.sid_auth_password }
+  "password" = local.sid_auth_password }
 
   hdb_ins                = try(local.hdb.instance, {})
   hdb_sid                = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
