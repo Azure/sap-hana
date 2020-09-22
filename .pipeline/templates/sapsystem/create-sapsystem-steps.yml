@@ -35,7 +35,8 @@ steps:
       sapsystem_env=${{parameters.sapsystem_env}}
       sapsystem_isRelease=${sapsystem_env%%$buildId*}
 
-      [[ ${{parameters.osImage_publisher}} == "RedHat" ]] && isSles=false || isSles=true
+      [ -z ${{parameters.osImage_publisher}} ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
+      [[ ${osImage_publisher} == "SUSE" ]] && isSles=true || isSles=false
       
       # subnet is decided by buildId if it is unit test.
       # Otherwise, use 10.10.0.0 for sles and 10.10.1.0 for rhel
