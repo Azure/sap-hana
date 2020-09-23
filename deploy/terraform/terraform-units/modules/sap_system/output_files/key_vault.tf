@@ -2,7 +2,7 @@ data "azurerm_key_vault_secret" "cockpit_admin" {
   name         = var.cockpit_admin
   key_vault_id = var.hdb_kv_id
 }
-data "azurerm_key_vault_secret" "xsa_admin " {
+data "azurerm_key_vault_secret" "xsa_admin" {
   name         = var.xsa_admin
   key_vault_id = var.hdb_kv_id
 }
