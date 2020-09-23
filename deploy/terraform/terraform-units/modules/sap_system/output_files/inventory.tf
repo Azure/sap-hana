@@ -50,7 +50,6 @@ resource "local_file" "output-json" {
             os_sapadm_password     = try(data.azurerm_key_vault_secret.os_sapadm.value, "")
             xsa_admin_password     = try(data.azurerm_key_vault_secret.xsa_admin.value, "")
             cockpit_admin_password = try(data.azurerm_key_vault_secret.cockpit_admin.value, "")
-            ha_cluster_password    = try(data.azurerm_key_vault_secret.ha_cluster.value, "")
           },
 
           components        = database.components,

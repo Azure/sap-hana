@@ -20,7 +20,7 @@ data "azurerm_key_vault_secret" "os_sapadm" {
   key_vault_id = var.hdb_kv_id
 }
 
-data "azurerm_key_vault_secret" "ha_cluster" {
-  name         = var.ha_cluster
-  key_vault_id = var.hdb_kv_id
-}
+# data "azurerm_key_vault_secret" "ha_cluster" {
+#   name         = var.ha_cluster
+#   key_vault_id = var.hdb_kv_id
+# }
