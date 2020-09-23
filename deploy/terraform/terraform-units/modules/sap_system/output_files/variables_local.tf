@@ -82,6 +82,7 @@ variable "nics-anydb" {
 variable "random-id" {
   description = "Random hex string"
 }
+
 variable "anydb-loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
@@ -92,6 +93,27 @@ variable "any-database-info" {
 
 variable "deployers" {
   description = "Details of the deployer(s)"
+}
+
+variable "cockpit_admin"{
+
+}
+
+variable "ha_cluster"{
+
+}
+
+variable "db_systemdb"{
+
+}
+variable "os_sidadm"{
+
+}
+variable "os_sapadm"{
+
+}
+variable "xsa_admin"{
+  
 }
 
 locals {

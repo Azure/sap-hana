@@ -163,4 +163,10 @@ module "output_files" {
   anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
   deployers                    = module.deployer.import_deployer
   random-id        = module.common_infrastructure.random-id
+  cockpit_admin       = module.hdb_node.secret_name_cockpit_admin
+  xsa_admin                 = module.hdb_node.secret_name_xsa_admin
+  ha_cluster                          = module.hdb_node.secret_name_ha_cluster
+  db_systemdb  =  module.hdb_node.secret_name_db_systemdb
+  os_sidadm = module.hdb_node.secret_name_os_sidadm
+  os_sapadm = module.hdb_node.secret_name_os_sapadm
 }
