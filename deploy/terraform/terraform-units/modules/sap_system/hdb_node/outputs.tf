@@ -39,7 +39,7 @@ output "secret_name_xsa_admin"{
   value = azurerm_key_vault_secret.xsa_admin[0].name
 }
 output "secret_name_ha_cluster"{
-  value = azurerm_key_vault_secret.ha_cluster[0].name
+  value = try(azurerm_key_vault_secret.ha_cluster[0].name, null)
 }
 output "secret_name_db_systemdb"{
   value = azurerm_key_vault_secret.db_systemdb[0].name
