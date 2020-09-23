@@ -60,6 +60,7 @@ variable "hdb-sid" {
 
 variable "hana-database-info" {
   description = "Updated hana database json"
+  default = []
 }
 
 variable "nics-scs" {
@@ -89,6 +90,7 @@ variable "anydb-loadbalancers" {
 
 variable "any-database-info" {
   description = "Updated anydb database json"
+  default = []
 }
 
 variable "deployers" {
@@ -113,7 +115,7 @@ variable "os_sapadm"{
 
 }
 variable "xsa_admin"{
-  
+
 }
 
 locals {

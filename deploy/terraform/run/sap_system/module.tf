@@ -154,12 +154,12 @@ module "output_files" {
   nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
   loadbalancers                = module.hdb_node.loadbalancers
   hdb-sid                      = module.hdb_node.hdb-sid
-  hana-database-info           = module.hdb_node.hana-database-info
+  #hana-database-info           = module.hdb_node.hana-database-info
   nics-scs                     = module.app_tier.nics-scs
   nics-app                     = module.app_tier.nics-app
   nics-web                     = module.app_tier.nics-web
   nics-anydb                   = module.anydb_node.nics-anydb
-  any-database-info            = module.anydb_node.any-database-info
+  #any-database-info            = module.anydb_node.any-database-info
   anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
   deployers                    = module.deployer.import_deployer
   random-id        = module.common_infrastructure.random-id
