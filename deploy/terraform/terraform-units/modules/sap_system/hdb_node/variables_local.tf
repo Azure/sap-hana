@@ -209,12 +209,12 @@ locals {
       }
     },
     { credentials = {
-      db_systemdb_password   = local.db_systemdb_password,
-      os_sidadm_password     = local.os_sidadm_password,
-      os_sapadm_password     = local.os_sapadm_password,
-      xsa_admin_password     = local.xsa_admin_password,
-      cockpit_admin_password = local.cockpit_admin_password,
-      ha_cluster_password    = local.ha_cluster_password
+      db_systemdb_password   = azurerm_key_vault_secret.db_systemdb[0].value,
+      os_sidadm_password     = azurerm_key_vault_secret.os_sidadm[0].value,
+      os_sapadm_password     = azurerm_key_vault_secret.os_sapadm[0].value,
+      xsa_admin_password     = azurerm_key_vault_secret.xsa_admin[0].value,
+      cockpit_admin_password = azurerm_key_vault_secret.cockpit_admin[0].value,
+      ha_cluster_password    = azurerm_key_vault_secret.ha_cluster[0].value
       }
     },
     { components = local.components },
