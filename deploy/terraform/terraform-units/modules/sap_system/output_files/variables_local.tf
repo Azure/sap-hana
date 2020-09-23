@@ -126,7 +126,10 @@ locals {
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
-  databases = [
+  # databases = [
+  #   var.hana-database-info
+  # ]
+  databases = length(var.hana-database-info) == 0 ? [] : [
     var.hana-database-info
   ]
   hdb_vms = flatten([
@@ -157,7 +160,7 @@ locals {
   ips-web = [for key, value in var.nics-web : value.private_ip_address]
 
   ips-anydbnodes = [for key, value in var.nics-anydb : value.private_ip_address]
-  anydatabases = [
+  anydatabases = length(var.any-database-info) == 0 ? [] : [
     var.any-database-info
   ]
   anydb_vms = flatten([
