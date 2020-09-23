@@ -214,7 +214,7 @@ locals {
       os_sapadm_password     = azurerm_key_vault_secret.os_sapadm[0].value,
       xsa_admin_password     = azurerm_key_vault_secret.xsa_admin[0].value,
       cockpit_admin_password = azurerm_key_vault_secret.cockpit_admin[0].value,
-      ha_cluster_password    = azurerm_key_vault_secret.ha_cluster[0].value
+      ha_cluster_password    = try(azurerm_key_vault_secret.ha_cluster[0].value, null)
       }
     },
     { components = local.components },
