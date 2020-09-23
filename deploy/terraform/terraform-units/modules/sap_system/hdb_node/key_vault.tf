@@ -73,7 +73,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
 }
 
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
-resource "random_password" "password" {
+resource "random_string" "password" {
   count = (
     local.enable_auth_password
   && try(local.hdb.authentication.password, null) == null) ? 1 : 0
@@ -115,7 +115,7 @@ resource "azurerm_key_vault_secret" "auth_password" {
    Currently, six passwords for hana database credentials are generated regardless of how many passwords populated in credentials block. 
    If some of them is empty, one of these pre-generated passwords with a fixed index will be used.
 */
-resource "random_password" "credentials" {
+resource "random_string" "credentials" {
   count            = local.enable_deployment ? 6 : 0
   length           = 16
   special          = true
