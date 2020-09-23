@@ -32,6 +32,7 @@ stages:
           branch_name: $(targetBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "$(Build.BuildId)"
       - template: templates/sapsystem/validate-sapsystem-steps.yml
         parameters:
@@ -42,6 +43,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:

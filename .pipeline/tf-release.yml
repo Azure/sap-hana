@@ -122,6 +122,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "SLES"
           osImage_offer: "sles-sap-12-sp5"
           osImage_publisher: "SUSE"
@@ -144,6 +145,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "RHEL"
           osImage_offer: "RHEL-SAP-HA"
           osImage_publisher: "RedHat"

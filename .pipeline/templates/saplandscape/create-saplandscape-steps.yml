@@ -46,29 +46,21 @@ steps:
       then 
         idx1=${buildId: -1}
         idx2=$((${buildId: -2:1} + 1))
+        idx=$((10#$idx2$idx1))
         saplandscape_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
         ha="false"
       else
-        idx1=10
         saplandscape_prefix=${saplandscape_env}
         ha="true"
         if ${isSles}
-        then idx2=11
-        else idx2=12
+        then idx=11
+        else idx=12
         fi
       fi
-      sap_vnet_address_space="10.${idx2}.${idx1}.0/25"
-      subnet_admin_prefix="10.${idx2}.${idx1}.0/27"
-      subnet_db_prefix="10.${idx2}.${idx1}.32/27"
-      subnet_iscsi_prefix="10.${idx2}.${idx1}.64/27"
-      subnet_app_prefix="10.${idx2}.${idx1}.96/27"
+      sap_vnet_address_space="10.${idx}.0.0/16"
+      subnet_iscsi_prefix="10.${idx}.${idx}.64/27"
 
       saplandscape_rg="${saplandscape_prefix}-EAUS-SAP0-INFRASTRUCTURE"
-
-      # If no osImage provided, deploy SLES12SP5
-      [ -z "${{parameters.osImage_offer}}" ] && osImage_offer="sles-sap-12-sp5" || osImage_offer=${{parameters.osImage_offer}}
-      [ -z "${{parameters.osImage_publisher}}" ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
-      [ -z "${{parameters.osImage_sku}}" ] && osImage_sku="gen1" || osImage_sku=${{parameters.osImage_sku}}
       
       repo_dir=$HOME/${saplandscape_rg}/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/${saplandscape_rg}

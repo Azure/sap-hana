@@ -87,6 +87,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "$(Build.BuildId)"
           saplib_env: "$(Build.BuildId)"
+          saplandscape_env: "$(Build.BuildId)"
           sapsystem_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
