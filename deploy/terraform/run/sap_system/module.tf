@@ -169,6 +169,6 @@ module "output_files" {
   db_systemdb  =  module.hdb_node.secret_name_db_systemdb
   os_sidadm = module.hdb_node.secret_name_os_sidadm
   os_sapadm = module.hdb_node.secret_name_os_sapadm
-  hdb_kv_id = module.hdb_kv_id.hdb_kv_id
+  hdb_kv_id = module.hdb_node.hdb_kv_id
 
 }

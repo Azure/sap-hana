@@ -30,3 +30,23 @@ output "dbnode-data-disk-att" {
 output "hdb_kv_id" {
   value = azurerm_key_vault.kv_user[0].id
 }
+
+output "secret_name_cockpit_admin"{
+  value = azurerm_key_vault_secret.cockpit_admin[0].name
+}
+
+output "secret_name_xsa_admin"{
+  value = azurerm_key_vault_secret.xsa_admin[0].name
+}
+output "secret_name_ha_cluster"{
+  value = azurerm_key_vault_secret.ha_cluster[0].name
+}
+output "secret_name_db_systemdb"{
+  value = azurerm_key_vault_secret.db_systemdb[0].name
+}
+output "secret_name_os_sidadm"{
+  value = azurerm_key_vault_secret.os_sidadm[0].name
+}
+output "secret_name_os_sapadm"{
+  value = azurerm_key_vault_secret.os_sapadm[0].name
+}
