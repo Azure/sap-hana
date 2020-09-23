@@ -10,6 +10,3 @@ output "nics-web" {
   value = azurerm_network_interface.web
 }
 
-output "user_vault_name" {
-  value = azurerm_key_vault.kv_user
-}
