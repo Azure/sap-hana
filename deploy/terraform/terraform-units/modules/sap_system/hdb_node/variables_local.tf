@@ -94,7 +94,7 @@ locals {
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : null
+  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_string.password[0].result) : null
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
@@ -163,12 +163,12 @@ locals {
   hdb_sid                = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
   hdb_nr                 = try(local.hdb_ins.instance_number, "01")
   hdb_cred               = try(local.hdb.credentials, {})
-  db_systemdb_password   = local.enable_deployment ? try(local.hdb_cred.db_systemdb_password, random_password.credentials[0].result) : null
-  os_sidadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sidadm_password, random_password.credentials[1].result) : null
-  os_sapadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sapadm_password, random_password.credentials[2].result) : null
-  xsa_admin_password     = local.enable_deployment ? try(local.hdb_cred.xsa_admin_password, random_password.credentials[3].result) : null
-  cockpit_admin_password = local.enable_deployment ? try(local.hdb_cred.cockpit_admin_password, random_password.credentials[4].result) : null
-  ha_cluster_password    = local.enable_deployment && local.hdb_ha ? try(local.hdb_cred.ha_cluster_password, random_password.credentials[5].result) : null
+  db_systemdb_password   = local.enable_deployment ? try(local.hdb_cred.db_systemdb_password, random_string.credentials[0].result) : null
+  os_sidadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sidadm_password, random_string.credentials[1].result) : null
+  os_sapadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sapadm_password, random_string.credentials[2].result) : null
+  xsa_admin_password     = local.enable_deployment ? try(local.hdb_cred.xsa_admin_password, random_string.credentials[3].result) : null
+  cockpit_admin_password = local.enable_deployment ? try(local.hdb_cred.cockpit_admin_password, random_string.credentials[4].result) : null
+  ha_cluster_password    = local.enable_deployment && local.hdb_ha ? try(local.hdb_cred.ha_cluster_password, random_string.credentials[5].result) : null
   components             = merge({ hana_database = [] }, try(local.hdb.components, {}))
   xsa                    = try(local.hdb.xsa, { routing = "ports" })
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
@@ -202,19 +202,25 @@ locals {
     { size = local.hdb_size },
     { filesystem = local.hdb_fs },
     { high_availability = local.hdb_ha },
-    { authentication = local.hdb_auth },
+    { authentication = null },
     { instance = {
       sid             = local.hdb_sid,
       instance_number = local.hdb_nr
       }
     },
     { credentials = {
-      db_systemdb_password   = local.db_systemdb_password,
-      os_sidadm_password     = local.os_sidadm_password,
-      os_sapadm_password     = local.os_sapadm_password,
-      xsa_admin_password     = local.xsa_admin_password,
-      cockpit_admin_password = local.cockpit_admin_password,
-      ha_cluster_password    = local.ha_cluster_password
+      # db_systemdb_password   = azurerm_key_vault_secret.db_systemdb[0].value,
+      # os_sidadm_password     = azurerm_key_vault_secret.os_sidadm[0].value,
+      # os_sapadm_password     = azurerm_key_vault_secret.os_sapadm[0].value,
+      # xsa_admin_password     = azurerm_key_vault_secret.xsa_admin[0].value,
+      # cockpit_admin_password = azurerm_key_vault_secret.cockpit_admin[0].value,
+      # ha_cluster_password    = try(azurerm_key_vault_secret.ha_cluster[0].value, null)
+       db_systemdb_password   = null,
+       os_sidadm_password     = null,
+       os_sapadm_password     = null,
+       xsa_admin_password     = null,
+       cockpit_admin_password = null,
+       ha_cluster_password    = null
       }
     },
     { components = local.components },

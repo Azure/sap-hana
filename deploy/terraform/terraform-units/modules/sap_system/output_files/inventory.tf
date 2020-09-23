@@ -43,7 +43,16 @@ resource "local_file" "output-json" {
           high_availability = database.high_availability,
           instance          = database.instance,
           authentication    = database.authentication,
-          credentials       = database.credentials,
+          #credentials       = database.credentials,
+          credentials = {
+            db_systemdb_password   = try(data.azurerm_key_vault_secret.cockpit_admin.value, "")
+            os_sidadm_password     = try(data.azurerm_key_vault_secret.os_sidadm.value, "")
+            os_sapadm_password     = try(data.azurerm_key_vault_secret.os_sapadm.value, "")
+            xsa_admin_password     = try(data.azurerm_key_vault_secret.xsa_admin.value, "")
+            cockpit_admin_password = try(data.azurerm_key_vault_secret.cockpit_admin.value, "")
+            ha_cluster_password    = try(data.azurerm_key_vault_secret.ha_cluster.value, "")
+          },
+
           components        = database.components,
           xsa               = database.xsa,
           shine             = database.shine,

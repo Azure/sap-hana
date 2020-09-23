@@ -94,6 +94,30 @@ variable "deployers" {
   description = "Details of the deployer(s)"
 }
 
+variable "cockpit_admin"{
+
+}
+
+variable "hdb_kv_id"{
+
+}
+variable "ha_cluster"{
+
+}
+
+variable "db_systemdb"{
+
+}
+variable "os_sidadm"{
+
+}
+variable "os_sapadm"{
+
+}
+variable "xsa_admin"{
+
+}
+
 locals {
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
