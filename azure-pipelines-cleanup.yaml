@@ -24,4 +24,15 @@ jobs:
         fi
       done
     displayName: 'Clean up resource group daily'
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      deployer_rg="UNIT-EAUS-MGMT-INFRASTRUCTURE"
+      mgmt_vnet=$(az network vnet list --resource-group ${deployer_rg} | jq -r '.[].name')
+      peering_list=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name ${mgmt_vnet} | jq -c '.[] | select(.peeringState=="Disconnected")' | jq -r .name)
+      for peering in ${peering_list}
+      do
+        echo ${peering_list}
+        az network vnet peering delete --resource-group ${deployer_rg}  --vnet-name ${mgmt_vnet} --name ${peering} --no-wait -y
+      done
+    displayName: 'Clean up network peering daily'
 
