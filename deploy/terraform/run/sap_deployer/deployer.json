@@ -4,7 +4,7 @@
     "environment": "global",
     "vnets": {
       "management": {
-        "name" : "MGMT",
+        "name": "MGMT",
         "address_space": "10.0.0.0/26",
         "subnet_mgmt": {
           "prefix": "10.0.0.16/28"
@@ -12,6 +12,13 @@
       }
     }
   },
+  "deployers": [
+    {
+      "users": {
+        "object_id": []
+      }
+    }
+  ],
   "options": {
     "enable_secure_transfer": true
   }
