@@ -91,7 +91,7 @@ locals {
   enable_auth_password = local.enable_deployment && local.authentication.type == "password"
   enable_auth_key      = local.enable_deployment && local.authentication.type == "key"
   sid_auth_username    = try(local.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : null
+  sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : ""
 
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
