@@ -57,9 +57,7 @@ steps:
       
       echo "=== Delete SAP system from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
-      cat ~/.log/$(Build.BuildId)_destroy_error.log
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
 
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${sapsystem_rg}

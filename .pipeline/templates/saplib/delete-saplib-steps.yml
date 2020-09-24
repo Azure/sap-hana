@@ -42,10 +42,8 @@ steps:
 
       echo "=== Delete SAP library from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
-      cat ~/.log/$(Build.BuildId)_apply_error.log;
-
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/
+      
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${saplib_rg}
 

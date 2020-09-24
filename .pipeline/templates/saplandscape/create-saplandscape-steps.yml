@@ -116,9 +116,7 @@ steps:
         --backend-config "container_name=tfstate" \
         --backend-config "key=${sap_landscape_key}" \
         ${repo_dir}/deploy/terraform/run/sap_system/
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_sap_landscape_apply_error.log 2>&1>~/.log/$(Build.BuildId)_sap_landscape_apply.log
-      if [ -s ~/.log/$(Build.BuildId)_sap_landscape_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_sap_landscape_apply_error.log; exit 1; fi;
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       '
     displayName: "Deploy new sap landscape: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
