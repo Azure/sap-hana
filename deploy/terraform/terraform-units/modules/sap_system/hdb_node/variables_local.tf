@@ -94,7 +94,7 @@ locals {
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : null
+  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
