@@ -23,8 +23,9 @@ variable "deployer-uai" {
   description = "Details of the UAI used by deployer(s)"
 }
 
-variable "deployer_user"{
+variable "deployer_user" {
   description = "Details of the users"
+  default     = []
 }
 
 variable "region_mapping" {
@@ -117,7 +118,7 @@ locals {
   kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
   kv_private_name = format("%sprvt%s", local.kv_prefix, upper(substr(local.postfix, 0, 4)))
   kv_user_name    = format("%suser%s", local.kv_prefix, upper(substr(local.postfix, 0, 4)))
-  kv_users        = [var.deployer_user]
+  kv_users        = var.deployer_user
 
   //iSCSI
   var_iscsi = try(local.var_infra.iscsi, {})
@@ -139,9 +140,9 @@ locals {
   iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  enable_iscsi_auth_key   = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
-  iscsi_public_key        = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
-  iscsi_private_key       = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
+  enable_iscsi_auth_key = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
+  iscsi_public_key      = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
+  iscsi_private_key     = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
   enable_iscsi_auth_password = local.iscsi_count > 0 && local.iscsi_auth_type == "password"

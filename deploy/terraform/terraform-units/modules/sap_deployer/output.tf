@@ -57,5 +57,5 @@ output "pwd_name" {
 }
 
 output "deployer_user" {
-  value = data.azurerm_client_config.deployer.object_id
+  value = local.deployer_users_id_list
 }

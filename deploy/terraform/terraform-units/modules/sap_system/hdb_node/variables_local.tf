@@ -32,6 +32,7 @@ variable "deployer-uai" {
 
 variable "deployer_user" {
   description = "Details of the users"
+  default = []
 }
 
 variable "region_mapping" {
@@ -90,7 +91,7 @@ locals {
   kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
   kv_private_name      = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_user_name         = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_users             = [var.deployer_user]
+  kv_users             = var.deployer_user
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"

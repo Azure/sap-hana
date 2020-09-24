@@ -9,7 +9,7 @@ data "azurerm_client_config" "deployer" {}
 resource "azurerm_key_vault" "kv_prvt" {
   name                       = local.kv_private_name
   location                   = local.region
-  resource_group_name        = local.rg_exists? data.azurerm_resource_group.resource-group[0].name : local.rg_name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : local.rg_name
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
@@ -32,7 +32,7 @@ resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
 resource "azurerm_key_vault" "kv_user" {
   name                       = local.kv_user_name
   location                   = local.region
-  resource_group_name        = local.rg_exists? data.azurerm_resource_group.resource-group[0].name : local.rg_name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : local.rg_name
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
@@ -43,8 +43,8 @@ resource "azurerm_key_vault" "kv_user" {
 
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   key_vault_id = azurerm_key_vault.kv_user.id
-  tenant_id = data.azurerm_client_config.deployer.tenant_id
-  object_id = var.deployer-uai.principal_id
+  tenant_id    = data.azurerm_client_config.deployer.tenant_id
+  object_id    = var.deployer-uai.principal_id
 
   secret_permissions = [
     "delete",
@@ -55,10 +55,10 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_portal" {
-  count = length(local.kv_users)
+  count        = length(local.kv_users)
   key_vault_id = azurerm_key_vault.kv_user.id
-  tenant_id = data.azurerm_client_config.deployer.tenant_id
-  object_id = local.kv_users[count.index]
+  tenant_id    = data.azurerm_client_config.deployer.tenant_id
+  object_id    = local.kv_users[count.index]
 
   secret_permissions = [
     "delete",
@@ -71,8 +71,8 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
 // Using TF tls to generate SSH key pair for iscsi devices and store in user KV
 resource "tls_private_key" "iscsi" {
   count = (
-  local.enable_iscsi_auth_key 
-  && try(file(var.sshkey.path_to_public_key), null) == null ) ? 1 : 0
+    local.enable_iscsi_auth_key
+  && try(file(var.sshkey.path_to_public_key), null) == null) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
@@ -116,8 +116,8 @@ resource "azurerm_key_vault_secret" "iscsi_password" {
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "iscsi_password" {
   count = (
-  local.enable_iscsi_auth_password 
-  && try(local.var_iscsi.authentication.password, null) == null ) ? 1 : 0
+    local.enable_iscsi_auth_password
+  && try(local.var_iscsi.authentication.password, null) == null) ? 1 : 0
   length           = 16
   special          = true
   override_special = "_%@"

@@ -33,3 +33,9 @@ output "deployer" {
   sensitive = true
   value     = module.sap_deployer.deployers
 }
+
+output "deployer_user" {
+  sensitive = true
+  value = module.sap_deployer.deployer_user
+}
+
