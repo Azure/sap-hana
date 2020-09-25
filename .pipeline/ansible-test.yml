@@ -24,31 +24,33 @@ stages:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          saplandscape_rg_name: "UNIT-EAUS-SAP0-INFRASTRUCTURE"
           sapsystem_rg_name: "SLES-EAUS-SAP-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"
   - job: runAnsibleRHEL
     timeoutInMinutes: 120
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          saplandscape_rg_name: "UNIT-EAUS-SAP0-INFRASTRUCTURE"
           sapsystem_rg_name: "RHEL-EAUS-SAP-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
-          deployer_rg_name: "UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_env: "UNIT"

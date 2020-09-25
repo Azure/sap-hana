@@ -6,9 +6,18 @@ steps:
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh
 
+      saplandscape_rg=${{parameters.saplandscape_rg_name}}
       sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
       repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg_name}
+
+      echo "=== Retrieving SSH key from sap_landscape KV ==="
+      landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      sid_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\") | not).name"'")
+
+      rm -f ${ws_dir}/sshkey
+      az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_private_key_secret_name} | jq -r .value > ${ws_dir}/sshkey
+      chmod 600 ${ws_dir}/sshkey
 
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
@@ -20,7 +29,7 @@ steps:
       export ANSIBLE_HOST_KEY_CHECKING=False
       source ${ws_dir}/export-clustering-sp-details.sh
       cd ~/Azure_SAP_Automated_Deployment
-      ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml ${repo_dir}/deploy/ansible/sap_playbook.yml
+      ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml --private-key ${ws_dir}/sshkey ${repo_dir}/deploy/ansible/sap_playbook.yml
       '
     displayName: "Run Ansible-playbook: Branch ${{parameters.branch_name}}"
     env:
