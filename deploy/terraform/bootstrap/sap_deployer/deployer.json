@@ -12,13 +12,6 @@
       }
     }
   },
-  "deployers": [
-    {
-      "users": {
-        "object_id": []
-      }
-    }
-  ],
   "options": {
     "enable_secure_transfer": true
   }
