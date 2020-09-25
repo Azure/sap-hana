@@ -66,8 +66,8 @@ all:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
 %{~ if application.authentication.type == "password" }
-          ansible_ssh_pass:    "${application.authentication.username}"
-          ansible_become_pass: "${application.authentication.username}"
+          ansible_ssh_pass:    "${application.authentication.password}"
+          ansible_become_pass: "${application.authentication.password}"
 %{~ endif }
 %{~ endfor }
 
@@ -78,8 +78,8 @@ all:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
 %{~ if application.authentication.type == "password" }
-          ansible_ssh_pass:    "${application.authentication.username}"
-          ansible_become_pass: "${application.authentication.username}"
+          ansible_ssh_pass:    "${application.authentication.password}"
+          ansible_become_pass: "${application.authentication.password}"
 %{~ endif }
 %{~ endfor }
 
@@ -90,8 +90,8 @@ all:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
 %{~ if application.authentication.type == "password" }
-          ansible_ssh_pass:    "${application.authentication.username}"
-          ansible_become_pass: "${application.authentication.username}"
+          ansible_ssh_pass:    "${application.authentication.password}"
+          ansible_become_pass: "${application.authentication.password}"
 %{~ endif }
 %{~ endfor }
 
