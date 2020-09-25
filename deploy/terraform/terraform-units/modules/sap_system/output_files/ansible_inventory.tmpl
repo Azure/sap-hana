@@ -84,16 +84,25 @@ ${ip-dbnode-admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips-dbn
 [scs]
 %{~ for ip-scs in ips-scs }
 ${ip-scs}  ansible_connection=ssh ansible_user=${application.authentication.username}
+%{~ if application.authentication.type == "password" }
+${ip-scs}  ansible_connection=ssh  ansible_user=${application.authentication.username}  ansible_ssh_pass=${application.authentication.password}  ansible_become_pass=${application.authentication.password}
+%{~ endif }
 %{~ endfor }
 
 [app]
 %{~ for ip-app in ips-app }
 ${ip-app}  ansible_connection=ssh ansible_user=${application.authentication.username}
+%{~ if application.authentication.type == "password" }
+${ip-app}  ansible_connection=ssh  ansible_user=${application.authentication.username}  ansible_ssh_pass=${application.authentication.password}  ansible_become_pass=${application.authentication.password}
+%{~ endif }
 %{~ endfor }
 
 [web]
 %{~ for ip-web in ips-web }
 ${ip-web}  ansible_connection=ssh ansible_user=${application.authentication.username}
+%{~ if application.authentication.type == "password" }
+${ip-web}  ansible_connection=ssh  ansible_user=${application.authentication.username}  ansible_ssh_pass=${application.authentication.password}  ansible_become_pass=${application.authentication.password}
+%{~ endif }
 %{~ endfor }
 
 [ase]

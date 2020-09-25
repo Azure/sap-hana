@@ -28,7 +28,7 @@ variable "deployer-uai" {
 
 variable "deployer_user" {
   description = "Details of the users"
-  default = []
+  default     = []
 }
 
 variable "region_mapping" {
@@ -89,10 +89,17 @@ locals {
   kv_private_name      = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_user_name         = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
   kv_users             = var.deployer_user
-  enable_auth_password = local.enable_deployment && local.authentication.type == "password"
-  enable_auth_key      = local.enable_deployment && local.authentication.type == "key"
-  sid_auth_username    = try(local.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.authentication.password, random_password.password[0].result) : ""
+  sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
+  enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
+  enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
+  sid_auth_username    = try(var.application.authentication.username, "azureadm")
+  sid_auth_password    = local.enable_auth_password ? try(var.application.authentication.password, random_password.password[0].result) : ""
+
+  authentication = {
+    "type"     = local.sid_auth_type
+    "username" = local.sid_auth_username
+    "password" = local.sid_auth_password
+  }
 
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
@@ -163,12 +170,6 @@ locals {
   app_ostype = try(var.application.os.os_type, "Linux")
   app_oscode = upper(local.app_ostype) == "LINUX" ? "l" : "w"
 
-  authentication = try(var.application.authentication,
-    {
-      "type"     = upper(local.app_ostype) == "LINUX" ? "key" : "password"
-      "username" = "azureadm"
-      "password" = "Sap@hana2019!"
-  })
 
   // OS image for all Application Tier VMs
   // If custom image is used, we do not overwrite os reference with default value
@@ -181,6 +182,10 @@ locals {
     "sku"             = try(var.application.os.sku, local.app_custom_image ? "" : "gen1")
     "version"         = try(var.application.os.version, local.app_custom_image ? "" : "latest")
   }
+
+  application = merge(var.application,
+    { authentication = local.authentication }
+  )
 
 }
 

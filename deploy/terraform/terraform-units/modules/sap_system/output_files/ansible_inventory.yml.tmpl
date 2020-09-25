@@ -65,6 +65,10 @@ all:
         ${ip-scs}:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
+%{~ if application.authentication.type == "password" }
+          ansible_ssh_pass:    "${application.authentication.username}"
+          ansible_become_pass: "${application.authentication.username}"
+%{~ endif }
 %{~ endfor }
 
     app:
@@ -73,6 +77,10 @@ all:
         ${ip-app}:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
+%{~ if application.authentication.type == "password" }
+          ansible_ssh_pass:    "${application.authentication.username}"
+          ansible_become_pass: "${application.authentication.username}"
+%{~ endif }
 %{~ endfor }
 
     web:
@@ -81,6 +89,10 @@ all:
         ${ip-web}:
           ansible_connection: "ssh"
           ansible_user:       "${application.authentication.username}"
+%{~ if application.authentication.type == "password" }
+          ansible_ssh_pass:    "${application.authentication.username}"
+          ansible_become_pass: "${application.authentication.username}"
+%{~ endif }
 %{~ endfor }
 
     asenodes:
