@@ -49,6 +49,10 @@ steps:
       sap_vnet_prefix_idx=${sap_vnet_prefix_parts[1]}
       unset IFS
 
+      landscape_kv_arm_id=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).id"'")
+      landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\")).name"'")
+
       # Modify environment value so it starts with u and with length of 5
       sapsystem_env=${{parameters.sapsystem_env}}
       sapsystem_isRelease=${sapsystem_env%%$buildId*}
@@ -142,8 +146,8 @@ steps:
       | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
       | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
       | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
-      | jq --arg landscape_kv_arm_id "/subscriptions/$(landscape-subscription)/resourceGroups/${sapland_rg}/providers/Microsoft.KeyVault/vaults/UNITEAUSSAPuser8B24" .infrastructure.landscape.key_vault_arm_id\ =\ \$landscape_kv_arm_id \
-      | jq --arg sid_public_key_secret_name "${sapland_rg}-sid-sshkey-pub" .infrastructure.landscape.sid_public_key_secret_name\ =\ \$sid_public_key_secret_name \
+      | jq --arg landscape_kv_arm_id "${landscape_kv_arm_id}" .infrastructure.landscape.key_vault_arm_id\ =\ \$landscape_kv_arm_id \
+      | jq --arg sid_public_key_secret_name "${sid_public_key_secret_name}" .infrastructure.landscape.sid_public_key_secret_name\ =\ \$sid_public_key_secret_name \
       > ${input}
 
       cat ${input}
