@@ -130,6 +130,8 @@ module "anydb_node" {
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
+  sid_kv_user_msi  = module.common_infrastructure.sid_kv_user_msi
 }
 
 // Generate output files

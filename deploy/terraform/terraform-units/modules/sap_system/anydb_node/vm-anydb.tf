@@ -20,7 +20,7 @@ resource azurerm_network_interface "anydb" {
 # Section for Linux Virtual machine 
 resource azurerm_linux_virtual_machine "dbserver" {
   count                        = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? length(local.anydb_vms) : 0) : 0
-  name                         = local.customer_provided_names ? format("%s", local.anydb_vms[count.index].name) :format("%s_%s", local.prefix, local.anydb_vms[count.index].name)
+  name                         = local.customer_provided_names ? format("%s", local.anydb_vms[count.index].name) : format("%s_%s", local.prefix, local.anydb_vms[count.index].name)
   location                     = var.resource-group[0].location
   resource_group_name          = var.resource-group[0].name
   availability_set_id          = azurerm_availability_set.anydb[0].id
@@ -52,13 +52,16 @@ resource azurerm_linux_virtual_machine "dbserver" {
   }
 
   computer_name                   = substr(lower(local.anydb_vms[count.index].name), 0, 13)
-  admin_username                  = local.authentication.username
-  admin_password                  = local.authentication.type == "password" ? try(local.authentication.password, null) : null
-  disable_password_authentication = local.authentication.type != "password" ? true : false
+  admin_username                  = local.sid_auth_username
+  admin_password                  = local.sid_auth_password
+  disable_password_authentication = ! local.enable_auth_password
 
-  admin_ssh_key {
-    username   = local.authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+  dynamic "admin_ssh_key" {
+    for_each = range(local.enable_auth_password ? 0 : 1)
+    content {
+      username   = local.anydb_vms[count.index].authentication.username
+      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+    }
   }
 
   boot_diagnostics {
@@ -105,8 +108,8 @@ resource azurerm_windows_virtual_machine "dbserver" {
   }
 
   computer_name  = substr(lower(local.anydb_vms[count.index].name), 0, 13)
-  admin_username = local.authentication.username
-  admin_password = try(local.authentication.password, null)
+  admin_username = local.sid_auth_username
+  admin_password = local.sid_auth_password
 
   boot_diagnostics {
     storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
