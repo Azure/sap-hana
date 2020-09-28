@@ -31,6 +31,10 @@ variable "deployer_user" {
   default     = []
 }
 
+variable "app_auth" {
+  description = "Details of the application authentication method"
+}
+
 variable "region_mapping" {
   type        = map(string)
   description = "Region Mapping: Full = Single CHAR, 4-CHAR"
@@ -81,19 +85,12 @@ locals {
   sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
   vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.environment, local.location_short))
 
-  // Post fix for all deployed resources
-  postfix = random_id.sapsystem.hex
-
-  // key vault for sap system
-  kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  kv_private_name      = format("%sSIDp%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_user_name         = format("%sSIDu%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_users             = var.deployer_user
-  sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
+  // key vault for application
+  sid_auth_type        = var.app_auth.type
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(var.application.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(var.application.authentication.password, random_password.password[0].result) : ""
+  sid_auth_username    = var.app_auth.username
+  sid_auth_password    = var.app_auth.password
 
   authentication = {
     "type"     = local.sid_auth_type

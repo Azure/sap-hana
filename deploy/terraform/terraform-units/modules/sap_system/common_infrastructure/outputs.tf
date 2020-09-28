@@ -38,6 +38,22 @@ output "software_w_defaults" {
   value = local.software
 }
 
-output "user_vault_name" {
-  value = azurerm_key_vault.kv_user.name
+output "hdb_auth" {
+  value = {
+    type     = local.hdb_auth_type,
+    username = local.hdb_auth_username,
+    password = local.hdb_auth_password
+  }
+}
+
+output "hdb_cred" {
+  value = random_password.credentials
+}
+
+output "app_auth" {
+  value = {
+    type     = local.app_auth_type,
+    username = local.app_auth_username,
+    password = local.app_auth_password
+  }
 }
