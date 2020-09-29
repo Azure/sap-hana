@@ -140,35 +140,6 @@ locals {
   sid_kv_private_name = format("%s%sp%s", local.kv_prefix, local.sid, upper(substr(local.postfix, 0, 3)))
   sid_kv_user_name    = format("%s%su%s", local.kv_prefix, local.sid, upper(substr(local.postfix, 0, 3)))
 
-  // key vault for sap system
-  hdb_auth_type            = try(local.hdb.authentication.type, "key")
-  enable_hdb_auth_password = local.enable_hdb_deployment && local.hdb_auth_type == "password"
-  enable_hdb_auth_key      = local.enable_hdb_deployment && local.hdb_auth_type == "key"
-  hdb_auth_username        = try(local.hdb.authentication.username, "azureadm")
-  hdb_auth_password        = local.enable_hdb_auth_password ? try(local.hdb.authentication.password, random_password.hdb_password[0].result) : ""
-
-  hdb_cred               = try(local.hdb.credentials, {})
-  db_systemdb_password   = local.enable_hdb_deployment ? try(local.hdb_cred.db_systemdb_password, random_password.credentials[0].result) : null
-  os_sidadm_password     = local.enable_hdb_deployment ? try(local.hdb_cred.os_sidadm_password, random_password.credentials[1].result) : null
-  os_sapadm_password     = local.enable_hdb_deployment ? try(local.hdb_cred.os_sapadm_password, random_password.credentials[2].result) : null
-  xsa_admin_password     = local.enable_hdb_deployment ? try(local.hdb_cred.xsa_admin_password, random_password.credentials[3].result) : null
-  cockpit_admin_password = local.enable_hdb_deployment ? try(local.hdb_cred.cockpit_admin_password, random_password.credentials[4].result) : null
-  ha_cluster_password    = local.enable_hdb_deployment && local.hdb_ha ? try(local.hdb_cred.ha_cluster_password, random_password.credentials[5].result) : null
-
-  app_ostype               = try(var.application.os.os_type, "Linux")
-  app_auth_type            = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
-  enable_app_auth_password = local.enable_app_deployment && local.app_auth_type == "password"
-  enable_app_auth_key      = local.enable_app_deployment && local.app_auth_type == "key"
-  app_auth_username        = try(var.application.authentication.username, "azureadm")
-  app_auth_password        = local.enable_app_auth_password ? try(var.application.authentication.password, random_password.app_password[0].result) : ""
-
-  // SPN of Azure Fence Agent for Hana Database
-  enable_fence_agent          = local.enable_hdb_deployment && try(local.hdb.fence_agent, null) != null
-  fence_agent_subscription_id = local.enable_fence_agent ? local.hdb.fence_agent.subscription_id : null
-  fence_agent_tenant_id       = local.enable_fence_agent ? local.hdb.fence_agent.tenant_id : null
-  fence_agent_client_id       = local.enable_fence_agent ? local.hdb.fence_agent.client_id : null
-  fence_agent_client_secret   = local.enable_fence_agent ? local.hdb.fence_agent.client_secret : null
-
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
      The key vault information of sap landscape will be obtained via input json.

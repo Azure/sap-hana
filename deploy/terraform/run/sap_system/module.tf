@@ -85,8 +85,8 @@ module "hdb_node" {
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
-  hdb_auth         = module.common_infrastructure.hdb_auth
-  hdb_cred         = module.common_infrastructure.hdb_cred
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
+  sid_kv_user_msi  = module.common_infrastructure.sid_kv_user_msi
   deployer-uai     = module.deployer.deployer-uai
   deployer_user    = module.deployer.deployer_user
 }
@@ -108,7 +108,8 @@ module "app_tier" {
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
-  app_auth         = module.common_infrastructure.app_auth
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
+  sid_kv_user_msi  = module.common_infrastructure.sid_kv_user_msi
   deployer-uai     = module.deployer.deployer-uai
   deployer_user    = module.deployer.deployer_user
 }

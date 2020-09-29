@@ -31,8 +31,12 @@ variable "deployer_user" {
   default     = []
 }
 
-variable "app_auth" {
-  description = "Details of the application authentication method"
+variable "sid_kv_user" {
+  description = "Details of the user keyvault for sap_system"
+}
+
+variable "sid_kv_user_msi" {
+  description = "Azurerm_key_vault_access_policy is required to save secrets in KV"
 }
 
 variable "region_mapping" {
@@ -85,12 +89,11 @@ locals {
   sa_prefix   = lower(replace(format("%s%s%sdiag", substr(local.environment, 0, 5), local.location_short, substr(local.codename, 0, 7)), "--", "-"))
   vnet_prefix = try(local.var_infra.resource_group.name, format("%s-%s", local.environment, local.location_short))
 
-  // key vault for application
-  sid_auth_type        = var.app_auth.type
+  sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = var.app_auth.username
-  sid_auth_password    = var.app_auth.password
+  sid_auth_username    = try(var.application.authentication.username, "azureadm")
+  sid_auth_password    = local.enable_auth_password ? try(var.application.authentication.password, random_password.password[0].result) : ""
 
   authentication = {
     "type"     = local.sid_auth_type
@@ -105,6 +108,9 @@ locals {
   */
   kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
   secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
+
+  // Define this variable to make it easier when implementing existing kv.
+  sid_kv_user = var.sid_kv_user[0]
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
