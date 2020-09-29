@@ -4,9 +4,7 @@ locals {
   app_oscode      = upper(var.app_ostype) == "LINUX" ? "l" : "w"
   db_platformcode = substr(var.db_platform, 0, 3)
 
-
-  //Deployer
-  deployer_vm_names = [for idx in range(var.app_server_count) :
+ deployer_vm_names = [for idx in range(var.app_server_count) :
     lower(format("%s%s%sdeploy%02d", local.env_verified, local.location_short, local.dep_vnet_verified, idx))
   ]
 
