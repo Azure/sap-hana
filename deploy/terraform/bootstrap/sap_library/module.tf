@@ -12,7 +12,7 @@ module "sap_library" {
 
 module "sap_namegenerator" {
   source      = "../../terraform-units/modules/sap_namegenerator"
-  environment = lower(try(var.infrastructure.landscape, ""))
+  environment = lower(try(var.infrastructure.environment, ""))
   location    = try(var.infrastructure.region, "")
   random_id   = random_id.lib-random-id.hex
 }
