@@ -8,7 +8,6 @@ module "sap_library" {
   storage_account_sapbits = var.storage_account_sapbits
   storage_account_tfstate = var.storage_account_tfstate
   naming                  = module.sap_namegenerator.naming
-
 }
 
 module sap_namegenerator {
@@ -24,4 +23,3 @@ module sap_namegenerator {
   sap_sid              = ""
   db_sid               = ""
 }
-
