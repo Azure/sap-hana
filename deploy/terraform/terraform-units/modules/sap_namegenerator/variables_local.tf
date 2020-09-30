@@ -195,7 +195,7 @@ variable resource_suffixes {
     "deployer-subnet-nsg" = "_deployment-subnet-nsg"
     "iscsi-subnet"        = "_iscsi-subnet"
     "iscsi-subnet-nsg"    = "_iscsiSubnet-nsg"
-    "library-rg"          = "_SAP-LIBRARY"
+    "library-rg"          = "-SAP_LIBRARY"
     "library-state"       = "_SAP-LIBRARY.terraform.tfstate"
     "kv"                  = ""
     "msi"                 = "-msi"
