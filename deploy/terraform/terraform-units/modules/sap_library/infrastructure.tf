@@ -3,6 +3,11 @@
   Set up infrastructure for sap library 
 */
 
+// Generates random text for resources
+resource "random_id" "lib_random_id" {
+  byte_length = 4
+}
+
 resource "azurerm_resource_group" "library" {
   count    = local.rg_exists ? 0 : 1
   name     = local.rg_name
