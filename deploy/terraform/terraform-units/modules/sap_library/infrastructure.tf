@@ -7,7 +7,7 @@
 resource "random_id" "post_fix" {
   keepers = {
     // Generate a new id only when a new resource group is defined
-    environment_location = local.random_keeper
+    resource_group = local.random_keeper
   }
 
   byte_length = 4
