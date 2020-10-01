@@ -9,6 +9,10 @@ locals {
   keyvault_names       = var.naming.keyvault_names.LIBRARY
   resource_suffixes    = var.naming.resource_suffixes
 
+  environment   = try(var.infrastructure.environment, "")
+  location      = try(var.infrastructure.region, "")
+  random_keeper = try(local.var_infra.resource_group.name, "${local.environment}-${local.location}")
+
   // Infrastructure
   var_infra = try(var.infrastructure, {})
 
