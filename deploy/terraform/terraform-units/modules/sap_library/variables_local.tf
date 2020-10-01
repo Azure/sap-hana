@@ -11,7 +11,7 @@ locals {
 
   environment   = try(var.infrastructure.environment, "")
   location      = try(var.infrastructure.region, "")
-  random_keeper = try(local.var_infra.resource_group.name, "${local.environment}-${local.location}-SAP_LIBRARY")
+  random_keeper = try(local.var_infra.resource_group.name, upper("${local.environment}-${local.location}-SAP_LIBRARY"))
 
   // Infrastructure
   var_infra = try(var.infrastructure, {})
