@@ -2,4 +2,3 @@
 resource "random_id"  "post_fix" {
   byte_length = 4
 }
- 
