@@ -86,11 +86,3 @@ resource "azurerm_storage_share" "fileshare_sapbits" {
   storage_account_name = local.sa_sapbits.name
 }
 
-// Generates random text for storage account name
-resource "random_id" "post_fix" {
-  keepers = {
-    // Generate a new id only when a new resource group is defined
-    resource_group = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
-  }
-  byte_length = 4
-}

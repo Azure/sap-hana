@@ -17,3 +17,7 @@ output "storagecontainer_sapbits" {
 output "fileshare_sapbits_name" {
   value = local.fileshare_sapbits_name
 }
+
+output "random_id" {
+  value = random_id.post_fix.hex
+}

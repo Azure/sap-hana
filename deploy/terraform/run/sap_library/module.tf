@@ -7,4 +7,12 @@ module "sap_library" {
   infrastructure          = var.infrastructure
   storage_account_sapbits = var.storage_account_sapbits
   storage_account_tfstate = var.storage_account_tfstate
+  naming                  = module.sap_namegenerator.naming
+}
+
+module sap_namegenerator {
+  source      = "../../terraform-units/modules/sap_namegenerator"
+  environment = lower(try(var.infrastructure.environment, ""))
+  location    = try(var.infrastructure.region, "")
+  random_id   = module.sap_library.random_id
 }
