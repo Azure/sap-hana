@@ -67,6 +67,9 @@ stages:
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
           deployer_env: "UNIT"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
   - job: createSAPLib
     dependsOn: createDeployer
     steps:

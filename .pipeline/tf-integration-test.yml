@@ -31,6 +31,9 @@ stages:
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
           deployer_env: "$(Build.BuildId)"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
   - job: createSAPLib
     dependsOn: createDeployer
     steps:
