@@ -39,11 +39,11 @@ output "software_w_defaults" {
 }
 
 output "sid_kv_user" {
-  value = azurerm_key_vault.sid_kv_user
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user : null
 }
 
 output "sid_kv_prvt" {
-  value = azurerm_key_vault.sid_kv_prvt
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt : null
 }
 
 /*

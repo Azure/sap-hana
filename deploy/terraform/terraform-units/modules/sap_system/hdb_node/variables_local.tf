@@ -101,7 +101,7 @@ locals {
   secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
 
   // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = var.sid_kv_user[0]
+  sid_kv_user = try(var.sid_kv_user[0], null)
 
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
