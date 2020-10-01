@@ -19,5 +19,5 @@ output "fileshare_sapbits_name" {
 }
 
 output "lib_random_id" {
-  value = random_id.lib_random_id.hex
+  value = random_id.post_fix.hex
 }

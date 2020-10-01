@@ -4,7 +4,7 @@
 */
 
 // Generates random text for resources
-resource "random_id" "lib_random_id" {
+resource "random_id" "post_fix" {
   keepers = {
     // Generate a new id only when a new resource group is defined
     environment_location = local.random_keeper
