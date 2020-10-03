@@ -60,10 +60,10 @@ module "sap_namegenerator" {
   app_ostype    = local.app_ostype
   db_ostype     = local.db_ostype
   /////////////////////////////////////////////////////////////////////////////////////
-  // The naming module creates a list of servers names that is app_server_max_count
-  // for database servers the list is 2 * db_server_max_count. 
-  // The first db_server_max_count items are for single node
-  // The the second db_server_max_count items are for ha
+  // The naming module creates a list of servers names that is app_server_count
+  // for database servers the list is 2 * db_server_count. 
+  // The first db_server_count items are for single node
+  // The the second db_server_count items are for ha
   /////////////////////////////////////////////////////////////////////////////////////
   db_server_count  = local.db_server_count
   app_server_count = local.app_server_count
