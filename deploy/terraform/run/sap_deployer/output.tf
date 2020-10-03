@@ -34,7 +34,10 @@ output "deployer" {
   value     = module.sap_deployer.deployers
 }
 
+// Comment out code with users.object_id for the time being.
+/*
 output "deployer_user" {
   sensitive = true
   value = module.sap_deployer.deployer_user
 }
+*/

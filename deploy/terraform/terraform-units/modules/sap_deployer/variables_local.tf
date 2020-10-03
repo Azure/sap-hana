@@ -162,6 +162,7 @@ locals {
       deployer.users.object_id
     ])
   )
-  curr_deployer_user_id  = try(data.azurerm_client_config.deployer.object_id, "")
-  deployer_users_id_list = distinct(compact(concat(local.deployer_users_id, [local.curr_deployer_user_id])))
+
+  // Comment out code with users.object_id for the time being.
+  // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
 }

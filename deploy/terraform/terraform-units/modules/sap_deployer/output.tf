@@ -56,6 +56,9 @@ output "pwd_name" {
   value = local.enable_deployers && local.enable_password ? azurerm_key_vault_secret.pwd[0].name : ""
 }
 
+// Comment out code with users.object_id for the time being.
+/*
 output "deployer_user" {
   value = local.deployer_users_id_list
 }
+*/
