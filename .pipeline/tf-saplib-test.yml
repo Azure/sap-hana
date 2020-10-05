@@ -31,6 +31,7 @@ stages:
       - template: templates/saplib/create-saplib-steps.yml
         parameters:
           branch_name: $(targetBranchName)
+          deployer_env: "UNIT"
           saplib_env: "$(Build.BuildId)"
       - template: templates/saplib/validate-saplib-steps.yml
         parameters:
@@ -39,6 +40,7 @@ stages:
       - template: templates/saplib/create-saplib-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
           saplib_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
