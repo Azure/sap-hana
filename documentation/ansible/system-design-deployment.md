@@ -176,17 +176,17 @@ materials:
       version:  2.0SP06
       archive:  SWPM20SP06_6-80003424.SAR
 
-    - name: SAP IGS HELPER
-      version: 7.20EXT
-      archive: igshelper_17-10010245.sar
+    - name:     SAP IGS HELPER
+      version:  7.20EXT
+      archive:  igshelper_17-10010245.sar
 
-    - name: SAP HR 6.08
-      version: 608
-      archive: SAP_HR608.SAR
+    - name:     SAP HR 6.08
+      version:  608
+      archive:  SAP_HR608.SAR
 
-    - name: S4COREOP 104
-      version: 104
-      archive: S4COREOP104.SAR
+    - name:     S4COREOP 104
+      version:  104
+      archive:  S4COREOP104.SAR
 
   templates:
     - name:     SCS_INI
