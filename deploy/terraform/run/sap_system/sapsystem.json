@@ -76,10 +76,6 @@
       "saplib_tfstate_key": ""
     },
     "downloader": {
-      "credentials": {
-        "sap_user": "<sap_user>",
-        "sap_password": "<sap_password>"
-      },
       "scenarios": [
         {
           "scenario_type": "DB",

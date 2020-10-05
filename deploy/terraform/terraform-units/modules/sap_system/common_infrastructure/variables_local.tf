@@ -336,8 +336,8 @@ locals {
   }
 
   //Downloader
-  sap_user     = try(var.software.downloader.credentials.sap_user, "sap_smp_user")
-  sap_password = try(var.software.downloader.credentials.sap_password, "sap_smp_password")
+  sap_user     = "sap_smp_user"
+  sap_password = "sap_smp_password"
   hdb_versions = [
     for scenario in try(var.software.downloader.scenarios, []) : scenario.product_version
     if scenario.scenario_type == "DB"

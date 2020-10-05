@@ -54,8 +54,6 @@ steps:
       | jq --arg environment "${saplib_prefix}" .infrastructure.environment\ =\ \$environment \
       | jq --arg deployer_rg_name "${deployer_rg_name}" .deployer.resource_group.name\ =\ \$deployer_rg_name \
       | jq --arg msi_name "${msi_name}" .deployer.msi.name\ =\ \$msi_name \
-      | jq --arg downloader_username "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$downloader_username \
-      | jq --arg downloader_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$downloader_password \
       > ${input}
 
       cat ${input}

@@ -28,16 +28,6 @@ output "user_vault_name" {
   value     = module.sap_library.user_vault_name
 }
 
-output "downloader_username_secret_name" {
-  sensitive = true
-  value     = module.sap_library.downloader_username_secret_name
-}
-
-output "downloader_password_secret_name" {
-  sensitive = true
-  value     = module.sap_library.downloader_password_secret_name
-}
-
 output "remote_state_resource_group_name" {
   value = module.sap_library.remote_state_resource_group_name
 }

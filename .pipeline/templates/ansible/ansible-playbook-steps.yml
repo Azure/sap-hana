@@ -29,6 +29,14 @@ steps:
       export ANSIBLE_HOST_KEY_CHECKING=False
       source ${ws_dir}/export-clustering-sp-details.sh
       cd ~/Azure_SAP_Automated_Deployment
+
+      output_json=${ws_dir}/ansible_config_files/output.json
+      updated_output_json=$(cat $output_json \
+      | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
+      | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      )
+      echo $updated_output_json > $output_json
+
       ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml --private-key ${ws_dir}/sshkey ${repo_dir}/deploy/ansible/sap_playbook.yml
       '
     displayName: "Run Ansible-playbook: Branch ${{parameters.branch_name}}"

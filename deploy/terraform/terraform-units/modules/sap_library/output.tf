@@ -22,14 +22,6 @@ output "user_vault_name" {
   value = azurerm_key_vault.kv_user.name
 }
 
-output "downloader_username_secret_name" {
-  value = azurerm_key_vault_secret.downloader_username.name
-}
-
-output "downloader_password_secret_name" {
-  value = azurerm_key_vault_secret.downloader_password.name
-}
-
 output "remote_state_resource_group_name" {
   value = local.rg_name
 }
