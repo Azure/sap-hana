@@ -1,0 +1,70 @@
+trigger: none
+pr:
+  branches:
+    include:
+    - feature/*
+  paths:
+    include:
+    - deploy/terraform/terraform-units/modules/sap_system/anydb_node/*
+variables:
+  - group: azure-config-variables
+  - group: azure-sap-hana-pipeline-secrets
+  - template: templates/variables.yaml
+stages:
+- stage:
+  pool:
+    vmImage: "ubuntu-18.04"
+  variables:
+    ssh_timeout_s: 120
+  jobs:
+  - job: createSAPSystemAnyDB
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/sapsystem/create-sapsystem-steps.yml
+        parameters:
+          branch_name: $(targetBranchName)
+          deployer_env: "UNIT"
+          saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
+          sapsystem_env: "$(Build.BuildId)"
+          db_type: "Oracle"
+      - template: templates/sapsystem/validate-sapsystem-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          sapsystem_env: "$(Build.BuildId)"
+      - template: templates/sapsystem/create-sapsystem-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
+          saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
+          sapsystem_env: "$(Build.BuildId)"
+          db_type: "Oracle"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
+  - job: deleteSAPSystemAnyDB
+    dependsOn: createSAPSystemAnyDB
+    condition: or(succeededOrFailed(), always())
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/sapsystem/delete-sapsystem-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
+          sapsystem_env: "$(Build.BuildId)"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"

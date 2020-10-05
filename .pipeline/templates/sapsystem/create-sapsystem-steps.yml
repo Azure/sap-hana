@@ -118,6 +118,9 @@ steps:
       deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"MGMT-INFRASTRUCTURE\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
 
+      db_type=${{parameters.db_type}}
+      [ -z "$db_type" ] && db="HANA" || db=${db_type}
+
       cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
       cat ${ws_dir}/sapsystem.json \
       | jq --arg environment "${sapsystem_prefix}" .infrastructure.environment\ =\ \$environment \
@@ -131,6 +134,7 @@ steps:
       | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
       | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
       | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
+      | jq --arg db "${db}" .databases[].platform\ =\ \$db \
       | jq --arg ha "${ha}" .databases[].high_availability\ =\ \$ha \
       | jq --arg osImage_offer "${osImage_offer}" .databases[].os.offer\ =\ \$osImage_offer \
       | jq --arg osImage_publisher "${osImage_publisher}" .databases[].os.publisher\ =\ \$osImage_publisher \
