@@ -74,10 +74,9 @@ locals {
 
   app_ostype          = try(var.application.os.os_type, "LINUX")
   db_ostype           = try(var.databases[0].os.os_type, "LINUX")
-  db_server_count     = length(var.databases)
+  db_server_count     = try(length(var.databases[0].dbnodes), 1)
   app_server_count    = try(var.application.application_server_count, 0)
   webdispatcher_count = try(var.application.webdispatcher_count, 0)
   scs_server_count    = try(var.application.scs_high_availability, false) ? 2 : 1
-
 
 }

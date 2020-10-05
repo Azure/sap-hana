@@ -20,9 +20,9 @@ locals {
 
   // Resource group and location
 
-  region             = try(var.infrastructure.region, "")
-  prefix             = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
-  rg_name            = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer-rg))
+  region  = try(var.infrastructure.region, "")
+  prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
+  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer-rg))
 
   // Management vnet
   vnet_mgmt        = try(var.infrastructure.vnets.management, {})
@@ -35,7 +35,7 @@ locals {
   sub_mgmt          = try(local.vnet_mgmt.subnet_mgmt, {})
   sub_mgmt_arm_id   = try(local.sub_mgmt.arm_id, "")
   sub_mgmt_exists   = length(local.sub_mgmt_arm_id) > 0 ? true : false
-  sub_mgmt_name     = local.sub_mgmt_exists ?  split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.deployer-subnet))
+  sub_mgmt_name     = local.sub_mgmt_exists ? split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.deployer-subnet))
   sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "10.0.0.16/28")
   sub_mgmt_deployed = try(local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0] : azurerm_subnet.subnet_mgmt[0], null)
 
@@ -43,9 +43,8 @@ locals {
   sub_mgmt_nsg             = try(local.sub_mgmt.nsg, {})
   sub_mgmt_nsg_arm_id      = try(local.sub_mgmt_nsg.arm_id, "")
   sub_mgmt_nsg_exists      = length(local.sub_mgmt_nsg_arm_id) > 0 ? true : false
-  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? split("/", local.sub_mgmt_nsg)[8] : try(local.sub_mgmt_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.deployer-subnet-nsg))
-  deployer_pip_list        = azurerm_public_ip.deployer[*].ip_address
-  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(concat(local.sub_mgmt_nsg.allowed_ips, local.deployer_pip_list), ["0.0.0.0/0"])
+  sub_mgmt_nsg_name        = local.sub_mgmt_nsg_exists ? "" : try(local.sub_mgmt_nsg.name, format("%s_deploymentSubnet-nsg", local.prefix))
+  sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? [] : try(local.sub_mgmt_nsg.allowed_ips, ["0.0.0.0/0"])
   sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0], null)
 
   // Deployer(s) information from input

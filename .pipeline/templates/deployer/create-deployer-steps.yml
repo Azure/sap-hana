@@ -16,7 +16,10 @@ steps:
       deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       input=${ws_dir}/${deployer_rg}.json
-      
+
+      #Only private IP addresses can be added to NSG due to S360 requirement
+      prefix="10.0.0.16/28"
+
       git checkout ${{parameters.branch_name}}
 
       mkdir -p ${ws_dir}; cd $_
@@ -28,9 +31,9 @@ steps:
       [[ -f ${input} ]] ||
       cat deployer.json \
       | jq --arg environment "${deployer_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg allowed_ip "$(agent_ip)" '.infrastructure.vnets.management.subnet_mgmt += {
+      | jq --arg prefix "${prefix}" --arg agent_ip "$(agent_ip)" '.infrastructure.vnets.management.subnet_mgmt += {
         nsg: {
-          allowed_ips: ["67.160.0.0/16", $allowed_ip]
+          allowed_ips: [$prefix, $agent_ip]
         }
       }' > ${input}
 

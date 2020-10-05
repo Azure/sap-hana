@@ -1,17 +1,21 @@
+trigger: none
+pr: none
 schedules:
-- cron: '0 0 * * *'
-  displayName: Daily midnight clean up (UTC)
+- cron: '0 */2 * * *'
+  displayName: Cleanup resources every 2 hours
   branches:
     include:
     - master
+    - beta/*
+    - feature/*
   always: true
 variables:
   - group: azure-config-variables
   - group: azure-sap-hana-pipeline-secrets
 jobs:
-- job: dailyCleanup
+- job: scheduled_RG_Cleanup
   pool:
-    vmImage: "ubuntu-16.04"
+    vmImage: "ubuntu-18.04"
   steps:
   - script: |
       az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
@@ -19,9 +23,62 @@ jobs:
       for rg in $groups
       do
         if $(az group exists -n $rg); then
+          echo ${rg}
           az group delete -n $rg --no-wait -y
-          echo $rg
         fi
       done
-    displayName: 'Clean up resource group daily'
+    displayName: 'Clean up resource group'
+- job: scheduled_Peering_Cleanup
+  pool:
+    vmImage: "ubuntu-18.04"
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      deployer_rg="UNIT-EAUS-MGMT-INFRASTRUCTURE"
+      mgmt_vnet=$(az network vnet list --resource-group ${deployer_rg} | jq -r '.[].name')
+      peering_list=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name ${mgmt_vnet} | jq -c '.[] | select(.peeringState=="Disconnected")' | jq -r .name)
+      for peering in ${peering_list}
+      do
+        echo ${peering}
+        az network vnet peering delete --resource-group ${deployer_rg}  --vnet-name ${mgmt_vnet} --name ${peering}
+      done
+    displayName: 'Clean up network peering'
+- job: scheduled_NSG_Cleanup
+  pool:
+    vmImage: "ubuntu-18.04"
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      
+      rg_name="UNIT-EAUS-MGMT-INFRASTRUCTURE"
+
+      vnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].name)
+      subnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].subnets[].name)
+      nsg_name=$(az network nsg list --resource-group ${rg_name} | jq -r --arg vnet_name "${vnet_name}" '.[] | select(.name | contains($vnet_name) | not) | .name')
+      
+      echo "=== Update NSG source address with only private IP address ==="
+      #Only private IP addresses can be added to NSG due to S360 requirement
+      prefix_list="10.0.0.16/28"
+      az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n ssh --source-address-prefixes ${prefix_list} --output none
+      az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n rdp --source-address-prefixes ${prefix_list} --output none
+      az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n winrm --source-address-prefixes ${prefix_list} --output none
+
+      echo "=== Assgin ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
+      az network vnet subnet update -g ${rg_name} -n ${subnet_name} --vnet-name ${vnet_name} --network-security-group ${nsg_name} --output none
+    displayName: 'Clean up NSG'
+- job: scheduled_Subnet_Cleanup
+  pool:
+    vmImage: "ubuntu-18.04"
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      sap_landscape_rg="UNIT-EAUS-SAP0-INFRASTRUCTURE"
+      sap_vnet=$(az network vnet list --resource-group ${sap_landscape_rg} | jq -r '.[].name')
+      subnet_list=$(az network vnet subnet list --resource-group ${sap_landscape_rg} --vnet-name ${sap_vnet} | jq -c '.[] | select(.name | contains("RHEL") | not) | select(.name | contains("SLES") | not)' | jq -r .name)
+      for subnet in ${subnet_list}
+      do
+        echo ${subnet}
+        az network vnet subnet delete --resource-group ${sap_landscape_rg} --vnet-name ${sap_vnet} --name ${subnet} || :
+      done
+    displayName: 'Clean up subnet'
 
