@@ -124,7 +124,7 @@ sapbits
 |   |-- <tool>_<id>.EXE
 |
 |-- BoMs/
-|   |-- S4HANA2_SP05_v001/
+|   |-- S4HANA_1909_SP0_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/
 |   |   |   |-- MP_Excel_1001034051_20200921_SWC.xls
@@ -153,12 +153,12 @@ sapbits
 
 #### Example Bill of Materials (BoM) file
 
-File `BoMs/S4HANA_SP05_v001/bom.yml`:
+File `BoMs/S4HANA_1909_SP0_v001/bom.yml`:
 
 ```yaml
 ---
 
-name:    'S/4HANA - 1909'
+name:    'S/4HANA - 1909 SP0 v001'
 version: 001
 target:  'ABAP PLATFORM 1909'
 
