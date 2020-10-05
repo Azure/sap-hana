@@ -124,7 +124,7 @@ sapbits
 |   |-- <tool>_<id>.EXE
 |
 |-- BoMs/
-|   |-- S4HANA_1909_v001/
+|   |-- S4HANA2_SP05_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/
 |   |   |   |-- MP_Excel_1001034051_20200921_SWC.xls
@@ -132,40 +132,40 @@ sapbits
 |   |   |   |-- MP_Stack_1001034051_20200921_.txt
 |   |   |   |-- MP_Stack_1001034051_20200921_.xml
 |   |
-|   |-- BW4HANA_1909_v1/
+|   |-- BW4HANA_SP04_v001/
 |   |   |-- ...
 |   |
-|   |-- BW4HANA_1909_v2/
+|   |-- BW4HANA_SP05_v002/
 |       |-- ...
 |
 |-- templates/
     |-- abap_ascs_1909_v2.ini
-    |-- abap_hana_1909_v2.ini
+    |-- hana2_sp05_v2.ini
 ```
 
 **Notes:**
 
 1. All Installation Media tools and files for all systems designed by the user will be contained within a single flat directory to avoid duplication.
-1. The Bill of Materials directory (BoMs/) will contain a folder for each system the user designs. The recommended naming convention for these folders will use the product type(e.g. S4HANA), product version (e.g. 1909), and a version marker (e.g. v1). This allows the user to update a particular system BoM and retain an earlier version should it ever be needed.
+1. The Bill of Materials directory (BoMs/) will contain a folder for each system the user designs. The recommended naming convention for these folders will use the product type(e.g. S4HANA), service pack version (e.g. SP05), and a version marker (e.g. v001). This allows the user to update a particular system BoM and retain an earlier version should it ever be needed.
 1. The Bill of Materials file (bom.yml) and template files (hana.ini, application.ini) will be created following manual steps (process TBD in Milestone 2).
 1. Additional SAP files obtained from SAP Maintenance Planner (the XML Stack file, Text file representation of stack file, the PDF and xls files) will be stored in a subfolder for a particular BoM.
 1. Stack files are made unique by an index, e.g. `MP_<type>_<index>_<date>_<???>.<filetype>` where `<type>` is Stack, Plan, or Excel, `<index>` is a 10 digit integer, `<date>` is in format yyyymmdd, `<???>` is SWC for the Excel type and empty for the rest, and `<filetype>` is xls for type Excel, pdf for type Plan, and txt or xml for type Stack.
 
 #### Example Bill of Materials (BoM) file
 
-File `BoMs/S4HANA_1909_v001/bom.yml`:
+File `BoMs/S4HANA_SP05_v001/bom.yml`:
 
 ```yaml
 ---
 
-name:    'S/4HANA - 1909'
+name:    'S/4HANA - SP05'
 version: 001
 target:  'ABAP PLATFORM 1909'
 
 materials:
   dependencies:
     - name:     HANA2.0
-      version:  003
+      version:  001
 
   tools:
     - name:     SAPCAR
@@ -195,10 +195,10 @@ materials:
 **Notes:**
 
 1. The configuration for each individual HANA (or database) component will be stored in dependent BoMs, in order to allow for independent deployments when required.
-1. The dependency with name `HANA2.0` and version `003` corresponds to the BoM file `BoMs/HANA2.0_v001/bom.yml` which would contain the actual SAP HANA version within the `materials.media` list.
-1. Any `tools` or `media` materials with `.SAR` archives will be extracted
-1. Any `tools` materials will be extracted with `0755` permissions
-1. Any `media` materials will be extracted with `0644` permissions
+2. The dependency with name `HANA2.0` and version `001` corresponds to the BoM file `BoMs/HANA2.0_v001/bom.yml` which would contain the actual SAP HANA version within the `materials.media` list.
+3. Any `tools` or `media` materials with `.SAR` archives will be extracted
+4. Any `tools` materials will be extracted with `0755` permissions
+5. Any `media` materials will be extracted with `0644` permissions
 
 ### Phase 2 Results and Outputs
 
