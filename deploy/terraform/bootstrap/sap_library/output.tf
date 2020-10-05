@@ -37,3 +37,15 @@ output "downloader_password_secret_name" {
   sensitive = true
   value     = module.sap_library.downloader_password_secret_name
 }
+
+output "remote_state_resource_group_name" {
+  value = module.sap_library.remote_state_resource_group_name
+}
+
+output "remote_state_storage_account_name" {
+  value = module.sap_library.remote_state_storage_account_name
+}
+
+output "remote_state_container_name" {
+  value = module.sap_library.remote_state_container_name
+}
