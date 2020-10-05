@@ -158,38 +158,44 @@ File `BoMs/S4HANA_SP05_v001/bom.yml`:
 ```yaml
 ---
 
-name:    'S/4HANA - SP05'
+name:    'S/4HANA - 1909'
 version: 001
 target:  'ABAP PLATFORM 1909'
 
 materials:
   dependencies:
-    - name:     HANA2.0
-      version:  001
+    - name:     HANA2
+      version:  003
 
-  tools:
+  media:
     - name:     SAPCAR
       version:  7.21
       archive:  SAPCAR_1320-80000935.EXE
 
     - name:     SWPM
-      version:  2.0
-      archive:  SWPM20SP05_5-80003424.SAR
+      version:  2.0SP06
+      archive:  SWPM20SP06_6-80003424.SAR
 
-  media:
-    - name:     ABAP_ASCS
-      version:  1909
-      archive:  S4CORE101.SAR.SAR
-      template: ABAP_ASCS_INI
+    - name: SAP IGS HELPER
+      version: 7.20EXT
+      archive: igshelper_17-10010245.sar
+
+    - name: SAP HR 6.08
+      version: 608
+      archive: SAP_HR608.SAR
+
+    - name: S4COREOP 104
+      version: 104
+      archive: S4COREOP104.SAR
 
   templates:
-    - name:     ABAP_ASCS_INI
+    - name:     SCS_INI
       version:  1909.2
-      file:     abap_ascs_1909_v2.ini
+      file:     scs_1909_v2.ini
 
-    - name:     ABAP_ASCS_XML
+    - name:     SCS_XML
       version:  1909.1
-      file:     abap_ascs_1909_v2.xml
+      file:     scs_1909_v2.xml
 ```
 
 **Notes:**
