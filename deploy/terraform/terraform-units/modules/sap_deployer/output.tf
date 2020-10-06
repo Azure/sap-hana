@@ -62,3 +62,7 @@ output "deployer_user" {
   value = local.deployer_users_id_list
 }
 */
+
+output "deployer_kv_user_arm_id" {
+  value = local.enable_deployers? azurerm_key_vault.kv_user[0].id : ""
+}
