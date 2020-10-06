@@ -194,7 +194,7 @@ locals {
     "DB2" = [
       "62500"
     ]
-    "SQLServer" = [
+    "SQLSERVER" = [
       "59999"
     ]
     "NONE" = [
