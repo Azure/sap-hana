@@ -36,20 +36,3 @@ resource "azurerm_key_vault_secret" "auth_password" {
   value        = local.sid_auth_password
   key_vault_id = local.sid_kv_user.id
 }
-
-// Generate random passwords as anydb database credentials
-resource "random_password" "credentials" {
-  count            = (local.enable_deployment && try(local.anydb_cred.db_systemdb_password, "") == "") ? 1 : 0
-  length           = 16
-  special          = true
-  override_special = "_%@"
-}
-
-// Store Hana database credentials as secrets in KV
-resource "azurerm_key_vault_secret" "db_systemdb" {
-  count        = local.enable_deployment ? 1 : 0
-  depends_on   = [var.sid_kv_user_msi]
-  name         = format("%s-xdb-systemdb-password", local.prefix)
-  value        = local.db_systemdb_password
-  key_vault_id = local.sid_kv_user.id
-}

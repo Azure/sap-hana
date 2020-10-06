@@ -168,30 +168,22 @@ locals {
   sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
 
-  db_systemdb_password   = local.enable_deployment ? try(local.hdb_cred.db_systemdb_password, random_password.credentials[0].result) : null
-  os_sidadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sidadm_password, random_password.credentials[1].result) : null
-  os_sapadm_password     = local.enable_deployment ? try(local.hdb_cred.os_sapadm_password, random_password.credentials[2].result) : null
-  xsa_admin_password     = local.enable_deployment ? try(local.hdb_cred.xsa_admin_password, random_password.credentials[3].result) : null
-  cockpit_admin_password = local.enable_deployment ? try(local.hdb_cred.cockpit_admin_password, random_password.credentials[4].result) : null
-  ha_cluster_password    = local.enable_deployment && local.hdb_ha ? try(local.hdb_cred.ha_cluster_password, random_password.credentials[5].result) : null
-
-  // SPN of Azure Fence Agent for Hana Database
-  enable_fence_agent          = local.enable_deployment && try(local.hdb.fence_agent, null) != null
-  fence_agent_subscription_id = local.enable_fence_agent ? local.hdb.fence_agent.subscription_id : null
-  fence_agent_tenant_id       = local.enable_fence_agent ? local.hdb.fence_agent.tenant_id : null
-  fence_agent_client_id       = local.enable_fence_agent ? local.hdb.fence_agent.client_id : null
-  fence_agent_client_secret   = local.enable_fence_agent ? local.hdb.fence_agent.client_secret : null
+  db_systemdb_password   = "db_systemdb_password"
+  os_sidadm_password     = "os_sidadm_password"
+  os_sapadm_password     = "os_sapadm_password"
+  xsa_admin_password     = "xsa_admin_password"
+  cockpit_admin_password = "cockpit_admin_password"
+  ha_cluster_password    = "ha_cluster_password"
 
   hdb_auth = {
     "type"     = local.sid_auth_type
     "username" = local.sid_auth_username
-    "password" = local.sid_auth_password
+    "password" = "hdb_vm_password"
   }
 
-  hdb_ins  = try(local.hdb.instance, {})
-  hdb_sid  = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
-  hdb_nr   = try(local.hdb_ins.instance_number, "01")
-  hdb_cred = try(local.hdb.credentials, {})
+  hdb_ins = try(local.hdb.instance, {})
+  hdb_sid = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
+  hdb_nr  = try(local.hdb_ins.instance_number, "01")
 
   components = merge({ hana_database = [] }, try(local.hdb.components, {}))
   xsa        = try(local.hdb.xsa, { routing = "ports" })

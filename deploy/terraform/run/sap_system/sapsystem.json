@@ -45,14 +45,6 @@
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
-      },
-      "credentials": {
-        "db_systemdb_password": "<db_systemdb_password>",
-        "os_sidadm_password": "<os_sidadm_password>",
-        "os_sapadm_password": "<os_sapadm_password>",
-        "xsa_admin_password": "<xsa_admin_password>",
-        "cockpit_admin_password": "<cockpit_admin_password>",
-        "ha_cluster_password": "<ha_cluster_password>"
       }
     }
   ],

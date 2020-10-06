@@ -147,13 +147,13 @@ locals {
   sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
 
-  db_systemdb_password = local.enable_deployment ? try(local.anydb_cred.db_systemdb_password, random_password.credentials[0].result) : null
+  db_systemdb_password = "db_systemdb_password"
 
   authentication = try(local.anydb.authentication,
     {
       "type"     = local.sid_auth_type
       "username" = local.sid_auth_username
-      "password" = local.sid_auth_password
+      "password" = "anydb_vm_password"
   })
 
   // Default values in case not provided

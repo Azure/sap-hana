@@ -34,6 +34,12 @@ steps:
       updated_output_json=$(cat $output_json \
       | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
       | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      | jq --arg db_systemdb_password "$(hana-pipeline-db-pwd)" .databases[].credentials.db_systemdb_password\ =\ \$db_systemdb_password \
+      | jq --arg os_sidadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sidadm_password\ =\ \$os_sidadm_password \
+      | jq --arg os_sapadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sapadm_password\ =\ \$os_sapadm_password \
+      | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
+      | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
+      | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
       )
       echo $updated_output_json > $output_json
 
