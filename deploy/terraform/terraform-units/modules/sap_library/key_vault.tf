@@ -59,6 +59,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   ]
 }
 
+/**
 resource "azurerm_key_vault_access_policy" "kv_user_portal" {
   count        = length(local.deployer_users_id)
   key_vault_id = azurerm_key_vault.kv_user.id
@@ -72,3 +73,4 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
     "set",
   ]
 }
+**/
