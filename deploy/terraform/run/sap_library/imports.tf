@@ -3,33 +3,36 @@
       Import deployer resources
 */
 
-data "terraform_remote_state" "local_deployer" {
-  backend = "local"
+data "terraform_remote_state" "remote_deployer" {
+  backend = "azurerm"
   config = {
-    path = "../../LOCAL/${local.deployer_rg_name}/terraform.tfstate"
+    resource_group_name  = local.saplib_resource_group_name
+    storage_account_name = local.tfstate_storage_account_name
+    container_name       = local.tfstate_container_name
+    key                  = local.deployer_tfstate_key
   }
 }
 
 data "azurerm_key_vault_secret" "subscription_id" {
   provider     = azurerm.deployer
-  name         = "deployer-subscription-id"
+  name         = format("%s-subscription-id", local.environment)
   key_vault_id = local.deployer_key_vault_arm_id
 }
 
 data "azurerm_key_vault_secret" "client_id" {
   provider     = azurerm.deployer
-  name         = "deployer-client-id"
+  name         = format("%s-client-id", local.environment)
   key_vault_id = local.deployer_key_vault_arm_id
 }
 
 data "azurerm_key_vault_secret" "client_secret" {
   provider     = azurerm.deployer
-  name         = "deployer-client-secret"
+  name         = format("%s-client-secret", local.environment)
   key_vault_id = local.deployer_key_vault_arm_id
 }
 
 data "azurerm_key_vault_secret" "tenant_id" {
   provider     = azurerm.deployer
-  name         = "deployer-tenant-id"
+  name         = format("%s-tenant-id", local.environment)
   key_vault_id = local.deployer_key_vault_arm_id
 }
