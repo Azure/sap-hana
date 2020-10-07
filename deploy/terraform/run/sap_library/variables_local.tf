@@ -2,6 +2,7 @@
 locals {
   environment                  = try(var.infrastructure.environment, "")
   deployer                     = try(var.deployer, "")
+  deployer_rg_name             = try(local.deployer.resource_group.name, "")
   deployer_key_vault_arm_id    = try(data.terraform_remote_state.remote_deployer.outputs.deployer_kv_user_arm_id, "")
   saplib_resource_group_name   = try(local.deployer.saplib_resource_group_name, "")
   tfstate_storage_account_name = try(local.deployer.tfstate_storage_account_name, "")
