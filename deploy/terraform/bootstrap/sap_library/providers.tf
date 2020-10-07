@@ -16,10 +16,10 @@ Description:
 provider "azurerm" {
   version = "~> 2.10"
   features {}
-  subscription_id = data.azurerm_key_vault_secret.subscription_id.value
-  client_id       = data.azurerm_key_vault_secret.client_id.value
-  client_secret   = data.azurerm_key_vault_secret.client_secret.value
-  tenant_id       = data.azurerm_key_vault_secret.tenant_id.value
+  subscription_id = local.spn.subscription_id
+  client_id       = local.spn.client_id
+  client_secret   = local.spn.client_secret
+  tenant_id       = local.spn.tenant_id
 }
 
 provider "azurerm" {

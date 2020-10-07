@@ -106,11 +106,6 @@ locals {
   kv_prefix       = upper(format("%s%s", substr(local.environment, 0, 5), local.location_short))
   kv_private_name = format("%sSAPLIBprvt%s", local.kv_prefix, local.postfix)
   kv_user_name    = format("%sSAPLIBuser%s", local.kv_prefix, local.postfix)
-  // credential for sap downloader
-  secret_downloader_username_name = format("%s-downloader-username", local.kv_prefix)
-  secret_downloader_password_name = format("%s-downloader-password", local.kv_prefix)
-  downloader_username             = try(var.software.downloader.credentials.sap_user, "sap_smp_user")
-  downloader_password             = try(var.software.downloader.credentials.sap_password, "sap_smp_password")
 
 }
 
