@@ -2,6 +2,7 @@
 locals {
 
   deployer                  = try(var.deployer, "")
+  environment               = try(var.infrastructure.environment, "")
   deployer_rg_name          = try(local.deployer.resource_group.name, "")
   deployer_key_vault_arm_id = try(data.terraform_remote_state.local_deployer.outputs.deployer_kv_user_arm_id, "")
 
