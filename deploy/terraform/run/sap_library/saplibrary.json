@@ -8,14 +8,9 @@
         }
     },
     "deployer": {
-        "resource_group": {
-            "name": ""
-        },
-        "msi": {
-            "name": ""
-        },
-        "saplib_resource_group_name": "",
-        "tfstate_storage_account_name": "",
-        "deployer_tfstate_key": ""
-    }
+        "environment": "global",
+        "region": "eastus",
+        "vnet": "MGMT"
+    },
+    "tfstate_storage_account_name": ""
 }
