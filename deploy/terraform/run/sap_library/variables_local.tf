@@ -58,6 +58,7 @@ locals {
   // If custom names are used for deployer, providing resource_group_name and msi_name will override the naming convention
   deployer_rg_name = try(local.deployer.resource_group_name, format("%s-INFRASTRUCTURE", local.deployer_prefix))
 
+  // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
   deployer_key_vault_arm_id = try(data.terraform_remote_state.remote_deployer.outputs.deployer_kv_user_arm_id, "")
 
   saplib_resource_group_name   = local.rg_name

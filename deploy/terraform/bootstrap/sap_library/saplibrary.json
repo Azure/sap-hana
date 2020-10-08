@@ -11,13 +11,5 @@
         "environment": "global",
         "region": "eastus",
         "vnet": "MGMT"
-    },
-    "software": {
-        "downloader": {
-            "credentials": {
-                "sap_user": "",
-                "sap_password": ""
-            }
-        }
     }
 }
