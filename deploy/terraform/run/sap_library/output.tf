@@ -36,12 +36,8 @@ output "remote_state_container_name" {
   value = module.sap_library.remote_state_container_name
 }
 
-output "saplibrary_rg_name" {
-  value = local.rg_name
-}
-
-output "tfstate_storage_account_name" {
-  value = local.deployer.tfstate_storage_account_name
+output "remote_state_resource_group_name" {
+  value = module.sap_library.remote_state_resource_group_name
 }
 
 output "deployer_tfstate_key" {
