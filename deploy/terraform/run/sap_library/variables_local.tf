@@ -62,7 +62,7 @@ locals {
   deployer_key_vault_arm_id = try(data.terraform_remote_state.remote_deployer.outputs.deployer_kv_user_arm_id, "")
 
   saplib_resource_group_name   = local.rg_name
-  tfstate_storage_account_name = try(var.tfstate_storage_account_name, "")
+  tfstate_storage_account_name = try(local.deployer.tfstate_storage_account_name, "")
   tfstate_container_name       = "tfstate"
   deployer_tfstate_key         = try(format("%s.terraform.tfstate", local.deployer.deployer_tfstate_key), "")
 
