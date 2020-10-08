@@ -8,7 +8,7 @@
         }
     },
     "deployer": {
-        "environment": "global",
+        "environment": "np",
         "region": "eastus",
         "vnet": "MGMT",
         "tfstate_storage_account_name": ""

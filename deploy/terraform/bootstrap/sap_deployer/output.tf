@@ -44,5 +44,5 @@ output "deployer_user" {
 
 output "deployer_kv_user_arm_id" {
   sensitive = true
-  value = module.sap_deployer.deployer_kv_user_arm_id
+  value     = module.sap_deployer.deployer_kv_user_arm_id
 }
