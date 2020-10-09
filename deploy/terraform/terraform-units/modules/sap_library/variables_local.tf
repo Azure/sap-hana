@@ -1,3 +1,9 @@
+/*
+Description:
+
+  Define local variables.
+*/
+
 // Input arguments 
 variable "region_mapping" {
   type        = map(string)
