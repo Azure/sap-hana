@@ -43,7 +43,8 @@ module "common_infrastructure" {
   subnet-mgmt         = module.deployer.subnet-mgmt
   nsg-mgmt            = module.deployer.nsg-mgmt
   deployer-uai        = module.deployer.deployer-uai
-  deployer_user       = module.deployer.deployer_user
+  // Comment out code with users.object_id for the time being.
+  // deployer_user       = module.deployer.deployer_user
 }
 
 // Create Jumpboxes
@@ -88,7 +89,8 @@ module "hdb_node" {
   sid_kv_user      = module.common_infrastructure.sid_kv_user
   sid_kv_user_msi  = module.common_infrastructure.sid_kv_user_msi
   deployer-uai     = module.deployer.deployer-uai
-  deployer_user    = module.deployer.deployer_user
+  // Comment out code with users.object_id for the time being.
+  // deployer_user    = module.deployer.deployer_user
 }
 
 // Create Application Tier nodes
@@ -111,7 +113,8 @@ module "app_tier" {
   sid_kv_user      = module.common_infrastructure.sid_kv_user
   sid_kv_user_msi  = module.common_infrastructure.sid_kv_user_msi
   deployer-uai     = module.deployer.deployer-uai
-  deployer_user    = module.deployer.deployer_user
+  // Comment out code with users.object_id for the time being.  
+  // deployer_user    = module.deployer.deployer_user
 }
 
 // Create anydb database nodes

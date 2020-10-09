@@ -18,6 +18,9 @@ output "deployer-uai" {
   value = data.azurerm_user_assigned_identity.deployer
 }
 
+// Comment out code with users.object_id for the time being.
+/*
 output "deployer_user" {
   value = data.terraform_remote_state.deployer.outputs.deployer_user
 }
+*/
