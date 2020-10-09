@@ -14,8 +14,8 @@ data "azurerm_storage_account" "storage_tfstate" {
 resource "azurerm_storage_account" "storage_tfstate" {
   count                     = local.sa_tfstate_exists ? 0 : 1
   name                      = local.sa_tfstate_name
-  resource_group_name       = local.rg_library.name
-  location                  = local.rg_library.location
+  resource_group_name       = local.rg_name
+  location                  = local.rg_library_location
   account_replication_type  = local.sa_tfstate_account_replication_type
   account_tier              = local.sa_tfstate_account_tier
   account_kind              = local.sa_tfstate_account_kind
@@ -31,14 +31,14 @@ resource "azurerm_storage_account" "storage_tfstate" {
 data "azurerm_storage_container" "storagecontainer_tfstate" {
   count                = local.sa_tfstate_container_exists ? 1 : 0
   name                 = local.sa_tfstate_container_name
-  storage_account_name = local.sa_tfstate.name
+  storage_account_name = local.sa_tfstate_name
 }
 
 // Creates the storage container inside the storage account for sapsystem
 resource "azurerm_storage_container" "storagecontainer_tfstate" {
   count                 = local.sa_tfstate_container_exists ? 0 : 1
   name                  = local.sa_tfstate_container_name
-  storage_account_name  = local.sa_tfstate.name
+  storage_account_name  = local.sa_tfstate_name
   container_access_type = local.sa_tfstate_container_access_type
 }
 
@@ -53,8 +53,8 @@ data "azurerm_storage_account" "storage_sapbits" {
 resource "azurerm_storage_account" "storage_sapbits" {
   count                     = local.sa_sapbits_exists ? 0 : 1
   name                      = local.sa_sapbits_name
-  resource_group_name       = local.rg_library.name
-  location                  = local.rg_library.location
+  resource_group_name       = local.rg_name
+  location                  = local.rg_library_location
   account_replication_type  = local.sa_sapbits_account_replication_type
   account_tier              = local.sa_sapbits_account_tier
   account_kind              = local.sa_sapbits_account_kind
@@ -68,14 +68,14 @@ resource "azurerm_storage_account" "storage_sapbits" {
 data "azurerm_storage_container" "storagecontainer_sapbits" {
   count                = (local.sa_sapbits_blob_container_enable && local.sa_sapbits_blob_container_exists) ? 1 : 0
   name                 = local.sa_sapbits_blob_container_name
-  storage_account_name = local.sa_sapbits.name
+  storage_account_name = local.sa_sapbits_name
 }
 
 // Creates the storage container inside the storage account for SAP bits
 resource "azurerm_storage_container" "storagecontainer_sapbits" {
   count                 = (local.sa_sapbits_blob_container_enable && ! local.sa_sapbits_blob_container_exists) ? 1 : 0
   name                  = local.sa_sapbits_blob_container_name
-  storage_account_name  = local.sa_sapbits.name
+  storage_account_name  = local.sa_sapbits_name
   container_access_type = local.sa_sapbits_container_access_type
 }
 
@@ -83,7 +83,7 @@ resource "azurerm_storage_container" "storagecontainer_sapbits" {
 resource "azurerm_storage_share" "fileshare_sapbits" {
   count                = (local.sa_sapbits_file_share_enable && ! local.sa_sapbits_file_share_exists) ? 1 : 0
   name                 = local.sa_sapbits_file_share_name
-  storage_account_name = local.sa_sapbits.name
+  storage_account_name = local.sa_sapbits_name
 }
 
 // Generates random text for storage account name
