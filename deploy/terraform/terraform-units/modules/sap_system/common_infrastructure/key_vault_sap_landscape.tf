@@ -58,6 +58,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   ]
 }
 
+/* Comment out code with users.object_id for the time being
 resource "azurerm_key_vault_access_policy" "kv_user_portal" {
   count        = local.enable_landscape_kv ? length(local.kv_users) : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
@@ -71,7 +72,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
     "set",
   ]
 }
-
+*/
 // Using TF tls to generate SSH key pair for iscsi devices and store in user KV
 resource "tls_private_key" "iscsi" {
   count = (

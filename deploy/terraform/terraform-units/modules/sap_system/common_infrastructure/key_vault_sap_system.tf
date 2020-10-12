@@ -57,6 +57,7 @@ resource "azurerm_key_vault_access_policy" "sid_kv_user_msi" {
   ]
 }
 
+/* Comment out code with users.object_id for the time being
 resource "azurerm_key_vault_access_policy" "sid_kv_user_portal" {
   count        = local.enable_sid_deployment ? length(local.kv_users) : 0
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
@@ -70,7 +71,7 @@ resource "azurerm_key_vault_access_policy" "sid_kv_user_portal" {
     "set",
   ]
 }
-
+*/
 // random bytes to product
 resource "random_id" "sapsystem" {
   byte_length = 4

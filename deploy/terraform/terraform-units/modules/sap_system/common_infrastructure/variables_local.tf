@@ -22,12 +22,12 @@ variable "nsg-mgmt" {
 variable "deployer-uai" {
   description = "Details of the UAI used by deployer(s)"
 }
-
+/* Comment out code with users.object_id for the time being
 variable "deployer_user" {
   description = "Details of the users"
   default     = []
 }
-
+*/
 variable "region_mapping" {
   type        = map(string)
   description = "Region Mapping: Full = Single CHAR, 4-CHAR"
@@ -134,9 +134,10 @@ locals {
   // Post fix for all deployed resources
   postfix = random_id.saplandscape.hex
 
+/* Comment out code with users.object_id for the time being
   // Additional users add to user KV
   kv_users = var.deployer_user
-
+*/
   // kv for sap landscape
   kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
   kv_private_name = format("%sprvt%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
