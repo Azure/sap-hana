@@ -163,6 +163,12 @@ locals {
     ])
   )
 
+  // public ip address list of deployers
+  deployer_public_ip_address_list = distinct(flatten([
+    for pip_deployer in azurerm_public_ip.deployer :
+    pip_deployer.ip_address
+  ]))
+
   // Comment out code with users.object_id for the time being.
   // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
 }

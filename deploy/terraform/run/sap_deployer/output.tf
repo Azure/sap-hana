@@ -48,9 +48,25 @@ output "deployer_kv_user_arm_id" {
 }
 
 output "deployer_kv_prvt_name" {
-  value     = module.sap_deployer.prvt_vault_name
+  value = module.sap_deployer.prvt_vault_name
 }
 
 output "deployer_kv_user_name" {
-  value     = module.sap_deployer.user_vault_name
+  value = module.sap_deployer.user_vault_name
+}
+
+output "deployer_public_key_secret_name" {
+  value = module.sap_deployer.ppk_name
+}
+
+output "deployer_private_key_secret_name" {
+  value = module.sap_deployer.pk_name
+}
+
+output "deployer_rg_name" {
+  value = module.sap_deployer.deployer_rg_name
+}
+
+output "deployer_public_ip_address" {
+  value = module.sap_deployer.deployer_public_ip_address
 }
