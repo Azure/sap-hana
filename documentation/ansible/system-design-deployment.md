@@ -19,13 +19,15 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 - **_Bootstrapping_** to deploy and configure the SAP Deployer and the SAP Library must be completed before _Preparation_;
 - **_Provisioning_** to deploy the SAP target VMs into Azure must be completed before _Deployment_.
 
-## Contents
+## Contents <!-- omit in toc -->
 
 - [SAP System Design and Deployment](#sap-system-design-and-deployment)
   - [Phase 1: Acquisition](#phase-1-acquisition)
     - [Phase 1 Prerequisites](#phase-1-prerequisites)
     - [Phase 1 Inputs](#phase-1-inputs)
     - [Phase 1 Process](#phase-1-process)
+      - [Phase 1a: The SAP Application](#phase-1a-the-sap-application)
+      - [Phase 1b: The Database Software](#phase-1b-the-database-software)
     - [Phase 1 Results and Outputs](#phase-1-results-and-outputs)
   - [Phase 2: Preparation](#phase-2-preparation)
     - [Phase 2 Prerequisites](#phase-2-prerequisites)
@@ -58,11 +60,11 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 ### Phase 1 Process
 
-_**Note:** The Preparation and Deployment stages will be independent of each other in the sense that the preparation stage can happen at any time before the user wishes to begin the Deployment stage, however the Deployment cannot happen without Preparation being completed._
-
 _**Note:** Creating a Virtual Machine within Azure to use as your workstation will improve the upload speed when transfering the SAP media to a Storage account.
 
-#### Phase 1 A) The SAP Application
+Phase 1 is split into two parts, obtaining the Application Installation Media and stack files, and obtaining the Database Installation Media if required.
+
+#### Phase 1a: The SAP Application
 
 1. Create unique Stack Download Directory for SAP Downloads on User Workstation, e.g. `~/Downloads/S4HANA_1909_SP2/`
 1. Log in to [SAP Launchpad](https://launchpad.support.sap.com/#)
@@ -72,20 +74,28 @@ _**Note:** Creating a Virtual Machine within Azure to use as your workstation wi
 1. Download Stack XML file to Stack Download Directory
 1. Click `Push to Download Basket`
 1. Download additional files (Stack Text File, PDF, Excel export)
-1. In your web browser, log in to Launchpad and navigate to the Download Basket
-1. Click the `T` icon above the table to download a file containing the URL hardlinks for the download basket and save to your workstation
-1. Log into SAP Download Basket within SAP Download Manager
-1. Set download directory to Stack Download Directory created in Phase 1 step 1
+1. Navigate to the Download Basket
+1. Click the `T` icon above the table to download a file containing the URL hardlinks for the download basket and save to your workstation <sup>1</sup>
+1. Run SAP Download Manager and login to access your SAP Download Basket
+1. Set download directory to Stack Download Directory created in Phase 1a, step 1
+1. Download all files into the empty DIR on workstation
+
+#### Phase 1b: The Database Software
+
+1. Create unique Stack Download Directory for SAP Downloads on User Workstation, e.g. `~/Downloads/HANA2.0/`
+1. Log in to [SAP Launchpad](https://launchpad.support.sap.com/#)
+1. Navigate to Software Downloads to clear the download basket
+1. Find the SAP HANA Database media (Database and any additional components required) and add to download basket
+1. Navigate to the Download Basket
+1. Click the `T` icon above the table to download a file containing the URL hardlinks for the download basket and save to your workstation <sup>1</sup>
+1. Run SAP Download Manager and login to access your SAP Download Basket
+1. Set download directory to Stack Download Directory created in Phase 1b, step 1
 1. Download all files into empty DIR on workstation
 
-#### Phase 1 B) The Database Software
 
-1. If Database Installation media is also required:
-   1. Create unique Stack Download Directory for SAP Downloads on User Workstation, e.g. `~/Downloads/HANA2.0/`
-   1. Find the SAP HANA Database media (Database and any additional components required) and add to download basket
-   1. Log into SAP Download Basket within SAP Download Manager
-   1. Set download directory to Stack Download Directory created in Phase 1 step 1, i
-   1. Download all files into empty DIR on workstation
+**Notes:**
+
+1. The text file containing the download URL hardlinks is always named `myDownloadBasketFiles.txt` but is specific to the Application or Database and should be kept with the other downloads for the particular phase so it can be uploaded to the correct location in Phase 2.
 
 ### Phase 1 Results and Outputs
 
@@ -108,15 +118,12 @@ _**Note:** Creating a Virtual Machine within Azure to use as your workstation wi
 
 ### Phase 2 Process
 
-1. Upload SAP Media from workstation to SAP Library.
-   This process will create a repository of archive files, tools and Stack files to be used when deploying systems (see [Example SAP Library file structure](#example-sap-library-file-structure)).
 1. Upload the downloaded media and stack files to the sapbits container in the Storage Account for the SAP Library, using the directory structure shown in the [Example SAP Library file structure](#example-sap-library-file-structure).
 1. Create SAP Unattended Installation Template(s) (process TBD in Milestone 2).
 1. Upload into SAP Library.
 1. Create the BoM file.
 1. Populate BoM with required inputs shown in the [Example Bill of Materials (BoM) file](#example-bill-of-materials-bom-file).
 1. Upload BoM files to SAP Library.
-1. Define SAP Library path Storage account in Ansible either in the Ansible inventory or passed into a playbook as a parameter i.e sap_lib_root_url: `https://<storage_acount_name>.blob.core.windows.net/<container_name>/`. The same applies to the file destination on the target vm as all media will be extracted to one directory.
 
 #### Example SAP Library file structure
 
@@ -139,6 +146,7 @@ sapbits
 |   |   |   |-- MP_Plan_1001034051_20200921_.pdf
 |   |   |   |-- MP_Stack_1001034051_20200921_.txt
 |   |   |   |-- MP_Stack_1001034051_20200921_.xml
+|   |   |   |-- myDownloadBasketFiles.txt
 |   |
 |   |-- BW4HANA_SP04_v001/
 |   |   |-- ...
@@ -147,13 +155,13 @@ sapbits
 |       |-- ...
 |
 |-- templates/
-    |-- abap_ascs_1909_v2.ini
+    |-- s4_1909_v2.ini
     |-- hana2_sp05_v2.ini
 ```
 
 **Notes:**
 
-1. All Installation Media tools and files for all systems designed by the user will be contained within a single flat directory to avoid duplication.
+1. To prevent duplication, the Installation Media and Tools for all systems designed will be kept in a single flat `archives` directory.
 1. The Bill of Materials directory (BoMs/) will contain a folder for each system the user designs. The recommended naming convention for these folders will use the product type(e.g. S4HANA), service pack version (e.g. SP05), and a version marker (e.g. v001). This allows the user to update a particular system BoM and retain an earlier version should it ever be needed.
 1. The Bill of Materials file (bom.yml) and template files (hana.ini, application.ini) will be created following manual steps (process TBD in Milestone 2).
 1. Additional SAP files obtained from SAP Maintenance Planner (the XML Stack file, Text file representation of stack file, the PDF and xls files) will be stored in a subfolder for a particular BoM.
@@ -260,6 +268,7 @@ materials:
    1. Configure media directory exports
 1. Run Ansible playbook on SCS VM to unarchive SAP Media and extract to exported media directory
    1. Iterates over BoM content to extract (media, unattended install templates, etc.)
+   1. Media will be downloaded to a known location on the filesystem of a particular VM and selectively extracted where it benefits the automated process.
 1. Run Ansible playbook on SCS VM to deploy SAP product components (using SWPM)
 
 ### Phase 3 Results and Outputs
