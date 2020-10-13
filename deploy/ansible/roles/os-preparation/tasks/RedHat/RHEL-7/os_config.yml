@@ -91,7 +91,16 @@
   loop:
       - compat-sap-c++-7
       - libatomic
-  when: hana_database.db_version is regex("2.\d{2}.0([4-9]\d|[0-9]\d{2,})")
+  when: hana_database.db_version is regex("2.\d{2}.04\d")
+
+- name: SAP Note 2886607 - Linux - Running SAP applications compiled with GCC 9.x
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+      - compat-sap-c++-9
+      - libatomic
+  when: hana_database.db_version is regex("2.\d{2}.0([5-9]\d|[0-9]\d{2,})")
 
 - name: SAP Note 2292690 - SAP HANA DB Recommended OS settings for RHEL 7 - Tuned profile 1
   systemd:
