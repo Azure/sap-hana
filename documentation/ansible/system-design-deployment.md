@@ -22,7 +22,6 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 ## Contents
 
 - [SAP System Design and Deployment](#sap-system-design-and-deployment)
-  - [Contents](#contents)
   - [Phase 1: Acquisition](#phase-1-acquisition)
     - [Phase 1 Prerequisites](#phase-1-prerequisites)
     - [Phase 1 Inputs](#phase-1-inputs)
@@ -61,6 +60,10 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 _**Note:** The Preparation and Deployment stages will be independent of each other in the sense that the preparation stage can happen at any time before the user wishes to begin the Deployment stage, however the Deployment cannot happen without Preparation being completed._
 
+_**Note:** Creating a Virtual Machine within Azure to use as your workstation will improve the upload speed when transfering the SAP media to a Storage account.
+
+#### Phase 1 A) The SAP Application
+
 1. Create unique Stack Download Directory for SAP Downloads on User Workstation, e.g. `~/Downloads/S4HANA_1909_SP2/`
 1. Log in to [SAP Launchpad](https://launchpad.support.sap.com/#)
 1. Navigate to Software Downloads to clear the download basket
@@ -69,20 +72,25 @@ _**Note:** The Preparation and Deployment stages will be independent of each oth
 1. Download Stack XML file to Stack Download Directory
 1. Click `Push to Download Basket`
 1. Download additional files (Stack Text File, PDF, Excel export)
-1. Download and install the
+1. In your web browser, log in to Launchpad and navigate to the Download Basket
+1. Click the `T` icon above the table to download a file containing the URL hardlinks for the download basket and save to your workstation
 1. Log into SAP Download Basket within SAP Download Manager
 1. Set download directory to Stack Download Directory created in Phase 1 step 1
 1. Download all files into empty DIR on workstation
+
+#### Phase 1 B) The Database Software
+
 1. If Database Installation media is also required:
    1. Create unique Stack Download Directory for SAP Downloads on User Workstation, e.g. `~/Downloads/HANA2.0/`
    1. Find the SAP HANA Database media (Database and any additional components required) and add to download basket
    1. Log into SAP Download Basket within SAP Download Manager
-   1. Set download directory to Stack Download Directory created in Phase 1 step 13, i
+   1. Set download directory to Stack Download Directory created in Phase 1 step 1, i
    1. Download all files into empty DIR on workstation
 
 ### Phase 1 Results and Outputs
 
 - XML Stack file
+- Download Basket URL hardlinks file
 - SAP Installation Media
 - Stack Download Directory path containing Installation Media
 
@@ -124,7 +132,7 @@ sapbits
 |   |-- <tool>_<id>.EXE
 |
 |-- BoMs/
-|   |-- S4HANA_1909_SP0_v001/
+|   |-- S4HANA2_SP05_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/
 |   |   |   |-- MP_Excel_1001034051_20200921_SWC.xls
@@ -153,12 +161,12 @@ sapbits
 
 #### Example Bill of Materials (BoM) file
 
-File `BoMs/S4HANA_1909_SP0_v001/bom.yml`:
+File `BoMs/S4HANA_SP05_v001/bom.yml`:
 
 ```yaml
 ---
 
-name:    'S/4HANA - 1909 SP0 v001'
+name:    'S/4HANA - 1909'
 version: 001
 target:  'ABAP PLATFORM 1909'
 
