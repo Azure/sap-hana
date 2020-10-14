@@ -92,7 +92,6 @@ Phase 1 is split into two parts, obtaining the Application Installation Media an
 1. Set download directory to Stack Download Directory created in Phase 1b, step 1
 1. Download all files into empty DIR on workstation
 
-
 **Notes:**
 
 1. The text file containing the download URL hardlinks is always named `myDownloadBasketFiles.txt` but is specific to the Application or Database and should be kept with the other downloads for the particular phase so it can be uploaded to the correct location in Phase 2.
@@ -165,7 +164,7 @@ sapbits
 1. The Bill of Materials directory (BoMs/) will contain a folder for each system the user designs. The recommended naming convention for these folders will use the product type(e.g. S4HANA), service pack version (e.g. SP05), and a version marker (e.g. v001). This allows the user to update a particular system BoM and retain an earlier version should it ever be needed.
 1. The Bill of Materials file (bom.yml) and template files (hana.ini, application.ini) will be created following manual steps (process TBD in Milestone 2).
 1. Additional SAP files obtained from SAP Maintenance Planner (the XML Stack file, Text file representation of stack file, the PDF and xls files) will be stored in a subfolder for a particular BoM.
-1. Stack files are made unique by an index, e.g. `MP_<type>_<index>_<date>_<???>.<filetype>` where `<type>` is Stack, Plan, or Excel, `<index>` is a 10 digit integer, `<date>` is in format yyyymmdd, `<???>` is SWC for the Excel type and empty for the rest, and `<filetype>` is xls for type Excel, pdf for type Plan, and txt or xml for type Stack.
+1. Stack files are made unique by an index, e.g. `MP_<type>_<index>_<date>_<???>.<filetype>` where `<type>` is Stack, Plan, or Excel, `<index>` is a 10 digit integer, `<date>` is in format yyyymmdd, `<???>` is SWC for the Excel type and empty for the rest, and `<filetype>` is xls for type Excel, pdf for type Plan, and txt or xml for type Stack. . The text file containing the download URL hardlinks named `myDownloadBasketFiles.txt` is not unique, but specific to the BoM so should be stored in the BoM directory it relates to.
 
 #### Example Bill of Materials (BoM) file
 
@@ -177,6 +176,12 @@ File `BoMs/S4HANA_SP05_v001/bom.yml`:
 name:    'S/4HANA - 1909'
 version: 001
 target:  'ABAP PLATFORM 1909'
+
+ProductIdSCS:
+ProductIdHDB:
+ProductIdPAS:
+ProductIdAPP:
+ProductIdWEB:
 
 materials:
   dependencies:
