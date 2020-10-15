@@ -37,8 +37,5 @@ variable "ssh-timeout" {
 
 variable "sshkey" {
   description = "Details of ssh key pair"
-  default = {
-    path_to_public_key  = "~/.ssh/id_rsa.pub",
-    path_to_private_key = "~/.ssh/id_rsa"
-  }
+  default     = {}
 }

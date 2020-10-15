@@ -10,6 +10,19 @@ steps:
       repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg_name}
 
+      echo "=== Retrieving SSH key pairs from sap_landscape KV ==="
+      landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      sid_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\") | not).name"'")
+      sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\")).name"'")
+
+      rm -f ${ws_dir}/sshkey
+      az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_private_key_secret_name} | jq -r .value > ${ws_dir}/sshkey
+      chmod 600 ${ws_dir}/sshkey
+
+      rm -f ${ws_dir}/sshkey.pub
+      az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_public_key_secret_name} | jq -r .value > ${ws_dir}/sshkey.pub
+      chmod 644 ${ws_dir}/sshkey.pub
+
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
       

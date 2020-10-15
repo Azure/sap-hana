@@ -23,7 +23,7 @@ locals {
 
 locals {
   file_share_exists          = try(data.terraform_remote_state.saplibrary.outputs.fileshare_sapbits_name, null) == null ? false : true
-  blob_container_exists      = try(data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapbits, null) == null ? false : true
+  blob_container_exists      = try(data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapbits_name, null) == null ? false : true
   storagecontainer_sapsystem = try(data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapsystem, null)
   sa_tfstate                 = try(data.terraform_remote_state.saplibrary.outputs.tfstate_storage_account, null)
 

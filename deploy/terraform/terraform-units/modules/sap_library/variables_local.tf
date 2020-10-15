@@ -65,10 +65,7 @@ locals {
 
 // Output objects 
 locals {
-  rg_library               = local.rg_exists ? data.azurerm_resource_group.library[0] : azurerm_resource_group.library[0]
-  sa_tfstate               = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0] : azurerm_storage_account.storage_tfstate[0]
-  sa_sapbits               = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0] : azurerm_storage_account.storage_sapbits[0]
-  storagecontainer_tfstate = local.sa_tfstate_container_exists ? data.azurerm_storage_container.storagecontainer_tfstate[0] : azurerm_storage_container.storagecontainer_tfstate[0]
-  storagecontainer_sapbits = ! local.sa_sapbits_blob_container_enable ? null : (local.sa_sapbits_blob_container_exists ? data.azurerm_storage_container.storagecontainer_sapbits[0] : azurerm_storage_container.storagecontainer_sapbits[0])
-  fileshare_sapbits_name   = local.sa_sapbits_file_share_enable ? local.sa_sapbits_file_share_name : null
+  rg_library_location           = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
+  storagecontainer_sapbits_name = local.sa_sapbits_blob_container_enable ? local.sa_sapbits_blob_container_name : null
+  fileshare_sapbits_name        = local.sa_sapbits_file_share_enable ? local.sa_sapbits_file_share_name : null
 }

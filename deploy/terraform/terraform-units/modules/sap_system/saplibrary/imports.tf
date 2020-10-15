@@ -15,13 +15,13 @@ data "terraform_remote_state" "saplibrary" {
 
 // Import SA for sap bits
 data "azurerm_storage_account" "saplibrary" {
-  name                = data.terraform_remote_state.saplibrary.outputs.sapbits_storage_account.name
-  resource_group_name = data.terraform_remote_state.saplibrary.outputs.sapbits_storage_account.resource_group_name
+  name                = data.terraform_remote_state.saplibrary.outputs.sapbits_storage_account_name
+  resource_group_name = data.terraform_remote_state.saplibrary.outputs.sapbits_sa_resource_group_name
 }
 
 // Import storage container for sap bits if exists
 data "azurerm_storage_container" "storagecontainer-sapbits" {
   count                = local.blob_container_exists ? 1 : 0
-  name                 = data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapbits.name
-  storage_account_name = data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapbits.storage_account_name
+  name                 = data.terraform_remote_state.saplibrary.outputs.storagecontainer_sapbits_name
+  storage_account_name = data.terraform_remote_state.saplibrary.outputs.sapbits_storage_account_name
 }
