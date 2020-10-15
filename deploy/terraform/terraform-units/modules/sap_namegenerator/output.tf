@@ -22,15 +22,15 @@ output naming {
       VNET     = local.vnet_keyvault_name
     }
     virtualmachine_names = {
-      ANYDB       = concat(local.anydb_server_names, local.anydb_server_names_ha)
-      ANYDB_ZONAL = concat(local.anydb_server_zonal_names, local.anydb_server_zonal_names_ha)
-      APP         = local.app_server_names
-      DEPLOYER    = local.deployer_vm_names
-      HANA        = concat(local.hana_server_names, local.hana_server_names_ha)
-      HANA_ZONAL  = concat(local.hana_server_zonal_names, local.hana_server_zonal_names_ha)
-      ISCSI       = local.iscsi_server_names
-      SCS         = local.scs_server_names
-      WEB         = local.web_server_names
+      ANYDB_COMPUTERNAME = concat(local.anydb_computer_names, local.anydb_computer_names_ha)
+      ANYDB_VMNAME       = concat(local.anydb_vm_names, local.anydb_vm_names_ha)
+      APP_COMPUTERNAME   = local.app_server_names
+      DEPLOYER           = local.deployer_vm_names
+      HANA_COMPUTERNAME  = concat(local.hana_computer_names, local.hana_computer_names_ha)
+      HANA_VMNAME        = concat(local.hana_server_vm_names, local.hana_server_vm_names_ha)
+      ISCSI_COMPUTERNAME = local.iscsi_server_names
+      SCS_COMPUTERNAME   = local.scs_server_names
+      WEB_COMPUTERNAME   = local.web_server_names
     }
     resource_suffixes = var.resource_suffixes
   }

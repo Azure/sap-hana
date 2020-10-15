@@ -20,8 +20,8 @@ variable naming {
 
 locals {
 
-  computer_names       = var.naming.virtualmachine_names.ANYDB
-  virtualmachine_names = local.zonal_deployment ? var.naming.virtualmachine_names.ANYDB_ZONAL : var.naming.virtualmachine_names.ANYDB
+  computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME 
+  virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
 
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes

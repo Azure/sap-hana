@@ -29,8 +29,8 @@ variable naming {
 // Set defaults
 locals {
 
-  computer_names       = var.naming.virtualmachine_names.HANA
-  virtualmachine_names = local.zonal_deployment ? var.naming.virtualmachine_names.HANA_ZONAL : var.naming.virtualmachine_names.HANA
+  computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME 
+  virtualmachine_names = var.naming.virtualmachine_names.HANA_VMNAME
 
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
