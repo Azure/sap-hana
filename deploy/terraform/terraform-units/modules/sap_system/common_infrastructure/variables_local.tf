@@ -36,14 +36,22 @@ locals {
   sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
 
-  // Zonal support
-  zones            = try(var.infrastructure.zones, [])
+  // Zonal support - 1 PPG by default and with zonal 1 PPG per zone
+  db_list = [
+    for db in var.databases : db
+    if try(db.platform, "NONE") != "NONE"
+  ]
+  db_zones         = try(local.db_list[0].zones, [])
+  app_zones        = try(var.application.app_zones, [])
+  scs_zones        = try(var.application.scs_zones, [])
+  web_zones        = try(var.application.web_zones, [])
+  zones            = distinct(concat(local.db_zones, local.app_zones, local.scs_zones, local.web_zones))
   zonal_deployment = length(local.zones) > 0 ? true : false
 
   vnet_prefix          = var.naming.prefix.VNET
   storageaccount_name  = var.naming.storageaccount_names.SDU
   keyvault_names       = var.naming.keyvault_names.SDU
-  virtualmachine_names = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME 
+  virtualmachine_names = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME
   resource_suffixes    = var.naming.resource_suffixes
 
   //Filter the list of databases to only HANA platform entries
