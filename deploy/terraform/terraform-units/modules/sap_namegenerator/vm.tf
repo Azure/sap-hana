@@ -34,7 +34,7 @@ locals {
     )
   ]
 
-  app_server_names = [for idx in range(var.app_server_count) :
+  app_computer_names = [for idx in range(var.app_server_count) :
     format("%sapp%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
   ]
 
@@ -71,7 +71,7 @@ locals {
     )
   ]
 
-  scs_server_names = [for idx in range(var.scs_server_count) :
+  scs_computer_names = [for idx in range(var.scs_server_count) :
     format("%sscs%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
   ]
 
@@ -82,7 +82,7 @@ locals {
     )
   ]
 
-  web_server_names = [for idx in range(var.web_server_count) :
+  web_computer_names = [for idx in range(var.web_server_count) :
     format("%sweb%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
   ]
 
