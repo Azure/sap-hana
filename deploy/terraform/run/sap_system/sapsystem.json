@@ -1,7 +1,7 @@
 {
   "infrastructure": {
     "region": "eastus",
-    "environment": "global",
+    "environment": "np",
     "resource_group": {
       "is_existing": "false",
       "arm_id": ""
