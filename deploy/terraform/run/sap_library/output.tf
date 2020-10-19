@@ -47,11 +47,10 @@ output "deployer_tfstate_key" {
   value = format("%s%s", local.deployer_rg_name, ".terraform.tfstate")
 }
 
-
 output "saplibrary_environment" {
   value = local.environment
 }
 
 output "saplibrary_subscription_id" {
-  value = var.saplibrary_subscription_id
+  value = local.saplib_subscription_id
 }

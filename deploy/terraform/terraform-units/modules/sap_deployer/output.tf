@@ -78,5 +78,5 @@ output "deployer_kv_user_arm_id" {
 }
 
 output "deployer_public_ip_address" {
-  value = local.enable_deployers ? local.deployer_public_ip_address_list : []
+  value = local.enable_deployers ? local.deployer_public_ip_address : ""
 }

@@ -37,25 +37,14 @@ variable "region_mapping" {
   }
 }
 
-variable "tfstate_resource_group_name" {
-  description = "The name of resource group where tfstate is stored"
+variable "tfstate_resource_id" {
+  description = "The resource id of tfstate storage account"
+  default     = ""
 }
 
-variable "tfstate_storage_account_name" {
-  description = "The name of storage account where tfstate is stored"
-}
-
-variable "saplibrary_subscription_id" {
-  description = "Input $subscription_id of sap library"
-}
-/*
-variable "saplibrary_environment" {
-  description = "Fetch $environment of sap library"
-}
-*/
 locals {
   // Sap library's environment
-  environment    = upper(try(var.infrastructure.environment, ""))
+  environment = upper(try(var.infrastructure.environment, ""))
 
   // Derive resource group name for deployer
   deployer                = try(var.deployer, {})
@@ -69,8 +58,11 @@ locals {
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
   deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
 
-  saplib_resource_group_name   = try(var.tfstate_resource_group_name, "")
-  tfstate_storage_account_name = try(var.tfstate_storage_account_name, "")
+  // Locate the tfstate storage account
+  tfstate_resource_id          = try(var.tfstate_resource_id, "")
+  saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
+  saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
+  tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
   tfstate_container_name       = "tfstate"
   deployer_tfstate_key         = format("%s%s", local.deployer_rg_name, ".terraform.tfstate")
 

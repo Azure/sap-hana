@@ -169,6 +169,9 @@ locals {
     pip_deployer.ip_address
   ]))
 
+  // public ip address of the first deployer
+  deployer_public_ip_address = local.enable_deployers ? local.deployer_public_ip_address_list[0] : ""
+
   // Comment out code with users.object_id for the time being.
   // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
 }

@@ -10,7 +10,7 @@ data "terraform_remote_state" "deployer" {
     storage_account_name = local.tfstate_storage_account_name
     container_name       = local.tfstate_container_name
     key                  = local.deployer_tfstate_key
-    subscription_id      = var.saplibrary_subscription_id
+    subscription_id      = local.saplib_subscription_id
     use_msi              = true
   }
 }

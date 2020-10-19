@@ -8,6 +8,5 @@
         "region": "eastus",
         "vnet": "MGMT"
     },
-    "tfstate_resource_group_name": "",
-    "tfstate_storage_account_name": ""
+    "tfstate_resource_id": ""
 }
