@@ -105,7 +105,7 @@ locals {
   ers_instance_number      = try(var.application.ers_instance_number, "02")
   scs_high_availability    = try(var.application.scs_high_availability, false)
   application_server_count = try(var.application.application_server_count, 0)
-  scs_server_count         = try(var.application.scs_server_count, local.scs_high_availability ? 2 : 1)
+  scs_server_count         = try(var.application.scs_server_count, 1) * local.scs_high_availability ? 2 : 1
   webdispatcher_count      = try(var.application.webdispatcher_count, 0)
   vm_sizing                = try(var.application.vm_sizing, "Default")
   app_nic_ips              = try(var.application.app_nic_ips, [])
