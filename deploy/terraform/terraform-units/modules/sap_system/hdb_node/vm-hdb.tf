@@ -138,18 +138,11 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   //Ultra disk requires zonal deployment
   availability_set_id = local.enable_ultradisk ? null : (
-    local.zonal_deployment) ? (
-    local.db_server_count == local.db_zone_count ? null : azurerm_availability_set.hdb[count.index % local.db_zone_count].id) : (
-    azurerm_availability_set.hdb[0].id
+    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : azurerm_availability_set.anydb[count.index % local.db_zone_count].id
   )
 
-  zone = local.enable_ultradisk ? local.zones[count.index % local.db_zone_count] : (
-    local.zonal_deployment ? (
-      local.db_server_count == local.db_zone_count ? local.zones[count.index % local.db_zone_count] : null) : (
-      null
-    )
-  )
-
+  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % local.db_zone_count] : null
+      
   network_interface_ids = [
     azurerm_network_interface.nics-dbnodes-admin[count.index].id,
     azurerm_network_interface.nics-dbnodes-db[count.index].id
@@ -206,14 +199,10 @@ resource "azurerm_managed_disk" "data-disk" {
   create_option        = "Empty"
   storage_account_type = local.data_disk_list[count.index].storage_account_type
   disk_size_gb         = local.data_disk_list[count.index].disk_size_gb
-  zones = local.enable_ultradisk ? (
-    [azurerm_linux_virtual_machine.vm-dbnode[local.data_disk_list[count.index].vm_index].zone]) : (local.zonal_deployment ? (
-      local.db_server_count == local.db_zone_count ? (
+  zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
         [azurerm_linux_virtual_machine.vm-dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
         null
-      )) : (
-      null
-  ))
+      )
 }
 
 # Manages attaching a Disk to a Virtual Machine
