@@ -276,7 +276,7 @@ locals {
   ) : []
 
   scs-data-disks = flatten([
-    for vm_counter in range(local.scs_high_availability ? 2 : 1) : [
+    for vm_counter in range(local.scs_server_count) : [
       for idx, datadisk in local.app-data-disk-per-dbnode : {
         suffix                    = datadisk.suffix
         vm_index                  = vm_counter
