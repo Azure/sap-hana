@@ -69,7 +69,7 @@ locals {
         "type"     = "key",
         "username" = try(deployer.authentication.username, "azureadm"),
         "sshkey" = {
-          "path_to_private_key" = "~/.ssh/id_rsa"
+          "path_to_private_key" = var.sshkey.path_to_private_key
         }
       },
       "components" = [

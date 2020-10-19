@@ -27,7 +27,7 @@ resource "null_resource" "IMDS" {
     type        = "ssh"
     host        = azurerm_public_ip.deployer[count.index].ip_address
     user        = local.deployers[count.index].authentication.username
-    private_key = local.deployers[count.index].authentication.type == "key" ? local.deployers[count.index].authentication.sshkey.private_key : null
+    private_key = local.deployers[count.index].authentication.type == "key" ? file(local.deployers[count.index].authentication.sshkey.path_to_private_key) : null
     password    = lookup(local.deployers[count.index].authentication, "password", null)
     timeout     = var.ssh-timeout
   }
