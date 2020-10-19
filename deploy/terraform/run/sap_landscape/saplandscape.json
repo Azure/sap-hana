@@ -14,7 +14,6 @@
                 "deployer_tfstate_key": ""
             },
             "sap": {
-                "name": "global-eaus-sap0-vnet",
                 "address_space": "10.1.0.0/16",
                 "subnet_iscsi": {
                     "name": "global-eaus-sap0_iscsi-subnet",

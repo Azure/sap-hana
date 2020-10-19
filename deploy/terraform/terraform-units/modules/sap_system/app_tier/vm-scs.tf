@@ -24,7 +24,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
 
 # Create the SCS Linux VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
-  count               = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? local.scs_server_count : 0) : 0
+  count               = local.enable_deployment && (upper(local.app_ostype) == "LINUX") ? local.scs_server_count : 0
   name                = format("%s_%s%s", local.prefix, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_virtualmachine_names[count.index]
   location            = var.resource-group[0].location
@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
 # Create the SCS Windows VM(s)
 resource "azurerm_windows_virtual_machine" "scs" {
-  count               = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? (local.scs_high_availability ? 2 : 1) : 0) : 0
+  count               = local.enable_deployment && (upper(local.app_ostype) == "WINDOWS") ? local.scs_server_count : 0
   name                = format("%s_%s%s", local.prefix, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_virtualmachine_names[count.index]
   location            = var.resource-group[0].location

@@ -32,6 +32,11 @@ stages:
           az group update --resource-group $sapsystem_rg --set tags.Delete=True
           az group delete -n $sapsystem_rg -y
 
+          saplandscape_rg="UNIT-EAUS-SAP0-INFRASTRUCTURE"
+          echo "=== Mark and try to delete rg $saplandscape_rg ==="
+          az group update --resource-group $saplandscape_rg --set tags.Delete=True
+          az group delete -n $saplandscape_rg -y
+
           saplib_rg="UNIT-EAUS-SAP_LIBRARY"
           echo "=== Mark and try to delete rg $saplib_rg ==="
           az group update --resource-group $saplib_rg --set tags.Delete=True
@@ -55,6 +60,9 @@ stages:
       - template: templates/deployer/create-deployer-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
           deployer_env: "UNIT"
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
@@ -83,8 +91,27 @@ stages:
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
           deployer_env: "UNIT"
-  - job: createSAPSystemSLES
+  - job: createSAPLandscape
     dependsOn: createSAPLib
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
+      - template: templates/saplandscape/create-saplandscape-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
+          saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
+  - job: createSAPSystemSLES
+    dependsOn: createSAPLandscape
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -98,6 +125,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "SLES"
           osImage_offer: "sles-sap-12-sp5"
           osImage_publisher: "SUSE"
@@ -106,7 +134,7 @@ stages:
         parameters:
           deployer_env: "UNIT"
   - job: createSAPSystemRHEL
-    dependsOn: createSAPLib
+    dependsOn: createSAPLandscape
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -120,6 +148,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
+          saplandscape_env: "UNIT"
           sapsystem_env: "RHEL"
           osImage_offer: "RHEL-SAP-HA"
           osImage_publisher: "RedHat"

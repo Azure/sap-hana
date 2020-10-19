@@ -1,0 +1,129 @@
+steps:
+  - script: |
+      set -e
+
+      echo "=== Logon deployer ==="
+      ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
+      source /etc/profile.d/deploy_server.sh
+
+      # Modify environment value so it starts with u and with length of 5
+      deployer_env=${{parameters.deployer_env}}
+      buildId=$(Build.BuildId)
+      deployer_isRelease=${deployer_env%%$buildId*}
+
+      if [ -z "${deployer_isRelease}" ]
+      then 
+        deployer_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        deployer_prefix=${deployer_env}
+      fi
+
+      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+
+      # Modify environment value so it starts with u and with length of 5
+      saplib_env=${{parameters.saplib_env}}
+      saplib_isRelease=${saplib_env%%$buildId*}
+
+      if [ -z "${saplib_isRelease}" ]
+      then 
+        saplib_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        saplib_prefix=${saplib_env}
+      fi
+
+      saplib_rg="${saplib_prefix}-EAUS-SAP_LIBRARY"
+
+      # Modify environment value so it starts with u and with length of 5
+      saplandscape_env=${{parameters.saplandscape_env}}
+      saplandscape_isRelease=${saplandscape_env%%$buildId*}
+
+      [ -z ${{parameters.osImage_publisher}} ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
+      [[ ${osImage_publisher} == "SUSE" ]] && isSles=true || isSles=false
+      
+      # subnet is decided by buildId if it is unit test.
+      # Otherwise, use 10.10.0.0 for sles and 10.10.1.0 for rhel
+      if [ -z "${saplandscape_isRelease}" ]
+      then 
+        idx1=${buildId: -1}
+        idx2=$((${buildId: -2:1} + 1))
+        idx=$((10#$idx2$idx1))
+        saplandscape_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+        ha="false"
+      else
+        saplandscape_prefix=${saplandscape_env}
+        ha="true"
+        if ${isSles}
+        then idx=11
+        else idx=12
+        fi
+      fi
+      sap_vnet_address_space="10.${idx}.0.0/16"
+      subnet_iscsi_prefix="10.${idx}.${idx}.64/27"
+
+      saplandscape_rg="${saplandscape_prefix}-EAUS-SAP0-INFRASTRUCTURE"
+      
+      repo_dir=$HOME/${saplandscape_rg}/sap-hana
+      ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/${saplandscape_rg}
+      deployer_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
+      input=${ws_dir}/${saplandscape_rg}.json
+      
+      echo "=== Checkout required branch ${{parameters.branch_name}} ==="
+      if [ ! -d "${repo_dir}" ]
+      then
+        mkdir $HOME/${saplandscape_rg}; cd $_
+        git clone https://github.com/Azure/sap-hana.git
+      fi
+      cd $repo_dir && git pull && git checkout ${{parameters.branch_name}}
+
+      echo "=== Create workspace ${ws_dir} ==="
+      mkdir -p ${ws_dir}; cd $_
+      cp ${deployer_ws_dir}/ssh* .
+
+      cat <<- EOF > export-clustering-sp-details.sh
+        export SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID=$(landscape-subscription)
+        export SAP_HANA_FENCING_AGENT_TENANT_ID=$(landscape-tenant)
+        export SAP_HANA_FENCING_AGENT_CLIENT_ID=$(hana-pipeline-spn-id)
+        export SAP_HANA_FENCING_AGENT_CLIENT_SECRET=$(hana-pipeline-spn-pw)
+      EOF
+
+      tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
+      sap_landscape_key="${saplandscape_rg}.terraform.tfstate"
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"MGMT-INFRASTRUCTURE\\\")).name"'")
+      saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
+
+      cp ${repo_dir}/deploy/terraform/run/sap_landscape/saplandscape.json ${ws_dir}/saplandscape.json
+      cat ${ws_dir}/saplandscape.json \
+      | jq --arg saplandscape_rg "${saplandscape_rg}" .infrastructure.resource_group.name\ =\ \$saplandscape_rg \
+      | jq --arg environment "${saplandscape_prefix}" .infrastructure.environment\ =\ \$environment \
+      | jq --arg saplib_rg "${saplib_rg}" .infrastructure.vnets.management.saplib_resource_group_name\ =\ \$saplib_rg \
+      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .infrastructure.vnets.management.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
+      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
+      | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
+      | jq --arg saplib_rg "${saplib_rg}" .software.storage_account_sapbits.saplib_resource_group_name\ =\ \$saplib_rg \
+      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .software.storage_account_sapbits.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
+      | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
+      > ${input}
+
+      cat ${input}
+      
+      echo "=== Deploy sap landscape from deployer with terraform ==="
+      echo "=== This may take quite a while, please be patient ==="
+      terraform -version
+      terraform init -upgrade=true -force-copy \
+        --backend-config "resource_group_name=${saplib_rg}" \
+        --backend-config "storage_account_name=${tfstate_sa_name}" \
+        --backend-config "container_name=tfstate" \
+        --backend-config "key=${sap_landscape_key}" \
+        ${repo_dir}/deploy/terraform/run/sap_system/
+      [ -d ~/.log ] || mkdir -p ~/.log
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_sap_landscape_apply_error.log 2>&1>~/.log/$(Build.BuildId)_sap_landscape_apply.log
+      if [ -s ~/.log/$(Build.BuildId)_sap_landscape_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_sap_landscape_apply_error.log; exit 1; fi;
+      '
+    displayName: "Deploy new sap landscape: Branch ${{parameters.branch_name}}"
+    condition: or(succeededOrFailed(), always())
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)

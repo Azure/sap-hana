@@ -30,11 +30,11 @@ variable "custom_disk_sizes_filename" {
 
 locals {
   // Imports Disk sizing sizing information
-  sizes      = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
+  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
 
   app_virtualmachine_names = var.naming.virtualmachine_names.APP_COMPUTERNAME
   scs_virtualmachine_names = var.naming.virtualmachine_names.SCS_COMPUTERNAME
-  web_virtualmachine_names = var.naming.virtualmachine_names.WEB_COMPUTERNAME   
+  web_virtualmachine_names = var.naming.virtualmachine_names.WEB_COMPUTERNAME
   resource_suffixes        = var.naming.resource_suffixes
 
   region  = try(var.infrastructure.region, "")
@@ -105,7 +105,7 @@ locals {
   ers_instance_number      = try(var.application.ers_instance_number, "02")
   scs_high_availability    = try(var.application.scs_high_availability, false)
   application_server_count = try(var.application.application_server_count, 0)
-  scs_server_count         = local.scs_high_availability ? 2 : 1
+  scs_server_count         = try(var.application.scs_server_count, 1) * (local.scs_high_availability ? 2 : 1)
   webdispatcher_count      = try(var.application.webdispatcher_count, 0)
   vm_sizing                = try(var.application.vm_sizing, "Default")
   app_nic_ips              = try(var.application.app_nic_ips, [])
@@ -276,7 +276,7 @@ locals {
   ) : []
 
   scs-data-disks = flatten([
-    for vm_counter in range(local.scs_high_availability ? 2 : 1) : [
+    for vm_counter in range(local.scs_server_count) : [
       for idx, datadisk in local.app-data-disk-per-dbnode : {
         suffix                    = datadisk.suffix
         vm_index                  = vm_counter

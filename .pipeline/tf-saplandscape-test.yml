@@ -5,8 +5,8 @@ pr:
     - feature/*
   paths:
     include:
-    - deploy/terraform/run/sap_system/*
-    - deploy/terraform/terraform-units/modules/sap_system/*
+    - deploy/terraform/run/sap_landscape/*
+    - deploy/terraform/terraform-units/modules/sap_landscape/*
 variables:
   - group: azure-config-variables
   - group: azure-sap-hana-pipeline-secrets
@@ -18,7 +18,7 @@ stages:
   variables:
     ssh_timeout_s: 120
   jobs:
-  - job: createSAPSystem
+  - job: createSAPLandscape
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -27,29 +27,27 @@ stages:
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
           deployer_env: "UNIT"
-      - template: templates/sapsystem/create-sapsystem-steps.yml
+      - template: templates/saplandscape/create-saplandscape-steps.yml
         parameters:
           branch_name: $(targetBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
-          saplandscape_env: "UNIT"
-          sapsystem_env: "$(Build.BuildId)"
-      - template: templates/sapsystem/validate-sapsystem-steps.yml
+          saplandscape_env: "$(Build.BuildId)"
+      - template: templates/saplandscape/validate-saplandscape-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
-          sapsystem_env: "$(Build.BuildId)"
-      - template: templates/sapsystem/create-sapsystem-steps.yml
+          saplandscape_env: "$(Build.BuildId)"
+      - template: templates/saplandscape/create-saplandscape-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
           saplib_env: "UNIT"
-          saplandscape_env: "UNIT"
-          sapsystem_env: "$(Build.BuildId)"
+          saplandscape_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
           deployer_env: "UNIT"
-  - job: deleteSAPSystem
-    dependsOn: createSAPSystem
+  - job: deleteSAPLandscape
+    dependsOn: createSAPLandscape
     condition: or(succeededOrFailed(), always())
     steps:
       - template: templates/util/prepare-agent.yml
@@ -59,12 +57,11 @@ stages:
       - template: templates/util/add-agent-to-deployer-nsg.yml
         parameters:
           deployer_env: "UNIT"
-      - template: templates/sapsystem/delete-sapsystem-steps.yml
+      - template: templates/saplandscape/delete-saplandscape-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
           deployer_env: "UNIT"
-          sapsystem_env: "$(Build.BuildId)"
+          saplandscape_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
           deployer_env: "UNIT"
- 

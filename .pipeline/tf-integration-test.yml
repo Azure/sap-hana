@@ -25,6 +25,9 @@ stages:
         parameters:
           branch_name: $(sourceBranchName)
           deployer_env: "$(Build.BuildId)"
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
           deployer_env: "$(Build.BuildId)"
@@ -53,8 +56,27 @@ stages:
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
           deployer_env: "$(Build.BuildId)"
-  - job: createSAPSystem
+  - job: createSAPLandscape
     dependsOn: createSAPLib
+    steps:
+      - template: templates/util/prepare-agent.yml
+      - template: templates/util/collect-deployer-info.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
+      - template: templates/saplandscape/create-saplandscape-steps.yml
+        parameters:
+          branch_name: $(sourceBranchName)
+          deployer_env: "$(Build.BuildId)"
+          saplib_env: "$(Build.BuildId)"
+          saplandscape_env: "$(Build.BuildId)"
+      - template: templates/util/remove-agent-from-deployer-nsg.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
+  - job: createSAPSystem
+    dependsOn: createSAPLandscape
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -68,6 +90,7 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "$(Build.BuildId)"
           saplib_env: "$(Build.BuildId)"
+          saplandscape_env: "$(Build.BuildId)"
           sapsystem_env: "$(Build.BuildId)"
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
@@ -84,6 +107,11 @@ stages:
           echo "=== Mark and try to delete rg ${sapsystem_rg} ==="
           az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
           az group delete -n ${sapsystem_rg} --no-wait -y
+
+          saplandscape_rg="${environment}-EAUS-SAP0-INFRASTRUCTURE"
+          echo "=== Mark and try to delete rg ${saplandscape_rg} ==="
+          az group update --resource-group ${saplandscape_rg} --set tags.Delete=True
+          az group delete -n ${saplandscape_rg} --no-wait -y
 
           saplib_rg="${environment}-EAUS-SAP_LIBRARY"
           echo "=== Mark and try to delete rg ${saplib_rg} ==="
