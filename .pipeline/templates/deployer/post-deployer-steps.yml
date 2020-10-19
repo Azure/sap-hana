@@ -14,7 +14,17 @@ steps:
       deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
       
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
+      remote_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}"
 
       cd ${ws_dir}
+      az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
       bash ${ws_dir}/post_deployment.sh
+
+      # Copy local key pair to deployer. Temporary workaround until kv feature completes.
+      scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) ${ws_dir}/sshkey* "$(username)"@"$(publicIP)":${remote_dir}
     displayName: "Post deployment"
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)

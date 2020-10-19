@@ -80,12 +80,13 @@ locals {
   db_sid         = length(local.hana-databases) > 0 ? local.hanadb_sid : local.anydb_sid
   sap_sid        = upper(try(var.application.sid, local.db_sid))
 
-  app_ostype          = try(var.application.os.os_type, "LINUX")
-  db_ostype           = try(var.databases[0].os.os_type, "LINUX")
-  db_server_count     = try(length(var.databases[0].dbnodes), 1)
-  app_server_count    = try(var.application.application_server_count, 0)
-  webdispatcher_count = try(var.application.webdispatcher_count, 0)
-  scs_server_count    = try(var.application.scs_high_availability, false) ? 2 : 1
+  app_ostype            = try(var.application.os.os_type, "LINUX")
+  db_ostype             = try(var.databases[0].os.os_type, "LINUX")
+  db_server_count       = try(length(var.databases[0].dbnodes), 1)
+  app_server_count      = try(var.application.application_server_count, 0)
+  webdispatcher_count   = try(var.application.webdispatcher_count, 0)
+  scs_high_availability = try(var.application.scs_high_availability, false)
+  scs_server_count      = try(var.application.scs_server_count, 1) * (local.scs_high_availability ? 2 : 1)
 
   db_zones  = try(var.databases[0].zones, [])
   app_zones = try(var.application.app_zones, [])

@@ -134,21 +134,15 @@ resource "azurerm_linux_virtual_machine" "vm-dbnode" {
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
 
-  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
-
-  availability_set_id = local.zonal_deployment ? (
-    length(local.hdb_vms) == local.db_zone_count ? (
-      null) : (
-      azurerm_availability_set.hdb[count.index % local.db_zone_count].id
-    )) : (
-    azurerm_availability_set.hdb[0].id
-  )
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
-  zone = local.zonal_deployment ? (
-    length(local.hdb_vms) == local.db_zone_count ? local.zones[count.index % local.db_zone_count] : null) : (
-    null
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  //Ultra disk requires zonal deployment
+  availability_set_id = local.enable_ultradisk ? null : (
+    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : azurerm_availability_set.hdb[count.index % local.db_zone_count].id
   )
 
+  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % local.db_zone_count] : null
+      
   network_interface_ids = [
     azurerm_network_interface.nics-dbnodes-admin[count.index].id,
     azurerm_network_interface.nics-dbnodes-db[count.index].id
@@ -205,13 +199,10 @@ resource "azurerm_managed_disk" "data-disk" {
   create_option        = "Empty"
   storage_account_type = local.data_disk_list[count.index].storage_account_type
   disk_size_gb         = local.data_disk_list[count.index].disk_size_gb
-  zones = local.zonal_deployment ? (
-    local.db_server_count == local.db_zone_count ? (
-      [azurerm_linux_virtual_machine.vm-dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
-      null
-    )) : (
-    null
-  )
+  zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
+        [azurerm_linux_virtual_machine.vm-dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
+        null
+      )
 }
 
 # Manages attaching a Disk to a Virtual Machine
@@ -221,5 +212,5 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm-dbnode-data-disk" {
   virtual_machine_id        = azurerm_linux_virtual_machine.vm-dbnode[local.data_disk_list[count.index].vm_index].id
   caching                   = local.data_disk_list[count.index].caching
   write_accelerator_enabled = local.data_disk_list[count.index].write_accelerator_enabled
-  lun                       = count.index
+  lun                       = local.data_disk_list[count.index].lun
 }
