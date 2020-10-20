@@ -11,7 +11,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       sapsystem_env=${{parameters.sapsystem_env}}
@@ -64,7 +64,7 @@ steps:
       '
 
       echo "=== Remove vnet peering with vnet-mgmt in case deployment/destroy fails ==="
-      vnet_name="${deployer_prefix}-EAUS-MGMT-vnet"
+      vnet_name="${deployer_prefix}-EAUS-DEP00-vnet"
       peering_name=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name ${vnet_name} | jq -r .[].name | grep $(Build.BuildId))
       [ ! -z "$peering_name" ] && az network vnet peering delete --resource-group ${deployer_rg} --name ${peering_name} --vnet-name ${vnet_name}
 

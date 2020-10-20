@@ -6,6 +6,6 @@
     "deployer": {
         "environment": "np",
         "region": "eastus",
-        "vnet": "MGMT"
+        "vnet": "DEP00"
     }
 }

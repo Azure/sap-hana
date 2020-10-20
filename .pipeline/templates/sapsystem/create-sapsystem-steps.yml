@@ -18,7 +18,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       saplib_env=${{parameters.saplib_env}}
@@ -123,7 +123,7 @@ steps:
 
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
-      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"MGMT-INFRASTRUCTURE\\\")).name"'")
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"DEP00-INFRASTRUCTURE\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
       tfstate_resource_id=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] | select(.name | contains(\\\"tfstate\\\")).id"'")
 

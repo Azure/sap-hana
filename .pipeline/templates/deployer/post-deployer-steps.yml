@@ -11,7 +11,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
       
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       remote_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}"

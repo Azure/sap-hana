@@ -126,8 +126,8 @@ stages:
           echo "=== Mark rg for deletion ${saplib_rg} ==="
           az group update --resource-group ${saplib_rg} --set tags.Delete=True
 
-          deployer_rg="${environment}-EAUS-MGMT-INFRASTRUCTURE"
-          echo "=== Mark rg for deletion ${deployer_rg} ==="
+          deployer_rg="${environment}-EAUS-DEP00-INFRASTRUCTURE"
+          echo "=== Mark and try to delete rg ${deployer_rg} ==="
           az group update --resource-group ${deployer_rg} --set tags.Delete=True
         displayName: "Clean up"
         env:
@@ -155,7 +155,7 @@ stages:
           echo "=== Try to delete rg ${saplib_rg} ==="
           az group delete -n ${saplib_rg} --no-wait -y
 
-          deployer_rg="${environment}-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_rg="${environment}-EAUS-DEP00-INFRASTRUCTURE"
           echo "=== Try to delete rg ${deployer_rg} ==="
           az group delete -n ${deployer_rg} --no-wait -y
         displayName: "Clean up"

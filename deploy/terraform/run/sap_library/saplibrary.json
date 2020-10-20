@@ -6,7 +6,7 @@
     "deployer": {
         "environment": "np",
         "region": "eastus",
-        "vnet": "MGMT"
+        "vnet": "DEP00"
     },
     "tfstate_resource_id": ""
 }

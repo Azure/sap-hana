@@ -19,7 +19,7 @@ steps:
       fi
       
       deployer_environment=${deployer_prefix}
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       saplib_env=${{parameters.saplib_env}}

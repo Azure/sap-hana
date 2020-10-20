@@ -15,7 +15,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      rg_name="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      rg_name="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       echo "##vso[task.setvariable variable=username]$(az vm list --resource-group ${rg_name} | jq -r .[].osProfile.adminUsername)"
       vm_name=$(az vm list --resource-group ${rg_name} | jq -r .[].name)

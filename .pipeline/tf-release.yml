@@ -42,7 +42,7 @@ stages:
           az group update --resource-group $saplib_rg --set tags.Delete=True
           az group delete -n $saplib_rg -y
 
-          deployer_rg="UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_rg="UNIT-EAUS-DEP00-INFRASTRUCTURE"
           echo "=== Mark and try to delete rg $deployer_rg ==="
           az group update --resource-group $deployer_rg --set tags.Delete=True
           az group delete -n $deployer_rg -y
