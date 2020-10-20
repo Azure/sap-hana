@@ -13,8 +13,18 @@ Description:
 */
 
 provider "azurerm" {
-  version = "~> 2.25.0"
+  version = "~> 2.32.0"
   features {}
+  subscription_id = local.spn.subscription_id
+  client_id       = local.spn.client_id
+  client_secret   = local.spn.client_secret
+  tenant_id       = local.spn.tenant_id
+}
+
+provider "azurerm" {
+  version = "~> 2.32.0"
+  features {}
+  alias = "deployer"
 }
 
 terraform {

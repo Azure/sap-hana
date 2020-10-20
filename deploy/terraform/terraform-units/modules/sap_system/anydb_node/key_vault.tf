@@ -19,18 +19,18 @@ resource "random_password" "password" {
  To force dependency between kv access policy and secrets. Expected behavior:
  https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
 */
-// store the xdb logon username in KV
+// Store the xdb logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
-  depends_on   = [var.sid_kv_user_msi]
+  depends_on   = [var.sid_kv_user_spn]
   count        = local.enable_auth_password ? 1 : 0
   name         = format("%s-%s-xdb-auth-username", local.prefix, local.sid)
   value        = local.sid_auth_username
   key_vault_id = local.sid_kv_user.id
 }
 
-// store the xdb logon password in KV
+// Store the xdb logon password in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
-  depends_on   = [var.sid_kv_user_msi]
+  depends_on   = [var.sid_kv_user_spn]
   count        = local.enable_auth_password ? 1 : 0
   name         = format("%s-%s-xdb-auth-password", local.prefix, local.sid)
   value        = local.sid_auth_password

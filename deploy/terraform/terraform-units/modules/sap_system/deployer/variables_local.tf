@@ -47,9 +47,11 @@ locals {
   region         = lower(try(var.infrastructure.region, ""))
   location_short = lower(try(var.region_mapping[local.region], "unkn"))
 
-  // Default value follows naming convention
-  saplib_resource_group_name   = try(local.deployer_config.saplib_resource_group_name, "${local.environment}-${local.location_short}-sap_library")
-  tfstate_storage_account_name = try(local.deployer_config.tfstate_storage_account_name, "")
+  // Locate the tfstate storage account
+  tfstate_resource_id          = try(local.deployer_config.tfstate_resource_id, "")
+  saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
+  saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
+  tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
   tfstate_container_name       = "tfstate"
   deployer_tfstate_key         = try(local.deployer_config.deployer_tfstate_key, "${local.environment}-${local.location_short}-deployer-infrastructure.terraform.tfstate")
 }

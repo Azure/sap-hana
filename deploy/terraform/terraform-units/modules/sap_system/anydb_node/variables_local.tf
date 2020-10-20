@@ -22,7 +22,7 @@ variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
 
-variable "sid_kv_user_msi" {
+variable "sid_kv_user_spn" {
   description = "Azurerm_key_vault_access_policy is required to save secrets in KV"
 }
 

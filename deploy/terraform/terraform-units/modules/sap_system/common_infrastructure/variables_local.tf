@@ -25,6 +25,10 @@ variable "nsg-mgmt" {
   description = "Details about management nsg of deployer(s)"
 }
 
+variable "spn" {
+  description = "Current SPN used to authenticate to Azure"
+}
+
 variable "deployer-uai" {
   description = "Details of the UAI used by deployer(s)"
 }
@@ -140,7 +144,7 @@ locals {
   // Post fix for all deployed resources
   postfix = random_id.saplandscape.hex
 
-/* Comment out code with users.object_id for the time being
+  /* Comment out code with users.object_id for the time being
   // Additional users add to user KV
   kv_users = var.deployer_user
 */
@@ -397,5 +401,8 @@ locals {
   software = merge(var.software, {
     downloader = local.downloader
   })
+
+  // SPN
+  spn = try(var.spn, {})
 
 }

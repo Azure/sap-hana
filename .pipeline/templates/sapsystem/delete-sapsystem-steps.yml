@@ -73,6 +73,14 @@ steps:
       az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
       az group delete -n ${sapsystem_rg} --no-wait -y
 
+      # Delete SPN secrets from deployer KV
+      echo "=== Delete SPN secrets from deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-secret --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-subscription-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-tenant-id --output none
+
       exit 0
     displayName: "Delete new sapsystem"
     env:

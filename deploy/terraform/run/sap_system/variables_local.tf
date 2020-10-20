@@ -41,3 +41,29 @@ locals {
 locals {
   import_deployer = module.deployer.import_deployer
 }
+
+locals {
+  // The environment of sap landscape and sap system
+  environment = upper(try(var.infrastructure.environment, ""))
+
+  // Get deployer remote tfstate info
+  deployer_config = try(var.infrastructure.vnets.management, {})
+
+  // Locate the tfstate storage account
+  tfstate_resource_id          = try(local.deployer_config.tfstate_resource_id, "")
+  saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
+  saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
+  tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
+  tfstate_container_name       = "tfstate"
+  deployer_tfstate_key         = try(local.deployer_config.deployer_tfstate_key, "")
+
+  // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
+  deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
+
+  spn = {
+    subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
+    client_id       = data.azurerm_key_vault_secret.client_id.value,
+    client_secret   = data.azurerm_key_vault_secret.client_secret.value,
+    tenant_id       = data.azurerm_key_vault_secret.tenant_id.value,
+  }
+}

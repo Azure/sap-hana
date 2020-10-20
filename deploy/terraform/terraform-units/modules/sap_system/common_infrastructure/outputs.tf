@@ -50,6 +50,6 @@ output "sid_kv_prvt" {
  To force dependency between kv access policy and secrets. Expected behavior:
  https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
 */
-output "sid_kv_user_msi" {
-  value = azurerm_key_vault_access_policy.sid_kv_user_msi
+output "sid_kv_user_spn" {
+  value = azurerm_key_vault_access_policy.sid_kv_user_spn
 }

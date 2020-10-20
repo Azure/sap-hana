@@ -5,7 +5,6 @@ Load balancer front IP address range: .4 - .9
 resource "azurerm_lb" "anydb" {
   count               = local.enable_deployment ? 1 : 0
   name                = format("%s_db-alb", local.prefix)
-  
   resource_group_name = var.resource-group[0].name
   location            = var.resource-group[0].location
 
