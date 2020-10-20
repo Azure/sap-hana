@@ -115,24 +115,20 @@ stages:
 
           az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
           sapsystem_rg="${environment}-EAUS-SAP-PRD"
-          echo "=== Mark and try to delete rg ${sapsystem_rg} ==="
+          echo "=== Mark rg for deletion ${sapsystem_rg} ==="
           az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
-          az group delete -n ${sapsystem_rg} --no-wait -y
 
           saplandscape_rg="${environment}-EAUS-SAP0-INFRASTRUCTURE"
-          echo "=== Mark and try to delete rg ${saplandscape_rg} ==="
+          echo "=== Mark rg for deletion ${saplandscape_rg} ==="
           az group update --resource-group ${saplandscape_rg} --set tags.Delete=True
-          az group delete -n ${saplandscape_rg} --no-wait -y
 
           saplib_rg="${environment}-EAUS-SAP_LIBRARY"
-          echo "=== Mark and try to delete rg ${saplib_rg} ==="
+          echo "=== Mark rg for deletion ${saplib_rg} ==="
           az group update --resource-group ${saplib_rg} --set tags.Delete=True
-          az group delete -n ${saplib_rg} --no-wait -y
 
           deployer_rg="${environment}-EAUS-MGMT-INFRASTRUCTURE"
-          echo "=== Mark and try to delete rg ${deployer_rg} ==="
+          echo "=== Mark rg for deletion ${deployer_rg} ==="
           az group update --resource-group ${deployer_rg} --set tags.Delete=True
-          az group delete -n ${deployer_rg} --no-wait -y
         displayName: "Clean up"
         env:
           ARM_CLIENT_ID: $(hana-pipeline-spn-id)
