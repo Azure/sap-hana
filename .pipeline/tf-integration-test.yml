@@ -56,6 +56,9 @@ stages:
           branch_name: $(sourceBranchName)
           deployer_env: "$(Build.BuildId)"
           saplib_env: "$(Build.BuildId)"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "$(Build.BuildId)"
       - template: templates/saplib/post-saplib-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
