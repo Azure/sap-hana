@@ -16,8 +16,6 @@ variable "scenario" {
 # Set defaults
 locals {
 
-  ansible_path = "${module.saplibrary.environment}_${module.saplibrary.sid}"
-
   # Options
   enable_secure_transfer = try(var.options.enable_secure_transfer, true)
   ansible_execution      = try(var.options.ansible_execution, false)

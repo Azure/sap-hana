@@ -24,6 +24,7 @@ variable "options" {
 
 variable "software" {
   description = "Details of the infrastructure components required for SAP installation"
+  default     = {}
 }
 
 variable "ssh-timeout" {

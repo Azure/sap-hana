@@ -9,8 +9,7 @@
         },
         "vnets": {
             "management": {
-                "saplib_resource_group_name": "",
-                "tfstate_storage_account_name": "",
+                "tfstate_resource_id": "",
                 "deployer_tfstate_key": ""
             },
             "sap": {
@@ -36,13 +35,6 @@
     ],
     "application": {
         "enable_deployment": false
-    },
-    "software": {
-        "storage_account_sapbits": {
-            "saplib_resource_group_name": "",
-            "tfstate_storage_account_name": "",
-            "saplib_tfstate_key": ""
-        }
     },
     "sshkey": {},
     "options": {}
