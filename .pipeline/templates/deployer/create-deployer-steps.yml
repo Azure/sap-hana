@@ -49,7 +49,7 @@ steps:
       terraform -version
       terraform init -upgrade=true ${repo_path}/deploy/terraform/bootstrap/sap_deployer/
       terraform apply -auto-approve -var-file=${input} ${repo_path}/deploy/terraform/bootstrap/sap_deployer/ 
-    displayName: "Deploy deployer: Branch ${{parameters.branch_name}}"
+    displayName: "Deploy deployer bootstrap: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)
