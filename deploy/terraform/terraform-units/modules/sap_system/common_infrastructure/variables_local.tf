@@ -25,8 +25,8 @@ variable "nsg-mgmt" {
   description = "Details about management nsg of deployer(s)"
 }
 
-variable "spn" {
-  description = "Current SPN used to authenticate to Azure"
+variable "service_principal" {
+  description = "Current service principal used to authenticate to Azure"
 }
 
 variable "deployer-uai" {
@@ -402,7 +402,7 @@ locals {
     downloader = local.downloader
   })
 
-  // SPN
-  spn = try(var.spn, {})
+  // Current service principal
+  service_principal = try(var.service_principal, {})
 
 }

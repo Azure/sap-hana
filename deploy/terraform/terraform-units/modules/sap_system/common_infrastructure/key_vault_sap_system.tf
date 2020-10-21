@@ -10,21 +10,21 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
   name                       = local.sid_kv_private_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  tenant_id                  = local.spn.tenant_id
+  tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
   sku_name                   = "standard"
-}
 
-resource "azurerm_key_vault_access_policy" "sid_kv_prvt_spn" {
-  count        = local.enable_sid_deployment ? 1 : 0
-  key_vault_id = azurerm_key_vault.sid_kv_prvt[0].id
-  tenant_id    = local.spn.tenant_id
-  object_id    = local.spn.client_id
-  secret_permissions = [
-    "get",
-  ]
+  access_policy {
+    tenant_id = local.service_principal.tenant_id
+    object_id = local.service_principal.object_id
+
+    secret_permissions = [
+      "get",
+    ]
+  }
+
 }
 
 // Create user KV with access policy
@@ -33,24 +33,24 @@ resource "azurerm_key_vault" "sid_kv_user" {
   name                       = local.sid_kv_user_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
-  tenant_id                  = local.spn.tenant_id
+  tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
   sku_name                   = "standard"
-}
 
-resource "azurerm_key_vault_access_policy" "sid_kv_user_spn" {
-  count        = local.enable_sid_deployment ? 1 : 0
-  key_vault_id = azurerm_key_vault.sid_kv_user[0].id
-  tenant_id    = local.spn.tenant_id
-  object_id    = local.spn.client_id
-  secret_permissions = [
-    "delete",
-    "get",
-    "list",
-    "set",
-  ]
+  access_policy {
+    tenant_id = local.service_principal.tenant_id
+    object_id = local.service_principal.object_id
+
+    secret_permissions = [
+      "delete",
+      "get",
+      "list",
+      "set",
+    ]
+
+  }
 }
 
 /* Comment out code with users.object_id for the time being
