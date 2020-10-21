@@ -106,7 +106,7 @@ stages:
       - template: templates/util/remove-agent-from-deployer-nsg.yml
         parameters:
           deployer_env: "$(Build.BuildId)"
-  - job: deleteAll
+  - job: markDeleteAll
     dependsOn: createSAPSystem
     condition: or(succeededOrFailed(), always())
     steps:
@@ -129,6 +129,35 @@ stages:
           deployer_rg="${environment}-EAUS-MGMT-INFRASTRUCTURE"
           echo "=== Mark rg for deletion ${deployer_rg} ==="
           az group update --resource-group ${deployer_rg} --set tags.Delete=True
+        displayName: "Clean up"
+        env:
+          ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+          ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+          ARM_TENANT_ID: $(landscape-tenant)
+          ARM_SUBSCRIPTION_ID: $(landscape-subscription)
+  - job: deleteAll
+    dependsOn: createSAPSystem
+    condition: and(succeeded(), always())
+    steps:
+      - script: |
+          environment="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+
+          az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+          sapsystem_rg="${environment}-EAUS-SAP-PRD"
+          echo "=== Try to delete rg ${sapsystem_rg} ==="
+          az group delete -n ${sapsystem_rg} --no-wait -y
+
+          saplandscape_rg="${environment}-EAUS-SAP0-INFRASTRUCTURE"
+          echo "=== Try to delete rg ${saplandscape_rg} ==="
+          az group delete -n ${saplandscape_rg} --no-wait -y
+
+          saplib_rg="${environment}-EAUS-SAP_LIBRARY"
+          echo "=== Try to delete rg ${saplib_rg} ==="
+          az group delete -n ${saplib_rg} --no-wait -y
+
+          deployer_rg="${environment}-EAUS-MGMT-INFRASTRUCTURE"
+          echo "=== Try to delete rg ${deployer_rg} ==="
+          az group delete -n ${deployer_rg} --no-wait -y
         displayName: "Clean up"
         env:
           ARM_CLIENT_ID: $(hana-pipeline-spn-id)
