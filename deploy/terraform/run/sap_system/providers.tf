@@ -27,6 +27,15 @@ provider "azurerm" {
   alias = "deployer"
 }
 
+provider "azuread" {
+  # Whilst version is optional, we /strongly recommend/ using it to pin the version of the Provider being used
+  version = "=0.10.0"
+  subscription_id = local.spn.subscription_id
+  client_id     = local.spn.client_id
+  client_secret = local.spn.client_secret
+  tenant_id     = local.spn.tenant_id
+}
+
 terraform {
   required_version = ">= 0.12"
   required_providers {
@@ -37,3 +46,4 @@ terraform {
     tls      = { version = "~> 2.2" }
   }
 }
+

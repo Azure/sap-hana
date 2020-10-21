@@ -44,7 +44,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_spn" {
   count        = local.enable_landscape_kv ? 1 : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
   tenant_id    = local.spn.tenant_id
-  object_id    = local.spn.client_id
+  object_id    = data.azuread_service_principal.sp.id
   secret_permissions = [
     "delete",
     "get",
@@ -156,4 +156,8 @@ data "azurerm_key_vault_secret" "sid_pk" {
   count        = local.enable_landscape_kv ? 0 : 1
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
+}
+
+data "azuread_service_principal" "sp" {
+  application_id = local.spn.client_id
 }
