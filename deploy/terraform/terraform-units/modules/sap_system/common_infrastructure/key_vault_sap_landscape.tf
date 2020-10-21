@@ -143,10 +143,3 @@ resource "azurerm_key_vault_secret" "sid_pk" {
 resource "random_id" "saplandscape" {
   byte_length = 4
 }
-
-// retrieve public key from sap landscape's Key vault
-data "azurerm_key_vault_secret" "sid_pk" {
-  count        = local.enable_landscape_kv ? 0 : 1
-  name         = local.secret_sid_pk_name
-  key_vault_id = local.kv_landscape_id
-}
