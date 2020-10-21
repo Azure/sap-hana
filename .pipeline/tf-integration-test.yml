@@ -129,7 +129,7 @@ stages:
           deployer_rg="${environment}-EAUS-DEP00-INFRASTRUCTURE"
           echo "=== Mark and try to delete rg ${deployer_rg} ==="
           az group update --resource-group ${deployer_rg} --set tags.Delete=True
-        displayName: "Clean up"
+        displayName: "Tag resource with Delete: True"
         env:
           ARM_CLIENT_ID: $(hana-pipeline-spn-id)
           ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
