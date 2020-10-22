@@ -17,20 +17,20 @@ output naming {
     }
     keyvault_names = {
       DEPLOYER = {
-        privileged_access = local.deployer_private_keyvault_name
-        user_access       = local.deployer_user_keyvault_name
+        private_access = local.deployer_private_keyvault_name
+        user_access    = local.deployer_user_keyvault_name
       }
       LIBRARY = {
-        privileged_access = local.library_private_keyvault_name
-        user_access       = local.library_user_keyvault_name
+        private_access = local.library_private_keyvault_name
+        user_access    = local.library_user_keyvault_name
       }
       SDU = {
-        privileged_access = local.sdu_private_keyvault_name
-        user_access       = local.sdu_user_keyvault_name
+        private_access = local.sdu_private_keyvault_name
+        user_access    = local.sdu_user_keyvault_name
       }
       VNET = {
-        privileged_access = local.vnet_private_keyvault_name
-        user_access       = local.vnet_user_keyvault_name
+        private_access = local.vnet_private_keyvault_name
+        user_access    = local.vnet_user_keyvault_name
       }
     }
     virtualmachine_names = {
