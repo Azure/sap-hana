@@ -38,3 +38,8 @@ data "azurerm_key_vault_secret" "tenant_id" {
   name         = format("%s-tenant-id", local.environment)
   key_vault_id = local.deployer_key_vault_arm_id
 }
+
+// Import current service principal
+data "azuread_service_principal" "sp" {
+  application_id = local.spn.client_id
+}

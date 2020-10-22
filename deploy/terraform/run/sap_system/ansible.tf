@@ -23,7 +23,7 @@ resource "null_resource" "ansible_playbook" {
       "curl -i -H \"Metadata: \"true\"\" -H \"user-agent: SAP AutoDeploy/${var.auto-deploy-version}; scenario=${var.scenario}; deploy-status=Terraform_finished\" http://169.254.169.254/metadata/instance?api-version=${var.api-version}",
       "export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES",
       "source ~/export-clustering-sp-details.sh",
-      "ansible-playbook -i ${local.ansible_path}/hosts.yml ~/sap-hana/deploy/ansible/sap_playbook.yml"
+      "ansible-playbook -i ${path.cwd}/ansible_config_files/hosts.yml ~/sap-hana/deploy/ansible/sap_playbook.yml"
     ]
   }
 }

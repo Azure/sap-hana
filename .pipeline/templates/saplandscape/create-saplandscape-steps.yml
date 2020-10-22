@@ -90,13 +90,21 @@ steps:
       sap_landscape_key="${saplandscape_rg}.terraform.tfstate"
       deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"MGMT-INFRASTRUCTURE\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
+      tfstate_resource_id=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] | select(.name | contains(\\\"tfstate\\\")).id"'")
+
+      # Store SPN in deployer KV
+      echo "=== Store SPN in deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-client-id --value $(hana-pipeline-spn-id) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-client-secret --value $(hana-pipeline-spn-pw) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-subscription-id --value $(landscape-subscription) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-tenant-id --value $(landscape-tenant) --output none
 
       cp ${repo_dir}/deploy/terraform/run/sap_landscape/saplandscape.json ${ws_dir}/saplandscape.json
       cat ${ws_dir}/saplandscape.json \
       | jq --arg saplandscape_rg "${saplandscape_rg}" .infrastructure.resource_group.name\ =\ \$saplandscape_rg \
       | jq --arg environment "${saplandscape_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg saplib_rg "${saplib_rg}" .infrastructure.vnets.management.saplib_resource_group_name\ =\ \$saplib_rg \
-      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .infrastructure.vnets.management.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
+      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .infrastructure.vnets.management.tfstate_resource_id\ =\ \$tfstate_resource_id \
       | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
       | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \

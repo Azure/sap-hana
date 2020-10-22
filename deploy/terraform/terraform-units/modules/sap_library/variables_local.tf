@@ -47,6 +47,10 @@ variable "deployer_tfstate" {
   description = "terraform.tfstate of deployer"
 }
 
+variable "service_principal" {
+  description = "Current service principal used to authenticate to Azure"
+}
+
 locals {
 
   // Post fix for all deployed resources
@@ -116,8 +120,8 @@ locals {
   kv_private_name = format("%sSAPLIBprvt%s", local.kv_prefix, local.postfix)
   kv_user_name    = format("%sSAPLIBuser%s", local.kv_prefix, local.postfix)
 
-  // spn
-  spn = try(var.spn, {})
+  // Current service principal
+  service_principal = try(var.service_principal, {})
 
   // deployer terraform.tfstate
   deployer_tfstate          = var.deployer_tfstate

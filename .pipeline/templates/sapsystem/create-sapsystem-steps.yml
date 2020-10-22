@@ -51,7 +51,7 @@ steps:
 
       landscape_kv_arm_id=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).id"'")
       landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
-      sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\")).name"'")
+      sid_public_key_secret_name="${saplandscape_rg}-sid-sshkey-pub"
 
       # Modify environment value so it starts with u and with length of 5
       sapsystem_env=${{parameters.sapsystem_env}}

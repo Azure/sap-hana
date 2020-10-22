@@ -15,18 +15,6 @@ module "deployer" {
   sshkey         = var.sshkey
 }
 
-module "saplibrary" {
-  source         = "../../terraform-units/modules/sap_system/saplibrary"
-  application    = var.application
-  databases      = var.databases
-  infrastructure = var.infrastructure
-  jumpboxes      = var.jumpboxes
-  options        = var.options
-  software       = var.software
-  ssh-timeout    = var.ssh-timeout
-  sshkey         = var.sshkey
-}
-
 module "common_infrastructure" {
   source              = "../../terraform-units/modules/sap_system/common_infrastructure"
   is_single_node_hana = "true"
@@ -43,7 +31,7 @@ module "common_infrastructure" {
   subnet-mgmt         = module.deployer.subnet-mgmt
   nsg-mgmt            = module.deployer.nsg-mgmt
   deployer-uai        = module.deployer.deployer-uai
-  spn                 = local.spn
+  service_principal   = local.service_principal
   // Comment out code with users.object_id for the time being.
   // deployer_user       = module.deployer.deployer_user
 }
@@ -88,7 +76,6 @@ module "hdb_node" {
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
-  sid_kv_user_spn  = module.common_infrastructure.sid_kv_user_spn
   deployer-uai     = module.deployer.deployer-uai
   // Comment out code with users.object_id for the time being.
   // deployer_user    = module.deployer.deployer_user
@@ -112,7 +99,6 @@ module "app_tier" {
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
-  sid_kv_user_spn  = module.common_infrastructure.sid_kv_user_spn
   deployer-uai     = module.deployer.deployer-uai
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
@@ -135,7 +121,6 @@ module "anydb_node" {
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
-  sid_kv_user_spn  = module.common_infrastructure.sid_kv_user_spn
 }
 
 // Generate output files
@@ -149,9 +134,6 @@ module "output_files" {
   software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
-  storage-sapbits              = module.saplibrary.saplibrary
-  file_share_name              = module.saplibrary.file_share_name
-  storagecontainer-sapbits     = module.saplibrary.storagecontainer-sapbits
   nics-iscsi                   = module.common_infrastructure.nics-iscsi
   infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
   software_w_defaults          = module.common_infrastructure.software_w_defaults

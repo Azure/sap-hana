@@ -60,22 +60,6 @@
       "username": "azureadm"
     }
   },
-  "software": {
-    "storage_account_sapbits": {
-      "saplib_resource_group_name": "",
-      "tfstate_storage_account_name": "",
-      "saplib_tfstate_key": ""
-    },
-    "downloader": {
-      "scenarios": [
-        {
-          "scenario_type": "DB",
-          "product_name": "HANA",
-          "product_version": "2.0"
-        }
-      ]
-    }
-  },
   "options": {
     "enable_secure_transfer": true,
     "ansible_execution": false,
