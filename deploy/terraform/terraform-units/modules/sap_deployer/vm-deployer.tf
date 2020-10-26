@@ -1,7 +1,7 @@
 /*
 Description:
 
-  The deployer will be used to run Terraform and Anisbe tasks to create the SAP environments
+  The deployer will be used to run Terraform and Ansible tasks to create the SAP environments
 
   Define 0..n Deployer(s).
 */
@@ -44,13 +44,6 @@ data "azurerm_client_config" "current" {}
 resource "azurerm_role_assignment" "sub_contributor" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Contributor"
-  principal_id         = azurerm_user_assigned_identity.deployer.principal_id
-}
-
-// Add role to be able to create lock on rg 
-resource "azurerm_role_assignment" "sub_user_admin" {
-  scope                = data.azurerm_subscription.primary.id
-  role_definition_name = "User Access Administrator"
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
 }
 

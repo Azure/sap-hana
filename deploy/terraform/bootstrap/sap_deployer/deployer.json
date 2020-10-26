@@ -11,8 +11,5 @@
         }
       }
     }
-  },
-  "options": {
-    "enable_secure_transfer": true
   }
 }
