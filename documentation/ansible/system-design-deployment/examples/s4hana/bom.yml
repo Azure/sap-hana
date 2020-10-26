@@ -1,0 +1,771 @@
+---
+
+  name: "SAP S/4HANA 1809"
+  target: "ABAP PLATFORM 1809"
+  version: "001"
+
+  defaults:
+    archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
+    target_location: "/usr/sap/install/downloads/"
+
+  materials:
+    dependencies:
+      - name: "HANA2"
+        version: "003"
+
+    media:
+
+      # kernel components
+
+      - name: "Kernel Part II (777)"
+        archive: "SAPEXEDB_200-80004392.SAR"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001063182020"
+
+      - name: "Kernel Part I"
+        archive: "SAPEXE_200-80004393.SAR"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001063232020"
+
+      - name: "SAP HOST AGENT 7.21 SP49"
+        archive: "SAPHOSTAGENT49_49-20009394.SAR"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001725602020"
+
+      - name: "Patch 1 for SOFTWARE UPDATE MANAGER 2.0 SP09"
+        archive: "SUM20SP09_1-80002456.SAR"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001781372020"
+
+      - name: "Installation for SAP IGS integrated in SAP Kernel"
+        archive: "igsexe_12-80003187.sar"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001632902020"
+
+      - name: "SAP IGS Fonts and Textures"
+        archive: "igshelper_17-10010245.sar"
+        override_target_location: "/usr/sap/install/download_basket/"
+        sapurl: "https://softwaredownloads.sap.com/file/0020000000703122018"
+
+      # db export components
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_1.zip"
+        archive: "S4CORE103_INST_EXPORT_1.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001872432018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_10.zip"
+        archive: "S4CORE103_INST_EXPORT_10.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001872652018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_11.zip"
+        archive: "S4CORE103_INST_EXPORT_11.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001872832018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_12.zip"
+        archive: "S4CORE103_INST_EXPORT_12.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001872972018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_13.zip"
+        archive: "S4CORE103_INST_EXPORT_13.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873122018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_14.zip"
+        archive: "S4CORE103_INST_EXPORT_14.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873222018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_15.zip"
+        archive: "S4CORE103_INST_EXPORT_15.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873272018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_16.zip"
+        archive: "S4CORE103_INST_EXPORT_16.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873292018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_17.zip"
+        archive: "S4CORE103_INST_EXPORT_17.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873302018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_18.zip"
+        archive: "S4CORE103_INST_EXPORT_18.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873372018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_19.zip"
+        archive: "S4CORE103_INST_EXPORT_19.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873442018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_2.zip"
+        archive: "S4CORE103_INST_EXPORT_2.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873452018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_20.zip"
+        archive: "S4CORE103_INST_EXPORT_20.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873472018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_3.zip"
+        archive: "S4CORE103_INST_EXPORT_3.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873512018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_4.zip"
+        archive: "S4CORE103_INST_EXPORT_4.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873502018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_5.zip"
+        archive: "S4CORE103_INST_EXPORT_5.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873512018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_6.zip"
+        archive: "S4CORE103_INST_EXPORT_6.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873572018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_7.zip"
+        archive: "S4CORE103_INST_EXPORT_7.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873642018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_8.zip"
+        archive: "S4CORE103_INST_EXPORT_8.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873732018"
+
+      - name: "File on DVD - S4CORE103_INST_EXPORT_9.zip"
+        archive: "S4CORE103_INST_EXPORT_9.zip"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001873832018"
+
+      - name: "File on DVD - S4HANAOP103_ERP_LANG_DE.SAR"
+        archive: "S4HANAOP103_ERP_LANG_DE.SAR"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001874042018"
+
+      - name: "File on DVD - S4HANAOP103_ERP_LANG_EN.SAR"
+        archive: "S4HANAOP103_ERP_LANG_EN.SAR"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001874092018"
+
+      - name: "File on DVD - S4HANAOP103_ERP_LANG_UK.SAR"
+        archive: "S4HANAOP103_ERP_LANG_UK.SAR"
+        override_target_location: "/usr/sap/install/cd_exports/"
+        sapurl: "https://softwaredownloads.sap.com/file/0030000001875132018"
+
+      # other components
+
+      - name: "Attribute Change Package 16 for EA-HR 608"
+        archive: "EA-HR608.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000059642016"
+
+      - name: "S4CORE 103: SP 0001"
+        archive: "K-10301INS4CORE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000026952019"
+
+      - name: "S4FND 103: SP 0001"
+        archive: "K-10301INS4FND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433912018"
+
+      - name: "S4CORE 103: SP 0002"
+        archive: "K-10302INS4CORE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617872019"
+
+      - name: "S4FND 103: SP 0002"
+        archive: "K-10302INS4FND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617882019"
+
+      - name: "S4CORE 103: SP 0003"
+        archive: "K-10303INS4CORE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863072019"
+
+      - name: "S4FND 103: SP 0003"
+        archive: "K-10303INS4FND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001854662019"
+
+      - name: "S4CORE 103: SP 0004"
+        archive: "K-10304INS4CORE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512692020"
+
+      - name: "S4FND 103: SP 0004"
+        archive: "K-10304INS4FND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512712020"
+
+      - name: "BSNAGT 200: SP 0003"
+        archive: "K-20003INBSNAGT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001907632018"
+
+      - name: "BSNAGT 200: SP 0004"
+        archive: "K-20004INBSNAGT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001039292019"
+
+      - name: "MSGPMCON 200: Patch 0004"
+        archive: "K-20004INMSGPMCON.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002104262018"
+
+      - name: "BSNAGT 200: SP 0005"
+        archive: "K-20005INBSNAGT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002252642019"
+
+      - name: "GBX01HR 600: SP 0011"
+        archive: "K-60011INGBX01HR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001743192018"
+
+      - name: "SRA004 600: Support Package 0011"
+        archive: "K-60011INSRA004.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002014762018"
+
+      - name: "GBX01HR 600: SP 0012"
+        archive: "K-60012INGBX01HR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002406812018"
+
+      - name: "GBX01HR 600: SP 0013"
+        archive: "K-60013INGBX01HR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000476312019"
+
+      - name: "GBX01HR 600: SP 0014"
+        archive: "K-60014INGBX01HR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001255172019"
+
+      - name: "GBX01HR 600: SP 0015"
+        archive: "K-60015INGBX01HR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001714692019"
+
+      - name: "GBX01HR5 605: SP 0008"
+        archive: "K-60508INGBX01HR5.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001743212018"
+
+      - name: "GBX01HR5 605: SP 0009"
+        archive: "K-60509INGBX01HR5.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002409732018"
+
+      - name: "GBX01HR5 605: SP 0010"
+        archive: "K-60510INGBX01HR5.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000452832019"
+
+      - name: "GBX01HR5 605: SP 0011"
+        archive: "K-60511INGBX01HR5.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001303782019"
+
+      - name: "GBX01HR5 605: SP 0012"
+        archive: "K-60512INGBX01HR5.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001713732019"
+
+      - name: "EA-HR 608: SP 0057"
+        archive: "K-60857INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001550252018"
+
+      - name: "EA-HR 608: SP 0058"
+        archive: "K-60858INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001784352018"
+
+      - name: "EA-HR 608: SP 0059"
+        archive: "K-60859INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001932542018"
+
+      - name: "EA-HR 608: SP 0060"
+        archive: "K-60860INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002091622018"
+
+      - name: "EA-HR 608: SP 0061"
+        archive: "K-60861INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002344942018"
+
+      - name: "EA-HR 608: SP 0062"
+        archive: "K-60862INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002426102018"
+
+      - name: "EA-HR 608: SP 0063"
+        archive: "K-60863INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000116252019"
+
+      - name: "EA-HR 608: SP 0064"
+        archive: "K-60864INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000246932019"
+
+      - name: "EA-HR 608: SP 0065"
+        archive: "K-60865INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000438012019"
+
+      - name: "EA-HR 608: SP 0066"
+        archive: "K-60866INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000662132019"
+
+      - name: "EA-HR 608: SP 0067"
+        archive: "K-60867INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000817662019"
+
+      - name: "EA-HR 608: SP 0068"
+        archive: "K-60868INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001048172019"
+
+      - name: "EA-HR 608: SP 0069"
+        archive: "K-60869INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001234482019"
+
+      - name: "EA-HR 608: SP 0070"
+        archive: "K-60870INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001408362019"
+
+      - name: "EA-HR 608: SP 0071"
+        archive: "K-60871INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001610262019"
+
+      - name: "EA-HR 608: SP 0072"
+        archive: "K-60872INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001804692019"
+
+      - name: "EA-HR 608: SP 0073"
+        archive: "K-60873INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001982812019"
+
+      - name: "EA-HR 608: SP 0074"
+        archive: "K-60874INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002175012019"
+
+      - name: "EA-HR 608: SP 0075"
+        archive: "K-60875INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002263012019"
+
+      - name: "EA-HR 608: SP 0076"
+        archive: "K-60876INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000079822020"
+
+      - name: "EA-HR 608: SP 0077"
+        archive: "K-60877INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000194132020"
+
+      - name: "EA-HR 608: SP 0078"
+        archive: "K-60878INEAHR.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000372672020"
+
+      - name: "ST-PI 740: SP 0009"
+        archive: "K-74009INSTPI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002257102018"
+
+      - name: "ST-PI 740: SP 0010"
+        archive: "K-74010INSTPI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000161692019"
+
+      - name: "ST-PI 740: SP 0011"
+        archive: "K-74011INSTPI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001051532019"
+
+      - name: "ST-PI 740: SP 0012"
+        archive: "K-74012INSTPI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002162182019"
+
+      - name: "ST-PI 740: SP 0013"
+        archive: "K-74013INSTPI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000660652020"
+
+      - name: "SAP_BASIS 753: SP 0001"
+        archive: "K-75301INSAPBASIS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433642018"
+
+      - name: "SAP_BW 753: SP 0001"
+        archive: "K-75301INSAPBW.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433652018"
+
+      - name: "SAP_GWFND 753: SP 0001"
+        archive: "K-75301INSAPGWFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433662018"
+
+      - name: "SAP_UI 753: SP 0001"
+        archive: "K-75301INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001783292018"
+
+      - name: "SAP_BASIS 753: SP 0002"
+        archive: "K-75302INSAPBASIS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000564652019"
+
+      - name: "SAP_BW 753: SP 0002"
+        archive: "K-75302INSAPBW.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000564692019"
+
+      - name: "SAP_GWFND 753: SP 0002"
+        archive: "K-75302INSAPGWFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000564702019"
+
+      - name: "SAP_UI 753: SP 0002"
+        archive: "K-75302INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433672018"
+
+      - name: "SAP_BASIS 753: SP 0003"
+        archive: "K-75303INSAPBASIS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001869462019"
+
+      - name: "SAP_BW 753: SP 0003"
+        archive: "K-75303INSAPBW.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001730732019"
+
+      - name: "SAP_GWFND 753: SP 0003"
+        archive: "K-75303INSAPGWFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001730742019"
+
+      - name: "SAP_UI 753: SP 0003"
+        archive: "K-75303INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000564712019"
+
+      - name: "SAP_BASIS 753: SP 0004"
+        archive: "K-75304INSAPBASIS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000279722020"
+
+      - name: "SAP_BW 753: SP 0004"
+        archive: "K-75304INSAPBW.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000279742020"
+
+      - name: "SAP_GWFND 753: SP 0004"
+        archive: "K-75304INSAPGWFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000279762020"
+
+      - name: "SAP_UI 753: SP 0004"
+        archive: "K-75304INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001014562019"
+
+      - name: "SAP_UI 753: SP 0005"
+        archive: "K-75305INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001730772019"
+
+      - name: "SAP_UI 753: SP 0006"
+        archive: "K-75306INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000279772020"
+
+      - name: "SAP_UI 753: SP 0007"
+        archive: "K-75307INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000834262020"
+
+      - name: "SAP_UI 753: SP 0008"
+        archive: "K-75308INSAPUI.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001474132020"
+
+      - name: "SAP_ABA 75D: SP 0001"
+        archive: "K-75D01INSAPABA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002469792018"
+
+      - name: "SAP_ABA 75D: SP 0002"
+        archive: "K-75D02INSAPABA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000564732019"
+
+      - name: "SAP_ABA 75D: SP 0003"
+        archive: "K-75D03INSAPABA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001730792019"
+
+      - name: "SAP_ABA 75D: SP 0004"
+        archive: "K-75D04INSAPABA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000279782020"
+
+      - name: "EA-DFPS 803: SP 0001"
+        archive: "K-80301INEADFPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433922018"
+
+      - name: "EA-PS 803: SP 0001"
+        archive: "K-80301INEAPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433932018"
+
+      - name: "ECC-SE 803: SP 0001"
+        archive: "K-80301INECCSE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433942018"
+
+      - name: "FI-CAX 803: SP 0001"
+        archive: "K-80301INFICAX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433952018"
+
+      - name: "INSURANCE 803: SP 0001"
+        archive: "K-80301ININSURANC.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433962018"
+
+      - name: "IS-OIL 803: SP 0001"
+        archive: "K-80301INISOIL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433972018"
+
+      - name: "IS-PRA 803: SP 0001"
+        archive: "K-80301INISPRA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433982018"
+
+      - name: "IS-PS-CA 803: SP 0001"
+        archive: "K-80301INISPSCA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002433992018"
+
+      - name: "IS-UT 803: SP 0001"
+        archive: "K-80301INISUT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002434002018"
+
+      - name: "MDG_APPL 803: SP 0001"
+        archive: "K-80301INMDGAPPL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002434012018"
+
+      - name: "MDG_FND 803: SP 0001"
+        archive: "K-80301INMDGFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002434022018"
+
+      - name: "MDG_UX 803: SP 0001"
+        archive: "K-80301INMDGUX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002434032018"
+
+      - name: "EA-DFPS 803: SP 0002"
+        archive: "K-80302INEADFPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617892019"
+
+      - name: "EA-PS 803: SP 0002"
+        archive: "K-80302INEAPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617902019"
+
+      - name: "ECC-SE 803: SP 0002"
+        archive: "K-80302INECCSE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617912019"
+
+      - name: "FI-CAX 803: SP 0002"
+        archive: "K-80302INFICAX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617922019"
+
+      - name: "INSURANCE 803: SP 0002"
+        archive: "K-80302ININSURANC.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617932019"
+
+      - name: "IS-OIL 803: SP 0002"
+        archive: "K-80302INISOIL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617952019"
+
+      - name: "IS-PRA 803: SP 0002"
+        archive: "K-80302INISPRA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617962019"
+
+      - name: "IS-PS-CA 803: SP 0002"
+        archive: "K-80302INISPSCA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617972019"
+
+      - name: "IS-UT 803: SP 0002"
+        archive: "K-80302INISUT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617982019"
+
+      - name: "MDG_APPL 803: SP 0002"
+        archive: "K-80302INMDGAPPL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000617992019"
+
+      - name: "MDG_FND 803: SP 0002"
+        archive: "K-80302INMDGFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000618002019"
+
+      - name: "MDG_UX 803: SP 0002"
+        archive: "K-80302INMDGUX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000618012019"
+
+      - name: "EA-DFPS 803: SP 0003"
+        archive: "K-80303INEADFPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863092019"
+
+      - name: "EA-PS 803: SP 0003"
+        archive: "K-80303INEAPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863102019"
+
+      - name: "ECC-SE 803: SP 0003"
+        archive: "K-80303INECCSE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863112019"
+
+      - name: "FI-CAX 803: SP 0003"
+        archive: "K-80303INFICAX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863122019"
+
+      - name: "INSURANCE 803: SP 0003"
+        archive: "K-80303ININSURANC.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863132019"
+
+      - name: "IS-OIL 803: SP 0003"
+        archive: "K-80303INISOIL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863152019"
+
+      - name: "IS-PRA 803: SP 0003"
+        archive: "K-80303INISPRA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863172019"
+
+      - name: "IS-PS-CA 803: SP 0003"
+        archive: "K-80303INISPSCA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863182019"
+
+      - name: "IS-UT 803: SP 0003"
+        archive: "K-80303INISUT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863192019"
+
+      - name: "MDG_APPL 803: SP 0003"
+        archive: "K-80303INMDGAPPL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863202019"
+
+      - name: "MDG_FND 803: SP 0003"
+        archive: "K-80303INMDGFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001854712019"
+
+      - name: "MDG_UX 803: SP 0003"
+        archive: "K-80303INMDGUX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001863212019"
+
+      - name: "EA-DFPS 803: SP 0004"
+        archive: "K-80304INEADFPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512722020"
+
+      - name: "EA-PS 803: SP 0004"
+        archive: "K-80304INEAPS.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512732020"
+
+      - name: "ECC-SE 803: SP 0004"
+        archive: "K-80304INECCSE.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512742020"
+
+      - name: "FI-CAX 803: SP 0004"
+        archive: "K-80304INFICAX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512752020"
+
+      - name: "INSURANCE 803: SP 0004"
+        archive: "K-80304ININSURANC.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512772020"
+
+      - name: "IS-OIL 803: SP 0004"
+        archive: "K-80304INISOIL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512782020"
+
+      - name: "IS-PRA 803: SP 0004"
+        archive: "K-80304INISPRA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512792020"
+
+      - name: "IS-PS-CA 803: SP 0004"
+        archive: "K-80304INISPSCA.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512802020"
+
+      - name: "IS-UT 803: SP 0004"
+        archive: "K-80304INISUT.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512812020"
+
+      - name: "MDG_APPL 803: SP 0004"
+        archive: "K-80304INMDGAPPL.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512822020"
+
+      - name: "MDG_FND 803: SP 0004"
+        archive: "K-80304INMDGFND.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512832020"
+
+      - name: "MDG_UX 803: SP 0004"
+        archive: "K-80304INMDGUX.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000512842020"
+
+      - name: "SPAM/SAINT Update - Version 753/0076"
+        archive: "KD75376.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001619172020"
+
+      - name: "SAP_HR 608: SP 0057"
+        archive: "KE60857.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001550262018"
+
+      - name: "SAP_HR 608: SP 0058"
+        archive: "KE60858.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001782192018"
+
+      - name: "SAP_HR 608: SP 0059"
+        archive: "KE60859.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001976222018"
+
+      - name: "SAP_HR 608: SP 0060"
+        archive: "KE60860.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002091612018"
+
+      - name: "SAP_HR 608: SP 0061"
+        archive: "KE60861.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002336502018"
+
+      - name: "SAP_HR 608: SP 0062"
+        archive: "KE60862.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002426052018"
+
+      - name: "SAP_HR 608: SP 0063"
+        archive: "KE60863.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000116222019"
+
+      - name: "SAP_HR 608: SP 0064"
+        archive: "KE60864.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000246962019"
+
+      - name: "SAP_HR 608: SP 0065"
+        archive: "KE60865.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000438002019"
+
+      - name: "SAP_HR 608: SP 0066"
+        archive: "KE60866.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000662122019"
+
+      - name: "SAP_HR 608: SP 0067"
+        archive: "KE60867.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000817612019"
+
+      - name: "SAP_HR 608: SP 0068"
+        archive: "KE60868.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001048162019"
+
+      - name: "SAP_HR 608: SP 0069"
+        archive: "KE60869.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001234472019"
+
+      - name: "SAP_HR 608: SP 0070"
+        archive: "KE60870.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001408342019"
+
+      - name: "SAP_HR 608: SP 0071"
+        archive: "KE60871.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001610232019"
+
+      - name: "SAP_HR 608: SP 0072"
+        archive: "KE60872.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001804682019"
+
+      - name: "SAP_HR 608: SP 0073"
+        archive: "KE60873.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001982832019"
+
+      - name: "SAP_HR 608: SP 0074"
+        archive: "KE60874.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002175002019"
+
+      - name: "SAP_HR 608: SP 0075"
+        archive: "KE60875.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002263022019"
+
+      - name: "SAP_HR 608: SP 0076"
+        archive: "KE60876.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000079812020"
+
+      - name: "SAP_HR 608: SP 0077"
+        archive: "KE60877.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000194122020"
+
+      - name: "SAP_HR 608: SP 0078"
+        archive: "KE60878.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000372662020"
+
+      - name: "Servicetools for SAP Basis 731 and higher"
+        archive: "KITAB9V.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000002253762018"
+
+      - name: "Servicetools for SAP Basis 731 and higher"
+        archive: "KITAB9W.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000817512019"
+
+      - name: "Servicetools for SAP Basis 731 and higher"
+        archive: "KITAB9X.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000001910402019"
+
+      - name: "Attribute Change Package 13 for SAP_BASIS 753"
+        archive: "SAP_BASIS753.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000804552020"
+
+      - name: "Attribute Change Package 31 for SAP_HR 608"
+        archive: "SAP_HR608.SAR"
+        sapurl: "https://softwaredownloads.sap.com/file/0010000000249512014"
