@@ -104,8 +104,8 @@ steps:
       cat ${ws_dir}/saplandscape.json \
       | jq --arg saplandscape_rg "${saplandscape_rg}" .infrastructure.resource_group.name\ =\ \$saplandscape_rg \
       | jq --arg environment "${saplandscape_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .infrastructure.vnets.management.tfstate_resource_id\ =\ \$tfstate_resource_id \
-      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
+      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
       | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
       | jq --arg saplib_rg "${saplib_rg}" .software.storage_account_sapbits.saplib_resource_group_name\ =\ \$saplib_rg \

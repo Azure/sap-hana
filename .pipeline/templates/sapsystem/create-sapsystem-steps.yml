@@ -133,8 +133,8 @@ steps:
       cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
       cat ${ws_dir}/sapsystem.json \
       | jq --arg environment "${sapsystem_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .infrastructure.vnets.management.tfstate_resource_id\ =\ \$tfstate_resource_id \
-      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
+      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq .infrastructure.vnets.sap.is_existing\ =\ \"true\" \
       | jq --arg saplandscape_sap_vnet_arm_id "${saplandscape_sap_vnet_arm_id}" .infrastructure.vnets.sap.arm_id\ =\ \$saplandscape_sap_vnet_arm_id \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
