@@ -45,7 +45,7 @@ locals {
 
 // Import deployer information for ansible.tf
 locals {
-  import_deployer = module.deployer.import_deployer
+  import_deployer = data.terraform_remote_state.deployer.outputs.deployer
 }
 
 locals {

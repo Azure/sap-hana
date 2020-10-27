@@ -33,7 +33,7 @@ variable "deployer_tfstate" {
 locals {
 
   // Retrieve deployer information from tfstate file
-  deployer-uai = var.deployer_tfstate.deployer-uai
+  deployer-uai = var.deployer_tfstate.deployer_uai
 
   output-tf = jsondecode(var.output-json.content)
 

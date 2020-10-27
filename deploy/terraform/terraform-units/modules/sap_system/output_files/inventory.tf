@@ -120,7 +120,7 @@ resource "local_file" "ansible-inventory" {
     ips-web               = local.ips-web
     anydbnodes            = local.anydb_vms,
     ips-anydbnodes        = local.ips-anydbnodes,
-    deployers             = var.deployers
+    deployers             = local.deployers
     }
   )
   filename             = "${path.cwd}/ansible_config_files/hosts"
