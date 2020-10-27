@@ -26,15 +26,6 @@ variable "random-id" {
   description = "Random hex string"
 }
 
-variable "deployer-uai" {
-  description = "Details of the UAI used by deployer(s)"
-}
-
-variable "deployer_user" {
-  description = "Details of the users"
-  default     = []
-}
-
 variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
