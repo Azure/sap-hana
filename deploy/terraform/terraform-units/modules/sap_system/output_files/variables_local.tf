@@ -78,11 +78,14 @@ variable "any-database-info" {
   description = "Updated anydb database json"
 }
 
-variable "deployers" {
-  description = "Details of the deployer(s)"
+variable "deployer_tfstate" {
+  description = "Deployer tfstate file"
 }
 
 locals {
+  // Retrieve deployer information from tfstate file
+  deployers = var.deployer_tfstate.deployer
+
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
   ips-jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
@@ -146,5 +149,5 @@ locals {
       ]
     ])
     if adatabase != {}
-  ])
+  ]) 
 }

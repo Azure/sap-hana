@@ -7,11 +7,11 @@ output "vnet-sap" {
 }
 
 output "subnet-mgmt" {
-  value = var.subnet-mgmt
+  value = local.subnet-mgmt
 }
 
 output "nsg-mgmt" {
-  value = var.nsg-mgmt
+  value = local.nsg-mgmt
 }
 
 output "storage-bootdiag" {

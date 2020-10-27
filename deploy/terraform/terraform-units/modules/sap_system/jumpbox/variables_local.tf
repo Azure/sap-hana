@@ -26,11 +26,15 @@ variable "random-id" {
   description = "Random hex for creating unique Azure key vault name"
 }
 
-variable "deployer-uai" {
-  description = "Details of the UAI used by deployer(s)"
+variable "deployer_tfstate" {
+  description = "Deployer tfstate file"
 }
 
 locals {
+
+  // Retrieve deployer information from tfstate file
+  deployer-uai = var.deployer_tfstate.deployer-uai
+
   output-tf = jsondecode(var.output-json.content)
 
   # Linux jumpbox information

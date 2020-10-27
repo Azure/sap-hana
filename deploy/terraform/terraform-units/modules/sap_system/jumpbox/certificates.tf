@@ -20,7 +20,7 @@ resource "azurerm_key_vault" "key-vault" {
 
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = var.deployer-uai.principal_id
+    object_id = local.deployer-uai.principal_id
 
     certificate_permissions = [
       "create",

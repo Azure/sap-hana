@@ -3,17 +3,6 @@
   Setup common infrastructure
 */
 
-module "deployer" {
-  source         = "../../terraform-units/modules/sap_system/deployer"
-  application    = var.application
-  databases      = var.databases
-  infrastructure = var.infrastructure
-  jumpboxes      = var.jumpboxes
-  options        = var.options
-  software       = var.software
-  ssh-timeout    = var.ssh-timeout
-  sshkey         = var.sshkey
-}
 
 module "common_infrastructure" {
   source              = "../../terraform-units/modules/sap_system/common_infrastructure"
@@ -27,11 +16,8 @@ module "common_infrastructure" {
   ssh-timeout         = var.ssh-timeout
   sshkey              = var.sshkey
   subnet-sap-admin    = module.hdb_node.subnet-sap-admin
-  vnet-mgmt           = module.deployer.vnet-mgmt
-  subnet-mgmt         = module.deployer.subnet-mgmt
-  nsg-mgmt            = module.deployer.nsg-mgmt
-  deployer-uai        = module.deployer.deployer-uai
   service_principal   = local.service_principal
+  deployer_tfstate    = data.terraform_remote_state.deployer.outputs
   // Comment out code with users.object_id for the time being.
   // deployer_user       = module.deployer.deployer_user
 }
@@ -54,7 +40,7 @@ module "jumpbox" {
   output-json       = module.output_files.output-json
   ansible-inventory = module.output_files.ansible-inventory
   random-id         = module.common_infrastructure.random-id
-  deployer-uai      = module.deployer.deployer-uai
+  deployer_tfstate  = data.terraform_remote_state.deployer.outputs
 }
 
 // Create HANA database nodes
@@ -76,7 +62,6 @@ module "hdb_node" {
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
-  deployer-uai     = module.deployer.deployer-uai
   // Comment out code with users.object_id for the time being.
   // deployer_user    = module.deployer.deployer_user
 }
@@ -99,7 +84,6 @@ module "app_tier" {
   ppg              = module.common_infrastructure.ppg
   random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
-  deployer-uai     = module.deployer.deployer-uai
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
 }
@@ -153,6 +137,6 @@ module "output_files" {
   nics-anydb                   = module.anydb_node.nics-anydb
   any-database-info            = module.anydb_node.any-database-info
   anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
-  deployers                    = module.deployer.import_deployer
+  deployer_tfstate             = data.terraform_remote_state.deployer.outputs
   random-id                    = module.common_infrastructure.random-id
 }

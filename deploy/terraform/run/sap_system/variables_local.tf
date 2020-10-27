@@ -13,6 +13,14 @@ variable "scenario" {
   default     = "HANA Database"
 }
 
+variable "tfstate_resource_id" {
+  description = "Resource id of tfstate storage account"
+}
+
+variable "deployer_tfstate_key" {
+  description = "The key of deployer's remote tfstate file"
+}
+
 # Set defaults
 locals {
 
@@ -44,16 +52,13 @@ locals {
   // The environment of sap landscape and sap system
   environment = upper(try(var.infrastructure.environment, ""))
 
-  // Get deployer remote tfstate info
-  deployer_config = try(var.infrastructure.vnets.management, {})
-
   // Locate the tfstate storage account
-  tfstate_resource_id          = try(local.deployer_config.tfstate_resource_id, "")
+  tfstate_resource_id          = try(var.tfstate_resource_id, "")
   saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
   saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
   tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
   tfstate_container_name       = "tfstate"
-  deployer_tfstate_key         = try(local.deployer_config.deployer_tfstate_key, "")
+  deployer_tfstate_key         = try(var.deployer_tfstate_key, "")
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
   deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
@@ -70,6 +75,6 @@ locals {
     client_id       = local.spn.client_id,
     client_secret   = local.spn.client_secret,
     tenant_id       = local.spn.tenant_id,
-    object_id       = data.azuread_service_principal.sp.id 
+    object_id       = data.azuread_service_principal.sp.id
   }
 }

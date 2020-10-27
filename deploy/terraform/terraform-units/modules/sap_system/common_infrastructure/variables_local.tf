@@ -13,25 +13,14 @@ variable "subnet-sap-admin" {
   description = "Information about SAP admin subnet"
 }
 
-variable "vnet-mgmt" {
-  description = "Details about management vnet of deployer(s)"
-}
-
-variable "subnet-mgmt" {
-  description = "Details about management subnet of deployer(s)"
-}
-
-variable "nsg-mgmt" {
-  description = "Details about management nsg of deployer(s)"
+variable "deployer_tfstate" {
+  description = "Deployer remote tfstate file"
 }
 
 variable "service_principal" {
   description = "Current service principal used to authenticate to Azure"
 }
 
-variable "deployer-uai" {
-  description = "Details of the UAI used by deployer(s)"
-}
 /* Comment out code with users.object_id for the time being
 variable "deployer_user" {
   description = "Details of the users"
@@ -78,6 +67,12 @@ variable "region_mapping" {
 
 //Set defaults
 locals {
+
+  // Retrieve information about Deployer from tfstate file
+  deployer_tfstate = var.deployer_tfstate
+  vnet-mgmt        = local.deployer_tfstate.vnet_mgmt
+  subnet-mgmt      = local.deployer_tfstate.subnet_mgmt
+  nsg-mgmt         = local.deployer_tfstate.nsg_mgmt
 
   //Filter the list of databases to only HANA platform entries
   hana-databases = [

@@ -1,6 +1,6 @@
 /*
     Description:
-      Import deployer resources
+      Retrieve remote tfstate file of Deployer and current environment's SPN
 */
 
 data "terraform_remote_state" "deployer" {
