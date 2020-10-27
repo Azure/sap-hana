@@ -1,0 +1,27 @@
+---
+
+name:    'HANA 2.00.052'
+target:  'HANA 2.0'
+version: 001
+
+defaults:
+archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
+target_location: "/usr/sap/install/downloads/"
+
+materials:
+  media:
+  - name:     SAPCAR
+    version:  7.21
+    archive:  SAPCAR_1320-80000935.EXE
+
+  - name:     IMDB LCAPPS 2.052
+    archive:  IMDB_LCAPPS_2052_0-20010426.SAR
+
+  - name:     "SAP HANA Platform Edt. 2.0 SPS05 rev52 Linux x86_64"
+    version:  2.00.052
+    archive:  51054623.ZIP
+
+  templates:
+  - name:     HANA
+    version:  2.0
+    file:     hana2.0_v1.ini

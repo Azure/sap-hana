@@ -1,0 +1,27 @@
+---
+
+name:    'HANA 1.00.122'
+target:  'HANA 1.0'
+version: 001
+
+defaults:
+archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
+target_location: "/usr/sap/install/downloads/"
+
+materials:
+  media:
+  - name:     SAPCAR
+    version:  7.21
+    archive:  SAPCAR_1320-80000935.EXE
+
+  - name:     "LCAPPS for HANA 1.00.122.33 Build 100.46 PL 036"
+    archive:  IMDB_LCAPPS_122P_3300-20010426.SAR
+
+  - name:     "Maintenance Revision 122.33 (SPS12) for HANA DB 1.00"
+    version:  1.00.122
+    archive:  IMDB_SERVER100_122_33-10009569.SAR
+
+  templates:
+  - name:     HANA
+    version:  1.0
+    file:     hana1.0_v1.ini
