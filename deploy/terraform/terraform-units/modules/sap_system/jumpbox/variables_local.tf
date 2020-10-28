@@ -2,14 +2,6 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-mgmt" {
-  description = "Details of the management subnet"
-}
-
-variable "nsg-mgmt" {
-  description = "Details of the management NSG"
-}
-
 variable "storage-bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
@@ -34,6 +26,8 @@ locals {
 
   // Retrieve deployer information from tfstate file
   deployer-uai = var.deployer_tfstate.deployer_uai
+  subnet-mgmt  = var.deployer_tfstate.subnet_mgmt
+  nsg-mgmt     = var.deployer_tfstate.nsg_mgmt
 
   output-tf = jsondecode(var.output-json.content)
 

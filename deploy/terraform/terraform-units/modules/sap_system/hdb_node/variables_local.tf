@@ -2,14 +2,6 @@ variable "resource-group" {
   description = "Details of the resource group"
 }
 
-variable "subnet-mgmt" {
-  description = "Details of the management subnet"
-}
-
-variable "nsg-mgmt" {
-  description = "Details of the NSG for management subnet"
-}
-
 variable "vnet-sap" {
   description = "Details of the SAP VNet"
 }

@@ -36,6 +36,8 @@ resource "azurerm_network_security_rule" "webRule_internet" {
   network_security_group_name  = local.sub_web_nsg_deployed.name
 }
 
+/*
+   Comment out this nsg rule temporarily, because of peering between vnet-mgmt and vnet-sap, mgmt-subnet can access subnet-web by default.
 # NSG rule to open ports for Web dispatcher
 resource "azurerm_network_security_rule" "web" {
   count                        = local.enable_deployment ? (local.sub_web_nsg_exists ? 0 : length(local.nsg-ports.web)) : 0
@@ -51,3 +53,4 @@ resource "azurerm_network_security_rule" "web" {
   resource_group_name          = var.resource-group[0].name
   network_security_group_name  = local.sub_web_nsg_deployed.name
 }
+*/

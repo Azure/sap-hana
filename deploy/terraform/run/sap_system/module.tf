@@ -3,7 +3,6 @@
   Setup common infrastructure
 */
 
-
 module "common_infrastructure" {
   source              = "../../terraform-units/modules/sap_system/common_infrastructure"
   is_single_node_hana = "true"
@@ -34,8 +33,6 @@ module "jumpbox" {
   ssh-timeout       = var.ssh-timeout
   sshkey            = var.sshkey
   resource-group    = module.common_infrastructure.resource-group
-  subnet-mgmt       = module.common_infrastructure.subnet-mgmt
-  nsg-mgmt          = module.common_infrastructure.nsg-mgmt
   storage-bootdiag  = module.common_infrastructure.storage-bootdiag
   output-json       = module.output_files.output-json
   ansible-inventory = module.output_files.ansible-inventory
@@ -55,8 +52,6 @@ module "hdb_node" {
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
-  subnet-mgmt      = module.common_infrastructure.subnet-mgmt
-  nsg-mgmt         = module.common_infrastructure.nsg-mgmt
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
@@ -78,7 +73,6 @@ module "app_tier" {
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource-group   = module.common_infrastructure.resource-group
-  subnet-mgmt      = module.common_infrastructure.subnet-mgmt
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg

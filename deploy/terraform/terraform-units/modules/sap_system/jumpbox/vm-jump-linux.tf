@@ -30,7 +30,7 @@ resource "azurerm_network_interface" "jump-linux" {
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = var.subnet-mgmt.id
+    subnet_id                     = local.subnet-mgmt.id
     private_ip_address            = local.vm-jump-linux[count.index].private_ip_address
     private_ip_address_allocation = "static"
     public_ip_address_id          = azurerm_public_ip.jump-linux[count.index].id
@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "jump-linux" {
 resource "azurerm_network_interface_security_group_association" "jump-linux" {
   count                     = length(local.vm-jump-linux)
   network_interface_id      = azurerm_network_interface.jump-linux[count.index].id
-  network_security_group_id = var.nsg-mgmt.id
+  network_security_group_id = local.nsg-mgmt.id
 }
 
 # Manages Linux Virtual Machine for Linux jumpboxes

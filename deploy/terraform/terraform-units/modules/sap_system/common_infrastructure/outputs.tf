@@ -6,14 +6,6 @@ output "vnet-sap" {
   value = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap : azurerm_virtual_network.vnet-sap
 }
 
-output "subnet-mgmt" {
-  value = local.subnet-mgmt
-}
-
-output "nsg-mgmt" {
-  value = local.nsg-mgmt
-}
-
 output "storage-bootdiag" {
   value = azurerm_storage_account.storage-bootdiag
 }
