@@ -2,7 +2,11 @@
 
 ## Prerequisites
 
-1. HANA Media downloaded
+- HANA Media downloaded
+  - SAP Library contains all media for HANA installation
+- SAP HANA infrastructure has been deployed
+  - Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place)
+- Ensure prerequites RPM exist, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
 
 ## Inputs
 
@@ -61,13 +65,45 @@ Any additional components are not required at this stage as they do not affect t
 1. Upload the generated template files to the SAP Library:
    1. In the Azure Portal navigate to the `sapbits` file share
    1. Create a new `templates` directory under `sapbits`
-   1. Click Upload
-   1. In the panel on the right, click Select a file
+   1. Click "Upload"
+   1. In the panel on the right, click "Select a file"
    1. Navigate your workstation to the template generation directory `/tmp/hana_template`
    1. Select the generated templates, e.g. `hana_sp05_v001.params` and `hana_sp05_v001.paramas.xml`
-   1. Click Advanced to show the advanced options, and enter `templates` for the Upload Directory
-   1. Click Upload
+   1. Click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
+   1. Click "Upload"
+
+### Manual HANA Installation Using Template
+
+1. Connect to target VM for HANA installation as `root` user
+1. Follow the previsouly outlined [Process](#Process). In this instance "Workstation" is the SAP HANA Target VM.
+1. Replace varibles set in both inifiles
+1. Edit the `HANA_sp05_v001.params` file:
+   1. Update `components` to `all`
+   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
+   1. Update `sid` to `<HANA SID>` for example: `sid=HD1`
+   1. Update `number` to `<Instance Number>` for example: `number=00`
+1. Edit the `HANA_sp05_v001.params.xml` file, replacing the ansible variables with a password as below:
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!-- Replace the ansible varibles {{ }} with the password of minimum 8 charchters -->
+   <!-- Use the same password for each entery-->
+   <Passwords>
+       <root_password><![CDATA[masterpassw0rd]]></root_password>
+       <sapadm_password><![CDATA[masterpassw0rd]]></sapadm_password>
+       <master_password><![CDATA[masterpassw0rd]]></master_password>
+       <sapadm_password><![CDATA[masterpassw0rd]]></sapadm_password>
+       <password><![CDATA[masterpassw0rd]]></password>
+       <system_user_password><![CDATA[masterpassw0rd]]></system_user_password>
+       <streaming_cluster_manager_password><![CDATA[masterpassw0rd]]></streaming_cluster_manager_password>
+       <ase_user_password><![CDATA[masterpassw0rd]]></ase_user_password>
+       <org_manager_password><![CDATA[masterpassw0rd]]></org_manager_password>
+   </Passwords>
+
+1. Run the HANA installation:\
+   `cat HANA_sp05_v001.params.xml | SAP_HANA_DATABASE/hdblcm --read_password_from_stdin=xml -b --configfile=HANA_sp05_v001.params`
 
 ## Results and Outputs
 
 1. A completed `inifile.params` template uploaded to SAP library for SAP HANA install
+1. A working HANA instance ready for use in [Preparing App tier inifile](../app/prepare-ini.md)
