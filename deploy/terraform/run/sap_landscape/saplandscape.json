@@ -2,9 +2,6 @@
     "infrastructure": {
         "environment": "np",
         "region": "eastus",
-        "resource_group": {
-            "name": "azure-test-saplandscape-rg"
-        },
         "vnets": {
             "management": {
                 "tfstate_resource_id": "",
@@ -21,14 +18,6 @@
         "iscsi": {
             "iscsi_count": 3
         }
-    },
-    "databases": [
-        {
-            "platform": "NONE"
-        }
-    ],
-    "application": {
-        "enable_deployment": false
     },
     "sshkey": {},
     "options": {}

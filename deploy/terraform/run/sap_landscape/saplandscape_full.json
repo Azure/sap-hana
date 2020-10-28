@@ -24,14 +24,6 @@
             "iscsi_count": 3
         }
     },
-    "databases": [
-        {
-            "platform": "NONE"
-        }
-    ],
-    "application": {
-        "enable_deployment": false
-    },
     "sshkey": {},
     "options": {}
 }
