@@ -32,7 +32,7 @@ Any additional components are not required at this stage as they do not affect t
   -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
   ```
 
-1. Use the extracted `hdblcm` tool to generate an empty install template and password file using the Stack Version (e.g. `hana_sp05_v001`):\
+1. Use the extracted `hdblcm` tool to generate an empty install template and password file. The file name should reflect the Stack Version (e.g. `hana_sp05_v001`):\
   `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA_sp05_v001.params`
   **_Note:_** These two files will be used in the automated installation of the SAP HANA Database
 1. Edit the `HANA_sp05_v001.params` file:
@@ -75,7 +75,7 @@ Any additional components are not required at this stage as they do not affect t
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Follow the previsouly outlined [Process](#Process). In this instance "Workstation" is the SAP HANA Target VM.
+1. Ensure the `HANA_sp05_v001.params` and `HANA_sp05_v001.params.xml` files exists in `/tmp/hana_template`
 1. Replace varibles set in both inifiles
 1. Edit the `HANA_sp05_v001.params` file:
    1. Update `components` to `all`
