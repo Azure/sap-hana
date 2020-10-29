@@ -15,8 +15,8 @@ resource "local_file" "output-json" {
         os                   = jumpbox-windows.os,
         authentication       = jumpbox-windows.authentication,
         components           = jumpbox-windows.components,
-        private_ip_address   = local.ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
-        public_ip_address    = local.public-ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
+        private_ip_address   = local.ips_jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
+        public_ip_address    = local.public-ips_jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
         }
       ],
       "linux" = [for jumpbox-linux in var.jumpboxes-linux : {
@@ -27,8 +27,8 @@ resource "local_file" "output-json" {
         os                   = jumpbox-linux.os,
         authentication       = jumpbox-linux.authentication,
         components           = jumpbox-linux.components,
-        private_ip_address   = local.ips-jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
-        public_ip_address    = local.public-ips-jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
+        private_ip_address   = local.ips_jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
+        public_ip_address    = local.public-ips_jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
         }
       ]
     },
@@ -109,8 +109,8 @@ resource "local_file" "ansible-inventory" {
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips_iscsi             = local.ips_iscsi,
-    ips-jumpboxes-windows = local.ips-jumpboxes-windows,
-    ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
+    ips-jumpboxes-windows = local.ips_jumpboxes-windows,
+    ips-jumpboxes-linux   = local.ips_jumpboxes-linux,
     ips_dbnodes-admin     = local.ips_dbnodes-admin,
     ips_dbnodes-db        = local.ips_dbnodes-db,
     dbnodes               = local.hdb_vms,
@@ -135,8 +135,8 @@ resource "local_file" "ansible-inventory-yml" {
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips_iscsi             = local.ips_iscsi,
-    ips-jumpboxes-windows = local.ips-jumpboxes-windows,
-    ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
+    ips-jumpboxes-windows = local.ips_jumpboxes-windows,
+    ips-jumpboxes-linux   = local.ips_jumpboxes-linux,
     ips_dbnodes-admin     = local.ips_dbnodes-admin,
     ips_dbnodes-db        = local.ips_dbnodes-db,
     dbnodes               = local.hdb_vms,
