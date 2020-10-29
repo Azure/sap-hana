@@ -6,6 +6,9 @@ steps:
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh
 
+      echo "=== Login using pipeline spn ==="
+      az login --service-principal -u $(hana-pipeline-spn-id) -p $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+
       saplandscape_rg=${{parameters.saplandscape_rg_name}}
       sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
       repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
