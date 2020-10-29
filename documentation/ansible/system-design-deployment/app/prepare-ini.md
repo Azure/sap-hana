@@ -101,11 +101,14 @@ Logon users: [root]
 1. Connect to the SCS VM as `root` User
 1. Launch SCS Unattended install replacing `<target vm hostname>` with the SCS VM hostname:
 
-    ```bash
+     ```bash
     root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
     SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
     SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params
+    SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAPHA
+    SAPINST_START_GUI=false
+    SAPINST_START_GUISERVER=false
     ```
 
 #### Manual DB Content Load Using Template
