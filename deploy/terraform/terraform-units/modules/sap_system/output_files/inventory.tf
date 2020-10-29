@@ -5,7 +5,7 @@
 # Generates the output JSON with IP address and disk details
 resource "local_file" "output-json" {
   content = jsonencode({
-    "infrastructure" = merge(var.infrastructure_w_defaults, { "iscsi" = { "iscsi_nic_ips" = [local.ips-iscsi] } })
+    "infrastructure" = merge(var.infrastructure_w_defaults, { "iscsi" = { "iscsi_nic_ips" = [local.ips_iscsi] } })
     "jumpboxes" = {
       "windows" = [for jumpbox-windows in var.jumpboxes.windows : {
         name                 = jumpbox-windows.name,
@@ -47,13 +47,13 @@ resource "local_file" "output-json" {
           components        = database.components,
           xsa               = database.xsa,
           shine             = database.shine,
-          nodes = [for ip-dbnode-admin in local.ips-dbnodes-admin : {
+          nodes = [for ip-dbnode-admin in local.ips_dbnodes-admin : {
             // Hostname is required for Ansible, therefore set dbname from resource name to hostname
-            dbname       = replace(local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].name, "_", "")
+            dbname       = replace(local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].name, "_", "")
             ip_admin_nic = ip-dbnode-admin,
-            ip_db_nic    = local.ips-dbnodes-db[index(local.ips-dbnodes-admin, ip-dbnode-admin)]
-            role         = local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].role
-            } if local.hdb_vms[index(local.ips-dbnodes-admin, ip-dbnode-admin)].platform == database.platform
+            ip_db_nic    = local.ips_dbnodes-db[index(local.ips_dbnodes-admin, ip-dbnode-admin)]
+            role         = local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].role
+            } if local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].platform == database.platform
           ],
           loadbalancer = {
             frontend_ip = var.loadbalancers[0].private_ip_address
@@ -71,12 +71,12 @@ resource "local_file" "output-json" {
           high_availability = database.high_availability,
           authentication    = database.authentication,
           credentials       = database.credentials,
-          nodes = [for ip-anydbnode in local.ips-anydbnodes : {
+          nodes = [for ip-anydbnode in local.ips_anydbnodes : {
             # Check for maximum length and for "_"
-            dbname    = substr(replace(local.anydb_vms[index(local.ips-anydbnodes, ip-anydbnode)].name, "_", ""), 0, 13)
-            ip_db_nic = local.ips-anydbnodes[index(local.ips-anydbnodes, ip-anydbnode)],
-            role      = local.anydb_vms[index(local.ips-anydbnodes, ip-anydbnode)].role
-            } if upper(local.anydb_vms[index(local.ips-anydbnodes, ip-anydbnode)].platform) == upper(database.platform)
+            dbname    = substr(replace(local.anydb_vms[index(local.ips_anydbnodes, ip-anydbnode)].name, "_", ""), 0, 13)
+            ip_db_nic = local.ips_anydbnodes[index(local.ips_anydbnodes, ip-anydbnode)],
+            role      = local.anydb_vms[index(local.ips_anydbnodes, ip-anydbnode)].role
+            } if upper(local.anydb_vms[index(local.ips_anydbnodes, ip-anydbnode)].platform) == upper(database.platform)
           ],
           loadbalancer = {
             frontend_ip = var.anydb-loadbalancers[0].private_ip_address
@@ -108,18 +108,18 @@ resource "local_file" "ansible-inventory" {
     iscsi                 = var.infrastructure_w_defaults.iscsi,
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
-    ips-iscsi             = local.ips-iscsi,
+    ips_iscsi             = local.ips_iscsi,
     ips-jumpboxes-windows = local.ips-jumpboxes-windows,
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
-    ips-dbnodes-admin     = local.ips-dbnodes-admin,
-    ips-dbnodes-db        = local.ips-dbnodes-db,
+    ips_dbnodes-admin     = local.ips_dbnodes-admin,
+    ips_dbnodes-db        = local.ips_dbnodes-db,
     dbnodes               = local.hdb_vms,
     application           = var.application,
-    ips-scs               = local.ips-scs,
-    ips-app               = local.ips-app,
-    ips-web               = local.ips-web
+    ips_scs               = local.ips_scs,
+    ips_app               = local.ips_app,
+    ips_web               = local.ips_web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes,
+    ips_anydbnodes        = local.ips_anydbnodes,
     deployers             = var.deployers
     }
   )
@@ -134,18 +134,18 @@ resource "local_file" "ansible-inventory-yml" {
     iscsi                 = var.infrastructure_w_defaults.iscsi,
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
-    ips-iscsi             = local.ips-iscsi,
+    ips_iscsi             = local.ips_iscsi,
     ips-jumpboxes-windows = local.ips-jumpboxes-windows,
     ips-jumpboxes-linux   = local.ips-jumpboxes-linux,
-    ips-dbnodes-admin     = local.ips-dbnodes-admin,
-    ips-dbnodes-db        = local.ips-dbnodes-db,
+    ips_dbnodes-admin     = local.ips_dbnodes-admin,
+    ips_dbnodes-db        = local.ips_dbnodes-db,
     dbnodes               = local.hdb_vms,
     application           = var.application,
-    ips-scs               = local.ips-scs,
-    ips-app               = local.ips-app,
-    ips-web               = local.ips-web
+    ips_scs               = local.ips_scs,
+    ips_app               = local.ips_app,
+    ips_web               = local.ips_web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes,
+    ips_anydbnodes        = local.ips_anydbnodes,
     deployers             = var.deployers
     }
   )
