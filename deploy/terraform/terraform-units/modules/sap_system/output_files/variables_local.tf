@@ -115,8 +115,8 @@ locals {
   ips_iscsi                    = var.nics-iscsi[*].private_ip_address
   ips_jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
   ips_jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
-  public-ips_jumpboxes-windows = var.public-ips_jumpboxes-windows[*].ip_address
-  public-ips_jumpboxes-linux   = var.public-ips_jumpboxes-linux[*].ip_address
+  public-ips_jumpboxes-windows = var.public-ips-jumpboxes-windows[*].ip_address
+  public-ips_jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
   ips_dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
   ips_dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
   databases = [
@@ -154,7 +154,7 @@ locals {
   ips_app = [for key, value in local.ips_primary_app : value.private_ip_address]
   ips_web = [for key, value in local.ips_primary_web : value.private_ip_address]
 
-  ips_primary_anydb = length(var.var.nics_anydb_admin) > 0 ? var.nics_anydb_admin : var.nics_anydb
+  ips_primary_anydb = length(var.nics_anydb_admin) > 0 ? var.nics_anydb_admin : var.nics_anydb
   ips_anydbnodes = [for key, value in local.ips_primary_anydb : value.private_ip_address]
   
   anydatabases = [
