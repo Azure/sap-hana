@@ -248,10 +248,10 @@ The order of entries in the `media` section does not matter. However, for improv
 1. From the correct Azure storage account, navigate to "File shares", then to "sapbits".
 1. For the `boms` folder in sapbits:
    1. Click the correct BoM folder name in the portal to open. In this example, that would be `S4HANA_1909_SP2_v001`.
-   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2.00.052_v001`, then:
+   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2_00_052_v001`, then:
    1. Click "Upload" and select the `bom.yml` file for upload.
    1. Click "Upload".
 
 ## Results and Outputs
 
-1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2.00.052_v001/bom.yml`.
+1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2_00_052_v001/bom.yml`.

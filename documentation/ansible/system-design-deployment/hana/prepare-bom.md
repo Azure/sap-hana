@@ -7,11 +7,11 @@
 1. SAP HANA media present on the Storage Account.
 1. You have completed the download of `myDownloadBasketFiles.txt` to your workstation.
 
-Your working folder should look something like this, although the folder name `HANA2.00.052_v001`, will be replaced with a similar name for the product you are building:
+Your working folder should look something like this, although the folder name `HANA2_00_052_v001`, will be replaced with a similar name for the product you are building:
 
 ```text
    .
-   └── HANA2.00.052_v001
+   └── HANA2_00_052_v001
        └── stackfiles
            └── myDownloadBasketFiles.txt
 ```
@@ -23,11 +23,11 @@ Your working folder should look something like this, although the folder name `H
 
 ## Process
 
-1. Within the `HANA2.00.052_v001` folder, create an empty text file called `bom.yml`.
+1. Within the `HANA2_00_052_v001` folder, create an empty text file called `bom.yml`.
 
    ```text
    .
-   └── HANA2.00.052_v001
+   └── HANA2_00_052_v001
        ├── bom.yml      <-- BoM content will go in here
        └── stackfiles
            └── myDownloadBasketFiles.txt
@@ -35,7 +35,7 @@ Your working folder should look something like this, although the folder name `H
 
 ### Example Partial BoM File
 
-An example of a small part of a BoM file for S/4HANA 1909 SP2. The `[x]` numbered sections are covered in the following documentation. Note that `v001` is a sequential number used to indicate the internal (non-SAP) version of the files included.
+An example of a small part of a BoM file for HANA2.0. The `[x]` numbered sections are covered in the following documentation. Note that `v001` is a sequential number used to indicate the internal (non-SAP) version of the files included.
 
 ```text
 step|BoM Content
@@ -151,10 +151,10 @@ The order of entries in the `media` section does not matter. However, for improv
 
 1. From the correct Azure storage account, navigate to "File shares", then to "sapbits".
 1. For the `boms` folder in sapbits:
-   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2.00.052_v001`, then:
+   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2_00_052_v001`, then:
    1. Click "Upload" and select the `bom.yml` file for upload.
    1. Click "Upload".
 
 ## Results and Outputs
 
-1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2.00.052_v001/bom.yml`.
+1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2_00_052_v001/bom.yml`.
