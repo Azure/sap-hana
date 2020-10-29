@@ -2,28 +2,16 @@
 
 :hand: The process documented here is sufficient to produce a functional BoM. However, it does not include steps for including SAP "permalinks" to media.
 
-The process for generating a BoM which includes those is more complex and has additional acquisition steps which must be done before the SAP Download Manager is run. The process is documented [here](prepare-app-full-bom.md) for reference.
+The process for generating a BoM which includes those is more complex and has additional acquisition steps which must be done during [Acquisition of Media](acquire-media.md) and before the SAP Download Manager is run. The process is documented [here](prepare-app-full-bom.md) for reference.
 
 ## Prerequisites
 
 1. Microsoft Excel for viewing the Excel stack file spreadsheet.
 1. An editor for creating the SAP Application BoM file.
-1. Application installation template(s) for SCS and/or PAS/AAS.
+1. Application installation template(s) for SCS and/or PAS/AAS uploaded to the Storage Account.
 1. SAP Application media present on the Storage Account.
 1. You have completed the downloading of associated stack files to your workstation's `stackfiles` folder.
-
-Your working folder should look something like this, although the folder name `S4HANA_1909_SP2_v001`, will be replaced with a similar name for the product you are building and `xxx` will be a variable component of each name:
-
-```text
-   .
-   └── S4HANA_1909_SP2_v001
-       └── stackfiles
-           ├── MP_Excel_xxx.xls
-           ├── MP_Plan_xxx.pdf
-           ├── MP_Stack_xxx.txt
-           ├── MP_Stack_xxx.xml
-           └── myDownloadBasketFiles.txt
-```
+1. An empty folder in which to create the BoM file.
 
 ## Inputs
 

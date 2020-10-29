@@ -5,7 +5,6 @@
 1. An editor for creating the HANA BoM file.
 1. A HANA installation template uploaded to the Storage Account.
 1. SAP HANA media present on the Storage Account.
-1. You have completed the download of `myDownloadBasketFiles.txt` to your workstation.
 1. An empty folder in which to create the BoM file.
 
 ## Inputs
