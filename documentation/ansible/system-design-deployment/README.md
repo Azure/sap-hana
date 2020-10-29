@@ -27,8 +27,8 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
    1. [Acquisition of Media](./hana/acquire-media.md)
 1. **Preparation**
    1. [Upload of Installation Media](./hana/prepare-sap-library.md)
-   1. [Generate Installation Templates](./hana/prepare-ini.md)
    1. [Generate Bill of Materials](./hana/prepare-bom.md)
+   1. [Generate Installation Templates](./hana/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
 
@@ -38,8 +38,8 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
    1. [Acquisition of Media](./app/acquire-media.md)
 1. **Preparation**
    1. [Upload of Installation Media](./app/prepare-sap-library.md)
-   1. [Generate Installation Templates](./app/prepare-ini.md)
    1. [Generate Bill of Materials](./app/prepare-bom.md)
+   1. [Generate Installation Templates](./app/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP HANA SID](./app/deploy-sid.md)
 
