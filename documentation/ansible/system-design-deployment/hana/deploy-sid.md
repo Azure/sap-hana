@@ -2,22 +2,21 @@
 
 ## Prerequisites
 
-- Bootstrap infrastructure has been deployed
-- Bootstrap infrastructure has been configured
-  - Deployer has been configured with working Ansible
-  - SAP Library contains all media for the relevant BoM
-- SAP infrastructure has been deployed
-  - SAP Library contains all Terraform state files for the environment
-  - Deployer has Ansible connectivity to SAP Infrastructure (e.g. SSH keys in place/available via key vault)
-  - Ansible inventory has been created
+1. Bootstrap infrastructure has been deployed
+1. Bootstrap infrastructure has been configured
+1. Deployer has been configured with working Ansible
+1. SAP Library contains all media for the relevant BoM
+1. SAP infrastructure has been deployed
+1. SAP Library contains all Terraform state files for the environment
+1. Deployer has Ansible connectivity to SAP Infrastructure (e.g. SSH keys in place/available via key vault)
+1. Ansible inventory has been created
 
 ## Inputs
 
-- Populated BoM file
-- Ansible inventory that details deployed SAP Infrastructure
-  - Note: Inventory contents and format TBD, but may contain reference to the SAP Library
-- SID (likely to exist in Ansible inventory in some form)
-- Unattended install template
+1. Populated BoM file
+1. Ansible inventory that details deployed SAP Infrastructure. **Note:** Inventory contents and format TBD, but may contain reference to the SAP Library
+1. SID (likely to exist in Ansible inventory in some form)
+1. Unattended install template
 
 ## Process
 
@@ -45,5 +44,5 @@
 
 ## Results and Outputs
 
-- SAP HANA has been deployed and running
-- Connection details/credentials so the Basis Administrator can configure HANA DB Client
+1. SAP HANA has been deployed and running
+1. Connection details/credentials so the Basis Administrator can configure HANA DB Client
