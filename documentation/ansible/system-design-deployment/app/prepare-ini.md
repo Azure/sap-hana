@@ -6,7 +6,6 @@
 - SAP Library contains all media for the relevant applications
 - SAP infrastructure has been deployed
   - Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place)
-  - 128GB data disk attached and mounted to target SAP VM this process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/attach-disk-portal)
   - Browser connectivity between workstation and target SAP VM
 
 ## Inputs
