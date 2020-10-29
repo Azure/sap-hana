@@ -53,10 +53,7 @@ sapbits
 |   |   |-- stackfiles/
 |   |   |   |-- myDownloadBasketFiles.txt
 |   |
-|   |-- BW4HANA_SP04_v001/
-|   |   |-- ...
-|   |
-|   |-- BW4HANA_SP05_v002/
+|   |-- SAP BW/4HANA_2_0_v002/
 |       |-- ...
 |
 |-- templates/
@@ -66,8 +63,6 @@ sapbits
 
 **_Notes:_**
 
-1. To prevent duplication, the Installation Media and Tools for all systems designed will be kept in a single flat `archives` directory.
-1. The Bill of Materials (bom.yml) and template files (.ini) are created in the follow-on steps from this process.
 1. Stack files are made unique by an index, e.g. `MP_<type>_<index>_<date>_<???>.<filetype>` where `<type>` is Stack, Plan, or Excel, `<index>` is a 10 digit integer, `<date>` is in format yyyymmdd, `<???>` is SWC for the Excel type and empty for the rest, and `<filetype>` is xls for type Excel, pdf for type Plan, and txt or xml for type Stack.
 1. The text file containing the download URL hardlinks is always named `myDownloadBasketFiles.txt`, so is not unique and should be stored in the BoM directory it relates to.
 

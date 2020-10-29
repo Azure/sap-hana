@@ -3,37 +3,17 @@
 ## Prerequisites
 
 1. An editor for creating the HANA BoM file.
-1. A HANA installation template.
+1. A HANA installation template uploaded to the Storage Account.
 1. SAP HANA media present on the Storage Account.
 1. You have completed the download of `myDownloadBasketFiles.txt` to your workstation.
-
-Your working folder should look something like this, although the folder name `HANA2_00_052_v001`, will be replaced with a similar name for the product you are building:
-
-```text
-   .
-   └── HANA2_00_052_v001
-       └── stackfiles
-           └── myDownloadBasketFiles.txt
-```
+1. An empty folder in which to create the BoM file.
 
 ## Inputs
 
 1. List of archive media for this version of HANA.
 1. `ini` template for installing this version of HANA.
 
-## Process
-
-1. Within the `HANA2_00_052_v001` folder, create an empty text file called `bom.yml`.
-
-   ```text
-   .
-   └── HANA2_00_052_v001
-       ├── bom.yml      <-- BoM content will go in here
-       └── stackfiles
-           └── myDownloadBasketFiles.txt
-   ```
-
-### Example Partial BoM File
+## Example Partial BoM File
 
 An example of a small part of a BoM file for HANA2.0. The `[x]` numbered sections are covered in the following documentation. Note that `v001` is a sequential number used to indicate the internal (non-SAP) version of the files included.
 
@@ -42,7 +22,7 @@ step|BoM Content
     |
     |---
     |
-[1] |name:    'HANA 2.00.052'
+[1] |name:    'HANA2_00_052_v001'
 [2] |target:  'HANA 2.0'
 [3] |version: 001
     |
@@ -61,17 +41,26 @@ step|BoM Content
     |
     |    - name:     HANA 2.0
     |      version:  2.00.052
-    |      archive:  XXX.ZIP
+    |      archive:  51054623.ZIP
     |
 [7] |  templates:
     |    - name:     HANA
-    |      version:  2.0
-    |      file:     hana2.0_v1.ini
+    |      version:  001
+    |      file:     HANA2_00_052_v001
 ```
+
+## Process
+
+1. Within your working folder, create an empty text file called `bom.yml`.
+
+   ```text
+   .
+   └── bom.yml      <-- BoM content will go in here
+   ```
 
 ### Create BoM Header
 
-1. `[1]` and `[2]`: Record appropriate names for the build and target.
+1. `[1]` and `[2]`: Record appropriate names for the build and target. The `name` should be the same as that recorded in the Storage Account under `sapbits/boms`.
 
 ### Define BoM Version
 
@@ -91,7 +80,7 @@ step|BoM Content
 
 1. `[6]`: Specify `media:` exactly as shown.
 
-1. Using **your editor**, for each item in your Download Basket, provide a suitable, descriptive name, together with the filename as `- name` and `archive` respectively into your `bom.yml` file. :information_source: The `version` property is optional.
+1. Using your editor, for each item in your Download Basket, provide a suitable, descriptive name and filename as `- name` and `archive` respectively into your `bom.yml` file. :information_source: The `version` property is optional.
 
    ```text
    - name:     SAPCAR
@@ -103,25 +92,25 @@ step|BoM Content
 
    - name:     HANA 2.0
      version:  2.00.052
-     archive:  XXX.ZIP
+     archive:  51054623.ZIP
    ```
 
 ### Override Target Destination
 
-Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis.
+Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis, although this is not normally necessary.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
 
    ```text
    - name:     HANA 2.0
      version:  2.00.052
-     archive:  XXX.ZIP
+     archive:  51054623.ZIP
      override_target_location: "/usr/sap/install/database/"
    ```
 
 ### Override Target Filename
 
-By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis.
+By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example:
 
@@ -138,13 +127,15 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [7]: Create a `templates` section as shown, with the correct template name. Note that the `version` is optional. For example:
+1. [7]: Create a `templates` section as shown, with the correct template name. Note that the extensions `.params` and `.params.xml` are not specified.
+
+   :information_source: The `version` is optional. For example:
 
    ```text
      templates:
        - name:     HANA
-         version:  2.0
-         file:     hana2.0_v1.ini
+         version:  001
+         file:     HANA2_00_052_v001
    ```
 
 ### Upload Files to Archive Location
@@ -152,7 +143,7 @@ The order of entries in the `media` section does not matter. However, for improv
 1. From the correct Azure storage account, navigate to "File shares", then to "sapbits".
 1. For the `boms` folder in sapbits:
    1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2_00_052_v001`, then:
-   1. Click "Upload" and select the `bom.yml` file for upload.
+   1. Click "Upload" and select the `bom.yml` file from your workstation for upload.
    1. Click "Upload".
 
 ## Results and Outputs
