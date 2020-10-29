@@ -2,26 +2,28 @@
 
 ## Prerequisites
 
-- [HANA DB Deployment](../hana/prepare-ini.md) must be completed before following this process.
-- SAP Library contains all media for the relevant applications
-- SAP infrastructure has been deployed
-  - Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place)
-  - Browser connectivity between workstation and target SAP VM
+1. [HANA DB Deployment](../hana/prepare-ini.md) must be completed before following this process;
+1. SAP Library contains all media for the relevant applications;
+1. SAP infrastructure has been deployed;
+1. Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place);
+1. Browser connectivity between workstation and target SAP VM.
 
 ## Inputs
 
-- SAP Library to be prepared with the SAP Media
+1. SAP Library prepared with the SAP Media.
 
 ## Process
 
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user
-1. Ensure a directory is mounted to a large enough file system to copy the `sapbits` Azure file share contents to. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/attach-disk-portal)
-1. On your target server, create a temporary directory to copy the SAP media to:
-`mkdir /tmp/app_templates`
-1. Mount the `sapbits` Azure file share to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-linux)
-1. Copy the media from `sapbits/` to the directory created in step 2:\
+1. Ensure a file system eith enough space is mounted to copy the required `sapbits` Azure file share contents to. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/attach-disk-portal)
+1. On your target server, create a temporary directory to copy the SAP media to. For example: `mkdir /tmp/app_templates`
+1. Mount the `sapbits` Azure file share to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-linux). Detailed instructions for the `sapbits` file share can be found by clicking `Connect` from the Azure Portal `sapbits` Overview:
+
+   ![sapbits connect details](../images/sapbits-connect.png)
+
+1. Copy the required media from `sapbits/archive/` to the directory created in step 2:\
 `cp /mnt/<sapbits fileshare path> /datadrive`
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
 `chmod +x /datadrive/archives/SAPCAR_1311-80000935.EXE`
