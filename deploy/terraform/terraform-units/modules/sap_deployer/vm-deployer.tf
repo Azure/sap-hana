@@ -12,7 +12,7 @@ data azurerm_client_config "current" {}
 // Public IP addresse and nic for Deployer
 resource "azurerm_public_ip" "deployer" {
   count               = length(local.deployers)
-  name                = format("%s_%s%s", local.prefix, local.deployers[count.index].name, local.resource_suffixes.pip)
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.pip)
   location            = azurerm_resource_group.deployer[0].location
   resource_group_name = azurerm_resource_group.deployer[0].name
   allocation_method   = "Static"
@@ -20,7 +20,7 @@ resource "azurerm_public_ip" "deployer" {
 
 resource "azurerm_network_interface" "deployer" {
   count               = length(local.deployers)
-  name                = format("%s_%s%s", local.prefix, local.deployers[count.index].name, local.resource_suffixes.nic)
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.nic)
   location            = azurerm_resource_group.deployer[0].location
   resource_group_name = azurerm_resource_group.deployer[0].name
 
@@ -57,7 +57,7 @@ resource "azurerm_role_assignment" "sub_user_admin" {
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
-  name                            = format("%s_%s%s", local.prefix, local.deployers[count.index].name, local.resource_suffixes.vm)
+  name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.vm)
   computer_name                   = local.deployers[count.index].name
   location                        = azurerm_resource_group.deployer[0].location
   resource_group_name             = azurerm_resource_group.deployer[0].name
@@ -68,7 +68,7 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   disable_password_authentication = local.deployers[count.index].authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.deployers[count.index].name, local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = local.deployers[count.index].disk_type
   }

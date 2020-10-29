@@ -22,14 +22,14 @@ locals {
 
   anydb_vm_names = [for idx in range(var.db_server_count) :
     local.zonal_deployment ? (
-      format("%sd%s_z%s_%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), var.db_zones[idx % length(var.db_zones)], idx, 0, local.random_id_vm_verified)) : (
+      format("%sd%s%sz%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), local.separator, var.db_zones[idx % length(var.db_zones)], local.separator, idx, 0, local.random_id_vm_verified)) : (
       format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx, 0, local.random_id_vm_verified)
     )
   ]
 
   anydb_vm_names_ha = [for idx in range(var.db_server_count) :
     local.zonal_deployment ? (
-      format("%sd%s_z%s_%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), var.db_zones[idx % length(var.db_zones)], idx, 1, local.random_id_vm_verified)) : (
+      format("%sd%s%sz%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), local.separator, var.db_zones[idx % length(var.db_zones)], local.separator, idx, 1, local.random_id_vm_verified)) : (
       format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx, 1, local.random_id_vm_verified)
     )
   ]
@@ -40,7 +40,7 @@ locals {
 
   app_server_vm_names = [for idx in range(var.app_server_count) :
     local.zonal_deployment ? (
-      format("%sapp_z%s_%02d%s%s", lower(var.sap_sid), var.app_zones[idx % length(var.app_zones)], idx, local.app_oscode, local.random_id_vm_verified)) : (
+      format("%sapp%sz%s%s%02d%s%s", lower(var.sap_sid), local.separator, var.app_zones[idx % length(var.app_zones)], local.separator, idx, local.app_oscode, local.random_id_vm_verified)) : (
       format("%sapp%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
     )
   ]
@@ -59,14 +59,14 @@ locals {
 
   hana_server_vm_names = [for idx in range(var.db_server_count) :
     local.zonal_deployment ? (
-      format("%sd%s_z%s_%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), var.db_zones[idx % length(var.db_zones)], idx, 0, local.random_id_vm_verified)) : (
+      format("%sd%s%sz%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), local.separator, var.db_zones[idx % length(var.db_zones)], local.separator, idx, 0, local.random_id_vm_verified)) : (
       format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx, 0, local.random_id_vm_verified)
     )
   ]
 
   hana_server_vm_names_ha = [for idx in range(var.db_server_count) :
     local.zonal_deployment ? (
-      format("%sd%s_z%s_%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), var.db_zones[idx % length(var.db_zones)], idx, 1, local.random_id_vm_verified)) : (
+      format("%sd%s%sz%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), local.separator, var.db_zones[idx % length(var.db_zones)], local.separator, idx, 1, local.random_id_vm_verified)) : (
       format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx, 1, local.random_id_vm_verified)
     )
   ]
@@ -77,7 +77,7 @@ locals {
 
   scs_server_vm_names = [for idx in range(var.scs_server_count) :
     local.zonal_deployment ? (
-      format("%sscs_z%s_%02d%s%s", lower(var.sap_sid), var.scs_zones[idx % length(var.scs_zones)], idx, local.app_oscode, local.random_id_vm_verified)) : (
+      format("%sscs%sz%s%s%02d%s%s", lower(var.sap_sid), local.separator, var.scs_zones[idx % length(var.scs_zones)], local.separator, idx, local.app_oscode, local.random_id_vm_verified)) : (
       format("%sscs%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
     )
   ]
@@ -88,7 +88,7 @@ locals {
 
   web_server_vm_names = [for idx in range(var.scs_server_count) :
     local.zonal_deployment ? (
-      format("%sweb_z%s_%02d%s%s", lower(var.sap_sid), var.web_zones[idx % length(var.web_zones)], idx, local.app_oscode, local.random_id_vm_verified)) : (
+      format("%sweb%sz%s%s%02d%s%s", lower(var.sap_sid), local.separator, var.web_zones[idx % length(var.web_zones)], local.separator, idx, local.app_oscode, local.random_id_vm_verified)) : (
       format("%sweb%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
     )
   ]

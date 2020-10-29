@@ -49,7 +49,7 @@ iSCSI device IP address range: .4 -
 # Creates the NIC and IP address for iSCSI device
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi_count
-  name                = format("%s_%s%s", local.prefix, local.virtualmachine_names[count.index], local.resource_suffixes.nic)
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.nic)
   location            = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
 
@@ -71,7 +71,7 @@ resource "azurerm_network_interface_security_group_association" "iscsi" {
 # Manages Linux Virtual Machine for iSCSI
 resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi_count
-  name                            = format("%s_%s%s", local.prefix, local.virtualmachine_names[count.index], local.resource_suffixes.vm)
+  name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name                   = local.virtualmachine_names[count.index]
   location                        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
   resource_group_name             = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
@@ -82,7 +82,7 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   disable_password_authentication = local.iscsi.authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }

@@ -238,25 +238,25 @@ variable resource_suffixes {
 variable app_zones {
   type        = list(string)
   description = "List of availability zones for application tier"
-  default = []
+  default     = []
 }
 
 variable scs_zones {
   type        = list(string)
   description = "List of availability zones for scs tier"
-  default = []
+  default     = []
 }
 
 variable web_zones {
   type        = list(string)
   description = "List of availability zones for web tier"
-  default = []
+  default     = []
 }
 
 variable db_zones {
   type        = list(string)
   description = "List of availability zones for db tier"
-  default = []
+  default     = []
 }
 
 
@@ -272,6 +272,10 @@ locals {
   random_id_vm_verified = lower(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))
 
   zones            = distinct(concat(var.db_zones, var.app_zones, var.scs_zones, var.web_zones))
-  zonal_deployment = try(length(local.zones),0) > 0 ? true : false
+  zonal_deployment = try(length(local.zones), 0) > 0 ? true : false
+
+  //The separator to use between the prefix and resource name
+  separator = "_"
+
 }
 

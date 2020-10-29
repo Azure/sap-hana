@@ -134,7 +134,7 @@ locals {
   shine                  = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
   dbnodes = flatten([[for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s_%s%s", local.prefix, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
     computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
     role         = try(dbnode.role, "worker")
     admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
@@ -142,7 +142,7 @@ locals {
     }
     ],
     [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%s_%s%s", local.prefix, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+      name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
       computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
       role         = try(dbnode.role, "worker")
       admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
