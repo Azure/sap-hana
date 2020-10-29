@@ -17,23 +17,24 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user
-1. On your target server, create a temporary directory to copy the SAP media to:\
+1. Ensure a directory is mounted to a large enough file system to copy the `sapbits` Azure file share contents to. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/attach-disk-portal)
+1. On your target server, create a temporary directory to copy the SAP media to:
 `mkdir /tmp/app_templates`
 1. Mount the `sapbits` Azure file share to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-linux)
-1. Copy the media from `sapbits/archives` to your temporary dir `/tmp/app_templates`:\
-`cp /mnt/<sapbits fileshare path> /tmp/app_templates`
+1. Copy the media from `sapbits/` to the directory created in step 2:\
+`cp /mnt/<sapbits fileshare path> /datadrive`
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
-`chmod +x /tmp/app_templates/SAPCAR_1311-80000935.EXE`
-1. Make and change to a temporary directory:\
-`mkdir /tmp/app_templates; cd $_`
+`chmod +x /datadrive/archives/SAPCAR_1311-80000935.EXE`
 1. Ensure `/usr/sap/install/SWPM/`exists and extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE` here(SAR file version may change depending on your downloads):\
-`/tmp/app_templates/SAPCAR_1311-80000935.EXE -xf /tmp/app_templates/SWPM20SP07_0-80003424.SAR -R /usr/sap/SWPM/`
-1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner
-1. Ensure `/usr/sap/downloads/` exists
+`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf /datadrive/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/SWPM/`
+1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:\
+`mkdir -p "/usr/sap/install/config" && cp /datadrive/BoMs/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
+1. Ensure `/usr/sap/downloads/` exists:\
+`mkdir /usr/sap/downloads/`
 1. Extract `SAPEXE_200-80004393.SAR` using `SAPCAR.EXE` to `/usr/sap/downloads/`:\
-`/tmp/app_templates/SAPCAR_1311-80000935.EXE  -xf /tmp/app_templates/SAPCAR_1311-80000935.EXE SAPEXE_200-80004393.SAR -R /usr/sap/downloads/`
+`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf SAPEXE_200-80004393.SAR -R /usr/sap/downloads/`
 1. Extract `SAPHOSTAGENT49_49-20009394.SAR` using `SAPCAR.EXE` to `/usr/sap/downloads/`:\
-`/tmp/app_templates/SAPCAR_1311-80000935.EXE  -xf /tmp/app_templates/SAPCAR_1311-80000935.EXE SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`.
+`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf SAPHOSTAGENT49_49-20009394.SAR -R usr/sap/downloads/`.
 1. Follow the instructions bellow to generate each ini template
 
 ### Generating unattended installation inifile for ASCS
