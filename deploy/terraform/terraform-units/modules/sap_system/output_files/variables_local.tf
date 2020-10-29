@@ -70,6 +70,7 @@ variable "nics-anydb" {
 variable "random-id" {
   description = "Random hex string"
 }
+
 variable "anydb-loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
@@ -78,13 +79,7 @@ variable "any-database-info" {
   description = "Updated anydb database json"
 }
 
-variable "deployer_tfstate" {
-  description = "Deployer tfstate file"
-}
-
 locals {
-  // Retrieve deployer information from tfstate file
-  deployers = var.deployer_tfstate.deployer
 
   ips-iscsi                    = var.nics-iscsi[*].private_ip_address
   ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address

@@ -131,6 +131,5 @@ module "output_files" {
   nics-anydb                   = module.anydb_node.nics-anydb
   any-database-info            = module.anydb_node.any-database-info
   anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
-  deployer_tfstate             = data.terraform_remote_state.deployer.outputs
   random-id                    = module.common_infrastructure.random-id
 }
