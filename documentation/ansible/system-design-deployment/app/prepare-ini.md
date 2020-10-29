@@ -30,7 +30,7 @@
 1. Ensure `/usr/sap/install/SWPM/`exists and extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE` here(SAR file version may change depending on your downloads):\
 `/datadrive/archives/SAPCAR_1311-80000935.EXE -xf /datadrive/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:\
-`mkdir -p "/usr/sap/install/config" && cp /datadrive/BoMs/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
+`mkdir -p "/usr/sap/install/config" && cp /datadrive/boms/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
 1. Ensure `/usr/sap/downloads/` exists:\
 `mkdir /usr/sap/downloads/`
 1. Extract `SAPEXE_200-80004393.SAR` using `SAPCAR.EXE` to `/usr/sap/downloads/`:\

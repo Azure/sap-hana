@@ -30,7 +30,7 @@
       1. In the panel on the right, click Select a file;
       1. Navigate your workstation to your download directory;
       1. Select all Stack files (MP_*.(xml|xls|pdf|txt));
-      1. Click Advanced to show the advanced options, and enter `BoMs/<Stack_Version>/stackfiles` for the Upload Directory.
+      1. Click Advanced to show the advanced options, and enter `boms/<Stack_Version>/stackfiles` for the Upload Directory.
 
          _Note: `<Stack_Version>` should consist of Product type (e.g. `S4HANA`), Product Release (e.g. `1909`), Service Pack (e.g. `SP2`) and a version of the Stack (e.g. `v001`), example: `S4HANA_1909_SP2_v001`_
 
@@ -47,7 +47,7 @@ sapbits
 |   |-- SAPCAR_1320-80000935.EXE
 |   |-- <tool>_<id>.EXE
 |
-|-- BoMs/
+|-- boms/
 |   |-- S4HANA_1909_SP2_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/

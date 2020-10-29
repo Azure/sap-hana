@@ -30,7 +30,7 @@
       1. In the panel on the right, click Select a file;
       1. Navigate your workstation to your download directory;
       1. Select `myDownloadBasketFiles.txt`;
-      1. Click Advanced to show the advanced options, and enter `BoMs/<Stack_Version>/stackfiles` for the Upload Directory.
+      1. Click Advanced to show the advanced options, and enter `boms/<Stack_Version>/stackfiles` for the Upload Directory.
 
          _Note: `<Stack_Version>` should consist of Product type (e.g. `HANA2`), Product Release (e.g. `00_052`, and a version of the Stack (e.g. `v001`). For example: `HANA2_00_052_v001`_
 
@@ -47,7 +47,7 @@ sapbits
 |   |-- SAPCAR_1320-80000935.EXE
 |   |-- <tool>_<id>.EXE
 |
-|-- BoMs/
+|-- boms/
 |   |-- HANA2_00_052_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/

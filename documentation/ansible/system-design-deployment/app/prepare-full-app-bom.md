@@ -7,31 +7,30 @@
 1. Application installation template(s) for SCS and/or PAS/AAS.
 1. SAP Application media present on the Storage Account.
 1. You have completed the downloading of associated stack files to your workstation's `stackfiles` folder.
-
-Your working folder should look something like this, although the folder name `S4HANA_1909_SP2_v001`, will be replaced with a similar name for the product you are building and `xxx` will be a variable component of each name:
-
-```text
-   .
-   └── S4HANA_1909_SP2_v001
-       └── stackfiles
-           ├── DownloadBasket.json
-           ├── MP_Excel_xxx.xls
-           ├── MP_Plan_xxx.pdf
-           ├── MP_Stack_xxx.txt
-           ├── MP_Stack_xxx.xml
-           └── myDownloadBasketFiles.txt
-```
+1. An empty folder in which to create the BoM file.
 
 ## Inputs
 
 1. Stack files.
-1. Application installation template name(s) for SCS and/or PAS/AAS.
 
 ## Process
 
+1. Download the associated stack files to your workstation's empty, working folder;
+1. Create an empty text file called `bom.yml`.
+
+   ```text
+   .
+   ├── bom.yml      <-- BoM content will go in here
+   ├── MP_Excel_xxx.xls
+   ├── MP_Plan_xxx.pdf
+   ├── MP_Stack_xxx.txt
+   ├── MP_Stack_xxx.xml
+   └── myDownloadBasketFiles.txt
+   ```
+
 ### Get the SAP Download Basket Manifest
 
-Ensure you do this **before** running SAP Download Manager.
+Ensure you do this section **before** running SAP Download Manager.
 
 1. Start the `postman` utility and create a new `GET` request by clicking the :heavy_plus_sign: in the workspace tab.
 
@@ -55,15 +54,13 @@ Ensure you do this **before** running SAP Download Manager.
 
    ```text
    .
-   └── S4HANA_1909_SP2_v001
-       ├── bom.yml      <-- BoM content will go in here
-       └── stackfiles
-           ├── DownloadBasket.json
-           ├── MP_Excel_xxx.xls
-           ├── MP_Plan_xxx.pdf
-           ├── MP_Stack_xxx.txt
-           ├── MP_Stack_xxx.xml
-           └── myDownloadBasketFiles.txt
+   ├── bom.yml      <-- BoM content will go in here
+   ├── DownloadBasket.json
+   ├── MP_Excel_xxx.xls
+   ├── MP_Plan_xxx.pdf
+   ├── MP_Stack_xxx.txt
+   ├── MP_Stack_xxx.xml
+   └── myDownloadBasketFiles.txt
    ```
 
 ### Example Partial BoM File
@@ -75,7 +72,7 @@ step|BoM Content
     |
     |---
     |
-[1] |name:    'S/4HANA 1909 SP2'
+[1] |name:    'S4HANA_1909_SP2_v001'
 [2] |target:  'ABAP PLATFORM 1909'
 [3] |version: 001
     |
@@ -110,31 +107,12 @@ step|BoM Content
     |      archive:  S4COREOP104.SAR
     |
 [8] |  templates:
-    |    - name:     SCS_INI
-    |      version:  1909.2
-    |      file:     scs_1909_v2.ini
-    |
-    |    - name:     SCS_XML
-    |      version:  1909.1
-    |      file:     scs_1909_v2.xml
+    |    - name:     S4HANA_1909_SP2_v001
 ```
 
 ### Create BoM Header
 
-1. `[1]` and `[2]`: Record appropriate names for the build and target. If you want to use the embedded names in the SAP download, follow the next section.
-
-### Determine SAP Embedded Names
-
-1. Open the XML Stack file in your editor and ensure it's formatted to make it more human-readable. You will notice a number of `<sp-stack>...</sp-stack>` sections and a `<target-system>` section. This image shows the sections collapsed.
-
-   ![SAP XML Stack showing sp-stack Sections](../images/sap-sp-stack.png)
-
-1. `[1]` and `[2]`: The `name` and `target` to use can be found in the `<target-system>` section at the end of the XML file.
-
-   ![SAP XML Stack showing target-system Section](../images/sap-target-system.png)
-
-   1. `name` is the description property in `<constraint name="ppms-main-app-id" value="73555000100900002474" description="SAP S/4HANA 1909"/>`
-   1. `target` is the description property in `<constraint name="ppms-nw-id" value="73555000100900002792" description="ABAP PLATFORM 1909"/>`
+1. `[1]` and `[2]`: Record appropriate names for the build and target. The `name` must be the same as the BoM folder name in the Storage Account.
 
 ### Define BoM Version
 
@@ -228,7 +206,7 @@ Files downloaded or shared from the archive space will need to be extracted to t
 
 ### Override Target Filename
 
-By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis.
+By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example:
 
@@ -243,14 +221,25 @@ By default, files downloaded or shared from the archive space will be extracted 
 
 The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
 
+### Add Template Name
+
+1. [8]: Create a `templates` section as shown, with the same template name as the BoM itself. Note that the extensions `.params` and `.params.xml` are not specified.
+
+   :information_source: The `version` is optional. For example:
+
+   ```text
+     templates:
+       - name:     S4HANA_1909_SP2_v001
+         version:  001
+   ```
+
 ### Upload Files to Archive Location
 
-1. From the correct Azure storage account, navigate to "File shares", then to "sapbits".
-1. For the `boms` folder in sapbits:
-   1. Click the correct BoM folder name in the portal to open. In this example, that would be `S4HANA_1909_SP2_v001`.
-   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2_00_052_v001`, then:
-   1. Click "Upload" and select the `bom.yml` file for upload.
-   1. Click "Upload".
+1. From the correct Azure storage account, navigate to "Containers", then to "sapbits";
+1. In the panel on the right, click Select a file;
+1. Navigate your workstation to your working directory;
+1. Select `bom.yml`;
+1. Click Advanced to show the advanced options, and enter `boms/<Stack_Version>` for the Upload Directory.
 
 ## Results and Outputs
 

@@ -10,7 +10,6 @@
 ## Inputs
 
 1. List of archive media for this version of HANA.
-1. `ini` template for installing this version of HANA.
 
 ## Example Partial BoM File
 
@@ -126,15 +125,14 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [7]: Create a `templates` section as shown, with the correct template name. Note that the extensions `.params` and `.params.xml` are not specified.
+1. [8]: Create a `templates` section as shown, with the same template name as the BoM itself. Note that the extensions `.params` and `.params.xml` are not specified.
 
    :information_source: The `version` is optional. For example:
 
    ```text
      templates:
-       - name:     HANA
+       - name:     HANA2_00_052_v001
          version:  001
-         file:     HANA2_00_052_v001
    ```
 
 ### Upload Files to Archive Location
