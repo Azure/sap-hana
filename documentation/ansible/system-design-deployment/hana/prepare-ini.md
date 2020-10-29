@@ -4,11 +4,12 @@
 
 ## Prerequisites
 
+1. An editor for working with the generated files.
 1. HANA Media downloaded
 1. SAP Library contains all media for HANA installation
 1. SAP HANA infrastructure has been deployed
 1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place)
-1. Ensure prerequisite RPMs exist, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
+1. Prerequisite RPMs installed, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
 
 ## Inputs
 
@@ -34,9 +35,9 @@ Any additional components are not required at this stage as they do not affect t
    -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
    ```
 
-1. Use the extracted `hdblcm` tool to generate an empty install template and password file. **_Note:_** These two files will be used in the automated installation of the SAP HANA Database.
+1. Use the extracted `hdblcm` tool to generate an empty install template and password file. **_Note:_** These two files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
 
-   The file name used in this command should reflect the Stack version (e.g. `HANA2_00_052_v001`):
+   The file name used in this command should reflect the `<stack_version>` (e.g. `HANA2_00_052_v001`):
 
    `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA2_00_052_v001.params`
 
@@ -68,41 +69,40 @@ Any additional components are not required at this stage as they do not affect t
    ```
 
 1. Upload the generated template files to the SAP Library:
-   1. In the Azure Portal navigate to the `sapbits` file share
-   1. Create a new `templates` directory under `sapbits`
-   1. Click "Upload"
-   1. In the panel on the right, click "Select a file"
-   1. Navigate your workstation to the template generation directory `/tmp/hana_template`
-   1. Select the generated templates, e.g. `HANA2_00_052_v001.params` and `HANA2_00_052_v001.paramas.xml`
-   1. Click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
-   1. Click "Upload"
+   1. In the Azure Portal navigate to the `sapbits` file share;
+   1. Create a new `templates` directory under `sapbits` if it does not already exist;
+   1. Click "Upload";
+   1. In the panel on the right, click "Select a file";
+   1. Navigate your workstation to the template generation directory `/tmp/hana_template`;
+   1. Select the generated templates, e.g. `HANA2_00_052_v001.params` and `HANA2_00_052_v001.params.xml`;
+   1. Click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory;
+   1. Click "Upload".
 
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Ensure the `HANA2_00_052_v001.params` and `HANA2_00_052_v001.params.xml` files exists in `/tmp/hana_template`
-1. Replace varibles set in both inifiles
-1. Edit the `HANA2_00_052_v001.params` file:
+1. Ensure the `HANA2_00_052_v001.params` and `HANA2_00_052_v001.params.xml` files exist in `/tmp/hana_template`
+1. Edit the `HANA2_00_052_v001.params` file and replace variables:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
    1. Update `sid` to `<HANA SID>` for example: `sid=HD1`
    1. Update `number` to `<Instance Number>` for example: `number=00`
-1. Edit the `HANA2_00_052_v001.params.xml` file, replacing the ansible variables with a password as below:
+1. Edit the `HANA2_00_052_v001.params.xml` file, replacing the ansible variables with a suitable master password as below:
 
    ```xml
    <?xml version="1.0" encoding="UTF-8"?>
-   <!-- Replace the ansible varibles {{ }} with the password of minimum 8 charchters -->
-   <!-- Use the same password for each entery-->
+   <!-- Replace the ansible variables {{ }} with a password of minimum 8 characters -->
+   <!-- Use the same password for each -->
    <Passwords>
-       <root_password><![CDATA[masterpassw0rd]]></root_password>
-       <sapadm_password><![CDATA[masterpassw0rd]]></sapadm_password>
-       <master_password><![CDATA[masterpassw0rd]]></master_password>
-       <sapadm_password><![CDATA[masterpassw0rd]]></sapadm_password>
-       <password><![CDATA[masterpassw0rd]]></password>
-       <system_user_password><![CDATA[masterpassw0rd]]></system_user_password>
-       <streaming_cluster_manager_password><![CDATA[masterpassw0rd]]></streaming_cluster_manager_password>
-       <ase_user_password><![CDATA[masterpassw0rd]]></ase_user_password>
-       <org_manager_password><![CDATA[masterpassw0rd]]></org_manager_password>
+       <root_password><![CDATA[ma$terPassw0rd]]></root_password>
+       <sapadm_password><![CDATA[ma$terPassw0rd]]></sapadm_password>
+       <master_password><![CDATA[ma$terPassw0rd]]></master_password>
+       <sapadm_password><![CDATA[ma$terPassw0rd]]></sapadm_password>
+       <password><![CDATA[ma$terPassw0rd]]></password>
+       <system_user_password><![CDATA[ma$terPassw0rd]]></system_user_password>
+       <streaming_cluster_manager_password><![CDATA[ma$terPassw0rd]]></streaming_cluster_manager_password>
+       <ase_user_password><![CDATA[ma$terPassw0rd]]></ase_user_password>
+       <org_manager_password><![CDATA[ma$terPassw0rd]]></org_manager_password>
    </Passwords>
 
 1. Run the HANA installation:\
