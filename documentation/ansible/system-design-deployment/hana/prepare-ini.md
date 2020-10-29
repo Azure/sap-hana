@@ -1,40 +1,43 @@
 # HANA Template Generation
 
+**_Note:_** Creating a Virtual Machine within Azure to use as your workstation will improve the speed when transferring the SAP media from a Storage Account.
+
 ## Prerequisites
 
-- HANA Media downloaded
-  - SAP Library contains all media for HANA installation
-- SAP HANA infrastructure has been deployed
-  - Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place)
-- Ensure prerequites RPM exist, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
+1. HANA Media downloaded
+1. SAP Library contains all media for HANA installation
+1. SAP HANA infrastructure has been deployed
+1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place)
+1. Ensure prerequisite RPMs exist, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
 
 ## Inputs
 
 In order to generate the installation templates for SAP HANA, you will need:
 
 1. SAPCAR executable
-1. SAP HANA Server
+1. SAP HANA infrastructure.
 
-Any additional components are not required at this stage as they do not affect the template files generated
+Any additional components are not required at this stage as they do not affect the template files generated.
 
 ## Process
 
 1. On your workstation, locate the SAP HANA Installation Media from Phase 1b, make note of the path as `<HANA_MEDIA>`
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
-  `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
+   `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
 1. Make and change to a temporary directory:\
-  `mkdir /tmp/hana_template; cd $_`
+   `mkdir /tmp/hana_template; cd $_`
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
-  ```shell
-  <HANA_MEDIA>/SAPCAR_1311-80000935.EXE
-  -manifest SAP_HANA_DATABASE/SIGNATURE.SMF
-  -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
-  ```
+   ```shell
+   <HANA_MEDIA>/SAPCAR_1311-80000935.EXE
+   -manifest SAP_HANA_DATABASE/SIGNATURE.SMF
+   -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
+   ```
 
-1. Use the extracted `hdblcm` tool to generate an empty install template and password file using the Stack Version (e.g. `hana_sp05_v001`):\
-  `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA_sp05_v001.params`
-  **_Note:_** These two files will be used in the automated installation of the SAP HANA Database
+1. Use the extracted `hdblcm` tool to generate an empty install template and password file using the Stack Version (e.g. `hana_sp05_v001`). **_Note:_** These two files will be used in the automated installation of the SAP HANA Database:
+
+   `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA_sp05_v001.params`
+
 1. Edit the `HANA_sp05_v001.params` file:
    1. Update `components` to `all`:\
       `components=all`
@@ -75,8 +78,8 @@ Any additional components are not required at this stage as they do not affect t
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Follow the previsouly outlined [Process](#Process). In this instance "Workstation" is the SAP HANA Target VM.
-1. Replace varibles set in both inifiles
+1. Follow the previously outlined [Process](#Process). In this instance "Workstation" is the SAP HANA Target VM.
+1. Replace variables set in both inifiles
 1. Edit the `HANA_sp05_v001.params` file:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`

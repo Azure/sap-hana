@@ -32,7 +32,7 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 1. **Deployment**
    1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
 
-### Application
+### SAP Application
 
 1. **Acquisition**
    1. [Acquisition of Media](./app/acquire-media.md)
@@ -45,6 +45,6 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 ## Notes
 
-The SAP HANA and Application processes have been separated as in the overall SAP journey, a set of the SAP HANA Database deployment materials obtained by following the SAP HANA process is likely to be reused by more than one SAP Application, e.g. S/4HANA, BW/4HANA etc.
+The SAP HANA and SAP Application processes have been separated, because in the overall SAP journey a set of the SAP HANA Database deployment materials obtained by following the SAP HANA process, is likely to be reused by more than one SAP Application, e.g. S/4HANA, BW/4HANA, etc.
 
 The Application Bill of Materials (BoM) will contain a reference to a SAP HANA BoM. This allows the process for the Application BoM generation and deployment to be completed separately, and multiple times without requiring the generation of a new SAP HANA BoM.
