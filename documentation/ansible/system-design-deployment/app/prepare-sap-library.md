@@ -63,7 +63,7 @@ sapbits
 |-- templates/
     |-- HANA_2_00_052_v001.params
     |-- HANA_2_00_052_v001.params.xml
-    |-- S4HANA_2020_ISS_v001.ini
+    |-- S4HANA_2020_ISS_v001.inifile.params
 ```
 
 **_Notes:_**
