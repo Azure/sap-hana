@@ -181,7 +181,14 @@ The directories to be exported for this process are:
 
 :hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load :hand:
 
-1. On the PAS VM carry out the [Access SWPM](#Access-SWPM) process
+1. Make and change to a temporary directory:
+
+   `mkdir /tmp/db_workdir; cd $_`
+
+1. Ensure SWPM is extracted:
+
+   `/usr/sap/downloads/SAPCAR_1311-80000935.EXE -xf /usr/sap/downloads/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+
 1. Launch SWPM with the following command:
 
     ```bash
@@ -193,9 +200,11 @@ The directories to be exported for this process are:
 1. Accept the security risk and authenticate with the systems ROOT user credentials
 1. Navigate through the drop-down menu to the "SAP S4/HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "
 Distributed System" , click on "Database Instance" and click "Next"
-1. Notice the profile directory which the ASCS instance installation created /usr/sap/`<SID>`/SYS/profile then click "Next"
+1. Select the `Custom` Parameter Mode and click "Next";
+1. Notice the profile directory which the ASCS instance installation created `/usr/sap/<SID>/SYS/profile` then click "Next"
 1. Enter in the ABAP message server port for the ASCS instance, which should be 36`<InstanceNumber>` for example: "3600" then click "Next"
 1. Enter the Master Password to be used during the database content installation and click "Next"
+1. Click Next on the Operating System Users screen for the SAP System Administrator.
 1. Do not edit the prepopulated Password fields and click "Next"
 1. Populate the SAP HANA Database Tenant fields:
     1. Database Host should be the HANA DB VM hostname which can be found by navigating to the resource in the Azure Portal
@@ -207,17 +216,23 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Enter the path to the SAPEXE Kernel `/usr/sap/downloads/` and click "Next"
 1. Notice the files are listed as available and click "Next"
 1. Ensure “Yes, clean up operating system users” is checked and click "Next
-1. Review the installation parameters specified and click "Next"
-1. Once installation is complete, a summary will be presented click "OK" to continue
-1. A feedback window will be displayed click "Close" then click "Exit"
-1. The SWPM process that was running will terminate cleanly as soon as this has been completed.
+1. Do not click "Next" on the Parameter Summary Page. At this point the installation configuration is stored in a file named `inifile.params` in the temporary SAP installation directory.
+1. To locate the file, list the files in `/tmp/sapinst_instdir/`.
+1. If the file `.lastInstallationLocation` exists, view the file contents and note the directory listed.
+1. If a directory named for the product you are installing exists, e.g. `S4HANA1809`, navigate into the folders matching the product installation type, for example:
+
+   `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
+
+1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
+1. Copy and rename `inifile.params` to `/tmp/app_template`:
+
+`cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
 
 #### Manual DB Content Load Using Template
 
 :hand: TODO: Add Manual DB Content load instructions using template#
 
 1. Connect to the PAS VM as `root` User
-1. Ensure the previously generated `inifile.params` is copied to `/tmp/app_templates`
 1. Launch the DB Load process via SWPM:
 
       ```bash
