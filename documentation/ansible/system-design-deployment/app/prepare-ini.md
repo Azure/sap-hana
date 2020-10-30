@@ -30,7 +30,11 @@
 
 1. Make and change to a temporary directory:
 
-   `mkdir /tmp/app_template; cd $_`
+   `mkdir /tmp/workdir; cd $_`
+
+1. Ensure `/tmp/app_template/` exists:
+
+   `mkdir /tmp/app_template/`
 
 1. Ensure `/usr/sap/downloads/` exists:
 
@@ -146,11 +150,32 @@ Logon users: [root]
 
 ### Exporting SAP FileSystems from SCS VM
 
-:hand: TODO: Add instructions for exporting required filesystems (installation media, stack files, `/usr/sap/<SID>/SYS`)
+To enable the installation of a distributed system, the Installation Media, Configuration Files, and SID System directory needs to be shared between the SCS and Application VMs.
+
+Follow the [SAP instructions for Exporting directories via NFS for Linux](https://help.sap.com/viewer/e85af73ba3324e29834015d03d8eea84/CURRENT_VERSION/en-US/73297e14899f4dbb878e26d9359f8cf7.html).
+
+The directories to be exported for this process are:
+
+1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattented installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
+1. `/usr/sap/downloads`
+1. `/usr/sap/install/config`
+1. `/tmp/app_template`
+1. `/sapmnt/<SID>/global`
+1. `/sapmnt/<SID>/profile`
 
 ### Mounting SAP FileSystems on PAS VM
 
-:hand: TODO: Add instructions for mounting required filesystems
+1. On the PAS VM as `root` ensure the mount points exist:
+
+   `mkdir -p /usr/sap/{downloads,install/config,<SID>/SYS} /tmp/app_template /sapmnt/<SID>/{global,profile}`
+
+1. Ensure the exported directories are mounted:
+   1. `mount <scs-vm-IP>:/usr/sap/downloads /usr/sap/downloads`
+   1. `mount <scs-vm-IP>:/usr/sap/install/config /usr/sap/install/config`
+   1. `mount <scs-vm-IP>:/usr/sap/<SID>/SYS /usr/sap/<SID>/SYS`
+   1. `mount <scs-vm-IP>:/tmp/app_template /tmp/app_template`
+   1. `mount <scs-vm-IP>:/sapmnt/<SID>/global /sapmnt/<SID>/global`
+   1. `mount <scs-vm-IP>:/sapmnt/<SID>/profile /sapmnt/<SID>/profile`
 
 ### Generating unattended installation parameter `inifile` for Database Content Load
 
