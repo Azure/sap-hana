@@ -69,13 +69,13 @@
 
    `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`
 
-1. Follow the instructions below to generate each `ini` template.
+1. Follow the instructions below to generate each `inifile` template.
 
-### Generating unattended installation `ini` file for ASCS
+### Generating unattended installation `inifile` for ASCS
 
 This section covers the manual generation of the ABAP SAP Central Services (ASCS) unattended install file
 
-In order to install SCS unattended, an `ini` file needs to be generated in order to pass all of the required parameters into the SWPM installer. Currently, the only way to generate a new one is to partially run through a manual install as per SAP Note [2230669 - System Provisioning Using a Parameter Input File](https://launchpad.support.sap.com/#/notes/2230669).
+In order to install SCS unattended, an `inifile` needs to be generated in order to pass all of the required parameters into the SWPM installer. Currently, the only way to generate a new one is to partially run through a manual install as per SAP Note [2230669 - System Provisioning Using a Parameter Input File](https://launchpad.support.sap.com/#/notes/2230669).
 
 The following steps show how to begin the manual install of an ASCS instance in order to create an unattended installation file.
 
@@ -181,7 +181,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. A feedback window will be displayed click "Close" then click "Exit"
 1. The SWPM process that was running will terminate cleanly as soon as this has been completed.
 
-### Generating unattended installation parameter `ini` file for PAS-AAS
+### Generating unattended installation parameter `inifile` for PAS-AAS
 
 This section covers the manual generation of the ABAP PAS/AAS (Primary Application Server/Additional Application Server) unattended install file.
 
@@ -231,8 +231,8 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 1. click "Ok"
 1. Ensure Yes, clean up operating system users is checked
 1. click "Next"
-1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at
-1. On only the PAS/AAS node, a copy of the inifile.params file is generated in the temporary SAP installation directory:
+1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the `inifile.params` file is generated in the temporary SAP installation directory, located at
+1. On only the PAS/AAS node, a copy of the `inifile.params` file is generated in the temporary SAP installation directory:
    1. PAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params`
    1. AAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params`
 1. The inifiles can be used as the basis for unattended deployments
@@ -286,9 +286,9 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
     SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params
     ```
 
-### `ini` file consolidation
+### `inifile` consolidation
 
-When you have completed generating your inifile.params templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_2020_v2.inifile.params`.
+When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_2020_v2.inifile.params`.
 
 1. Edit the `s4_2020_v2.inifile.params` file:
     1. Update `components` to `all`:
@@ -317,4 +317,4 @@ When you have completed generating your inifile.params templates you will need t
 ## Results and Outputs
 
 1. A Consolidated `inifile.params` which can be used to the unattended installation of ASCS, PAS and AAS
-1. Consolidated inifile uploaded to `targets` directory in the `sapbits` container
+1. Consolidated inifile uploaded to `templates` directory in the `sapbits` container
