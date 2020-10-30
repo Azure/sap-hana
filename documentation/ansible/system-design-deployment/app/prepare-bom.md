@@ -46,7 +46,7 @@ step|BoM Content
     |
 [4] |defaults:
     |  archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
-    |  target_location: "/usr/sap/install/downloads/"
+    |  target_location: "/usr/sap/downloads/"
     |
 [5] |materials:
 [6] |  dependencies:
