@@ -20,6 +20,7 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user;
+1. Set the root user password to a known value as this will be requierd to access SWPM;
 1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux);
 1. Make and change to a temporary directory:
 
