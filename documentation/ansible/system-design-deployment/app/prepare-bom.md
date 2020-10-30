@@ -75,7 +75,8 @@ step|BoM Content
     |      archive:  S4COREOP104.SAR
     |
 [8] |  templates:
-    |    - name:     S4HANA_2020_ISS_v001
+    |    - name:     "S4HANA_2020_ISS_v001 ini file"
+    |      file:     "S4HANA_2020_ISS_v001.ini"
 ```
 
 ### Create BoM Header
@@ -154,14 +155,12 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [8]: Create a `templates` section as shown, with the same template name as the BoM itself. Note that the extensions `.params` and `.params.xml` are not specified.
-
-   :information_source: The `version` is optional. For example:
+1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM stack name.
 
    ```text
      templates:
-       - name:     S4HANA_2020_ISS_v001
-         version:  001
+       - name:     "S4HANA_2020_ISS_v001 ini file"
+         file:     "S4HANA_2020_ISS_v001.ini"
    ```
 
 ### Upload Files to Archive Location
@@ -174,4 +173,4 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ## Results and Outputs
 
-1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2_00_052_v001/bom.yml`.
+1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/S4HANA_2020_ISS_v001/bom.yml`.

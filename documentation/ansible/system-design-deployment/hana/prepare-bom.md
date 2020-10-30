@@ -20,7 +20,7 @@ step|BoM Content
     |
     |---
     |
-[1] |name:    'HANA2_00_052_v001'
+[1] |name:    'HANA_2_00_052_v001'
 [2] |target:  'HANA 2.0'
 [3] |version: 001
     |
@@ -42,9 +42,11 @@ step|BoM Content
     |      archive:  51054623.ZIP
     |
 [7] |  templates:
-    |    - name:     HANA
-    |      version:  001
-    |      file:     HANA2_00_052_v001
+    |    - name:     HANA params
+    |      file:     HANA_2_00_052_v001.params
+    |
+    |    - name:     HANA xml
+    |      file:     HANA_2_00_052_v001.params.xml
 ```
 
 ## Process
@@ -103,7 +105,7 @@ Files downloaded or shared from the archive space will need to be extracted to t
    - name:     HANA 2.0
      version:  2.00.052
      archive:  51054623.ZIP
-     override_target_location: "/usr/sap/install/database/"
+     override_target_location: "/usr/sap/install/elsewhere/"
    ```
 
 ### Override Target Filename
@@ -125,24 +127,25 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [8]: Create a `templates` section as shown, with the same template name as the BoM itself. Note that the extensions `.params` and `.params.xml` are not specified.
-
-   :information_source: The `version` is optional. For example:
+1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM stack file. Entries are needed for `.params` and `.params.xml` files.
 
    ```text
      templates:
-       - name:     HANA2_00_052_v001
-         version:  001
+       - name:     HANA params
+         file:     HANA_2_00_052_v001.params
+
+       - name:     HANA xml
+         file:     HANA_2_00_052_v001.params.xml
    ```
 
 ### Upload Files to Archive Location
 
 1. From the correct Azure storage account, navigate to "File shares", then to "sapbits".
 1. For the `boms` folder in sapbits:
-   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA2_00_052_v001`, then:
+   1. Click the correct BoM folder name in the portal to open. In this example, that would be `HANA_2_00_052_v001`, then:
    1. Click "Upload" and select the `bom.yml` file from your workstation for upload.
    1. Click "Upload".
 
 ## Results and Outputs
 
-1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA2_00_052_v001/bom.yml`.
+1. A `bom.yml` file present in the Storage Account in the correct location. In this example, `sapbits/boms/HANA_2_00_052_v001/bom.yml`.
