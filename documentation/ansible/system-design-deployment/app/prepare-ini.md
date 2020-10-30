@@ -329,5 +329,5 @@ When you have completed generating your `inifile.params` templates you will need
 
 ## Results and Outputs
 
-1. A Consolidated `inifile.params` which can be used to the unattended installation of ASCS, PAS and AAS
+1. A Consolidated `inifile.params` which can be used for the unattended installation of ASCS, PAS and AAS
 1. Consolidated inifile uploaded to `templates` directory in the `sapbits` container
