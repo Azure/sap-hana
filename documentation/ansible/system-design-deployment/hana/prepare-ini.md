@@ -81,7 +81,7 @@ Any additional components are not required at this stage as they do not affect t
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Ensure the `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` files exist in `/tmp/hana_template`
+1. Ensure the `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` files from your workstation exist in `/tmp/hana_template`
 1. Edit the `HANA_2_00_052_v001.params` file and replace variables:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
