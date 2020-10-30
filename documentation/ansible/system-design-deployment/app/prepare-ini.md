@@ -191,7 +191,20 @@ Distributed System" , click on "Database Instance" and click "Next"
 
 #### Manual DB Content Load Using Template
 
-:hand: TODO: Add Manual DB Content load instructions using template
+:hand: TODO: Add Manual DB Content load instructions using template#
+
+1. Connect to the PAS VM as `root` User
+1. Ensure the previously generated `inifile.params` is copied to `/tmp/app_templates`
+1. Launch the DB Load process via SWPM:
+
+      ```bash
+      /usr/sap/intall/SWPM/sapinst
+      SAPINST_STACK_XML=/tmp/app_templates/MP_STACK_S4_2020_v001.xml
+      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_templates/inifile.params
+      SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_DB:S4HANA2020.CORE.HDB.ABAP
+      SAPINST_SKIP_DIALOGS=true
+      SAPINST_START_GUI=false SAPINST_START_GUISERVER=false
+      ```
 
 ### Generating unattended installation parameter `inifile` for PAS/AAS
 
