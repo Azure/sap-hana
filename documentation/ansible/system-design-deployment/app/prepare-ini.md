@@ -300,7 +300,7 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
 ### `inifile` consolidation
 
-When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_2020_v2.inifile.params`.
+When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then save the new file with a meaningful name relating to the SAP Product e.g `S4HANA_2020_ISS_v001.inifile.params`.
 
 :hand: TODO: Clarify inifile consolidation instructions, including adding ansible variables.
 
