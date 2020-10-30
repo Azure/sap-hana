@@ -146,7 +146,15 @@ Logon users: [root]
     SAPINST_START_GUISERVER=false
     ```
 
-#### Manual DB Content Load Using Template
+### Exporting SAP FileSystems from SCS VM
+
+:hand: TODO: Add instructions for exporting required filesystems (installation media, stack files, `/usr/sap/<SID>/SYS`)
+
+### Mounting SAP FileSystems on PAS VM
+
+:hand: TODO: Add instructions for mounting required filesystems
+
+### Generating unattended installation parameter `inifile` for Database Content Load
 
 :hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load :hand:
 
@@ -181,7 +189,11 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. A feedback window will be displayed click "Close" then click "Exit"
 1. The SWPM process that was running will terminate cleanly as soon as this has been completed.
 
-### Generating unattended installation parameter `inifile` for PAS-AAS
+#### Manual DB Content Load Using Template
+
+:hand: TODO: Add Manual DB Content load instructions using template
+
+### Generating unattended installation parameter `inifile` for PAS/AAS
 
 This section covers the manual generation of the ABAP PAS/AAS (Primary Application Server/Additional Application Server) unattended install file.
 
@@ -290,19 +302,7 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
 When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_2020_v2.inifile.params`.
 
-1. Edit the `s4_2020_v2.inifile.params` file:
-    1. Update `components` to `all`:
-
-        `components=all`
-    1. Update `hostname` to `{{ ansible_hostname }}`:
-
-        `hostname={{ ansible_hostname }}`
-    1. Update `sid` to `{{ app_sid | upper }}`:
-
-        `sid={{ app_sid | upper }}`
-    1. Update `number` to `{{ app_instance_number }}`:
-
-        `number={{ app_instance_number }}`
+:hand: TODO: Clarify inifile consolidation instructions, including adding ansible variables.
 
 1. Upload the generated template files to the SAP Library:
     1. In the Azure Portal navigate to the `sapbits` container
