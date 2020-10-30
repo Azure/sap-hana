@@ -15,8 +15,8 @@ resource "local_file" "output-json" {
         os                   = jumpbox-windows.os,
         authentication       = jumpbox-windows.authentication,
         components           = jumpbox-windows.components,
-        private_ip_address   = local.ips_jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
-        public_ip_address    = local.public-ips_jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
+        private_ip_address   = local.ips_jumpboxes_windows[index(var.jumpboxes.windows, jumpbox-windows)]
+        public_ip_address    = local.public-ips-jumpboxes-windows[index(var.jumpboxes.windows, jumpbox-windows)]
         }
       ],
       "linux" = [for jumpbox-linux in var.jumpboxes-linux : {
@@ -27,8 +27,8 @@ resource "local_file" "output-json" {
         os                   = jumpbox-linux.os,
         authentication       = jumpbox-linux.authentication,
         components           = jumpbox-linux.components,
-        private_ip_address   = local.ips_jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
-        public_ip_address    = local.public-ips_jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
+        private_ip_address   = local.ips_jumpboxes_linux[index(var.jumpboxes-linux, jumpbox-linux)]
+        public_ip_address    = local.public-ips-jumpboxes-linux[index(var.jumpboxes-linux, jumpbox-linux)]
         }
       ]
     },
@@ -47,13 +47,13 @@ resource "local_file" "output-json" {
           components        = database.components,
           xsa               = database.xsa,
           shine             = database.shine,
-          nodes = [for ip-dbnode-admin in local.ips_dbnodes-admin : {
+          nodes = [for ip-dbnode-admin in local.ips_dbnodes_admin : {
             // Hostname is required for Ansible, therefore set dbname from resource name to hostname
-            dbname       = replace(local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].name, "_", "")
+            dbname       = replace(local.hdb_vms[index(local.ips_dbnodes_admin, ip-dbnode-admin)].name, "_", "")
             ip_admin_nic = ip-dbnode-admin,
-            ip_db_nic    = local.ips_dbnodes-db[index(local.ips_dbnodes-admin, ip-dbnode-admin)]
-            role         = local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].role
-            } if local.hdb_vms[index(local.ips_dbnodes-admin, ip-dbnode-admin)].platform == database.platform
+            ip_db_nic    = local.ips_dbnodes_db[index(local.ips_dbnodes_admin, ip-dbnode-admin)]
+            role         = local.hdb_vms[index(local.ips_dbnodes_admin, ip-dbnode-admin)].role
+            } if local.hdb_vms[index(local.ips_dbnodes_admin, ip-dbnode-admin)].platform == database.platform
           ],
           loadbalancer = {
             frontend_ip = var.loadbalancers[0].private_ip_address
@@ -109,17 +109,17 @@ resource "local_file" "ansible-inventory" {
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips_iscsi             = local.ips_iscsi,
-    ips_jumpboxes-windows = local.ips_jumpboxes-windows,
-    ips_jumpboxes-linux   = local.ips_jumpboxes-linux,
-    ips_dbnodes-admin     = local.ips_dbnodes-admin,
-    ips_dbnodes-db        = local.ips_dbnodes-db,
+    ips_jumpboxes_windows = local.ips_jumpboxes_windows,
+    ips_jumpboxes_linux   = local.ips_jumpboxes_linux,
+    ips_dbnodes_admin     = local.ips_dbnodes_admin,
+    ips_dbnodes_db        = local.ips_dbnodes_db,
     dbnodes               = local.hdb_vms,
     application           = var.application,
     ips_scs               = local.ips_scs,
     ips_app               = local.ips_app,
     ips_web               = local.ips_web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes,
+    ips_anydbnodes        = local.ips_anydbnodes,
     }
   )
   filename             = "${path.cwd}/ansible_config_files/hosts"
@@ -134,17 +134,17 @@ resource "local_file" "ansible-inventory-yml" {
     jumpboxes-windows     = var.jumpboxes.windows,
     jumpboxes-linux       = var.jumpboxes-linux,
     ips_iscsi             = local.ips_iscsi,
-    ips_jumpboxes-windows = local.ips_jumpboxes-windows,
-    ips_jumpboxes-linux   = local.ips_jumpboxes-linux,
-    ips_dbnodes-admin     = local.ips_dbnodes-admin,
-    ips_dbnodes-db        = local.ips_dbnodes-db,
+    ips_jumpboxes_windows = local.ips_jumpboxes_windows,
+    ips_jumpboxes_linux   = local.ips_jumpboxes_linux,
+    ips_dbnodes_admin     = local.ips_dbnodes_admin,
+    ips_dbnodes_db        = local.ips_dbnodes_db,
     dbnodes               = local.hdb_vms,
     application           = var.application,
     ips_scs               = local.ips_scs,
     ips_app               = local.ips_app,
     ips_web               = local.ips_web
     anydbnodes            = local.anydb_vms,
-    ips-anydbnodes        = local.ips-anydbnodes,
+    ips_anydbnodes        = local.ips_anydbnodes,
     }
   )
   filename             = "${path.cwd}/ansible_config_files/hosts.yml"

@@ -13,7 +13,7 @@ resource "azurerm_network_interface" "anydb_db" {
     name      = "ipconfig1"
     subnet_id = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
 
-    private_ip_address = try(local.anydb_vms[count.index].db_nic_ip, null) != null ? (
+    private_ip_address = try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
       local.anydb_vms[count.index].db_nic_ip) : (
       cidrhost(local.sub_db_exists ? (
         data.azurerm_subnet.anydb[0].address_prefixes[0]) : (
@@ -38,7 +38,7 @@ resource "azurerm_network_interface" "anydb_admin" {
     name      = "ipconfig1"
     subnet_id = var.admin_subnet.id
 
-    private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, null) != null ? (
+    private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
       local.anydb_vms[count.index].admin_nic_ip) : (
       cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + 10)
     )

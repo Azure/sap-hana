@@ -18,7 +18,7 @@ all:
     jumpboxes_windows:
       hosts:
 %{~ for jumpbox-windows in jumpboxes-windows }
-        ${ips_jumpboxes-windows[index(jumpboxes-windows, jumpbox-windows)]}:
+        ${ips_jumpboxes_windows[index(jumpboxes-windows, jumpbox-windows)]}:
           ansible_connection:                   "winrm"
           ansible_user:                         "${jumpbox-windows.authentication.username}"
           ansible_ssh_pass:                     "${jumpbox-windows.authentication.password}"
@@ -31,7 +31,7 @@ all:
       hosts:
 %{~ for jumpbox-linux in jumpboxes-linux }
 %{~ if jumpbox-linux.destroy_after_deploy != "true"}
-        ${ips_jumpboxes-linux[index(jumpboxes-linux, jumpbox-linux)]}:
+        ${ips_jumpboxes_linux[index(jumpboxes-linux, jumpbox-linux)]}:
           ansible_connection:  "ssh"
 %{~ if jumpbox-linux.authentication.type == "key" }
           ansible_user:        "${jumpbox-linux.authentication.username}"
@@ -46,16 +46,16 @@ all:
 
     hanadbnodes:
       hosts:
-%{~ for ip_dbnode-admin in ips_dbnodes-admin }
+%{~ for ip_dbnode-admin in ips_dbnodes_admin }
         ${ip_dbnode-admin}:
           ansible_connection:  "ssh"
-%{~ if dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.type == "key" }
-          ansible_user:        "${dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.username}"
+%{~ if dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.type == "key" }
+          ansible_user:        "${dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.username}"
 %{~ endif }
-%{~ if dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.type == "password" }
-          ansible_user:        "${dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.username}"
-          ansible_ssh_pass:    "${dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.password}"
-          ansible_become_pass: "${dbnodes[index(ips_dbnodes-admin, ip_dbnode-admin)].authentication.password}"
+%{~ if dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.type == "password" }
+          ansible_user:        "${dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.username}"
+          ansible_ssh_pass:    "${dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.password}"
+          ansible_become_pass: "${dbnodes[index(ips_dbnodes_admin, ip_dbnode-admin)].authentication.password}"
 %{~ endif }
 %{~ endfor }
 

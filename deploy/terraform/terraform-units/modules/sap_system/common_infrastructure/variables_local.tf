@@ -9,10 +9,6 @@ variable "is_single_node_hana" {
   default     = false
 }
 
-variable "subnet-sap-admin" {
-  description = "Information about SAP admin subnet"
-}
-
 variable "deployer_tfstate" {
   description = "Deployer remote tfstate file"
 }
@@ -28,6 +24,47 @@ variable "deployer_user" {
 }
 */
 
+variable naming {
+  description = "Defines the names for the resources"
+}
+
+variable "region_mapping" {
+  type        = map(string)
+  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
+
+  //28 Regions 
+
+  default = {
+    westus             = "weus"
+    westus2            = "wus2"
+    centralus          = "ceus"
+    eastus             = "eaus"
+    eastus2            = "eus2"
+    northcentralus     = "ncus"
+    southcentralus     = "scus"
+    westcentralus      = "wcus"
+    northeurope        = "noeu"
+    westeurope         = "weeu"
+    eastasia           = "eaas"
+    southeastasia      = "seas"
+    brazilsouth        = "brso"
+    japaneast          = "jpea"
+    japanwest          = "jpwe"
+    centralindia       = "cein"
+    southindia         = "soin"
+    westindia          = "wein"
+    uksouth2           = "uks2"
+    uknorth            = "ukno"
+    canadacentral      = "cace"
+    canadaeast         = "caea"
+    australiaeast      = "auea"
+    australiasoutheast = "ause"
+    uksouth            = "ukso"
+    ukwest             = "ukwe"
+    koreacentral       = "koce"
+    koreasouth         = "koso"
+  }
+}
 
 //Set defaults
 locals {
@@ -152,9 +189,14 @@ locals {
   kv_users = var.deployer_user
   */
   // kv for sap landscape
-  kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  kv_private_name = format("%sprvt%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_user_name    = format("%suser%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  environment    = lower(try(local.var_infra.environment, ""))
+  location_short = lower(try(var.region_mapping[local.region], "unkn"))
+  vnet_nr_parts  = length(split("-", local.vnet_sap_name))
+  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
+  vnet_sap_name_prefix = local.vnet_nr_parts >= 3 ? split("-", upper(local.vnet_sap_name))[local.vnet_nr_parts - 1] == "VNET" ? split("-", local.vnet_sap_name)[local.vnet_nr_parts - 2] : local.vnet_sap_name : local.vnet_sap_name
+  kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
+  kv_private_name      = format("%sprvt%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
+  kv_user_name         = format("%suser%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
 
   // key vault naming for sap system
   sid_kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
@@ -172,7 +214,7 @@ locals {
   //iSCSI
   var_iscsi = try(local.var_infra.iscsi, {})
 
-  enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (upper(local.db.platform) == "HANA")
+  enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
 
   //iSCSI target device(s) is only created when below conditions met:
   //- iscsi is defined in input JSON

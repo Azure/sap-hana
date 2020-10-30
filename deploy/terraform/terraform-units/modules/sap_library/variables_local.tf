@@ -17,6 +17,44 @@ variable "service_principal" {
   description = "Current service principal used to authenticate to Azure"
 }
 
+variable "region_mapping" {
+  type        = map(string)
+  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
+
+  # 28 Regions 
+
+  default = {
+    westus             = "weus"
+    westus2            = "wus2"
+    centralus          = "ceus"
+    eastus             = "eaus"
+    eastus2            = "eus2"
+    northcentralus     = "ncus"
+    southcentralus     = "scus"
+    westcentralus      = "wcus"
+    northeurope        = "noeu"
+    westeurope         = "weeu"
+    eastasia           = "eaas"
+    southeastasia      = "seas"
+    brazilsouth        = "brso"
+    japaneast          = "jpea"
+    japanwest          = "jpwe"
+    centralindia       = "cein"
+    southindia         = "soin"
+    westindia          = "wein"
+    uksouth2           = "uks2"
+    uknorth            = "ukno"
+    canadacentral      = "cace"
+    canadaeast         = "caea"
+    australiaeast      = "auea"
+    australiasoutheast = "ause"
+    uksouth            = "ukso"
+    ukwest             = "ukwe"
+    koreacentral       = "koce"
+    koreasouth         = "koso"
+  }
+}
+
 locals {
 
   storageaccount_names = var.naming.storageaccount_names.LIBRARY
@@ -83,6 +121,10 @@ locals {
   // deployer_users_id = try(local.deployer.users.object_id, [])
 
   // key vault for saplibrary
+  // Post fix for all deployed resources
+  postfix         = upper(substr(random_id.post_fix.hex, 0, 4))
+  environment     = try(var.infrastructure.environment, "")
+  location_short  = try(var.region_mapping[local.region], "unkn")
   kv_prefix       = upper(format("%s%s", substr(local.environment, 0, 5), local.location_short))
   kv_private_name = format("%sSAPLIBprvt%s", local.kv_prefix, local.postfix)
   kv_user_name    = format("%sSAPLIBuser%s", local.kv_prefix, local.postfix)

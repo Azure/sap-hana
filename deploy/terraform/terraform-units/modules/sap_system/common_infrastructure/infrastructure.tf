@@ -39,7 +39,7 @@ data "azurerm_virtual_network" "vnet-sap" {
 resource "azurerm_subnet" "admin" {
   count                = ! local.sub_admin_exists && local.enable_admin_subnet ? 1 : 0
   name                 = local.sub_admin_name
-  resource_group_name  = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
   address_prefixes     = [local.sub_admin_prefix]
 }
@@ -80,9 +80,9 @@ resource "azurerm_subnet_network_security_group_association" "Associate-admin" {
 # Peers management VNET to SAP VNET
 resource "azurerm_virtual_network_peering" "peering-management-sap" {
   count                        = local.vnet_sap_exists ? 0 : 1
-  name                         = substr(format("%s_to_%s", var.vnet-mgmt.name, local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name), 0, 80)
-  resource_group_name          = var.vnet-mgmt.resource_group_name
-  virtual_network_name         = var.vnet-mgmt.name
+  name                         = substr(format("%s_to_%s", local.vnet-mgmt.name, local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name), 0, 80)
+  resource_group_name          = local.vnet-mgmt.resource_group_name
+  virtual_network_name         = local.vnet-mgmt.name
   remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].id : azurerm_virtual_network.vnet-sap[0].id
   allow_virtual_network_access = true
 }
@@ -90,7 +90,7 @@ resource "azurerm_virtual_network_peering" "peering-management-sap" {
 # Peers SAP VNET to management VNET
 resource "azurerm_virtual_network_peering" "peering-sap-management" {
   count                        = local.vnet_sap_exists ? 0 : 1
-  name                         = substr(format("%s_to_%s", local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name, var.vnet-mgmt.name), 0, 80)
+  name                         = substr(format("%s_to_%s", local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name, local.vnet-mgmt.name), 0, 80)
   resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
   virtual_network_name         = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
   remote_virtual_network_id    = local.vnet-mgmt.id

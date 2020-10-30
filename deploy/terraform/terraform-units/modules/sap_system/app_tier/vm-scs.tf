@@ -13,7 +13,7 @@ resource "azurerm_network_interface" "scs" {
       cidrhost(local.sub_app_exists ?
         data.azurerm_subnet.subnet-sap-app[0].address_prefixes[0] :
         azurerm_subnet.subnet-sap-app[0].address_prefixes[0],
-        tonumber(count.index) + local.ip_offsets.app_vm
+        tonumber(count.index) + local.ip_offsets.scs_vm
       )
     )
     private_ip_address_allocation = "static"

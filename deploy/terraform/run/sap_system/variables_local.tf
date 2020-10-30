@@ -34,6 +34,14 @@ variable "deployer_tfstate_key" {
 # Set defaults
 locals {
 
+  // The environment of sap landscape and sap system
+  environment = upper(try(var.infrastructure.environment, ""))
+
+  vnet_sap_name = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "sap")
+  vnet_nr_parts = length(split("-", local.vnet_sap_name))
+  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
+  vnet_sap_name_part = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? substr(split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)], 0, 7) : local.vnet_sap_name
+
   # Options
   enable_secure_transfer = try(var.options.enable_secure_transfer, true)
   ansible_execution      = try(var.options.ansible_execution, false)

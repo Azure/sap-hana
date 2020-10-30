@@ -98,13 +98,13 @@ variable "any-database-info" {
 
 locals {
 
-  ips-iscsi                    = var.nics-iscsi[*].private_ip_address
-  ips-jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
-  ips-jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
+  ips_iscsi                    = var.nics-iscsi[*].private_ip_address
+  ips_jumpboxes_windows        = var.nics-jumpboxes-windows[*].private_ip_address
+  ips_jumpboxes_linux          = var.nics-jumpboxes-linux[*].private_ip_address
   public-ips-jumpboxes-windows = var.public-ips-jumpboxes-windows[*].ip_address
   public-ips-jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
-  ips-dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
-  ips-dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
+  ips_dbnodes_admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
+  ips_dbnodes_db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
   databases = [
     var.hana-database-info
   ]

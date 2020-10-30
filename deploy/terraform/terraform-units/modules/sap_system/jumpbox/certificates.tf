@@ -8,7 +8,7 @@ data "azurerm_client_config" "current" {}
 # Creates Azure key vault
 resource "azurerm_key_vault" "key-vault" {
   count               = length(local.vm-jump-win) > 0 ? 1 : 0
-  name                = "winrm-kv-${var.random-id.hex}"
+  name                = "winrm-kv-${var.random_id.hex}"
   location            = var.resource-group[0].location
   resource_group_name = var.resource-group[0].name
   tenant_id           = data.azurerm_client_config.current.tenant_id

@@ -14,10 +14,11 @@ module "common_infrastructure" {
   software            = var.software
   ssh-timeout         = var.ssh-timeout
   sshkey              = var.sshkey
-  vnet-mgmt           = module.deployer.vnet-mgmt
-  subnet-mgmt         = module.deployer.subnet-mgmt
-  nsg-mgmt            = module.deployer.nsg-mgmt
   naming              = module.sap_namegenerator.naming
+  service_principal   = local.service_principal
+  deployer_tfstate    = data.terraform_remote_state.deployer.outputs
+  // Comment out code with users.object_id for the time being.
+  // deployer_user       = module.deployer.deployer_user
 }
 
 module "sap_namegenerator" {
@@ -38,19 +39,14 @@ module "sap_namegenerator" {
   // The first db_server_count items are for single node
   // The the second db_server_count items are for ha
   /////////////////////////////////////////////////////////////////////////////////////
-  db_server_count   = local.db_server_count
-  app_server_count  = local.app_server_count
-  web_server_count  = local.webdispatcher_count
-  scs_server_count  = local.scs_server_count
-  app_zones         = local.app_zones
-  scs_zones         = local.scs_zones
-  web_zones         = local.web_zones
-  db_zones          = local.db_zones
-  subnet-sap-admin  = module.hdb_node.subnet-sap-admin
-  service_principal = local.service_principal
-  deployer_tfstate  = data.terraform_remote_state.deployer.outputs
-  // Comment out code with users.object_id for the time being.
-  // deployer_user       = module.deployer.deployer_user
+  db_server_count  = local.db_server_count
+  app_server_count = local.app_server_count
+  web_server_count = local.webdispatcher_count
+  scs_server_count = local.scs_server_count
+  app_zones        = local.app_zones
+  scs_zones        = local.scs_zones
+  web_zones        = local.web_zones
+  db_zones         = local.db_zones
 }
 
 // Create Jumpboxes
@@ -68,7 +64,7 @@ module "jumpbox" {
   storage-bootdiag  = module.common_infrastructure.storage-bootdiag
   output-json       = module.output_files.output-json
   ansible-inventory = module.output_files.ansible-inventory
-  random-id         = module.common_infrastructure.random-id
+  random_id         = module.common_infrastructure.random_id
   deployer_tfstate  = data.terraform_remote_state.deployer.outputs
 }
 
@@ -87,7 +83,6 @@ module "hdb_node" {
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
-  random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
   // Comment out code with users.object_id for the time being.
   // deployer_user    = module.deployer.deployer_user
@@ -111,7 +106,6 @@ module "app_tier" {
   vnet-sap         = module.common_infrastructure.vnet-sap
   storage-bootdiag = module.common_infrastructure.storage-bootdiag
   ppg              = module.common_infrastructure.ppg
-  random-id        = module.common_infrastructure.random-id
   sid_kv_user      = module.common_infrastructure.sid_kv_user
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
@@ -135,7 +129,6 @@ module "anydb_node" {
   vnet-sap                   = module.common_infrastructure.vnet-sap
   storage-bootdiag           = module.common_infrastructure.storage-bootdiag
   ppg                        = module.common_infrastructure.ppg
-  random-id                  = module.common_infrastructure.random-id
   sid_kv_user                = module.common_infrastructure.sid_kv_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
@@ -176,5 +169,5 @@ module "output_files" {
   nics_anydb_admin             = module.anydb_node.nics_anydb_admin
   any-database-info            = module.anydb_node.any-database-info
   anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
-  random-id                    = module.common_infrastructure.random-id
+  random_id                    = module.common_infrastructure.random_id
 }

@@ -14,7 +14,7 @@ variable "ansible-inventory" {
   description = "Details of the Ansible inventory"
 }
 
-variable "random-id" {
+variable "random_id" {
   description = "Random hex for creating unique Azure key vault name"
 }
 
