@@ -37,11 +37,11 @@ Any additional components are not required at this stage as they do not affect t
 
 1. Use the extracted `hdblcm` tool to generate an empty install template and password file. **_Note:_** These two files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
 
-   The file name used in this command should reflect the `<stack_version>` (e.g. `HANA2_00_052_v001`):
+   The file name used in this command should reflect the `<stack_version>` (e.g. `HANA_2_00_052_v001`):
 
-   `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA2_00_052_v001.params`
+   `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA_2_00_052_v001.params`
 
-1. Edit the `HANA2_00_052_v001.params` file:
+1. Edit the `HANA_2_00_052_v001.params` file:
    1. Update `components` to `all`:\
       `components=all`
    1. Update `hostname` to `{{ ansible_hostname }}`:\
@@ -50,7 +50,7 @@ Any additional components are not required at this stage as they do not affect t
       `sid={{ db_sid | upper }}`
    1. Update `number` to `{{ db_instance_number }}`:\
       `number={{ db_instance_number }}`
-1. Edit the `HANA2_00_052_v001.params.xml` file, replacing the three asterisks (`***`) for each value with the ansible variables as below:
+1. Edit the `HANA_2_00_052_v001.params.xml` file, replacing the three asterisks (`***`) for each value with the ansible variables as below:
 
    ```xml
    <?xml version="1.0" encoding="UTF-8"?>
@@ -74,20 +74,20 @@ Any additional components are not required at this stage as they do not affect t
    1. Click "Upload";
    1. In the panel on the right, click "Select a file";
    1. Navigate your workstation to the template generation directory `/tmp/hana_template`;
-   1. Select the generated templates, e.g. `HANA2_00_052_v001.params` and `HANA2_00_052_v001.params.xml`;
+   1. Select the generated templates, e.g. `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml`;
    1. Click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory;
    1. Click "Upload".
 
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Ensure the `HANA2_00_052_v001.params` and `HANA2_00_052_v001.params.xml` files exist in `/tmp/hana_template`
-1. Edit the `HANA2_00_052_v001.params` file and replace variables:
+1. Ensure the `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` files exist in `/tmp/hana_template`
+1. Edit the `HANA_2_00_052_v001.params` file and replace variables:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
    1. Update `sid` to `<HANA SID>` for example: `sid=HD1`
    1. Update `number` to `<Instance Number>` for example: `number=00`
-1. Edit the `HANA2_00_052_v001.params.xml` file, replacing the ansible variables with a suitable master password as below:
+1. Edit the `HANA_2_00_052_v001.params.xml` file, replacing the ansible variables with a suitable master password as below:
 
    ```xml
    <?xml version="1.0" encoding="UTF-8"?>
@@ -106,7 +106,7 @@ Any additional components are not required at this stage as they do not affect t
    </Passwords>
 
 1. Run the HANA installation:\
-   `cat HANA2_00_052_v001.params.xml | SAP_HANA_DATABASE/hdblcm --read_password_from_stdin=xml -b --configfile=HANA2_00_052_v001.params`
+   `cat HANA_2_00_052_v001.params.xml | SAP_HANA_DATABASE/hdblcm --read_password_from_stdin=xml -b --configfile=HANA_2_00_052_v001.params`
 
 ## Results and Outputs
 
