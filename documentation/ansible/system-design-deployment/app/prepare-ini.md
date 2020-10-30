@@ -7,10 +7,11 @@
 1. The BoM file for this stack.
 1. SAP Library contains all media for the relevant applications;
 1. SAP infrastructure has been deployed;
+1. Application servers should have swap space of greater than 1MB configured;
 1. Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place);
 1. Browser connectivity between workstation and target SAP VM.
 
-## Inputs
+## Inputs`
 
 1. SAP Library prepared with the SAP Media.
 1. The BoM file for this stack.
