@@ -310,7 +310,7 @@ When you have completed generating your `inifile.params` templates you will need
     1. click "Upload"
     1. In the panel on the right, click Select a file
     1. Navigate your workstation to the template generation directory `/tmp/hana_template`
-    1. Select the generated templates, e.g. `hana_sp05_v001.params` and `hana_sp05_v001.paramas.xml`
+    1. Select the generated templates, e.g. `hana_sp05_v001.params` and `hana_sp05_v001.params.xml`
     1. click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
     1. click "Upload"
 
