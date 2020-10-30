@@ -197,7 +197,10 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 1. Ensure Yes, clean up operating system users is checked
 1. click "Next"
 1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at
-1. On only the PAS/AAS node, a copy of the inifile.params file is generated in the temporary SAP installation directory located at /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ERS/.  This can be used as the basis for unattended deployments
+1. On only the PAS/AAS node, a copy of the inifile.params file is generated in the temporary SAP installation directory:
+    1. PAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params`
+    1. AAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params`
+1. The inifiles can be used as the basis for unattended deployments
 1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params`:\
 `cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params /mnt/<sapbits fileshare path>/templates/pas.inifile.params`
 1. For AAS:\
