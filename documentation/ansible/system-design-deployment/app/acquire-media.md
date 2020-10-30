@@ -61,7 +61,7 @@
    1. Click `Download Stack Text File`;
    1. Click `Download PDF`;
    1. Click `Export to Excel`.
-1. Navigate to the Download Basket.
+1. Navigate to the Download Basket from SAP Launchpad (you may need to refresh the page to see the new basket contents).
 1. Click the `T` icon above the table to download a file containing the URL hardlinks for the download basket and save to your workstation <sup>1</sup>.
 1. From your workstation:
    1. Run SAP Download Manager and login to access your SAP Download Basket;

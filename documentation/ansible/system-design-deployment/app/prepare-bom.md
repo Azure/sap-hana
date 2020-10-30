@@ -40,7 +40,7 @@ step|BoM Content
     |
     |---
     |
-[1] |name:    'S4HANA_1909_SP2_v001'
+[1] |name:    'S4HANA_2020_ISS_v001'
 [2] |target:  'ABAP PLATFORM 1909'
 [3] |version: 001
     |
@@ -75,7 +75,7 @@ step|BoM Content
     |      archive:  S4COREOP104.SAR
     |
 [8] |  templates:
-    |    - name:     S4HANA_1909_SP2_v001
+    |    - name:     S4HANA_2020_ISS_v001
 ```
 
 ### Create BoM Header
@@ -160,7 +160,7 @@ The order of entries in the `media` section does not matter. However, for improv
 
    ```text
      templates:
-       - name:     S4HANA_1909_SP2_v001
+       - name:     S4HANA_2020_ISS_v001
          version:  001
    ```
 

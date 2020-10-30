@@ -32,7 +32,7 @@
       1. Select all Stack files (MP_*.(xml|xls|pdf|txt));
       1. Click Advanced to show the advanced options, and enter `boms/<Stack_Version>/stackfiles` for the Upload Directory.
 
-         _Note: `<Stack_Version>` should consist of Product type (e.g. `S4HANA`), Product Release (e.g. `1909`), Service Pack (e.g. `SP2`) and a version of the Stack (e.g. `v001`), example: `S4HANA_1909_SP2_v001`_
+         _Note: `<Stack_Version>` should consist of Product type (e.g. `S4HANA`), Product Release (e.g. `2020`), Service Pack (e.g. `SP2` or `ISS` for Initial Software Shipment) and a version of the Stack (e.g. `v001`), example: `S4HANA_2020_ISS_v001`_
 
 ### Example SAP Library file structure
 
@@ -48,7 +48,7 @@ sapbits
 |   |-- <tool>_<id>.EXE
 |
 |-- boms/
-|   |-- S4HANA_1909_SP2_v001/
+|   |-- S4HANA_2020_ISS_v001/
 |   |   |-- bom.yml
 |   |   |-- stackfiles/
 |   |   |   |-- MP_Excel_1001034051_20200921_SWC.xls
@@ -57,13 +57,13 @@ sapbits
 |   |   |   |-- MP_Stack_1001034051_20200921_.xml
 |   |   |   |-- myDownloadBasketFiles.txt
 |   |
-|   |-- SAP BW/4HANA_2_0_v002/
+|   |-- S4HANA_2020_ISS_v001/
 |       |-- ...
 |
 |-- templates/
-    |-- HANA2_00_052_v001.params
-    |-- HANA2_00_052_v001.params.xml
-    |-- S4HANA_1909_SP2_v001.ini
+    |-- HANA_2_00_052_v001.params
+    |-- HANA_2_00_052_v001.params.xml
+    |-- S4HANA_2020_ISS_v001.ini
 ```
 
 **_Notes:_**
