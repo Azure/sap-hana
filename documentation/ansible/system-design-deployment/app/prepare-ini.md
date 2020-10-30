@@ -17,26 +17,27 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user
-1. Ensure a file system eith enough space is mounted to copy the required `sapbits` Azure file share contents to. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/attach-disk-portal)
-1. On your target server, create a temporary directory to copy the SAP media to. For example: `mkdir /tmp/app_templates`
-1. Mount the `sapbits` Azure file share to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-linux). Detailed instructions for the `sapbits` file share can be found by clicking `Connect` from the Azure Portal `sapbits` Overview:
+1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux). Detailed instructions for the `sapbits` container can be found by clicking `Connect` from the Azure Portal `sapbits` Overview:
 
    ![sapbits connect details](../images/sapbits-connect.png)
 
-1. Copy the required media from `sapbits/archive/` to the directory created in step 2:\
-`cp /mnt/<sapbits fileshare path> /datadrive`
+1. Make and change to a temporary directory:\
+   `mkdir /tmp/app_template; cd $_`
+1. Copy the required media from `sapbits/` to `/tmp/app_template`:\
+`cp /mnt/<sapbits fileshare path> /tmp/app_template`
+    **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media`.
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
-`chmod +x /datadrive/archives/SAPCAR_1311-80000935.EXE`
+`chmod +x /tmp/app_template/SAPCAR_1311-80000935.EXE`
 1. Ensure `/usr/sap/install/SWPM/`exists and extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE` here(SAR file version may change depending on your downloads):\
-`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf /datadrive/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+`/tmp/app_template/archives/SAPCAR_1311-80000935.EXE -xf /tmp/app_template/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:\
-`mkdir -p "/usr/sap/install/config" && cp /datadrive/boms/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
+`mkdir -p "/usr/sap/install/config" && cp /tmp/app_template/BoMs/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
 1. Ensure `/usr/sap/downloads/` exists:\
 `mkdir /usr/sap/downloads/`
-1. Extract `SAPEXE_200-80004393.SAR` using `SAPCAR.EXE` to `/usr/sap/downloads/`:\
-`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf SAPEXE_200-80004393.SAR -R /usr/sap/downloads/`
-1. Extract `SAPHOSTAGENT49_49-20009394.SAR` using `SAPCAR.EXE` to `/usr/sap/downloads/`:\
-`/datadrive/archives/SAPCAR_1311-80000935.EXE -xf SAPHOSTAGENT49_49-20009394.SAR -R usr/sap/downloads/`.
+1. Move `SAPEXE_200-80004393.SAR`  to `/usr/sap/downloads/`:\
+`mv /tmp/app_template/archives/SAPEXE_200-80004393.SAR -R /usr/sap/downloads/`
+1. Move `/tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:\
+`mv /tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR -R usr/sap/downloads/`.
 1. Follow the instructions bellow to generate each ini template
 
 ### Generating unattended installation inifile for ASCS
@@ -50,7 +51,7 @@ The following steps show how to manually begin the install of an ASCS instance i
 1. Establish a connection to the ASCS node using a web browser
 1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output)
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu to the "ASCS Instance" relevant to your installation
+1. Navigate through the drop-down menu "SAP S/4HANA Foundation 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
 1. Select the `Custom` Parameter Mode and click "Next"
 1. The SAP system ID should be prepopulated with {SID} and SAP Mount Directory /sapmnt, click "Next"
 1. The FQDN should be prepopulated.  Ensure “Set FQDN for SAP system” is checked, and click "Next"
@@ -68,13 +69,13 @@ The following steps show how to manually begin the install of an ASCS instance i
 1. On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/.  This can be used as the basis for unattended deployments.
 1. click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method
 1. Copy and rename `inifile.params` to `sapbits/templates`:\
-`cp /tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params /mnt/<sapbits fileshare path>/templates/scs.inifile.params`
+`cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params /mnt/<sapbits fileshare path>/templates/scs.inifile.params`
 
 #### Example software provision manager input
 
 ```bash
 root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
-SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
+SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
 SAPINST_USE_HOSTNAME=<target vm hostname>
 ```
 
@@ -95,7 +96,7 @@ Logon users: [root]
 #### Manual SCS Installation Using Template
 
 1. Connect to the SCS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params` file on the SCS VM:
+1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params` file on the SCS VM:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-scs-vm`
    1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
@@ -105,10 +106,10 @@ Logon users: [root]
 
      ```bash
     root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
-    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
+    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
-    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params
-    SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAPHA
+    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params
+    SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAPHA
     SAPINST_START_GUI=false
     SAPINST_START_GUISERVER=false
     ```
@@ -122,12 +123,13 @@ Logon users: [root]
 
     ```bash
     root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
-    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
+    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     ```
 
 1. Connect to the URL displayed from a browser session on your workstation
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu to the "SAP S4/HANA Server 1909" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "High Availability System", click on "Database Instance" and click "Next"
+1. Navigate through the drop-down menu to the "SAP S4/HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "
+Distributed System" , click on "Database Instance" and click "Next"
 1. Notice the profile directory which the ASCS instance installation created /usr/sap/`<SID>`/SYS/profile then click "Next"
 1. Enter in the ABAP message server port for the ASCS instance, which should be 36`<InstanceNumber>` for example: "3600" then click "Next"
 1. Enter the Master Password to be used during the database content installation and click "Next"
@@ -157,7 +159,9 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 1. Connect to the PAS Node as Root user and launch Software Provisioning Manager, shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input). Ensure that you update <sap_component> to PAS/AAS
 1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output)
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu to the "Primary Application Server Instance" relevant to your installation
+1. Navigate through the drop-down menu:
+    1. For PAS "SAP S/4HANA Foundation 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "Primary Application Server Instance"
+    1. For AAS ""SAP S/4HANA Foundation 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "High-Availability System" > "Additional Application Server Instance"
 1. On the Parameter Settings Screen Select "Custom" and click "Next"
 1. Ensure the Profile Directory is set to `/sapmnt/<SID>/profile/` and click "Next"
 1. Set the Message Server Port to 3611 and click "Next"
@@ -197,17 +201,17 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 1. click "Next"
 1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at
 1. On only the PAS/AAS node, a copy of the inifile.params file is generated in the temporary SAP installation directory located at /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ERS/.  This can be used as the basis for unattended deployments
-1. Create a copy of the `inifile.params` to the `sapbits` Azure File Share to the `/templates/` directory and rename to `pas.inifile.params`:\
-`cp /tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params /mnt/<sapbits fileshare path>/templates/pas.inifile.params`
+1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params`:\
+`cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params /mnt/<sapbits fileshare path>/templates/pas.inifile.params`
 1. For AAS:\
-`cp /tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/AS/APPS/inifile.params inifile.params /mnt/<sapbits fileshare path>/templates/aas.inifile.params`
+`cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params inifile.params /mnt/<sapbits fileshare path>/templates/aas.inifile.params`
 
 #### Manual PAS/AAS Installation Using Template
 
 ##### PAS installation
 
 1. Connect to PAS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params` file on the PAS VM:
+1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params` file on the PAS VM:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-pas-vm`
    1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
@@ -218,9 +222,9 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
     ```bash
     root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
-    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
+    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
-    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params
+    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params
     ```
 
 ##### AAS Installation
@@ -228,7 +232,7 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 :hand: A PAS must exist before the AAS Installation is attempted :hand:
 
 1. Connect to the AAS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/AS/APPS/inifile.params` file on the AAS VM:
+1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params` file on the AAS VM:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-pas-vm`
    1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
@@ -239,16 +243,16 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
     ```bash
     root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
-    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_1909_v001.xml
+    SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
-    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA1909/CORE/HDB/INSTALL/AS/APPS/inifile.params
+    SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params
     ```
 
 ### Inifile consolidation
 
-When you have completed generating your inifile.params templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_1909_v2.inifile.params`.
+When you have completed generating your inifile.params templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then Save the new file with a meaningful name relating to the SAP Product e.g `s4_2020_v2.inifile.params`.
 
-1. Edit the `s4_1909_v2.inifile.params` file:
+1. Edit the `s4_2020_v2.inifile.params` file:
     1. Update `components` to `all`:\
         `components=all`
     1. Update `hostname` to `{{ ansible_hostname }}`:\
@@ -259,7 +263,7 @@ When you have completed generating your inifile.params templates you will need t
         `number={{ app_instance_number }}`
 
 1. Upload the generated template files to the SAP Library:
-    1. In the Azure Portal navigate to the `sapbits` file share
+    1. In the Azure Portal navigate to the `sapbits` container
     1. Create a new `templates` directory under `sapbits`
     1. click "Upload"
     1. In the panel on the right, click Select a file
@@ -271,4 +275,4 @@ When you have completed generating your inifile.params templates you will need t
 ## Results and Outputs
 
 1. A Consolidated `inifile.params` which can be used to the unattended installation of ASCS, PAS and AAS
-1. Consolidated inifile uploaded to `targets` directory in the `SAPBITS` Azure File Share
+1. Consolidated inifile uploaded to `targets` directory in the `sapbits` container
