@@ -8,11 +8,19 @@ This can be a challenge when SAP removes available software versions, or a custo
 The process is aimed at users with some prior experience of both deploying SAP systems and with the Azure cloud platform.
 For example, users should be familiar with: _SAP Launchpad_, _SAP Maintenance Planner_, _SAP Download Manager_, and _Azure Portal_.
 
-The process described here consists of 3 distinct phases:
+The process is split between SAP HANA and SAP Application to promote modularity and reuse in the overall SAP journey.
+The SAP HANA Database deployment materials obtained by following the SAP HANA process is likely to be reused by more than one SAP Application deployment - both for different versions of the same product, and different products.
+
+In turn, these two processes both consist of 3 distinct phases:
 
 1. **_Acquisition_** of the SAP installation media, configuration files and tools;
-1. **_Preparation_** of the SAP media library, and generation of the files required for automated deployments;
+1. **_Preparation_** of the SAP media library, and generation of the _Bill of Materials_ (BoM);
 1. **_Deployment_** of the SAP landscape into Azure.
+
+**Notes:**
+
+- To prevent unecessary duplication with the Acquisition phase, the installation media and tools for all systems are stored in a single flat directory.
+- To keep the SAP Application and SAP HANA proccesses modular, the SAP Application BoM contains a (nested) reference to a SAP HANA BoM, allowing them to be updated and used independently.
 
 Two other phases are involved in the overall end-to-end lifecycle, but these are described elsewhere:
 
@@ -24,27 +32,21 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 ### SAP HANA
 
 1. **Acquisition**
-   1. [Acquisition of Media](./hana/acquire-media.md)
+   1. [Acquire Media](./hana/acquire-media.md)
 1. **Preparation**
-   1. [Upload of Installation Media](./hana/prepare-sap-library.md)
-   1. [Generate Bill of Materials](./hana/prepare-bom.md)
-   1. [Generate Installation Templates](./hana/prepare-ini.md)
+   1. [Prepare Media](./hana/prepare-sap-library.md)
+   1. [Prepare Bill of Materials](./hana/prepare-bom.md)
+   1. [Prepare Installation Template](./hana/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
 
 ### SAP Application
 
 1. **Acquisition**
-   1. [Acquisition of Media](./app/acquire-media.md)
+   1. [Acquire Media](./app/acquire-media.md)
 1. **Preparation**
-   1. [Upload of Installation Media](./app/prepare-sap-library.md)
-   1. [Generate Bill of Materials](./app/prepare-bom.md)
-   1. [Generate Installation Templates](./app/prepare-ini.md)
+   1. [Prepare Media](./app/prepare-sap-library.md)
+   1. [Prepare Bill of Materials](./app/prepare-bom.md)
+   1. [Prepare Installation Template](./app/prepare-ini.md)
 1. **Deployment**
-   1. [Deploy SAP HANA SID](./app/deploy-sid.md)
-
-## Notes
-
-1. The SAP HANA and SAP Application processes have been separated, because in the overall SAP journey, a set of the SAP HANA Database deployment materials obtained by following the SAP HANA process is likely to be reused by more than one SAP Application, e.g. S/4HANA, BW/4HANA, etc.
-1. The Application Bill of Materials (BoM) will contain a reference to a SAP HANA BoM. This allows the process for the Application BoM generation and deployment to be completed separately, and multiple times without requiring the generation of a new SAP HANA BoM.
-1. To prevent duplication, the Installation Media and Tools for all systems designed will be kept in a single flat `archives` directory.
+   1. [Deploy SAP Application SID](./app/deploy-sid.md)
