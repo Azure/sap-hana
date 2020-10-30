@@ -20,7 +20,7 @@
 
 ## Process
 
-### Access SWPM
+### Ensure Installation Media And Required Tools Are Present
 
 1. Connect to your target VM as the `root` user;
 1. Set the root user password to a known value as this will be required to access SWPM;
@@ -32,18 +32,22 @@
 
    `mkdir /tmp/app_template; cd $_`
 
-1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/tmp/hana_template`:
+1. Ensure `/usr/sap/downloads/` exists:
+
+   `mkdir /usr/sap/downloads/`
+
+1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/usr/sap/downloads`:
    1. For each entry in `media`:
 
-      `cp /mnt/sapbits/archive/<archive> .`
+      `cp /mnt/sapbits/archive/<archive> /usr/sap/downloads`
 
       Where `<archive>` is the filename in the `archive:` property of the entry in the BoM.
 
-      For example: `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR .`
+      For example: `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR /usr/sap/downloads`
 
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
-   `chmod +x SAPCAR_1311-80000935.EXE`
+   `chmod +x /usr/sap/downloads/SAPCAR_1311-80000935.EXE`
 
 1. Ensure `/usr/sap/install/SWPM/` exists:
 
@@ -51,23 +55,11 @@
 
 1. Extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE`. For example:
 
-   `./SAPCAR_1311-80000935.EXE -xf SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+   `/usr/sap/downloads/SAPCAR_1311-80000935.EXE -xf /usr/sap/downloads/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:
 
    `mkdir -p /usr/sap/install/config && cp /mnt/sapbits/boms/S4HANA_2020_ISS_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
-
-1. Ensure `/usr/sap/downloads/` exists:
-
-   `mkdir /usr/sap/downloads/`
-
-1. Copy `SAPEXE_200-80004393.SAR`  to `/usr/sap/downloads/`:
-
-   `cp /mnt/sapbits/archive/SAPEXE_200-80004393.SAR /usr/sap/downloads/`
-
-1. Copy `SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:
-
-   `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`
 
 1. Follow the instructions below to generate each `inifile` template.
 
