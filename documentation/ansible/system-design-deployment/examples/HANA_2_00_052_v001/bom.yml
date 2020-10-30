@@ -14,12 +14,12 @@ materials:
     version:  7.21
     archive:  SAPCAR_1320-80000935.EXE
 
-  - name:     IMDB LCAPPS 2.052
+  - name:     "LCAPPS for HANA 2.00.052.00 Build 100.46 PL 029"
     archive:  IMDB_LCAPPS_2052_0-20010426.SAR
 
-  - name:     "SAP HANA Platform Edt. 2.0 SPS05 rev52 Linux x86_64"
+  - name:     "Revision 2.00.052.0 (SPS05) for HANA DB 2.0"
     version:  2.00.052
-    archive:  51054623.ZIP
+    archive:  IMDB_SERVER20_052_0-80002031.SAR
 
   templates:
 
