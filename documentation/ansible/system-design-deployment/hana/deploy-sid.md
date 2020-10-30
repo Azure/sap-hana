@@ -2,21 +2,21 @@
 
 ## Prerequisites
 
-1. Bootstrap infrastructure has been deployed
-1. Bootstrap infrastructure has been configured
-1. Deployer has been configured with working Ansible
-1. SAP Library contains all media for the relevant BoM
-1. SAP infrastructure has been deployed
-1. SAP Library contains all Terraform state files for the environment
-1. Deployer has Ansible connectivity to SAP Infrastructure (e.g. SSH keys in place/available via key vault)
-1. Ansible inventory has been created
+1. Bootstrap infrastructure has been deployed;
+1. Bootstrap infrastructure has been configured;
+1. Deployer has been configured with working Ansible;
+1. SAP Library contains all media for the relevant BoM;
+1. SAP infrastructure has been deployed;
+1. SAP Library contains all Terraform state files for the environment;
+1. Deployer has Ansible connectivity to SAP Infrastructure (e.g. SSH keys in place/available via key vault);
+1. Ansible inventory has been created.
 
 ## Inputs
 
-1. Populated BoM file
-1. Ansible inventory that details deployed SAP Infrastructure. **Note:** Inventory contents and format TBD, but may contain reference to the SAP Library
-1. SID (likely to exist in Ansible inventory in some form)
-1. Unattended install template
+1. BoM file;
+1. Ansible inventory that details deployed SAP Infrastructure. **Note:** Inventory contents and format TBD, but may contain reference to the SAP Library;
+1. SID (likely to exist in Ansible inventory in some form);
+1. Unattended install template.
 
 ## Process
 
@@ -33,11 +33,11 @@
    1. Configures generic SAP filesystem mounts
       1. Configure directory structure (e.g. `/sapmnt`, `/usr/sap`, etc.)
       1. Configure file systems (i.e. `/etc/fstab`)
-1. Run Ansible playbook which processes the BoM file to obtain and prepare the correct Installation Media for the system
+1. Run Ansible playbook which processes the BoM file to obtain and prepare the correct installation media for the system
    1. Configure install directories (e.g. `/sapmnt/<SID>` and `/usr/sap/install`)
    1. Configure media directory exports
    1. Iterates over BoM content to download (media, unattended install templates, etc.)
-   1. Media will be downloaded to a known location (`/usr/sap/install`) on the filesystem of a particular VM and selectively extracted and organised into directories where it benefits the automated process
+   1. Media will be downloaded to a known location (`/usr/sap/downloDS`) on the filesystem of a particular VM and selectively extracted and organised into directories where it benefits the automated process
    1. Creates NFS export of downloaded/extracted media making available to other VMs in the system
    1. Mounts above export on other VMs
 1. Run Ansible playbook which deploys stand alone SAP HANA instance (using SWPM)
