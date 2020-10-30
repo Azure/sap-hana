@@ -22,11 +22,15 @@ Any additional components are not required at this stage as they do not affect t
 
 ## Process
 
-1. On your workstation, locate the SAP HANA Installation Media from Phase 1b and make note of the path as `<HANA_MEDIA>`;
-1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
-   `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
+1. Connect to your target VM as the `root` user
+1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux). Detailed instructions for the `sapbits` container can be found by clicking `Connect` from the Azure Portal `sapbits` Overview
 1. Make and change to a temporary directory:\
    `mkdir /tmp/hana_template; cd $_`
+1. Copy the required media from `sapbits/` to `/tmp/app_template`:\
+`cp /mnt/<sapbits fileshare path> /tmp/hana_template`
+    **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media`.
+1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
+   `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
    ```text
@@ -81,7 +85,7 @@ Any additional components are not required at this stage as they do not affect t
 ### Manual HANA Installation Using Template
 
 1. Connect to target VM for HANA installation as `root` user
-1. Ensure the `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` files from your workstation exist in `/tmp/hana_template`
+1. Ensure the the inifiles `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` generated in [Process](#Process)  exist in `/tmp/hana_template`
 1. Edit the `HANA_2_00_052_v001.params` file and replace variables:
    1. Update `components` to `all`
    1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
