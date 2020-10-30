@@ -1,7 +1,7 @@
 ---
 
-name:    'HANA 2.00.052'
-target:  'HANA 2.0'
+name:    "HANA_2_00_052_v001"
+target:  "HANA 2.0"
 version: 001
 
 defaults:
@@ -22,6 +22,9 @@ materials:
     archive:  51054623.ZIP
 
   templates:
-  - name:     HANA
-    version:  2.0
-    file:     hana2.0_v1.ini
+
+    - name:     "HANA_2_00_052_v001 params"
+      file:     "HANA_2_00_052_v001.params"
+
+    - name:     "HANA_2_00_052_v001 xml"
+      file:     "HANA_2_00_052_v001.params.xml"

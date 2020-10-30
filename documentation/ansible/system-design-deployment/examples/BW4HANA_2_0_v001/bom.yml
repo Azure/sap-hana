@@ -1,6 +1,6 @@
 ---
 
-  name: "SAP BW/4HANA 2.0"
+  name: "BW4HANA_2_0_v001"
   target: "SAP BW/4HANA 2.0"
   version: "001"
 
@@ -229,3 +229,8 @@
       - name: "Attribute Change Package 13 for SAP_BASIS 753"
         archive: "SAP_BASIS753.SAR"
         sapurl: "https://softwaredownloads.sap.com/file/0010000000804552020"
+
+  templates:
+
+    - name: "BW4HANA_2_0_v001 ini file"
+      file: "BW4HANA_2_0_v001.ini"

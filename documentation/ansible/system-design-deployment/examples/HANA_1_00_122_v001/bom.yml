@@ -1,7 +1,7 @@
 ---
 
-name:    'HANA 1.00.122'
-target:  'HANA 1.0'
+name:    "HANA_1_00_122_v001"
+target:  "HANA 1.0"
 version: 001
 
 defaults:
@@ -22,6 +22,9 @@ materials:
     archive:  IMDB_SERVER100_122_33-10009569.SAR
 
   templates:
-  - name:     HANA
-    version:  1.0
-    file:     hana1.0_v1.ini
+
+    - name:     "HANA_1_00_122_v001 params"
+      file:     "HANA_1_00_122_v001.params"
+
+    - name:     "HANA_1_00_122_v001 xml"
+      file:     "HANA_1_00_122_v001.params.xml"
