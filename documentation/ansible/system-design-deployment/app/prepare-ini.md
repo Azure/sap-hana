@@ -3,7 +3,7 @@
 ## Prerequisites
 
 1. An editor for working with the generated files;
-1. [HANA DB Deployment](../hana/prepare-ini.md) must be completed before following this process;
+1. [HANA DB Deployment](.hana/prepare-ini.md) must be completed before following this process;
 1. The BoM file for this stack.
 1. SAP Library contains all media for the relevant applications;
 1. SAP infrastructure has been deployed;
@@ -29,7 +29,7 @@
 
    `cp /mnt/<sapbits fileshare path> /tmp/app_template`
 
-   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media`.
+   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](prepare-bom) process listed under `media`.
 
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
@@ -41,7 +41,7 @@
 
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:
 
-   `mkdir -p "/usr/sap/install/config" && cp /tmp/app_template/BoMs/S4HANA_2020_ISS_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
+   `mkdir -p "/usr/sap/install/config" && cp /tmp/app_template/boms/S4HANA_2020_ISS_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
 
 1. Ensure `/usr/sap/downloads/` exists:
 

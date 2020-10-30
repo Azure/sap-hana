@@ -34,7 +34,8 @@ Any additional components are not required at this stage as they do not affect t
 
    `cp /mnt/<sapbits fileshare path> /tmp/hana_template`
 
-   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media:`.
+   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](prepare-bom) process listed under `media:`.
+
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
    `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`

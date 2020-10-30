@@ -27,12 +27,16 @@
    1. Ensure the search type at the top of the screen is set to Downloads;
    1. Enter `HANA PLATFORM` into the search bar and click the search button;
    1. Find the version of SAP HANA you wish to download, e.g. `SAP HANA PLATFORM EDITION 2.0`;
-   1. Click on the row with `Installation Product`;
-   1. Click `Installation`;
-   1. Click the checkbox next to the edition you wish to use, e.g. `SAP HANA Platform Edt. 2.0 SPS05 rev52 Linux x86_64`;
+   1. Click on the row with `Maintenance Product`;
+   1. If prompted, click on the row with `SAP HANA DATABASE 2.0`;
+
+      ![SAP HANA Database 2.0](../images/sap-hana-database-2.0.png)
+
+   1. Ensure the OS dropdown is `LINUX ON X86_64 BIT`;
+   1. Click the checkbox next to the edition you wish to use, e.g. `Revision 2.00.052.0 (SPS05) for HANA DB 2.0`;
    1. Click the Shopping Cart icon above the table to add to the download basket.
 
-      ![Example latest SAPCAR](../images/sap-hana.png)
+      ![SAP IMDB Server](../images/sap-imdb-server20.png)
 
 1. Repeat the process for any additional components required for your database installation, for example the `LCApps` component:
    1. Enter `LCAPPS` into the search bar and click the search button;
