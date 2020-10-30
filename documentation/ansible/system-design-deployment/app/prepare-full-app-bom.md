@@ -108,7 +108,7 @@ step|BoM Content
     |
 [8] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
-    |      file:     S4HANA_2020_ISS_v001.ini
+    |      file:     S4HANA_2020_ISS_v001.inifile.params
 ```
 
 ### Create BoM Header
@@ -224,12 +224,12 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [8]: Create a `templates` section as shown, with the same template name as the BoM itself. Note that the extensions `.params` and `.params.xml` are not specified.
+1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
 
    ```text
      templates:
        - name:     "S4HANA_2020_ISS_v001 ini file"
-         file:     S4HANA_2020_ISS_v001.ini
+         file:     S4HANA_2020_ISS_v001.inifile.params
    ```
 
 ### Upload Files to Archive Location

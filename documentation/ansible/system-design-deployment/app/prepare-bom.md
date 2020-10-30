@@ -76,7 +76,7 @@ step|BoM Content
     |
 [8] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
-    |      file:     "S4HANA_2020_ISS_v001.ini"
+    |      file:     "S4HANA_2020_ISS_v001.inifile.params"
 ```
 
 ### Create BoM Header
@@ -160,7 +160,7 @@ The order of entries in the `media` section does not matter. However, for improv
    ```text
      templates:
        - name:     "S4HANA_2020_ISS_v001 ini file"
-         file:     "S4HANA_2020_ISS_v001.ini"
+         file:     "S4HANA_2020_ISS_v001.inifile.params"
    ```
 
 ### Upload Files to Archive Location
