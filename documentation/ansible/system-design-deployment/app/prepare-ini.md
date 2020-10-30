@@ -64,13 +64,13 @@ This section covers the manual generation of the ABAP SAP Central Services (ASCS
 
 In order to install SCS unattended, an `ini` file needs to be generated in order to pass all of the required parameters into the SWPM installer. Currently, the only way to generate a new one is to partially run through a manual install as per SAP Note [2230669 - System Provisioning Using a Parameter Input File](https://launchpad.support.sap.com/#/notes/2230669).
 
-The following steps show how to manually begin the install of an ASCS instance in order to create an unattended file should it be needed.
+The following steps show how to manually begin the install of an ASCS instance in order to create an unattended file should it be needed. During the template generation process, you may need to confirm the change of ownership of files and permissions.
 
 1. On your ASCS Node as the `root` user, launch Software Provisioning Manager, shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input)
 1. Establish a connection to the ASCS node using a web browser
 1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output)
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu "SAP S/4HANA Foundation 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
+1. Navigate through the drop-down menu "SAP S/4HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
 1. Select the `Custom` Parameter Mode and click "Next"
 1. The SAP system ID should be prepopulated with {SID} and SAP Mount Directory /sapmnt, click "Next"
 1. The FQDN should be prepopulated.  Ensure “Set FQDN for SAP system” is checked, and click "Next"
