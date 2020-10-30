@@ -88,6 +88,7 @@ locals {
   deploy_anchor         = length(local.anchor) > 0 ? true : false
   anchor_size           = try(local.anchor.sku, "Standard_D8s_v3")
   anchor_authentication = try(local.anchor.authentication, local.db_auth)
+  anchor_nic_ips        = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
 
   anchor_custom_image = try(local.anchor.os.source_image_id, "") != "" ? true : false
 

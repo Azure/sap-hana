@@ -10,7 +10,7 @@ resource "azurerm_network_interface" "anchor" {
   ip_configuration {
     name                          = "IPConfig1"
     subnet_id                     = local.sub_admin_exists ? data.azurerm_subnet.admin[0].id : azurerm_subnet.admin[0].id
-    private_ip_address            = local.sub_admin_exists ? local.anchor.nic_ips[count.index] : cidrhost(local.sub_admin_prefix, (count.index + 5))
+    private_ip_address            = local.sub_admin_exists ? local.anchor_nic_ips[count.index] : cidrhost(local.sub_admin_prefix, (count.index + 5))
     private_ip_address_allocation = "static"
   }
 }
