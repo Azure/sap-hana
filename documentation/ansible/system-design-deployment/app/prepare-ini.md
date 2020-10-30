@@ -26,15 +26,15 @@
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
 `chmod +x /tmp/app_template/SAPCAR_1311-80000935.EXE`
 1. Ensure `/usr/sap/install/SWPM/`exists and extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE` here(SAR file version may change depending on your downloads):\
-`/tmp/app_template/archives/SAPCAR_1311-80000935.EXE -xf /tmp/app_template/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+`/tmp/app_template/SAPCAR_1311-80000935.EXE -xf /tmp/app_template/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:\
 `mkdir -p "/usr/sap/install/config" && cp /tmp/app_template/BoMs/S4HANA_SP05_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
 1. Ensure `/usr/sap/downloads/` exists:\
 `mkdir /usr/sap/downloads/`
 1. Move `SAPEXE_200-80004393.SAR`  to `/usr/sap/downloads/`:\
-`mv /tmp/app_template/archives/SAPEXE_200-80004393.SAR -R /usr/sap/downloads/`
-1. Move `/tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:\
-`mv /tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR -R usr/sap/downloads/`.
+`mv /tmp/app_template/SAPEXE_200-80004393.SAR /usr/sap/downloads/`
+1. Move `/tmp/app_template/SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:\
+`mv /tmp/app_template/SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`.
 1. Follow the instructions bellow to generate each ini template
 
 ### Generating unattended installation inifile for ASCS
@@ -115,7 +115,7 @@ Logon users: [root]
 
 :hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load :hand:
 
-1. On the PAS VM carry out the [Access SWPM](#Access-SWPM)
+1. On the PAS VM carry out the [Access SWPM](#Access-SWPM) process
 1. Launch SWPM with the following command:
 
     ```bash
