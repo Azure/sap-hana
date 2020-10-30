@@ -26,7 +26,7 @@ step|BoM Content
     |
 [4] |defaults:
     |  archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
-    |  target_location: "/usr/sap/install/downloads/"
+    |  target_location: "/usr/sap/downloads/"
     |
 [5] |materials:
 [6] |  media:
@@ -105,7 +105,7 @@ Files downloaded or shared from the archive space will need to be extracted to t
    - name:     HANA 2.0
      version:  2.00.052
      archive:  51054623.ZIP
-     override_target_location: "/usr/sap/install/elsewhere/"
+     override_target_location: "/usr/sap/elsewhere/"
    ```
 
 ### Override Target Filename
