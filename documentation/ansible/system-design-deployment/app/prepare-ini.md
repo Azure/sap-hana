@@ -7,10 +7,11 @@
 1. The BoM file for this stack.
 1. SAP Library contains all media for the relevant applications;
 1. SAP infrastructure has been deployed;
+1. Application servers should have swap space of greater than 1MB configured;
 1. Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place);
 1. Browser connectivity between workstation and target SAP VM.
 
-## Inputs
+## Inputs`
 
 1. SAP Library prepared with the SAP Media.
 1. The BoM file for this stack.
@@ -20,6 +21,7 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user;
+1. Set the root user password to a known value as this will be requierd to access SWPM;
 1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux);
 1. Make and change to a temporary directory:
 
@@ -63,13 +65,13 @@ This section covers the manual generation of the ABAP SAP Central Services (ASCS
 
 In order to install SCS unattended, an `ini` file needs to be generated in order to pass all of the required parameters into the SWPM installer. Currently, the only way to generate a new one is to partially run through a manual install as per SAP Note [2230669 - System Provisioning Using a Parameter Input File](https://launchpad.support.sap.com/#/notes/2230669).
 
-The following steps show how to manually begin the install of an ASCS instance in order to create an unattended file should it be needed.
+The following steps show how to manually begin the install of an ASCS instance in order to create an unattended file should it be needed. During the template generation process, you may need to confirm the change of ownership of files and permissions.
 
 1. On your ASCS Node as the `root` user, launch Software Provisioning Manager, shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input)
 1. Establish a connection to the ASCS node using a web browser
 1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output)
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu "SAP S/4HANA Foundation 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
+1. Navigate through the drop-down menu "SAP S/4HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
 1. Select the `Custom` Parameter Mode and click "Next"
 1. The SAP system ID should be prepopulated with {SID} and SAP Mount Directory /sapmnt, click "Next"
 1. The FQDN should be prepopulated.  Ensure “Set FQDN for SAP system” is checked, and click "Next"
