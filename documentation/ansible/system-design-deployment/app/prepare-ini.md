@@ -86,8 +86,8 @@ The following steps show how to manually begin the install of an ASCS instance i
 1. Do not select any additional components to install, click "Next"
 1. Check `Skip setting of security parameters` and click "Next"
 1. Select the checkbox “Yes, clean up operating system users” then click "Next"
-1. On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/.  This can be used as the basis for unattended deployments.
-1. click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method
+1. On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/.  This can be used as the basis for unattended deployments.
+1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method
 1. Copy and rename `inifile.params` to `sapbits/templates`:
 
 `cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params /mnt/<sapbits fileshare path>/templates/scs.inifile.params`
@@ -116,12 +116,6 @@ Logon users: [root]
 
 #### Manual SCS Installation Using Template
 
-1. Connect to the SCS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params` file on the SCS VM:
-   1. Update `components` to `all`
-   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-scs-vm`
-   1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
-   1. Update `number` to `<Instance Number>` for example: `number=00`
 1. Connect to the SCS VM as `root` User
 1. Launch SCS Unattended install replacing `<target vm hostname>` with the SCS VM hostname:
 
