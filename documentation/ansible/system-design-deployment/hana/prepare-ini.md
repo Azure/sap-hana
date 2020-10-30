@@ -6,7 +6,6 @@
 
 1. An editor for working with the generated files;
 1. The BoM file for this stack.
-1. HANA Media downloaded;
 1. SAP Library contains all media for HANA installation;
 1. SAP HANA infrastructure has been deployed;
 1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place);
@@ -14,10 +13,7 @@
 
 ## Inputs
 
-In order to generate the installation templates for SAP HANA, you will need:
-
 1. SAPCAR executable
-1. SAP HANA infrastructure.
 1. The BoM file for this stack.
 
 Any additional components are not required at this stage as they do not affect the template files generated.
@@ -26,31 +22,37 @@ Any additional components are not required at this stage as they do not affect t
 
 1. Connect to your target VM as the `root` user
 1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux).
+
+   **Note:** The following instructions assume you have mounted the container as `/mnt/sapbits`.
+
 1. Make and change to a temporary directory:
 
    `mkdir /tmp/hana_template; cd $_`
 
-1. Copy the required media from `sapbits/` to `/tmp/app_template`:
+1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/tmp/hana_template`:
+   1. For each entry in `media`:
 
-   `cp /mnt/<sapbits fileshare path> /tmp/hana_template`
+      `cp /mnt/sapbits/archive/<archive> .`
 
-   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](prepare-bom) process listed under `media:`.
+      Where `<archive>` is the filename in the `archive:` property of the entry in the BoM.
 
-1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
+      For example: `cp /mnt/sapbits/archive/IMDB_LCAPPS_2052_0-20010426.SAR .`
 
-   `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
+1. Update the permissions to make `SAPCAR` executable (SAPCAR filename may change depending on your downloads):
+
+   `chmod +x SAPCAR_1311-80000935.EXE`
 
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
    ```text
-   <HANA_MEDIA>/SAPCAR_1311-80000935.EXE
+   ./SAPCAR_1311-80000935.EXE
    -manifest SAP_HANA_DATABASE/SIGNATURE.SMF
-   -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
+   -xf IMDB_SERVER20_037_7-80002031.SAR
    ```
 
 1. Use the extracted `hdblcm` tool to generate an empty install template and password file.
 
-   **_Note:_** These two files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
+   **_Note:_** The two generated files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
 
    The file name used in this command should reflect the `<stack_version>` (e.g. `HANA_2_00_052_v001`):
 
@@ -82,7 +84,6 @@ Any additional components are not required at this stage as they do not affect t
        <root_password><![CDATA[{{ db_root_password }}]]></root_password>
        <sapadm_password><![CDATA[{{ db_sapadm_password }}]]></sapadm_password>
        <master_password><![CDATA[{{ db_master_password }}]]></master_password>
-       <sapadm_password><![CDATA[{{ db_sapadm_password }}]]></sapadm_password>
        <password><![CDATA[{{ db_password }}]]></password>
        <system_user_password><![CDATA[{{ db_system_user_password }}]]></system_user_password>
        <streaming_cluster_manager_password><![CDATA[{{ db_streaming_cluster_manager_password }}]]></streaming_cluster_manager_password>
@@ -103,13 +104,14 @@ Any additional components are not required at this stage as they do not affect t
 
 ### Manual HANA Installation Using Template
 
-1. Connect to target VM for HANA installation as `root` user
-1. Ensure the the inifiles `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` generated in [Process](#Process)  exist in `/tmp/hana_template`
+1. Connect to target VM for HANA installation as `root` user;
+1. Switch to the `/tmp/hana_template` directory: `cd /tmp/hana_template`;
+1. Ensure the the inifiles `HANA_2_00_052_v001.params` and `HANA_2_00_052_v001.params.xml` generated in [Process](#Process) exist in `/tmp/hana_template`;
 1. Edit the `HANA_2_00_052_v001.params` file and replace variables:
-   1. Update `components` to `all`
-   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`
-   1. Update `sid` to `<HANA SID>` for example: `sid=HD1`
-   1. Update `number` to `<Instance Number>` for example: `number=00`
+   1. Update `components` to `all`;
+   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=hd1-hanadb-vm`;
+   1. Update `sid` to `<HANA SID>` for example: `sid=HD1`;
+   1. Update `number` to `<Instance Number>` for example: `number=00`;
 1. Edit the `HANA_2_00_052_v001.params.xml` file, replacing the ansible variables with a suitable master password as below:
 
    ```xml
@@ -120,7 +122,6 @@ Any additional components are not required at this stage as they do not affect t
        <root_password><![CDATA[ma$terPassw0rd]]></root_password>
        <sapadm_password><![CDATA[ma$terPassw0rd]]></sapadm_password>
        <master_password><![CDATA[ma$terPassw0rd]]></master_password>
-       <sapadm_password><![CDATA[ma$terPassw0rd]]></sapadm_password>
        <password><![CDATA[ma$terPassw0rd]]></password>
        <system_user_password><![CDATA[ma$terPassw0rd]]></system_user_password>
        <streaming_cluster_manager_password><![CDATA[ma$terPassw0rd]]></streaming_cluster_manager_password>

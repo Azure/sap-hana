@@ -1,4 +1,6 @@
-# Generate application tier unattended installation parameter inifiles
+# Application Tier Template Generation
+
+**_Note:_** Creating a Virtual Machine within Azure to use as your workstation will improve the speed when transferring the SAP media from a Storage Account.
 
 ## Prerequisites
 
@@ -11,7 +13,7 @@
 1. Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place);
 1. Browser connectivity between workstation and target SAP VM.
 
-## Inputs`
+## Inputs
 
 1. SAP Library prepared with the SAP Media.
 1. The BoM file for this stack.
@@ -21,41 +23,51 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user;
-1. Set the root user password to a known value as this will be requierd to access SWPM;
+1. Set the root user password to a known value as this will be required to access SWPM;
 1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux);
+
+   **Note:** The following instructions assume you have mounted the container as `/mnt/sapbits`.
+
 1. Make and change to a temporary directory:
 
    `mkdir /tmp/app_template; cd $_`
 
-1. Copy the required media from `sapbits/` to `/tmp/app_template`:
+1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/tmp/hana_template`:
+   1. For each entry in `media`:
 
-   `cp /mnt/<sapbits fileshare path> /tmp/app_template`
+      `cp /mnt/sapbits/archive/<archive> .`
 
-   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](prepare-bom) process listed under `media`.
+      Where `<archive>` is the filename in the `archive:` property of the entry in the BoM.
+
+      For example: `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR .`
 
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
-   `chmod +x /tmp/app_template/SAPCAR_1311-80000935.EXE`
+   `chmod +x SAPCAR_1311-80000935.EXE`
 
-1. Ensure `/usr/sap/install/SWPM/`exists and extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE` here (SAR file version may change depending on your downloads):
+1. Ensure `/usr/sap/install/SWPM/` exists:
 
-   `/tmp/app_template/archives/SAPCAR_1311-80000935.EXE -xf /tmp/app_template/archives/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+   `mkdir -p /usr/sap/install/SWPM`
+
+1. Extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE`. For example:
+
+   `./SAPCAR_1311-80000935.EXE -xf SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:
 
-   `mkdir -p "/usr/sap/install/config" && cp /tmp/app_template/boms/S4HANA_2020_ISS_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
+   `mkdir -p /usr/sap/install/config && cp /mnt/sapbits/boms/S4HANA_2020_ISS_v001/stackfiles/<MP stack file>.xml /usr/sap/install/config`
 
 1. Ensure `/usr/sap/downloads/` exists:
 
    `mkdir /usr/sap/downloads/`
 
-1. Move `SAPEXE_200-80004393.SAR`  to `/usr/sap/downloads/`:
+1. Copy `SAPEXE_200-80004393.SAR`  to `/usr/sap/downloads/`:
 
-   `mv /tmp/app_template/archives/SAPEXE_200-80004393.SAR /usr/sap/downloads/`
+   `cp /mnt/sapbits/archive/SAPEXE_200-80004393.SAR /usr/sap/downloads/`
 
-1. Move `/tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:
+1. Copy `SAPHOSTAGENT49_49-20009394.SAR` to `/usr/sap/downloads/`:
 
-   `mv /tmp/app_template/archives/SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`
+   `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR usr/sap/downloads/`
 
 1. Follow the instructions below to generate each `ini` template.
 
@@ -65,32 +77,37 @@ This section covers the manual generation of the ABAP SAP Central Services (ASCS
 
 In order to install SCS unattended, an `ini` file needs to be generated in order to pass all of the required parameters into the SWPM installer. Currently, the only way to generate a new one is to partially run through a manual install as per SAP Note [2230669 - System Provisioning Using a Parameter Input File](https://launchpad.support.sap.com/#/notes/2230669).
 
-The following steps show how to manually begin the install of an ASCS instance in order to create an unattended file should it be needed. During the template generation process, you may need to confirm the change of ownership of files and permissions.
+The following steps show how to begin the manual install of an ASCS instance in order to create an unattended installation file.
 
-1. On your ASCS Node as the `root` user, launch Software Provisioning Manager, shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input)
-1. Establish a connection to the ASCS node using a web browser
-1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output)
-1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu "SAP S/4HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance"
-1. Select the `Custom` Parameter Mode and click "Next"
-1. The SAP system ID should be prepopulated with {SID} and SAP Mount Directory /sapmnt, click "Next"
-1. The FQDN should be prepopulated.  Ensure “Set FQDN for SAP system” is checked, and click "Next"
-1. Enter and confirm a master password which will be used during the creation of the ASCS instance, and click "Next". Note `The password of user DBUser may only consist of alphanumeric characters and the special characters #, $, @ and _. The first character must not be a digit or an underscore`
-1. The password fields will be pre-populated based on the master password supplied. Set the s4hadm OS user ID to 2000 and the sapsys OS group ID to 2000, and click "Next"
-1. When prompted to supply the path to the SAPEXE kernel file, specify a path of /usr/sap/downloads/ and click "Next"
-1. Notice the package status is "Available" click "Next"
-1. Notice the SAP Host Agent installation file status is "Available" click "Next"
-1. Details for the sapadm OS user will be presented next.  It is recommended to leave the password as inherited from the master password, and enter in the OS user ID of 2100, and click "Next"
-1. Ensure the correct instance number for the installation is set, and that the virtual host name for the instance has been set, click "Next"
-1. Leave the ABAP message server ports at the defaults of 3600 and 3900, click "Next"
-1. Do not select any additional components to install, click "Next"
-1. Check `Skip setting of security parameters` and click "Next"
-1. Select the checkbox “Yes, clean up operating system users” then click "Next"
-1. On the Parameter Summary Page a copy of the inifile.params file is generated in the temporary SAP installation directory, located at /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/.  This can be used as the basis for unattended deployments.
-1. click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method
-1. Copy and rename `inifile.params` to `sapbits/templates`:
+**Note:** During the template generation process, you may need to confirm the change of ownership of files and permissions.
 
-`cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/ASCS/inifile.params /mnt/<sapbits fileshare path>/templates/scs.inifile.params`
+1. On your ASCS Node as the `root` user, launch Software Provisioning Manager, as shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input);
+1. Establish a connection to the ASCS node using a web browser;
+1. Launch the required URL to access SWPM shown in [Software Provision Manager output](#Example-Software-Provision-Manager-output);
+1. Accept the security risk and authenticate with the system's `root` user credentials;
+1. Navigate through the drop-down menu "SAP S/4HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "Distributed System" > "ASCS Instance";
+1. Select the `Custom` Parameter Mode and click "Next";
+1. The SAP system ID should be prepopulated with {SID} and SAP Mount Directory /sapmnt, click "Next";
+1. The FQDN should be prepopulated.  Ensure "Set FQDN for SAP system" is checked, and click "Next";
+1. Enter and confirm a master password which will be used during the creation of the ASCS instance, and click "Next".
+
+   **Note:** `The password of user DBUser may only consist of alphanumeric characters and the special characters #, $, @ and _. The first character must not be a digit or an underscore`.
+
+1. The password fields will be pre-populated based on the master password supplied. Set the `<sid>adm` OS user ID to 2000 and the `sapsys` OS group ID to 2000, and click "Next";
+1. When prompted to supply the path to the SAPEXE kernel file, specify a path of /usr/sap/downloads/ and click "Next";
+1. Notice the package status is "Available" click "Next";
+1. Notice the SAP Host Agent installation file status is "Available" click "Next";
+1. Details for the sapadm OS user will be presented next. It is recommended to leave the password as inherited from the master password, and enter in the OS user ID of 2100, and click "Next";
+1. Ensure the correct instance number for the installation is set, and that the virtual host name for the instance has been set, click "Next";
+1. Leave the ABAP message server ports at the defaults of 3600 and 3900, click "Next";
+1. Do not select any additional components to install, click "Next";
+1. Check `Skip setting of security parameters` and click "Next";
+1. Select the checkbox "Yes, clean up operating system users" then click "Next";
+1. On the Parameter Summary Page a copy of the `inifile.params` file is generated in the temporary SAP installation directory, located at `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/`.  This can be used as the basis for unattended deployments;
+1. click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
+1. Copy and rename `inifile.params` to `sapbits/templates/`:
+
+`cp /tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/inifile.params /mnt/sapbits/templates/scs.inifile.params`
 
 #### Example software provision manager input
 
