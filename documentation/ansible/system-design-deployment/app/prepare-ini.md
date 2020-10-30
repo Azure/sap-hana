@@ -137,7 +137,7 @@ Logon users: [root]
 
 :hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load :hand:
 
-1. On the PAS VM carry out the [Access SWPM](#Access-SWPM)
+1. On the PAS VM carry out the [Access SWPM](#Access-SWPM) process
 1. Launch SWPM with the following command:
 
     ```bash
