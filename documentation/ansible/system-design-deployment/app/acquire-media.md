@@ -40,18 +40,18 @@
    1. If desired, update the Maintenance Plan name in the top left;
    1. Ensure `Install New S4HANA System` is selected and click Next;
    1. Enter SID for `Install a New System`;
-   1. Choose `Target Version`, e.g. `SAP S/4HANA 1909`;
-   1. Choose `Target Stack`, e.g. `02 (05/2020) FP`;
+   1. Choose `Target Version`, e.g. `SAP S/4HANA 2020`;
+   1. Choose `Target Stack`, e.g. `Initial Shipment Stack`;
    1. If required, choose Target Product Instances;
    1. Click Next;
    1. Select `Co-Deployed with Backend`;
-   1. Choose `Target Version`, e.g. `SAP FIORI FOR SAP S/4HANA 1909`;
-   1. Choose `Target Stack`, e.g. `02 (05/2020) FP`;
+   1. Choose `Target Version`, e.g. `SAP FIORI FOR SAP S/4HANA 2020`;
+   1. Choose `Target Stack`, e.g. `Initial Shipment Stack`;
    1. Click Next;
    1. Click Continue Planning;
    1. No changes required for a new system, Click Next;
    1. For OS/DB dependent files, select `Linux on x86_64 64bit`;
-   1. Click Confirm;
+   1. Click `Confirm Selection`;
    1. Click Next;
    1. If desired, NON-ABAP under `Select Stack Independent Files` can be expanded, and unrequired language files can be deselected;
    1. Click Next.
