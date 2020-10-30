@@ -127,7 +127,7 @@ The order of entries in the `media` section does not matter. However, for improv
 
 ### Add Template Name
 
-1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM stack file. Entries are needed for `.params` and `.params.xml` files.
+1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`. Entries are needed for `.params` and `.params.xml` files.
 
    ```text
      templates:

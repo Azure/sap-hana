@@ -4,12 +4,13 @@
 
 ## Prerequisites
 
-1. An editor for working with the generated files.
-1. HANA Media downloaded
-1. SAP Library contains all media for HANA installation
-1. SAP HANA infrastructure has been deployed
-1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place)
-1. Prerequisite RPMs installed, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607)
+1. An editor for working with the generated files;
+1. The BoM file for this stack.
+1. HANA Media downloaded;
+1. SAP Library contains all media for HANA installation;
+1. SAP HANA infrastructure has been deployed;
+1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place);
+1. Prerequisite RPMs installed, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607).
 
 ## Inputs
 
@@ -17,20 +18,27 @@ In order to generate the installation templates for SAP HANA, you will need:
 
 1. SAPCAR executable
 1. SAP HANA infrastructure.
+1. The BoM file for this stack.
 
 Any additional components are not required at this stage as they do not affect the template files generated.
 
 ## Process
 
 1. Connect to your target VM as the `root` user
-1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux). Detailed instructions for the `sapbits` container can be found by clicking `Connect` from the Azure Portal `sapbits` Overview
-1. Make and change to a temporary directory:\
+1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux).
+1. Make and change to a temporary directory:
+
    `mkdir /tmp/hana_template; cd $_`
-1. Copy the required media from `sapbits/` to `/tmp/app_template`:\
-`cp /mnt/<sapbits fileshare path> /tmp/hana_template`
-    **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media`.
-1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):\
+
+1. Copy the required media from `sapbits/` to `/tmp/app_template`:
+
+   `cp /mnt/<sapbits fileshare path> /tmp/hana_template`
+
+   **_Note_:** The files required for specific application installations can be found in the BoM file generated in the [prepare bom](./prepare-bom) process listed under `media:`.
+1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
+
    `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
+
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
    ```text
@@ -39,21 +47,31 @@ Any additional components are not required at this stage as they do not affect t
    -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
    ```
 
-1. Use the extracted `hdblcm` tool to generate an empty install template and password file. **_Note:_** These two files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
+1. Use the extracted `hdblcm` tool to generate an empty install template and password file.
+
+   **_Note:_** These two files (`<name>.params` and `<name>.params.xml`) will be used in the automated installation of the SAP HANA Database.
 
    The file name used in this command should reflect the `<stack_version>` (e.g. `HANA_2_00_052_v001`):
 
    `SAP_HANA_DATABASE/hdblcm --dump_configfile_template=HANA_2_00_052_v001.params`
 
 1. Edit the `HANA_2_00_052_v001.params` file:
-   1. Update `components` to `all`:\
+   1. Update `components` to `all`:
+
       `components=all`
-   1. Update `hostname` to `{{ ansible_hostname }}`:\
+
+   1. Update `hostname` to `{{ ansible_hostname }}`:
+
       `hostname={{ ansible_hostname }}`
-   1. Update `sid` to `{{ db_sid | upper }}`:\
+
+   1. Update `sid` to `{{ db_sid | upper }}`:
+
       `sid={{ db_sid | upper }}`
-   1. Update `number` to `{{ db_instance_number }}`:\
+
+   1. Update `number` to `{{ db_instance_number }}`:
+
       `number={{ db_instance_number }}`
+
 1. Edit the `HANA_2_00_052_v001.params.xml` file, replacing the three asterisks (`***`) for each value with the ansible variables as below:
 
    ```xml
@@ -109,7 +127,8 @@ Any additional components are not required at this stage as they do not affect t
        <org_manager_password><![CDATA[ma$terPassw0rd]]></org_manager_password>
    </Passwords>
 
-1. Run the HANA installation:\
+1. Run the HANA installation:
+
    `cat HANA_2_00_052_v001.params.xml | SAP_HANA_DATABASE/hdblcm --read_password_from_stdin=xml -b --configfile=HANA_2_00_052_v001.params`
 
 ## Results and Outputs
