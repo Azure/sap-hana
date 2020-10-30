@@ -17,7 +17,7 @@
 ### Access SWPM
 
 1. Connect to your target VM as the `root` user
-1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux). Detailed instructions for the `sapbits` container can be found by clicking `Connect` from the Azure Portal `sapbits` Overview:
+1. Mount the `sapbits` container to your target VM. This process is documented on the [Microsoft Azure Website](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-how-to-mount-container-linux). Detailed instructions for the `sapbits` container can be found by clicking `Connect` from the Azure Portal `sapbits` Overview
 1. Make and change to a temporary directory:\
    `mkdir /tmp/app_template; cd $_`
 1. Copy the required media from `sapbits/` to `/tmp/app_template`:\
