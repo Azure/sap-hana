@@ -354,7 +354,7 @@ When you have completed generating your `inifile.params` templates you will need
    1. `nwUsers.sidAdmUID` = `{{ sidadm_uid }}`
    1. `nwUsers.sidadmPassword` = `{{ app_base_password }}`
 
-1. Edit the PAS/AAS inifile, update the following values to the corresponding Ansible variable:
+1. Edit the PAS inifile, update the following values to the corresponding Ansible variable:
    1. `HDB_Schema_Check_Dialogs.schemaPassword` = `{{ db_system_user_password }}`
    1. `HDB_Userstore.doNotResolveHostnames` = `{{ db_sid | lower }}-db`
    1. `NW_ABAP_SPAM_Update.SPAMUpdateArchive` = `{{ hana_install_media_nfs_pas_dir }}/*****.SAR`
@@ -372,6 +372,9 @@ When you have completed generating your `inifile.params` templates you will need
    1. `archives.downloadBasket` = `{{ app_stackfiles_dir }}`
    1. `storageBasedCopy.hdb.instanceNumber` = `{{ hana_instance_number }}`
    1. `storageBasedCopy.hdb.systemPassword` = `{{ db_system_user_password }}`
+
+1. Edit the AAS inifile, update the following values to the corresponding Ansible variable:
+   1. `NW_DI_Instance.virtualHostname` = `{{ aas_virtual_hostname }`
 
 1. Upload the consolidated template file to the SAP Library:
     1. In the Azure Portal navigate to the `sapbits` container
