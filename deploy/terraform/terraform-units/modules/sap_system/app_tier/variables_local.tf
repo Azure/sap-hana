@@ -1,12 +1,12 @@
-variable "resource-group" {
+variable "resource_group" {
   description = "Details of the resource group"
 }
 
-variable "vnet-sap" {
+variable "vnet_sap" {
   description = "Details of the SAP VNet"
 }
 
-variable "storage-bootdiag" {
+variable "storage_bootdiag" {
   description = "Details of the boot diagnostic storage device"
 }
 
@@ -54,7 +54,7 @@ locals {
   region  = try(var.infrastructure.region, "")
   sid     = upper(try(var.application.sid, ""))
   prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu-rg))
+  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
   // Zones
   app_zones            = try(var.application.app_zones, [])
@@ -111,7 +111,7 @@ locals {
   sub_app_exists = length(local.sub_app_arm_id) > 0 ? true : false
   sub_app_name = local.sub_app_exists ? (
     try(split("/", local.sub_app_arm_id)[10], "")) : (
-    try(local.var_sub_app.name, format("%s%s", local.prefix, local.resource_suffixes.app-subnet))
+    try(local.var_sub_app.name, format("%s%s", local.prefix, local.resource_suffixes.app_subnet))
   )
   sub_app_prefix = try(local.var_sub_app.prefix, "")
 
@@ -121,7 +121,7 @@ locals {
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0 ? true : false
   sub_app_nsg_name = local.sub_app_nsg_exists ? (
     try(split("/", local.sub_app_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_app_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.app-subnet-nsg))
+    try(local.var_sub_app_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.app_subnet_nsg))
   )
 
   // WEB subnet
@@ -132,13 +132,13 @@ locals {
   sub_web_exists  = length(local.sub_web_arm_id) > 0 ? true : false
   sub_web_name = local.sub_web_exists ? (
     try(split("/", local.sub_web_arm_id)[10], "")) : (
-    try(local.sub_web.name, format("%s%s", local.prefix, local.resource_suffixes.web-subnet))
+    try(local.sub_web.name, format("%s%s", local.prefix, local.resource_suffixes.web_subnet))
   )
 
   sub_web_prefix = try(local.sub_web.prefix, "")
   sub_web_deployed = try(local.sub_web_defined ? (
-    local.sub_web_exists ? data.azurerm_subnet.subnet-sap-web[0] : azurerm_subnet.subnet-sap-web[0]) : (
-    local.sub_app_exists ? data.azurerm_subnet.subnet-sap-app[0] : azurerm_subnet.subnet-sap-app[0]), null
+    local.sub_web_exists ? data.azurerm_subnet.subnet_sap_web[0] : azurerm_subnet.subnet_sap_web[0]) : (
+    local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0] : azurerm_subnet.subnet_sap_app[0]), null
   )
 
   // WEB NSG
@@ -147,12 +147,12 @@ locals {
   sub_web_nsg_exists = length(local.sub_web_nsg_arm_id) > 0 ? true : false
   sub_web_nsg_name = local.sub_web_nsg_exists ? (
     try(split("/", local.sub_web_nsg_arm_id)[8], "")) : (
-    try(local.sub_web_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.web-subnet-nsg))
+    try(local.sub_web_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.web_subnet_nsg))
   )
 
   sub_web_nsg_deployed = try(local.sub_web_defined ? (
-    local.sub_web_nsg_exists ? data.azurerm_network_security_group.nsg-web[0] : azurerm_network_security_group.nsg-web[0]) : (
-    local.sub_app_nsg_exists ? data.azurerm_network_security_group.nsg-app[0] : azurerm_network_security_group.nsg-app[0]), null
+    local.sub_web_nsg_exists ? data.azurerm_network_security_group.nsg_web[0] : azurerm_network_security_group.nsg_web[0]) : (
+    local.sub_app_nsg_exists ? data.azurerm_network_security_group.nsg_app[0] : azurerm_network_security_group.nsg_app[0]), null
   )
 
   application_sid          = try(var.application.sid, "")
@@ -240,7 +240,7 @@ locals {
   web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
 
   // Ports used for specific ASCS, ERS and Web dispatcher
-  lb-ports = {
+  lb_ports = {
     "scs" = [
       3200 + tonumber(local.scs_instance_number),          // e.g. 3201
       3600 + tonumber(local.scs_instance_number),          // e.g. 3601
@@ -266,7 +266,7 @@ locals {
   }
 
   // Ports used for ASCS, ERS and Web dispatcher NSG rules
-  nsg-ports = {
+  nsg_ports = {
     "web" = [
       {
         "priority" = "101",
@@ -300,12 +300,12 @@ locals {
   // Where Instance Number is nn:
   // SCS (index 0) - 620nn
   // ERS (index 1) - 621nn
-  hp-ports = [
+  hp_ports = [
     62000 + tonumber(local.scs_instance_number),
     62100 + tonumber(local.ers_instance_number)
   ]
 
-  app-data-disk-per-dbnode = (local.application_server_count > 0) ? flatten(
+  app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
       for storage_type in local.app_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -323,9 +323,9 @@ locals {
     ]
   ) : []
 
-  app-data-disks = flatten([
+  app_data_disks = flatten([
     for vm_counter in range(local.application_server_count) : [
-      for idx, datadisk in local.app-data-disk-per-dbnode : {
+      for idx, datadisk in local.app_data_disk_per_dbnode : {
         suffix                    = datadisk.suffix
         vm_index                  = vm_counter
         caching                   = datadisk.caching
@@ -339,7 +339,7 @@ locals {
     ]
   ])
 
-  scs-data-disk-per-dbnode = (local.enable_deployment) ? flatten(
+  scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
       for storage_type in local.scs_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -357,9 +357,9 @@ locals {
     ]
   ) : []
 
-  scs-data-disks = flatten([
+  scs_data_disks = flatten([
     for vm_counter in range(local.scs_server_count) : [
-      for idx, datadisk in local.app-data-disk-per-dbnode : {
+      for idx, datadisk in local.app_data_disk_per_dbnode : {
         suffix                    = datadisk.suffix
         vm_index                  = vm_counter
         caching                   = datadisk.caching
@@ -373,7 +373,7 @@ locals {
     ]
   ])
 
-  web-data-disk-per-dbnode = (local.webdispatcher_count > 0) ? flatten(
+  web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
       for storage_type in local.web_sizing.storage : [
         for disk_count in range(storage_type.count) : {
@@ -391,9 +391,9 @@ locals {
     ]
   ) : []
 
-  web-data-disks = flatten([
+  web_data_disks = flatten([
     for vm_counter in range(local.webdispatcher_count) : [
-      for idx, datadisk in local.web-data-disk-per-dbnode : {
+      for idx, datadisk in local.web_data_disk_per_dbnode : {
         suffix                    = datadisk.suffix
         vm_index                  = vm_counter
         caching                   = datadisk.caching

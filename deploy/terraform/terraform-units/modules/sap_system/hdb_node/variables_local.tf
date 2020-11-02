@@ -1,12 +1,12 @@
-variable "resource-group" {
+variable "resource_group" {
   description = "Details of the resource group"
 }
 
-variable "vnet-sap" {
+variable "vnet_sap" {
   description = "Details of the SAP VNet"
 }
 
-variable "storage-bootdiag" {
+variable "storage_bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
@@ -48,7 +48,7 @@ locals {
   sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
 
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu-rg))
+  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
@@ -78,7 +78,7 @@ locals {
   var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
   sub_db_arm_id = try(local.var_sub_db.arm_id, "")
   sub_db_exists = length(local.sub_db_arm_id) > 0 ? true : false
-  sub_db_name   = local.sub_db_exists ? try(split("/", local.sub_db_arm_id)[10], "") : try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet))
+  sub_db_name   = local.sub_db_exists ? try(split("/", local.sub_db_arm_id)[10], "") : try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet))
   sub_db_prefix = try(local.var_sub_db.prefix, "")
 
   // DB NSG
@@ -87,7 +87,7 @@ locals {
   sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
   sub_db_nsg_name = local.sub_db_nsg_exists ? (
     try(split("/", local.sub_db_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet-nsg))
+    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet_nsg))
   )
 
   hdb_list = [
@@ -242,7 +242,7 @@ locals {
   ])
 
   // List of data disks to be created for HANA DB nodes
-  data-disk-per-dbnode = (length(local.hdb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.hdb_vms) > 0) ? flatten(
     [
       for storage_type in lookup(local.sizes, local.hdb_size).storage : [
         for disk_count in range(storage_type.count) : {
@@ -262,7 +262,7 @@ locals {
 
   data_disk_list = flatten([
     for vm_counter, hdb_vm in local.hdb_vms : [
-      for idx, datadisk in local.data-disk-per-dbnode : {
+      for idx, datadisk in local.data_disk_per_dbnode : {
         vm_index                  = vm_counter
         name                      = format("%s-%s", hdb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter

@@ -8,7 +8,7 @@ resource "azurerm_key_vault" "kv_prvt" {
   count                      = local.enable_landscape_kv ? 1 : 0
   name                       = local.kv_private_name
   location                   = local.region
-  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
@@ -31,7 +31,7 @@ resource "azurerm_key_vault" "kv_user" {
   count                      = local.enable_landscape_kv ? 1 : 0
   name                       = local.kv_user_name
   location                   = local.region
-  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7

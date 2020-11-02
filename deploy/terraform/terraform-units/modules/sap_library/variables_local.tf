@@ -73,7 +73,7 @@ locals {
   rg_exists = try(local.var_rg.is_existing, false)
   rg_arm_id = local.rg_exists ? try(local.var_rg.arm_id, "") : ""
 
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library-rg))
+  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
 
   // Storage account for sapbits
   sa_sapbits_arm_id = try(var.storage_account_sapbits.arm_id, "")

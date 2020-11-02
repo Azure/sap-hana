@@ -15,8 +15,8 @@ Only create/import iSCSI subnet and nsg when iSCSI device(s) will be deployed
 resource "azurerm_subnet" "iscsi" {
   count                = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_exists ? 0 : 1)
   name                 = local.sub_iscsi_name
-  resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].resource_group_name : azurerm_virtual_network.vnet-sap[0].resource_group_name
-  virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap[0].name : azurerm_virtual_network.vnet-sap[0].name
+  resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
   address_prefixes     = [local.sub_iscsi_prefix]
 }
 
@@ -32,8 +32,8 @@ data "azurerm_subnet" "iscsi" {
 resource "azurerm_network_security_group" "iscsi" {
   count               = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_nsg_exists ? 0 : 1)
   name                = local.sub_iscsi_nsg_name
-  location            = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
 }
 
 # Imports the SAP iSCSI subnet nsg data
@@ -52,8 +52,8 @@ iSCSI device IP address range: .4 -
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi_count
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.nic)
-  location            = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
 
   ip_configuration {
     name                          = "ipconfig1"
@@ -75,8 +75,8 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi_count
   name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name                   = local.virtualmachine_names[count.index]
-  location                        = local.rg_exists ? data.azurerm_resource_group.resource-group[0].location : azurerm_resource_group.resource-group[0].location
-  resource_group_name             = local.rg_exists ? data.azurerm_resource_group.resource-group[0].name : azurerm_resource_group.resource-group[0].name
+  location                        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+  resource_group_name             = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   network_interface_ids           = [azurerm_network_interface.iscsi[count.index].id]
   size                            = local.iscsi.size
   admin_username                  = local.iscsi.authentication.username
@@ -105,7 +105,7 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
   }
 
   tags = {

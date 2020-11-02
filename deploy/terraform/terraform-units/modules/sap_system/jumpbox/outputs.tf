@@ -1,23 +1,23 @@
-output "nics-jumpboxes-linux" {
-  value = azurerm_network_interface.jump-linux
+output "nics_jumpboxes_linux" {
+  value = azurerm_network_interface.jump_linux
 }
 
-output "nics-jumpboxes-windows" {
-  value = azurerm_network_interface.jump-win
+output "nics_jumpboxes_windows" {
+  value = azurerm_network_interface.jump_win
 }
 
-output "public-ips-jumpboxes-linux" {
-  value = azurerm_public_ip.jump-linux
+output "public_ips_jumpboxes_linux" {
+  value = azurerm_public_ip.jump_linux
 }
 
-output "public-ips-jumpboxes-windows" {
-  value = azurerm_public_ip.jump-win
+output "public_ips_jumpboxes_windows" {
+  value = azurerm_public_ip.jump_win
 }
 
-output "jumpboxes-linux" {
-  value = local.vm-jump-linux
+output "jumpboxes_linux" {
+  value = local.vm_jump_linux
 }
 
-output "vm-windows" {
-  value = azurerm_windows_virtual_machine.jump-win
+output "vm_windows" {
+  value = azurerm_windows_virtual_machine.jump_win
 }

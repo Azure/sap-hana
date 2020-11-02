@@ -1,12 +1,12 @@
-variable "resource-group" {
+variable "resource_group" {
   description = "Details of the resource group"
 }
 
-variable "vnet-sap" {
+variable "vnet_sap" {
   description = "Details of the SAP VNet"
 }
 
-variable "storage-bootdiag" {
+variable "storage_bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
@@ -45,10 +45,10 @@ locals {
 
   region    = try(var.infrastructure.region, "")
   sap_sid   = upper(try(var.application.sid, ""))
-  anydb_sid = (length(local.anydb-databases) > 0) ? try(local.anydb.instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
+  anydb_sid = (length(local.anydb_databases) > 0) ? try(local.anydb.instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
   sid       = upper(try(var.application.sid, local.anydb_sid))
   prefix    = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
-  rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu-rg))
+  rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
   // Zones
   zones            = try(local.anydb.zones, [])
@@ -74,7 +74,7 @@ locals {
   sub_db_exists = length(local.sub_db_arm_id) > 0 ? true : false
   sub_db_name = local.sub_db_exists ? (
     try(split("/", local.sub_db_arm_id)[10], "")) : (
-    try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet))
+    try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet))
   )
   sub_db_prefix = try(local.var_sub_db.prefix, "")
 
@@ -84,13 +84,13 @@ locals {
   sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
   sub_db_nsg_name = local.sub_db_nsg_exists ? (
     try(split("/", local.sub_db_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet-nsg))
+    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet_nsg))
   )
 
   // PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : ""
 
-  anydb          = try(local.anydb-databases[0], {})
+  anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
 
@@ -99,13 +99,13 @@ locals {
 
   // Filter the list of databases to only AnyDB platform entries
   // Supported databases: Oracle, DB2, SQLServer, ASE 
-  anydb-databases = [
+  anydb_databases = [
     for database in var.databases : database
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
   ]
 
-  // Enable deployment based on length of local.anydb-databases
-  enable_deployment = (length(local.anydb-databases) > 0) ? true : false
+  // Enable deployment based on length of local.anydb_databases
+  enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
@@ -268,7 +268,7 @@ locals {
     }
   ])
 
-  data-disk-per-dbnode = (length(local.anydb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
       for storage_type in lookup(local.sizes, local.anydb_size).storage : [
         for disk_count in range(storage_type.count) : {
@@ -288,7 +288,7 @@ locals {
 
   anydb_disks = flatten([
     for vm_counter, anydb_vm in local.anydb_vms : [
-      for idx, datadisk in local.data-disk-per-dbnode : {
+      for idx, datadisk in local.data_disk_per_dbnode : {
         name                      = format("%s-%s", anydb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter
         caching                   = datadisk.caching

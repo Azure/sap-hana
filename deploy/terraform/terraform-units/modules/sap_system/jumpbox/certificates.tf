@@ -6,11 +6,11 @@
 data "azurerm_client_config" "current" {}
 
 # Creates Azure key vault
-resource "azurerm_key_vault" "key-vault" {
-  count               = length(local.vm-jump-win) > 0 ? 1 : 0
+resource "azurerm_key_vault" "key_vault" {
+  count               = length(local.vm_jump_win) > 0 ? 1 : 0
   name                = "winrm-kv-${var.random_id.hex}"
-  location            = var.resource-group[0].location
-  resource_group_name = var.resource-group[0].name
+  location            = var.resource_group[0].location
+  resource_group_name = var.resource_group[0].name
   tenant_id           = data.azurerm_client_config.current.tenant_id
 
   enabled_for_deployment          = true
@@ -20,7 +20,7 @@ resource "azurerm_key_vault" "key-vault" {
 
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = local.deployer-uai.principal_id
+    object_id = local.deployer_uai.principal_id
 
     certificate_permissions = [
       "create",
@@ -35,10 +35,10 @@ resource "azurerm_key_vault" "key-vault" {
 }
 
 # Creates Azure key vault certificates
-resource "azurerm_key_vault_certificate" "key-vault-cert" {
+resource "azurerm_key_vault_certificate" "key_vault_cert" {
   count        = length(var.jumpboxes.windows)
   name         = "${var.jumpboxes.windows[count.index].name}-cert"
-  key_vault_id = try(azurerm_key_vault.key-vault[0].id, null)
+  key_vault_id = try(azurerm_key_vault.key_vault[0].id, null)
 
   certificate_policy {
     issuer_parameters {

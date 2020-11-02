@@ -1,16 +1,16 @@
-variable "resource-group" {
+variable "resource_group" {
   description = "Details of the resource group"
 }
 
-variable "storage-bootdiag" {
+variable "storage_bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
-variable "output-json" {
+variable "output_json" {
   description = "Details of the output JSON"
 }
 
-variable "ansible-inventory" {
+variable "ansible_inventory" {
   description = "Details of the Ansible inventory"
 }
 
@@ -25,19 +25,19 @@ variable "deployer_tfstate" {
 locals {
 
   // Retrieve deployer information from tfstate file
-  deployer-uai = var.deployer_tfstate.deployer_uai
-  subnet-mgmt  = var.deployer_tfstate.subnet_mgmt
-  nsg-mgmt     = var.deployer_tfstate.nsg_mgmt
+  deployer_uai = var.deployer_tfstate.deployer_uai
+  subnet_mgmt  = var.deployer_tfstate.subnet_mgmt
+  nsg_mgmt     = var.deployer_tfstate.nsg_mgmt
 
-  output-tf = jsondecode(var.output-json.content)
+  output_tf = jsondecode(var.output_json.content)
 
   # Linux jumpbox information
-  vm-jump-linux = [
+  vm_jump_linux = [
     for jumpbox in var.jumpboxes.linux : jumpbox
   ]
 
   # Windows jumpbox information
-  vm-jump-win = [
+  vm_jump_win = [
     for jumpbox in var.jumpboxes.windows : jumpbox
   ]
 }

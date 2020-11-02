@@ -1,20 +1,20 @@
-output "resource-group" {
-  value = local.rg_exists ? data.azurerm_resource_group.resource-group : azurerm_resource_group.resource-group
+output "resource_group" {
+  value = local.rg_exists ? data.azurerm_resource_group.resource_group : azurerm_resource_group.resource_group
 }
 
-output "vnet-sap" {
-  value = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet-sap : azurerm_virtual_network.vnet-sap
+output "vnet_sap" {
+  value = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap : azurerm_virtual_network.vnet_sap
 }
 
-output "storage-bootdiag" {
-  value = azurerm_storage_account.storage-bootdiag
+output "storage_bootdiag" {
+  value = azurerm_storage_account.storage_bootdiag
 }
 
 output "random_id" {
   value = random_id.random_id.hex
 }
 
-output "nics-iscsi" {
+output "nics_iscsi" {
   value = azurerm_network_interface.iscsi
 }
 

@@ -5,7 +5,7 @@
 
 resource "null_resource" "ansible_playbook" {
   count      = local.ansible_execution ? 1 : 0
-  depends_on = [module.hdb_node.dbnode-data-disk-att, module.jumpbox.vm-windows]
+  depends_on = [module.hdb_node.dbnode_data_disk_att, module.jumpbox.vm_windows]
 
   connection {
     type        = "ssh"

@@ -5,7 +5,7 @@
 +--------------------------------------4--------------------------------------*/
 
 # Creates network security rule to allow internal traffic for SAP db subnet
-resource "azurerm_network_security_rule" "nsr-internal-db" {
+resource "azurerm_network_security_rule" "nsr_internal_db" {
   count                        = local.enable_deployment ? (local.sub_db_nsg_exists ? 0 : 1) : 0
   name                         = "allow-internal-traffic"
   resource_group_name          = local.sub_db_nsg_exists ? data.azurerm_network_security_group.db[0].resource_group_name : azurerm_network_security_group.db[0].resource_group_name
@@ -16,12 +16,12 @@ resource "azurerm_network_security_rule" "nsr-internal-db" {
   protocol                     = "Tcp"
   source_port_range            = "*"
   destination_port_range       = "*"
-  source_address_prefixes      = var.vnet-sap[0].address_space
-  destination_address_prefixes = local.sub_db_exists ? data.azurerm_subnet.sap-db[0].address_prefixes : azurerm_subnet.sap-db[0].address_prefixes
+  source_address_prefixes      = var.vnet_sap[0].address_space
+  destination_address_prefixes = local.sub_db_exists ? data.azurerm_subnet.sap_db[0].address_prefixes : azurerm_subnet.sap_db[0].address_prefixes
 }
 
 # Creates network security rule to deny external traffic for SAP db subnet
-resource "azurerm_network_security_rule" "nsr-external-db" {
+resource "azurerm_network_security_rule" "nsr_external_db" {
   count                        = local.enable_deployment ? (local.sub_db_nsg_exists ? 0 : 1) : 0
   name                         = "deny-inbound-traffic"
   resource_group_name          = local.sub_db_nsg_exists ? data.azurerm_network_security_group.db[0].resource_group_name : azurerm_network_security_group.db[0].resource_group_name
@@ -33,5 +33,5 @@ resource "azurerm_network_security_rule" "nsr-external-db" {
   source_port_range            = "*"
   destination_port_range       = "*"
   source_address_prefix        = "*"
-  destination_address_prefixes = local.sub_db_exists ? data.azurerm_subnet.sap-db[0].address_prefixes : azurerm_subnet.sap-db[0].address_prefixes
+  destination_address_prefixes = local.sub_db_exists ? data.azurerm_subnet.sap_db[0].address_prefixes : azurerm_subnet.sap_db[0].address_prefixes
 }
