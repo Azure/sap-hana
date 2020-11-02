@@ -10,8 +10,8 @@ defaults:
 
 materials:
   dependencies:
-    - name: "HANA2"
-      version: "003"
+    - name: "HANA_2_00_052_v001"
+      version: "001"
 
   media:
 
@@ -205,6 +205,11 @@ materials:
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666922020"
 
     # other components
+
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1320-80000935.EXE
+      override_target_filename: SAPCAR.EXE
 
     - name: "Attribute Change Package 16 for EA-HR 608"
       archive: "EA-HR608.SAR"
@@ -485,4 +490,4 @@ materials:
   templates:
 
     - name: "S4HANA_2020_ISS_v001 ini file"
-      file: "S4HANA_2020_ISS_v001.ini"
+      file: "S4HANA_2020_ISS_v001.inifile.params"
