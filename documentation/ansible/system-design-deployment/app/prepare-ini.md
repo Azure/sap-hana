@@ -216,15 +216,25 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Enter the System Database Administrator Password and click "Next"
 1. Enter the path to the SAPEXE Kernel `/usr/sap/downloads/` and click "Next"
 1. Notice the files are listed as available and click "Next"
+1. Notice the SAPHOSTAGENT file is listed as available and click "Next"
+1. Click "Next" on the SAP System Administrator password confirmation.
+1. Notice all the CORE HANA DB Export files are listed as available and click "Next"
+1. Click "Next" on the Database Schema page for schema `DBACOCKPIT`.
+1. Click "Next" on the Database Schema page for schema `SAPHANADB`.
+1. Click "Next" on the Secure Storage for Database Connection page.
+1. Click "Next" on the SAP HANA Import Parameters page.
+1. Enter the Password for the HANA DB <sid>adm user on the Database VM, click "Next"
+1. Click "Next" on the SAP HANA Client Software Installation Path page.
+1. Notice the SAP HANA CLIENT file is listed as available and click "Next"
 1. Ensure “Yes, clean up operating system users” is checked and click "Next
 1. Do not click "Next" on the Parameter Summary Page. At this point the installation configuration is stored in a file named `inifile.params` in the temporary SAP installation directory.
 1. To locate the file, list the files in `/tmp/sapinst_instdir/`.
 1. If the file `.lastInstallationLocation` exists, view the file contents and note the directory listed.
 1. If a directory named for the product you are installing exists, e.g. `S4HANA1809`, navigate into the folders matching the product installation type, for example:
 
-   `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
+   `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/DB/`
 
-1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
+1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
 1. Copy and rename `inifile.params` to `/tmp/app_template`:
 
 `cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
