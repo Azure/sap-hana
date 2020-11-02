@@ -9,7 +9,7 @@
 1. The BoM file for this stack.
 1. SAP Library contains all media for the relevant applications;
 1. SAP infrastructure has been deployed;
-1. Application servers should have swap space of greater than 1MB configured;
+1. Application servers should have swap space of greater than 256MB configured;
 1. Workstation has connectivity to SAP Infrastructure (e.g. SSH keys in place);
 1. Browser connectivity between workstation and target SAP VM.
 
@@ -205,13 +205,12 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Notice the profile directory which the ASCS instance installation created `/usr/sap/<SID>/SYS/profile` then click "Next"
 1. Enter in the ABAP message server port for the ASCS instance, which should be 36`<InstanceNumber>` for example: "3600" then click "Next"
 1. Enter the Master Password to be used during the database content installation and click "Next"
-1. Click Next on the Operating System Users screen for the SAP System Administrator.
-1. Do not edit the prepopulated Password fields and click "Next"
 1. Populate the SAP HANA Database Tenant fields:
-    1. Database Host should be the HANA DB VM hostname which can be found by navigating to the resource in the Azure Portal
-    1. Instance Number should contain the HANA instance number for example: `00`
-    1. Enter the ID for the new database tenant, for example: `S4H`
-    1. click "Next"
+   1. Database Host should be the HANA DB VM hostname which can be found by navigating to the resource in the Azure Portal
+   1. Instance Number should contain the HANA instance number for example: `00`
+   1. Enter the ID for the new database tenant, for example: `S4H`
+   1. Leave the prepopulated DB System Admin password value
+   1. click "Next"
 1. Verify the connection details and click "OK"
 1. Enter the System Database Administrator Password and click "Next"
 1. Enter the path to the SAPEXE Kernel `/usr/sap/downloads/` and click "Next"
@@ -230,9 +229,9 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Do not click "Next" on the Parameter Summary Page. At this point the installation configuration is stored in a file named `inifile.params` in the temporary SAP installation directory.
 1. To locate the file, list the files in `/tmp/sapinst_instdir/`.
 1. If the file `.lastInstallationLocation` exists, view the file contents and note the directory listed.
-1. If a directory named for the product you are installing exists, e.g. `S4HANA1809`, navigate into the folders matching the product installation type, for example:
+1. If a directory named for the product you are installing exists, e.g. `S4HANA2020`, navigate into the folders matching the product installation type, for example:
 
-   `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/DB/`
+   `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
 
 1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
 1. Copy and rename `inifile.params` to `/tmp/app_template`:
