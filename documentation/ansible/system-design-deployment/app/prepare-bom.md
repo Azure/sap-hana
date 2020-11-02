@@ -105,6 +105,14 @@ step|BoM Content
 
 1. Using Microsoft Excel, open the download basket spreadsheet
 
+1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet. :information_source: The `version` property is optional.
+
+   ```text
+      - name:     SAPCAR
+        version:  7.21
+        archive:  SAPCAR_1320-80000935.EXE
+   ```
+
 1. Using your editor, transcribe the Description and Technical Name as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
 
    ![SAP Download Basket Spreadsheet](../images/sap-xls-download-basket.png)

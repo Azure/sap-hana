@@ -179,7 +179,7 @@ The directories to be exported for this process are:
 
 ### Generating unattended installation parameter `inifile` for Database Content Load
 
-:hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load :hand:
+:hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load.
 
 1. Make and change to a temporary directory:
 
@@ -230,7 +230,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 
 #### Manual DB Content Load Using Template
 
-:hand: TODO: Add Manual DB Content load instructions using template#
+:hand: TODO: Add Manual DB Content load instructions using template
 
 1. Connect to the PAS VM as `root` User
 1. Launch the DB Load process via SWPM:
@@ -248,7 +248,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 
 This section covers the manual generation of the ABAP PAS/AAS (Primary Application Server/Additional Application Server) unattended install file.
 
-:hand: To generate the PAS/AAS inifiles you must have a fully built HANA DB and ACSC. :hand:
+:hand: To generate the PAS/AAS inifiles you must have a fully built HANA DB and ASCS.
 
 1. The [Access SWPM](#Access-SWPM) steps will need to be completed on the target VM before you can access SWPM
 1. Connect to the PAS Node as Root user and launch Software Provisioning Manager, shown in [Software Provision Manager input](#Example-Software-Provision-Manager-input). Ensure that you update <sap_component> to PAS/AAS
@@ -324,7 +324,7 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
 ##### AAS Installation
 
-:hand: A PAS must exist before the AAS Installation is attempted :hand:
+:hand: A PAS must exist before the AAS Installation is attempted.
 
 1. Connect to the SCS VM as `root` User
 1. Launch SCS Unattended install replacing `<target vm hostname>` with the SCS VM hostname:
