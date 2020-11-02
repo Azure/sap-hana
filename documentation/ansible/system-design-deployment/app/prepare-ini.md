@@ -119,8 +119,9 @@ SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
 SAPINST_USE_HOSTNAME=<target vm hostname>
 ```
 
-**_Note:_** The `SAPINST_XML_FILE` should be set to the XML Stack File path you created in the `Access SWPM` stage of the document
-**_Note:_** `SAPINST_USE_HOSTNAME` should be set to the hostname of the vm you are running the installation from. This can be obtained by entering `hostname` into your console session
+**_Note:_** The `SAPINST_XML_FILE` should be set to the XML Stack File path you created in the `Access SWPM` stage of the document.
+
+**_Note:_** `SAPINST_USE_HOSTNAME` should be set to the hostname of the VM you are running the installation from. This can be obtained by entering `hostname` into your console session.
 
 #### Example software provision manager output
 
