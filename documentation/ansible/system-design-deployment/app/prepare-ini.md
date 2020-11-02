@@ -312,17 +312,11 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 ##### PAS installation
 
 1. Connect to PAS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params` file on the PAS VM:
-   1. Update `components` to `all`
-   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-pas-vm`
-   1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
-   1. Update `number` to `<Instance Number>` for example: `number=01`
-1. Connect to the SCS VM as `root` User
 1. Launch SCS Unattended install replacing `<target vm hostname>` with the SCS VM hostname:
 1. For a PAS unattended install run the following:
 
     ```bash
-    root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
+    root@sid-xxpas-0 ~]$ /usr/sap/install/SWPM/sapinst
     SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
     SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params
@@ -332,18 +326,12 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
 :hand: A PAS must exist before the AAS Installation is attempted :hand:
 
-1. Connect to the AAS as `root` user
-1. Edit `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params` file on the AAS VM:
-   1. Update `components` to `all`
-   1. Update `hostname` to `<hana-vm-hostname>` for example: `hostname=s1d-pas-vm`
-   1. Update `sid` to `<HANA SID>` for example: `sid=S1D`
-   1. Update `number` to `<Instance Number>` for example: `number=03`
 1. Connect to the SCS VM as `root` User
 1. Launch SCS Unattended install replacing `<target vm hostname>` with the SCS VM hostname:
 1. For a AAS unattended install run the following:
 
     ```bash
-    root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
+    root@sid-xxaas-0 ~]$ /usr/sap/install/SWPM/sapinst
     SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     SAPINST_USE_HOSTNAME=<target vm hostname>
     SAPINST_INPUT_PARAMETERS_URL=/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params
