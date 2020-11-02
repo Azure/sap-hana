@@ -231,7 +231,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. If the file `.lastInstallationLocation` exists, view the file contents and note the directory listed.
 1. If a directory named for the product you are installing exists, e.g. `S4HANA2020`, navigate into the folders matching the product installation type, for example:
 
-   `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
+   `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/DB/`
 
 1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
 1. Copy and rename `inifile.params` to `/tmp/app_template`:
