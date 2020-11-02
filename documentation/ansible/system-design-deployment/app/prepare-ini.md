@@ -192,13 +192,13 @@ The directories to be exported for this process are:
 1. Launch SWPM with the following command:
 
     ```bash
-    root@sid-xxascs-0 ~]$ /usr/sap/install/SWPM/sapinst
+    root@sid-xxpas-0 ~]$ /usr/sap/install/SWPM/sapinst
     SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml
     ```
 
 1. Connect to the URL displayed from a browser session on your workstation
 1. Accept the security risk and authenticate with the systems ROOT user credentials
-1. Navigate through the drop-down menu to the "SAP S4/HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > "
+1. Navigate through the drop-down menu to the "SAP S4/HANA Server 2020" > "SAP HANA Database" > "Installation" > "Application Server ABAP" > Distrubuted System > Database Instance"
 Distributed System" , click on "Database Instance" and click "Next"
 1. Select the `Custom` Parameter Mode and click "Next";
 1. Notice the profile directory which the ASCS instance installation created `/usr/sap/<SID>/SYS/profile` then click "Next"
