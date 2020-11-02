@@ -339,17 +339,47 @@ This section covers the manual generation of the ABAP PAS/AAS (Primary Applicati
 
 ### `inifile` consolidation
 
-When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then save the new file with a meaningful name relating to the SAP Product e.g `S4HANA_2020_ISS_v001.inifile.params`.
+When you have completed generating your `inifile.params` templates you will need to consolidate the files into one inifile. Merge and deduplicate the files then save the new file with a meaningful name relating to the SAP Product e.g `S4HANA_2020_ISS_v001.inifile.params`. Prior to consolidating the inifiles the individual template files should be updated to replace default values with Ansible variables  for automation purposes.
 
-:hand: TODO: Clarify inifile consolidation instructions, including adding ansible variables.
+1. Edit the SCS inifile, update the following values to the corresponding Ansible variable:
+   1. `NW_GetMasterPassword.masterPwd` = `{{ app_master_password }}`
+   1. `NW_GetSidNoProfiles.sid` = `{{ app_sid | upper }}`
+   1. `NW_SCS_Instance.instanceNumber` = `{{ scs_instance_number }}`
+   1. `NW_SCS_Instance.scsVirtualHostname` = `{{ ansible_hostname }}`
+   1. `NW_getFQDN.FQDN` = `{{ fqdn_hostname }}`
+   1. `archives.downloadBasket` = `{{ app_stackfiles_dir }}`
+   1. `hostAgent.sapAdmPassword` = `{{ app_sapadm_password }}`
+   1. `nwUsers.sapadmUID` = `{{ sapadm_uid }}`
+   1. `nwUsers.sapsysGID` = `{{ sapsys_gid }}`
+   1. `nwUsers.sidAdmUID` = `{{ sidadm_uid }}`
+   1. `nwUsers.sidadmPassword` = `{{ app_base_password }}`
 
-1. Upload the generated template files to the SAP Library:
+1. Edit the PAS/AAS inifile, update the following values to the corresponding Ansible variable:
+   1. `HDB_Schema_Check_Dialogs.schemaPassword` = `{{ db_system_user_password }}`
+   1. `HDB_Userstore.doNotResolveHostnames` = `{{ db_sid | lower }}-db`
+   1. `NW_ABAP_SPAM_Update.SPAMUpdateArchive` = `{{ hana_install_media_nfs_pas_dir }}/*****.SAR`
+   1. `NW_ABAP_TMSConfig.transportPassword` = `{{ app_sapadm_password }}`
+   1. `NW_CI_Instance.ascsInstanceNumber` = `{{ scs_instance_number }}`
+   1. `NW_CI_Instance.ascsVirtualHostname` = `{{ scs_virtual_hostname }}`
+   1. `NW_CI_Instance.ciInstanceNumber` = `{{ pas_instance_number }}`
+   1. `NW_CI_Instance.ciMSPort` = `36{{ scs_instance_number }}`
+   1. `NW_CI_Instance.ciVirtualHostname` = `{{ pas_virtual_hostname }}`
+   1. `NW_CI_Instance.scsVirtualHostname` = `{{ pas_virtual_hostname }}`
+   1. `NW_GetMasterPassword.masterPwd` = `{{ app_master_password }}`
+   1. `NW_HDB_getDBInfo.instanceNumber` = `{{ hana_instance_number }}`
+   1. `NW_checkMsgServer.abapMSPort` = `36{{ scs_instance_number }}`
+   1. `NW_readProfileDir.profileDir` = `/usr/sap/{{ app_sid | upper }}/SYS/profile`
+   1. `archives.downloadBasket` = `{{ app_stackfiles_dir }}`
+   1. `storageBasedCopy.hdb.instanceNumber` = `{{ hana_instance_number }}`
+   1. `storageBasedCopy.hdb.systemPassword` = `{{ db_system_user_password }}`
+
+1. Upload the consolidated template file to the SAP Library:
     1. In the Azure Portal navigate to the `sapbits` container
     1. Create a new `templates` directory under `sapbits`
     1. click "Upload"
     1. In the panel on the right, click Select a file
     1. Navigate your workstation to the template generation directory `/tmp/hana_template`
-    1. Select the generated templates, e.g. `hana_sp05_v001.params` and `hana_sp05_v001.params.xml`
+    1. Select the generated template, e.g. `S4HANA_2020_ISS_v001.inifile.params`
     1. click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
     1. click "Upload"
 
