@@ -10,18 +10,18 @@ resource "azurerm_network_interface" "observer" {
   ip_configuration {
     name                          = "IPConfig1"
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
-    private_ip_address            = try(local.observer.nic_ips[count.index], cidrhost(data.azurerm_subnet.observer[0].address_prefixes[0], (count.index + 5)))
+    private_ip_address            = try(local.observer.nic_ips[count.index], cidrhost(data.azurerm_subnet.observer[0].address_prefixes[0], (count.index + local.anydb_ip_offsets.observer_db_vm)))
     private_ip_address_allocation = "static"
   }
 }
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
-  count                        = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
-  name                         = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
-  computer_name                = local.observer_computer_names[count.index]
-  resource_group_name          = var.resource-group[0].name
-  location                     = var.resource-group[0].location
+  count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
+  name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  computer_name       = local.observer_computer_names[count.index]
+  resource_group_name = var.resource-group[0].name
+  location            = var.resource-group[0].location
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -62,7 +62,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
   admin_ssh_key {
     username   = local.observer_authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+    public_key = data.azurerm_key_vault_secret.sid_pk[0].value
   }
 
   boot_diagnostics {
@@ -72,11 +72,11 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "observer" {
-  count                        = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
-  name                         = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
-  computer_name                = local.observer_computer_names[count.index]
-  resource_group_name          = var.resource-group[0].name
-  location                     = var.resource-group[0].location
+  count               = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
+  name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  computer_name       = local.observer_computer_names[count.index]
+  resource_group_name = var.resource-group[0].name
+  location            = var.resource-group[0].location
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
