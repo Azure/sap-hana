@@ -38,7 +38,7 @@ Any additional components are not required at this stage as they do not affect t
 
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
-   `chmod +x <HANA_MEDIA>/SAPCAR_1311-80000935.EXE`
+   `chmod +x /tmp/hana_template/SAPCAR_1320-80000935.EXE`
 
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
