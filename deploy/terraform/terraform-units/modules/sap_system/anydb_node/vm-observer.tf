@@ -3,8 +3,8 @@
 resource "azurerm_network_interface" "observer" {
   count                         = local.deploy_observer ? length(local.zones) : 0
   name                          = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.nic)
-  resource_group_name           = var.resource-group[0].name
-  location                      = var.resource-group[0].location
+  resource_group_name           = var.resource_group[0].name
+  location                      = var.resource_group[0].location
   enable_accelerated_networking = false
 
   ip_configuration {
@@ -25,8 +25,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
   name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
-  resource_group_name = var.resource-group[0].name
-  location            = var.resource-group[0].location
+  resource_group_name = var.resource_group[0].name
+  location            = var.resource_group[0].location
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -71,7 +71,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   }
 
   boot_diagnostics {
-    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
 }
 
@@ -80,8 +80,8 @@ resource "azurerm_windows_virtual_machine" "observer" {
   count               = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
   name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
-  resource_group_name = var.resource-group[0].name
-  location            = var.resource-group[0].location
+  resource_group_name = var.resource_group[0].name
+  location            = var.resource_group[0].location
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -122,6 +122,6 @@ resource "azurerm_windows_virtual_machine" "observer" {
   }
 
   boot_diagnostics {
-    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
 }
