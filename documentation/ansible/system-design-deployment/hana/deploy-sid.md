@@ -37,6 +37,7 @@
    1. Configure install directories (e.g. `/sapmnt/<SID>` and `/usr/sap/install`)
    1. Configure media directory exports
    1. Iterates over BoM content to download (media, unattended install templates, etc.)
+   1. **Note:** Nested BoMs will also be iterated over, to ensure media which may be needed for the installation will also be downloaded and made available.
    1. Media will be downloaded to a known location (`/usr/sap/downloDS`) on the filesystem of a particular VM and selectively extracted and organised into directories where it benefits the automated process
    1. Creates NFS export of downloaded/extracted media making available to other VMs in the system
    1. Mounts above export on other VMs
@@ -44,5 +45,5 @@
 
 ## Results and Outputs
 
-1. SAP HANA has been deployed and running
-1. Connection details/credentials so the Basis Administrator can configure HANA DB Client
+1. SAP HANA has been deployed and running;
+1. Connection details/credentials so the Basis Administrator can configure HANA DB Client.
