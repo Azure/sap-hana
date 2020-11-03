@@ -43,9 +43,9 @@ Any additional components are not required at this stage as they do not affect t
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
    ```text
-   <HANA_MEDIA>/SAPCAR_1311-80000935.EXE
-   -manifest SAP_HANA_DATABASE/SIGNATURE.SMF
-   -xf <HANA_MEDIA>/IMDB_SERVER20_037_7-80002031.SAR
+   /tmp/hana_template/SAPCAR_1320-80000935.EXE
+   -manifest SAP_HANA_DATABASE/SIGNATURE.SMF -xf
+   /tmp/hana_template/IMDB_SERVER20_052_0-80002031.SAR
    ```
 
 1. Use the extracted `hdblcm` tool to generate an empty install template and password file.
