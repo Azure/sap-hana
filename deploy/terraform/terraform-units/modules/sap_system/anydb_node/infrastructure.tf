@@ -14,7 +14,12 @@ resource "azurerm_lb" "anydb" {
     name                          = format("%s%s", local.prefix, local.resource_suffixes.db_alb_feip)
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
     private_ip_address_allocation = "Static"
-    private_ip_address            = local.sub_db_exists ? try(local.anydb.loadbalancer.frontend_ip, cidrhost(local.sub_db_exists ? data.azurerm_subnet.anydb[0].address_prefixes[0] : azurerm_subnet.anydb[0].address_prefixes[0], tonumber(count.index) + 4)) : cidrhost(local.sub_db_exists ? data.azurerm_subnet.anydb[0].address_prefixes[0] : azurerm_subnet.anydb[0].address_prefixes[0], tonumber(count.index) + 4)
+    private_ip_address = try(local.anydb.loadbalancer.frontend_ip,
+      cidrhost(local.sub_db_exists ?
+        data.azurerm_subnet.anydb[0].address_prefixes[0] :
+        azurerm_subnet.anydb[0].address_prefixes[0],
+      tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
+    )
   }
 }
 

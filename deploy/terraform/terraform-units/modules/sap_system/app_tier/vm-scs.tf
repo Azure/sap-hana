@@ -33,7 +33,7 @@ resource "azurerm_network_interface" "scs_admin" {
     subnet_id = var.admin_subnet.id
     private_ip_address = try(local.scs_admin_nic_ips[count.index],
       cidrhost(var.admin_subnet.id.address_prefixes[0],
-        tonumber(count.index) + 20
+        tonumber(count.index) + local.admin_ip_offsets.scs_vm
       )
     )
     private_ip_address_allocation = "static"

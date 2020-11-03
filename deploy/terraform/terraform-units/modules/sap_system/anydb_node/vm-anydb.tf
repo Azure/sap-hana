@@ -18,7 +18,7 @@ resource "azurerm_network_interface" "anydb_db" {
       cidrhost(local.sub_db_exists ? (
         data.azurerm_subnet.anydb[0].address_prefixes[0]) : (
         azurerm_subnet.anydb[0].address_prefixes[0]
-      ), tonumber(count.index) + 10)
+      ), tonumber(count.index) + local.anydb_ip_offsets.anydb_db_vm)
     )
 
     private_ip_address_allocation = "static"
@@ -40,7 +40,7 @@ resource "azurerm_network_interface" "anydb_admin" {
 
     private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
       local.anydb_vms[count.index].admin_nic_ip) : (
-      cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + 10)
+      cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_admin_vm)
     )
     private_ip_address_allocation = "static"
   }

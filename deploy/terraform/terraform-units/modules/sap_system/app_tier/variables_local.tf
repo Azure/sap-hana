@@ -231,6 +231,11 @@ locals {
     app_vm = 4 + 10
     web_vm = local.sub_web_defined ? (4 + 2) : -3
   }
+  admin_ip_offsets = {
+    scs_vm = 4 + 16
+    app_vm = 4 + 11
+    web_vm = 4 + 21
+  }
 
   // Default VM config should be merged with any the user passes in
   app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))

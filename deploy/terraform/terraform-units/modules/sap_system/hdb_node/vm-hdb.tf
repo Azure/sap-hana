@@ -24,7 +24,7 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
     subnet_id = var.admin_subnet.id
     private_ip_address = lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? (
       local.hdb_vms[count.index].admin_nic_ip) : (
-      cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + 10)
+      cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_admin_vm)
     )
 
     private_ip_address_allocation = "static"
@@ -50,7 +50,7 @@ resource "azurerm_network_interface" "nics_dbnodes_db" {
       cidrhost((local.sub_db_exists ? (
         data.azurerm_subnet.sap_db[0].address_prefixes[0]) : (
         azurerm_subnet.sap_db[0].address_prefixes[0])
-      ), tonumber(count.index) + 10)
+      ), tonumber(count.index) + local.hdb_ip_offsets.hdb_db_vm)
     )
     private_ip_address_allocation = "static"
   }
@@ -74,8 +74,8 @@ resource "azurerm_lb" "hdb" {
     subnet_id                     = local.sub_db_exists ? data.azurerm_subnet.sap_db[0].id : azurerm_subnet.sap_db[0].id
     private_ip_address_allocation = "Static"
     private_ip_address = try(local.hana_database.loadbalancer.frontend_ip, (local.sub_db_exists ? (
-      cidrhost(data.azurerm_subnet.sap_db[0].address_prefixes[0], tonumber(count.index) + 4)) : (
-      cidrhost(azurerm_subnet.sap_db[0].address_prefixes[0], tonumber(count.index) + 4)))
+      cidrhost(data.azurerm_subnet.sap_db[0].address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb)) : (
+      cidrhost(azurerm_subnet.sap_db[0].address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb)))
     )
   }
 }

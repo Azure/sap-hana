@@ -243,6 +243,14 @@ locals {
     }
   ]
 
+  // Subnet IP Offsets
+  // Note: First 4 IP addresses in a subnet are reserved by Azure
+  anydb_ip_offsets = {
+    anydb_lb       = 4
+    anydb_admin_vm = 10
+    anydb_db_vm    = 10
+  }
+
   // Ports used for specific DB Versions
   lb_ports = {
     "ASE" = [
