@@ -5,7 +5,7 @@
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "kv_prvt" {
-  name                       = local.kv_private_name
+  name                       = local.keyvault_names.private_access
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : local.rg_name
   tenant_id                  = local.service_principal.tenant_id
@@ -26,7 +26,7 @@ resource "azurerm_key_vault" "kv_prvt" {
 
 // Create user KV with access policy
 resource "azurerm_key_vault" "kv_user" {
-  name                       = local.kv_user_name
+  name                       = local.keyvault_names.user_access
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : local.rg_name
   tenant_id                  = local.service_principal.tenant_id

@@ -17,44 +17,6 @@ variable "service_principal" {
   description = "Current service principal used to authenticate to Azure"
 }
 
-variable "region_mapping" {
-  type        = map(string)
-  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
-
-  # 28 Regions 
-
-  default = {
-    westus             = "weus"
-    westus2            = "wus2"
-    centralus          = "ceus"
-    eastus             = "eaus"
-    eastus2            = "eus2"
-    northcentralus     = "ncus"
-    southcentralus     = "scus"
-    westcentralus      = "wcus"
-    northeurope        = "noeu"
-    westeurope         = "weeu"
-    eastasia           = "eaas"
-    southeastasia      = "seas"
-    brazilsouth        = "brso"
-    japaneast          = "jpea"
-    japanwest          = "jpwe"
-    centralindia       = "cein"
-    southindia         = "soin"
-    westindia          = "wein"
-    uksouth2           = "uks2"
-    uknorth            = "ukno"
-    canadacentral      = "cace"
-    canadaeast         = "caea"
-    australiaeast      = "auea"
-    australiasoutheast = "ause"
-    uksouth            = "ukso"
-    ukwest             = "ukwe"
-    koreacentral       = "koce"
-    koreasouth         = "koso"
-  }
-}
-
 locals {
 
   storageaccount_names = var.naming.storageaccount_names.LIBRARY
@@ -111,23 +73,11 @@ locals {
   sa_tfstate_container_name   = try(var.storage_account_sapbits.tfstate_blob_container.name, "tfstate")
 
   // deployer
-  deployer                = try(var.deployer, {})
-  deployer_environment    = try(local.deployer.environment, "")
-  deployer_location_short = try(var.region_mapping[local.deployer.region], "unkn")
-  deployer_vnet           = try(local.deployer.vnet, "")
-  deployer_prefix         = upper(format("%s-%s-%s", local.deployer_environment, local.deployer_location_short, substr(local.deployer_vnet, 0, 7)))
+  deployer      = try(var.deployer, {})
+  deployer_vnet = try(local.deployer.vnet, "")
 
   // Comment out code with users.object_id for the time being.
   // deployer_users_id = try(local.deployer.users.object_id, [])
-
-  // key vault for saplibrary
-  // Post fix for all deployed resources
-  postfix         = upper(substr(random_id.post_fix.hex, 0, 4))
-  environment     = try(var.infrastructure.environment, "")
-  location_short  = try(var.region_mapping[local.region], "unkn")
-  kv_prefix       = upper(format("%s%s", substr(local.environment, 0, 5), local.location_short))
-  kv_private_name = format("%sSAPLIBprvt%s", local.kv_prefix, local.postfix)
-  kv_user_name    = format("%sSAPLIBuser%s", local.kv_prefix, local.postfix)
 
   // Current service principal
   service_principal = try(var.service_principal, {})

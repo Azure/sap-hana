@@ -28,44 +28,6 @@ variable naming {
   description = "Defines the names for the resources"
 }
 
-variable "region_mapping" {
-  type        = map(string)
-  description = "Region Mapping: Full = Single CHAR, 4-CHAR"
-
-  //28 Regions 
-
-  default = {
-    westus             = "weus"
-    westus2            = "wus2"
-    centralus          = "ceus"
-    eastus             = "eaus"
-    eastus2            = "eus2"
-    northcentralus     = "ncus"
-    southcentralus     = "scus"
-    westcentralus      = "wcus"
-    northeurope        = "noeu"
-    westeurope         = "weeu"
-    eastasia           = "eaas"
-    southeastasia      = "seas"
-    brazilsouth        = "brso"
-    japaneast          = "jpea"
-    japanwest          = "jpwe"
-    centralindia       = "cein"
-    southindia         = "soin"
-    westindia          = "wein"
-    uksouth2           = "uks2"
-    uknorth            = "ukno"
-    canadacentral      = "cace"
-    canadaeast         = "caea"
-    australiaeast      = "auea"
-    australiasoutheast = "ause"
-    uksouth            = "ukso"
-    ukwest             = "ukwe"
-    koreacentral       = "koce"
-    koreasouth         = "koso"
-  }
-}
-
 //Set defaults
 locals {
   //Region and metadata
@@ -87,7 +49,8 @@ locals {
 
   vnet_prefix                 = var.naming.prefix.VNET
   storageaccount_name         = var.naming.storageaccount_names.SDU
-  keyvault_names              = var.naming.keyvault_names.SDU
+  landscape_keyvault_names    = var.naming.keyvault_names.VNET
+  sid_keyvault_names          = var.naming.keyvault_names.SDU
   virtualmachine_names        = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME
   anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
   anchor_computer_names       = var.naming.virtualmachine_names.ANCHOR_COMPUTERNAME
@@ -181,27 +144,10 @@ locals {
   ppg_exists = length(local.ppg_arm_id) > 0 ? true : false
   ppg_name   = local.ppg_exists ? try(split("/", local.ppg_arm_id)[8], "") : try(local.var_ppg.name, format("%s%s", local.prefix, local.resource_suffixes.ppg))
 
-  // Post fix for all deployed resources
-  postfix = random_id.saplandscape.hex
-
   /* Comment out code with users.object_id for the time being
   // Additional users add to user KV
   kv_users = var.deployer_user
   */
-  // kv for sap landscape
-  environment    = lower(try(local.var_infra.environment, ""))
-  location_short = lower(try(var.region_mapping[local.region], "unkn"))
-  vnet_nr_parts  = length(split("-", local.vnet_sap_name))
-  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = local.vnet_nr_parts >= 3 ? split("-", upper(local.vnet_sap_name))[local.vnet_nr_parts - 1] == "VNET" ? split("-", local.vnet_sap_name)[local.vnet_nr_parts - 2] : local.vnet_sap_name : local.vnet_sap_name
-  kv_prefix            = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  kv_private_name      = format("%sprvt%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-  kv_user_name         = format("%suser%s", local.kv_prefix, upper(substr(local.postfix, 0, 3)))
-
-  // key vault naming for sap system
-  sid_kv_prefix       = upper(format("%s%s%s", substr(local.environment, 0, 5), local.location_short, substr(local.vnet_sap_name_prefix, 0, 7)))
-  sid_kv_private_name = format("%s%sp%s", local.kv_prefix, local.sid, upper(substr(local.postfix, 0, 3)))
-  sid_kv_user_name    = format("%s%su%s", local.kv_prefix, local.sid, upper(substr(local.postfix, 0, 3)))
 
   /* 
      TODO: currently sap landscape and sap system haven't been decoupled. 
