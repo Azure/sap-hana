@@ -105,6 +105,7 @@ locals {
   public_ips_jumpboxes_linux   = var.public_ips_jumpboxes_linux[*].ip_address
   ips_dbnodes_admin            = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
   ips_dbnodes_db               = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
+
   databases = [
     var.hana_database_info
   ]

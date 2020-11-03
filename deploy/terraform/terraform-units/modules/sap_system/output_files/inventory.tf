@@ -47,6 +47,7 @@ resource "local_file" "output_json" {
           components        = database.components,
           xsa               = database.xsa,
           shine             = database.shine,
+
           nodes = [for ip_dbnode_admin in local.ips_dbnodes_admin : {
             // Hostname is required for Ansible, therefore set dbname from resource name to hostname
             dbname       = replace(local.hdb_vms[index(local.ips_dbnodes_admin, ip_dbnode_admin)].name, "_", "")
