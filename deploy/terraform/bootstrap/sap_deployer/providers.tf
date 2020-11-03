@@ -25,5 +25,6 @@ terraform {
     local    = { version = "~> 1.4" }
     random   = { version = "~> 2.2" }
     null     = { version = "~> 2.1" }
+    tls      = { version = "~> 2.2" }
   }
 }

@@ -32,7 +32,7 @@ steps:
       terraform plan -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ > plan_output.log
       cat plan_output.log
       
-      if ! grep "No changes" plan_output.log; then exit 1; fi;
+      if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then exit 1; fi;
       '
     displayName: "Validate library new config"
     env:

@@ -42,7 +42,7 @@ stages:
           az group update --resource-group $saplib_rg --set tags.Delete=True
           az group delete -n $saplib_rg -y
 
-          deployer_rg="UNIT-EAUS-MGMT-INFRASTRUCTURE"
+          deployer_rg="UNIT-EAUS-DEP00-INFRASTRUCTURE"
           echo "=== Mark and try to delete rg $deployer_rg ==="
           az group update --resource-group $deployer_rg --set tags.Delete=True
           az group delete -n $deployer_rg -y
@@ -64,6 +64,9 @@ stages:
       - template: templates/util/collect-deployer-info.yml
         parameters:
           deployer_env: "UNIT"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
       - template: templates/deployer/post-deployer-steps.yml
         parameters:
           deployer_env: "UNIT"
@@ -83,7 +86,11 @@ stages:
       - template: templates/saplib/create-saplib-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          deployer_env: "UNIT"
           saplib_env: "UNIT"
+      - template: templates/util/add-agent-to-deployer-nsg.yml
+        parameters:
+          deployer_env: "UNIT"
       - template: templates/saplib/post-saplib-steps.yml
         parameters:
           deployer_env: "UNIT"

@@ -4,16 +4,16 @@
 
 resource "azurerm_network_interface" "anydb_db" {
   count               = local.enable_deployment ? local.db_server_count : 0
-  name                = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.db-nic)
-  location            = var.resource-group[0].location
-  resource_group_name = var.resource-group[0].name
+  name                = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.db_nic)
+  location            = var.resource_group[0].location
+  resource_group_name = var.resource_group[0].name
 
   ip_configuration {
     primary   = true
     name      = "ipconfig1"
     subnet_id = local.sub_db_exists ? data.azurerm_subnet.anydb[0].id : azurerm_subnet.anydb[0].id
 
-    private_ip_address = try(local.anydb_vms[count.index].db_nic_ip, null) != null ? (
+    private_ip_address = try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
       local.anydb_vms[count.index].db_nic_ip) : (
       cidrhost(local.sub_db_exists ? (
         data.azurerm_subnet.anydb[0].address_prefixes[0]) : (
@@ -28,9 +28,9 @@ resource "azurerm_network_interface" "anydb_db" {
 # Creates the Admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "anydb_admin" {
   count                         = local.enable_deployment && local.anydb_dual_nics ? local.db_server_count : 0
-  name                          = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.admin-nic)
-  location                      = var.resource-group[0].location
-  resource_group_name           = var.resource-group[0].name
+  name                          = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.admin_nic)
+  location                      = var.resource_group[0].location
+  resource_group_name           = var.resource_group[0].name
   enable_accelerated_networking = true
 
   ip_configuration {
@@ -38,7 +38,7 @@ resource "azurerm_network_interface" "anydb_admin" {
     name      = "ipconfig1"
     subnet_id = var.admin_subnet.id
 
-    private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, null) != null ? (
+    private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
       local.anydb_vms[count.index].admin_nic_ip) : (
       cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + 10)
     )
@@ -51,8 +51,8 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
-  resource_group_name = var.resource-group[0].name
-  location            = var.resource-group[0].location
+  resource_group_name = var.resource_group[0].name
+  location            = var.resource_group[0].location
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //Ultra disk requires zonal deployment
@@ -95,13 +95,16 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     }
   }
 
-  admin_username                  = local.authentication.username
-  admin_password                  = local.authentication.type == "password" ? try(local.authentication.password, null) : null
-  disable_password_authentication = local.authentication.type != "password" ? true : false
+  admin_username                  = local.sid_auth_username
+  admin_password                  = local.sid_auth_password
+  disable_password_authentication = ! local.enable_auth_password
 
-  admin_ssh_key {
-    username   = local.authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+  dynamic "admin_ssh_key" {
+    for_each = range(local.enable_auth_password ? 0 : 1)
+    content {
+      username   = local.anydb_vms[count.index].authentication.username
+      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+    }
   }
 
   additional_capabilities {
@@ -109,7 +112,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   }
 
   boot_diagnostics {
-    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
   tags = {
     environment = "SAP"
@@ -122,8 +125,8 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
-  resource_group_name = var.resource-group[0].name
-  location            = var.resource-group[0].location
+  resource_group_name = var.resource_group[0].name
+  location            = var.resource_group[0].location
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % local.db_zone_count].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -166,15 +169,15 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
     }
   }
 
-  admin_username = local.authentication.username
-  admin_password = try(local.authentication.password, null)
+  admin_username = local.sid_auth_username
+  admin_password = local.sid_auth_password
 
   additional_capabilities {
     ultra_ssd_enabled = local.enable_ultradisk
   }
 
   boot_diagnostics {
-    storage_account_uri = var.storage-bootdiag.primary_blob_endpoint
+    storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
   tags = {
     environment = "SAP"
@@ -186,8 +189,8 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
 resource "azurerm_managed_disk" "disks" {
   count                = local.enable_deployment ? length(local.anydb_disks) : 0
   name                 = local.anydb_disks[count.index].name
-  location             = var.resource-group[0].location
-  resource_group_name  = var.resource-group[0].name
+  location             = var.resource_group[0].location
+  resource_group_name  = var.resource_group[0].name
   create_option        = "Empty"
   storage_account_type = local.anydb_disks[count.index].storage_account_type
   disk_size_gb         = local.anydb_disks[count.index].disk_size_gb
@@ -201,7 +204,7 @@ resource "azurerm_managed_disk" "disks" {
 }
 
 // Manages attaching a Disk to a Virtual Machine
-resource "azurerm_virtual_machine_data_disk_attachment" "vm-disks" {
+resource "azurerm_virtual_machine_data_disk_attachment" "vm_disks" {
   count           = local.enable_deployment ? length(azurerm_managed_disk.disks) : 0
   managed_disk_id = azurerm_managed_disk.disks[count.index].id
   virtual_machine_id = upper(local.anydb_ostype) == "LINUX" ? (

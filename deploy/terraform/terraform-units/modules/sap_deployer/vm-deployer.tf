@@ -1,7 +1,7 @@
 /*
 Description:
 
-  The deployer will be used to run Terraform and Anisbe tasks to create the SAP environments
+  The deployer will be used to run Terraform and Ansible tasks to create the SAP environments
 
   Define 0..n Deployer(s).
 */
@@ -47,13 +47,6 @@ resource "azurerm_role_assignment" "sub_contributor" {
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
 }
 
-// Add role to be able to create lock on rg 
-resource "azurerm_role_assignment" "sub_user_admin" {
-  scope                = data.azurerm_subscription.primary.id
-  role_definition_name = "User Access Administrator"
-  principal_id         = azurerm_user_assigned_identity.deployer.principal_id
-}
-
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
@@ -90,9 +83,12 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     identity_ids = [azurerm_user_assigned_identity.deployer.id]
   }
 
-  admin_ssh_key {
-    username   = local.deployers[count.index].authentication.username
-    public_key = file(var.sshkey.path_to_public_key)
+  dynamic "admin_ssh_key" {
+    for_each = range(local.deployers[count.index].authentication.sshkey.public_key == null ? 0 : 1)
+    content {
+      username   = local.deployers[count.index].authentication.username
+      public_key = local.deployers[count.index].authentication.sshkey.public_key
+    }
   }
 
   boot_diagnostics {
@@ -107,27 +103,9 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     type        = "ssh"
     host        = azurerm_public_ip.deployer[count.index].ip_address
     user        = local.deployers[count.index].authentication.username
-    private_key = local.deployers[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    private_key = local.deployers[count.index].authentication.type == "key" ? local.deployers[count.index].authentication.sshkey.private_key : null
     password    = lookup(local.deployers[count.index].authentication, "password", null)
     timeout     = var.ssh-timeout
-  }
-
-  // Copy ssh keypair over to Deployer and sets permission
-  provisioner "file" {
-    source      = lookup(var.sshkey, "path_to_public_key", null)
-    destination = "/home/${local.deployers[count.index].authentication.username}/.ssh/id_rsa.pub"
-  }
-
-  provisioner "file" {
-    source      = lookup(var.sshkey, "path_to_private_key", null)
-    destination = "/home/${local.deployers[count.index].authentication.username}/.ssh/id_rsa"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod 644 /home/${local.deployers[count.index].authentication.username}/.ssh/id_rsa.pub",
-      "chmod 600 /home/${local.deployers[count.index].authentication.username}/.ssh/id_rsa",
-    ]
   }
 }
 
@@ -140,7 +118,7 @@ resource "null_resource" "prepare-deployer" {
     type        = "ssh"
     host        = azurerm_public_ip.deployer[count.index].ip_address
     user        = local.deployers[count.index].authentication.username
-    private_key = local.deployers[count.index].authentication.type == "key" ? file(var.sshkey.path_to_private_key) : null
+    private_key = local.deployers[count.index].authentication.type == "key" ? local.deployers[count.index].authentication.sshkey.private_key : null
     password    = lookup(local.deployers[count.index].authentication, "password", null)
     timeout     = var.ssh-timeout
   }

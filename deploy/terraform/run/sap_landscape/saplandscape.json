@@ -1,18 +1,10 @@
 {
+    "tfstate_resource_id": "",
+    "deployer_tfstate_key": "",
     "infrastructure": {
+        "environment": "np",
         "region": "eastus",
-        "environment": "global",
-        "resource_group": {
-            "is_existing": "false",
-            "arm_id": "",
-            "name": "azure-test-saplandscape-rg"
-        },
         "vnets": {
-            "management": {
-                "saplib_resource_group_name": "",
-                "tfstate_storage_account_name": "",
-                "deployer_tfstate_key": ""
-            },
             "sap": {
                 "address_space": "10.1.0.0/16",
                 "subnet_iscsi": {
@@ -20,25 +12,9 @@
                     "prefix": "10.1.0.0/24"
                 }
             }
-        }
-    },
-    "jumpboxes": {
-        "windows": [],
-        "linux": []
-    },
-    "databases": [
-        {
-            "platform": "NONE"
-        }
-    ],
-    "application": {
-        "enable_deployment": false
-    },
-    "software": {
-        "storage_account_sapbits": {
-            "saplib_resource_group_name": "",
-            "tfstate_storage_account_name": "",
-            "saplib_tfstate_key": ""
+        },
+        "iscsi": {
+            "iscsi_count": 3
         }
     },
     "sshkey": {},

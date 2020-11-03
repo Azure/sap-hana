@@ -1,12 +1,12 @@
-variable "resource-group" {
+variable "resource_group" {
   description = "Details of the resource group"
 }
 
-variable "vnet-sap" {
+variable "vnet_sap" {
   description = "Details of the SAP VNet"
 }
 
-variable "storage-bootdiag" {
+variable "storage_bootdiag" {
   description = "Details of the boot diagnostics storage account"
 }
 
@@ -28,6 +28,10 @@ variable "admin_subnet" {
   description = "Information about SAP admin subnet"
 }
 
+variable "sid_kv_user" {
+  description = "Details of the user keyvault for sap_system"
+}
+
 locals {
   // Imports database sizing information
 
@@ -42,17 +46,19 @@ locals {
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
-  region  = try(var.infrastructure.region, "")
-  sap_sid = upper(try(var.application.sid, ""))
-  prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu-rg))
+  region    = try(var.infrastructure.region, "")
+  sap_sid   = upper(try(var.application.sid, ""))
+  anydb_sid = (length(local.anydb_databases) > 0) ? try(local.anydb.instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
+  sid       = upper(try(var.application.sid, local.anydb_sid))
+  prefix    = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
+  rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
   // Zones
   zones            = try(local.anydb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = try(length(local.zones), 1)
 
-  # SAP vnet
+  // SAP vnet
   var_infra       = try(var.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
   vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
@@ -71,7 +77,7 @@ locals {
   sub_db_exists = length(local.sub_db_arm_id) > 0 ? true : false
   sub_db_name = local.sub_db_exists ? (
     try(split("/", local.sub_db_arm_id)[10], "")) : (
-    try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet))
+    try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet))
   )
   sub_db_prefix = try(local.var_sub_db.prefix, "")
 
@@ -81,13 +87,13 @@ locals {
   sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
   sub_db_nsg_name = local.sub_db_nsg_exists ? (
     try(split("/", local.sub_db_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db-subnet-nsg))
+    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet_nsg))
   )
 
   // PPG Information
-  ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : null
+  ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : ""
 
-  anydb          = try(local.anydb-databases[0], {})
+  anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
 
@@ -96,13 +102,24 @@ locals {
 
   // Filter the list of databases to only AnyDB platform entries
   // Supported databases: Oracle, DB2, SQLServer, ASE 
-  anydb-databases = [
+  anydb_databases = [
     for database in var.databases : database
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
   ]
 
-  // Enable deployment based on length of local.anydb-databases
-  enable_deployment = (length(local.anydb-databases) > 0) ? true : false
+  // Enable deployment based on length of local.anydb_databases
+  enable_deployment = (length(local.anydb_databases) > 0) ? true : false
+
+  /* 
+     TODO: currently sap landscape and sap system haven't been decoupled. 
+     The key vault information of sap landscape will be obtained via input json.
+     At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
+  */
+  kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
+  secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
+
+  // Define this variable to make it easier when implementing existing kv.
+  sid_kv_user = try(var.sid_kv_user[0], null)
 
   // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
@@ -113,20 +130,29 @@ locals {
   anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, false)
+
   db_sid       = lower(substr(local.anydb_platform, 0, 3))
   loadbalancer = try(local.anydb.loadbalancer, {})
 
   node_count      = try(length(var.databases[0].dbnodes), 1)
   db_server_count = local.anydb_ha ? local.node_count * 2 : local.node_count
 
+  anydb_cred = try(local.anydb.credentials, {})
+
+  sid_auth_type        = try(local.anydb.authentication.type, "key")
+  enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
+  enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
+  sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
+  sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
+
+  db_systemdb_password = "db_systemdb_password"
+
   authentication = try(local.anydb.authentication,
     {
-      "type"     = upper(local.anydb_ostype) == "LINUX" ? "key" : "password"
-      "username" = "azureadm"
+      "type"     = local.sid_auth_type
+      "username" = local.sid_auth_username
+      "password" = "anydb_vm_password"
   })
-
-  anydb_cred           = try(local.anydb.credentials, {})
-  db_systemdb_password = try(local.anydb_cred.db_systemdb_password, "")
 
   // Default values in case not provided
   os_defaults = {
@@ -197,19 +223,19 @@ locals {
   )
 
   dbnodes = flatten([[for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
     computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
     role         = try(dbnode.role, "worker"),
-    db_nic_ip    = lookup(dbnode, "db_nic_ips", [null, null])[0]
-    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [null, null])[0]
+    db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
+    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
     }
     ],
     [for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
       name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
       computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count], local.resource_suffixes.vm)
       role         = try(dbnode.role, "worker"),
-      db_nic_ip    = lookup(dbnode, "db_nic_ips", [null, null])[1],
-      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [null, null])[1]
+      db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1],
+      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
       } if local.anydb_ha
     ]
     ]
@@ -254,7 +280,7 @@ locals {
     }
   ])
 
-  data-disk-per-dbnode = (length(local.anydb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
       for storage_type in lookup(local.sizes, local.anydb_size).storage : [
         for disk_count in range(storage_type.count) : {
@@ -274,7 +300,7 @@ locals {
 
   anydb_disks = flatten([
     for vm_counter, anydb_vm in local.anydb_vms : [
-      for idx, datadisk in local.data-disk-per-dbnode : {
+      for idx, datadisk in local.data_disk_per_dbnode : {
         name                      = format("%s-%s", anydb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter
         caching                   = datadisk.caching

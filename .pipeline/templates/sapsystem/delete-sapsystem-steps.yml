@@ -11,7 +11,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       sapsystem_env=${{parameters.sapsystem_env}}
@@ -57,16 +57,14 @@ steps:
       
       echo "=== Delete SAP system from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
-      cat ~/.log/$(Build.BuildId)_destroy_error.log
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
 
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${sapsystem_rg}
       '
 
       echo "=== Remove vnet peering with vnet-mgmt in case deployment/destroy fails ==="
-      vnet_name="${deployer_prefix}-EAUS-MGMT-vnet"
+      vnet_name="${deployer_prefix}-EAUS-DEP00-vnet"
       peering_name=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name ${vnet_name} | jq -r .[].name | grep $(Build.BuildId))
       [ ! -z "$peering_name" ] && az network vnet peering delete --resource-group ${deployer_rg} --name ${peering_name} --vnet-name ${vnet_name}
 
@@ -74,6 +72,14 @@ steps:
       az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
       az group update --resource-group ${sapsystem_rg} --set tags.Delete=True
       az group delete -n ${sapsystem_rg} --no-wait -y
+
+      # Delete SPN secrets from deployer KV
+      echo "=== Delete SPN secrets from deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-secret --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-subscription-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-tenant-id --output none
 
       exit 0
     displayName: "Delete new sapsystem"

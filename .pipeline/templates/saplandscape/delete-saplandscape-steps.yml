@@ -11,7 +11,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       saplandscape_env=${{parameters.saplandscape_env}}
@@ -20,12 +20,12 @@ steps:
 
       if [ -z "${isRelease}" ]
       then 
-        sapsystem_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+        saplandscape_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
       else
-        sapsystem_prefix=${saplandscape_env}
+        saplandscape_prefix=${saplandscape_env}
       fi
 
-      saplandscape_rg="${sapsystem_prefix}-EAUS-SAP0-INFRASTRUCTURE"
+      saplandscape_rg="${saplandscape_prefix}-EAUS-SAP0-INFRASTRUCTURE"
 
       echo "=== Delete SAP system from deployer ==="
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
@@ -38,12 +38,12 @@ steps:
 
       if [ -z "${isRelease}" ]
       then 
-        sapsystem_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+        saplandscape_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
       else
-        sapsystem_prefix=${saplandscape_env}
+        saplandscape_prefix=${saplandscape_env}
       fi
 
-      saplandscape_rg="${sapsystem_prefix}-EAUS-SAP0-INFRASTRUCTURE"
+      saplandscape_rg="${saplandscape_prefix}-EAUS-SAP0-INFRASTRUCTURE"
 
       repo_dir=$HOME/$saplandscape_rg/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/${saplandscape_rg}
@@ -57,15 +57,13 @@ steps:
       
       echo "=== Delete SAP system from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_sap_landscape_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_sap_landscape_destroy.log
-      cat ~/.log/$(Build.BuildId)_sap_landscape_destroy_error.log
-
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
+      
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${saplandscape_rg}
       '
 
-      vnet_name="${deployer_prefix}-EAUS-MGMT-vnet"
+      vnet_name="${deployer_prefix}-EAUS-DEP00-vnet"
       echo "=== Remove vnet peering with ${vnet_name} in case deployment/destroy fails ==="
       peering_name=$(az network vnet peering list --resource-group ${deployer_rg} --vnet-name ${vnet_name} | jq -r .[].name | grep $(Build.BuildId))
       echo "=== Delete peering ${peering_name} ==="
@@ -75,6 +73,14 @@ steps:
       az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
       az group update --resource-group ${saplandscape_rg} --set tags.Delete=True
       az group delete -n ${saplandscape_rg} --no-wait -y
+
+      # Delete SPN secrets from deployer KV
+      echo "=== Delete SPN secrets from deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-client-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-client-secret --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-subscription-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-tenant-id --output none
 
       exit 0
     displayName: "Delete new sap landscape"

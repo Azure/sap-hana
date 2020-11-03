@@ -23,10 +23,24 @@ variable "app_disk_sizes_filename" {
   default     = ""
 }
 
+variable "tfstate_resource_id" {
+  description = "Resource id of tfstate storage account"
+}
+
+variable "deployer_tfstate_key" {
+  description = "The key of deployer's remote tfstate file"
+}
+
 # Set defaults
 locals {
 
-  ansible_path = "${module.saplibrary.environment}_${module.saplibrary.sid}"
+  // The environment of sap landscape and sap system
+  environment = upper(try(var.infrastructure.environment, ""))
+
+  vnet_sap_name = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "sap")
+  vnet_nr_parts = length(split("-", local.vnet_sap_name))
+  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
+  vnet_sap_name_part = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? substr(split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)], 0, 7) : local.vnet_sap_name
 
   # Options
   enable_secure_transfer = try(var.options.enable_secure_transfer, true)
@@ -44,19 +58,11 @@ locals {
   file_hosts_yml = fileexists("${terraform.workspace}/ansible_config_files/hosts.yml") ? file("${terraform.workspace}/ansible_config_files/hosts.yml") : ""
   file_output    = fileexists("${terraform.workspace}/ansible_config_files/output.json") ? file("${terraform.workspace}/ansible_config_files/output.json") : ""
 
-  // Import deployer information for ansible.tf
-  import_deployer = module.deployer.import_deployer
-
   # SAP vnet
   var_infra       = try(var.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
   vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
-
-  vnet_sap_name = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "sap")
-  vnet_nr_parts = length(split("-", local.vnet_sap_name))
-  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_part = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? substr(split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)], 0, 7) : local.vnet_sap_name
 
   //SID determination
 
@@ -96,4 +102,32 @@ locals {
   anchor        = try(local.var_infra.anchor_vms, {})
   anchor_ostype = upper(try(local.anchor.os.os_type, "LINUX"))
 
+  // Import deployer information for ansible.tf
+  import_deployer = data.terraform_remote_state.deployer.outputs.deployer
+
+  // Locate the tfstate storage account
+  tfstate_resource_id          = try(var.tfstate_resource_id, "")
+  saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
+  saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
+  tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
+  tfstate_container_name       = "tfstate"
+  deployer_tfstate_key         = try(var.deployer_tfstate_key, "")
+
+  // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
+  deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
+
+  spn = {
+    subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
+    client_id       = data.azurerm_key_vault_secret.client_id.value,
+    client_secret   = data.azurerm_key_vault_secret.client_secret.value,
+    tenant_id       = data.azurerm_key_vault_secret.tenant_id.value,
+  }
+
+  service_principal = {
+    subscription_id = local.spn.subscription_id,
+    client_id       = local.spn.client_id,
+    client_secret   = local.spn.client_secret,
+    tenant_id       = local.spn.tenant_id,
+    object_id       = data.azuread_service_principal.sp.id
+  }
 }

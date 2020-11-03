@@ -1,21 +1,15 @@
 {
   "infrastructure": {
     "region": "eastus",
-    "environment": "global",
+    "environment": "np",
     "vnets": {
       "management": {
+        "name": "DEP00",
         "address_space": "10.0.0.0/26",
         "subnet_mgmt": {
           "prefix": "10.0.0.16/28"
         }
       }
     }
-  },
-  "sshkey": {
-    "path_to_public_key": "sshkey.pub",
-    "path_to_private_key": "sshkey"
-  },
-  "options": {
-    "enable_secure_transfer": true
   }
 }

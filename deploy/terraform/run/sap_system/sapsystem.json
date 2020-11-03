@@ -1,17 +1,18 @@
 {
+  "tfstate_resource_id": "",
+  "deployer_tfstate_key": "",
   "infrastructure": {
+    "environment": "np",
     "region": "eastus",
-    "environment": "global",
     "resource_group": {
       "is_existing": "false",
       "arm_id": ""
     },
+    "landscape": {
+      "key_vault_arm_id": "",
+      "sid_public_key_secret_name": ""
+    },
     "vnets": {
-      "management": {
-        "saplib_resource_group_name": "",
-        "tfstate_storage_account_name": "",
-        "deployer_tfstate_key": ""
-      },
       "sap": {
         "is_existing": "false",
         "arm_id": "",
@@ -43,15 +44,7 @@
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
       },
-      "zones": [],
-      "credentials": {
-        "db_systemdb_password": "<db_systemdb_password>",
-        "os_sidadm_password": "<os_sidadm_password>",
-        "os_sapadm_password": "<os_sapadm_password>",
-        "xsa_admin_password": "<xsa_admin_password>",
-        "cockpit_admin_password": "<cockpit_admin_password>",
-        "ha_cluster_password": "<ha_cluster_password>"
-      }
+      "zones": []
     }
   ],
   "application": {
@@ -69,30 +62,6 @@
       "type": "key",
       "username": "azureadm"
     }
-  },
-  "software": {
-    "storage_account_sapbits": {
-      "saplib_resource_group_name": "",
-      "tfstate_storage_account_name": "",
-      "saplib_tfstate_key": ""
-    },
-    "downloader": {
-      "credentials": {
-        "sap_user": "<sap_user>",
-        "sap_password": "<sap_password>"
-      },
-      "scenarios": [
-        {
-          "scenario_type": "DB",
-          "product_name": "HANA",
-          "product_version": "2.0"
-        }
-      ]
-    }
-  },
-  "sshkey": {
-    "path_to_public_key": "sshkey.pub",
-    "path_to_private_key": "sshkey"
   },
   "options": {
     "enable_secure_transfer": true,

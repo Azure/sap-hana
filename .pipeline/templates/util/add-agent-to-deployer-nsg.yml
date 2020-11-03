@@ -17,7 +17,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      rg_name="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      rg_name="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       vnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].name)
       subnet_name=$(az network vnet list --resource-group ${rg_name} | jq -r .[].subnets[].name)

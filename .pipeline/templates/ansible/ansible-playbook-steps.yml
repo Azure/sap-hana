@@ -6,6 +6,10 @@ steps:
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh
 
+      echo "=== Login using pipeline spn ==="
+      az login --service-principal -u $(hana-pipeline-spn-id) -p $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+
+      saplandscape_rg=${{parameters.saplandscape_rg_name}}
       sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
       repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/${sapsystem_rg_name}
@@ -33,7 +37,21 @@ steps:
       export ANSIBLE_HOST_KEY_CHECKING=False
       source ${ws_dir}/export-clustering-sp-details.sh
       cd ~/Azure_SAP_Automated_Deployment
-      ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml ${repo_dir}/deploy/ansible/sap_playbook.yml
+
+      output_json=${ws_dir}/ansible_config_files/output.json
+      updated_output_json=$(cat $output_json \
+      | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
+      | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      | jq --arg db_systemdb_password "$(hana-pipeline-db-pwd)" .databases[].credentials.db_systemdb_password\ =\ \$db_systemdb_password \
+      | jq --arg os_sidadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sidadm_password\ =\ \$os_sidadm_password \
+      | jq --arg os_sapadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sapadm_password\ =\ \$os_sapadm_password \
+      | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
+      | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
+      | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
+      )
+      echo $updated_output_json > $output_json
+
+      ansible-playbook -i ${ws_dir}/ansible_config_files/hosts.yml --private-key ${ws_dir}/sshkey ${repo_dir}/deploy/ansible/sap_playbook.yml
       '
     displayName: "Run Ansible-playbook: Branch ${{parameters.branch_name}}"
     env:

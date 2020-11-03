@@ -18,7 +18,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       saplib_env=${{parameters.saplib_env}}
@@ -49,10 +49,15 @@ steps:
       sap_vnet_prefix_idx=${sap_vnet_prefix_parts[1]}
       unset IFS
 
+      landscape_kv_arm_id=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).id"'")
+      landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      sid_public_key_secret_name="${saplandscape_rg}-sid-sshkey-pub"
+
       # Modify environment value so it starts with u and with length of 5
       sapsystem_env=${{parameters.sapsystem_env}}
       sapsystem_isRelease=${sapsystem_env%%$buildId*}
 
+      [ -z ${{parameters.osImage_publisher}} ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
       [[ ${osImage_publisher} == "SUSE" ]] && isSles=true || isSles=false
 
       # subnet is decided by buildId if it is unit test.
@@ -77,6 +82,15 @@ steps:
       subnet_app_prefix="10.${sap_vnet_prefix_idx}.${idx}.96/27"
 
       sapsystem_rg="${sapsystem_prefix}-EAUS-SAP-PRD"
+      sapland_rg="UNIT-EAUS-SAP0-INFRASTRUCTURE"
+
+      # Store SPN in deployer KV
+      echo "=== Store SPN in deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-id --value $(hana-pipeline-spn-id) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-secret --value $(hana-pipeline-spn-pw) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-subscription-id --value $(landscape-subscription) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-tenant-id --value $(landscape-tenant) --output none
 
       # If no osImage provided, deploy SLES12SP5
       [ -z "${{parameters.osImage_offer}}" ] && osImage_offer="sles-sap-12-sp5" || osImage_offer=${{parameters.osImage_offer}}
@@ -109,8 +123,12 @@ steps:
 
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
-      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"MGMT-INFRASTRUCTURE\\\")).name"'")
+      deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"DEP00-INFRASTRUCTURE\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
+      tfstate_resource_id=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] | select(.name | contains(\\\"tfstate\\\")).id"'")
+
+      db_type=${{parameters.db_type}}
+      [ -z "$db_type" ] && db="HANA" || db=${db_type}
 
       db_type=${{parameters.db_type}}
       [ -z "$db_type" ] && db="HANA" || db=${db_type}
@@ -118,9 +136,8 @@ steps:
       cp ${repo_dir}/deploy/terraform/run/sap_system/sapsystem.json ${ws_dir}/sapsystem.json
       cat ${ws_dir}/sapsystem.json \
       | jq --arg environment "${sapsystem_prefix}" .infrastructure.environment\ =\ \$environment \
-      | jq --arg saplib_rg "${saplib_rg}" .infrastructure.vnets.management.saplib_resource_group_name\ =\ \$saplib_rg \
-      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .infrastructure.vnets.management.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
-      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .infrastructure.vnets.management.deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
+      | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq .infrastructure.vnets.sap.is_existing\ =\ \"true\" \
       | jq --arg saplandscape_sap_vnet_arm_id "${saplandscape_sap_vnet_arm_id}" .infrastructure.vnets.sap.arm_id\ =\ \$saplandscape_sap_vnet_arm_id \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
@@ -142,8 +159,8 @@ steps:
       | jq --arg saplib_rg "${saplib_rg}" .software.storage_account_sapbits.saplib_resource_group_name\ =\ \$saplib_rg \
       | jq --arg tfstate_sa_name "${tfstate_sa_name}" .software.storage_account_sapbits.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
       | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
-      | jq --arg sap_user "$(hana-smp-nancyc-username)" .software.downloader.credentials.sap_user\ =\ \$sap_user \
-      | jq --arg sap_password "$(hana-smp-nancyc-password)" .software.downloader.credentials.sap_password\ =\ \$sap_password \
+      | jq --arg landscape_kv_arm_id "${landscape_kv_arm_id}" .infrastructure.landscape.key_vault_arm_id\ =\ \$landscape_kv_arm_id \
+      | jq --arg sid_public_key_secret_name "${sid_public_key_secret_name}" .infrastructure.landscape.sid_public_key_secret_name\ =\ \$sid_public_key_secret_name \
       > ${input}
 
       cat ${input}
@@ -152,14 +169,13 @@ steps:
       echo "=== This may take quite a while, please be patient ==="
       terraform -version
       terraform init -upgrade=true -force-copy \
+        --backend-config "subscription_id=$(landscape-subscription)" \
         --backend-config "resource_group_name=${saplib_rg}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${sap_system_key}" \
         ${repo_dir}/deploy/terraform/run/sap_system/
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ 2>~/.log/$(Build.BuildId)_apply_error.log 2>&1>~/.log/$(Build.BuildId)_apply.log
-      if [ -s ~/.log/$(Build.BuildId)_apply_error.log ]; then cat ~/.log/$(Build.BuildId)_apply_error.log; exit 1; fi;
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       '
     displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())

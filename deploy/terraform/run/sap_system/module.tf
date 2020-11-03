@@ -3,33 +3,6 @@
   Setup common infrastructure
 */
 
-module "deployer" {
-  source         = "../../terraform-units/modules/sap_system/deployer"
-  application    = var.application
-  databases      = var.databases
-  infrastructure = var.infrastructure
-  jumpboxes      = var.jumpboxes
-  options        = var.options
-  software       = var.software
-  ssh-timeout    = var.ssh-timeout
-  sshkey         = var.sshkey
-  naming         = module.sap_namegenerator.naming
-}
-
-module "saplibrary" {
-  source         = "../../terraform-units/modules/sap_system/saplibrary"
-  application    = var.application
-  databases      = var.databases
-  infrastructure = var.infrastructure
-  jumpboxes      = var.jumpboxes
-  options        = var.options
-  software       = var.software
-  ssh-timeout    = var.ssh-timeout
-  sshkey         = var.sshkey
-  naming         = module.sap_namegenerator.naming
-}
-
-
 module "common_infrastructure" {
   source              = "../../terraform-units/modules/sap_system/common_infrastructure"
   is_single_node_hana = "true"
@@ -41,10 +14,11 @@ module "common_infrastructure" {
   software            = var.software
   ssh-timeout         = var.ssh-timeout
   sshkey              = var.sshkey
-  vnet-mgmt           = module.deployer.vnet-mgmt
-  subnet-mgmt         = module.deployer.subnet-mgmt
-  nsg-mgmt            = module.deployer.nsg-mgmt
   naming              = module.sap_namegenerator.naming
+  service_principal   = local.service_principal
+  deployer_tfstate    = data.terraform_remote_state.deployer.outputs
+  // Comment out code with users.object_id for the time being.
+  // deployer_user       = module.deployer.deployer_user
 }
 
 module "sap_namegenerator" {
@@ -86,33 +60,32 @@ module "jumpbox" {
   software          = var.software
   ssh-timeout       = var.ssh-timeout
   sshkey            = var.sshkey
-  resource-group    = module.common_infrastructure.resource-group
-  subnet-mgmt       = module.common_infrastructure.subnet-mgmt
-  nsg-mgmt          = module.common_infrastructure.nsg-mgmt
-  storage-bootdiag  = module.common_infrastructure.storage-bootdiag
-  output-json       = module.output_files.output-json
-  ansible-inventory = module.output_files.ansible-inventory
-  random-id         = module.common_infrastructure.random_id
-  deployer-uai      = module.deployer.deployer-uai
+  resource_group    = module.common_infrastructure.resource_group
+  storage_bootdiag  = module.common_infrastructure.storage_bootdiag
+  output_json       = module.output_files.output_json
+  ansible_inventory = module.output_files.ansible_inventory
+  random_id         = module.common_infrastructure.random_id
+  deployer_tfstate  = data.terraform_remote_state.deployer.outputs
 }
 
 // Create HANA database nodes
 module "hdb_node" {
-  source                     = "../../terraform-units/modules/sap_system/hdb_node"
-  application                = var.application
-  databases                  = var.databases
-  infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
-  options                    = local.options
-  software                   = var.software
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
-  resource-group             = module.common_infrastructure.resource-group
-  subnet-mgmt                = module.common_infrastructure.subnet-mgmt
-  nsg-mgmt                   = module.common_infrastructure.nsg-mgmt
-  vnet-sap                   = module.common_infrastructure.vnet-sap
-  storage-bootdiag           = module.common_infrastructure.storage-bootdiag
-  ppg                        = module.common_infrastructure.ppg
+  source           = "../../terraform-units/modules/sap_system/hdb_node"
+  application      = var.application
+  databases        = var.databases
+  infrastructure   = var.infrastructure
+  jumpboxes        = var.jumpboxes
+  options          = local.options
+  software         = var.software
+  ssh-timeout      = var.ssh-timeout
+  sshkey           = var.sshkey
+  resource_group   = module.common_infrastructure.resource_group
+  vnet_sap         = module.common_infrastructure.vnet_sap
+  storage_bootdiag = module.common_infrastructure.storage_bootdiag
+  ppg              = module.common_infrastructure.ppg
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
+  // Comment out code with users.object_id for the time being.
+  // deployer_user    = module.deployer.deployer_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
@@ -120,24 +93,25 @@ module "hdb_node" {
 
 // Create Application Tier nodes
 module "app_tier" {
-  source                     = "../../terraform-units/modules/sap_system/app_tier"
-  application                = var.application
-  databases                  = var.databases
-  infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
-  options                    = local.options
-  software                   = var.software
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
-  resource-group             = module.common_infrastructure.resource-group
-  subnet-mgmt                = module.common_infrastructure.subnet-mgmt
-  vnet-sap                   = module.common_infrastructure.vnet-sap
-  storage-bootdiag           = module.common_infrastructure.storage-bootdiag
-  ppg                        = module.common_infrastructure.ppg
+  source           = "../../terraform-units/modules/sap_system/app_tier"
+  application      = var.application
+  databases        = var.databases
+  infrastructure   = var.infrastructure
+  jumpboxes        = var.jumpboxes
+  options          = local.options
+  software         = var.software
+  ssh-timeout      = var.ssh-timeout
+  sshkey           = var.sshkey
+  resource_group   = module.common_infrastructure.resource_group
+  vnet_sap         = module.common_infrastructure.vnet_sap
+  storage_bootdiag = module.common_infrastructure.storage_bootdiag
+  ppg              = module.common_infrastructure.ppg
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
+  // Comment out code with users.object_id for the time being.  
+  // deployer_user    = module.deployer.deployer_user
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
-
 }
 
 // Create anydb database nodes
@@ -151,10 +125,11 @@ module "anydb_node" {
   software                   = var.software
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
-  resource-group             = module.common_infrastructure.resource-group
-  vnet-sap                   = module.common_infrastructure.vnet-sap
-  storage-bootdiag           = module.common_infrastructure.storage-bootdiag
+  resource_group             = module.common_infrastructure.resource_group
+  vnet_sap                   = module.common_infrastructure.vnet_sap
+  storage_bootdiag           = module.common_infrastructure.storage_bootdiag
   ppg                        = module.common_infrastructure.ppg
+  sid_kv_user                = module.common_infrastructure.sid_kv_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
@@ -163,7 +138,7 @@ module "anydb_node" {
 // Generate output files
 module "output_files" {
   source                       = "../../terraform-units/modules/sap_system/output_files"
-  application                  = var.application
+  application                  = module.app_tier.application
   databases                    = var.databases
   infrastructure               = var.infrastructure
   jumpboxes                    = var.jumpboxes
@@ -171,22 +146,19 @@ module "output_files" {
   software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
-  storage-sapbits              = module.saplibrary.saplibrary
-  file_share_name              = module.saplibrary.file_share_name
-  storagecontainer-sapbits     = module.saplibrary.storagecontainer-sapbits
-  nics-iscsi                   = module.common_infrastructure.nics-iscsi
+  nics_iscsi                   = module.common_infrastructure.nics_iscsi
   infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
   software_w_defaults          = module.common_infrastructure.software_w_defaults
-  nics-jumpboxes-windows       = module.jumpbox.nics-jumpboxes-windows
-  nics-jumpboxes-linux         = module.jumpbox.nics-jumpboxes-linux
-  public-ips-jumpboxes-windows = module.jumpbox.public-ips-jumpboxes-windows
-  public-ips-jumpboxes-linux   = module.jumpbox.public-ips-jumpboxes-linux
-  jumpboxes-linux              = module.jumpbox.jumpboxes-linux
-  nics-dbnodes-admin           = module.hdb_node.nics-dbnodes-admin
-  nics-dbnodes-db              = module.hdb_node.nics-dbnodes-db
+  nics_jumpboxes_windows       = module.jumpbox.nics_jumpboxes_windows
+  nics_jumpboxes_linux         = module.jumpbox.nics_jumpboxes_linux
+  public_ips_jumpboxes_windows = module.jumpbox.public_ips_jumpboxes_windows
+  public_ips_jumpboxes_linux   = module.jumpbox.public_ips_jumpboxes_linux
+  jumpboxes_linux              = module.jumpbox.jumpboxes_linux
+  nics_dbnodes_admin           = module.hdb_node.nics_dbnodes_admin
+  nics_dbnodes_db              = module.hdb_node.nics_dbnodes_db
   loadbalancers                = module.hdb_node.loadbalancers
-  hdb-sid                      = module.hdb_node.hdb-sid
-  hana-database-info           = module.hdb_node.hana-database-info
+  hdb_sid                      = module.hdb_node.hdb_sid
+  hana_database_info           = module.hdb_node.hana_database_info
   nics_scs                     = module.app_tier.nics_scs
   nics_app                     = module.app_tier.nics_app
   nics_web                     = module.app_tier.nics_web
@@ -195,8 +167,7 @@ module "output_files" {
   nics_app_admin               = module.app_tier.nics_app_admin
   nics_web_admin               = module.app_tier.nics_web_admin
   nics_anydb_admin             = module.anydb_node.nics_anydb_admin
-  any-database-info            = module.anydb_node.any-database-info
-  anydb-loadbalancers          = module.anydb_node.anydb-loadbalancers
-  deployers                    = module.deployer.import_deployer
+  any_database_info            = module.anydb_node.any_database_info
+  anydb_loadbalancers          = module.anydb_node.anydb_loadbalancers
   random_id                    = module.common_infrastructure.random_id
 }

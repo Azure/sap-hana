@@ -16,7 +16,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       # Modify environment value so it starts with u and with length of 5
       saplib_env=${{parameters.saplib_env}}
@@ -35,6 +35,7 @@ steps:
       deployer_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       saplib_ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/${saplib_rg}
 
+      tfstate_sa_id=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).id"'")
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       deployer_key="${deployer_rg}.terraform.tfstate"
       saplib_key="${saplib_rg}.terraform.tfstate"
@@ -45,19 +46,45 @@ steps:
       echo "=== Upload deployer tfstate under ${deployer_ws_dir} to saplibrary ==="
       cd ${deployer_ws_dir}
       terraform init -force-copy \
+        --backend-config "subscription_id=$(landscape-subscription)" \
         --backend-config "resource_group_name=${saplib_rg}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${deployer_key}" \
         ${repo_dir}/deploy/terraform/run/sap_deployer/
 
+      echo "=== Re-apply deployer with run ==="
+      input=${deployer_ws_dir}/${deployer_rg}.json
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_deployer/
+
+      echo "=== Rename local tfstate filename for saplib unit test ==="
+      mv terraform.tfstate.backup terraform.tfstate
+
       echo "=== Upload saplib tfstate under ${saplib_ws_dir} to saplibrary ==="
       cd ${saplib_ws_dir}
       terraform init -force-copy \
+        --backend-config "subscription_id=$(landscape-subscription)" \
         --backend-config "resource_group_name=${saplib_rg}" \
         --backend-config "storage_account_name=${tfstate_sa_name}" \
         --backend-config "container_name=tfstate" \
         --backend-config "key=${saplib_key}" \
         ${repo_dir}/deploy/terraform/run/sap_library/
+
+      echo "=== Re-apply saplib with run ==="
+      input=${saplib_ws_dir}/${saplib_rg}.json
+      cat ${input} \
+      | jq --arg tfstate_resource_id "${tfstate_sa_id}" "'". += {
+        tfstate_resource_id: \\\$tfstate_resource_id
+      }"'" > tmp.json
+      mv tmp.json ${input}
+
+      cat ${input}
+
+      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_library/
       '
     displayName: "Post saplibrary"
+    env:
+      ARM_CLIENT_ID: $(hana-pipeline-spn-id)
+      ARM_CLIENT_SECRET: $(hana-pipeline-spn-pw)
+      ARM_TENANT_ID: $(landscape-tenant)
+      ARM_SUBSCRIPTION_ID: $(landscape-subscription)

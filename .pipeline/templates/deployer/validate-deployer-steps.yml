@@ -13,7 +13,7 @@ steps:
         deployer_prefix=${deployer_env}
       fi
 
-      deployer_rg="${deployer_prefix}-EAUS-MGMT-INFRASTRUCTURE"
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
 
       ws_dir=$(Agent.BuildDirectory)/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${deployer_rg}
       input=${ws_dir}/${deployer_rg}.json
@@ -29,7 +29,7 @@ steps:
       terraform plan -var-file=${input} ${repo_path}/deploy/terraform/bootstrap/sap_deployer/ > plan_output.log
       cat plan_output.log
       
-      if ! grep "No changes" plan_output.log; then exit 1; fi;
+      if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then exit 1; fi;
     displayName: "Validate deployer new config"
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)

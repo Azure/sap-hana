@@ -1,6 +1,19 @@
 steps:
   - script: |
       # Modify environment value so it starts with u and with length of 5
+      deployer_env=${{parameters.deployer_env}}
+      buildId=$(Build.BuildId)
+      isRelease=${deployer_env%%$buildId*}
+      if [ -z "${isRelease}" ]
+      then 
+        deployer_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        deployer_prefix=${deployer_env}
+      fi
+      
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
+
+      # Modify environment value so it starts with u and with length of 5
       saplib_env=${{parameters.saplib_env}}
       buildId=$(Build.BuildId)
       isRelease=${saplib_env%%$buildId*}
@@ -42,10 +55,8 @@ steps:
 
       echo "=== Delete SAP library from deployer with terraform ==="
       echo "=== This may take quite a while, please be patient ==="
-      [ -d ~/.log ] || mkdir -p ~/.log
-      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/ 2>~/.log/$(Build.BuildId)_destroy_error.log 2>&1>~/.log/$(Build.BuildId)_destroy.log
-      cat ~/.log/$(Build.BuildId)_apply_error.log;
-
+      terraform destroy -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/bootstrap/sap_library/
+      
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${saplib_rg}
 
@@ -57,6 +68,13 @@ steps:
       az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
       az group update --resource-group ${saplib_rg} --set tags.Delete=True --output none
       az group delete -n ${saplib_rg} --no-wait -y
+
+      echo "=== Delete SPN secrets from deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --output none
+      az keyvault secret delete --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --output none
 
       exit 0
     displayName: "Delete new saplibrary"

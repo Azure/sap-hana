@@ -6,47 +6,35 @@ variable "software_w_defaults" {
   description = "software dect with default values"
 }
 
-variable "nics-jumpboxes-linux" {
+variable "nics_jumpboxes_linux" {
   description = "NICs of the Linux jumpboxes"
 }
 
-variable "nics-jumpboxes-windows" {
+variable "nics_jumpboxes_windows" {
   description = "NICs of the Windows jumpboxes"
 }
 
-variable "public-ips-jumpboxes-linux" {
+variable "public_ips_jumpboxes_linux" {
   description = "Public IPs of the Linux jumpboxes"
 }
 
-variable "public-ips-jumpboxes-windows" {
+variable "public_ips_jumpboxes_windows" {
   description = "Public IPs of the Windows jumpboxes"
 }
 
-variable "jumpboxes-linux" {
+variable "jumpboxes_linux" {
   description = "linux jumpboxes with rti"
 }
 
-variable "nics-dbnodes-admin" {
+variable "nics_dbnodes_admin" {
   description = "Admin NICs of HANA database nodes"
 }
 
-variable "nics-dbnodes-db" {
+variable "nics_dbnodes_db" {
   description = "NICs of HANA database nodes"
 }
 
-variable "storage-sapbits" {
-  description = "Details of the storage account for SAP bits"
-}
-
-variable "file_share_name" {
-  description = "Name of the file share for SAP bits"
-}
-
-variable "storagecontainer-sapbits" {
-  description = "Details of the storage container for SAP bits"
-}
-
-variable "nics-iscsi" {
+variable "nics_iscsi" {
   description = "NICs of ISCSI target servers"
 }
 
@@ -54,11 +42,11 @@ variable "loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
-variable "hdb-sid" {
+variable "hdb_sid" {
   description = "List of SIDs used when generating Load Balancers"
 }
 
-variable "hana-database-info" {
+variable "hana_database_info" {
   description = "Updated hana database json"
 }
 
@@ -99,28 +87,27 @@ variable "nics_anydb_admin" {
 variable "random_id" {
   description = "Random hex string"
 }
-variable "anydb-loadbalancers" {
+
+variable "anydb_loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
-variable "any-database-info" {
+variable "any_database_info" {
   description = "Updated anydb database json"
 }
 
-variable "deployers" {
-  description = "Details of the deployer(s)"
-}
-
 locals {
-  ips_iscsi                    = var.nics-iscsi[*].private_ip_address
-  ips_jumpboxes-windows        = var.nics-jumpboxes-windows[*].private_ip_address
-  ips_jumpboxes-linux          = var.nics-jumpboxes-linux[*].private_ip_address
-  public-ips_jumpboxes-windows = var.public-ips-jumpboxes-windows[*].ip_address
-  public-ips_jumpboxes-linux   = var.public-ips-jumpboxes-linux[*].ip_address
-  ips_dbnodes-admin            = [for key, value in var.nics-dbnodes-admin : value.private_ip_address]
-  ips_dbnodes-db               = [for key, value in var.nics-dbnodes-db : value.private_ip_address]
+
+  ips_iscsi                    = var.nics_iscsi[*].private_ip_address
+  ips_jumpboxes_windows        = var.nics_jumpboxes_windows[*].private_ip_address
+  ips_jumpboxes_linux          = var.nics_jumpboxes_linux[*].private_ip_address
+  public_ips_jumpboxes_windows = var.public_ips_jumpboxes_windows[*].ip_address
+  public_ips_jumpboxes_linux   = var.public_ips_jumpboxes_linux[*].ip_address
+  ips_dbnodes_admin            = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
+  ips_dbnodes_db               = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
+
   databases = [
-    var.hana-database-info
+    var.hana_database_info
   ]
   hdb_vms = flatten([
     for database in local.databases : flatten([
@@ -155,10 +142,10 @@ locals {
   ips_web = [for key, value in local.ips_primary_web : value.private_ip_address]
 
   ips_primary_anydb = length(var.nics_anydb_admin) > 0 ? var.nics_anydb_admin : var.nics_anydb
-  ips_anydbnodes = [for key, value in local.ips_primary_anydb : value.private_ip_address]
-  
+  ips_anydbnodes    = [for key, value in local.ips_primary_anydb : value.private_ip_address]
+
   anydatabases = [
-    var.any-database-info
+    var.any_database_info
   ]
   anydb_vms = flatten([
     for adatabase in local.anydatabases : flatten([

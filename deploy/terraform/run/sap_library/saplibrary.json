@@ -1,30 +1,12 @@
 {
     "infrastructure": {
         "region": "eastus",
-        "environment": "global",
-        "resource_group": {
-            "is_existing": "false",
-            "arm_id": ""
-        }
+        "environment": "np"
     },
-    "storage_account_sapbits": {
-        "is_existing": "false",
-        "arm_id": "",
-        "file_share": {
-            "enable_deployment": true,
-            "name": "sapbits"
-        },
-        "sapbits_blob_container": {
-            "enable_deployment": true,
-            "name": "sapbits"
-        }
+    "deployer": {
+        "environment": "np",
+        "region": "eastus",
+        "vnet": "DEP00"
     },
-    "storage_account_tfstate": {
-        "is_existing": "false",
-        "arm_id": "",
-        "account_tier": "Standard",
-        "account_replication_type": "LRS",
-        "account_kind": "StorageV2",
-        "saplibrary_blob_container": {}
-    }
+    "tfstate_resource_id": ""
 }

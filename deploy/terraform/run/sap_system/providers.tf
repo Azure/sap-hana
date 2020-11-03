@@ -13,8 +13,26 @@ Description:
 */
 
 provider "azurerm" {
-  version = "~> 2.10"
+  version = "~> 2.32.0"
   features {}
+  subscription_id = local.spn.subscription_id
+  client_id       = local.spn.client_id
+  client_secret   = local.spn.client_secret
+  tenant_id       = local.spn.tenant_id
+}
+
+provider "azurerm" {
+  version = "~> 2.32.0"
+  features {}
+  alias = "deployer"
+}
+
+provider "azuread" {
+  version = ">= 0.10.0"
+
+  client_id     = local.spn.client_id
+  client_secret = local.spn.client_secret
+  tenant_id     = local.spn.tenant_id
 }
 
 terraform {
@@ -24,5 +42,6 @@ terraform {
     local    = { version = "~> 1.4" }
     random   = { version = "~> 2.2" }
     null     = { version = "~> 2.1" }
+    tls      = { version = "~> 2.2" }
   }
 }
