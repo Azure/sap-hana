@@ -151,11 +151,15 @@ locals {
 
   //Anchor VM
 
-  anchor                = try(local.var_infra.anchor_vms, {})
-  deploy_anchor         = length(local.anchor) > 0 ? true : false
-  anchor_size           = try(local.anchor.sku, "Standard_D8s_v3")
-  anchor_authentication = try(local.anchor.authentication, local.db_auth)
-  anchor_nic_ips        = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
+  anchor                      = try(local.var_infra.anchor_vms, {})
+  deploy_anchor               = length(local.anchor) > 0 ? true : false
+  anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
+  anchor_authentication       = try(local.anchor.authentication, local.db_auth)
+  anchor_auth_type            = try(local.anchor.authentication.type, "key")
+  enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
+  enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
+
+  anchor_nic_ips = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
 
   anchor_custom_image = try(local.anchor.os.source_image_id, "") != "" ? true : false
 
@@ -209,6 +213,7 @@ locals {
      At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
   */
   kv_landscape_id     = try(local.var_infra.landscape.key_vault_arm_id, "")
+  secret_sid_pk_name  = try(local.var_infra.landscape.sid_public_key_secret_name, "")
   enable_landscape_kv = local.kv_landscape_id == ""
 
   //iSCSI
