@@ -236,7 +236,31 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
 1. Copy and rename `inifile.params` to `/tmp/app_template`:
 
-`cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
+   `cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
+
+1. Check the version of SWPM's `sapinst` tool:
+
+   `/usr/sap/install/SWPM/sapinst -version`
+
+   ```text
+   SAPinst build information:
+   --------------------------
+   Version:         749.0.85
+   Build:           2027494
+   Compile time:    Oct 15 2020 - 03:53:09
+   Make type:       optU
+   Codeline:        749_REL
+   Platform:        linuxx86_64
+   Kernel build:    749, patch 928, changelist 2026562
+   SAP JRE build:   SAP Java Server VM (build 8.1.065 10.0.2+000, Jul 27 2020 17:26:10 - 81_REL - optU - linux amd64 - 6 - bas2:320007 (mixed mode))
+   SAP JCo build:   3.0.20
+   SL-UI version:   2.6.64
+   SAP UI5 version: 1.60.30
+   ```
+
+1. If the Version is greater than `749.0.69`, as per [SAP Note 2393060](https://launchpad.support.sap.com/#/notes/2393060) also copy the `keydb.xml` and `instkey.pkey` files:
+
+   `cp <path_to_inifile>/{keydb.xml,instkey.pkey} /tmp/app_template/`
 
 #### Manual DB Content Load Using Template
 
