@@ -264,8 +264,6 @@ Distributed System" , click on "Database Instance" and click "Next"
 
 #### Manual DB Content Load Using Template
 
-:hand: TODO: Add Manual DB Content load instructions using template
-
 1. Connect to the PAS VM as `root` User
 1. Launch the DB Load process via SWPM:
 
