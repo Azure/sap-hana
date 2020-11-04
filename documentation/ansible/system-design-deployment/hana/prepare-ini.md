@@ -9,6 +9,7 @@
 1. HANA Media downloaded;
 1. SAP Library contains all media for HANA installation;
 1. SAP HANA infrastructure has been deployed;
+1. SAP HANA infrastructure has sufficient disk space configured for Database Content if being used for [Application Template generation](../app/prepare-ini.md);
 1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place);
 1. Prerequisite RPMs installed, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607).
 
