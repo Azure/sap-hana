@@ -222,7 +222,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 1. Click "Next" on the Database Schema page for schema `SAPHANADB`.
 1. Click "Next" on the Secure Storage for Database Connection page.
 1. Click "Next" on the SAP HANA Import Parameters page.
-1. Enter the Password for the HANA DB <sid>adm user on the Database VM, click "Next"
+1. Enter the Password for the HANA DB `<sid>adm` user on the Database VM, click "Next"
 1. Click "Next" on the SAP HANA Client Software Installation Path page.
 1. Notice the SAP HANA CLIENT file is listed as available and click "Next"
 1. Ensure “Yes, clean up operating system users” is checked and click "Next
