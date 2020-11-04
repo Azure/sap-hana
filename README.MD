@@ -49,7 +49,7 @@ Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
 
 ## Contributions
 
-If you want to contribute to our project, be sure to review the [contributing guidelines](/documentation/contributing.md).
+If you want to contribute to our project, be sure to review the [contributing guidelines](/CONTRIBUTING.md).
 
 We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
 
