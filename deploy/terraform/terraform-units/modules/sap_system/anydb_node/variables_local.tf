@@ -40,6 +40,9 @@ locals {
   computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
 
+  observer_computer_names       = var.naming.virtualmachine_names.OBSERVER_COMPUTERNAME
+  observer_virtualmachine_names = var.naming.virtualmachine_names.OBSERVER_VMNAME
+
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
@@ -193,6 +196,15 @@ locals {
     "version"         = try(local.anydb.os.version, local.anydb_custom_image ? "" : local.os_defaults[upper(local.anydb_platform)].version)
   }
 
+  //Observer VM
+  observer                 = try(local.anydb.observer, {})
+  deploy_observer          = upper(local.anydb_platform) == "ORACLE" && local.anydb_ha
+  observer_size            = "Standard_D4s_v3"
+  observer_authentication  = local.authentication
+  observer_custom_image    = local.anydb_custom_image
+  observer_custom_image_id = local.anydb_os.source_image_id
+  observer_os              = local.anydb_os
+
   // Update database information with defaults
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
@@ -249,6 +261,7 @@ locals {
     anydb_lb       = 4
     anydb_admin_vm = 10
     anydb_db_vm    = 10
+    observer_db_vm = 4 + 1
   }
 
   // Ports used for specific DB Versions
