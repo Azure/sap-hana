@@ -3,10 +3,11 @@
 #############################################################################
 
 resource "azurerm_network_interface" "anydb_db" {
-  count               = local.enable_deployment ? local.db_server_count : 0
-  name                = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.db_nic)
-  location            = var.resource_group[0].location
-  resource_group_name = var.resource_group[0].name
+  count                         = local.enable_deployment ? local.db_server_count : 0
+  name                          = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.db_nic)
+  location                      = var.resource_group[0].location
+  resource_group_name           = var.resource_group[0].name
+  enable_accelerated_networking = true
 
   ip_configuration {
     primary   = true
