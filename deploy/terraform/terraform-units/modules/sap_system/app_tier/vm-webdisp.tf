@@ -38,7 +38,7 @@ resource "azurerm_network_interface" "web_admin" {
 
 # Create the Linux Web dispatcher VM(s)
 resource "azurerm_linux_virtual_machine" "web" {
-  count               = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
+  count               = local.enable_deployment ? (upper(local.web_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
   location            = var.resource_group[0].location
@@ -100,7 +100,7 @@ resource "azurerm_linux_virtual_machine" "web" {
 
 # Create the Windows Web dispatcher VM(s)
 resource "azurerm_windows_virtual_machine" "web" {
-  count               = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
+  count               = local.enable_deployment ? (upper(local.web_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
   location            = var.resource_group[0].location
@@ -161,7 +161,7 @@ resource "azurerm_managed_disk" "web" {
   storage_account_type = local.web_data_disks[count.index].storage_account_type
   disk_size_gb         = local.web_data_disks[count.index].disk_size_gb
   zones = local.web_zonal_deployment && (local.webdispatcher_count == local.web_zone_count) ? (
-    upper(local.app_ostype) == "LINUX" ? (
+    upper(local.web_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]) : (
       [azurerm_windows_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]
     )) : (
@@ -172,7 +172,7 @@ resource "azurerm_managed_disk" "web" {
 resource "azurerm_virtual_machine_data_disk_attachment" "web" {
   count           = local.enable_deployment ? length(azurerm_managed_disk.web) : 0
   managed_disk_id = azurerm_managed_disk.web[count.index].id
-  virtual_machine_id = upper(local.app_ostype) == "LINUX" ? (
+  virtual_machine_id = upper(local.web_ostype) == "LINUX" ? (
     azurerm_linux_virtual_machine.web[local.web_data_disks[count.index].vm_index].id) : (
     azurerm_windows_virtual_machine.web[local.web_data_disks[count.index].vm_index].id
   )

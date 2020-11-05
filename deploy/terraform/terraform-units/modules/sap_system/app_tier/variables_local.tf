@@ -176,13 +176,10 @@ locals {
   // Dual network cards
   apptier_dual_nics = try(var.application.dual_nics, false)
 
-  app_ostype = try(var.application.os.os_type, "Linux")
-  app_oscode = upper(local.app_ostype) == "LINUX" ? "l" : "w"
-
-
   // OS image for all Application Tier VMs
   // If custom image is used, we do not overwrite os reference with default value
   app_custom_image = try(var.application.os.source_image_id, "") != "" ? true : false
+  app_ostype       = try(var.application.os.os_type, "Linux")
 
   app_os = {
     "source_image_id" = local.app_custom_image ? var.application.os.source_image_id : ""
@@ -196,7 +193,7 @@ locals {
   // If custom image is used, we do not overwrite os reference with default value
   // If no publisher or no custom image is specified use the custom image from the app if specified
   scs_custom_image = try(var.application.scs_os.source_image_id, "") == "" && ! local.app_custom_image ? false : true
-  scs_ostype       = try(var.application.scs_os.os_type, "Linux")
+  scs_ostype       = try(var.application.scs_os.os_type, local.app_ostype)
 
   scs_os = {
     "source_image_id" = local.scs_custom_image ? try(var.application.scs_os.source_image_id, var.application.os.source_image_id) : ""
@@ -214,7 +211,7 @@ locals {
   // If custom image is used, we do not overwrite os reference with default value
   // If no publisher or no custom image is specified use the custom image from the app if specified
   web_custom_image = try(var.application.web_os.source_image_id, "") == "" && ! local.app_custom_image ? false : true
-  web_ostype       = try(var.application.web_os.os_type, "Linux")
+  web_ostype       = try(var.application.web_os.os_type, local.app_ostype)
 
   web_os = {
     "source_image_id" = local.web_custom_image ? var.application.web_os.source_image_id : ""
