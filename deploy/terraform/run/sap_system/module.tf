@@ -4,41 +4,34 @@
 */
 
 module "common_infrastructure" {
-  source              = "../../terraform-units/modules/sap_system/common_infrastructure"
-  is_single_node_hana = "true"
-  application         = var.application
-  databases           = var.databases
-  infrastructure      = var.infrastructure
-  jumpboxes           = var.jumpboxes
-  options             = local.options
-  software            = var.software
-  ssh-timeout         = var.ssh-timeout
-  sshkey              = var.sshkey
-  naming              = module.sap_namegenerator.naming
-  service_principal   = local.service_principal
-  deployer_tfstate    = data.terraform_remote_state.deployer.outputs
-  // Comment out code with users.object_id for the time being.
-  // deployer_user       = module.deployer.deployer_user
+  source                     = "../../terraform-units/modules/sap_system/common_infrastructure"
+  is_single_node_hana        = "true"
+  application                = var.application
+  databases                  = var.databases
+  infrastructure             = var.infrastructure
+  jumpboxes                  = var.jumpboxes
+  options                    = local.options
+  software                   = var.software
+  ssh-timeout                = var.ssh-timeout
+  sshkey                     = var.sshkey
+  naming                     = module.sap_namegenerator.naming
+  service_principal          = local.service_principal
+  deployer_tfstate           = data.terraform_remote_state.deployer.outputs
+  custom_disk_sizes_filename = var.db_disk_sizes_filename
 }
 
 module "sap_namegenerator" {
-  source        = "../../terraform-units/modules/sap_namegenerator"
-  environment   = var.infrastructure.environment
-  location      = var.infrastructure.region
-  codename      = lower(try(var.infrastructure.codename, ""))
-  random_id     = module.common_infrastructure.random_id
-  sap_vnet_name = local.vnet_sap_name_part
-  sap_sid       = local.sap_sid
-  db_sid        = local.db_sid
-  app_ostype    = local.app_ostype
-  anchor_ostype = local.anchor_ostype
-  db_ostype     = local.db_ostype
-  /////////////////////////////////////////////////////////////////////////////////////
-  // The naming module creates a list of servers names that is app_server_count
-  // for database servers the list is 2 * db_server_count. 
-  // The first db_server_count items are for single node
-  // The the second db_server_count items are for ha
-  /////////////////////////////////////////////////////////////////////////////////////
+  source           = "../../terraform-units/modules/sap_namegenerator"
+  environment      = var.infrastructure.environment
+  location         = var.infrastructure.region
+  codename         = lower(try(var.infrastructure.codename, ""))
+  random_id        = module.common_infrastructure.random_id
+  sap_vnet_name    = local.vnet_sap_name_part
+  sap_sid          = local.sap_sid
+  db_sid           = local.db_sid
+  app_ostype       = local.app_ostype
+  anchor_ostype    = local.anchor_ostype
+  db_ostype        = local.db_ostype
   db_server_count  = local.db_server_count
   app_server_count = local.app_server_count
   web_server_count = local.webdispatcher_count
@@ -70,22 +63,20 @@ module "jumpbox" {
 
 // Create HANA database nodes
 module "hdb_node" {
-  source           = "../../terraform-units/modules/sap_system/hdb_node"
-  application      = var.application
-  databases        = var.databases
-  infrastructure   = var.infrastructure
-  jumpboxes        = var.jumpboxes
-  options          = local.options
-  software         = var.software
-  ssh-timeout      = var.ssh-timeout
-  sshkey           = var.sshkey
-  resource_group   = module.common_infrastructure.resource_group
-  vnet_sap         = module.common_infrastructure.vnet_sap
-  storage_bootdiag = module.common_infrastructure.storage_bootdiag
-  ppg              = module.common_infrastructure.ppg
-  sid_kv_user      = module.common_infrastructure.sid_kv_user
-  // Comment out code with users.object_id for the time being.
-  // deployer_user    = module.deployer.deployer_user
+  source                     = "../../terraform-units/modules/sap_system/hdb_node"
+  application                = var.application
+  databases                  = var.databases
+  infrastructure             = var.infrastructure
+  jumpboxes                  = var.jumpboxes
+  options                    = local.options
+  software                   = var.software
+  ssh-timeout                = var.ssh-timeout
+  sshkey                     = var.sshkey
+  resource_group             = module.common_infrastructure.resource_group
+  vnet_sap                   = module.common_infrastructure.vnet_sap
+  storage_bootdiag           = module.common_infrastructure.storage_bootdiag
+  ppg                        = module.common_infrastructure.ppg
+  sid_kv_user                = module.common_infrastructure.sid_kv_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet

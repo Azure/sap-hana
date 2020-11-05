@@ -28,6 +28,12 @@ variable naming {
   description = "Defines the names for the resources"
 }
 
+variable "custom_disk_sizes_filename" {
+  type        = string
+  description = "Disk size json file"
+  default     = ""
+}
+
 //Set defaults
 locals {
   //Region and metadata
@@ -95,7 +101,16 @@ locals {
     for db in var.databases : db
     if contains(["HANA"], upper(try(db.platform, "NONE")))
   ]
+
   enable_hdb_deployment = (length(local.hdb_list) > 0) ? true : false
+
+  default_filepath = local.enable_hdb_deployment ? "${path.module}/../../../../../configs/hdb_sizes.json" : "${path.module}/../../../../../configs/anydb_sizes.json"
+  sizes            = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
+  storage_list     = lookup(local.sizes, var.databases[0].size).storage
+  enable_ultradisk = try(compact([
+    for storage in local.storage_list :
+    storage.disk_type == "UltraSSD_LRS" ? true : ""
+  ])[0], false)
 
   //Enable xDB deployment 
   xdb_list = [
@@ -114,14 +129,20 @@ locals {
 
   //Anchor VM
 
-  anchor                        = try(local.var_infra.anchor_vms, {})
-  deploy_anchor                 = length(local.anchor) > 0 ? true : false
-  anchor_size                   = try(local.anchor.sku, "Standard_D8s_v3")
-  anchor_authentication         = try(local.anchor.authentication, local.db_auth)
-  anchor_auth_type              = try(local.anchor.authentication.type, "key")
-  enable_anchor_auth_password   = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key        = local.deploy_anchor && local.anchor_auth_type == "key"
-  enable_anchor_ultra           = try(local.anchor.enable_ultra, [false, false, false])
+  anchor                      = try(local.var_infra.anchor_vms, {})
+  deploy_anchor               = length(local.anchor) > 0 ? true : false
+  anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
+  anchor_authentication       = try(local.anchor.authentication, local.db_auth)
+  anchor_auth_type            = try(local.anchor.authentication.type, "key")
+  enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
+  enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
+
+  //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
+  enable_anchor_ultra =  [
+    for zone in local.zones :
+    contains(local.db_zones, zone) ? local.enable_ultradisk : false
+  ]
+  
   enable_accelerated_networking = try(local.anchor.accelerated_networking, false)
   anchor_nic_ips                = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
 
