@@ -2,7 +2,7 @@
 # Create observer VM
 resource "azurerm_network_interface" "observer" {
   count                         = local.deploy_observer ? length(local.zones) : 0
-  name                          = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.nic)
+  name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.nic)
   resource_group_name           = var.resource_group[0].name
   location                      = var.resource_group[0].location
   enable_accelerated_networking = false
@@ -23,7 +23,7 @@ resource "azurerm_network_interface" "observer" {
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
-  name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -48,7 +48,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -78,7 +78,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "observer" {
   count               = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
-  name                = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -104,7 +104,7 @@ resource "azurerm_windows_virtual_machine" "observer" {
   admin_password = local.observer_authentication.password
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }

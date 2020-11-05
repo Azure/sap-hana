@@ -2,7 +2,7 @@
 # Create Anchor VM
 resource "azurerm_network_interface" "anchor" {
   count                         = local.deploy_anchor ? length(local.zones) : 0
-  name                          = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.nic)
+  name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.nic)
   resource_group_name           = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                      = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
   enable_accelerated_networking = false
@@ -18,7 +18,7 @@ resource "azurerm_network_interface" "anchor" {
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "anchor" {
   count                        = local.deploy_anchor && (local.anchor_ostype == "LINUX") ? length(local.zones) : 0
-  name                         = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  name                         = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name                = local.anchor_computer_names[count.index]
   resource_group_name          = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                     = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
@@ -33,7 +33,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -63,7 +63,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "anchor" {
   count                        = local.deploy_anchor && (local.anchor_ostype == "WINDOWS") ? length(local.zones) : 0
-  name                         = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  name                         = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name                = local.anchor_computer_names[count.index]
   resource_group_name          = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                     = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
@@ -79,7 +79,7 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   admin_password = local.anchor_authentication.password
 
   os_disk {
-    name                 = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
