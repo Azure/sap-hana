@@ -77,6 +77,8 @@ module "hdb_node" {
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
   ppg                        = module.common_infrastructure.ppg
   sid_kv_user                = module.common_infrastructure.sid_kv_user
+  // Comment out code with users.object_id for the time being.  
+  // deployer_user    = module.deployer.deployer_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
