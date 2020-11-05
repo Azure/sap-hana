@@ -61,6 +61,9 @@ steps:
 
       echo "=== Delete git clone for the build from deployer ==="
       rm -rf ~/${sapsystem_rg}
+
+      echo "=== Cleanup local .terraform ==="
+      rm -r ${ws_dir}/.terraform
       '
 
       echo "=== Remove vnet peering with vnet-mgmt in case deployment/destroy fails ==="
@@ -74,6 +77,9 @@ steps:
       az group delete -n ${sapsystem_rg} --no-wait -y
 
       # Delete SPN secrets from deployer KV
+      echo "=== Login using pipeline spn ==="
+      az login --service-principal -u $(hana-pipeline-spn-id) -p $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+
       echo "=== Delete SPN secrets from deployer KV ==="
       deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
       az keyvault secret delete --vault-name ${deployer_kv_name} --name ${sapsystem_prefix}-client-id --output none
