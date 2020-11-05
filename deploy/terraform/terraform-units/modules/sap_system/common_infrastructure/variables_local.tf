@@ -114,15 +114,16 @@ locals {
 
   //Anchor VM
 
-  anchor                      = try(local.var_infra.anchor_vms, {})
-  deploy_anchor               = length(local.anchor) > 0 ? true : false
-  anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
-  anchor_authentication       = try(local.anchor.authentication, local.db_auth)
-  anchor_auth_type            = try(local.anchor.authentication.type, "key")
-  enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
-
-  anchor_nic_ips = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
+  anchor                        = try(local.var_infra.anchor_vms, {})
+  deploy_anchor                 = length(local.anchor) > 0 ? true : false
+  anchor_size                   = try(local.anchor.sku, "Standard_D8s_v3")
+  anchor_authentication         = try(local.anchor.authentication, local.db_auth)
+  anchor_auth_type              = try(local.anchor.authentication.type, "key")
+  enable_anchor_auth_password   = local.deploy_anchor && local.anchor_auth_type == "password"
+  enable_anchor_auth_key        = local.deploy_anchor && local.anchor_auth_type == "key"
+  enable_anchor_ultra           = try(local.anchor.enable_ultra, [false, false, false])
+  enable_accelerated_networking = try(local.anchor.accelerated_networking, false)
+  anchor_nic_ips                = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
 
   anchor_custom_image = try(local.anchor.os.source_image_id, "") != "" ? true : false
 

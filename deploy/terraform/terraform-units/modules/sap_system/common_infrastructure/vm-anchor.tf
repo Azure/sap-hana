@@ -5,7 +5,7 @@ resource "azurerm_network_interface" "anchor" {
   name                          = format("%s_%s%s", local.prefix, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.nic)
   resource_group_name           = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                      = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
-  enable_accelerated_networking = false
+  enable_accelerated_networking = local.enable_accelerated_networking
 
   ip_configuration {
     name                          = "IPConfig1"
@@ -58,6 +58,11 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
   }
+
+  additional_capabilities {
+    ultra_ssd_enabled = local.enable_anchor_ultra[count.index]
+  }
+
 }
 
 # Create the Windows Application VM(s)
@@ -99,4 +104,9 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
   }
+
+  additional_capabilities {
+    ultra_ssd_enabled = local.enable_anchor_ultra[count.index]
+  }
+
 }
