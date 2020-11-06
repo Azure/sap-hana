@@ -13,7 +13,6 @@ Description:
 */
 
 provider "azurerm" {
-  version = "~> 2.32.0"
   features {}
   subscription_id = local.spn.subscription_id
   client_id       = local.spn.client_id
@@ -22,20 +21,18 @@ provider "azurerm" {
 }
 
 provider "azurerm" {
-  version = "~> 2.32.0"
   features {}
   alias = "deployer"
 }
 
 provider "azuread" {
-  version = ">= 0.10.0"
-
   client_id     = local.spn.client_id
   client_secret = local.spn.client_secret
   tenant_id     = local.spn.tenant_id
 }
 
 terraform {
+  required_version = ">= 0.13"
   required_providers {
     external = {
       source  = "hashicorp/external"
@@ -59,9 +56,11 @@ terraform {
     }
     azuread = {
       source = "hashicorp/azuread"
+      version = ">= 0.10.0"
     }
     azurerm = {
       source = "hashicorp/azurerm"
+      version = "~> 2.35.0"
     }
   }
 }
