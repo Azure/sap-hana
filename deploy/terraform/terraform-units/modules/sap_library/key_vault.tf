@@ -7,7 +7,7 @@
 resource "azurerm_key_vault" "kv_prvt" {
   name                       = local.keyvault_names.private_access
   location                   = local.region
-  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : local.rg_name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
@@ -28,7 +28,7 @@ resource "azurerm_key_vault" "kv_prvt" {
 resource "azurerm_key_vault" "kv_user" {
   name                       = local.keyvault_names.user_access
   location                   = local.region
-  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : local.rg_name
+  resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_enabled        = true
   soft_delete_retention_days = 7
