@@ -20,9 +20,24 @@ provider "azurerm" {
 terraform {
   required_version = ">= 0.12"
   required_providers {
-    external = { version = "~> 1.2" }
-    local    = { version = "~> 1.4" }
-    random   = { version = "~> 2.2" }
-    null     = { version = "~> 2.1" }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 1.2"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 1.4"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.2"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 2.1"
+    }
+    azurerm = {
+      source = "hashicorp/azurerm"
+    }
   }
 }
