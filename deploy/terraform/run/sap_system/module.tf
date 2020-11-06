@@ -47,7 +47,6 @@ module "hdb_node" {
   application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
-  jumpboxes        = var.jumpboxes
   options          = local.options
   software         = var.software
   ssh-timeout      = var.ssh-timeout
@@ -111,30 +110,31 @@ module "anydb_node" {
 
 // Generate output files
 module "output_files" {
-  source                       = "../../terraform-units/modules/sap_system/output_files"
-  application                  = module.app_tier.application
-  databases                    = var.databases
-  infrastructure               = var.infrastructure
-  options                      = local.options
-  software                     = var.software
-  ssh-timeout                  = var.ssh-timeout
-  sshkey                       = var.sshkey
-  iscsi_private_ip             = module.common_infrastructure.iscsi_private_ip
-  infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
-  nics_dbnodes_admin           = module.hdb_node.nics_dbnodes_admin
-  nics_dbnodes_db              = module.hdb_node.nics_dbnodes_db
-  loadbalancers                = module.hdb_node.loadbalancers
-  hdb_sid                      = module.hdb_node.hdb_sid
-  hana_database_info           = module.hdb_node.hana_database_info
-  nics_scs                     = module.app_tier.nics_scs
-  nics_app                     = module.app_tier.nics_app
-  nics_web                     = module.app_tier.nics_web
-  nics_anydb                   = module.anydb_node.nics_anydb
-  nics_scs_admin               = module.app_tier.nics_scs_admin
-  nics_app_admin               = module.app_tier.nics_app_admin
-  nics_web_admin               = module.app_tier.nics_web_admin
-  nics_anydb_admin             = module.anydb_node.nics_anydb_admin
-  any_database_info            = module.anydb_node.any_database_info
-  anydb_loadbalancers          = module.anydb_node.anydb_loadbalancers
-  random_id                    = module.common_infrastructure.random_id
+  source                    = "../../terraform-units/modules/sap_system/output_files"
+  application               = module.app_tier.application
+  databases                 = var.databases
+  infrastructure            = var.infrastructure
+  options                   = local.options
+  software                  = var.software
+  ssh-timeout               = var.ssh-timeout
+  sshkey                    = var.sshkey
+  nics_iscsi                = module.common_infrastructure.nics_iscsi
+  infrastructure_w_defaults = module.common_infrastructure.infrastructure_w_defaults
+  software_w_defaults       = module.common_infrastructure.software_w_defaults
+  nics_dbnodes_admin        = module.hdb_node.nics_dbnodes_admin
+  nics_dbnodes_db           = module.hdb_node.nics_dbnodes_db
+  loadbalancers             = module.hdb_node.loadbalancers
+  hdb_sid                   = module.hdb_node.hdb_sid
+  hana_database_info        = module.hdb_node.hana_database_info
+  nics_scs                  = module.app_tier.nics_scs
+  nics_app                  = module.app_tier.nics_app
+  nics_web                  = module.app_tier.nics_web
+  nics_anydb                = module.anydb_node.nics_anydb
+  nics_scs_admin            = module.app_tier.nics_scs_admin
+  nics_app_admin            = module.app_tier.nics_app_admin
+  nics_web_admin            = module.app_tier.nics_web_admin
+  nics_anydb_admin          = module.anydb_node.nics_anydb_admin
+  any_database_info         = module.anydb_node.any_database_info
+  anydb_loadbalancers       = module.anydb_node.anydb_loadbalancers
+  random_id                 = module.common_infrastructure.random_id
 }
