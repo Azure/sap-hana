@@ -6,26 +6,6 @@ variable "software_w_defaults" {
   description = "software dect with default values"
 }
 
-variable "nics_jumpboxes_linux" {
-  description = "NICs of the Linux jumpboxes"
-}
-
-variable "nics_jumpboxes_windows" {
-  description = "NICs of the Windows jumpboxes"
-}
-
-variable "public_ips_jumpboxes_linux" {
-  description = "Public IPs of the Linux jumpboxes"
-}
-
-variable "public_ips_jumpboxes_windows" {
-  description = "Public IPs of the Windows jumpboxes"
-}
-
-variable "jumpboxes_linux" {
-  description = "linux jumpboxes with rti"
-}
-
 variable "nics_dbnodes_admin" {
   description = "Admin NICs of HANA database nodes"
 }
@@ -99,10 +79,6 @@ variable "any_database_info" {
 locals {
 
   ips_iscsi                    = var.nics_iscsi[*].private_ip_address
-  ips_jumpboxes_windows        = var.nics_jumpboxes_windows[*].private_ip_address
-  ips_jumpboxes_linux          = var.nics_jumpboxes_linux[*].private_ip_address
-  public_ips_jumpboxes_windows = var.public_ips_jumpboxes_windows[*].ip_address
-  public_ips_jumpboxes_linux   = var.public_ips_jumpboxes_linux[*].ip_address
   ips_dbnodes_admin            = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
   ips_dbnodes_db               = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
 

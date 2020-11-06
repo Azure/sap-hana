@@ -15,35 +15,6 @@ all:
 %{~ endif }
 %{~ endfor }
 
-    jumpboxes_windows:
-      hosts:
-%{~ for jumpbox_windows in jumpboxes_windows }
-        ${ips_jumpboxes_windows[index(jumpboxes_windows, jumpbox_windows)]}:
-          ansible_connection:                   "winrm"
-          ansible_user:                         "${jumpbox_windows.authentication.username}"
-          ansible_ssh_pass:                     "${jumpbox_windows.authentication.password}"
-          ansible_ssh_port:                     5986
-          ansible_winrm_transport:              "ntlm"
-          ansible_winrm_server_cert_validation: "ignore"
-%{~ endfor }
-
-    jumpboxes_linux:
-      hosts:
-%{~ for jumpbox_linux in jumpboxes_linux }
-%{~ if jumpbox_linux.destroy_after_deploy != "true"}
-        ${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}:
-          ansible_connection:  "ssh"
-%{~ if jumpbox_linux.authentication.type == "key" }
-          ansible_user:        "${jumpbox_linux.authentication.username}"
-%{~ endif }
-%{~ if jumpbox_linux.authentication.type == "password" }
-          ansible_user:        "${jumpbox_linux.authentication.username}"
-          ansible_ssh_pass:    "${jumpbox_linux.authentication.password}"
-          ansible_become_pass: "${jumpbox_linux.authentication.password}"
-%{~ endif }
-%{~ endif }
-%{~ endfor }
-
     hanadbnodes:
       hosts:
 %{~ for ip_dbnode_admin in ips_dbnodes_admin }
@@ -159,14 +130,8 @@ all:
 %{~ endfor }
 
     # Groups below are collections of the above groups for easier reference
-    all_jumpboxes:
-      children:
-        jumpboxes_windows:
-        jumpboxes_linux:
-
     all_linux_servers:
       children:
-        jumpboxes_linux:
         hanadbnodes:
         scs:
         app:

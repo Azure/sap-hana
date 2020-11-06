@@ -8,43 +8,7 @@ ${ip_iscsi}  ansible_connection=ssh  ansible_user=${iscsi.authentication.usernam
 %{~ endif }
 %{~ endfor }
 
-[jumpboxes_windows]
-%{~ for jumpbox_windows in jumpboxes_windows }
-${ips_jumpboxes_windows[index(jumpboxes_windows, jumpbox_windows)]}  ansible_connection=winrm  ansible_user=${jumpbox_windows.authentication.username} ansible_ssh_pass=${jumpbox_windows.authentication.password}  ansible_ssh_port=5986 ansible_winrm_transport=ntlm ansible_winrm_server_cert_validation=ignore
-%{~ endfor }
-
-[jumpboxes_linux]
-%{~ for jumpbox_linux in jumpboxes_linux }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "key" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}
-%{~ endif }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "password" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}  ansible_ssh_pass=${jumpbox_linux.authentication.password}  ansible_become_pass=${jumpbox_linux.authentication.password}
-%{~ endif }
-%{~ endfor }
-
-[all_jumpboxes]
-%{~ for jumpbox_windows in jumpboxes_windows }
-${ips_jumpboxes_windows[index(jumpboxes_windows, jumpbox_windows)]}  ansible_connection=winrm  ansible_user=${jumpbox_windows.authentication.username} ansible_ssh_pass=${jumpbox_windows.authentication.password}  ansible_ssh_port=5986
-%{~ endfor }
-%{~ for jumpbox_linux in jumpboxes_linux }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "key" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}
-%{~ endif }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "password" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}  ansible_ssh_pass=${jumpbox_linux.authentication.password}  ansible_become_pass=${jumpbox_linux.authentication.password}
-%{~ endif }
-%{~ endfor }
-
 [all_linux_servers]
-%{~ for jumpbox_linux in jumpboxes_linux }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "key" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}
-%{~ endif }
-%{~ if jumpbox_linux.destroy_after_deploy != "true" && jumpbox_linux.authentication.type == "password" }
-${ips_jumpboxes_linux[index(jumpboxes_linux, jumpbox_linux)]}  ansible_connection=ssh  ansible_user=${jumpbox_linux.authentication.username}  ansible_ssh_pass=${jumpbox_linux.authentication.password}  ansible_become_pass=${jumpbox_linux.authentication.password}
-%{~ endif }
-%{~ endfor }
 %{~ for ip_dbnode_admin in ips_dbnodes_admin }
 %{~ if dbnodes[index(ips_dbnodes_admin, ip_dbnode_admin)].authentication.type == "key" }
 ${ip_dbnode_admin}  ansible_connection=ssh  ansible_user=${dbnodes[index(ips_dbnodes_admin, ip_dbnode_admin)].authentication.username}

@@ -9,7 +9,6 @@ module "common_infrastructure" {
   application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
   options                    = local.options
   software                   = var.software
   ssh-timeout                = var.ssh-timeout
@@ -42,32 +41,12 @@ module "sap_namegenerator" {
   db_zones         = local.db_zones
 }
 
-// Create Jumpboxes
-module "jumpbox" {
-  source            = "../../terraform-units/modules/sap_system/jumpbox"
-  application       = var.application
-  databases         = var.databases
-  infrastructure    = var.infrastructure
-  jumpboxes         = var.jumpboxes
-  options           = local.options
-  software          = var.software
-  ssh-timeout       = var.ssh-timeout
-  sshkey            = var.sshkey
-  resource_group    = module.common_infrastructure.resource_group
-  storage_bootdiag  = module.common_infrastructure.storage_bootdiag
-  output_json       = module.output_files.output_json
-  ansible_inventory = module.output_files.ansible_inventory
-  random_id         = module.common_infrastructure.random_id
-  deployer_tfstate  = data.terraform_remote_state.deployer.outputs
-}
-
 // Create HANA database nodes
 module "hdb_node" {
   source                     = "../../terraform-units/modules/sap_system/hdb_node"
   application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
   options                    = local.options
   software                   = var.software
   ssh-timeout                = var.ssh-timeout
@@ -90,7 +69,6 @@ module "app_tier" {
   application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
-  jumpboxes        = var.jumpboxes
   options          = local.options
   software         = var.software
   ssh-timeout      = var.ssh-timeout
@@ -113,7 +91,6 @@ module "anydb_node" {
   application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
   options                    = var.options
   software                   = var.software
   ssh-timeout                = var.ssh-timeout
@@ -134,7 +111,6 @@ module "output_files" {
   application                  = module.app_tier.application
   databases                    = var.databases
   infrastructure               = var.infrastructure
-  jumpboxes                    = var.jumpboxes
   options                      = local.options
   software                     = var.software
   ssh-timeout                  = var.ssh-timeout
@@ -142,11 +118,6 @@ module "output_files" {
   nics_iscsi                   = module.common_infrastructure.nics_iscsi
   infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
   software_w_defaults          = module.common_infrastructure.software_w_defaults
-  nics_jumpboxes_windows       = module.jumpbox.nics_jumpboxes_windows
-  nics_jumpboxes_linux         = module.jumpbox.nics_jumpboxes_linux
-  public_ips_jumpboxes_windows = module.jumpbox.public_ips_jumpboxes_windows
-  public_ips_jumpboxes_linux   = module.jumpbox.public_ips_jumpboxes_linux
-  jumpboxes_linux              = module.jumpbox.jumpboxes_linux
   nics_dbnodes_admin           = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db              = module.hdb_node.nics_dbnodes_db
   loadbalancers                = module.hdb_node.loadbalancers

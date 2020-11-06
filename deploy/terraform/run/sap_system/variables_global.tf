@@ -13,14 +13,6 @@ variable "infrastructure" {
   default     = {}
 }
 
-variable "jumpboxes" {
-  description = "Details of the jumpboxes"
-  default = {
-    windows = [],
-    linux   = []
-  }
-}
-
 variable "options" {
   description = "Configuration options"
   default     = {}
