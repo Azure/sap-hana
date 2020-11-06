@@ -106,7 +106,7 @@ locals {
 
   default_filepath = local.enable_hdb_deployment ? "${path.module}/../../../../../configs/hdb_sizes.json" : "${path.module}/../../../../../configs/anydb_sizes.json"
   sizes            = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
-  storage_list     = lookup(local.sizes, var.databases[0].size).storage
+  storage_list     = length(var.databases) > 0 ? lookup(local.sizes, var.databases[0].size).storage : []
   enable_ultradisk = try(compact([
     for storage in local.storage_list :
     storage.disk_type == "UltraSSD_LRS" ? true : ""
