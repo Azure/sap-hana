@@ -1,4 +1,6 @@
 {
+    "tfstate_resource_id": "",
+    "deployer_tfstate_key": "",
     "infrastructure": {
         "environment": "np",
         "region": "eastus",
@@ -8,10 +10,6 @@
             "name": "azure-test-saplandscape-rg"
         },
         "vnets": {
-            "management": {
-                "tfstate_resource_id": "",
-                "deployer_tfstate_key": ""
-            },
             "sap": {
                 "address_space": "10.1.0.0/16",
                 "subnet_iscsi": {

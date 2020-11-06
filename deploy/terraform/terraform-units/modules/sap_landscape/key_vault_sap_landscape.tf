@@ -90,10 +90,6 @@ resource "azurerm_key_vault_secret" "iscsi_pk" {
   key_vault_id = azurerm_key_vault.kv_user[0].id
 }
 
-/*
- To force dependency between kv access policy and secrets. Expected behavior:
- https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
-*/
 resource "azurerm_key_vault_secret" "iscsi_username" {
   count        = (local.enable_landscape_kv && local.enable_iscsi_auth_password) ? 1 : 0
   name         = format("%s-iscsi-username", local.prefix)

@@ -1,7 +1,7 @@
-output "ansible-jumpbox-public-ip-address" {
-  value = module.jumpbox.rti-info.public_ip_address
+output "saplandscape_kv_user_arm_id" {
+  value = try(module.sap_landscape.kv_user.id, "")
 }
 
-output "ansible-jumpbox-username" {
-  value = module.jumpbox.rti-info.authentication.username
+output "sid_public_key_secret_name" {
+  value = try(module.sap_landscape.sid_public_key_secret_name, "")
 }

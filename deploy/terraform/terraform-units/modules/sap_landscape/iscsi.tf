@@ -1,17 +1,13 @@
-/*-----------------------------------------------------------------------------8
-|                                                                              |
-|                                    iSCSI                                     |
-|                                                                              |
-+--------------------------------------4--------------------------------------*/
+/*
+  Description:
+  Setup iSCSI related resources, i.e. subnet, nsg, vm, nic, etc.
+*/
 
-/*-----------------------------------------------------------------------------8
-TODO:  Fix Naming convention and document in the Naming Convention Doc
-+--------------------------------------4--------------------------------------*/
+/*
+  Only create/import iSCSI subnet and nsg when iSCSI device(s) will be deployed
+*/
 
-/*-----------------------------------------------------------------------------8
-Only create/import iSCSI subnet and nsg when iSCSI device(s) will be deployed
-+--------------------------------------4--------------------------------------*/
-# Creates iSCSI subnet of SAP VNET
+// Creates iSCSI subnet of SAP VNET
 resource "azurerm_subnet" "iscsi" {
   count                = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_exists ? 0 : 1)
   name                 = local.sub_iscsi_name
@@ -20,7 +16,7 @@ resource "azurerm_subnet" "iscsi" {
   address_prefixes     = [local.sub_iscsi_prefix]
 }
 
-# Imports data of existing SAP iSCSI subnet
+// Imports data of existing SAP iSCSI subnet
 data "azurerm_subnet" "iscsi" {
   count                = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_exists ? 1 : 0)
   name                 = split("/", local.sub_iscsi_arm_id)[10]
@@ -28,7 +24,7 @@ data "azurerm_subnet" "iscsi" {
   virtual_network_name = split("/", local.sub_iscsi_arm_id)[8]
 }
 
-# Creates SAP iSCSI subnet nsg
+// Creates SAP iSCSI subnet nsg
 resource "azurerm_network_security_group" "iscsi" {
   count               = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_nsg_exists ? 0 : 1)
   name                = local.sub_iscsi_nsg_name
@@ -36,7 +32,7 @@ resource "azurerm_network_security_group" "iscsi" {
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
 }
 
-# Imports the SAP iSCSI subnet nsg data
+// Imports the SAP iSCSI subnet nsg data
 data "azurerm_network_security_group" "iscsi" {
   count               = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_nsg_exists ? 1 : 0)
   name                = split("/", local.sub_iscsi_nsg_arm_id)[8]
@@ -45,10 +41,10 @@ data "azurerm_network_security_group" "iscsi" {
 
 // TODO: Add nsr to iSCSI's nsg
 
-/*-----------------------------------------------------------------------------8
-iSCSI device IP address range: .4 - 
-+--------------------------------------4--------------------------------------*/
-# Creates the NIC and IP address for iSCSI device
+/*
+  iSCSI device IP address range: .4 - 
+*/
+// Creates the NIC and IP address for iSCSI device
 resource "azurerm_network_interface" "iscsi" {
   count               = local.iscsi_count
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.nic)
@@ -63,14 +59,14 @@ resource "azurerm_network_interface" "iscsi" {
   }
 }
 
-# Manages the association between NIC and NSG.
+// Manages the association between NIC and NSG
 resource "azurerm_network_interface_security_group_association" "iscsi" {
   count                     = local.iscsi_count
   network_interface_id      = azurerm_network_interface.iscsi[count.index].id
   network_security_group_id = local.sub_iscsi_nsg_exists ? data.azurerm_network_security_group.iscsi[0].id : azurerm_network_security_group.iscsi[0].id
 }
 
-# Manages Linux Virtual Machine for iSCSI
+// Manages Linux Virtual Machine for iSCSI
 resource "azurerm_linux_virtual_machine" "iscsi" {
   count                           = local.iscsi_count
   name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[count.index], local.resource_suffixes.vm)
