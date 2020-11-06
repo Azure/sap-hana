@@ -28,6 +28,10 @@ variable "admin_subnet" {
   description = "Information about SAP admin subnet"
 }
 
+variable "db_subnet" {
+  description = "Information about SAP db subnet"
+}
+
 variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
@@ -62,37 +66,7 @@ locals {
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
 
-  // SAP vnet
-  var_infra       = try(var.infrastructure, {})
-  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
-  vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
-  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
-  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "")
-  vnet_nr_parts   = length(split("-", local.vnet_sap_name))
-  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? (
-    split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)]) : (
-    local.vnet_sap_name
-  )
-
-  // DB subnet
-  var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
-  sub_db_arm_id = try(local.var_sub_db.arm_id, "")
-  sub_db_exists = length(local.sub_db_arm_id) > 0 ? true : false
-  sub_db_name = local.sub_db_exists ? (
-    try(split("/", local.sub_db_arm_id)[10], "")) : (
-    try(local.var_sub_db.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet))
-  )
-  sub_db_prefix = try(local.var_sub_db.prefix, "")
-
-  // DB NSG
-  var_sub_db_nsg    = try(var.infrastructure.vnets.sap.subnet_db.nsg, {})
-  sub_db_nsg_arm_id = try(local.var_sub_db_nsg.arm_id, "")
-  sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
-  sub_db_nsg_name = local.sub_db_nsg_exists ? (
-    try(split("/", local.sub_db_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet_nsg))
-  )
+  var_infrastructure = try(var.infrastructure, {})
 
   // PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : ""
@@ -114,10 +88,14 @@ locals {
   // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  /* 
+     TODO: currently sap landscape and sap system haven't been decoupled. 
+     The key vault information of sap landscape will be obtained via input json.
+     At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
+  */
+  kv_landscape_id    = try(local.var_infrastructure.landscape.key_vault_arm_id, "")
+  secret_sid_pk_name = try(local.var_infrastructure.landscape.sid_public_key_secret_name, "")
+
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)
 

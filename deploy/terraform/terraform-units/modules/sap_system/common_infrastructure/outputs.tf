@@ -30,6 +30,10 @@ output "admin_subnet" {
   value = ! local.enable_admin_subnet ? null : (local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0])
 }
 
+output "db_subnet" {
+  value = local.enable_xdb_deployment || local.enable_hdb_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : ""
+}
+
 output "sid_kv_user" {
   value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user : null
 }

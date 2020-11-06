@@ -43,24 +43,27 @@ module "sap_namegenerator" {
 
 // Create HANA database nodes
 module "hdb_node" {
-  source                     = "../../terraform-units/modules/sap_system/hdb_node"
-  application                = var.application
-  databases                  = var.databases
-  infrastructure             = var.infrastructure
-  options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
-  resource_group             = module.common_infrastructure.resource_group
-  vnet_sap                   = module.common_infrastructure.vnet_sap
-  storage_bootdiag           = module.common_infrastructure.storage_bootdiag
-  ppg                        = module.common_infrastructure.ppg
-  sid_kv_user                = module.common_infrastructure.sid_kv_user
+  source           = "../../terraform-units/modules/sap_system/hdb_node"
+  application      = var.application
+  databases        = var.databases
+  infrastructure   = var.infrastructure
+  jumpboxes        = var.jumpboxes
+  options          = local.options
+  software         = var.software
+  ssh-timeout      = var.ssh-timeout
+  sshkey           = var.sshkey
+  resource_group   = module.common_infrastructure.resource_group
+  vnet_sap         = module.common_infrastructure.vnet_sap
+  storage_bootdiag = module.common_infrastructure.storage_bootdiag
+  ppg              = module.common_infrastructure.ppg
+  sid_kv_user      = module.common_infrastructure.sid_kv_user
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  db_subnet                  = module.common_infrastructure.db_subnet
 }
 
 // Create Application Tier nodes
@@ -103,6 +106,7 @@ module "anydb_node" {
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  db_subnet                  = module.common_infrastructure.db_subnet
 }
 
 // Generate output files
