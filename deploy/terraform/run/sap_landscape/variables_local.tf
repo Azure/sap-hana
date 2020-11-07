@@ -49,6 +49,10 @@ locals {
   vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
 
+  // iSCSI
+  var_iscsi = try(local.var_infra.iscsi, {})
+  iscsi_count = try(local.var_iscsi.iscsi_count, 0)
+
   // Locate the tfstate storage account
   tfstate_resource_id          = try(var.tfstate_resource_id, "")
   saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]

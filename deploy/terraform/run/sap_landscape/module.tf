@@ -18,6 +18,7 @@ module "sap_namegenerator" {
   source           = "../../terraform-units/modules/sap_namegenerator"
   environment      = var.infrastructure.environment
   location         = var.infrastructure.region
+  iscsi_server_count = local.iscsi_count
   codename         = lower(try(var.infrastructure.codename, ""))
   random_id        = module.sap_landscape.random_id
   sap_vnet_name    = local.vnet_sap_name_part
