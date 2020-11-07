@@ -31,7 +31,7 @@ locals {
 
   // Region and metadata
   region = try(local.var_infra.region, "")
-  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
+  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.VNET)
 
   // Retrieve information about Deployer from tfstate file
   deployer_tfstate = var.deployer_tfstate
@@ -43,7 +43,7 @@ locals {
   var_rg    = try(local.var_infra.resource_group, {})
   rg_arm_id = try(local.var_rg.arm_id, "")
   rg_exists = length(local.rg_arm_id) > 0 ? true : false
-  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(local.var_rg.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
+  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(local.var_rg.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
 
   // iSCSI
   var_iscsi = try(local.var_infra.iscsi, {})
