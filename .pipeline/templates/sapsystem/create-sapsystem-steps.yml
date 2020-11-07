@@ -124,6 +124,7 @@ steps:
       tfstate_sa_name=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] |  select(.name | contains(\\\"tfstate\\\")).name"'")
       sap_system_key="${sapsystem_rg}.terraform.tfstate"
       deployer_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"DEP00-INFRASTRUCTURE\\\")).name"'")
+      landscape_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"SAP0-INFRASTRUCTURE\\\")).name"'")
       saplib_tfstate_key=$(az storage blob list --account-name ${tfstate_sa_name} --container-name tfstate --only-show-errors | jq -r "'".[] | select(.name | contains(\\\"LIBRARY\\\")).name"'")
       tfstate_resource_id=$(az storage account list --resource-group ${saplib_rg} | jq -r "'".[] | select(.name | contains(\\\"tfstate\\\")).id"'")
 
@@ -138,12 +139,12 @@ steps:
       | jq --arg environment "${sapsystem_prefix}" .infrastructure.environment\ =\ \$environment \
       | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
       | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
+      | jq --arg landscape_tfstate_key "${landscape_tfstate_key}" .landscape_tfstate_key\ =\ \$landscape_tfstate_key \
       | jq .infrastructure.vnets.sap.is_existing\ =\ \"true\" \
       | jq --arg saplandscape_sap_vnet_arm_id "${saplandscape_sap_vnet_arm_id}" .infrastructure.vnets.sap.arm_id\ =\ \$saplandscape_sap_vnet_arm_id \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
       | jq --arg subnet_admin_prefix "${subnet_admin_prefix}" .infrastructure.vnets.sap.subnet_admin.prefix\ =\ \$subnet_admin_prefix \
       | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
-      | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
       | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
       | jq --arg db "${db}" .databases[].platform\ =\ \$db \
       | jq --arg ha "${ha}" .databases[].high_availability\ =\ \$ha \
@@ -156,11 +157,6 @@ steps:
       | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
       | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
       | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
-      | jq --arg saplib_rg "${saplib_rg}" .software.storage_account_sapbits.saplib_resource_group_name\ =\ \$saplib_rg \
-      | jq --arg tfstate_sa_name "${tfstate_sa_name}" .software.storage_account_sapbits.tfstate_storage_account_name\ =\ \$tfstate_sa_name \
-      | jq --arg saplib_tfstate_key "${saplib_tfstate_key}" .software.storage_account_sapbits.saplib_tfstate_key\ =\ \$saplib_tfstate_key \
-      | jq --arg landscape_kv_arm_id "${landscape_kv_arm_id}" .infrastructure.landscape.key_vault_arm_id\ =\ \$landscape_kv_arm_id \
-      | jq --arg sid_public_key_secret_name "${sid_public_key_secret_name}" .infrastructure.landscape.sid_public_key_secret_name\ =\ \$sid_public_key_secret_name \
       > ${input}
 
       cat ${input}

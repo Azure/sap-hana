@@ -14,8 +14,8 @@ output "random_id" {
   value = random_id.random_id.hex
 }
 
-output "nics_iscsi" {
-  value = azurerm_network_interface.iscsi
+output "iscsi_private_ip" {
+  value = local.iscsi_private_ip
 }
 
 output "ppg" {
@@ -24,10 +24,6 @@ output "ppg" {
 
 output "infrastructure_w_defaults" {
   value = local.infrastructure
-}
-
-output "software_w_defaults" {
-  value = local.software
 }
 
 output "admin_subnet" {

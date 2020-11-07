@@ -1,5 +1,5 @@
 /*
-Description:
+  Description:
   Constraining provider versions
     =    (or no operator): exact version equality
     !=   version not equal

@@ -1,6 +1,6 @@
 /*
     Description:
-      Retrieve remote tfstate file of Deployer and current environment's SPN
+    Retrieve remote tfstate file(s) and current environment's SPN
 */
 
 data "terraform_remote_state" "deployer" {
@@ -10,6 +10,18 @@ data "terraform_remote_state" "deployer" {
     storage_account_name = local.tfstate_storage_account_name
     container_name       = local.tfstate_container_name
     key                  = local.deployer_tfstate_key
+    subscription_id      = local.saplib_subscription_id
+    use_msi              = true
+  }
+}
+
+data "terraform_remote_state" "landscape" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = local.saplib_resource_group_name
+    storage_account_name = local.tfstate_storage_account_name
+    container_name       = local.tfstate_container_name
+    key                  = local.landscape_tfstate_key
     subscription_id      = local.saplib_subscription_id
     use_msi              = true
   }

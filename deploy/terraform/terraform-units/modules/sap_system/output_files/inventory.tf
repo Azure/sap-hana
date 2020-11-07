@@ -61,14 +61,14 @@ resource "local_file" "output_json" {
       ]
       ]
     ),
-    "software" = merge(var.software_w_defaults, {
+    "software" = {
       storage_account_sapbits = {
         name                = ""
         storage_access_key  = ""
         file_share_name     = ""
         blob_container_name = ""
       }
-    })
+    }
     "options" = var.options
     }
   )

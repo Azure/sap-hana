@@ -1,4 +1,7 @@
 {
+  "tfstate_resource_id": "",
+  "deployer_tfstate_key": "",
+  "landscape_tfstate_key": "",
   "infrastructure": {
     "region": "eastus",
     "environment": "NP",
@@ -7,11 +10,6 @@
       "arm_id": ""
     },
     "vnets": {
-      "management": {
-        "saplib_resource_group_name": "",
-        "tfstate_storage_account_name": "",
-        "deployer_tfstate_key": ""
-      },
       "sap": {
         "is_existing": "false",
         "arm_id": "",
@@ -22,9 +20,6 @@
         },
         "subnet_db": {
           "prefix": "10.1.2.0/24"
-        },
-        "subnet_iscsi": {
-          "prefix": "10.1.3.0/24"
         },
         "subnet_app": {
           "prefix": "10.1.4.0/24"
@@ -68,26 +63,6 @@
     "authentication": {
       "type": "key",
       "username": "azureadm"
-    }
-  },
-  "software": {
-    "storage_account_sapbits": {
-      "saplib_resource_group_name": "",
-      "tfstate_storage_account_name": "",
-      "saplib_tfstate_key": ""
-    },
-    "downloader": {
-      "credentials": {
-        "sap_user": "<sap_user>",
-        "sap_password": "<sap_password>"
-      },
-      "scenarios": [
-        {
-          "scenario_type": "DB",
-          "product_name": "HANA",
-          "product_version": "2.0"
-        }
-      ]
     }
   },
   "sshkey": {
