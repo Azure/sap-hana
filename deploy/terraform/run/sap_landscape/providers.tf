@@ -1,5 +1,5 @@
 /*
-Description:
+  Description:
   Constraining provider versions
     =    (or no operator): exact version equality
     !=   version not equal
@@ -51,7 +51,7 @@ terraform {
       version = "~> 2.1"
     }
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "~> 2.35.0"
     }
   }

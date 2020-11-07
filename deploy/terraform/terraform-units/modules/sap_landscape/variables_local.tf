@@ -1,7 +1,6 @@
 /*
-Description:
-
-  Define local variables.
+  Description:
+  Define local variables
 */
 
 variable "deployer_tfstate" {
@@ -18,12 +17,12 @@ variable naming {
 
 locals {
   // Resources naming
-  vnet_prefix                 = var.naming.prefix.VNET
-  storageaccount_name         = var.naming.storageaccount_names.SDU
-  landscape_keyvault_names    = var.naming.keyvault_names.VNET
-  sid_keyvault_names          = var.naming.keyvault_names.SDU
-  virtualmachine_names        = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME
-  resource_suffixes           = var.naming.resource_suffixes
+  vnet_prefix              = var.naming.prefix.VNET
+  storageaccount_name      = var.naming.storageaccount_names.SDU
+  landscape_keyvault_names = var.naming.keyvault_names.VNET
+  sid_keyvault_names       = var.naming.keyvault_names.SDU
+  virtualmachine_names     = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME
+  resource_suffixes        = var.naming.resource_suffixes
 }
 
 locals {
@@ -46,7 +45,7 @@ locals {
   rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(local.var_rg.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
 
   // iSCSI
-  var_iscsi = try(local.var_infra.iscsi, {})
+  var_iscsi   = try(local.var_infra.iscsi, {})
   iscsi_count = try(local.var_iscsi.iscsi_count, 0)
   iscsi_size  = try(local.var_iscsi.size, "Standard_D2s_v3")
 
@@ -90,8 +89,8 @@ locals {
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_landscape_kv = true
-  sid_public_key  = local.enable_landscape_kv ? try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh) : null
-  sid_private_key = local.enable_landscape_kv ? try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem) : null
+  sid_public_key      = local.enable_landscape_kv ? try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh) : null
+  sid_private_key     = local.enable_landscape_kv ? try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem) : null
 
   // iSCSI subnet
   var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, {})
