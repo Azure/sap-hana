@@ -1,7 +1,6 @@
 /*
-Description:
-
-  Define local variables.
+  Description:
+  Define local variables
 */
 
 variable "is_single_node_hana" {
@@ -11,6 +10,10 @@ variable "is_single_node_hana" {
 
 variable "deployer_tfstate" {
   description = "Deployer remote tfstate file"
+}
+
+variable "landscape_tfstate" {
+  description = "Landscape remote tfstate file"
 }
 
 variable "service_principal" {
@@ -34,7 +37,16 @@ variable "custom_disk_sizes_filename" {
   default     = ""
 }
 
-//Set defaults
+locals {
+  // Resources naming
+  vnet_prefix                 = var.naming.prefix.VNET
+  storageaccount_name         = var.naming.storageaccount_names.SDU
+  sid_keyvault_names          = var.naming.keyvault_names.SDU
+  anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
+  anchor_computer_names       = var.naming.virtualmachine_names.ANCHOR_COMPUTERNAME
+  resource_suffixes           = var.naming.resource_suffixes
+}
+
 locals {
   //Region and metadata
   region = try(local.var_infra.region, "")
@@ -53,20 +65,14 @@ locals {
   zones            = distinct(concat(local.db_zones, local.app_zones, local.scs_zones, local.web_zones))
   zonal_deployment = length(local.zones) > 0 ? true : false
 
-  vnet_prefix                 = var.naming.prefix.VNET
-  storageaccount_name         = var.naming.storageaccount_names.SDU
-  landscape_keyvault_names    = var.naming.keyvault_names.VNET
-  sid_keyvault_names          = var.naming.keyvault_names.SDU
-  virtualmachine_names        = var.naming.virtualmachine_names.ISCSI_COMPUTERNAME
-  anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
-  anchor_computer_names       = var.naming.virtualmachine_names.ANCHOR_COMPUTERNAME
-  resource_suffixes           = var.naming.resource_suffixes
-
   // Retrieve information about Deployer from tfstate file
   deployer_tfstate = var.deployer_tfstate
-  vnet_mgmt        = local.deployer_tfstate.vnet_mgmt
-  subnet_mgmt      = local.deployer_tfstate.subnet_mgmt
-  nsg_mgmt         = local.deployer_tfstate.nsg_mgmt
+
+  // Retrieve information about Sap Landscape from tfstate file
+  landscape_tfstate  = var.landscape_tfstate
+  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
+  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  iscsi_private_ip   = try(local.landscape_tfstate.iscsi_private_ip, [])
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -128,7 +134,6 @@ locals {
   var_infra = try(var.infrastructure, {})
 
   //Anchor VM
-
   anchor                      = try(local.var_infra.anchor_vms, {})
   deploy_anchor               = length(local.anchor) > 0 ? true : false
   anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
@@ -138,11 +143,11 @@ locals {
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
-  enable_anchor_ultra =  [
+  enable_anchor_ultra = [
     for zone in local.zones :
     contains(local.db_zones, zone) ? local.enable_ultradisk : false
   ]
-  
+
   enable_accelerated_networking = try(local.anchor.accelerated_networking, false)
   anchor_nic_ips                = local.sub_admin_exists ? try(local.anchor.nic_ips, []) : []
 
@@ -175,74 +180,15 @@ locals {
   kv_users = var.deployer_user
   */
 
-  /* 
-     TODO: currently sap landscape and sap system haven't been decoupled. 
-     The key vault information of sap landscape will be obtained via input json.
-     At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
-  */
-  kv_landscape_id     = try(local.var_infra.landscape.key_vault_arm_id, "")
-  secret_sid_pk_name  = try(local.var_infra.landscape.sid_public_key_secret_name, "")
-  enable_landscape_kv = local.kv_landscape_id == ""
-
-  //iSCSI
-  var_iscsi = try(local.var_infra.iscsi, {})
-
-  enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
-
-  //iSCSI target device(s) is only created when below conditions met:
-  //- iscsi is defined in input JSON
-  //- AND
-  //  - HANA database has high_availability set to true
-  //  - HANA database uses SUSE
-  iscsi_count = (local.db_ha && upper(local.db_os.publisher) == "SUSE") ? try(local.var_iscsi.iscsi_count, 0) : 0
-  iscsi_size  = try(local.var_iscsi.size, "Standard_D2s_v3")
-
-  iscsi_os = try(local.var_iscsi.os,
-    {
-      "publisher" = try(local.var_iscsi.os.publisher, "SUSE")
-      "offer"     = try(local.var_iscsi.os.offer, "sles-sap-12-sp5")
-      "sku"       = try(local.var_iscsi.os.sku, "gen1")
-      "version"   = try(local.var_iscsi.os.version, "latest")
-  })
-  iscsi_auth_type     = try(local.var_iscsi.authentication.type, "key")
-  iscsi_auth_username = try(local.var_iscsi.authentication.username, "azureadm")
-  iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
-
-  // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  enable_iscsi_auth_key = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
-  iscsi_public_key      = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh) : null
-  iscsi_private_key     = local.enable_iscsi_auth_key ? try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem) : null
-
-  // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
-  enable_iscsi_auth_password = local.iscsi_count > 0 && local.iscsi_auth_type == "password"
-  iscsi_auth_password        = local.enable_iscsi_auth_password ? try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result) : null
-
-  iscsi = merge(local.var_iscsi, {
-    iscsi_count = local.iscsi_count,
-    size        = local.iscsi_size,
-    os          = local.iscsi_os,
-    authentication = {
-      type     = local.iscsi_auth_type,
-      username = local.iscsi_auth_username
-    },
-    iscsi_nic_ips = local.iscsi_nic_ips
-  })
-
   //SAP vnet
-  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
-  vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
-  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
-  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, format("%s%s", local.vnet_prefix, local.resource_suffixes.vnet))
-  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
-
-  // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  sid_public_key  = local.enable_landscape_kv ? try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh) : null
-  sid_private_key = local.enable_landscape_kv ? try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem) : null
+  vnet_sap_name            = try(local.landscape_tfstate.vnet_sap_name, "")
+  vnet_resource_group_name = try(local.landscape_tfstate.vnet_resource_group_name, "")
 
   //Admin subnet
-  var_sub_admin    = try(local.var_vnet_sap.subnet_admin, {})
-  sub_admin_arm_id = try(local.var_sub_admin.arm_id, "")
-  sub_admin_exists = length(local.sub_admin_arm_id) > 0 ? true : false
+  enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
+  var_sub_admin       = try(local.var_vnet_sap.subnet_admin, {})
+  sub_admin_arm_id    = try(local.var_sub_admin.arm_id, "")
+  sub_admin_exists    = length(local.sub_admin_arm_id) > 0
 
   sub_admin_name   = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s", local.prefix, local.resource_suffixes.admin_subnet))
   sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "")
@@ -265,19 +211,6 @@ locals {
   sub_db_nsg_arm_id = try(local.var_sub_db_nsg.arm_id, "")
   sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
   sub_db_nsg_name   = local.sub_db_nsg_exists ? try(split("/", local.sub_db_nsg_arm_id)[8], "") : try(local.var_sub_db_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.db_subnet_nsg))
-
-  //iSCSI subnet
-  var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, {})
-  sub_iscsi_arm_id = try(local.var_sub_iscsi.arm_id, "")
-  sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0 ? true : false
-  sub_iscsi_name   = local.sub_iscsi_exists ? try(split("/", local.sub_iscsi_arm_id)[10], "") : try(local.var_sub_iscsi.name, format("%s%s", local.prefix, local.resource_suffixes.iscsi_subnet))
-  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.prefix, "")
-
-  //iSCSI NSG
-  var_sub_iscsi_nsg    = try(local.var_sub_iscsi.nsg, {})
-  sub_iscsi_nsg_arm_id = try(local.var_sub_iscsi_nsg.arm_id, "")
-  sub_iscsi_nsg_exists = length(local.sub_iscsi_nsg_arm_id) > 0 ? true : false
-  sub_iscsi_nsg_name   = local.sub_iscsi_nsg_exists ? try(split("/", local.sub_iscsi_nsg_arm_id)[8], "") : try(local.var_sub_iscsi_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.iscsi_subnet_nsg))
 
   //APP subnet
   var_sub_app    = try(local.var_vnet_sap.subnet_app, {})
@@ -303,14 +236,6 @@ locals {
       is_existing = local.ppg_exists,
       name        = local.ppg_name,
       arm_id      = local.ppg_arm_id
-    }
-    iscsi = { iscsi_count = local.iscsi_count,
-      size = local.iscsi_size,
-      os   = local.iscsi_os,
-      authentication = {
-        type     = local.iscsi_auth_type
-        username = local.iscsi_auth_username
-      }
     },
     vnets = {
       sap = {
@@ -340,17 +265,6 @@ locals {
             name        = local.sub_db_nsg_name
           }
         },
-        subnet_iscsi = {
-          is_existing = local.sub_iscsi_exists,
-          arm_id      = local.sub_iscsi_arm_id,
-          name        = local.sub_iscsi_name,
-          prefix      = local.sub_iscsi_prefix,
-          nsg = {
-            is_existing = local.sub_iscsi_nsg_exists,
-            arm_id      = local.sub_iscsi_nsg_arm_id,
-            name        = local.sub_iscsi_nsg_name
-          }
-        },
         subnet_app = {
           is_existing = local.sub_app_exists,
           arm_id      = local.sub_app_arm_id,
@@ -365,62 +279,6 @@ locals {
       }
     }
   }
-
-  //Downloader
-  sap_user     = "sap_smp_user"
-  sap_password = "sap_smp_password"
-  hdb_versions = [
-    for scenario in try(var.software.downloader.scenarios, []) : scenario.product_version
-    if scenario.scenario_type == "DB"
-  ]
-  hdb_version = try(local.hdb_versions[0], "2.0")
-
-  downloader = merge({
-    credentials = {
-      sap_user     = local.sap_user,
-      sap_password = local.sap_password
-    }
-    },
-    {
-      scenarios = [
-        {
-          scenario_type   = "DB",
-          product_name    = "HANA",
-          product_version = local.hdb_version,
-          os_type         = "LINUX_X64",
-          os_version      = "SLES12.3",
-          components = [
-            "PLATFORM"
-          ]
-        },
-        {
-          scenario_type = "RTI",
-          product_name  = "RTI",
-          os_type       = "LINUX_X64"
-        },
-        {
-          scenario_type = "BASTION",
-          os_type       = "NT_X64"
-        },
-        {
-          scenario_type = "BASTION",
-          os_type       = "LINUX_X64"
-        }
-      ],
-      debug = {
-        enabled = false,
-        cert    = "charles.pem",
-        proxies = {
-          http  = "http://127.0.0.1:8888",
-          https = "https://127.0.0.1:8888"
-        }
-      }
-  })
-
-  //---- Update software with defaults ----//
-  software = merge(var.software, {
-    downloader = local.downloader
-  })
 
   // Current service principal
   service_principal = try(var.service_principal, {})

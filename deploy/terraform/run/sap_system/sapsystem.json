@@ -1,16 +1,13 @@
 {
   "tfstate_resource_id": "",
   "deployer_tfstate_key": "",
+  "landscape_tfstate_key": "",
   "infrastructure": {
     "environment": "np",
     "region": "eastus",
     "resource_group": {
       "is_existing": "false",
       "arm_id": ""
-    },
-    "landscape": {
-      "key_vault_arm_id": "",
-      "sid_public_key_secret_name": ""
     },
     "vnets": {
       "sap": {
@@ -23,9 +20,6 @@
         },
         "subnet_db": {
           "prefix": "10.1.2.0/24"
-        },
-        "subnet_iscsi": {
-          "prefix": "10.1.3.0/24"
         },
         "subnet_app": {
           "prefix": "10.1.4.0/24"

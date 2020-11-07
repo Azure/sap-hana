@@ -10,12 +10,12 @@ module "common_infrastructure" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  software                   = var.software
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
   naming                     = module.sap_namegenerator.naming
   service_principal          = local.service_principal
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
 }
 
@@ -48,7 +48,6 @@ module "hdb_node" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  software                   = var.software
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
   resource_group             = module.common_infrastructure.resource_group
@@ -61,6 +60,7 @@ module "hdb_node" {
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
 }
 
 // Create Application Tier nodes
@@ -70,7 +70,6 @@ module "app_tier" {
   databases        = var.databases
   infrastructure   = var.infrastructure
   options          = local.options
-  software         = var.software
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource_group   = module.common_infrastructure.resource_group
@@ -83,6 +82,7 @@ module "app_tier" {
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
 }
 
 // Create anydb database nodes
@@ -92,7 +92,6 @@ module "anydb_node" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = var.options
-  software                   = var.software
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
   resource_group             = module.common_infrastructure.resource_group
@@ -103,6 +102,7 @@ module "anydb_node" {
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
 }
 
 // Generate output files
@@ -112,12 +112,10 @@ module "output_files" {
   databases                    = var.databases
   infrastructure               = var.infrastructure
   options                      = local.options
-  software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
-  nics_iscsi                   = module.common_infrastructure.nics_iscsi
+  iscsi_private_ip             = module.common_infrastructure.iscsi_private_ip
   infrastructure_w_defaults    = module.common_infrastructure.infrastructure_w_defaults
-  software_w_defaults          = module.common_infrastructure.software_w_defaults
   nics_dbnodes_admin           = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db              = module.hdb_node.nics_dbnodes_db
   loadbalancers                = module.hdb_node.loadbalancers

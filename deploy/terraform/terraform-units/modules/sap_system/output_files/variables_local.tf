@@ -2,10 +2,6 @@ variable "infrastructure_w_defaults" {
   description = "infrasturcture dict with default values"
 }
 
-variable "software_w_defaults" {
-  description = "software dect with default values"
-}
-
 variable "nics_dbnodes_admin" {
   description = "Admin NICs of HANA database nodes"
 }
@@ -14,8 +10,8 @@ variable "nics_dbnodes_db" {
   description = "NICs of HANA database nodes"
 }
 
-variable "nics_iscsi" {
-  description = "NICs of ISCSI target servers"
+variable "iscsi_private_ip" {
+  description = "Private ips of iSCSIs"
 }
 
 variable "loadbalancers" {
@@ -78,7 +74,7 @@ variable "any_database_info" {
 
 locals {
 
-  ips_iscsi                    = var.nics_iscsi[*].private_ip_address
+  ips_iscsi                    = var.iscsi_private_ip
   ips_dbnodes_admin            = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
   ips_dbnodes_db               = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
 

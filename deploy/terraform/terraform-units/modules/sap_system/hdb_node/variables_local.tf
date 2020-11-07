@@ -32,6 +32,9 @@ variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
 
+variable "landscape_tfstate" {
+  description = "Landscape remote tfstate file"
+}
 
 locals {
   // Imports database sizing information
@@ -50,13 +53,10 @@ locals {
 
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
-  /* 
-     TODO: currently sap landscape and sap system haven't been decoupled. 
-     The key vault information of sap landscape will be obtained via input json.
-     At phase 2, the logic will be updated and the key vault information will be obtained from tfstate file of sap landscape.  
-  */
-  kv_landscape_id    = try(local.var_infra.landscape.key_vault_arm_id, "")
-  secret_sid_pk_name = try(local.var_infra.landscape.sid_public_key_secret_name, "")
+  // Retrieve information about Sap Landscape from tfstate file
+  landscape_tfstate  = var.landscape_tfstate
+  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
+  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
 
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)

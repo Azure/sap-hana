@@ -18,11 +18,6 @@ variable "options" {
   default     = {}
 }
 
-variable "software" {
-  description = "Details of the infrastructure components required for SAP installation"
-  default     = {}
-}
-
 variable "ssh-timeout" {
   description = "Timeout for connection that is used by provisioner"
   default     = "30s"
