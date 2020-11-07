@@ -23,11 +23,11 @@ output "infrastructure_w_defaults" {
 }
 
 output "kv_user" {
-  value = local.enable_landscape_kv ? azurerm_key_vault.kv_user[0] : {}
+  value = azurerm_key_vault.kv_user
 }
 
 output "kv_prvt" {
-  value = local.enable_landscape_kv ? azurerm_key_vault.kv_prvt[0] : {}
+  value = azurerm_key_vault.kv_prvt
 }
 
 output "sid_public_key_secret_name" {
