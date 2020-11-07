@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "resource_group" {
 // Imports data of existing resource group
 data "azurerm_resource_group" "resource_group" {
   count = local.rg_exists ? 1 : 0
-  name  = split("/", local.rg_arm_id)[4]
+  name  = local.rg_name
 }
 
 // Creates the SAP VNET

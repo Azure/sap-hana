@@ -119,8 +119,3 @@ resource "azurerm_key_vault_secret" "sid_pk" {
   value        = local.sid_public_key
   key_vault_id = azurerm_key_vault.kv_user[0].id
 }
-
-// random bytes to product
-resource "random_id" "saplandscape" {
-  byte_length = 4
-}
