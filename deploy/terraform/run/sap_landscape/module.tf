@@ -5,13 +5,8 @@
 
 module "sap_landscape" {
   source                     = "../../terraform-units/modules/sap_landscape"
-  is_single_node_hana        = "true"
-  application                = var.application
-  databases                  = var.databases
   infrastructure             = var.infrastructure
-  jumpboxes                  = var.jumpboxes
   options                    = local.options
-  software                   = var.software
   ssh-timeout                = var.ssh-timeout
   sshkey                     = var.sshkey
   naming                     = module.sap_namegenerator.naming

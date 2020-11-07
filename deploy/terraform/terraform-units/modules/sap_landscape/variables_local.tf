@@ -31,7 +31,6 @@ locals {
 
   // Region and metadata
   region = try(local.var_infra.region, "")
-  sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
 
   // Retrieve information about Deployer from tfstate file
