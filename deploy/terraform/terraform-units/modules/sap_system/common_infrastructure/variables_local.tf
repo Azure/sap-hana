@@ -180,9 +180,15 @@ locals {
   kv_users = var.deployer_user
   */
 
+  // SAP Landscape infrastructure
+  landscape_infrastructure = try(local.landscape_tfstate.landscape_infrastructure, {})
+  
   //SAP vnet
-  vnet_sap_name            = try(local.landscape_tfstate.vnet_sap_name, "")
-  vnet_resource_group_name = try(local.landscape_tfstate.vnet_resource_group_name, "")
+  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
+  vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
+  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
+  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, format("%s%s", local.vnet_prefix, local.resource_suffixes.vnet))
+  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
 
   //Admin subnet
   enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
@@ -237,12 +243,9 @@ locals {
       name        = local.ppg_name,
       arm_id      = local.ppg_arm_id
     },
+    iscsi = local.landscape_infrastructure.iscsi
     vnets = {
-      sap = {
-        is_existing   = local.vnet_sap_exists,
-        arm_id        = local.vnet_sap_arm_id,
-        name          = local.vnet_sap_name,
-        address_space = local.vnet_sap_addr,
+      sap = merge(local.landscape_infrastructure.vnets.sap, {
         subnet_admin = {
           is_existing = local.sub_admin_exists,
           arm_id      = local.sub_admin_arm_id,
@@ -276,7 +279,7 @@ locals {
             name        = local.sub_app_nsg_name
           }
         }
-      }
+      })
     }
   }
 
