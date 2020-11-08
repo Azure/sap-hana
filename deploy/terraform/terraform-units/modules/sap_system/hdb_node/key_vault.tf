@@ -15,10 +15,6 @@ resource "random_password" "password" {
   override_special = "_%@"
 }
 
-/*
- To force dependency between kv access policy and secrets. Expected behavior:
- https://github.com/terraform-providers/terraform-provider-azurerm/issues/4971
-*/
 // Store the hdb logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
   count        = local.enable_auth_password ? 1 : 0

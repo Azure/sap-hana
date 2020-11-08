@@ -3,7 +3,7 @@ variable "resource_group" {
 }
 
 variable "vnet_sap" {
-  description = "Details of the SAP VNet"
+  description = "Details of the SAP Vnet"
 }
 
 variable "storage_bootdiag" {
@@ -37,15 +37,18 @@ variable "landscape_tfstate" {
 }
 
 locals {
-  // Imports database sizing information
-
-  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
-
+  // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.HANA_VMNAME
 
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
+
+}
+
+locals {
+  // Imports database sizing information
+  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
   region = try(var.infrastructure.region, "")
   sid    = upper(try(var.application.sid, ""))
@@ -61,18 +64,11 @@ locals {
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)
 
-  # SAP vnet
-  var_infra       = try(var.infrastructure, {})
-  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
-  vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
-  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
-  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : try(local.var_vnet_sap.name, "")
-  vnet_nr_parts   = length(split("-", local.vnet_sap_name))
-  // Default naming of vnet has multiple parts. Taking the second-last part as the name 
-  vnet_sap_name_prefix = try(substr(upper(local.vnet_sap_name), -5, 5), "") == "-VNET" ? (
-    split("-", local.vnet_sap_name)[(local.vnet_nr_parts - 2)]) : (
-    local.vnet_sap_name
-  )
+  // SAP vnet
+  vnet_sap                 = try(var.vnet_sap, {})
+  vnet_sap_name            = try(local.vnet_sap.name, "")
+  vnet_resource_group_name = try(local.vnet_sap.resource_group_name, "")
+  vnet_sap_address_space   = try(local.vnet_sap.address_space, [])
 
   // DB subnet
   var_sub_db    = try(var.infrastructure.vnets.sap.subnet_db, {})
