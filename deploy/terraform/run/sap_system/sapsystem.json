@@ -11,9 +11,6 @@
     },
     "vnets": {
       "sap": {
-        "is_existing": "false",
-        "arm_id": "",
-        "address_space": "10.1.0.0/16",
         "subnet_admin": {
           "prefix": "10.1.1.0/24"
         },

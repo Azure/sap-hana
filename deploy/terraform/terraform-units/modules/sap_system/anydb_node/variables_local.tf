@@ -3,7 +3,7 @@ variable "resource_group" {
 }
 
 variable "vnet_sap" {
-  description = "Details of the SAP VNet"
+  description = "Details of the SAP Vnet"
 }
 
 variable "storage_bootdiag" {
@@ -65,8 +65,6 @@ locals {
   zones            = try(local.anydb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
-
-  var_infrastructure = try(var.infrastructure, {})
 
   // PPG Information
   ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : ""

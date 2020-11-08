@@ -57,4 +57,3 @@ resource "azurerm_availability_set" "anydb" {
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % length(local.zones)].id : var.ppg[0].id
   managed                      = true
 }
-
