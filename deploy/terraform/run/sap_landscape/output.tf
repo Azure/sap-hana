@@ -17,3 +17,7 @@ output "sid_public_key_secret_name" {
 output "iscsi_private_ip" {
   value = try(module.sap_landscape.nics_iscsi[*].private_ip_address, [])
 }
+
+output "landscape_infrastructure" {
+  value = try(module.sap_landscape.infrastructure_w_defaults, {})
+}
