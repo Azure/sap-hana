@@ -1,10 +1,10 @@
 
-# Creates db subnet of SAP VNET
+// Creates db subnet of SAP VNET
 resource "azurerm_subnet" "sap_db" {
   count                = local.enable_deployment ? (local.sub_db_exists ? 0 : 1) : 0
   name                 = local.sub_db_name
-  resource_group_name  = var.vnet_sap[0].resource_group_name
-  virtual_network_name = var.vnet_sap[0].name
+  resource_group_name  = local.vnet_resource_group_name
+  virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_db_prefix]
 }
 

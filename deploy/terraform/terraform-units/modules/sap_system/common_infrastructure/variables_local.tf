@@ -183,6 +183,9 @@ locals {
   //SAP vnet
   vnet_sap_name            = try(local.landscape_tfstate.vnet_sap_name, "")
   vnet_resource_group_name = try(local.landscape_tfstate.vnet_resource_group_name, "")
+  vnet_sap                 = data.azure_virtual_network.vnet_sap
+  vnet_sap_addr            = local.vnet_sap.address_space
+  vnet_sap_arm_id          = local.vnet_sap.id
 
   //Admin subnet
   enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
@@ -239,7 +242,7 @@ locals {
     },
     vnets = {
       sap = {
-        is_existing   = local.vnet_sap_exists,
+        is_existing   = true,
         arm_id        = local.vnet_sap_arm_id,
         name          = local.vnet_sap_name,
         address_space = local.vnet_sap_addr,

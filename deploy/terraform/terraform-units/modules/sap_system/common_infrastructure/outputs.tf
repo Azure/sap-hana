@@ -3,7 +3,7 @@ output "resource_group" {
 }
 
 output "vnet_sap" {
-  value = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap : azurerm_virtual_network.vnet_sap
+  value = local.vnet_sap
 }
 
 output "storage_bootdiag" {
