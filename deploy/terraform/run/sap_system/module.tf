@@ -43,13 +43,11 @@ module "sap_namegenerator" {
 
 // Create HANA database nodes
 module "hdb_node" {
-
   source           = "../../terraform-units/modules/sap_system/hdb_node"
   application      = var.application
   databases        = var.databases
   infrastructure   = var.infrastructure
   options          = local.options
-  software         = var.software
   ssh-timeout      = var.ssh-timeout
   sshkey           = var.sshkey
   resource_group   = module.common_infrastructure.resource_group
@@ -119,9 +117,8 @@ module "output_files" {
   software                  = var.software
   ssh-timeout               = var.ssh-timeout
   sshkey                    = var.sshkey
-  nics_iscsi                = module.common_infrastructure.nics_iscsi
+  iscsi_private_ip          = module.common_infrastructure.iscsi_private_ip
   infrastructure_w_defaults = module.common_infrastructure.infrastructure_w_defaults
-  software_w_defaults       = module.common_infrastructure.software_w_defaults
   nics_dbnodes_admin        = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db           = module.hdb_node.nics_dbnodes_db
   loadbalancers             = module.hdb_node.loadbalancers

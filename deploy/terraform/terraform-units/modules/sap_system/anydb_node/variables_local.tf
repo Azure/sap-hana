@@ -93,7 +93,7 @@ locals {
   kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
 
-      // Define this variable to make it easier when implementing existing kv.
+  // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)
 
   // If custom image is used, we do not overwrite os reference with default value

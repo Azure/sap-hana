@@ -84,9 +84,30 @@ resource "azurerm_virtual_network_peering" "peering_sap_management" {
   allow_forwarded_traffic      = true
 }
 
-# STORAGE ACCOUNTS ===============================================================================================
-# Creates boot diagnostics storage account
+// Creates SAP admin subnet nsg
+resource "azurerm_network_security_group" "admin" {
+  count               = local.sub_admin_nsg_exists && local.enable_admin_subnet ? 0 : 1
+  name                = local.sub_admin_nsg_name
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+}
 
+// Imports the SAP admin subnet nsg data
+data "azurerm_network_security_group" "admin" {
+  count               = local.sub_admin_nsg_exists && local.enable_admin_subnet ? 1 : 0
+  name                = split("/", local.sub_admin_nsg_arm_id)[8]
+  resource_group_name = split("/", local.sub_admin_nsg_arm_id)[4]
+}
+
+// Associates SAP admin nsg to SAP admin subnet
+resource "azurerm_subnet_network_security_group_association" "Associate_admin" {
+  count                     = local.enable_admin_subnet ? (signum((local.sub_admin_exists ? 0 : 1) + (local.sub_admin_nsg_exists ? 0 : 1))) : 0
+  subnet_id                 = local.sub_admin_exists ? data.azurerm_subnet.admin[0].id : azurerm_subnet.admin[0].id
+  network_security_group_id = local.sub_admin_nsg_exists ? data.azurerm_network_security_group.admin[0].id : azurerm_network_security_group.admin[0].id
+}
+
+// STORAGE ACCOUNTS ===============================================================================================
+// Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storage_bootdiag" {
   name                      = local.storageaccount_name
   resource_group_name       = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -97,7 +118,6 @@ resource "azurerm_storage_account" "storage_bootdiag" {
 }
 
 // PROXIMITY PLACEMENT GROUP
-
 resource "azurerm_proximity_placement_group" "ppg" {
   count               = local.ppg_exists ? 0 : (local.zonal_deployment ? max(length(local.zones), 1) : 1)
   name                = local.zonal_deployment ? format("%s%sz%s%s", local.prefix, var.naming.separator, local.zones[count.index], local.resource_suffixes.ppg) : local.ppg_name
