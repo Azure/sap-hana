@@ -60,7 +60,7 @@ resource "azurerm_subnet_network_security_group_association" "db" {
 
 # Creates SAP admin subnet nsg
 resource "azurerm_network_security_group" "admin" {
-  count               = local.sub_admin_nsg_exists && local.enable_admin_subnet ? 0 : 1
+  count               = ! local.sub_admin_nsg_exists && local.enable_admin_subnet ? 0 : 1
   name                = local.sub_admin_nsg_name
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
