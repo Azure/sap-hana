@@ -1,9 +1,5 @@
-output "vnet_resource_group_name" {
-  value = try(module.sap_landscape.vnet_sap[0].resource_group_name, "")
-}
-
-output "vnet_sap_name" {
-  value = try(module.sap_landscape.vnet_sap[0].name, "")
+output "vnet_sap_arm_id" {
+  value = try(module.sap_landscape.vnet_sap[0].id, "")
 }
 
 output "landscape_key_vault_user_arm_id" {
