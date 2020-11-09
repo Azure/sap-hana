@@ -61,14 +61,16 @@ resource "local_file" "output_json" {
       ]
       ]
     ),
-    "software" = {
-      storage_account_sapbits = {
+    "software" = merge(
+      { "downloader" = local.downloader },
+      { "storage_account_sapbits" = {
         name                = ""
         storage_access_key  = ""
         file_share_name     = ""
         blob_container_name = ""
+        }
       }
-    }
+    ),
     "options" = var.options
     }
   )
@@ -80,17 +82,17 @@ resource "local_file" "output_json" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/ansible_inventory.tmpl", {
-    iscsi                 = var.infrastructure_w_defaults.iscsi,
-    ips_iscsi             = local.ips_iscsi,
-    ips_dbnodes_admin     = local.ips_dbnodes_admin,
-    ips_dbnodes_db        = local.ips_dbnodes_db,
-    dbnodes               = local.hdb_vms,
-    application           = var.application,
-    ips_scs               = local.ips_scs,
-    ips_app               = local.ips_app,
-    ips_web               = local.ips_web
-    anydbnodes            = local.anydb_vms,
-    ips_anydbnodes        = local.ips_anydbnodes,
+    iscsi             = var.infrastructure_w_defaults.iscsi,
+    ips_iscsi         = local.ips_iscsi,
+    ips_dbnodes_admin = local.ips_dbnodes_admin,
+    ips_dbnodes_db    = local.ips_dbnodes_db,
+    dbnodes           = local.hdb_vms,
+    application       = var.application,
+    ips_scs           = local.ips_scs,
+    ips_app           = local.ips_app,
+    ips_web           = local.ips_web
+    anydbnodes        = local.anydb_vms,
+    ips_anydbnodes    = local.ips_anydbnodes,
     }
   )
   filename             = "${path.cwd}/ansible_config_files/hosts"
@@ -101,17 +103,17 @@ resource "local_file" "ansible_inventory" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible_inventory_yml" {
   content = templatefile("${path.module}/ansible_inventory.yml.tmpl", {
-    iscsi                 = var.infrastructure_w_defaults.iscsi,
-    ips_iscsi             = local.ips_iscsi,
-    ips_dbnodes_admin     = local.ips_dbnodes_admin,
-    ips_dbnodes_db        = local.ips_dbnodes_db,
-    dbnodes               = local.hdb_vms,
-    application           = var.application,
-    ips_scs               = local.ips_scs,
-    ips_app               = local.ips_app,
-    ips_web               = local.ips_web
-    anydbnodes            = local.anydb_vms,
-    ips_anydbnodes        = local.ips_anydbnodes,
+    iscsi             = var.infrastructure_w_defaults.iscsi,
+    ips_iscsi         = local.ips_iscsi,
+    ips_dbnodes_admin = local.ips_dbnodes_admin,
+    ips_dbnodes_db    = local.ips_dbnodes_db,
+    dbnodes           = local.hdb_vms,
+    application       = var.application,
+    ips_scs           = local.ips_scs,
+    ips_app           = local.ips_app,
+    ips_web           = local.ips_web
+    anydbnodes        = local.anydb_vms,
+    ips_anydbnodes    = local.ips_anydbnodes,
     }
   )
   filename             = "${path.cwd}/ansible_config_files/hosts.yml"

@@ -112,6 +112,7 @@ module "output_files" {
   databases                    = var.databases
   infrastructure               = var.infrastructure
   options                      = local.options
+  software                     = var.software
   ssh-timeout                  = var.ssh-timeout
   sshkey                       = var.sshkey
   iscsi_private_ip             = module.common_infrastructure.iscsi_private_ip

@@ -18,6 +18,11 @@ variable "options" {
   default     = {}
 }
 
+variable "software" {
+  description = "Contain information about downloader, sapbits, etc."
+  default     = {}
+}
+
 variable "ssh-timeout" {
   description = "Timeout for connection that is used by provisioner"
   default     = "30s"

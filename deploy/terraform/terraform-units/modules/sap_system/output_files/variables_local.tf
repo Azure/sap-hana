@@ -72,11 +72,16 @@ variable "any_database_info" {
   description = "Updated anydb database json"
 }
 
+variable "software" {
+  description = "Contain information about downloader, sapbits, etc."
+  default     = {}
+}
+
 locals {
 
-  ips_iscsi                    = var.iscsi_private_ip
-  ips_dbnodes_admin            = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
-  ips_dbnodes_db               = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
+  ips_iscsi         = var.iscsi_private_ip
+  ips_dbnodes_admin = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
+  ips_dbnodes_db    = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
 
   databases = [
     var.hana_database_info
@@ -142,4 +147,56 @@ locals {
     ])
     if adatabase != {}
   ])
+
+  // Downloader for Ansible use
+  sap_user     = try(var.software.downloader.credentials.sap_user, "sap_smp_user")
+  sap_password = try(var.software.downloader.credentials.sap_password, "sap_smp_password")
+
+  hdb_versions = [
+    for scenario in try(var.software.downloader.scenarios, []) : scenario.product_version
+    if scenario.scenario_type == "DB"
+  ]
+  hdb_version = try(local.hdb_versions[0], "2.0")
+
+  downloader = merge({
+    credentials = {
+      sap_user     = local.sap_user,
+      sap_password = local.sap_password
+    }
+    },
+    {
+      scenarios = [
+        {
+          scenario_type   = "DB",
+          product_name    = "HANA",
+          product_version = local.hdb_version,
+          os_type         = "LINUX_X64",
+          os_version      = "SLES12.3",
+          components = [
+            "PLATFORM"
+          ]
+        },
+        {
+          scenario_type = "RTI",
+          product_name  = "RTI",
+          os_type       = "LINUX_X64"
+        },
+        {
+          scenario_type = "BASTION",
+          os_type       = "NT_X64"
+        },
+        {
+          scenario_type = "BASTION",
+          os_type       = "LINUX_X64"
+        }
+      ],
+      debug = {
+        enabled = false,
+        cert    = "charles.pem",
+        proxies = {
+          http  = "http://127.0.0.1:8888",
+          https = "https://127.0.0.1:8888"
+        }
+      }
+  })
 }
