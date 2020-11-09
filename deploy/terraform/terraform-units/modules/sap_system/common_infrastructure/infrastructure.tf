@@ -46,7 +46,7 @@ data "azurerm_subnet" "admin" {
 
 // Creates db subnet of SAP VNET
 resource "azurerm_subnet" "db" {
-  count                = local.enable_hdb_deployment || local.enable_xdb_deployment ? (local.sub_db_exists ? 0 : 1) : 0
+  count                = local.enable_db_deployment ? (local.sub_db_exists ? 0 : 1) : 0
   name                 = local.sub_db_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
@@ -55,7 +55,7 @@ resource "azurerm_subnet" "db" {
 
 # Imports data of existing any-db subnet
 data "azurerm_subnet" "db" {
-  count                = local.enable_hdb_deployment || local.enable_xdb_deployment ? (local.sub_db_exists ? 1 : 0) : 0
+  count                = local.enable_db_deployment ? (local.sub_db_exists ? 1 : 0) : 0
   name                 = split("/", local.sub_db_arm_id)[10]
   resource_group_name  = split("/", local.sub_db_arm_id)[4]
   virtual_network_name = split("/", local.sub_db_arm_id)[8]

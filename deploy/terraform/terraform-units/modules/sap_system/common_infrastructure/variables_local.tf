@@ -123,13 +123,15 @@ locals {
     for db in var.databases : db
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(db.platform, "NONE")))
   ]
+  
   enable_xdb_deployment = (length(local.xdb_list) > 0) ? true : false
+  enable_db_deployment  = local.enable_xdb_deployment || local.enable_hdb_deployment
 
   //Enable APP deployment
   enable_app_deployment = try(var.application.enable_deployment, false)
 
   //Enable SID deployment
-  enable_sid_deployment = local.enable_hdb_deployment || local.enable_app_deployment || local.enable_xdb_deployment
+  enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment 
 
   var_infra = try(var.infrastructure, {})
 
