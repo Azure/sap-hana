@@ -62,7 +62,6 @@ module "hdb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  db_subnet                  = module.common_infrastructure.db_subnet
 }
 
 // Create Application Tier nodes
@@ -106,7 +105,6 @@ module "anydb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  db_subnet                  = module.common_infrastructure.db_subnet
 }
 
 // Generate output files
