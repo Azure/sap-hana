@@ -94,10 +94,10 @@ locals {
   sid_kv_user = try(var.sid_kv_user[0], null)
 
   // SAP vnet
-  vnet_sap                 = try(var.vnet_sap, {})
-  vnet_sap_name            = try(local.vnet_sap.name, "")
-  vnet_resource_group_name = try(local.vnet_sap.resource_group_name, "")
-  vnet_sap_address_space   = try(local.vnet_sap.address_space, [])
+  vnet_sap                     = try(var.vnet_sap, {})
+  vnet_sap_name                = try(local.vnet_sap.name, "")
+  vnet_sap_resource_group_name = try(local.vnet_sap.resource_group_name, "")
+  vnet_sap_address_space       = try(local.vnet_sap.address_space, [])
 
   // APP subnet
   var_sub_app    = try(var.infrastructure.vnets.sap.subnet_app, {})

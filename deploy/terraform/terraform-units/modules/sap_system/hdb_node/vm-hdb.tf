@@ -128,14 +128,14 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count,1)].id : var.ppg[0].id
+  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   //Ultra disk requires zonal deployment
   availability_set_id = local.enable_ultradisk ? null : (
-    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : azurerm_availability_set.hdb[count.index % max(local.db_zone_count,1)].id
+    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : azurerm_availability_set.hdb[count.index % max(local.db_zone_count, 1)].id
   )
 
-  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count,1)] : null
+  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
 
   network_interface_ids = [
     azurerm_network_interface.nics_dbnodes_admin[count.index].id,

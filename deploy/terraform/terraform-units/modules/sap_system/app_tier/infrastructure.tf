@@ -3,7 +3,7 @@
 resource "azurerm_subnet" "subnet_sap_app" {
   count                = local.enable_deployment ? (local.sub_app_exists ? 0 : 1) : 0
   name                 = local.sub_app_name
-  resource_group_name  = local.vnet_resource_group_name
+  resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_app_prefix]
 }
@@ -20,7 +20,7 @@ data "azurerm_subnet" "subnet_sap_app" {
 resource "azurerm_subnet" "subnet_sap_web" {
   count                = local.enable_deployment && local.sub_web_defined ? (local.sub_web_exists ? 0 : 1) : 0
   name                 = local.sub_web_name
-  resource_group_name  = local.vnet_resource_group_name
+  resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_web_prefix]
 }
