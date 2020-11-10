@@ -36,6 +36,10 @@ variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
 
+variable "landscape_tfstate" {
+  description = "Landscape remote tfstate file"
+}
+
 locals {
   // Imports database sizing information
 
