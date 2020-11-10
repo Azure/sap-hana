@@ -6,6 +6,12 @@ steps:
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
       source /etc/profile.d/deploy_server.sh
 
+      echo "=== Install yq on deployer for modifying yaml ==="
+      sudo add-apt-repository ppa:rmescandon/yq
+      sudo apt update
+      sudo apt install yq -y
+      sudo ln -s /usr/bin/yq /usr/local/bin/yq
+
       echo "=== Login using pipeline spn ==="
       az login --service-principal -u $(hana-pipeline-spn-id) -p $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
 
@@ -18,6 +24,8 @@ steps:
       landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
       sid_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\") | not).name"'")
       sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\")).name"'")
+      iscsi_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"pub\\\") | not).name"'")
+      iscsi_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"pub\\\")).name"'")
 
       rm -f ${ws_dir}/sshkey
       az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_private_key_secret_name} | jq -r .value > ${ws_dir}/sshkey
@@ -26,6 +34,17 @@ steps:
       rm -f ${ws_dir}/sshkey.pub
       az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_public_key_secret_name} | jq -r .value > ${ws_dir}/sshkey.pub
       chmod 644 ${ws_dir}/sshkey.pub
+
+      rm -f ${ws_dir}/iscsi_sshkey
+      az keyvault secret show --vault-name ${landscape_kv_name} --name ${iscsi_private_key_secret_name} | jq -r .value > ${ws_dir}/iscsi_sshkey
+      chmod 600 ${ws_dir}/iscsi_sshkey
+
+      rm -f ${ws_dir}/iscsi_sshkey.pub
+      az keyvault secret show --vault-name ${landscape_kv_name} --name ${iscsi_public_key_secret_name} | jq -r .value > ${ws_dir}/iscsi_sshkey.pub
+      chmod 644 ${ws_dir}/iscsi_sshkey.pub
+
+      echo "=== Update hosts.yml with iscsi ssh keyfiles ==="
+      yq w -i ${ws_dir}/ansible_config_files/hosts.yml all.children.iscsi.hosts.*.ansible_ssh_private_key_file ${ws_dir}/iscsi_sshkey
 
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
