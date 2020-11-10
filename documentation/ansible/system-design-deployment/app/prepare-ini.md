@@ -417,7 +417,7 @@ The next step will be to consolidate the files into one inifile. Merge and dedup
     1. Create a new `templates` directory under `sapbits`
     1. click "Upload"
     1. In the panel on the right, click Select a file
-    1. Navigate your workstation to the template generation directory `/tmp/hana_template`
+    1. Navigate your workstation to the template generation directory `/tmp/app_template`
     1. Select the generated template, e.g. `S4HANA_2020_ISS_v001.inifile.params`
     1. click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
     1. click "Upload"
