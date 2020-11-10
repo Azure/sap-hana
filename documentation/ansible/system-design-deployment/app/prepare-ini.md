@@ -28,14 +28,6 @@
 
    **Note:** The following instructions assume you have mounted the container as `/mnt/sapbits`.
 
-1. Make and change to a temporary directory:
-
-   `mkdir /tmp/workdir; cd $_`
-
-1. Ensure `/tmp/app_template/` exists:
-
-   `mkdir /tmp/app_template/`
-
 1. Ensure `/usr/sap/downloads/` exists:
 
    `mkdir /usr/sap/downloads/`
