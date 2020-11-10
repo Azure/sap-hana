@@ -60,6 +60,7 @@ module "hdb_node" {
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
+  db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   db_subnet                  = module.common_infrastructure.db_subnet
 }
@@ -103,6 +104,7 @@ module "anydb_node" {
   naming                     = module.sap_namegenerator.naming
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
+  db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   db_subnet                  = module.common_infrastructure.db_subnet
 }

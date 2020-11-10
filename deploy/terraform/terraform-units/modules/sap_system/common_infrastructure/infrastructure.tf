@@ -84,9 +84,47 @@ resource "azurerm_virtual_network_peering" "peering_sap_management" {
   allow_forwarded_traffic      = true
 }
 
-# STORAGE ACCOUNTS ===============================================================================================
+// Creates SAP admin subnet nsg
+resource "azurerm_network_security_group" "admin" {
+  count               = local.sub_admin_nsg_exists && local.enable_admin_subnet ? 0 : 1
+  name                = local.sub_admin_nsg_name
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+}
 
-# Creates boot diagnostics storage account
+# Imports data of existing any-db subnet
+data "azurerm_subnet" "db" {
+  count                = local.enable_db_deployment ? (local.sub_db_exists ? 1 : 0) : 0
+  name                 = split("/", local.sub_db_arm_id)[10]
+  resource_group_name  = split("/", local.sub_db_arm_id)[4]
+  virtual_network_name = split("/", local.sub_db_arm_id)[8]
+}
+
+# VNET PEERINGs ==================================================================================================
+
+# Peers management VNET to SAP VNET
+resource "azurerm_virtual_network_peering" "peering_management_sap" {
+  count                        = local.vnet_sap_exists ? 0 : 1
+  name                         = substr(format("%s_to_%s", local.vnet_mgmt.name, local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name), 0, 80)
+  resource_group_name          = local.vnet_mgmt.resource_group_name
+  virtual_network_name         = local.vnet_mgmt.name
+  remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].id : azurerm_virtual_network.vnet_sap[0].id
+  allow_virtual_network_access = true
+}
+
+# Peers SAP VNET to management VNET
+resource "azurerm_virtual_network_peering" "peering_sap_management" {
+  count                        = local.vnet_sap_exists ? 0 : 1
+  name                         = substr(format("%s_to_%s", local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name, local.vnet_mgmt.name), 0, 80)
+  resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  virtual_network_name         = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
+  remote_virtual_network_id    = local.vnet_mgmt.id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+}
+
+// STORAGE ACCOUNTS ===============================================================================================
+// Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storage_bootdiag" {
   name                      = local.storageaccount_name
   resource_group_name       = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
