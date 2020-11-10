@@ -31,7 +31,7 @@ output "admin_subnet" {
 }
 
 output "db_subnet" {
-  value = local.enable_xdb_deployment || local.enable_hdb_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
+  value = local.enable_db_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
 }
 
 output "sid_kv_user" {
