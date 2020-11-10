@@ -1,4 +1,4 @@
-# SAP Library Preperation
+# Application Library Preparation
 
 ## Prerequistes
 

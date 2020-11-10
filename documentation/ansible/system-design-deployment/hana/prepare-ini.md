@@ -31,7 +31,7 @@ Any additional components are not required at this stage as they do not affect t
 
    `mkdir /tmp/hana_template; cd $_`
 
-1. Copy the required media from `sapbits/` to `/tmp/app_template`:
+1. Copy the required media from `sapbits/` to `/tmp/hana_template`:
 
    `cp /mnt/<sapbits fileshare path> /tmp/hana_template`
 

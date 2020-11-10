@@ -1,4 +1,4 @@
-# Application Tier Template Generation
+# Application Template Generation
 
 **_Note:_** Creating a Virtual Machine within Azure to use as your workstation will improve the speed when transferring the SAP media from a Storage Account.
 

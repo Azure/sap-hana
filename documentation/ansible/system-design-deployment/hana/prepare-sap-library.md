@@ -1,4 +1,4 @@
-# SAP Library Preperation
+# HANA Library Preparation
 
 ## Prerequistes
 
