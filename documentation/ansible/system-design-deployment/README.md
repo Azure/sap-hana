@@ -29,7 +29,9 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 ## Process Index
 
-### SAP HANA
+### Database
+
+#### SAP HANA
 
 1. **Acquisition**
    1. [Acquire Media](./hana/acquire-media.md)
