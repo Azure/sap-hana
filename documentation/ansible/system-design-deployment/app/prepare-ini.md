@@ -5,7 +5,7 @@
 ## Prerequisites
 
 1. An editor for working with the generated files;
-1. [HANA DB Deployment](.hana/prepare-ini.md) must be completed before following this process;
+1. [HANA DB Deployment](../hana/prepare-ini.md) must be completed before following this process;
 1. The BoM file for this stack.
 1. SAP Library contains all media for the relevant applications;
 1. SAP infrastructure has been deployed;
