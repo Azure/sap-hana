@@ -10,7 +10,7 @@ locals {
   vnet_mgmt_exists = length(local.vnet_mgmt_arm_id) > 0 ? true : false
 
   //There is no default as the name is mandatory unless arm_id is specified
-  vnet_mgmt_name = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, "MGMT")
+  vnet_mgmt_name = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, "DEP00")
 
   // Default naming of vnet has multiple parts. Taking the second-last part as the name incase the name ends with -vnet
   vnet_mgmt_parts     = length(split("-", local.vnet_mgmt_name))
