@@ -5,12 +5,12 @@
         "environment": "np",
         "region": "eastus",
         "resource_group": {
-            "is_existing": "false",
             "arm_id": "",
             "name": "azure-test-saplandscape-rg"
         },
         "vnets": {
             "sap": {
+                "arm_id": "",
                 "address_space": "10.1.0.0/16",
                 "subnet_iscsi": {
                     "name": "global-eaus-sap0_iscsi-subnet",

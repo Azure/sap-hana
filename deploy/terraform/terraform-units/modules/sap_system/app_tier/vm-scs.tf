@@ -60,13 +60,13 @@ resource "azurerm_linux_virtual_machine" "scs" {
   availability_set_id = local.scs_zonal_deployment && (local.scs_server_count == local.scs_zone_count) ? (
     null) : (
     local.scs_zone_count > 1 ? (
-      azurerm_availability_set.scs[count.index % max(local.scs_zone_count,1)].id) : (
+      azurerm_availability_set.scs[count.index % max(local.scs_zone_count, 1)].id) : (
       azurerm_availability_set.scs[0].id
     )
   )
-  proximity_placement_group_id = local.scs_zonal_deployment ? var.ppg[count.index % max(local.scs_zone_count,1)].id : var.ppg[0].id
+  proximity_placement_group_id = local.scs_zonal_deployment ? var.ppg[count.index % max(local.scs_zone_count, 1)].id : var.ppg[0].id
   zone = local.scs_zonal_deployment && (local.scs_server_count == local.scs_zone_count) ? (
-    local.scs_zones[count.index % max(local.scs_zone_count,1)]) : (
+    local.scs_zones[count.index % max(local.scs_zone_count, 1)]) : (
     null
   )
 
@@ -123,13 +123,13 @@ resource "azurerm_windows_virtual_machine" "scs" {
   availability_set_id = local.scs_zonal_deployment && (local.scs_server_count == local.scs_zone_count) ? (
     null) : (
     local.scs_zone_count > 1 ? (
-      azurerm_availability_set.scs[count.index % max(local.scs_zone_count,1)].id) : (
+      azurerm_availability_set.scs[count.index % max(local.scs_zone_count, 1)].id) : (
       azurerm_availability_set.scs[0].id
     )
   )
-  proximity_placement_group_id = local.scs_zonal_deployment ? var.ppg[count.index % max(local.scs_zone_count,1)].id : var.ppg[0].id
+  proximity_placement_group_id = local.scs_zonal_deployment ? var.ppg[count.index % max(local.scs_zone_count, 1)].id : var.ppg[0].id
   zone = local.scs_zonal_deployment && (local.scs_server_count == local.scs_zone_count) ? (
-    local.scs_zones[count.index % max(local.scs_zone_count,1)]) : (
+    local.scs_zones[count.index % max(local.scs_zone_count, 1)]) : (
     null
   )
 

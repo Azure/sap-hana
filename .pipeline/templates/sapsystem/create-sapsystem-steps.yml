@@ -140,9 +140,6 @@ steps:
       | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
       | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq --arg landscape_tfstate_key "${landscape_tfstate_key}" .landscape_tfstate_key\ =\ \$landscape_tfstate_key \
-      | jq .infrastructure.vnets.sap.is_existing\ =\ \"true\" \
-      | jq --arg saplandscape_sap_vnet_arm_id "${saplandscape_sap_vnet_arm_id}" .infrastructure.vnets.sap.arm_id\ =\ \$saplandscape_sap_vnet_arm_id \
-      | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
       | jq --arg subnet_admin_prefix "${subnet_admin_prefix}" .infrastructure.vnets.sap.subnet_admin.prefix\ =\ \$subnet_admin_prefix \
       | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
       | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \

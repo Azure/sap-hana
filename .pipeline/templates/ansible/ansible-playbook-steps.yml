@@ -15,6 +15,7 @@ steps:
       echo "=== Login using pipeline spn ==="
       az login --service-principal -u $(hana-pipeline-spn-id) -p $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
 
+      saplib_rg_name=${{parameters.saplib_rg_name}}
       saplandscape_rg=${{parameters.saplandscape_rg_name}}
       sapsystem_rg_name=${{parameters.sapsystem_rg_name}}
       repo_dir=$HOME/Azure_SAP_Automated_Deployment/sap-hana
@@ -46,6 +47,11 @@ steps:
       echo "=== Update hosts.yml with iscsi ssh keyfiles ==="
       yq w -i ${ws_dir}/ansible_config_files/hosts.yml all.children.iscsi.hosts.*.ansible_ssh_private_key_file ${ws_dir}/iscsi_sshkey
 
+      echo "=== Retrieving sapbits SA information ==="
+      sa_name=$(az storage account list --resource-group ${saplib_rg_name} | jq -r "'".[] | select(.name | contains(\\\"saplib\\\")).name"'")
+      sa_storage_access_key=$(az storage account keys list --account-name ${sa_name} | jq -r "'".[0].value"'")
+      sa_file_share_name=$(az storage share list --account-name ${sa_name} --account-key ${sa_storage_access_key} | jq -r "'".[0].name"'")
+
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       cd ${repo_dir} && git pull && git checkout ${{parameters.branch_name}}
       
@@ -67,6 +73,9 @@ steps:
       | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
       | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
       | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
+      | jq --arg sa_name "${sa_name}" .software.storage_account_sapbits.name\ =\ \$sa_name \
+      | jq --arg sa_storage_access_key "${sa_storage_access_key}" .software.storage_account_sapbits.storage_access_key\ =\ \$sa_storage_access_key \
+      | jq --arg sa_file_share_name "${sa_file_share_name}" .software.storage_account_sapbits.file_share_name\ =\ \$sa_file_share_name \
       )
       echo $updated_output_json > $output_json
 

@@ -177,6 +177,7 @@ stages:
       - template: templates/ansible/ansible-playbook-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
+          saplib_rg_name: "UNIT-EAUS-SAP_LIBRARY"
           saplandscape_rg_name: "UNIT-EAUS-SAP0-INFRASTRUCTURE"
           sapsystem_rg_name: "SLES-EAUS-SAP-PRD"
       - template: templates/util/remove-agent-from-deployer-nsg.yml

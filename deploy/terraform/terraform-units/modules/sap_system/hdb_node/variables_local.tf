@@ -3,7 +3,7 @@ variable "resource_group" {
 }
 
 variable "vnet_sap" {
-  description = "Details of the SAP VNet"
+  description = "Details of the SAP Vnet"
 }
 
 variable "storage_bootdiag" {
@@ -41,15 +41,18 @@ variable "landscape_tfstate" {
 }
 
 locals {
-  // Imports database sizing information
-
-  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
-
+  // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.HANA_VMNAME
 
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
+
+}
+
+locals {
+  // Imports database sizing information
+  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
   region = try(var.infrastructure.region, "")
   sid    = upper(try(var.application.sid, ""))
@@ -64,9 +67,6 @@ locals {
 
   // Define this variable to make it easier when implementing existing kv.
   sid_kv_user = try(var.sid_kv_user[0], null)
-
-  # SAP vnet
-  var_infra = try(var.infrastructure, {})
 
   hdb_list = [
     for db in var.databases : db

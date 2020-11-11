@@ -1,5 +1,4 @@
-# AVAILABILITY SET ================================================================================================
-
+// AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
   count                        = local.enable_deployment ? max(length(local.zones), 1) : 0
   name                         = local.zonal_deployment ? format("%s%sz%s%s", local.prefix, var.naming.separator, local.zones[count.index], local.resource_suffixes.db_avset) : format("%s%s", local.prefix, local.resource_suffixes.db_avset)

@@ -6,8 +6,6 @@ schedules:
   branches:
     include:
     - master
-    - beta/*
-    - feature/*
   always: true
 variables:
   - group: azure-config-variables

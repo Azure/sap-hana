@@ -52,14 +52,14 @@ resource "azurerm_linux_virtual_machine" "app" {
   availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
     null) : (
     local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count,1)].id) : (
+      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
       azurerm_availability_set.app[0].id
     )
   )
 
-  proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count,1)].id : var.ppg[0].id
+  proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
   zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count,1)]) : (
+    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
   null)
 
   network_interface_ids = local.apptier_dual_nics ? (
@@ -115,13 +115,13 @@ resource "azurerm_windows_virtual_machine" "app" {
   availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
     null) : (
     local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count,1)].id) : (
+      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
       azurerm_availability_set.app[0].id
     )
   )
-  proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count,1)].id : var.ppg[0].id
+  proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
   zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count,1)]) : (
+    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
   null)
 
   network_interface_ids = local.apptier_dual_nics ? (
