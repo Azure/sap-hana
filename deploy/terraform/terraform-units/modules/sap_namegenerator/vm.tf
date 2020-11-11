@@ -3,7 +3,6 @@ locals {
   db_oscode       = upper(var.db_ostype) == "LINUX" ? "l" : "w"
   app_oscode      = upper(var.app_ostype) == "LINUX" ? "l" : "w"
   anchor_oscode   = upper(var.anchor_ostype) == "LINUX" ? "l" : "w"
-  db_platformcode = substr(var.db_platform, 0, 3)
 
   anchor_computer_names = [for idx in range(length(local.zones)) :
     format("%sanchorz%s%02d%s%s", lower(var.sap_sid), local.zones[idx % length(local.zones)], idx, local.anchor_oscode, local.random_id_vm_verified)
