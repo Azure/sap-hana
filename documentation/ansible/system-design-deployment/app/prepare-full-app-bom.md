@@ -1,9 +1,9 @@
-# Application BoM Preparation
+# Application Full BoM Preparation
 
 ## Prerequisites
 
 1. A Linux, MAC or Windows based workstation with the [`postman`](https://www.postman.com/downloads/) utility.
-1. An editor for creating the SAP Application BoM file.
+1. An editor for working with the SAP Application BoM file.
 1. Application installation template(s) for SCS and/or PAS/AAS.
 1. SAP Application media present on the Storage Account.
 1. You have completed the downloading of associated stack files to your workstation's `stackfiles` folder.
@@ -111,27 +111,31 @@ step|BoM Content
     |      file:     S4HANA_2020_ISS_v001.inifile.params
 ```
 
-### Create BoM Header
+### Manual Process
+
+:hand: The manual process is documented here for reference. Normally, it's recommended to use the [Scripted Process](#scripted-process) to generate the bulk of the BoM, with a few "[Finalize the Content](#finalize-the-content)" activities to complete.
+
+#### Create BoM Header
 
 1. `[1]` and `[2]`: Record appropriate names for the build and target. The `name` must be the same as the BoM folder name in the Storage Account.
 
-### Define BoM Version
+#### Define BoM Version
 
 1. `[3]` is an arbitrary number, chosen by you, which can be used to distinguish between any different versions you may have of this particular BoM. The value here should match the `_v...` numbering in the `bom.yml` parent folder, as described earlier.
 
-### Create Defaults Section
+#### Create Defaults Section
 
 1. `[4]`: This section contains:
    1. `archive_location`: The location to which you will upload the SAP build files. Also, the same location from which the files will be copied to the target server.
    1. `target_location`: The folder on the target server, into which the files will be copied for installation.
 
-### Create Materials Section
+#### Create Materials Section
 
 1. `[5]`: Use exactly as shown. This specifies the start of the list of materials needed.
 
 1. `[6]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
 
-### Create List of Media
+#### Create List of Media
 
 1. `[7]`: Specify `media:` exactly as shown.
 
@@ -150,7 +154,7 @@ step|BoM Content
      ... etc ...
    ```
 
-### Include SAP Permalink References
+#### Include SAP Permalink References
 
 1. Open the `DownloadBasket.json` in your editor and reformat to make it more human readable.
 
@@ -187,7 +191,31 @@ step|BoM Content
    1. `SPAT`: These appear to be non-kernel binary files.
    1. `CD`: These appear to be database exports.
 
-### Override Target Destination
+### Scripted Process
+
+The scripted process applies automation to the steps described in the [Manual Process](#manual-process). After running the script you should use your editor to check through the "[Finalize the Content](#finalize-the-content)" steps to ensure the BoM is organized as you want it.
+
+After downloading the stack files and Download Basket manifest `.json` file into your workstation's `stackfiles/` folder:
+
+1. Ensure you are in the `stackfiles/` folder:
+
+   ```text
+   cd stackfiles
+   ```
+
+1. Run the script `generate_bom.sh` from the `util` folder. Note, you will need to replace the example `/path/to/util/` with the correct directory path on your workstation.
+
+   ```text
+   /path/to/util/generate_bom.sh >../bom.yml
+   ```
+
+   This example makes assumtions about the Storage Account location and the product name. The BoM file `bom.yml` will be written to the parent directory of the `stackfiles/` folder.
+
+1. The script accepts parameters to specify the Storage Account location and the product name. See the [comment block](https://github.com/Azure/sap-hana/blob/5576bd29ea7e25fc8d879093e40e88ae192df656/util/generate_bom.sh#L3-L25) at the start of the script for more information.
+
+### Finalize the Content
+
+#### Override Target Destination
 
 Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis.
 
@@ -205,7 +233,7 @@ Files downloaded or shared from the archive space will need to be extracted to t
      override_target_location: "/usr/sap/install/download_basket/"
    ```
 
-### Override Target Filename
+#### Override Target Filename
 
 By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
 
@@ -218,13 +246,15 @@ By default, files downloaded or shared from the archive space will be extracted 
         override_target_filename: SAPCAR.EXE
    ```
 
-### Tidy Up Layout
+#### Tidy Up Layout
 
 The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
 
-### Add Template Name
+#### Add/Check Template Name
 
-1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+1. [8]: If following the Manual Process, create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+
+   If following the Scripted Process, you should check the `file` name is as expected and correct, if necessary.
 
    ```text
      templates:
