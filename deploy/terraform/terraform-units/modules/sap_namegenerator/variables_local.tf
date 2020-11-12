@@ -146,7 +146,7 @@ variable region_mapping {
     "centralus"          = "ceus"
     "eastasia"           = "eaas"
     "eastus"             = "eaus"
-    "eastus2"            = "eau2"
+    "eastus2"            = "eus2"
     "francecentral"      = "frce"
     "francesouth"        = "frso"
     "germanynorth"       = "geno"
