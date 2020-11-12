@@ -175,7 +175,7 @@ resource "azurerm_managed_disk" "app" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
-  count                     = local.enable_deployment ? length(azurerm_managed_disk.app) : 0
+  count                     = local.enable_deployment ? length(local.app_data_disks) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
   virtual_machine_id        = upper(local.app_ostype) == "LINUX" ? azurerm_linux_virtual_machine.app[local.app_data_disks[count.index].vm_index].id : azurerm_windows_virtual_machine.app[local.app_data_disks[count.index].vm_index].id
   caching                   = local.app_data_disks[count.index].caching

@@ -39,7 +39,7 @@ resource "azurerm_lb_probe" "anydb" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "anydb" {
-  count                   = local.enable_deployment ? length(azurerm_network_interface.anydb_db) : 0
+  count                   = local.enable_deployment ? local.db_server_count : 0
   network_interface_id    = azurerm_network_interface.anydb_db[count.index].id
   ip_configuration_name   = azurerm_network_interface.anydb_db[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.anydb[0].id

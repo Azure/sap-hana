@@ -43,6 +43,7 @@ module "sap_namegenerator" {
 
 // Create HANA database nodes
 module "hdb_node" {
+  depends_on       = [module.common_infrastructure]
   source           = "../../terraform-units/modules/sap_system/hdb_node"
   application      = var.application
   databases        = var.databases
@@ -66,6 +67,7 @@ module "hdb_node" {
 
 // Create Application Tier nodes
 module "app_tier" {
+  depends_on       = [module.common_infrastructure, module.hdb_node, module.anydb_node]
   source           = "../../terraform-units/modules/sap_system/app_tier"
   application      = var.application
   databases        = var.databases
@@ -88,6 +90,7 @@ module "app_tier" {
 
 // Create anydb database nodes
 module "anydb_node" {
+  depends_on                 = [module.common_infrastructure]
   source                     = "../../terraform-units/modules/sap_system/anydb_node"
   application                = var.application
   databases                  = var.databases
