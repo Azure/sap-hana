@@ -66,8 +66,9 @@ locals {
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
 
-  // PPG Information
-  ppgId = lookup(var.infrastructure, "ppg", false) != false ? (var.ppg[0].id) : ""
+  // Availability Set 
+  availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
+  availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
