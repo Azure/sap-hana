@@ -9,3 +9,9 @@ resource "azurerm_availability_set" "hdb" {
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % length(local.zones)].id : var.ppg[0].id
   managed                      = true
 }
+
+data "azurerm_availability_set" "hdb" {
+  count               = local.enable_deployment && local.availabilitysets_exist ? max(length(local.zones), 1) : 0
+  name                = split("/", local.availabilityset_arm_ids[count.index])[8]
+  resource_group_name = split("/", local.availabilityset_arm_ids[count.index])[4]
+}
