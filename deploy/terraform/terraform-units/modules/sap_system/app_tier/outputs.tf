@@ -47,7 +47,7 @@ output "web_admin_ip" {
 }
 
 output "web_lb_ip" {
-  value = local.enable_deployment && local.web_dispatch_count > 0 ? azurerm_lb.web[0].frontend_ip_configuration[0].private_ip_address : ""
+  value = local.enable_deployment && local.webdispatcher_count > 0 ? azurerm_lb.web[0].frontend_ip_configuration[0].private_ip_address : ""
 }
 
 output "scs_lb_ip" {
