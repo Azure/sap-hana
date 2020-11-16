@@ -39,7 +39,7 @@ variable "custom_disk_sizes_filename" {
 
 locals {
   // Resources naming
-  vnet_prefix                 = var.naming.prefix.VNET
+  vnet_prefix                 = trimspace(var.naming.prefix.VNET)
   storageaccount_name         = var.naming.storageaccount_names.SDU
   sid_keyvault_names          = var.naming.keyvault_names.SDU
   anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
@@ -51,7 +51,7 @@ locals {
   //Region and metadata
   region = try(local.var_infra.region, "")
   sid    = upper(try(var.application.sid, ""))
-  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
+  prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
 
   // Zonal support - 1 PPG by default and with zonal 1 PPG per zone
   db_list = [
