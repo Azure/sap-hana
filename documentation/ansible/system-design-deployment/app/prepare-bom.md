@@ -4,7 +4,7 @@
 
 The manual process documented here is sufficient to produce a functional BoM. However, it does not include steps for including SAP "permalinks" to media.
 
-The process for generating a BoM which includes SAP "permalinks" is more complex and has additional acquisition steps which must be done during [Acquisition of Media](acquire-media.md) and before the SAP Download Manager is run. The process is described in the [Application Full BoM Preparation](prepare-app-full-bom.md) document.
+The process for generating a BoM which includes SAP "permalinks" is more complex and has additional acquisition steps which must be done during [Acquisition of Media](acquire-media.md) and before the SAP Download Manager is run. The process is described in the [Application Full BoM Preparation](prepare-full-app-bom.md) document.
 
 The manual process to generate a "basic" BoM is very time consuming - perhaps around a day's work. However, the "full" BoM is likely to take twice as long because of the increased complexity and risk of error.
 
