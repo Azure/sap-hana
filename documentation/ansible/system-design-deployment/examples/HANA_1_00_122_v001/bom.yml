@@ -5,8 +5,8 @@ target:  "HANA 1.0"
 version: 001
 
 defaults:
-archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
-target_location: "/usr/sap/downloads/"
+  archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
+  target_location: "/usr/sap/downloads/"
 
 materials:
   media:
