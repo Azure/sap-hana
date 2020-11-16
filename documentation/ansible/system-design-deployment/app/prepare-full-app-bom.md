@@ -219,7 +219,7 @@ After downloading the stack files and Download Basket manifest `.json` file into
 
 #### Override Target Destination
 
-Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis.
+Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#create-defaults-section)). However, you may override this on a case-by-case basis.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
 
