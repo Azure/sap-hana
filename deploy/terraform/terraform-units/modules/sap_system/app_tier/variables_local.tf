@@ -126,7 +126,7 @@ locals {
   sub_web_exists  = length(local.sub_web_arm_id) > 0 ? true : false
   sub_web_name = local.sub_web_exists ? (
     try(split("/", local.sub_web_arm_id)[10], "")) : (
-    try(local.sub_web.name, format("%s%s", local.prefix, local.resource_suffixes.web_subnet))
+    try(local.sub_web.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet))
   )
 
   sub_web_prefix = try(local.sub_web.prefix, "")
@@ -141,7 +141,7 @@ locals {
   sub_web_nsg_exists = length(local.sub_web_nsg_arm_id) > 0 ? true : false
   sub_web_nsg_name = local.sub_web_nsg_exists ? (
     try(split("/", local.sub_web_nsg_arm_id)[8], "")) : (
-    try(local.sub_web_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.web_subnet_nsg))
+    try(local.sub_web_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet_nsg))
   )
 
   sub_web_nsg_deployed = try(local.sub_web_defined ? (
