@@ -195,6 +195,8 @@ step|BoM Content
 
 The scripted process applies automation to the steps described in the [Manual Process](#manual-process). After running the script you should use your editor to check through the "[Finalize the Content](#finalize-the-content)" steps to ensure the BoM is organized as you want it.
 
+:hand: The script processes the Stack `.xsl` file. Consequently, it will only generate entries for the media files identified by the SAP Maintenance Planner. Any files added to the SAP Download Basket independently (for example by using SAP Launchpad), will need adding into the BoM manually.
+
 After downloading the stack files and Download Basket manifest `.json` file into your workstation's `stackfiles/` folder:
 
 1. Ensure you are in the `stackfiles/` folder:
