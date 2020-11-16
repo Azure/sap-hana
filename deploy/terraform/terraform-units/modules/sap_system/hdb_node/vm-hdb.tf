@@ -67,17 +67,17 @@ resource "azurerm_lb" "hdb" {
   sku                 = local.zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
-    name                          = format("%s%s", local.prefix, local.resource_suffixes.db_alb_feip)
+    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id                     = var.db_subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address = try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
+    private_ip_address            = try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
   }
-    
+
 }
 
 resource "azurerm_lb_backend_address_pool" "hdb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s", local.prefix, local.resource_suffixes.db_alb_bepool)
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_bepool)
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
 
@@ -87,7 +87,7 @@ resource "azurerm_lb_probe" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
-  name                = format("%s%s", local.prefix, local.resource_suffixes.db_alb_hp)
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_hp)
   port                = "625${local.hana_database.instance.instance_number}"
   protocol            = "Tcp"
   interval_in_seconds = 5
@@ -109,7 +109,7 @@ resource "azurerm_lb_rule" "hdb" {
   count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.hdb[0].id
-  name                           = format("%s%s%05d-%02d", local.prefix, local.resource_suffixes.db_alb_rule, local.loadbalancer_ports[count.index].port, count.index)
+  name                           = format("%s%s%s%05d-%02d", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_rule, local.loadbalancer_ports[count.index].port, count.index)
   protocol                       = "Tcp"
   frontend_port                  = local.loadbalancer_ports[count.index].port
   backend_port                   = local.loadbalancer_ports[count.index].port
