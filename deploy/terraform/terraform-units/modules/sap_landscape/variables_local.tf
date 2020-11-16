@@ -96,14 +96,20 @@ locals {
   var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, {})
   sub_iscsi_arm_id = try(local.var_sub_iscsi.arm_id, "")
   sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0 ? true : false
-  sub_iscsi_name   = local.sub_iscsi_exists ? try(split("/", local.sub_iscsi_arm_id)[10], "") : try(local.var_sub_iscsi.name, format("%s%s", local.prefix, local.resource_suffixes.iscsi_subnet))
+  sub_iscsi_name = local.sub_iscsi_exists ? (
+    try(split("/", local.sub_iscsi_arm_id)[10], "")) : (
+    try(local.var_sub_iscsi.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet))
+  )
   sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.prefix, "")
 
   // iSCSI NSG
   var_sub_iscsi_nsg    = try(local.var_sub_iscsi.nsg, {})
   sub_iscsi_nsg_arm_id = try(local.var_sub_iscsi_nsg.arm_id, "")
   sub_iscsi_nsg_exists = length(local.sub_iscsi_nsg_arm_id) > 0 ? true : false
-  sub_iscsi_nsg_name   = local.sub_iscsi_nsg_exists ? try(split("/", local.sub_iscsi_nsg_arm_id)[8], "") : try(local.var_sub_iscsi_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.iscsi_subnet_nsg))
+  sub_iscsi_nsg_name = local.sub_iscsi_nsg_exists ? (
+    try(split("/", local.sub_iscsi_nsg_arm_id)[8], "")) : (
+    try(local.var_sub_iscsi_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet_nsg))
+  )
 
   // Update infrastructure with defaults
   infrastructure = {

@@ -11,7 +11,7 @@ resource "azurerm_lb" "anydb" {
   location            = var.resource_group[0].location
 
   frontend_ip_configuration {
-    name                          = format("%s%s", local.prefix, local.resource_suffixes.db_alb_feip)
+    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id                     = var.db_subnet.id
     private_ip_address_allocation = "Static"
     private_ip_address = try(local.anydb.loadbalancer.frontend_ip,
@@ -22,14 +22,14 @@ resource "azurerm_lb" "anydb" {
 
 resource "azurerm_lb_backend_address_pool" "anydb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s", local.prefix, local.resource_suffixes.db_alb_bepool)
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_bepool)
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
 }
 
 resource "azurerm_lb_probe" "anydb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s", local.prefix, local.resource_suffixes.db_alb_hp)
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_hp)
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.anydb[count.index].id
   port                = local.loadbalancer_ports[0].port
@@ -48,8 +48,11 @@ resource "azurerm_network_interface_backend_address_pool_association" "anydb" {
 # AVAILABILITY SET ================================================================================================
 
 resource "azurerm_availability_set" "anydb" {
-  count                        = local.enable_deployment ? max(length(local.zones), 1) : 0
-  name                         = local.zonal_deployment ? format("%s%sz%s%s", local.prefix, var.naming.separator, local.zones[count.index], local.resource_suffixes.db_avset) : format("%s%s", local.prefix, local.resource_suffixes.db_avset)
+  count = local.enable_deployment ? max(length(local.zones), 1) : 0
+  name = local.zonal_deployment ? (
+    format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.zones[count.index], var.naming.separator, local.resource_suffixes.db_avset)) : (
+    format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_avset)
+  )
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
