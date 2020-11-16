@@ -22,7 +22,7 @@ resource "azurerm_subnet_network_security_group_association" "Associate_nsg_web"
 
 # NSG rule to deny internet access
 resource "azurerm_network_security_rule" "webRule_internet" {
-  count                        = local.enable_deployment ? (local.sub_web_nsg_exists ? 0 : 1) : 0
+  count                        = local.enable_deployment && local.sub_web_defined ? (local.sub_web_nsg_exists ? 0 : 1) : 0
   name                         = "Internet"
   priority                     = 100
   direction                    = "Inbound"
