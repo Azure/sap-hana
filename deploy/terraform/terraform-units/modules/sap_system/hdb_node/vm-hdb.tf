@@ -99,7 +99,6 @@ resource "azurerm_lb" "hdb" {
   frontend_ip_configuration {
     name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id                     = var.db_subnet.id
-    
     private_ip_address            = local.use_DHCP ? null : try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
     private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
@@ -154,6 +153,7 @@ resource "azurerm_lb_rule" "hdb" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm_dbnode" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? length(local.hdb_vms) : 0
   name                = local.hdb_vms[count.index].name
   computer_name       = local.hdb_vms[count.index].computername

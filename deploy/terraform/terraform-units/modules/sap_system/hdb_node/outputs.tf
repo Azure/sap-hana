@@ -1,3 +1,6 @@
+output "hdb_vms" {
+  value = azurerm_linux_virtual_machine.vm_dbnode
+}
 
 output "nics_dbnodes_admin" {
   value = local.enable_deployment ? azurerm_network_interface.nics_dbnodes_admin : []

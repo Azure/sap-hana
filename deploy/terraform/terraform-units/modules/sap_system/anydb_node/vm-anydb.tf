@@ -52,6 +52,7 @@ resource "azurerm_network_interface" "anydb_admin" {
 
 // Section for Linux Virtual machine 
 resource "azurerm_linux_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
@@ -128,6 +129,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
 
 // Section for Windows Virtual machine 
 resource "azurerm_windows_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername

@@ -23,6 +23,7 @@ resource "azurerm_network_interface" "observer" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
+  depends_on          = [var.anchor_vm]
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
