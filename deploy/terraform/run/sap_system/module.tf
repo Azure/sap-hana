@@ -62,6 +62,8 @@ module "hdb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  // Workaround to create dependency from anchor to db to app
+  anchor_vm = module.common_infrastructure.anchor_vm
 }
 
 // Create Application Tier nodes
@@ -84,6 +86,9 @@ module "app_tier" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  // Workaround to create dependency from anchor to db to app
+  anydb_vms = module.anydb_node.anydb_vms
+  hdb_vms   = module.hdb_node.hdb_vms
 }
 
 // Create anydb database nodes
@@ -105,6 +110,8 @@ module "anydb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  // Workaround to create dependency from anchor to db to app
+  anchor_vm = module.common_infrastructure.anchor_vm
 }
 
 // Generate output files

@@ -1,3 +1,7 @@
+output "anchor_vm" {
+  value = local.anchor_ostype == "LINUX" ? azurerm_linux_virtual_machine.anchor : azurerm_windows_virtual_machine.anchor
+}
+
 output "resource_group" {
   value = local.rg_exists ? data.azurerm_resource_group.resource_group : azurerm_resource_group.resource_group
 }

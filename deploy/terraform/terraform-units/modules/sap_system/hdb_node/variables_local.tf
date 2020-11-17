@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }

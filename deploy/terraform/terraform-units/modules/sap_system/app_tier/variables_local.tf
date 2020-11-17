@@ -1,3 +1,11 @@
+variable "anydb_vms" {
+  description = "Deployed anydb VMs"
+}
+
+variable "hdb_vms" {
+  description = "Deployed HDB VMs"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
