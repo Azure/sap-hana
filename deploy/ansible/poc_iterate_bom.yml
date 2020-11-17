@@ -11,7 +11,7 @@
     archive_location: "{{ bom.defaults.archive_location | regex_replace('/$', '') | regex_replace('^https:', '') }}"
     target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
     file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
-    file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) }}"
+    file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
     file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
     file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
     bom_media: '{{ bom.materials.media }}'

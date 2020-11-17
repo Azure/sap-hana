@@ -156,7 +156,7 @@ END {
 
     printf("\n    - name: \"%s\"\n", component);
     printf("      archive: \"%s\"\n", filename);
-    if ( overridedir != "") printf("      override_target_location: \"%s/\"\n", overridedir);
+    if ( overridedir != "") printf("      override_target_location: \"%s\"\n", overridedir);
     if (match(filename, /SAPCAR_.*\.EXE/ ) != 0) printf("      override_target_filename: \"SAPCAR.EXE\"\n");
     if ( sapurl != "" ) printf("      sapurl: \"https://softwaredownloads.sap.com/file/%s\"\n", sapurl);
   }
