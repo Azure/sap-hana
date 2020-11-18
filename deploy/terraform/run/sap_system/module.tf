@@ -135,4 +135,5 @@ module "output_files" {
   any_database_info         = module.anydb_node.any_database_info
   anydb_loadbalancers       = module.anydb_node.anydb_loadbalancers
   random_id                 = module.common_infrastructure.random_id
+  landscape_tfstate         = data.terraform_remote_state.landscape.outputs
 }

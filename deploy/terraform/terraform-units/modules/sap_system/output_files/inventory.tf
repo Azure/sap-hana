@@ -82,7 +82,7 @@ resource "local_file" "output_json" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible_inventory" {
   content = templatefile("${path.module}/ansible_inventory.tmpl", {
-    iscsi             = var.infrastructure_w_defaults.iscsi,
+    iscsi             = local.iscsi,
     ips_iscsi         = local.ips_iscsi,
     ips_dbnodes_admin = local.ips_dbnodes_admin,
     ips_dbnodes_db    = local.ips_dbnodes_db,
@@ -103,7 +103,7 @@ resource "local_file" "ansible_inventory" {
 # Generates the Ansible Inventory file
 resource "local_file" "ansible_inventory_yml" {
   content = templatefile("${path.module}/ansible_inventory.yml.tmpl", {
-    iscsi             = var.infrastructure_w_defaults.iscsi,
+    iscsi             = local.iscsi,
     ips_iscsi         = local.ips_iscsi,
     ips_dbnodes_admin = local.ips_dbnodes_admin,
     ips_dbnodes_db    = local.ips_dbnodes_db,

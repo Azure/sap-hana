@@ -14,6 +14,11 @@ output "iscsi_private_ip" {
   value = try(module.sap_landscape.nics_iscsi[*].private_ip_address, [])
 }
 
-output "landscape_infrastructure" {
-  value = try(module.sap_landscape.infrastructure_w_defaults, {})
+output "iscsi_authentication_type" {
+  value = try(module.sap_landscape.iscsi_authentication_type, "")
 }
+
+output "iscsi_authentication_username" {
+  value = try(module.sap_landscape.iscsi_authentication_username, "")
+}
+
