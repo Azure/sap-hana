@@ -22,7 +22,6 @@
         # url: "{{ file_source }}"
         # dest: "{{ file_dest }}"
         # creates: "{{ file_dest }}"
-        # src: "{{ file_source }}"
       debug:
         msg: "Download {{ file_source }} to {{ file_dest }}"
       loop: "{{ bom_media | flatten(levels=1) }}"
