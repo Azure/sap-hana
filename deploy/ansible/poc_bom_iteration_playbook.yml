@@ -3,10 +3,10 @@
 - hosts: localhost
   vars:
     bom_location_base_path: "../../documentation/ansible/system-design-deployment/examples"
+    bom_base_name: "S4HANA_2020_ISS_v001"
 
-  tasks:
+  roles:
 
-    - name: Ensure {{ base_bom }} is processed
-      include_tasks: "./poc_iterate_bom.yml"
+    - role: process_bom
       vars:
-        base_bom: "{{ bom_location_base_path }}/S4HANA_2020_ISS_v001/bom.yml"
+        base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}/bom.yml"

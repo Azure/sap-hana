@@ -4,6 +4,6 @@
 
 - import_tasks: iterate_bom.yml
   vars:
-    base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}"
+    base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}/bom.yml"
 
 # - import_tasks: post_checks.yml
