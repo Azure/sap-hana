@@ -1,0 +1,37 @@
+---
+
+- name: "Ensure {{ base_bom }} is used"
+  include_vars:
+    file:       "{{ base_bom }}"
+    name:       bom
+
+- name: Ensure media property is iterated
+  vars:
+    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+    archive_location: "{{ bom.defaults.archive_location | regex_replace('/$', '') | regex_replace('^https:', '') }}"
+    target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+    file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
+    file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
+    file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
+    file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
+    bom_media: '{{ bom.materials.media }}'
+  # copy:
+    # dest: "{{ file_dest }}"
+    # src: "{{ file_source }}"
+    # group: undefined      # Name of the group that should own the file/directory, as would be fed to chown)
+    # mode: undefined       # Mode the file or directory should be. For those used to /usr/bin/chmod remember that modes are actually octal numbers. You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like 0644 or C(01777)) or quote it (like '644' or '1777') so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.  As of version 1.8, the mode may be specified as a symbolic mode (for example, 'u+rwx' or 'u=rw,g=r,o=r').  As of version 2.3, the mode may also be the special string 'preserve'.  'preserve' means that the file will be given the same permissions as the source file.
+    # owner: undefined      # Name of the user that should own the file/directory, as would be fed to chown.
+  debug:
+    msg: "{{ media_iterator.name}} copy from {{ file_source }} to {{ file_dest }}"
+  loop: "{{ bom_media | flatten(levels=1) }}"
+  loop_control:
+    loop_var: media_iterator
+
+- name: "Ensure {{ base_bom }} dependencies are followed"
+  when: bom_dependencies | length != 0
+  include_tasks: "./poc_iterate_bom.yml"
+  vars:
+    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+    bom_media: "{{ bom.materials.media }}"
+    base_bom: "{{ bom_location_base_path }}/{{ item.name }}/bom.yml"
+  loop: "{{ bom_dependencies | flatten(levels=1) }}"
