@@ -57,7 +57,7 @@ locals {
 
   region  = try(var.infrastructure.region, "")
   sid     = upper(try(var.application.sid, ""))
-  prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.SDU)
+  prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
   // Zones

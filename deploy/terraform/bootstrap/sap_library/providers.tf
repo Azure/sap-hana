@@ -37,23 +37,23 @@ terraform {
   required_providers {
     external = {
       source  = "hashicorp/external"
-      version = "~> 1.2"
+      version = "~> 2.0.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = "~> 1.4"
+      version = "~> 2.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 2.2"
+      version = "~> 3.0.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "~> 2.1"
+      version = "~> 3.0.0"
     }
     azuread = {
       source = "hashicorp/azuread"
-      version = ">= 0.10.0"
+      version = "~> 1.0.0"
     }
     azurerm = {
       source = "hashicorp/azurerm"

@@ -22,7 +22,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   computer_name                = local.anchor_computer_names[count.index]
   resource_group_name          = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                     = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
-  proximity_placement_group_id = azurerm_proximity_placement_group.ppg[count.index].id
+  proximity_placement_group_id = local.ppg_exists ? data.azurerm_proximity_placement_group.ppg[count.index].id : azurerm_proximity_placement_group.ppg[count.index].id
   zone                         = local.zones[count.index]
 
   network_interface_ids = [
@@ -72,7 +72,7 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   computer_name                = local.anchor_computer_names[count.index]
   resource_group_name          = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location                     = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
-  proximity_placement_group_id = azurerm_proximity_placement_group.ppg[count.index].id
+  proximity_placement_group_id = local.ppg_exists ? data.azurerm_proximity_placement_group.ppg[count.index].id : azurerm_proximity_placement_group.ppg[count.index].id
   zone                         = local.zones[count.index]
 
   network_interface_ids = [
