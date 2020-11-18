@@ -5,6 +5,5 @@
 - include_tasks: "{{ iterator }}"
   vars:
     iterator: "./iterate_bom{{ (test_mode is defined and test_mode) | ternary('_test', '') }}.yml"
-    # base_bom: "{{ sapbits_location_base_path }}/{{ bom_base_name }}/bom.yml"
 
 # - import_tasks: post_checks.yml

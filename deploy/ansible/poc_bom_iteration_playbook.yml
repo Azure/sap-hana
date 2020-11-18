@@ -9,5 +9,3 @@
   roles:
 
     - role: process_bom
-      # vars:
-      #   base_bom: "{{ sapbits_location_base_path }}/{{ bom_base_name }}/bom.yml"
