@@ -2,7 +2,7 @@
 
 - hosts: localhost
   vars:
-    sapbits_location_base_path: "https://npeus2saplibb546.blob.core.windows.net/sapbits/boms"
+    sapbits_location_base_path: "https://npeus2saplibb546.blob.core.windows.net/sapbits"
     bom_base_name: "S4HANA_2020_ISS_v001"
     test_mode: true
 

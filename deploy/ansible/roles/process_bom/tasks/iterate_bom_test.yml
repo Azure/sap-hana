@@ -2,7 +2,7 @@
 
 - name: "Ensure {{ bom_base_name }} is available"
   uri:
-    url: "{{ sapbits_location_base_path }}/{{ bom_base_name }}/bom.yml"
+    url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
     dest: "/tmp/{{ bom_base_name }}_bom.yml"
     creates: "/tmp/{{ bom_base_name }}_bom.yml"
 
