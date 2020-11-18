@@ -3,7 +3,7 @@
 - name: Check required variables are present and not empty
   assert:
     that:
-      - "bom_location_base_path is defined"
-      - "bom_location_base_path | trim | length != 0"
+      - "sapbits_location_base_path is defined"
+      - "sapbits_location_base_path | trim | length != 0"
       - "bom_base_name is defined"
       - "bom_base_name | trim | length != 0"

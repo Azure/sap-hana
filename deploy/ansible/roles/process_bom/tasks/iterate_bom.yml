@@ -2,8 +2,8 @@
 
 - name: "Ensure {{ base_bom }} is used"
   include_vars:
-    file:       "{{ base_bom }}"
-    name:       bom
+    file: "{{ base_bom }}"
+    name: bom
 
 - name: Group iterable tasks together
   vars:
@@ -32,5 +32,5 @@
   vars:
     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
     bom_media: "{{ bom.materials.media }}"
-    base_bom: "{{ bom_location_base_path }}/{{ item.name }}/bom.yml"
+    base_bom: "{{ sapbits_location_base_path }}/{{ item.name }}/bom.yml"
   loop: "{{ bom_dependencies | flatten(levels=1) }}"

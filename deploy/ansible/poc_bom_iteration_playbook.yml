@@ -2,12 +2,12 @@
 
 - hosts: localhost
   vars:
-    bom_location_base_path: "../../documentation/ansible/system-design-deployment/examples"
+    sapbits_location_base_path: "https://npeus2saplibb546.blob.core.windows.net/sapbits/BoMs"
     bom_base_name: "S4HANA_2020_ISS_v001"
     test_mode: true
 
   roles:
 
     - role: process_bom
-      vars:
-        base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}/bom.yml"
+      # vars:
+      #   base_bom: "{{ sapbits_location_base_path }}/{{ bom_base_name }}/bom.yml"
