@@ -94,9 +94,9 @@ The following steps show how to begin the manual install of an ASCS instance in 
 1. Do not click "Next" on the Parameter Summary Page. At this point the installation configuration is stored in a file named `inifile.params` in the temporary SAP installation directory.
 1. To locate the file, list the files in `/tmp/sapinst_instdir/`.
 1. If the file `.lastInstallationLocation` exists, view the file contents and note the directory listed.
-1. If a directory named for the product you are installing exists, e.g. `S4HANA1809`, navigate into the folders matching the product installation type, for example:
+1. If a directory named for the product you are installing exists, e.g. `S4HANA2020`, navigate into the folders matching the product installation type, for example:
 
-   `/tmp/sapinst_instdir/S4HANA1809/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
+   `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
 
 1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
 1. Copy and rename `inifile.params` to `/tmp/app_template`:
