@@ -105,7 +105,7 @@ locals {
   sub_app_exists = length(local.sub_app_arm_id) > 0 ? true : false
   sub_app_name = local.sub_app_exists ? (
     try(split("/", local.sub_app_arm_id)[10], "")) : (
-    try(local.var_sub_app.name, format("%s%s", local.prefix, local.resource_suffixes.app_subnet))
+    try(local.var_sub_app.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet))
   )
   sub_app_prefix = try(local.var_sub_app.prefix, "")
 
@@ -115,7 +115,7 @@ locals {
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0 ? true : false
   sub_app_nsg_name = local.sub_app_nsg_exists ? (
     try(split("/", local.sub_app_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_app_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.app_subnet_nsg))
+    try(local.var_sub_app_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet_nsg))
   )
 
   // WEB subnet
