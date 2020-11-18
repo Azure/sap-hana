@@ -31,7 +31,7 @@
       loop_control:
         loop_var: media_iterator
 
-- name: "Ensure {{ base_bom }} dependencies are followed"
+- name: "Ensure {{ bom_base_name }} dependencies are followed"
   when: bom_dependencies | length != 0
   include_tasks: "{{ iterator }}"
   vars:

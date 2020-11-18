@@ -1,8 +1,14 @@
 ---
 
-- name: "Ensure {{ base_bom }} is used"
+- name: "Ensure {{ bom_base_name }} is available"
+  uri:
+    url: "{{ sapbits_location_base_path }}/{{ bom_base_name }}/bom.yml"
+    dest: "/tmp/{{ bom_base_name }}_bom.yml"
+    creates: "/tmp/{{ bom_base_name }}_bom.yml"
+
+- name: "Ensure {{ bom_base_name }} is used"
   include_vars:
-    file: "{{ base_bom }}"
+    file: "/tmp/{{ bom_base_name }}_bom.yml"
     name: bom
 
 - name: Group iterable tasks together
@@ -26,11 +32,11 @@
       loop_control:
         loop_var: media_iterator
 
-- name: "Ensure {{ base_bom }} dependencies are followed"
+- name: "Ensure {{ bom_base_name }} dependencies are followed"
   when: bom_dependencies | length != 0
   include_tasks: "{{ iterator }}"
   vars:
     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
     bom_media: "{{ bom.materials.media }}"
-    base_bom: "{{ sapbits_location_base_path }}/{{ item.name }}/bom.yml"
+    bom_base_name: "{{ item.name }}"
   loop: "{{ bom_dependencies | flatten(levels=1) }}"
