@@ -196,7 +196,7 @@ locals {
   sub_admin_arm_id    = try(local.var_sub_admin.arm_id, "")
   sub_admin_exists    = length(local.sub_admin_arm_id) > 0
 
-  sub_admin_name   = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, var.naming. local.resource_suffixes.admin_subnet))
+  sub_admin_name   = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
   sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "")
 
   //Admin NSG
