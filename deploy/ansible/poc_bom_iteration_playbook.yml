@@ -4,6 +4,7 @@
   vars:
     bom_location_base_path: "../../documentation/ansible/system-design-deployment/examples"
     bom_base_name: "S4HANA_2020_ISS_v001"
+    test_mode: true
 
   roles:
 

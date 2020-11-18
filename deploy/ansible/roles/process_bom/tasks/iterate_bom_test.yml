@@ -18,10 +18,8 @@
         file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
         file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
         bom_media: '{{ bom.materials.media }}'
-      uri:
-        url: "{{ file_source }}"
-        dest: "{{ file_dest }}"
-        creates: "{{ file_dest }}"
+      debug:
+        msg: "Download {{ file_source }} to {{ file_dest }}"
       loop: "{{ bom_media | flatten(levels=1) }}"
       loop_control:
         loop_var: media_iterator

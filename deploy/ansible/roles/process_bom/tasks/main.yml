@@ -2,8 +2,9 @@
 
 - import_tasks: pre_checks.yml
 
-- import_tasks: iterate_bom.yml
+- include_tasks: "{{ iterator }}"
   vars:
     base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}/bom.yml"
+    iterator: "./iterate_bom{{ test_mode is defined and test_mode | ternary('_test', '') }}.yml"
 
 # - import_tasks: post_checks.yml
