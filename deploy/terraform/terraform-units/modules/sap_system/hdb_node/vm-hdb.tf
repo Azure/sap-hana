@@ -13,7 +13,7 @@ HANA DB Linux Server private IP range: .10 -
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics_dbnodes_admin" {
   count = local.enable_deployment ? length(local.hdb_vms) : 0
-  name  = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.admin_nic)
+  name  = format("%s%s%s", local.hdb_vms[count.index].name, var.naming.separator, local.resource_suffixes.admin_nic)
 
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
@@ -34,7 +34,7 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
 # Creates the DB traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics_dbnodes_db" {
   count = local.enable_deployment ? length(local.hdb_vms) : 0
-  name  = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.db_nic)
+  name  = format("%s%s%s", local.hdb_vms[count.index].name, var.naming.separator, local.resource_suffixes.db_nic)
 
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
@@ -61,7 +61,7 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "hdb" {
   count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s", local.prefix, local.resource_suffixes.db_alb)
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
   sku                 = local.zonal_deployment ? "Standard" : "Basic"
@@ -113,7 +113,7 @@ resource "azurerm_lb_rule" "hdb" {
   protocol                       = "Tcp"
   frontend_port                  = local.loadbalancer_ports[count.index].port
   backend_port                   = local.loadbalancer_ports[count.index].port
-  frontend_ip_configuration_name = format("%s%s", local.prefix, local.resource_suffixes.db_alb_feip)
+  frontend_ip_configuration_name = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
   backend_address_pool_id        = azurerm_lb_backend_address_pool.hdb[0].id
   probe_id                       = azurerm_lb_probe.hdb[0].id
   enable_floating_ip             = true
