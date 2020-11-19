@@ -105,6 +105,8 @@ steps:
       az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-client-secret --output none
       az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-subscription-id --output none
       az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplandscape_prefix}-tenant-id --output none
+      echo "=== Wait for 30s for secrets to be available === "
+      sleep 30s
 
       cp ${repo_dir}/deploy/terraform/run/sap_landscape/saplandscape.json ${ws_dir}/saplandscape.json
       cat ${ws_dir}/saplandscape.json \
