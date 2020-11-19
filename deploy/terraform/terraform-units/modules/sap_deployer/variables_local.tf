@@ -23,7 +23,6 @@ locals {
   prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
 
-
   // Post fix for all deployed resources
   postfix = random_id.deployer.hex
 
@@ -68,7 +67,7 @@ locals {
     try(deployer.authentication.password, "")
   ])
   input_pwd = length(local.input_pwd_list) > 0 ? local.input_pwd_list[0] : null
-  password  = (local.enable_deployers && local.enable_password) ? try(local.input_pwd_list[0], random_password.deployer[0].result) : null
+  password  = (local.enable_deployers && local.enable_password) ? (local.user_kv_exist ? data.azurerm_key_vault_secret.pwd[0].value : try(local.input_pwd_list[0], random_password.deployer[0].result)) : null
 
   enable_key = contains(compact([
     for deployer in local.deployer_input :
@@ -76,8 +75,8 @@ locals {
   ]), "true")
 
   // By default use generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  public_key  = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh) : null
-  private_key = (local.enable_deployers && local.enable_key) ? try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem) : null
+  public_key  = (local.enable_deployers && local.enable_key) ? (local.user_kv_exist ? data.azurerm_key_vault_secret.pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh)) : null
+  private_key = (local.enable_deployers && local.enable_key) ? (local.user_kv_exist ? data.azurerm_key_vault_secret.ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem)) : null
 
   deployers = [
     for idx, deployer in local.deployer_input : {
@@ -139,4 +138,22 @@ locals {
 
   // Comment out code with users.object_id for the time being.
   // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
+
+  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
+  user_key_vault_id    = try(var.user_key_vault_id, "")
+  prvt_key_vault_id    = try(var.private_key_vault_id, "")
+  user_kv_exist        = try(length(local.user_key_vault_id) > 0, false)
+  prvt_kv_exist        = try(length(local.prvt_key_vault_id) > 0, false)
+
+  ppk_name = format("%s-sshkey", local.prefix)
+  pk_name  = format("%s-sshkey-pub", local.prefix)
+  pwd_name = format("%s-password", local.prefix)
+
+  // Extract information from the specified key vault arm ids
+  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+
+  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+
 }

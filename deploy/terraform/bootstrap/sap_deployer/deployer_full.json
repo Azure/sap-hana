@@ -14,5 +14,7 @@
     },
     "options": {
         "enable_secure_transfer": true
-    }
+    },
+    "user_key_vault_id": "",
+    "private_key_vault_id": ""
 }
