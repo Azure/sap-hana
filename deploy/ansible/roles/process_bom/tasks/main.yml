@@ -3,7 +3,7 @@
 - import_tasks: pre_checks.yml
 
 - include_tasks: configure_disk.yml
-  when: test_mode is defined and not test_mode
+  when: test_mode is not defined or not test_mode
 
 - include_tasks: "{{ iterator }}"
   vars:

@@ -218,7 +218,7 @@ materials:
 
     - name:     SAPCAR
       version:  7.21
-      archive:  SAPCAR_1320-80000935.EXE
+      archive:  SAPCAR_1324-80000935.EXE
       override_target_filename: SAPCAR.EXE
 
     - name: "Attribute Change Package 16 for EA-HR 608"

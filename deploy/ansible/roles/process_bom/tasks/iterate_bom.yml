@@ -4,7 +4,7 @@
   uri:
     url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
     dest: "/tmp/{{ bom_base_name }}_bom.yml"
-    creates: "/tmp/{{ bom_base_name }}_bom.yml"
+    # creates: "/tmp/{{ bom_base_name }}_bom.yml"
 
 - name: "Ensure {{ bom_base_name }} is used"
   include_vars:
