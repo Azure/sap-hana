@@ -1,0 +1,28 @@
+---
+
+- name: Configure Disk mounted at /hana
+  become_user: root
+  become: yes
+  block:
+    - name: Add /hana partition
+      parted:
+        state: present
+        device: /dev/disk/azure/scsi1/lun0
+        number: 1
+
+    - name: Create /hana/ filesystem
+      filesystem:
+        fstype: xfs
+        dev: /dev/disk/azure/scsi1/lun0-part1
+
+    - name: Create /usr/sap/install mount point
+      file:
+        path: /usr/sap/install
+        state: directory
+
+    - name: Mount /hana
+      mount:
+        path: /usr/sap/install
+        src: /dev/disk/azure/scsi1/lun0-part1
+        fstype: xfs
+        state: mounted
