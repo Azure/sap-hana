@@ -13,7 +13,7 @@ HANA DB Linux Server private IP range: .10 -
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics_dbnodes_admin" {
   count = local.enable_deployment ? length(local.hdb_vms) : 0
-  name  = format("%s%s%s", local.hdb_vms[count.index].name, var.naming.separator, local.resource_suffixes.admin_nic)
+  name  = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.admin_nic)
 
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
@@ -34,7 +34,7 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
 # Creates the DB traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics_dbnodes_db" {
   count = local.enable_deployment ? length(local.hdb_vms) : 0
-  name  = format("%s%s%s", local.hdb_vms[count.index].name, var.naming.separator, local.resource_suffixes.db_nic)
+  name  = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.db_nic)
 
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
