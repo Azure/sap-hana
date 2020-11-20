@@ -2,11 +2,6 @@
 
 - import_tasks: pre_checks.yml
 
-- include_tasks: configure_disk.yml
-  when: test_mode is not defined or not test_mode
-
 - include_tasks: "{{ iterator }}"
   vars:
     iterator: "./iterate_bom{{ (test_mode is defined and test_mode) | ternary('_test', '') }}.yml"
-
-# - import_tasks: post_checks.yml
