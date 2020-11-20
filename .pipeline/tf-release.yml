@@ -143,6 +143,8 @@ stages:
   - job: createSAPSystemRHEL
     dependsOn: createSAPLandscape
     steps:
+      - script: |
+          sleep 5m
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
         parameters:
