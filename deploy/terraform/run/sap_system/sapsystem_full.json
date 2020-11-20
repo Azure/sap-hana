@@ -46,7 +46,10 @@
         "xsa_admin_password": "<xsa_admin_password>",
         "cockpit_admin_password": "<cockpit_admin_password>",
         "ha_cluster_password": "<ha_cluster_password>"
-      }
+      },
+      "avset_arm_ids": [
+        "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
+        ]
     }
   ],
   "application": {
