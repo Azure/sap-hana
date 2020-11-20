@@ -28,3 +28,13 @@ variable "sshkey" {
   description = "Details of ssh key pair"
   default     = {}
 }
+
+variable "user_key_vault_id" {
+  description = "The user brings an existing user Key Vault"
+  default     = ""
+}
+
+variable "private_key_vault_id" {
+  description = "The user brings an existing private Key Vault"
+  default     = ""
+}

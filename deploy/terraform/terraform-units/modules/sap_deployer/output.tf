@@ -49,25 +49,25 @@ output "random_id" {
 }
 
 output "user_vault_name" {
-  value = azurerm_key_vault.kv_user[0].name
+  value = local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].name : azurerm_key_vault.kv_user[0].name
 }
 
 output "prvt_vault_name" {
-  value = azurerm_key_vault.kv_prvt[0].name
+  value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
 }
 
 // output the secret name of public key
 output "ppk_name" {
-  value = local.enable_deployers && local.enable_key ? azurerm_key_vault_secret.ppk[0].name : ""
+  value = local.enable_deployers && local.enable_key ? local.ppk_name : ""
 }
 
 // output the secret name of private key
 output "pk_name" {
-  value = local.enable_deployers && local.enable_key ? azurerm_key_vault_secret.pk[0].name : ""
+  value = local.enable_deployers && local.enable_key ? local.pk_name : ""
 }
 
 output "pwd_name" {
-  value = local.enable_deployers && local.enable_password ? azurerm_key_vault_secret.pwd[0].name : ""
+  value = local.enable_deployers && local.enable_password ? local.pwd_name : ""
 }
 
 // Comment out code with users.object_id for the time being.
@@ -78,7 +78,7 @@ output "deployer_user" {
 */
 
 output "deployer_kv_user_arm_id" {
-  value = local.enable_deployers ? azurerm_key_vault.kv_user[0].id : ""
+  value = local.enable_deployers ? (local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].id : azurerm_key_vault.kv_user[0].id) : ""
 }
 
 output "deployer_public_ip_address" {
