@@ -150,7 +150,7 @@ resource "null_resource" "prepare-deployer" {
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
       // Install Git
       "sudo apt update",
-      "sudo apt-get install git=1:2.7.4-0ubuntu1.6",
+      "sudo apt-get install git=1:2.17.1-1ubuntu0.7",
       // install jq
       "sudo apt -y install jq=1.5+dfsg-2",
       // Install pip3

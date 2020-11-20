@@ -37,3 +37,11 @@ output "sid_public_key_secret_name" {
 output "sid_private_key_secret_name" {
   value = local.enable_landscape_kv ? azurerm_key_vault_secret.sid_ppk[0].name : ""
 }
+
+output "iscsi_authentication_type" {
+  value = local.iscsi_auth_type
+}
+
+output "iscsi_authentication_username" {
+  value = local.iscsi_auth_username
+}

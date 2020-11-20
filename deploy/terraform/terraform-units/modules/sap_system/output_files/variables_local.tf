@@ -77,11 +77,24 @@ variable "software" {
   default     = {}
 }
 
+variable "landscape_tfstate" {
+  description = "Landscape remote tfstate file"
+}
+
 locals {
 
+  landscape_tfstate = var.landscape_tfstate
   ips_iscsi         = var.iscsi_private_ip
   ips_dbnodes_admin = [for key, value in var.nics_dbnodes_admin : value.private_ip_address]
   ips_dbnodes_db    = [for key, value in var.nics_dbnodes_db : value.private_ip_address]
+
+  iscsi = {
+    iscsi_count = length(local.ips_iscsi)
+    authentication = {
+      type     = local.landscape_tfstate.iscsi_authentication_type
+      username = local.landscape_tfstate.iscsi_authentication_username
+    }
+  }
 
   databases = [
     var.hana_database_info

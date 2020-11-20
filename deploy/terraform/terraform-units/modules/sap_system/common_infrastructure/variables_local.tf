@@ -182,9 +182,6 @@ locals {
   kv_users = var.deployer_user
   */
 
-  // SAP Landscape infrastructure
-  landscape_infrastructure = try(local.landscape_tfstate.landscape_infrastructure, {})
-
   //SAP vnet
   vnet_sap_arm_id              = try(local.landscape_tfstate.vnet_sap_arm_id, "")
   vnet_sap_name                = split("/", local.vnet_sap_arm_id)[8]
@@ -246,9 +243,8 @@ locals {
       name        = local.ppg_names,
       arm_id      = local.ppg_arm_ids
     },
-    iscsi = local.landscape_infrastructure.iscsi
     vnets = {
-      sap = merge(local.landscape_infrastructure.vnets.sap, {
+      sap = merge({
         subnet_admin = {
           is_existing = local.sub_admin_exists,
           arm_id      = local.sub_admin_arm_id,
