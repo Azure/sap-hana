@@ -33,7 +33,8 @@ steps:
       terraform plan -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/ > plan_output.log
       cat plan_output.log
       
-      if ! grep "No changes\|0 to change, 0 to destroy" plan_output.log; then exit 1; fi;
+      # include 1 to add, 0 to change, 1 to destroy as expected result, due to regeneration of output.json
+      if ! grep "No changes\|0 to change, 0 to destroy\|1 to add, 0 to change, 1 to destroy" plan_output.log; then exit 1; fi;
       '
     displayName: "Validate sap system new config"
     env:
