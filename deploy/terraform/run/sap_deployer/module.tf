@@ -17,6 +17,7 @@ module "sap_deployer" {
 module "sap_namegenerator" {
   source               = "../../terraform-units/modules/sap_namegenerator"
   environment          = local.environment
+  deployer_environment = local.environment
   location             = local.location
   codename             = local.codename
   management_vnet_name = local.vnet_mgmt_name_part
