@@ -7,9 +7,9 @@ output "dns_information_loadbalancers_anydb" {
 }
 
 output "dns_information_hanadb" {
-    value = module.hana_node.dns_info_vms
+    value = module.hdb_node.dns_info_vms
 }
 
 output "dns_information_loadbalancers_hanadb" {
-    value = module.hana_node.dns_info_loadbalancers
+    value = module.hdb_node.dns_info_loadbalancers
 }

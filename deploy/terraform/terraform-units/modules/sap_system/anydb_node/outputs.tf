@@ -34,7 +34,7 @@ output "dns_info_vms" {
       {
         // If dual nics are used the admin NIC is first
         format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = local.anydb_dual_nics ? (
-          azurerm_network_interface.admin_db[idx].private_ip_address) : (
+          azurerm_network_interface.anydb_admin[idx].private_ip_address) : (
           azurerm_network_interface.anydb_db[idx].private_ip_address
         )
       }
