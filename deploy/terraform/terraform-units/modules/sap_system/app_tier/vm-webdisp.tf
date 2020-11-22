@@ -101,6 +101,8 @@ resource "azurerm_linux_virtual_machine" "web" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.web_tags
 }
 
 # Create the Windows Web dispatcher VM(s)
@@ -154,6 +156,8 @@ resource "azurerm_windows_virtual_machine" "web" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.web_tags
 }
 
 # Creates managed data disk
