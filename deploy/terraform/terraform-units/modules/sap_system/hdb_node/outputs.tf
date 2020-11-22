@@ -20,7 +20,6 @@ output "hana_database_info" {
 }
 
 // Output for DNS
-
 output "dns_info_vms" {
   value = concat(
     flatten([for idx, vm in local.virtualmachine_names :
