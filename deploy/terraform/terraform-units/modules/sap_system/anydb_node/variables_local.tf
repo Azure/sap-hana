@@ -70,6 +70,9 @@ locals {
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
+  // Support dynamic addressing
+  dynamic_ipaddresses = try(var.anydb.dynamic_addressing, false)
+
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
   anydb_version  = try(local.anydb.db_version, "")
