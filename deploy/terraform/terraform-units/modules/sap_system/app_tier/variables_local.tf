@@ -167,6 +167,8 @@ locals {
   web_nic_ips              = try(var.application.web_nic_ips, [])
   web_admin_nic_ips        = try(var.application.web_admin_nic_ips, [])
 
+  dynamic_ipaddresses = try(var.application.dynamic_addressing, false)
+
   // Dual network cards
   apptier_dual_nics = try(var.application.dual_nics, false)
 

@@ -63,6 +63,7 @@
     "app_zones": ["1","2"],
     "scs_zones": ["1"],
     "web_zones": ["1"],
+    "dynamic_addressing" : false,
     "authentication": {
       "type": "key",
       "username": "azureadm"
