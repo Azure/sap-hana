@@ -83,7 +83,7 @@ locals {
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
 
-    // Availability Set 
+  // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
