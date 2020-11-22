@@ -28,9 +28,9 @@ output "dns_info_vms" {
         format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.nics_dbnodes_admin[idx].private_ip_address
       }
     ]), 
-    flatten([for idx, vm in var.naming.virtualmachine_names.HANADB_SECONDARY_DNSNAME :
+    flatten([for idx, vm in var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME :
       {
-        var.naming.virtualmachine_names.HANADB_SECONDARY_DNSNAME[idx] = azurerm_network_interface.nics_dbnodes_db[idx].private_ip_address
+        var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME[idx] = azurerm_network_interface.nics_dbnodes_db[idx].private_ip_address
       }
     ])
   )
