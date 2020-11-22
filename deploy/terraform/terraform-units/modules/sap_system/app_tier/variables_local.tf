@@ -85,7 +85,16 @@ locals {
     "password" = local.sid_auth_password
   }
 
-  // Retrieve information about Sap Landscape from tfstate file
+  ///////////////////////////////////////
+  // Tags
+
+  app_tags = try(var.application.app_tags,[])
+  scs_tags = try(var.application.scs_tags,[])
+  web_tags = try(var.application.web_tags,[])
+
+  ////////////////////////////////////////
+  
+    // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate  = var.landscape_tfstate
   kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
