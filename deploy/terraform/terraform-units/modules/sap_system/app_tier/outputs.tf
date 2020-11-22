@@ -74,7 +74,7 @@ output "dns_info_vms" {
           azurerm_network_interface.app[idx].private_ip_address
         )
       }
-    ]), ! local.apptier_dual_nics ? null :
+    ]), ! local.apptier_dual_nics ? {} :
     flatten([for idx, vm in var.naming.virtualmachine_names.APP_SECONDARY_DNSNAME :
       {
         var.naming.virtualmachine_names.APP_SECONDARY_DNSNAME[idx] = azurerm_network_interface.app[idx].private_ip_address
@@ -88,7 +88,7 @@ output "dns_info_vms" {
         )
 
       }
-    ]), ! local.apptier_dual_nics ? null :
+    ]), ! local.apptier_dual_nics ? {} :
     flatten([for idx, vm in var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME :
       {
         var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME[idx] = azurerm_network_interface.scs[idx].private_ip_address
@@ -101,7 +101,7 @@ output "dns_info_vms" {
           azurerm_network_interface.web[idx].private_ip_address
         )
       }
-    ]), ! local.apptier_dual_nics ? null :
+    ]), ! local.apptier_dual_nics ? {} :
     flatten([for idx, vm in var.naming.virtualmachine_names.WEB_SECONDARY_DNSNAME :
       {
         var.naming.virtualmachine_names.WEB_SECONDARY_DNSNAME[idx] = azurerm_network_interface.web[idx].private_ip_address
