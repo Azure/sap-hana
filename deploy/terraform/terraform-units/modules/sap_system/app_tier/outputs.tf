@@ -113,9 +113,18 @@ output "dns_info_vms" {
 output "dns_info_loadbalancers" {
   value = local.enable_deployment ? (
     [
-      { format("%s%s%s", local.prefix, var.naming.separator, "scs") = azurerm_lb.scs[0].private_ip_addresses[0] },
-      { format("%s%s%s", local.prefix, var.naming.separator, "ers") = azurerm_lb.scs[0].private_ip_addresses[1] },
-      { format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) = azurerm_lb.web[0].private_ip_addresses[0] }
+      local.scs_server_count > 0 ? (
+        { format("%s%s%s", local.prefix, var.naming.separator, "scs") = azurerm_lb.scs[0].private_ip_addresses[0] }) : (
+        null
+      ),
+      local.scs_server_count > 0 ? (
+        { format("%s%s%s", local.prefix, var.naming.separator, "ers") = azurerm_lb.scs[0].private_ip_addresses[1] }) : (
+        null
+      ),
+      local.webdispatcher_count > 0 ? (
+        { format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) = azurerm_lb.web[0].private_ip_addresses[0] }) : (
+        null
+      )
     ]) : (
     null
   )
