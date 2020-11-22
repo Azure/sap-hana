@@ -71,7 +71,7 @@ locals {
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
   // Support dynamic addressing
-  dynamic_ipaddresses = try(var.anydb.dynamic_addressing, false)
+  dynamic_ipaddresses = try(local.anydb.dynamic_addressing, false)
 
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
