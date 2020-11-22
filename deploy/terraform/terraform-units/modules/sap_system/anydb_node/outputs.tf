@@ -29,7 +29,7 @@ output "anydb_loadbalancers" {
 // Output for DNS
 
 output "dns_info_vms" {
-  value = concat(local.anydb_dual_nics ? (
+  value = local.enable_deployment ? (concat(local.anydb_dual_nics ? (
     flatten([for idx, vm in local.virtualmachine_names :
       {
         // If dual nics are used the admin NIC is first
@@ -43,11 +43,15 @@ output "dns_info_vms" {
       }
     ])
     )
+    )) : (
+    null
   )
 }
 
 output "dns_info_loadbalancers" {
-  value = [
+  value = local.enable_deployment ? ([
     { format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb) = azurerm_lb.anydb[0].private_ip_addresses[0] }
-  ]
+    ]) : (
+    null
+  )
 }

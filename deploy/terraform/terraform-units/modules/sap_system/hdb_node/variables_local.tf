@@ -87,7 +87,7 @@ locals {
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
- // Support dynamic addressing
+  // Support dynamic addressing
   dynamic_ipaddresses = try(local.hdb.dynamic_addressing, false)
 
   hdb_platform = try(local.hdb.platform, "NONE")
