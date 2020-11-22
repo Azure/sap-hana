@@ -63,50 +63,46 @@ output "application" {
 }
 
 // Output for DNS
-
 output "dns_info_vms" {
-  value = concat(
+  value = concat(local.apptier_dual_nics ? (
     flatten([for idx, vm in local.app_virtualmachine_names :
       {
-        // If dual NICs are used the admin nic is the first
-        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = local.apptier_dual_nics ? (
-          azurerm_network_interface.app_admin[idx].private_ip_address) : (
-          azurerm_network_interface.app[idx].private_ip_address
-        )
-      }
-    ]), ! local.apptier_dual_nics ? [{}] :
-    flatten([for idx, vm in var.naming.virtualmachine_names.APP_SECONDARY_DNSNAME :
-      {
-        var.naming.virtualmachine_names.APP_SECONDARY_DNSNAME[idx] = azurerm_network_interface.app[idx].private_ip_address
-      }
-    ]),
-    flatten([for idx, vm in local.scs_virtualmachine_names :
-      {
-        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = local.apptier_dual_nics ? (
-          azurerm_network_interface.scs_admin[idx].private_ip_address) : (
-          azurerm_network_interface.scs[idx].private_ip_address
-        )
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.app_admin[idx].private_ip_address,
+        var.naming.virtualmachine_names.APP_SECONDARY_DNSNAME[idx]                             = azurerm_network_interface.app[idx].private_ip_address
 
       }
-    ]), ! local.apptier_dual_nics ? [{}] :
-    flatten([for idx, vm in var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME :
+    ])) : (
+    flatten([for idx, vm in local.app_virtualmachine_names :
       {
-        var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME[idx] = azurerm_network_interface.scs[idx].private_ip_address
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.app[idx].private_ip_address,
       }
-    ]),
+    ])
+    ), local.apptier_dual_nics ? (
+    flatten([for idx, vm in local.scs_virtualmachine_names :
+      {
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.scs_admin[idx].private_ip_address,
+        var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME[idx]                             = azurerm_network_interface.scs[idx].private_ip_address
+
+      }
+    ])) : (
+    flatten([for idx, vm in local.scs_virtualmachine_names :
+      {
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.scs[idx].private_ip_address,
+      }
+    ])
+    ), local.apptier_dual_nics ? (
     flatten([for idx, vm in local.web_virtualmachine_names :
       {
-        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = local.apptier_dual_nics ? (
-          azurerm_network_interface.web_admin[idx].private_ip_address) : (
-          azurerm_network_interface.web[idx].private_ip_address
-        )
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.web_admin[idx].private_ip_address,
+        var.naming.virtualmachine_names.SCS_SECONDARY_DNSNAME[idx]                             = azurerm_network_interface.web[idx].private_ip_address
+
       }
-    ]), ! local.apptier_dual_nics ? [{}] :
-    flatten([for idx, vm in var.naming.virtualmachine_names.WEB_SECONDARY_DNSNAME :
+    ])) : (
+    flatten([for idx, vm in local.web_virtualmachine_names :
       {
-        var.naming.virtualmachine_names.WEB_SECONDARY_DNSNAME[idx] = azurerm_network_interface.web[idx].private_ip_address
+        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.web[idx].private_ip_address,
       }
-      ]
+    ])
     )
   )
 }
