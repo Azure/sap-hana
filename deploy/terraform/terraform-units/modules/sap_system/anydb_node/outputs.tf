@@ -38,7 +38,7 @@ output "dns_info_vms" {
           azurerm_network_interface.anydb_db[idx].private_ip_address
         )
       }
-    ]), ! local.anydb_dual_nics ? null :
+    ]), ! local.anydb_dual_nics ? {} :
     flatten([for idx, vm in var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME :
       {
         var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME[idx] = azurerm_network_interface.anydb_db[idx].private_ip_address
