@@ -14,7 +14,7 @@ resource "azurerm_network_interface" "anydb_db" {
     name      = "ipconfig1"
     subnet_id = var.db_subnet.id
 
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
         local.anydb_vms[count.index].db_nic_ip) : (
@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "anydb_db" {
       )
     )
 
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -39,14 +39,14 @@ resource "azurerm_network_interface" "anydb_admin" {
     name      = "ipconfig1"
     subnet_id = var.admin_subnet.id
 
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
         local.anydb_vms[count.index].admin_nic_ip) : (
         cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_admin_vm)
       )
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 

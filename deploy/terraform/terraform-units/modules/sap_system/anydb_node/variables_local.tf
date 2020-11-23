@@ -71,7 +71,7 @@ locals {
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
   // Support dynamic addressing
-  dynamic_ipaddresses = try(local.anydb.dynamic_addressing, false)
+  use_DHCP = try(local.anydb.use_DHCP, false)
 
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
@@ -305,5 +305,9 @@ locals {
     for storage in local.storage_list :
     storage.disk_type == "UltraSSD_LRS" ? true : ""
   ])[0], false)
+
+  full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, local.separator, vm, local.resource_suffixes.vm)]
+  )
 
 }

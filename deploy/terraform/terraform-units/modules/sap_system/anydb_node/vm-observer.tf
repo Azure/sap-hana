@@ -10,13 +10,13 @@ resource "azurerm_network_interface" "observer" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = var.db_subnet.id
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.observer.nic_ips[count.index],
         cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.observer_db_vm)
       )
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
 
   }
 }

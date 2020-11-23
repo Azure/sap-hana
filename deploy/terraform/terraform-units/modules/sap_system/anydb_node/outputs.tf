@@ -27,31 +27,30 @@ output "anydb_loadbalancers" {
 }
 
 // Output for DNS
-
 output "dns_info_vms" {
-  value = local.enable_deployment ? (concat(local.anydb_dual_nics ? (
-    flatten([for idx, vm in local.virtualmachine_names :
-      {
-        // If dual nics are used the admin NIC is first
-        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.anydb_admin[idx].private_ip_address,
-        var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME[idx]                           = azurerm_network_interface.anydb_db[idx].private_ip_address
-      }
-    ])) : (
-    flatten([for idx, vm in local.virtualmachine_names :
-      {
-        format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm) = azurerm_network_interface.anydb_db[idx].private_ip_address,
-      }
-    ])
+  value = local.enable_deployment ? local.anydb_dual_nics ? (
+    zipmap(
+      concat(
+        local.local.anydb_vms[*].name,
+        var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,
+        local.deploy_observer ? local.full_observer_names : null
+      ),
+      concat(
+        azurerm_network_interface.anydb_admin[*].private_ip_address,
+        azurerm_network_interface.anydb_db[*].private_ip_address,
+        local.deploy_observer ? azurerm_network_interface.observer[*].private_ip_address : null
+      )
     )
-    )) : (
-    null
-  )
+    ) : (
+    zipmap(local.local.anydb_vms[*].name, azurerm_network_interface.anydb_db[*].private_ip_address)
+  ) : null
+
 }
 
+
 output "dns_info_loadbalancers" {
-  value = local.enable_deployment ? ([
-    { format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb) = azurerm_lb.anydb[0].private_ip_addresses[0] }
-    ]) : (
+  value = local.enable_deployment ? (
+    zipmap([format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)], [azurerm_lb.anydb[0].private_ip_addresses[0]])) : (
     null
   )
 }

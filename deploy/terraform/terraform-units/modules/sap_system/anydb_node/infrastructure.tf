@@ -14,13 +14,13 @@ resource "azurerm_lb" "anydb" {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id = var.db_subnet.id
 
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.anydb.loadbalancer.frontend_ip,
         cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
       )
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
