@@ -232,7 +232,7 @@ locals {
   sub_app_nsg_name   = local.sub_app_nsg_exists ? try(split("/", local.sub_app_nsg_arm_id)[8], "") : try(local.var_sub_app_nsg.name, format("%s%s%s", var.naming.separator, local.prefix, local.resource_suffixes.app_subnet_nsg))
 
   // Support dynamic addressing
-  dynamic_ipaddresses = try(local.var_infra.dynamic_addressing, false)
+  use_DHCP = try(local.var_infra.use_DHCP, false)
 
 
   //---- Update infrastructure with defaults ----//
