@@ -137,7 +137,7 @@ locals {
 
   //Anchor VM
   anchor                      = try(local.var_infra.anchor_vms, {})
-  deploy_anchor               = length(local.anchor) > 0 ? true : false
+  deploy_anchor               = length(local.anchor) > 0 && local.enable_db_deployment ? true : false
   anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
