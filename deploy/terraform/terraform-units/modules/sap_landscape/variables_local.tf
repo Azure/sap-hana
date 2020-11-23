@@ -56,8 +56,8 @@ locals {
       "sku"       = try(local.var_iscsi.os.sku, "gen1")
       "version"   = try(local.var_iscsi.os.version, "latest")
   })
-  iscsi_auth_type     = try(local.var_iscsi.authentication.type, "key")
-  iscsi_auth_username = try(local.var_iscsi.authentication.username, "azureadm")
+  iscsi_auth_type     = local.iscsi_count > 0 ? try(local.var_iscsi.authentication.type, "key") : ""
+  iscsi_auth_username = local.iscsi_count > 0 ? try(local.var_iscsi.authentication.username, "azureadm") : ""
   iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
