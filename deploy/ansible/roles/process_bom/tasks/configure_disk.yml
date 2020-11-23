@@ -1,0 +1,28 @@
+---
+
+- name: Configure Disk mounted at /usr/sap/install
+  become_user: root
+  become: yes
+  block:
+    - name: Add /usr/sap/install partition
+      parted:
+        state: present
+        device: /dev/disk/azure/scsi1/lun0
+        number: 1
+
+    - name: Create /usr/sap/install/ filesystem
+      filesystem:
+        fstype: xfs
+        dev: /dev/disk/azure/scsi1/lun0-part1
+
+    - name: Create /usr/sap/install mount point
+      file:
+        path: /usr/sap/install
+        state: directory
+
+    - name: Mount /usr/sap/install
+      mount:
+        path: /usr/sap/install
+        src: /dev/disk/azure/scsi1/lun0-part1
+        fstype: xfs
+        state: mounted
