@@ -31,7 +31,7 @@ output "dns_info_vms" {
   value = local.enable_deployment ? local.anydb_dual_nics ? (
     zipmap(
       concat(
-        local.local.anydb_vms[*].name,
+        local.anydb_vms[*].name,
         var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,
         local.deploy_observer ? local.full_observer_names : null
       ),
@@ -42,7 +42,7 @@ output "dns_info_vms" {
       )
     )
     ) : (
-    zipmap(local.local.anydb_vms[*].name, azurerm_network_interface.anydb_db[*].private_ip_address)
+    zipmap(local.anydb_vms[*].name, azurerm_network_interface.anydb_db[*].private_ip_address)
   ) : null
 
 }

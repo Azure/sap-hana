@@ -24,8 +24,8 @@ output "hana_database_info" {
 output "dns_info_vms" {
   value = local.enable_deployment ? (
     zipmap(
-      concat(local.local.hdb_vms[*].name, var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME),
-      concat(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, azurerm_network_interface.nics_dbnodes_db[idx].private_ip_address)
+      concat(local.hdb_vms[*].name, var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME),
+      concat(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, azurerm_network_interface.nics_dbnodes_db[*].private_ip_address)
     )) : (
     null
   )

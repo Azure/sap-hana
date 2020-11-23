@@ -307,7 +307,7 @@ locals {
   ])[0], false)
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
-    format("%s%s%s%s", local.prefix, local.separator, vm, local.resource_suffixes.vm)]
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
   )
 
 }
