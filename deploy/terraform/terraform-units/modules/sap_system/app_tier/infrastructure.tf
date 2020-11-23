@@ -49,21 +49,21 @@ resource "azurerm_lb" "scs" {
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_feip)
     subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.scs_lb_ips[0], cidrhost(local.sub_app_prefix, 0 + local.ip_offsets.scs_lb))
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_ers_feip)
     subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.scs_lb_ips[1], cidrhost(local.sub_app_prefix, 1 + local.ip_offsets.scs_lb))
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -163,11 +163,11 @@ resource "azurerm_lb" "web" {
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
     subnet_id = local.sub_web_deployed.id
-    private_ip_address = local.dynamic_ipaddresses ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.web_lb_ips[0], cidrhost(local.sub_web_deployed.address_prefixes[0], local.ip_offsets.web_lb))
     )
-    private_ip_address_allocation = local.dynamic_ipaddresses ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
