@@ -127,9 +127,9 @@ BEGIN {
 
 END {
 
-  printf("---\n\nname: \"%s\"\ntarget: \"%s\"\nversion: \"001\"\n\ndefaults:\n", product, targetname);
-  printf("  archive_location: \"%s/\"\n  target_location: \"/usr/sap/install/downloads/\"\n\n", archive);
-  printf("materials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"003\"\n\n  media:\n");
+  printf("---\n\nname: \"%s\"\ntarget: \"%s\"\nversion: \"001\"\n", product, targetname);
+  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}/downloads/\"\n");
+  printf("\nmaterials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"003\"\n\n  media:\n");
 
   while ( getline < "tempworkfile" ) {
     seq = $1;
@@ -138,16 +138,16 @@ END {
     component = $4;
     if ( component == "File on DVD" ) component = (component " - " $3)
 
-    dir = "/usr/sap/install/downloads";
+    dir = "{{ target_media_location }}";
     current = substr(seq,1,2);
     if (current != phase ) {
       phase = current;
       if ( phase == "AA" ) {
         printf("\n    # kernel components\n");
-        overridedir = "/usr/sap/install/download_basket";
+        overridedir = "{{ target_media_location }}/download_basket";
       } else if ( phase == "BB" ) {
         printf("\n    # db export components\n");
-        overridedir = "/usr/sap/install/cd_exports";
+        overridedir = "{{ target_media_location }}/cd_exports";
       } else {
         printf("\n    # other components\n");
         overridedir = "";
