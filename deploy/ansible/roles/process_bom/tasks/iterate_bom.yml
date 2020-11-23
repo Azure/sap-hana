@@ -13,6 +13,11 @@
     name: bom
   delegate_to: localhost
 
+- name: Ensure {{ target_media_location }} exists
+  file:
+    path: "{{ target_media_location }}"
+    state: directory
+
 - name: Group iterable tasks together
   vars:
     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
