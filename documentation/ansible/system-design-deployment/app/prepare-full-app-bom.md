@@ -77,8 +77,7 @@ step|BoM Content
 [3] |version: 001
     |
 [4] |defaults:
-    |  archive_location: "https://npweeusaplib9545.file.core.windows.net/sapbits/archives/"
-    |  target_location: "/usr/sap/downloads/"
+    |  target_location: "{{ target_media_location }}/downloads"
     |
 [5] |materials:
 [6] |  dependencies:
@@ -126,8 +125,7 @@ step|BoM Content
 #### Create Defaults Section
 
 1. `[4]`: This section contains:
-   1. `archive_location`: The location to which you will upload the SAP build files. Also, the same location from which the files will be copied to the target server.
-   1. `target_location`: The folder on the target server, into which the files will be copied for installation.
+   1. `target_location`: The folder on the target server, into which the files will be copied for installation. Normally, this will reference `{{ target_media_location }}` as shown, but could be an unrelated path.
 
 #### Create Materials Section
 
@@ -219,7 +217,7 @@ After downloading the stack files and Download Basket manifest `.json` file into
 
 #### Override Target Destination
 
-Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#create-defaults-section)). However, you may override this on a case-by-case basis.
+Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
 
@@ -227,12 +225,12 @@ Files downloaded or shared from the archive space will need to be extracted to t
    - name: "Kernel Part I"
      archive: "SAPEXE_200-80004393.SAR"
      sapurl: "https://softwaredownloads.sap.com/file/0020000001063232020"
-     override_target_location: "/usr/sap/install/download_basket/"
+     override_target_location: "{{ target_media_location }}/download_basket/"
 
    - name: "Kernel Part II (777)"
      archive: "SAPEXEDB_200-80004392.SAR"
      sapurl: "https://softwaredownloads.sap.com/file/0020000001063182020"
-     override_target_location: "/usr/sap/install/download_basket/"
+     override_target_location: "{{ target_media_location }}/download_basket/"
    ```
 
 #### Override Target Filename

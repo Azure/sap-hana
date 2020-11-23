@@ -28,22 +28,30 @@
 
    **Note:** The following instructions assume you have mounted the container as `/mnt/sapbits`.
 
-1. Ensure `/usr/sap/downloads/` exists:
+1. Make and change to a temporary directory:
 
-   `mkdir /usr/sap/downloads/`
+   `mkdir /tmp/workdir; cd $_`
 
-1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/usr/sap/downloads`:
+1. Ensure `/tmp/app_template/` exists:
+
+   `mkdir /tmp/app_template/`
+
+1. Ensure `/usr/sap/install/` exists:
+
+   `mkdir /usr/sap/install/`
+
+1. Using the `media` entries in the BoM file, copy the required media from `sapbits` to `/usr/sap/install`:
    1. For each entry in `media`:
 
-      `cp /mnt/sapbits/archive/<archive> /usr/sap/downloads`
+      `cp /mnt/sapbits/archive/<archive> /usr/sap/install`
 
       Where `<archive>` is the filename in the `archive:` property of the entry in the BoM.
 
-      For example: `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR /usr/sap/downloads`
+      For example: `cp /mnt/sapbits/archive/SAPHOSTAGENT49_49-20009394.SAR /usr/sap/install`
 
 1. Update the permissions to make `SAPCAR` executable (SAPCAR version may change depending on your downloads):
 
-   `chmod +x /usr/sap/downloads/SAPCAR_1311-80000935.EXE`
+   `chmod +x /usr/sap/install/SAPCAR_1311-80000935.EXE`
 
 1. Ensure `/usr/sap/install/SWPM/` exists:
 
@@ -51,7 +59,7 @@
 
 1. Extract `SWPM20SP07_0-80003424.SAR` via `SAPCAR.EXE`. For example:
 
-   `/usr/sap/downloads/SAPCAR_1311-80000935.EXE -xf /usr/sap/downloads/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+   `/usr/sap/install/SAPCAR_1311-80000935.EXE -xf /usr/sap/install/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 
 1. Ensure `/usr/sap/install/config` exists and contains the XML Stack file downloaded from the SAP Maintenance Planner:
 
@@ -82,7 +90,7 @@ The following steps show how to begin the manual install of an ASCS instance in 
    **Note:** `The password of user DBUser may only consist of alphanumeric characters and the special characters #, $, @ and _. The first character must not be a digit or an underscore`.
 
 1. The password fields will be pre-populated based on the master password supplied. Set the `<sid>adm` OS user ID to 2000 and the `sapsys` OS group ID to 2000, and click "Next";
-1. When prompted to supply the path to the SAPEXE kernel file, specify a path of /usr/sap/downloads/ and click "Next";
+1. When prompted to supply the path to the SAPEXE kernel file, specify a path of /usr/sap/install/ and click "Next";
 1. Notice the package status is "Available" click "Next";
 1. Notice the SAP Host Agent installation file status is "Available" click "Next";
 1. Details for the sapadm OS user will be presented next. It is recommended to leave the password as inherited from the master password, and enter in the OS user ID of 2100, and click "Next";
@@ -150,7 +158,7 @@ Follow the [SAP instructions for Exporting directories via NFS for Linux](https:
 The directories to be exported for this process are:
 
 1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattented installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
-1. `/usr/sap/downloads`
+1. `/usr/sap/install`
 1. `/usr/sap/install/config`
 1. `/tmp/app_template`
 1. `/sapmnt/<SID>/global`
@@ -163,7 +171,7 @@ The directories to be exported for this process are:
    `mkdir -p /usr/sap/{downloads,install/config,<SID>/SYS} /tmp/app_template /sapmnt/<SID>/{global,profile}`
 
 1. Ensure the exported directories are mounted:
-   1. `mount <scs-vm-IP>:/usr/sap/downloads /usr/sap/downloads`
+   1. `mount <scs-vm-IP>:/usr/sap/install /usr/sap/install`
    1. `mount <scs-vm-IP>:/usr/sap/install/config /usr/sap/install/config`
    1. `mount <scs-vm-IP>:/usr/sap/<SID>/SYS /usr/sap/<SID>/SYS`
    1. `mount <scs-vm-IP>:/tmp/app_template /tmp/app_template`
@@ -180,7 +188,7 @@ The directories to be exported for this process are:
 
 1. Ensure SWPM is extracted:
 
-   `/usr/sap/downloads/SAPCAR_1311-80000935.EXE -xf /usr/sap/downloads/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
+   `/usr/sap/install/SAPCAR_1311-80000935.EXE -xf /usr/sap/install/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
 
 1. Launch SWPM with the following command:
 
@@ -206,7 +214,7 @@ Distributed System" , click on "Database Instance" and click "Next"
    1. click "Next"
 1. Verify the connection details and click "OK"
 1. Enter the System Database Administrator Password and click "Next"
-1. Enter the path to the SAPEXE Kernel `/usr/sap/downloads/` and click "Next"
+1. Enter the path to the SAPEXE Kernel `/usr/sap/install/` and click "Next"
 1. Notice the files are listed as available and click "Next"
 1. Notice the SAPHOSTAGENT file is listed as available and click "Next"
 1. Click "Next" on the SAP System Administrator password confirmation.
@@ -292,7 +300,7 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 1. Ensure the Profile Directory is set to `/sapmnt/<SID>/profile/` or  `/usr/sap/<SID>/SYS/profile` and click "Next"
 1. Set the Message Server Port to `36nn` where `nn` is the ASCS Instance number and click "Next"
 1. Set the Master Password for All Users and click "Next"
-1. On the Software Package Browser Screen set the Search Directory to `/usr/sap/downloads` then click "Next"
+1. On the Software Package Browser Screen set the Search Directory to `/usr/sap/install` then click "Next"
 1. ⌛️ ... wait several minutes for `below-the-fold-list` to populate then click "Next"
 1. Ensure the "Upgrade SAP Host Agent to the version of the provided SAPHOSTAGENT.SAR archive" option is unchecked then click "Next"
 1. Enter the Instance Number of the SAP HANA Database and Database System Administrator Password and click "Next"
