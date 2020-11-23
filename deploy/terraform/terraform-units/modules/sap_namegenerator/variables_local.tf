@@ -5,12 +5,12 @@ variable environment {
 
 variable deployer_environment {
   description = "Deployer environment type (Prod, Test, Sand, QA)"
-  default = ""
+  default     = ""
 }
 
 variable landscape_environment {
   description = "Landscape environment type (Prod, Test, Sand, QA)"
-  default = ""
+  default     = ""
 }
 
 variable location {
@@ -292,11 +292,17 @@ locals {
 
   location_short = upper(try(var.region_mapping[var.location], "unkn"))
 
-  env_verified            = upper(substr(var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
-  deployer_env_verified   = upper(substr(length(var.deployer_environment) > 0 ? var.deployer_environment : var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
-  landscape_env_verified  = upper(substr(length(var.landscape_environment) > 0 ? var.deployer_environment : var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
+  // If no deployer environment provided use environment
+  deployer_environment_temp = length(var.deployer_environment) > 0 ? var.deployer_environment : var.environment
 
-  vnet_verified     = upper(trim(substr(var.sap_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
+  // If no landscape environment provided use environment
+  landscape_environment_temp = length(var.landscape_environment) > 0 ? var.landscape_environment : var.environment
+
+  env_verified           = upper(substr(var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
+  deployer_env_verified  = upper(substr(local.deployer_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
+  landscape_env_verified = upper(substr(local.landscape_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
+
+  sap_vnet_verified = upper(trim(substr(var.sap_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
   dep_vnet_verified = upper(trim(substr(var.management_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
 
   random_id_verified    = upper(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))
