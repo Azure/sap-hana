@@ -49,7 +49,8 @@
       },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
-        ]
+      ],
+      "use_DHCP": false
     }
   ],
   "application": {
@@ -60,10 +61,10 @@
     "scs_high_availability": false,
     "application_server_count": 2,
     "webdispatcher_count": 1,
-    "app_zones": ["1","2"],
+    "app_zones": ["1", "2"],
     "scs_zones": ["1"],
     "web_zones": ["1"],
-    "dynamic_addressing" : false,
+    "use_DHCP": false,
     "authentication": {
       "type": "key",
       "username": "azureadm"
