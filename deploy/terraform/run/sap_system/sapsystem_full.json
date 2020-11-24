@@ -21,7 +21,7 @@
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
       },
-      "nic_ips": ["10.1.2.10", "10.1.2.11", "10.1.2.12"],
+      "nic_ips": ["", "", ""],
       "use_DHCP" : false
     },
     "vnets": {

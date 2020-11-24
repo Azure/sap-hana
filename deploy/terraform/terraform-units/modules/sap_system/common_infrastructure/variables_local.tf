@@ -164,7 +164,7 @@ locals {
   }
 
   anchor_ostype = upper(try(local.anchor.os.os_type, local.db_ostype))
-    // Support dynamic addressing
+  // Support dynamic addressing
   anchor_use_DHCP = try(local.anchor.use_DHCP, false)
 
 
