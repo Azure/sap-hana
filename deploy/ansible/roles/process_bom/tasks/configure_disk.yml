@@ -1,28 +1,28 @@
 ---
 
-- name: Configure Disk mounted at /usr/sap/install
+- name: "Configure Disk mounted at {{ target_media_location }}"
   become_user: root
   become: yes
   block:
-    - name: Add /usr/sap/install partition
+    - name: "Add {{ target_media_location }} partition"
       parted:
         state: present
         device: /dev/disk/azure/scsi1/lun0
         number: 1
 
-    - name: Create /usr/sap/install/ filesystem
+    - name: "Create {{ target_media_location }}/ filesystem"
       filesystem:
         fstype: xfs
         dev: /dev/disk/azure/scsi1/lun0-part1
 
-    - name: Create /usr/sap/install mount point
+    - name: "Create {{ target_media_location }} mount point"
       file:
-        path: /usr/sap/install
+        path: "{{ target_media_location }}"
         state: directory
 
-    - name: Mount /usr/sap/install
+    - name: "Mount {{ target_media_location }}"
       mount:
-        path: /usr/sap/install
+        path: "{{ target_media_location }}"
         src: /dev/disk/azure/scsi1/lun0-part1
         fstype: xfs
         state: mounted
