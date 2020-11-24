@@ -23,6 +23,7 @@
     working_bom: bom
     source_location: media_iterator.location
     type: media_iterator.property
+  include_tasks: download_media.yml
   loop:
     - location: archives
       property: media
