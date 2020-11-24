@@ -9,16 +9,16 @@
         path: "{{ file_dest_target_location }}"
         state: directory
       vars:
-        file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
+        file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
       loop: "{{ bom_media | flatten(levels=1) }}"
       loop_control:
-        loop_var: media_iterator
+        loop_var: download_iterator
 
     - name: Ensure media are downloaded
       vars:
-        file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
-        file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
-        file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
+        file_source: "{{ archive_location }}/{{ download_iterator.archive }}"
+        file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
+        file_dest_target_name: "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, download_iterator.archive) }}"
         file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
       uri:
         url: "{{ file_source }}"
@@ -26,4 +26,4 @@
         creates: "{{ file_dest }}"
       loop: "{{ bom_media | flatten(levels=1) }}"
       loop_control:
-        loop_var: media_iterator
+        loop_var: download_iterator
