@@ -96,8 +96,6 @@ output "dns_info_vms" {
   )
 }
 
-
-
 output "dns_info_loadbalancers" {
   value = ! local.enable_deployment ? null : (
     zipmap(
@@ -114,27 +112,3 @@ output "dns_info_loadbalancers" {
     )
   )
 }
-/*
-output "dns_info_loadbalancers" {
-  value = ! local.enable_deployment ? null : (
-    zipmap(
-      [
-        compact([
-          local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",
-          local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "ers") : "",
-          local.webdispatcher_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) : ""]
-        )
-      ],
-      [
-        compact([
-          local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[0] : "",
-          local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[1] : "",
-          local.webdispatcher_count > 0 ? azurerm_lb.web[0].private_ip_address : ""]
-
-        )
-      ]
-    )
-  )
-}
-
-*/
