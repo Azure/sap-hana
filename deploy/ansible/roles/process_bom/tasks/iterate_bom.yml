@@ -30,6 +30,9 @@
         state: directory
       vars:
         file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
+      loop: "{{ bom_media | flatten(levels=1) }}"
+      loop_control:
+        loop_var: media_iterator
 
     - name: Ensure media are downloaded
       vars:
