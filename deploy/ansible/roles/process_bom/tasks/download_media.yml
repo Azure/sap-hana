@@ -2,10 +2,10 @@
 
 - name: "Ensure media property is iterated"
   vars:
-    bom_dependencies: "{{ working_bom.materials.dependencies is defined | ternary(working_bom.materials.dependencies, []) }}"
+    # bom_dependencies: "{{ working_bom.materials.dependencies is defined | ternary(working_bom.materials.dependencies, []) }}"
     archive_location: "{{ sapbits_location_base_path }}/{{ source_location }}"
     target_location: "{{ working_bom.defaults.target_location | regex_replace('/$', '') }}"
-    bom_media: '{{ working_bom.materials.type }}'
+    bom_media: '{{ working_bom[type] }}'
   block:
     - name: Ensure target folders exist
       file:
