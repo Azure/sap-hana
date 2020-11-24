@@ -161,6 +161,6 @@ END {
     if ( sapurl != "" ) printf("      sapurl: \"https://softwaredownloads.sap.com/file/%s\"\n", sapurl);
   }
 
-  printf("\n  templates:\n\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n", product, product);
+  printf("\n  templates:\n\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", product, product);
 }
 '

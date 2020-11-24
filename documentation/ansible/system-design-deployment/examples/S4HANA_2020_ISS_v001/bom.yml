@@ -490,3 +490,4 @@ materials:
 
     - name: "S4HANA_2020_ISS_v001 ini file"
       file: "S4HANA_2020_ISS_v001.inifile.params"
+      override_target_location: "{{ target_media_location }}/config"

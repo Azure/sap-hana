@@ -238,3 +238,4 @@ materials:
 
     - name: "SAP_BW4HANA_2_0 ini file"
       file: "SAP_BW4HANA_2_0.inifile.params"
+      override_target_location: "{{ target_media_location }}/config"

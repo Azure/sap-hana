@@ -24,6 +24,7 @@ materials:
 
     - name:     "HANA_1_00_122_v001 params"
       file:     "HANA_1_00_122_v001.params"
-
+      override_target_location: "{{ target_media_location }}/config"
     - name:     "HANA_1_00_122_v001 xml"
       file:     "HANA_1_00_122_v001.params.xml"
+      override_target_location: "{{ target_media_location }}/config"
