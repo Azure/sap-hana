@@ -30,16 +30,14 @@ output "anydb_loadbalancers" {
 output "dns_info_vms" {
   value = local.enable_deployment ? local.anydb_dual_nics ? (
     zipmap(
-      concat(
+      compact(concat(
         local.anydb_vms[*].name,
-        var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,
-        local.deploy_observer ? local.full_observer_names : null
-      ),
-      concat(
+        slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,0, length(azurerm_network_interface.anydb_db[*].private_ip_address))
+      )),
+      compact(concat(
         azurerm_network_interface.anydb_admin[*].private_ip_address,
-        azurerm_network_interface.anydb_db[*].private_ip_address,
-        local.deploy_observer ? azurerm_network_interface.observer[*].private_ip_address : null
-      )
+        azurerm_network_interface.anydb_db[*].private_ip_address
+      ))
     )
     ) : (
     zipmap(local.anydb_vms[*].name, azurerm_network_interface.anydb_db[*].private_ip_address)
