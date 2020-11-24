@@ -5,7 +5,7 @@ target: "SAP BW/4HANA 2.0"
 version: "001"
 
 defaults:
-  target_location: "{{ target_media_location }}/downloads/"
+  target_location: "{{ target_media_location }}"
 
 materials:
   dependencies:

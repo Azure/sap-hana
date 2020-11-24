@@ -5,7 +5,7 @@ target: "ABAP PLATFORM 2020"
 version: "001"
 
 defaults:
-  target_location: "{{ target_media_location }}/downloads/"
+  target_location: "{{ target_media_location }}"
 
 materials:
   dependencies:

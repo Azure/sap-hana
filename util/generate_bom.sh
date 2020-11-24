@@ -128,7 +128,7 @@ BEGIN {
 END {
 
   printf("---\n\nname: \"%s\"\ntarget: \"%s\"\nversion: \"001\"\n", product, targetname);
-  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}/downloads/\"\n");
+  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}\"\n");
   printf("\nmaterials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"003\"\n\n  media:\n");
 
   while ( getline < "tempworkfile" ) {
