@@ -691,5 +691,5 @@ materials:
   templates:
 
     - name: "S4HANA_1909_SP2_v001 ini file"
-      file: "S4HANA_S4HANA_1909_SP2_v001.inifile.params"
+      file: "S4HANA_1909_SP2_v001.inifile.params"
       override_target_location: "{{ target_media_location }}/config"

@@ -21,17 +21,17 @@
 - name: "Ensure current property is iterated"
   vars:
     default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
-    bom_media: "{{ media_iterator.media | flatten(levels=1) }}"
+    bom_media: "{{ media_iterator.media }}"
     source_location: "{{ media_iterator.location }}"
     file_name: "{{ media_iterator.property_name }}"
   include_tasks: download_media.yml
   loop:
     - location: archives
-      property_name: media
-      media: "{{ bom.materials.media }}"
+      property_name: archive
+      media: "{{ bom.materials.media | flatten(levels=1) }}"
     - location: templates
-      property_name: templates
-      media: "{{ bom.materials.templates }}"
+      property_name: file
+      media: "{{ bom.materials.templates | flatten(levels=1) }}"
   loop_control:
     loop_var: media_iterator
 
