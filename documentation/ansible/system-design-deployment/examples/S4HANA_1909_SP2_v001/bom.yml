@@ -693,3 +693,29 @@ materials:
     - name: "S4HANA_1909_SP2_v001 ini file"
       file: "S4HANA_1909_SP2_v001.inifile.params"
       override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Spreadsheet
+      file: MP_Excel_2001018560_2020112_SWC.xls
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Plan doc
+      file: MP_Plan_2001018560_2020112_.pdf
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack text
+      file: MP_Stack_2001018560_2020112_.txt
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack XML
+      file: MP_Stack_2001018560_2020112_.xml
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"

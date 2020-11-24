@@ -239,3 +239,29 @@ materials:
     - name: "SAP_BW4HANA_2_0 ini file"
       file: "SAP_BW4HANA_2_0.inifile.params"
       override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Spreadsheet
+      file: MP_Excel_1001059086_20201023_SWC.xls
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Plan doc
+      file: MP_Plan_1001059086_20201023_.pdf
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack text
+      file: MP_Stack_1001059086_20201023_.txt
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack XML
+      file: MP_Stack_1001059086_20201023_.xml
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"
