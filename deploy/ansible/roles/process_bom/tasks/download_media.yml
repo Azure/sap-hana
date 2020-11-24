@@ -16,9 +16,10 @@
 
     - name: Ensure media are downloaded
       vars:
-        file_source: "{{ archive_location }}/{{ download_iterator.archive }}"
+        default_file_name: "{{ download_iterator[file_name] }}"
+        file_source: "{{ archive_location }}/{{ default_file_name }}"
         file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
-        file_dest_target_name: "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, download_iterator.archive) }}"
+        file_dest_target_name: "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, default_file_name) }}"
         file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
       uri:
         url: "{{ file_source }}"
