@@ -32,7 +32,7 @@ output "dns_info_vms" {
     zipmap(
       compact(concat(
         local.anydb_vms[*].name,
-        slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,0, length(azurerm_network_interface.anydb_db[*].private_ip_address))
+        slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME,0, local.db_server_count)
       )),
       compact(concat(
         azurerm_network_interface.anydb_admin[*].private_ip_address,
