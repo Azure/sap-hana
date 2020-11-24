@@ -167,6 +167,8 @@ locals {
   web_nic_ips              = try(var.application.web_nic_ips, [])
   web_admin_nic_ips        = try(var.application.web_admin_nic_ips, [])
 
+  use_DHCP = try(var.application.use_DHCP, false)
+
   // Dual network cards
   apptier_dual_nics = try(var.application.dual_nics, false)
 
@@ -404,4 +406,17 @@ locals {
       }
     ]
   ])
+
+
+  full_appserver_names = flatten([for vm in local.app_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
+
+  full_scsserver_names = flatten([for vm in local.scs_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
+
+  full_webserver_names = flatten([for vm in local.web_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
 }

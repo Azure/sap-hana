@@ -9,11 +9,14 @@ resource "azurerm_network_interface" "web" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = local.sub_web_deployed.id
-    private_ip_address = try(local.web_nic_ips[count.index], local.sub_web_defined ?
-      cidrhost(local.sub_web_prefix, (tonumber(count.index) + local.ip_offsets.web_vm)) :
-      cidrhost(local.sub_app_prefix, (tonumber(count.index) * -1 + local.ip_offsets.web_vm))
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.web_nic_ips[count.index], local.sub_web_defined ?
+        cidrhost(local.sub_web_prefix, (tonumber(count.index) + local.ip_offsets.web_vm)) :
+        cidrhost(local.sub_app_prefix, (tonumber(count.index) * -1 + local.ip_offsets.web_vm))
+      )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -28,11 +31,13 @@ resource "azurerm_network_interface" "web_admin" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = var.admin_subnet.id
-    private_ip_address = try(local.web_admin_nic_ips[count.index],
-      cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + local.admin_ip_offsets.web_vm
-      )
-    )
-    private_ip_address_allocation = "static"
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.web_admin_nic_ips[count.index],
+        cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + local.admin_ip_offsets.web_vm
+        )
+    ))
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 

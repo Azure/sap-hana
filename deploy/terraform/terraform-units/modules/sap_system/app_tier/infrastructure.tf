@@ -47,17 +47,23 @@ resource "azurerm_lb" "scs" {
   sku                 = local.scs_zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_feip)
-    subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = try(local.scs_lb_ips[0], cidrhost(local.sub_app_prefix, 0 + local.ip_offsets.scs_lb))
+    name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_feip)
+    subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.scs_lb_ips[0], cidrhost(local.sub_app_prefix, 0 + local.ip_offsets.scs_lb))
+    )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 
   frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_ers_feip)
-    subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = try(local.scs_lb_ips[1], cidrhost(local.sub_app_prefix, 1 + local.ip_offsets.scs_lb))
+    name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_ers_feip)
+    subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.scs_lb_ips[1], cidrhost(local.sub_app_prefix, 1 + local.ip_offsets.scs_lb))
+    )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -148,22 +154,25 @@ resource "azurerm_availability_set" "app" {
 
 # Create the Web dispatcher Load Balancer
 resource "azurerm_lb" "web" {
-  count               = local.enable_deployment  && local.webdispatcher_count > 0 ? 1 : 0
+  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
   sku                 = local.web_zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
-    subnet_id                     = local.sub_web_deployed.id
-    private_ip_address            = try(local.web_lb_ips[0], cidrhost(local.sub_web_deployed.address_prefixes[0], local.ip_offsets.web_lb))
-    private_ip_address_allocation = "Static"
+    name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
+    subnet_id = local.sub_web_deployed.id
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.web_lb_ips[0], cidrhost(local.sub_web_deployed.address_prefixes[0], local.ip_offsets.web_lb))
+    )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
 resource "azurerm_lb_backend_address_pool" "web" {
-  count               = local.enable_deployment  && local.webdispatcher_count > 0 ? 1 : 0
+  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.web[0].id
@@ -173,7 +182,7 @@ resource "azurerm_lb_backend_address_pool" "web" {
 
 # Create the Web dispatcher Load Balancer Rules
 resource "azurerm_lb_rule" "web" {
-  count                          = local.enable_deployment  && local.webdispatcher_count > 0 ? length(local.lb_ports.web) : 0
+  count                          = local.enable_deployment && local.webdispatcher_count > 0 ? length(local.lb_ports.web) : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.web[0].id
   name                           = format("%s%s%s%05d-%02d", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_inrule, local.lb_ports.web[count.index], count.index)
@@ -187,7 +196,7 @@ resource "azurerm_lb_rule" "web" {
 
 # Associate Web dispatcher VM NICs with the Load Balancer Backend Address Pool
 resource "azurerm_network_interface_backend_address_pool_association" "web" {
-  count                   = local.enable_deployment  && local.webdispatcher_count > 0 ? local.webdispatcher_count : 0
+  count                   = local.enable_deployment && local.webdispatcher_count > 0 ? local.webdispatcher_count : 0
   network_interface_id    = azurerm_network_interface.web[count.index].id
   ip_configuration_name   = azurerm_network_interface.web[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.web[0].id
