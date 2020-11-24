@@ -18,7 +18,7 @@
     path: "{{ target_media_location }}"
     state: directory
 
-- name: "Ensure {{ type }} property is iterated"
+- name: "Ensure {{ media_iterator.property_name }} property is iterated"
   vars:
     default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
     bom_media: "{{ media_iterator.media }}"
@@ -27,10 +27,10 @@
   include_tasks: download_media.yml
   loop:
     - location: archives
-      property_name: archive
+      property_name: media
       media: "{{ bom.materials.media }}"
     - location: templates
-      property_name: file
+      property_name: templates
       media: "{{ bom.materials.templates }}"
   loop_control:
     loop_var: media_iterator
