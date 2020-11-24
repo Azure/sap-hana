@@ -23,6 +23,7 @@
     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
     archive_location: "{{ sapbits_location_base_path }}/archives"
     target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+    bom_media: '{{ bom.materials.media }}'
   block:
     - name: Ensure target folder exists
       file:
@@ -40,7 +41,6 @@
         file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
         file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
         file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
-        bom_media: '{{ bom.materials.media }}'
       uri:
         url: "{{ file_source }}"
         dest: "{{ file_dest }}"
