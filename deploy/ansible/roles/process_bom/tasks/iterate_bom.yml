@@ -18,36 +18,51 @@
     path: "{{ target_media_location }}"
     state: directory
 
-- name: Ensure media property is iterated
+- name: "Ensure current property is iterated"
   vars:
-    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
-    archive_location: "{{ sapbits_location_base_path }}/archives"
-    target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
-    bom_media: '{{ bom.materials.media }}'
-  block:
-    - name: Ensure target folder exists
-      file:
-        path: "{{ file_dest_target_location }}"
-        state: directory
-      vars:
-        file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
-      loop: "{{ bom_media | flatten(levels=1) }}"
-      loop_control:
-        loop_var: media_iterator
+    default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+    bom_media: "{{ media_iterator.media }}"
+    source_location: "{{ media_iterator.location }}"
+    file_name: "{{ media_iterator.property_name }}"
+  include_tasks: download_media.yml
+  loop:
+    - location: archives
+      property_name: archive
+      media: "{{ bom.materials.media | flatten(levels=1) }}"
+    - location: templates
+      property_name: file
+      media: "{{ bom.materials.templates | flatten(levels=1) }}"
+  loop_control:
+    loop_var: media_iterator
 
-    - name: Ensure media are downloaded
-      vars:
-        file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
-        file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
-        file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
-        file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
-      uri:
-        url: "{{ file_source }}"
-        dest: "{{ file_dest }}"
-        creates: "{{ file_dest }}"
-      loop: "{{ bom_media | flatten(levels=1) }}"
-      loop_control:
-        loop_var: media_iterator
+  #   bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+  #   archive_location: "{{ sapbits_location_base_path }}/archives"
+  #   target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+  #   bom_media: '{{ bom.materials.media }}'
+  # block:
+  #   - name: Ensure target folders exist
+  #     file:
+  #       path: "{{ file_dest_target_location }}"
+  #       state: directory
+  #     vars:
+  #       file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
+  #     loop: "{{ bom_media | flatten(levels=1) }}"
+  #     loop_control:
+  #       loop_var: media_iterator
+
+  #   - name: Ensure media are downloaded
+  #     vars:
+  #       file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
+  #       file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
+  #       file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
+  #       file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
+  #     uri:
+  #       url: "{{ file_source }}"
+  #       dest: "{{ file_dest }}"
+  #       creates: "{{ file_dest }}"
+  #     loop: "{{ bom_media | flatten(levels=1) }}"
+  #     loop_control:
+  #       loop_var: media_iterator
 
 - name: "Ensure {{ bom_base_name }} dependencies are followed"
   when: bom_dependencies | length != 0

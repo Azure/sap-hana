@@ -17,6 +17,5 @@ For example:
     test_mode: true
 
   roles:
-
     - role: process_bom
 ```
