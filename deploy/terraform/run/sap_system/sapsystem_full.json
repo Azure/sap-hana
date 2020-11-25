@@ -83,6 +83,18 @@
     "authentication": {
       "type": "key",
       "username": "azureadm"
+    },
+    "app_tags": 
+    {
+      "name": "value"
+    },
+    "scs_tags": 
+    {
+      "name": "value"
+    },
+    "web_tags": 
+    {
+      "name": "value"
     }
   },
   "sshkey": {
