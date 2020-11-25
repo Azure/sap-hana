@@ -84,7 +84,6 @@ locals {
 
   //ANF support
   use_ANF = try(local.hdb.use_ANF, false)
-
   //Scalout subnet is needed if ANF is used and there are more than one hana node 
   dbnode_per_site       = length(try(local.hdb.dbnodes, [{}]))
   enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
