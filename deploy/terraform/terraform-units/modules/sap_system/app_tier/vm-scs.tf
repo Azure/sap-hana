@@ -115,6 +115,8 @@ resource "azurerm_linux_virtual_machine" "scs" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.scs_tags
 }
 
 # Create the SCS Windows VM(s)
@@ -169,6 +171,8 @@ resource "azurerm_windows_virtual_machine" "scs" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.scs_tags
 }
 
 # Creates managed data disk

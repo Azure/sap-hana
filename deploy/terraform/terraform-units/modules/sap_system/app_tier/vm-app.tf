@@ -107,6 +107,8 @@ resource "azurerm_linux_virtual_machine" "app" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.app_tags
 }
 
 # Create the Windows Application VM(s)
@@ -160,6 +162,8 @@ resource "azurerm_windows_virtual_machine" "app" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.app_tags
 }
 
 # Creates managed data disk
