@@ -49,6 +49,8 @@ locals {
   iscsi_count = try(local.var_iscsi.iscsi_count, 0)
   iscsi_size  = try(local.var_iscsi.size, "Standard_D2s_v3")
 
+  use_DHCP = try(local.var_iscsi.use_DHCP, false)
+
   iscsi_os = try(local.var_iscsi.os,
     {
       "publisher" = try(local.var_iscsi.os.publisher, "SUSE")
@@ -150,5 +152,9 @@ locals {
 
   // Current service principal
   service_principal = try(var.service_principal, {})
+
+  full_iscsiserver_names = flatten([for vm in local.virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
 
 }

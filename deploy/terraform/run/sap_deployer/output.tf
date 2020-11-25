@@ -56,11 +56,11 @@ output "deployer_kv_user_name" {
 }
 
 output "deployer_public_key_secret_name" {
-  value = module.sap_deployer.ppk_name
+  value = module.sap_deployer.pk_name
 }
 
 output "deployer_private_key_secret_name" {
-  value = module.sap_deployer.pk_name
+  value = module.sap_deployer.ppk_name
 }
 
 output "deployer_rg_name" {

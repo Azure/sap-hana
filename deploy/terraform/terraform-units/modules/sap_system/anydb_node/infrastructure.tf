@@ -11,12 +11,16 @@ resource "azurerm_lb" "anydb" {
   location            = var.resource_group[0].location
 
   frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-    subnet_id                     = var.db_subnet.id
-    private_ip_address_allocation = "Static"
-    private_ip_address = try(local.anydb.loadbalancer.frontend_ip,
-      cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
+    name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
+    subnet_id = var.db_subnet.id
+
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.anydb.loadbalancer.frontend_ip,
+        cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
+      )
     )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 

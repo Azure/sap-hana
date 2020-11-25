@@ -22,3 +22,9 @@ output "iscsi_authentication_username" {
   value = try(module.sap_landscape.iscsi_authentication_username, "")
 }
 
+// Output for DNS
+output "dns_info_iscsi" {
+  value =  module.sap_landscape.dns_info_vms
+}
+
+

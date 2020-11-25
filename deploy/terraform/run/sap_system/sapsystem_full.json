@@ -9,6 +9,21 @@
       "is_existing": "false",
       "arm_id": ""
     },
+    "anchor_vms": {
+      "sku": "Standard_D4s_v4",
+      "authentication": {
+        "type": "key",
+        "username": "azureadm"
+      },
+      "accelerated_networking": true,
+      "os": {
+        "publisher": "SUSE",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
+      },
+      "nic_ips": ["", "", ""],
+      "use_DHCP" : false
+    },
     "vnets": {
       "sap": {
         "is_existing": "false",

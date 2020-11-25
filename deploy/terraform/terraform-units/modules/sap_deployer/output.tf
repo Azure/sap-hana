@@ -56,12 +56,12 @@ output "prvt_vault_name" {
   value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
 }
 
-// output the secret name of public key
+// output the secret name of private key
 output "ppk_name" {
   value = local.enable_deployers && local.enable_key ? local.ppk_name : ""
 }
 
-// output the secret name of private key
+// output the secret name of public key
 output "pk_name" {
   value = local.enable_deployers && local.enable_key ? local.pk_name : ""
 }

@@ -19,7 +19,8 @@
             }
         },
         "iscsi": {
-            "iscsi_count": 3
+            "iscsi_count": 3,
+            "use_DHCP": false
         }
     },
     "sshkey": {},

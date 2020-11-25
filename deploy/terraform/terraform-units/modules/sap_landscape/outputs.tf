@@ -45,3 +45,8 @@ output "iscsi_authentication_type" {
 output "iscsi_authentication_username" {
   value = local.iscsi_auth_username
 }
+
+// Output for DNS
+output "dns_info_vms" {
+  value =  local.iscsi_count > 0 ? zipmap(local.full_iscsiserver_names,azurerm_network_interface.iscsi[*].private_ip_address) : null
+}
