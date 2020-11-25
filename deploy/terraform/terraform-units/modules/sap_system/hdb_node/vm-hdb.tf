@@ -75,10 +75,7 @@ resource "azurerm_network_interface" "nics_dbnodes_storage" {
 
     private_ip_address = local.use_DHCP ? null : try(local.hdb_vms[count.index].scaleout_nic_ip, false) != false ? (
       local.hdb_vms[count.index].scaleout_nic_ip) : (
-      cidrhost(local.sub_scaleout_exists ? (
-        data.azurerm_subnet.scaleout[0].address_prefixes[0]) : (
-        azurerm_subnet.scaleout[0].address_prefixes[0]
-      ), tonumber(count.index) + local.hdb_ip_offsets.hdb_scaleout_vm)
+      cidrhost(var.storage_subnet[0].address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_scaleout_vm)
 
     )
     private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
@@ -100,10 +97,11 @@ resource "azurerm_lb" "hdb" {
   sku                 = local.zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
-    name                          = format("%s%s", local.prefix, local.resource_suffixes.db_alb_feip)
+    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id                     = var.db_subnet.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
+    
+    private_ip_address            = local.use_DHCP ? null : try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 
 }
