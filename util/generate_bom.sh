@@ -111,7 +111,7 @@ END {
 ' /dev/null
 
 sed -e 's@\(</[^>][^>]*>\)@\1\n@g' ${XML_FILE[0]} | \
-awk -v "archive=${ARCHIVE}" -v "product=${PRODUCT}" '
+awk -v "archive=${ARCHIVE}" -v "product=${PRODUCT}" -v "jsonfile=${JSON_FILE}" -v "xlsfile=${XLS_FILE}" -v "xmlfile=${XML_FILE}" '
 BEGIN {
   phase = "";
   FS = ",";
@@ -161,6 +161,15 @@ END {
     if ( sapurl != "" ) printf("      sapurl: \"https://softwaredownloads.sap.com/file/%s\"\n", sapurl);
   }
 
+  stackfileid = gensub(/^MP_Excel_(\d+_\d+).*/, "\\1", "g", xlsfile);
   printf("\n  templates:\n\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", product, product);
+  printf("\n  stackfiles:\n");
+  printf("\n    - name: \"Download Basket JSON Manifest\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", jsonfile);
+  printf("\n    - name: \"Download Basket Spreadsheet\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", xlsfile);
+  printf("\n    - name: \"Download Basket Plan\"\n      file: \"MP_Plan_%s_.pdf\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack text\"\n      file: \"MP_Stack_%s_.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack text\"\n      file: \"MP_Stack_%s_.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack XML\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", xmlfile);
+  printf("\n    - name: \"Download Basket permalinks\"\n      file: \"myDownloadBasketFiles.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n");
 }
 '
