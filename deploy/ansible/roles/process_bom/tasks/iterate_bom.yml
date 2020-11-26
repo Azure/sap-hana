@@ -32,6 +32,9 @@
     - location: templates
       property_name: file
       media: "{{ bom.materials.templates | flatten(levels=1) }}"
+    - location: "boms/{{ bom_base_name }}/stackfiles"
+      property_name: file
+      media: "{{ bom.materials.stackfiles | flatten(levels=1) }}"
   loop_control:
     loop_var: media_iterator
 
