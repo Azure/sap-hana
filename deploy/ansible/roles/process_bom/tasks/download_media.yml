@@ -6,13 +6,18 @@
   block:
     - name: Ensure target folders exist
       file:
-        path: "{{ file_dest_target_location }}"
+        path: "{{ download_location }}"
         state: directory
-      vars:
-        file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
-      loop: "{{ bom_media | flatten(levels=1) }}"
+      loop: "{{ (
+          bom_media | 
+          flatten(levels=1) | 
+          selectattr('override_target_location', 'defined') | 
+          map(attribute='override_target_location') | 
+          list
+        ) + [default_location] | 
+        unique }}"
       loop_control:
-        loop_var: download_iterator
+        loop_var: download_location
 
     - name: Ensure media are downloaded
       vars:
