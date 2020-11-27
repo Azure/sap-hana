@@ -1,0 +1,42 @@
+---
+
+- hosts: localhost
+  vars:
+    bom_name: ""
+    target_media_location: /usr/sap/install
+    test_mode: true
+
+  tasks:
+    - name: pre-checks
+      assert:
+        that:
+          - "{{ bom_name is defined }}"
+          - "{{ bom_name | trim | length != 0 }}"
+
+    - name: "Ensure {{ bom_name }} is available"
+      include_vars:
+        file: "{{ bom_name }}"
+        name: bom
+
+    - name: "Check basic structure of {{ bom_name }}"
+      assert:
+        that:
+          - "{{ bom.name is defined }}"
+          - "{{ bom.name | trim | length != 0 }}"
+          - "{{ bom.target is defined }}"
+          - "{{ bom.target | trim | length != 0 }}"
+          - "{{ bom.defaults is defined }}"
+          - "{{ bom.defaults | length != 0 }}"
+          - "{{ bom.defaults | type_debug == 'list' }}"
+          - "{{ bom.materials is defined }}"
+          - "{{ bom.materials | length != 0 }}"
+          - "{{ bom.materials | type_debug == 'list' }}"
+          - "{{ bom.materials.media is defined }}"
+          - "{{ bom.materials.media | length != 0 }}"
+          - "{{ bom.materials.media | type_debug == 'list' }}"
+          - "{{ bom.materials.templates is defined }}"
+          - "{{ bom.materials.templates | length != 0 }}"
+          - "{{ bom.materials.templates | type_debug == 'list' }}"
+          - "{{ bom.materials.stackfiles is defined }}"
+          - "{{ bom.materials.stackfiles | length != 0 }}"
+          - "{{ bom.materials.stackfiles | type_debug == 'list' }}"

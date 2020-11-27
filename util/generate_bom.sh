@@ -22,7 +22,7 @@
 #     If not supplied or blank, it will attempt to determine the name from the stack XML file.
 #   For example:
 #   cd stackfiles
-#   /path/to/util/generate_fullbom.sh "" "SAP_S4HANA_1809_S4_v001" >../bom.yml
+#   /path/to/util/generate_bom.sh "" "SAP_S4HANA_1809_S4_v001" >../bom.yml
 
 declare ARCHIVE=${1:-https://npweeusaplib9545.file.core.windows.net/sapbits/archives}
 declare PRODUCT=${2}
