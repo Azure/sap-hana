@@ -8,13 +8,13 @@
       file:
         path: "{{ download_location }}"
         state: directory
-      loop: "{{ (
-          bom_media | 
-          flatten(levels=1) | 
-          selectattr('override_target_location', 'defined') | 
-          map(attribute='override_target_location') | 
-          list
-        ) + [default_location] | 
+      loop: "{{
+        bom_media |
+        flatten(levels=1) |
+        selectattr('override_target_location', 'defined') |
+        map(attribute='override_target_location') |
+        list |
+        union([default_location]) |
         unique }}"
       loop_control:
         loop_var: download_location
