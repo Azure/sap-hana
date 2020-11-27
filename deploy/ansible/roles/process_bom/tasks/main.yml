@@ -6,4 +6,4 @@
 
 - include_tasks: "{{ iterator }}"
   vars:
-    iterator: "./iterate_bom{{ (test_mode is defined and test_mode) | ternary('_test', '') }}.yml"
+    iterator: "./iterate_bom.yml"

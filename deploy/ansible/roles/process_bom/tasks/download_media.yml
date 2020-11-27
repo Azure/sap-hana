@@ -18,6 +18,7 @@
         unique }}"
       loop_control:
         loop_var: download_location
+      check_mode: "{{ test_mode is defined and test_mode }}"
 
     - name: Ensure media are downloaded
       vars:
@@ -33,3 +34,4 @@
       loop: "{{ bom_media | flatten(levels=1) }}"
       loop_control:
         loop_var: download_iterator
+      check_mode: "{{ test_mode is defined and test_mode }}"

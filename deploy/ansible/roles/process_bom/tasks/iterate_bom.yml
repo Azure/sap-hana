@@ -17,6 +17,7 @@
   file:
     path: "{{ target_media_location }}"
     state: directory
+  check_mode: "{{ test_mode is defined and test_mode }}"
 
 - name: "Ensure current property is iterated"
   vars:
