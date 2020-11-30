@@ -161,7 +161,7 @@ END {
     if ( sapurl != "" ) printf("      sapurl: \"https://softwaredownloads.sap.com/file/%s\"\n", sapurl);
   }
 
-  stackfileid = gensub(/^MP_Excel_(\d+_\d+).*/, "\\1", "g", xlsfile);
+  stackfileid = gensub(/^MP_Excel_([0-9]+_[0-9]+).*/, "\\1", "g", xlsfile);
   printf("\n  templates:\n\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", product, product);
   printf("\n  stackfiles:\n");
   printf("\n    - name: \"Download Basket JSON Manifest\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", jsonfile);
