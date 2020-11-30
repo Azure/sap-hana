@@ -9,8 +9,8 @@
         {
           "count": 1,
           "name": "os",
-          "disk_type": "Premium_LRS",
-          "size_gb": 64,
+          "disk_type": "Standard_LRS",
+          "size_gb": 30,
           "caching": "None",
           "write_accelerator": false
         },
@@ -35,8 +35,8 @@
         {
           "count": 1,
           "name": "os",
-          "disk_type": "Premium_LRS",
-          "size_gb": 64,
+          "disk_type": "Standard_LRS",
+          "size_gb": 30,
           "caching": "None",
           "write_accelerator": false
         },
@@ -61,8 +61,8 @@
         {
           "count": 1,
           "name": "os",
-          "disk_type": "Premium_LRS",
-          "size_gb": 64,
+          "disk_type": "Standard_LRS",
+          "size_gb": 30,
           "caching": "None",
           "write_accelerator": false
         },
