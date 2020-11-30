@@ -59,7 +59,7 @@ locals {
       "version"   = try(local.var_iscsi.os.version, "latest")
   })
   iscsi_auth_type     = local.iscsi_count > 0 ? try(local.var_iscsi.authentication.type, "key") : ""
-  iscsi_auth_username = local.iscsi_count > 0 ? try(local.var_iscsi.authentication.username, "azureadm") : ""
+  iscsi_auth_username = local.iscsi_count > 0 ? (local.iscsi_username_exist ? data.azurerm_key_vault_secret.iscsi_username[0].value : try(local.var_iscsi.authentication.username, "azureadm")) : ""
   iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
@@ -171,15 +171,18 @@ locals {
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
   input_iscsi_private_key_secret_name = try(var.key_vault.kv_iscsi_sshkey_prvt, "")
   input_iscsi_password_secret_name    = try(var.key_vault.kv_iscsi_pwd, "")
+  input_iscsi_username_secret_name    = try(var.key_vault.kv_iscsi_username, "")
   iscsi_key_exist                     = try(length(local.input_iscsi_public_key_secret_name) > 0, false)
   iscsi_pwd_exist                     = try(length(local.input_iscsi_password_secret_name) > 0, false)
+  iscsi_username_exist                = try(length(local.input_iscsi_username_secret_name) > 0, false)
 
   sid_ppk_name = local.sid_key_exist ? local.input_sid_private_key_secret_name : format("%s-sid-sshkey", local.prefix)
   sid_pk_name  = local.sid_key_exist ? local.input_sid_public_key_secret_name : format("%s-sid-sshkey-pub", local.prefix)
 
-  iscsi_ppk_name = local.iscsi_key_exist ? local.input_iscsi_private_key_secret_name : format("%s-iscsi-sshkey", local.prefix)
-  iscsi_pk_name  = local.iscsi_key_exist ? local.input_iscsi_public_key_secret_name : format("%s-iscsi-sshkey-pub", local.prefix)
-  iscsi_pwd_name = local.iscsi_pwd_exist ? local.input_iscsi_password_secret_name : format("%s-iscsi-password", local.prefix)
+  iscsi_ppk_name      = local.iscsi_key_exist ? local.input_iscsi_private_key_secret_name : format("%s-iscsi-sshkey", local.prefix)
+  iscsi_pk_name       = local.iscsi_key_exist ? local.input_iscsi_public_key_secret_name : format("%s-iscsi-sshkey-pub", local.prefix)
+  iscsi_pwd_name      = local.iscsi_pwd_exist ? local.input_iscsi_password_secret_name : format("%s-iscsi-password", local.prefix)
+  iscsi_username_name = local.iscsi_username_exist ? local.input_iscsi_username_secret_name : format("%s-iscsi-username", local.prefix)
 
   // Extract information from the specified key vault arm ids
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.landscape_keyvault_names.user_access
