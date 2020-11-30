@@ -35,12 +35,6 @@ function main()
 
 	# JQ
 	display_tool_version "jq"
-
-	# Yaml Linting
-	display_tool_version "yamllint"
-
-	# Ansible Linting
-	display_tool_version "ansible-lint"
 }
 
 
