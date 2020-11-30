@@ -126,7 +126,7 @@ resource "azurerm_availability_set" "scs" {
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
-  platform_fault_domain_count  = 2
+  platform_fault_domain_count  = local.faultdomain_count
   proximity_placement_group_id = local.scs_zonal_deployment ? var.ppg[count.index % length(local.scs_zones)].id : var.ppg[0].id
   managed                      = true
 }
@@ -212,7 +212,7 @@ resource "azurerm_availability_set" "web" {
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
-  platform_fault_domain_count  = 2
+  platform_fault_domain_count  = local.faultdomain_count
   proximity_placement_group_id = local.web_zonal_deployment ? var.ppg[count.index % length(local.web_zones)].id : var.ppg[0].id
   managed                      = true
 }

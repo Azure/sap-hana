@@ -1,0 +1,174 @@
+[
+  {
+    "Location": "eastus",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "eastus2",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "westus",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "centralus",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "northcentralus",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "southcentralus",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "northeurope",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "westeurope",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "eastasia",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "southeastasia",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "japaneast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "japanwest",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "australiaeast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "australiasoutheast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "AustraliaCentral",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "brazilsouth",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "SouthIndia",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "CentralIndia",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "WestIndia",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "CanadaCentral",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "CanadaEast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "westus2",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "westcentralus",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "uksouth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "ukwest",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "KoreaCentral",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "KoreaSouth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "FranceCentral",
+    "MaximumFaultDomainCount": "3"
+  },
+  {
+    "Location": "SouthAfricaNorth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "UAENorth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "SwitzerlandNorth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "GermanyWestCentral",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "NorwayEast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "FranceSouth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "AustraliaCentral2",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "SouthAfricaWest",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "UAECentral",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "SwitzerlandWest",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "GermanyNorth",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "NorwayWest",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "BrazilSoutheast",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "EastUS2EUAP",
+    "MaximumFaultDomainCount": "2"
+  },
+  {
+    "Location": "CentralUSEUAP",
+    "MaximumFaultDomainCount": "1"
+  }
+]
