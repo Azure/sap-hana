@@ -69,7 +69,7 @@ locals {
   faultdomain_count = try(tonumber(compact(
     [for pair in local.faults : 
       pair.Location == local.region ? pair.MaximumFaultDomainCount : ""
-    ])[0],2)
+    ])[0]),2)
 
   sid     = upper(try(var.application.sid, ""))
   prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
