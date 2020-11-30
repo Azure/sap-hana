@@ -130,12 +130,7 @@ locals {
   //Enable APP deployment
   enable_app_deployment = try(var.application.enable_deployment, false)
   
- // Support for tags
-  app_tags = try(var.application.app_tags,[])
-  scs_tags = try(var.application.scs_tags,[])
-  web_tags = try(var.application.web_tags,[])
- 
-  //Enable SID deployment
+   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
   var_infra = try(var.infrastructure, {})
