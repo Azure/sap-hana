@@ -5,7 +5,8 @@
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "kv_prvt" {
-  name                       = local.keyvault_names.private_access
+  count                      = local.prvt_kv_exist ? 0 : 1
+  name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   tenant_id                  = local.service_principal.tenant_id
@@ -26,7 +27,8 @@ resource "azurerm_key_vault" "kv_prvt" {
 
 // Create user KV with access policy
 resource "azurerm_key_vault" "kv_user" {
-  name                       = local.keyvault_names.user_access
+  count                      = local.user_kv_exist ? 0 : 1
+  name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
   tenant_id                  = local.service_principal.tenant_id
@@ -63,3 +65,17 @@ resource "azurerm_key_vault_access_policy" "kv_user_portal" {
   ]
 }
 */
+
+// Import an existing private Key Vault
+data "azurerm_key_vault" "kv_prvt" {
+  count               = local.prvt_kv_exist ? 1 : 0
+  name                = local.prvt_kv_name
+  resource_group_name = local.prvt_kv_rg_name
+}
+
+// Import an existing user Key Vault
+data "azurerm_key_vault" "kv_user" {
+  count               = local.user_kv_exist ? 1 : 0
+  name                = local.user_kv_name
+  resource_group_name = local.user_kv_rg_name
+}

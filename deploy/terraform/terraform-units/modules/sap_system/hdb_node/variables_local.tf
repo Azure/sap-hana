@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -30,6 +34,10 @@ variable "admin_subnet" {
 
 variable "db_subnet" {
   description = "Information about SAP db subnet"
+}
+
+variable "storage_subnet" {
+  description = "Information about storage subnet"
 }
 
 variable "sid_kv_user" {
@@ -78,18 +86,27 @@ locals {
   // Filter the list of databases to only HANA platform entries
   hdb = try(local.hdb_list[0], {})
 
+  //ANF support
+  use_ANF = try(local.hdb.use_ANF, false)
+  //Scalout subnet is needed if ANF is used and there are more than one hana node 
+  dbnode_per_site       = length(try(local.hdb.dbnodes, [{}]))
+  enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
+
   // Zones
   zones            = try(local.hdb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
 
-    // Availability Set 
+  // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
   // Tags
   tags = try(local.hdb.tags,{})
   
+  // Support dynamic addressing
+  use_DHCP = try(local.hdb.use_DHCP, false)
+
   hdb_platform = try(local.hdb.platform, "NONE")
   hdb_version  = try(local.hdb.db_version, "2.00.043")
   // If custom image is used, we do not overwrite os reference with default value
@@ -134,19 +151,21 @@ locals {
   shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
   dbnodes = flatten([[for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-    computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-    role         = try(dbnode.role, "worker")
-    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-    db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
+    name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+    computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+    role           = try(dbnode.role, "worker")
+    admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
+    db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+    storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[0]
     }
     ],
     [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-      computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
-      role         = try(dbnode.role, "worker")
-      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-      db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1]
+      name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+      computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+      role           = try(dbnode.role, "worker")
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1]
+      storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[1]
       } if local.hdb_ha
     ]
     ]
@@ -195,6 +214,7 @@ locals {
       computername   = dbnode.computername
       admin_nic_ip   = dbnode.admin_nic_ip,
       db_nic_ip      = dbnode.db_nic_ip,
+      storage_nic_ip = dbnode.storage_nic_ip,
       size           = local.hdb_size,
       os             = local.hdb_os,
       authentication = local.hdb_auth
@@ -205,9 +225,10 @@ locals {
   // Subnet IP Offsets
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   hdb_ip_offsets = {
-    hdb_lb       = 4
-    hdb_admin_vm = 10
-    hdb_db_vm    = 10
+    hdb_lb         = 4
+    hdb_admin_vm   = 10
+    hdb_db_vm      = 10
+    hdb_storage_vm = 10
   }
 
   // Ports used for specific HANA Versions

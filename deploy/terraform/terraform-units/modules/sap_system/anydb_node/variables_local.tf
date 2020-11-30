@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -69,6 +73,9 @@ locals {
   // Availability Set 
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
+
+  // Support dynamic addressing
+  use_DHCP = try(local.anydb.use_DHCP, false)
 
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
@@ -305,5 +312,9 @@ locals {
     for storage in local.storage_list :
     storage.disk_type == "UltraSSD_LRS" ? true : ""
   ])[0], false)
+
+  full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
 
 }

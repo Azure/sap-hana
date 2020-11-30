@@ -1,0 +1,15 @@
+{
+    "infrastructure": {
+        "region": "eastus",
+        "environment": "np"
+    },
+    "deployer": {
+        "environment": "np",
+        "region": "eastus",
+        "vnet": "DEP00"
+    },
+    "key_vault":{
+        "kv_user_id": "",
+        "kv_prvt_id": ""
+    }
+}

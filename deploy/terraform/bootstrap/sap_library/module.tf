@@ -9,6 +9,7 @@ module "sap_library" {
   storage_account_tfstate = var.storage_account_tfstate
   software                = var.software
   deployer                = var.deployer
+  key_vault               = var.key_vault
   service_principal       = local.service_principal
   deployer_tfstate        = data.terraform_remote_state.deployer
   naming                  = module.sap_namegenerator.naming

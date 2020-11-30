@@ -23,19 +23,19 @@ output "infrastructure_w_defaults" {
 }
 
 output "kv_user" {
-  value = azurerm_key_vault.kv_user
+  value = local.user_kv_exist ? data.azurerm_key_vault.kv_user : azurerm_key_vault.kv_user
 }
 
 output "kv_prvt" {
-  value = azurerm_key_vault.kv_prvt
+  value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt : azurerm_key_vault.kv_prvt
 }
 
 output "sid_public_key_secret_name" {
-  value = local.enable_landscape_kv ? azurerm_key_vault_secret.sid_pk[0].name : ""
+  value = local.enable_landscape_kv ? local.sid_pk_name : ""
 }
 
 output "sid_private_key_secret_name" {
-  value = local.enable_landscape_kv ? azurerm_key_vault_secret.sid_ppk[0].name : ""
+  value = local.enable_landscape_kv ? local.sid_ppk_name : ""
 }
 
 output "iscsi_authentication_type" {
@@ -44,4 +44,9 @@ output "iscsi_authentication_type" {
 
 output "iscsi_authentication_username" {
   value = local.iscsi_auth_username
+}
+
+// Output for DNS
+output "dns_info_vms" {
+  value = local.iscsi_count > 0 ? zipmap(local.full_iscsiserver_names, azurerm_network_interface.iscsi[*].private_ip_address) : null
 }

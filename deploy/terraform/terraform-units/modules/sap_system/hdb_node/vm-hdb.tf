@@ -22,12 +22,15 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
   ip_configuration {
     name      = "ipconfig1"
     subnet_id = var.admin_subnet.id
-    private_ip_address = lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? (
-      local.hdb_vms[count.index].admin_nic_ip) : (
-      cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_admin_vm)
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? (
+        local.hdb_vms[count.index].admin_nic_ip) : (
+        cidrhost(var.admin_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_admin_vm)
+      )
     )
 
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -45,13 +48,40 @@ resource "azurerm_network_interface" "nics_dbnodes_db" {
     name      = "ipconfig1"
     subnet_id = var.db_subnet.id
 
-    private_ip_address = try(local.hdb_vms[count.index].db_nic_ip, false) != false ? (
-      local.hdb_vms[count.index].db_nic_ip) : (
-      cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_db_vm)
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.hdb_vms[count.index].db_nic_ip, false) != false ? (
+        local.hdb_vms[count.index].db_nic_ip) : (
+        cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_db_vm)
+      )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
+
+// Creates the NIC for Hana storage
+resource "azurerm_network_interface" "nics_dbnodes_storage" {
+  count = local.enable_deployment && local.enable_storage_subnet ? length(local.hdb_vms) : 0
+  name  = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.storage_nic)
+
+  location                      = var.resource_group[0].location
+  resource_group_name           = var.resource_group[0].name
+  enable_accelerated_networking = true
+
+  ip_configuration {
+    primary   = true
+    name      = "ipconfig1"
+    subnet_id = var.storage_subnet.id
+
+    private_ip_address = local.use_DHCP ? null : try(local.hdb_vms[count.index].scaleout_nic_ip, false) != false ? (
+      local.hdb_vms[count.index].scaleout_nic_ip) : (
+      cidrhost(var.storage_subnet[0].address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_scaleout_vm)
+
+    )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+  }
+}
+
 
 # LOAD BALANCER ===================================================================================================
 
@@ -69,8 +99,8 @@ resource "azurerm_lb" "hdb" {
   frontend_ip_configuration {
     name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
     subnet_id                     = var.db_subnet.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
+    private_ip_address            = local.use_DHCP ? null : try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 
 }
@@ -123,6 +153,7 @@ resource "azurerm_lb_rule" "hdb" {
 
 # Manages Linux Virtual Machine for HANA DB servers
 resource "azurerm_linux_virtual_machine" "vm_dbnode" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? length(local.hdb_vms) : 0
   name                = local.hdb_vms[count.index].name
   computer_name       = local.hdb_vms[count.index].computername
@@ -143,10 +174,13 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
 
   zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
 
-  network_interface_ids = [
+  network_interface_ids = local.enable_storage_subnet ? ([
     azurerm_network_interface.nics_dbnodes_admin[count.index].id,
-    azurerm_network_interface.nics_dbnodes_db[count.index].id
-  ]
+    azurerm_network_interface.nics_dbnodes_db[count.index].id,
+    azurerm_network_interface.nics_dbnodes_storage[count.index].id]) : ([
+    azurerm_network_interface.nics_dbnodes_admin[count.index].id,
+    azurerm_network_interface.nics_dbnodes_db[count.index].id]
+  )
   size                            = lookup(local.sizes, local.hdb_vms[count.index].size).compute.vm_size
   admin_username                  = local.sid_auth_username
   admin_password                  = local.sid_auth_password

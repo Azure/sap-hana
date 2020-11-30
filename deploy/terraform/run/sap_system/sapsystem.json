@@ -33,8 +33,7 @@
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
-      },
-      "zones": []
+      }
     }
   ],
   "application": {
@@ -45,9 +44,6 @@
     "scs_high_availability": false,
     "application_server_count": 1,
     "webdispatcher_count": 1,
-    "app_zones": [],
-    "scs_zones": [],
-    "web_zones": [],
     "authentication": {
       "type": "key",
       "username": "azureadm"

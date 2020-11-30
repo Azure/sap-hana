@@ -90,7 +90,7 @@ locals {
     format("%sweb%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)
   ]
 
-  web_server_vm_names = [for idx in range(var.scs_server_count) :
+  web_server_vm_names = [for idx in range(var.web_server_count) :
     length(var.web_zones) > 0 ? (
       format("%sweb%sz%s%s%02d%s%s", lower(var.sap_sid), local.separator, var.web_zones[idx % max(length(var.web_zones), 1)], local.separator, idx, local.app_oscode, local.random_id_vm_verified)) : (
       format("%sweb%02d%s%s", lower(var.sap_sid), idx, local.app_oscode, local.random_id_vm_verified)

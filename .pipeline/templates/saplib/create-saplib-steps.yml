@@ -45,6 +45,14 @@ steps:
       az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --value $(landscape-subscription) --output none
       az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --value $(landscape-tenant) --output none
 
+      echo "=== Recovery SPN in deployer KV when rerun same build ==="
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --output none
+      echo "=== Wait for 30s for secrets to be available === "
+      sleep 30s
+
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       if [ ! -d "${repo_dir}" ]
       then

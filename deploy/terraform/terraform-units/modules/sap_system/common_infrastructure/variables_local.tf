@@ -133,11 +133,17 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
+  //ANF support
+  use_ANF = try(local.db.use_ANF, false)
+  //Scalout subnet is needed if ANF is used and there are more than one hana node 
+  dbnode_per_site       = length(try(local.db.dbnodes, [{}]))
+  enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
+
   var_infra = try(var.infrastructure, {})
 
   //Anchor VM
   anchor                      = try(local.var_infra.anchor_vms, {})
-  deploy_anchor               = length(local.anchor) > 0 ? true : false
+  deploy_anchor               = length(local.anchor) > 0 && local.enable_db_deployment ? true : false
   anchor_size                 = try(local.anchor.sku, "Standard_D8s_v3")
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
@@ -164,6 +170,9 @@ locals {
   }
 
   anchor_ostype = upper(try(local.anchor.os.os_type, local.db_ostype))
+  // Support dynamic addressing
+  anchor_use_DHCP = try(local.anchor.use_DHCP, false)
+
 
   //Resource group
   var_rg    = try(local.var_infra.resource_group, {})
@@ -230,6 +239,20 @@ locals {
   sub_app_nsg_arm_id = try(local.var_sub_app_nsg.arm_id, "")
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0 ? true : false
   sub_app_nsg_name   = local.sub_app_nsg_exists ? try(split("/", local.sub_app_nsg_arm_id)[8], "") : try(local.var_sub_app_nsg.name, format("%s%s%s", var.naming.separator, local.prefix, local.resource_suffixes.app_subnet_nsg))
+
+  //Storage subnet
+  sub_storage_defined = try(var.infrastructure.vnets.sap.subnet_storage, null) == null ? false : true
+  sub_storage         = try(var.infrastructure.vnets.sap.subnet_storage, {})
+  sub_storage_arm_id  = try(local.sub_storage.arm_id, "")
+  sub_storage_exists  = length(local.sub_storage_arm_id) > 0 ? true : false
+  sub_storage_name    = local.sub_storage_exists ? try(split("/", local.sub_storage_arm_id)[10], "") : try(local.sub_storage.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet))
+  sub_storage_prefix  = local.sub_storage_exists ? "" : try(local.sub_storage.prefix, "")
+
+  //Storage NSG
+  sub_storage_nsg        = try(local.sub_storage.nsg, {})
+  sub_storage_nsg_arm_id = try(local.sub_storage_nsg.arm_id, "")
+  sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
+  sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {
