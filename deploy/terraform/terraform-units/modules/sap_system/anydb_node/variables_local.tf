@@ -121,10 +121,8 @@ locals {
 
   db_systemdb_password = "db_systemdb_password"
 
-  ///////////////////////////////////////
   // Tags
-  tags = try(local.anydb.tags,[])
-  ////////////////////////////////////////
+  tags = try(local.anydb.tags,{})
 
   authentication = try(local.anydb.authentication,
     {

@@ -87,12 +87,9 @@ locals {
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
-  ///////////////////////////////////////
   // Tags
-  tags = try(local.hdb.tags,[])
-  ////////////////////////////////////////
-
-
+  tags = try(local.hdb.tags,{})
+  
   hdb_platform = try(local.hdb.platform, "NONE")
   hdb_version  = try(local.hdb.db_version, "2.00.043")
   // If custom image is used, we do not overwrite os reference with default value
