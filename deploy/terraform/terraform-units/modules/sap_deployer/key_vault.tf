@@ -144,7 +144,7 @@ resource "azurerm_key_vault_secret" "pk" {
 
 resource "azurerm_key_vault_secret" "username" {
   depends_on   = [azurerm_key_vault_access_policy.kv_user_pre_deployer[0]]
-  count        = (local.enable_deployers && local.enable_password && ! local.username_exist) ? 1 : 0
+  count        = (local.enable_deployers && ! local.username_exist) ? 1 : 0
   name         = local.username_secret_name
   value        = local.username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -184,7 +184,7 @@ data "azurerm_key_vault_secret" "ppk" {
 }
 
 data "azurerm_key_vault_secret" "username" {
-  count        = (local.enable_deployers && local.enable_password && local.username_exist) ? 1 : 0
+  count        = (local.enable_deployers && local.username_exist) ? 1 : 0
   name         = local.username_secret_name
   key_vault_id = local.user_key_vault_id
 }
