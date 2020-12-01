@@ -207,9 +207,9 @@ locals {
     "version"         = try(var.application.scs_os.version, local.scs_custom_image ? "" : local.app_os.version)
   }
 
-  app_tags = try(var.application.app_tags,{})
-  scs_tags = try(var.application.scs_tags,{})
-  web_tags = try(var.application.web_tags,{})
+  app_tags = try(var.application.app_tags, {})
+  scs_tags = try(var.application.scs_tags, {})
+  web_tags = try(var.application.web_tags, {})
   application = merge(var.application,
     { authentication = local.authentication }
   )
