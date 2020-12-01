@@ -84,7 +84,7 @@ steps:
       '
 
       echo "=== Add access policy recover for pipeline SPN back to deployer KV ==="
-  
+
       az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
 
       # Modify environment value so it starts with u and with length of 5
