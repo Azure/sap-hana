@@ -21,8 +21,6 @@ output "dns_information_app" {
 output "dns_information_loadbalancers_app" {
   value = module.app_tier.dns_info_loadbalancers
 }
-
-
 output "app_vm_ids" {
   value = module.app_tier.app_vm_ids
 }
