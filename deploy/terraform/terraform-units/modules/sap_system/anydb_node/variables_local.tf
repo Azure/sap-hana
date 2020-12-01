@@ -76,6 +76,7 @@ locals {
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
+  // Return the max fault domain count for the region
   faultdomain_count = try(tonumber(compact(
     [for pair in local.faults :
       upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
