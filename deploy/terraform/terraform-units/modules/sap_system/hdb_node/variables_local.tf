@@ -62,6 +62,8 @@ locals {
   // Imports database sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+
   region = try(var.infrastructure.region, "")
   sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
@@ -101,9 +103,15 @@ locals {
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
 
+  // Return the max fault domain count for the region
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
+
   // Tags
-  tags = try(local.hdb.tags,{})
-  
+  tags = try(local.hdb.tags, {})
+
   // Support dynamic addressing
   use_DHCP = try(local.hdb.use_DHCP, false)
 

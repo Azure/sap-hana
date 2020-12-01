@@ -49,6 +49,8 @@ locals {
 
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/anydb_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+
   computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
 
@@ -73,6 +75,11 @@ locals {
   // Availability Set 
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
+
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
 
   // Support dynamic addressing
   use_DHCP = try(local.anydb.use_DHCP, false)
@@ -129,7 +136,7 @@ locals {
   db_systemdb_password = "db_systemdb_password"
 
   // Tags
-  tags = try(local.anydb.tags,{})
+  tags = try(local.anydb.tags, {})
 
   authentication = try(local.anydb.authentication,
     {
