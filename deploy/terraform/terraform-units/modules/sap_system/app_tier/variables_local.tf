@@ -53,7 +53,7 @@ locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
 
-  faults = jsondecode(file("${path.module}/../../../../../configs/faults.json"))
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
 
   app_computer_names       = var.naming.virtualmachine_names.APP_COMPUTERNAME
   app_virtualmachine_names = var.naming.virtualmachine_names.APP_VMNAME
@@ -68,7 +68,7 @@ locals {
 
   faultdomain_count = try(tonumber(compact(
     [for pair in local.faults : 
-      pair.Location == local.region ? pair.MaximumFaultDomainCount : ""
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
     ])[0]),2)
 
   sid     = upper(try(var.application.sid, ""))
