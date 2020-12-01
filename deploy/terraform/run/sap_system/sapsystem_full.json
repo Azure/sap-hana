@@ -65,7 +65,21 @@
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
       ],
-      "use_DHCP": false
+      "use_DHCP": false,
+      "dbnodes": [
+        {
+          "name": "hdb1",
+          "role": "worker"
+        },
+        {
+          "name": "hdb2",
+          "role": "worker"
+        },
+        {
+          "name": "hdb3",
+          "role": "standby"
+        }
+      ]
     }
   ],
   "application": {
