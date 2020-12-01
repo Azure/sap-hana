@@ -130,9 +130,6 @@ locals {
   //Enable APP deployment
   enable_app_deployment = try(var.application.enable_deployment, false)
   
-   //Enable SID deployment
-  enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
-
   var_infra = try(var.infrastructure, {})
 
   //Anchor VM
