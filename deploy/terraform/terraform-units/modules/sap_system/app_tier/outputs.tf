@@ -112,3 +112,15 @@ output "dns_info_loadbalancers" {
     )
   )
 }
+
+output "app_vm_ids" {
+  value = local.enable_deployment ? concat(azurerm_windows_virtual_machine.app[*].id, azurerm_linux_virtual_machine.app[*].id) : []
+}
+
+output "scs_vm_ids" {
+  value = local.enable_deployment ? concat(azurerm_windows_virtual_machine.scs[*].id, azurerm_linux_virtual_machine.scs[*].id) : []
+}
+
+output "web_vm_ids" {
+  value = local.enable_deployment ? concat(azurerm_windows_virtual_machine.web[*].id, azurerm_linux_virtual_machine.web[*].id) : []
+}

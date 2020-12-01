@@ -22,7 +22,6 @@ output "hana_database_info" {
   value = try(local.enable_deployment ? local.hana_database : map(false), {})
 }
 
-
 // Output for DNS
 output "dns_info_vms" {
   value = local.enable_deployment ? (
@@ -34,11 +33,15 @@ output "dns_info_vms" {
   )
 }
 
-
 output "dns_info_loadbalancers" {
   value = local.enable_deployment ? (
     zipmap([format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)], [azurerm_lb.hdb[0].private_ip_addresses[0]])) : (
     null
   )
 }
+
+output "hanadb_vm_ids" {
+  value = local.enable_deployment ? azurerm_linux_virtual_machine.vm_dbnode[*].id : []
+}
+
 

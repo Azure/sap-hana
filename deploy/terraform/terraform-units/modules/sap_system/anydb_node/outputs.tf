@@ -59,3 +59,7 @@ output "dns_info_loadbalancers" {
     null
   )
 }
+
+output "anydb_vm_ids" {
+  value = local.enable_deployment ? concat(azurerm_windows_virtual_machine.dbserver[*].id, azurerm_linux_virtual_machine.dbserver[*].id) : []
+}
