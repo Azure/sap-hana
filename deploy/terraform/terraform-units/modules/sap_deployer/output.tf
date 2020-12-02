@@ -67,7 +67,7 @@ output "pk_secret_name" {
 }
 
 output "username_secret_name" {
-  value = local.enable_deployers && local.enable_password ? local.username : ""
+  value = local.enable_deployers ? local.username : ""
 }
 
 output "pwd_secret_name" {
