@@ -11,7 +11,7 @@
           "name": "os",
           "disk_type": "Standard_LRS",
           "size_gb": 30,
-          "caching": "None",
+          "caching": "ReadWrite",
           "write_accelerator": false
         },
         {
@@ -37,7 +37,7 @@
           "name": "os",
           "disk_type": "Standard_LRS",
           "size_gb": 30,
-          "caching": "None",
+          "caching": "ReadWrite",
           "write_accelerator": false
         },
         {
@@ -63,7 +63,7 @@
           "name": "os",
           "disk_type": "Standard_LRS",
           "size_gb": 30,
-          "caching": "None",
+          "caching": "ReadWrite",
           "write_accelerator": false
         },
         {
