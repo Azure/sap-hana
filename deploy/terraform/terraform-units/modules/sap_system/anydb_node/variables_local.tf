@@ -281,9 +281,11 @@ locals {
     }
   ])
 
+  db_sizing = local.enable_deployment ? try(lookup(local.sizes, local.anydb_size).storage, []) : []
+
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.anydb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -315,11 +317,16 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.anydb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = local.enable_deployment ? (
+    try(compact([
+      for storage in local.db_sizing :
+      storage.disk_type == "UltraSSD_LRS" ? (
+        true) : (
+        ""
+      )
+    ])[0], false)) : (
+    false
+  )
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]

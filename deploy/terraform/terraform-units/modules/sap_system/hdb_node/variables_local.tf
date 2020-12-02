@@ -263,10 +263,13 @@ locals {
     }
   ])
 
+
+  db_sizing = local.enable_deployment ? try(lookup(local.sizes, local.hdb_size).storage, []) : []
+
   // List of data disks to be created for HANA DB nodes
-  data_disk_per_dbnode = (length(local.hdb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.hdb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -299,9 +302,14 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.hdb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = local.enable_deployment ? (
+    try(compact([
+      for storage in local.db_sizing :
+      storage.disk_type == "UltraSSD_LRS" ? (
+        true) : (
+        ""
+      )
+    ])[0], false)) : (
+    false
+  )
 }
