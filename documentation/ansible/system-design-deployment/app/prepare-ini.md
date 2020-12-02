@@ -107,7 +107,7 @@ The following steps show how to begin the manual install of an ASCS instance in 
    `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
 
 1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
-1. Copy and rename `inifile.params` to `/tmp/app_template`:
+1. Copy and rename `inifile.params` to `scs.inifile.params` in `/tmp/app_template`:
 
 `cp <path_to_inifile>/inifile.params /tmp/app_template/scs.inifile.params`
 
@@ -143,7 +143,7 @@ Logon users: [root]
     /usr/sap/install/SWPM/sapinst                                           \
       SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml    \
       SAPINST_USE_HOSTNAME=<target vm hostname>                             \
-      SAPINST_INPUT_PARAMETERS_URL=<path_to_inifile>/inifile.params         \
+      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_template/scs.inifile.params     \
       SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAPHA    \
       SAPINST_START_GUI=false                                               \
       SAPINST_START_GUISERVER=false
@@ -157,9 +157,8 @@ Follow the [SAP instructions for Exporting directories via NFS for Linux](https:
 
 The directories to be exported for this process are:
 
-1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattented installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
+1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattended installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
 1. `/usr/sap/install`
-1. `/usr/sap/install/config`
 1. `/tmp/app_template`
 1. `/sapmnt/<SID>/global`
 1. `/sapmnt/<SID>/profile`
@@ -235,9 +234,9 @@ Distributed System" , click on "Database Instance" and click "Next"
    `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/DB/`
 
 1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
-1. Copy and rename `inifile.params` to `/tmp/app_template`:
+1. Copy and rename `inifile.params` to `db.inifile.params` in `/tmp/app_template`:
 
-   `cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
+`cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
 
 1. Check the version of SWPM's `sapinst` tool:
 
@@ -270,7 +269,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 
       ```bash
       /usr/sap/install/SWPM/sapinst                                           \
-      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_templates/inifile.params          \
+      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_templates/db.inifile.params       \
       SAPINST_STACK_XML=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml     \
       SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_DB:S4HANA2020.CORE.HDB.ABAP          \
       SAPINST_SKIP_DIALOGS=true                                               \
@@ -327,12 +326,11 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 1. On the Warning Screen copy the Key ID and Key Value and store these securely and click "Ok"
 1. Ensure Yes, clean up operating system users is checked
 1. click "Next"
-1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the `inifile.params` file is generated in the temporary SAP installation directory, located at
-1. On only the PAS/AAS node, a copy of the `inifile.params` file is generated in the temporary SAP installation directory:
+1. On the PAS/AAS nodes, a copy of the `inifile.params` file is generated in the temporary SAP installation directory:
    1. PAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params`
    1. AAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params`
 1. The inifiles can be used as the basis for unattended deployments
-1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params`:
+1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params` or `aas.inifile.params` as appropriate:
 
    `cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params /mnt/<sapbits fileshare path>/templates/pas.inifile.params`
 
@@ -374,7 +372,7 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 
 ### `inifile` consolidation
 
-To use the inifiles during the installation process, they should be consolidated into one file. The first step is to update the individual template files replacing default values with Ansible variables  for automation purposes.
+To use the inifiles during the installation process, they should be consolidated into one file. The first step is to update the individual template files replacing default values with Ansible variables for automation purposes.
 
 The next step will be to consolidate the files into one inifile. Merge and deduplicate the files then save the new file with a meaningful name relating to the SAP Product e.g `S4HANA_2020_ISS_v001.inifile.params`.
 

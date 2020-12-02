@@ -46,7 +46,11 @@ step|BoM Content
     |
     |    - name:     HANA xml
     |      file:     HANA_2_00_052_v001.params.xml
-```
+    |
+[8] |  stackfiles:
+    |    - name: Download Basket permalinks
+    |      file: myDownloadBasketFiles.txt
+    |      override_target_location: "{{ target_media_location }}/```
 
 ## Process
 
@@ -93,6 +97,32 @@ step|BoM Content
      archive:  51054623.ZIP
    ```
 
+### Add Templates Section
+
+1. `[7]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`. Entries are needed for `.params` and `.params.xml` files.
+
+   ```text
+     templates:
+       - name:     HANA params
+         file:     HANA_2_00_052_v001.params
+
+       - name:     HANA xml
+         file:     HANA_2_00_052_v001.params.xml
+   ```
+
+### Add Stackfiles Section
+
+1. `[8]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+
+   ```text
+   stackfiles:
+     - name: Download Basket JSON Manifest
+        file: downloadbasket.json
+
+     - name: Download Basket Spreadsheet
+        file: MP_Excel_2001017452_20201030_SWC.xls
+   ```
+
 ### Override Target Destination
 
 Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
@@ -122,19 +152,6 @@ By default, files downloaded or shared from the archive space will be extracted 
 ### Tidy Up Layout
 
 The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
-
-### Add Template Name
-
-1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`. Entries are needed for `.params` and `.params.xml` files.
-
-   ```text
-     templates:
-       - name:     HANA params
-         file:     HANA_2_00_052_v001.params
-
-       - name:     HANA xml
-         file:     HANA_2_00_052_v001.params.xml
-   ```
 
 ### Upload Files to Archive Location
 

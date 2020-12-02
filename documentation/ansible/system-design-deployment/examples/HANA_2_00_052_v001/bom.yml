@@ -5,7 +5,7 @@ target:  "HANA 2.0"
 version: 001
 
 defaults:
-  target_location: "{{ target_media_location }}"
+  target_location: "{{ target_media_location }}/download_basket"
 
 materials:
   media:
@@ -19,6 +19,10 @@ materials:
     - name:     "Revision 2.00.052.0 (SPS05) for HANA DB 2.0"
       version:  2.00.052
       archive:  IMDB_SERVER20_052_0-80002031.SAR
+
+    - name:     "Client for HANA 2"
+      version:  2.6
+      archive:  IMDB_CLIENT20_006_58-80002082.SAR
 
   templates:
 

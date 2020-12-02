@@ -51,7 +51,7 @@ step|BoM Content
 [3] |version: 001
     |
 [4] |defaults:
-    |  target_location: "{{ target_media_location }}/downloads"
+    |  target_location: "{{ target_media_location }}/download_basket"
     |
 [5] |materials:
 [6] |  dependencies:
@@ -82,6 +82,33 @@ step|BoM Content
 [8] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
     |      file:     "S4HANA_2020_ISS_v001.inifile.params"
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+[9] |  stackfiles:
+    |
+    |    - name: Download Basket JSON Manifest
+    |      file: downloadbasket.json
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Spreadsheet
+    |      file: MP_Excel_2001017452_20201030_SWC.xls
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Plan doc
+    |      file: MP_Plan_2001017452_20201030_.pdf
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Stack text
+    |      file: MP_Stack_2001017452_20201030_.txt
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Stack XML
+    |      file: MP_Stack_2001017452_20201030_.xml
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket permalinks
+    |      file: myDownloadBasketFiles.txt
+    |      override_target_location: "{{ target_media_location }}/config"
 ```
 
 ### Create BoM Header
@@ -95,7 +122,7 @@ step|BoM Content
 ### Create Defaults Section
 
 1. `[4]`: This section contains:
-   1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
+   1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown.
 
 ### Create Materials Section
 
@@ -107,8 +134,6 @@ step|BoM Content
 
 1. `[7]`: Specify `media:` exactly as shown.
 
-1. Using Microsoft Excel, open the download basket spreadsheet
-
 1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet. :information_source: The `version` property is optional.
 
    ```text
@@ -117,7 +142,9 @@ step|BoM Content
         archive:  SAPCAR_1320-80000935.EXE
    ```
 
-1. Using your editor, transcribe the Description and Technical Name as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
+1. Using Microsoft Excel, open the download basket spreadsheet.
+
+1. Using your editor, transcribe the Description and Technical Name from the spreasheet as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
 
    ![SAP Download Basket Spreadsheet](../images/sap-xls-download-basket.png)
 
@@ -132,20 +159,43 @@ step|BoM Content
      ... etc ...
    ```
 
-### Override Target Destination
+### Add Template Name
 
-Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
+1. `[8]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+
+   ```text
+     templates:
+       - name:     "S4HANA_2020_ISS_v001 ini file"
+         file:     "S4HANA_2020_ISS_v001.inifile.params"
+   ```
+
+### Add Stackfiles Section
+
+1. `[9]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+
+   ```text
+   stackfiles:
+     - name: Download Basket JSON Manifest
+        file: downloadbasket.json
+
+     - name: Download Basket Spreadsheet
+        file: MP_Excel_2001017452_20201030_SWC.xls
+   ```
+
+### Override Target Location
+
+Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown.
 
 1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
 
    ```text
-   - name: "Kernel Part I"
-     archive: "SAPEXE_200-80004393.SAR"
-     override_target_location: "{{ target_media_location }}/download_basket/"
+   - name: Download Basket Stack XML
+     file: MP_Stack_2001017452_20201030_.xml
+     override_target_location: "{{ target_media_location }}/config"
 
-   - name: "Kernel Part II (777)"
-     archive: "SAPEXEDB_200-80004392.SAR"
-     override_target_location: "{{ target_media_location }}/download_basket/"
+   - name: Download Basket permalinks
+     file: myDownloadBasketFiles.txt
+     override_target_location: "{{ target_media_location }}/config"
    ```
 
 ### Override Target Filename
@@ -164,16 +214,6 @@ By default, files downloaded or shared from the archive space will be extracted 
 ### Tidy Up Layout
 
 The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
-
-### Add Template Name
-
-1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
-
-   ```text
-     templates:
-       - name:     "S4HANA_2020_ISS_v001 ini file"
-         file:     "S4HANA_2020_ISS_v001.inifile.params"
-   ```
 
 ### Upload Files to Archive Location
 
