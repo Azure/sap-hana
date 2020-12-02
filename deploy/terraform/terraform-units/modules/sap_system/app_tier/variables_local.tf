@@ -252,6 +252,13 @@ locals {
     web_vm = 4 + 21
   }
 
+  app_sizing = local.enable_deployment ? lookup(local.sizes.app, local.vm_sizing) : []
+
+  scs_sizing = local.enable_deployment ? lookup(local.sizes.scs, local.vm_sizing) : []
+
+  web_sizing = local.enable_deployment ? lookup(local.sizes.web, local.vm_sizing) : []
+
+  // Ports used for specific ASCS, ERS and Web dispatcher
   lb_ports = {
     "scs" = [
       3200 + tonumber(local.scs_instance_number),          // e.g. 3201
@@ -318,7 +325,7 @@ locals {
 
   app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
-      for storage_type in local.app_sizing : [
+      for storage_type in local.app_sizing.storage : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -352,7 +359,7 @@ locals {
 
   scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
-      for storage_type in local.scs_sizing : [
+      for storage_type in local.scs_sizing.storage : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -386,7 +393,7 @@ locals {
 
   web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
-      for storage_type in local.web_sizing : [
+      for storage_type in local.web_sizing.storage : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
