@@ -263,9 +263,7 @@ locals {
     }
   ])
 
-
-  hdb_size_details = lookup(local.sizes, local.hdb_size, [])
-  db_sizing        = local.hdb_size_details != [] ? local.hdb_size_details.storage : []
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.hdb_size, lookup(local.sizes, "Default")) : []
 
   // List of data disks to be created for HANA DB nodes
   data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(

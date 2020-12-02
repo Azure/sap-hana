@@ -28,7 +28,7 @@
       "platform": "HANA",
       "high_availability": false,
       "db_version": "2.00.050",
-      "size": "Demo",
+      "size": "Default",
       "os": {
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",

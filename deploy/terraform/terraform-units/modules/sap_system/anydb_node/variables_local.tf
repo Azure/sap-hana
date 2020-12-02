@@ -281,8 +281,7 @@ locals {
     }
   ])
 
-  anydb_size_details = lookup(local.sizes, local.anydb_size, [])
-  db_sizing          = local.anydb_size_details != [] ? local.anydb_size_details.storage : []
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.anydb_size, lookup(local.sizes, "Default")) : []
 
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
