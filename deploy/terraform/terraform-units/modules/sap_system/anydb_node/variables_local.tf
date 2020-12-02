@@ -281,7 +281,8 @@ locals {
     }
   ])
 
-  db_sizing = local.enable_deployment ? try(lookup(local.sizes, local.anydb_size).storage, []) : []
+  anydb_size_details = lookup(local.sizes, local.anydb_size, [])
+  db_sizing          = local.anydb_size_details != [] ? local.anydb_size_details.storage : []
 
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
@@ -317,14 +318,12 @@ locals {
     ]
   ])
 
-  enable_ultradisk = local.enable_deployment ? (
-    try(compact([
-      for storage in local.db_sizing :
-      storage.disk_type == "UltraSSD_LRS" ? (
-        true) : (
-        ""
-      )
-    ])[0], false)) : (
+  enable_ultradisk = try(
+    compact(
+      [
+        for storage in local.db_sizing : storage.disk_type == "UltraSSD_LRS" ? true : ""
+      ]
+    )[0],
     false
   )
 
