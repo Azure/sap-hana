@@ -252,12 +252,11 @@ locals {
     web_vm = 4 + 21
   }
 
-  // Default VM config should be merged with any the user passes in
-  app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))
+  app_sizing = local.enable_deployment ? lookup(local.sizes.app, local.vm_sizing).storage : []
 
-  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, lookup(local.sizes.scs, "Default"))
+  scs_sizing = local.enable_deployment ? lookup(local.sizes.scs, local.vm_sizing).storage : []
 
-  web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
+  web_sizing = local.enable_deployment ? lookup(local.sizes.web, local.vm_sizing).storage : []
 
   // Ports used for specific ASCS, ERS and Web dispatcher
   lb_ports = {
@@ -327,7 +326,7 @@ locals {
 
   app_data_disk_per_dbnode = (local.application_server_count > 0) ? flatten(
     [
-      for storage_type in local.app_sizing.storage : [
+      for storage_type in local.app_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -361,7 +360,7 @@ locals {
 
   scs_data_disk_per_dbnode = (local.enable_deployment) ? flatten(
     [
-      for storage_type in local.scs_sizing.storage : [
+      for storage_type in local.scs_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -395,7 +394,7 @@ locals {
 
   web_data_disk_per_dbnode = (local.webdispatcher_count > 0) ? flatten(
     [
-      for storage_type in local.web_sizing.storage : [
+      for storage_type in local.web_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("-%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
