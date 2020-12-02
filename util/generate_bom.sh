@@ -128,7 +128,7 @@ BEGIN {
 END {
 
   printf("---\n\nname: \"%s\"\ntarget: \"%s\"\nversion: \"001\"\n", product, targetname);
-  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}\"\n");
+  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}/download_basket\"\n");
   printf("\nmaterials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"001\"\n\n  media:\n");
 
   while ( getline < "tempworkfile" ) {
@@ -138,19 +138,19 @@ END {
     component = $4;
     if ( component == "File on DVD" ) component = (component " - " $3)
 
-    dir = "{{ target_media_location }}";
+    dir = "";
     current = substr(seq,1,2);
     if (current != phase ) {
       phase = current;
       if ( phase == "AA" ) {
         printf("\n    # kernel components\n");
-        overridedir = "{{ target_media_location }}/download_basket";
+        # overridedir = "{{ target_media_location }}/download_basket";
       } else if ( phase == "BB" ) {
         printf("\n    # db export components\n");
-        overridedir = "{{ target_media_location }}/cd_exports";
+        # overridedir = "{{ target_media_location }}/cd_exports";
       } else {
         printf("\n    # other components\n");
-        overridedir = "";
+        # overridedir = "";
       }
     }
 
