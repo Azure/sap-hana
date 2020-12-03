@@ -1,0 +1,82 @@
+#############################################################################################################################################
+#                                                                                                                                           #
+# Installation service 'SAP S/4HANA Server 1809 > SAP HANA Database > Installation                                                          #
+#   > Application Server ABAP > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA1809.CORE.HDB.ABAP'                     #
+#   > Application Server ABAP > Distributed System > Database Instance', product id 'NW_ABAP_DB:S4HANA1809.CORE.HDB.ABAP'                   #
+#   > Application Server ABAP > Distributed System > Primary Application Server Instance', product id 'NW_ABAP_CI:S4HANA1809.CORE.HDB.ABAP' #
+#   > Additional SAP System Instances > Additional Application Server Instance', product id 'NW_DI:S4HANA1809.CORE.HDB.PD'                  #
+#                                                                                                                                           #
+#############################################################################################################################################
+
+
+archives.downloadBasket                             = {{ download_basket_dir }}
+
+HDB_Schema_Check_Dialogs.schemaName                 = SAPHANADB
+HDB_Schema_Check_Dialogs.schemaPassword             = {{ password_hana_system }}
+
+HDB_Userstore.doNotResolveHostnames                 = {{ hdb_hostname }}
+
+hostAgent.sapAdmPassword                            = {{ password_master }}
+
+NW_AS.instanceNumber                                = {{ aas_instance_number }}
+
+NW_checkMsgServer.abapMSPort                        = 36{{ scs_instance_number }}
+
+NW_CI_Instance.ascsVirtualHostname                  = {{ scs_hostname }}
+NW_CI_Instance.ciInstanceNumber                     = {{ pas_instance_number }}
+NW_CI_Instance.ciMSPort                             = 36{{ scs_instance_number }}
+NW_CI_Instance.ciVirtualHostname                    = {{ pas_hostname }}
+NW_CI_Instance.scsVirtualHostname                   = {{ scs_hostname }}
+
+NW_DDIC_Password.ddic000Password                    =
+NW_DDIC_Password.needDDICPasswords                  = false
+
+NW_Delete_Sapinst_Users.removeUsers                 = true
+
+NW_DI_Instance.virtualHostname                      = {{ aas_hostname }}
+
+NW_getFQDN.FQDN                                     = {{ sap_fqdn }}
+
+NW_getLoadType.loadType                             = SAP
+
+NW_GetMasterPassword.masterPwd                      = {{ password_master }}
+
+NW_GetSidNoProfiles.sid                             = {{ app_sid | upper }}
+
+NW_HDB_DB.abapSchemaName                            = SAPHANADB
+
+NW_HDB_DB.abapSchemaPassword                        = {{ password_master }}
+
+NW_HDB_getDBInfo.dbhost                             = {{ hdb_hostname }}
+NW_HDB_getDBInfo.dbsid                              = {{ hdb_sid | upper }}
+NW_HDB_getDBInfo.instanceNumber                     = {{ hdb_instance_number }}
+NW_HDB_getDBInfo.systemDbPassword                   = {{ password_hana_system }}
+NW_HDB_getDBInfo.systemid                           = {{ hdb_sid | upper }}
+NW_HDB_getDBInfo.systemPassword                     = {{ password_hana_system }}
+
+NW_readProfileDir.profileDir                        = /usr/sap/{{ app_sid | upper }}/SYS/profile
+
+NW_Recovery_Install_HDB.extractLocation             = /usr/sap/{{ hdb_sid | upper }}/HDB{{ hdb_instance_number }}/backup/data/DB_{{ hdb_sid | upper }}
+NW_Recovery_Install_HDB.extractParallelJobs         = 19
+NW_Recovery_Install_HDB.sidAdmName                  = {{ hdb_sid | lower }}adm
+NW_Recovery_Install_HDB.sidAdmPassword              = {{ password_master }}
+
+NW_SAPCrypto.SAPCryptoFile                          = {{ download_basket_dir }}/SAPEXE_300-80004393.SAR
+
+NW_SCS_Instance.instanceNumber                      = {{ scs_instance_number }}
+NW_SCS_Instance.scsVirtualHostname                  = {{ scs_hostname }}
+
+NW_System.installSAPHostAgent                       = false
+
+NW_Unpack.igsExeSar                                 = {{ download_basket_dir }}/igsexe_12-80003187.sar
+NW_Unpack.igsHelperSar                              = {{ download_basket_dir }}/igshelper_17-10010245.sar
+NW_Unpack.sapExeDbSar                               = {{ download_basket_dir }}/SAPEXEDB_300-80004392.SAR
+NW_Unpack.sapExeSar                                 = {{ download_basket_dir }}/SAPEXE_300-80004393.SAR
+
+nwUsers.sapadmUID                                   = {{ sapadm_uid }}
+nwUsers.sapsysGID                                   = {{ sapsys_gid }}
+nwUsers.sidadmPassword                              = {{ password_master }}
+nwUsers.sidAdmUID                                   = {{ sidadm_uid }}
+
+storageBasedCopy.hdb.instanceNumber                 = {{ hdb_instance_number }}
+storageBasedCopy.hdb.systemPassword                 = {{ password_hana_system }}
