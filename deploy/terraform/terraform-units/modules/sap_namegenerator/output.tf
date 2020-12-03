@@ -61,5 +61,7 @@ output naming {
     resource_suffixes = var.resource_suffixes
 
     separator = local.separator
+
+    offset = local.offset
   }
 }
