@@ -67,6 +67,9 @@ locals {
   prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = var.naming.offset
+
   // Zones
   zones            = try(local.anydb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
@@ -287,7 +290,7 @@ locals {
     [
       for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count)
+          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
