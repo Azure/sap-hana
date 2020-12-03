@@ -70,8 +70,8 @@ locals {
 
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
-  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
-  offset = try(var.options.resource_offset, 0)
+    //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = var.naming.offset
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate  = var.landscape_tfstate
