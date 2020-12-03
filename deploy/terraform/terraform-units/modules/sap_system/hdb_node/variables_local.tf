@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -58,6 +62,8 @@ locals {
   // Imports database sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+
   region = try(var.infrastructure.region, "")
   sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
@@ -96,6 +102,15 @@ locals {
   // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
+
+  // Return the max fault domain count for the region
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
+
+  // Tags
+  tags = try(local.hdb.tags, {})
 
   // Support dynamic addressing
   use_DHCP = try(local.hdb.use_DHCP, false)
@@ -248,10 +263,14 @@ locals {
     }
   ])
 
+
+  hdb_size_details = lookup(local.sizes, local.hdb_size, [])
+  db_sizing        = local.hdb_size_details != [] ? local.hdb_size_details.storage : []
+
   // List of data disks to be created for HANA DB nodes
-  data_disk_per_dbnode = (length(local.hdb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.hdb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
           suffix               = format("%s%02d", storage_type.name, disk_count)
           storage_account_type = storage_type.disk_type,
@@ -284,9 +303,12 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.hdb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = try(
+    compact(
+      [
+        for storage in local.db_sizing : storage.disk_type == "UltraSSD_LRS" ? true : ""
+      ]
+    )[0],
+    false
+  )
 }
