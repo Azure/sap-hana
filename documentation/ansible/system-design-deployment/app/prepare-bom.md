@@ -53,12 +53,19 @@ step|BoM Content
 [4] |defaults:
     |  target_location: "{{ target_media_location }}/download_basket"
     |
-[5] |materials:
-[6] |  dependencies:
+[5] |product_ids:
+    |  scs:
+    |  db:
+    |  pas:
+    |  aas:
+    |  web:
+    |
+[6] |materials:
+[7] |  dependencies:
     |    - name:     HANA2_00_052_v001
     |      version:  001
     |
-[7] |  media:
+[8] |  media:
     |    - name:     SAPCAR
     |      version:  7.21
     |      archive:  SAPCAR_1320-80000935.EXE
@@ -79,12 +86,12 @@ step|BoM Content
     |      version:  104
     |      archive:  S4COREOP104.SAR
     |
-[8] |  templates:
+[9] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
     |      file:     "S4HANA_2020_ISS_v001.inifile.params"
     |      override_target_location: "{{ target_media_location }}/config"
     |
-[9] |  stackfiles:
+[10]|  stackfiles:
     |
     |    - name: Download Basket JSON Manifest
     |      file: downloadbasket.json
@@ -124,15 +131,19 @@ step|BoM Content
 1. `[4]`: This section contains:
    1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown.
 
+### Create Product Ids Section
+
+1. `[5]`: Create the section as shown. You will populate with values as part of the template preparation.
+
 ### Create Materials Section
 
-1. `[5]`: Use exactly as shown. This specifies the start of the list of materials needed.
+1. `[6]`: Use exactly as shown. This specifies the start of the list of materials needed.
 
-1. `[6]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
+1. `[7]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
 
 ### Create List of Media
 
-1. `[7]`: Specify `media:` exactly as shown.
+1. `[8]`: Specify `media:` exactly as shown.
 
 1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet. :information_source: The `version` property is optional.
 
@@ -161,7 +172,7 @@ step|BoM Content
 
 ### Add Template Name
 
-1. `[8]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+1. `[9]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
 
    ```text
      templates:
@@ -171,7 +182,7 @@ step|BoM Content
 
 ### Add Stackfiles Section
 
-1. `[9]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+1. `[10]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
 
    ```text
    stackfiles:
@@ -202,13 +213,18 @@ Files downloaded or shared from the archive space will need to be extracted to t
 
 By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
 
-1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example:
+1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example, the following are recommended (the archive name may be different for your system):
 
    ```text
       - name:     SAPCAR
         version:  7.21
         archive:  SAPCAR_1320-80000935.EXE
         override_target_filename: SAPCAR.EXE
+
+      - name: "SWPM20SP07"
+        archive: "SWPM20SP07_2-80003424.SAR"
+        override_target_filename: SWPM.SAR
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001812632020"
    ```
 
 ### Tidy Up Layout

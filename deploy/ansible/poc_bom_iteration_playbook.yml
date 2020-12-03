@@ -3,10 +3,12 @@
 - hosts: scs
   vars:
     sapbits_location_base_path: "https://npeus2saplibb546.blob.core.windows.net/sapbits"
-    bom_base_name: "S4HANA_1909_SP2_v001"
+    bom_base_name: "S4HANA_1909_SP2_v002"
     target_media_location: /usr/sap/install
-    test_mode: true
+    app_sid: Z01
+    # test_mode: true
 
   roles:
 
     - role: process_bom
+    - role: nfs-server-setup

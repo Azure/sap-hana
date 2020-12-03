@@ -1,8 +1,6 @@
 ---
 
 - name: "Ensure media property is iterated"
-  vars:
-    archive_location: "{{ sapbits_location_base_path }}/{{ source_location }}"
   block:
     - name: Ensure target folders exist
       file:
@@ -22,6 +20,7 @@
 
     - name: Ensure media are downloaded
       vars:
+        archive_location: "{{ sapbits_location_base_path }}/{{ source_location }}"
         default_file_name: "{{ download_iterator[file_name] }}"
         file_source: "{{ archive_location }}/{{ default_file_name }}"
         file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"

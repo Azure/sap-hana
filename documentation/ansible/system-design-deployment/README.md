@@ -33,6 +33,8 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 #### SAP HANA
 
+1. **Prepare System**:
+   1. [Prepare System](./hana/prepare-system.md)
 1. **Acquisition**
    1. [Acquire Media](./hana/acquire-media.md)
 1. **Preparation**
@@ -44,6 +46,8 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 ### SAP Application
 
+1. **Prepare System**:
+   1. [Prepare System](./app/prepare-system.md)
 1. **Acquisition**
    1. [Acquire Media](./app/acquire-media.md)
 1. **Preparation**

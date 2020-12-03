@@ -4,7 +4,6 @@
   uri:
     url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
     dest: "/tmp/{{ bom_base_name }}_bom.yml"
-    creates: "/tmp/{{ bom_base_name }}_bom.yml"
   delegate_to: localhost
 
 - name: "Ensure {{ bom_base_name }} is used"
@@ -20,20 +19,20 @@
   check_mode: "{{ test_mode is defined and test_mode }}"
 
 - name: "Ensure current property is iterated"
+  include_tasks: download_media.yml
   vars:
     default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
     bom_media: "{{ media_iterator.media }}"
-    source_location: "{{ media_iterator.location }}"
+    source_location: "{{ media_iterator.uri_location }}"
     file_name: "{{ media_iterator.property_name }}"
-  include_tasks: download_media.yml
   loop:
-    - location: archives
+    - uri_location: archives
       property_name: archive
       media: "{{ bom.materials.media | flatten(levels=1) }}"
-    - location: templates
+    - uri_location: templates
       property_name: file
       media: "{{ bom.materials.templates | flatten(levels=1) }}"
-    - location: "boms/{{ bom_base_name }}/stackfiles"
+    - uri_location: "boms/{{ bom_base_name }}/stackfiles"
       property_name: file
       media: "{{ bom.materials.stackfiles | flatten(levels=1) }}"
   loop_control:

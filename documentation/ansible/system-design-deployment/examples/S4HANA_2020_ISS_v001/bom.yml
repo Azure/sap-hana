@@ -7,6 +7,13 @@ version: "001"
 defaults:
   target_location: "{{ target_media_location }}/download_basket"
 
+product_ids:
+  scs:
+  db:
+  pas:
+  aas:
+  web:
+
 materials:
   dependencies:
     - name: "HANA_2_00_052_v001"
