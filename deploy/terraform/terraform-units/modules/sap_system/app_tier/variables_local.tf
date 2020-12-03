@@ -252,12 +252,11 @@ locals {
     web_vm = 4 + 21
   }
 
-  // Default VM config should be merged with any the user passes in
-  app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))
+  app_sizing = local.enable_deployment ? lookup(local.sizes.app, local.vm_sizing) : []
 
-  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, lookup(local.sizes.scs, "Default"))
+  scs_sizing = local.enable_deployment ? lookup(local.sizes.scs, local.vm_sizing) : []
 
-  web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
+  web_sizing = local.enable_deployment ? lookup(local.sizes.web, local.vm_sizing) : []
 
   // Ports used for specific ASCS, ERS and Web dispatcher
   lb_ports = {
@@ -265,7 +264,6 @@ locals {
       3200 + tonumber(local.scs_instance_number),          // e.g. 3201
       3600 + tonumber(local.scs_instance_number),          // e.g. 3601
       3900 + tonumber(local.scs_instance_number),          // e.g. 3901
-      8100 + tonumber(local.scs_instance_number),          // e.g. 8101
       50013 + (tonumber(local.scs_instance_number) * 100), // e.g. 50113
       50014 + (tonumber(local.scs_instance_number) * 100), // e.g. 50114
       50016 + (tonumber(local.scs_instance_number) * 100), // e.g. 50116
