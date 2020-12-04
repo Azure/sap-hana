@@ -82,7 +82,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
     [azurerm_network_interface.scs[count.index].id]
   )
 
-  size                            = try(local.scs_sizing.compute.vm_size, "Standard_D4s_v3")
+  size                            = local.scs_sizing.compute.vm_size
   admin_username                  = local.sid_auth_username
   disable_password_authentication = ! local.enable_auth_password
   admin_password                  = local.sid_auth_password
@@ -168,7 +168,7 @@ resource "azurerm_windows_virtual_machine" "scs" {
     [azurerm_network_interface.scs[count.index].id]
   )
 
-  size           = try(local.scs_sizing.compute.vm_size, "Standard_D4s_v3")
+  size           = local.scs_sizing.compute.vm_size
   admin_username = local.sid_auth_username
   admin_password = local.sid_auth_password
 
