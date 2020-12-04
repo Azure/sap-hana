@@ -138,9 +138,6 @@ locals {
     )[0],
     false
   )
-
-
-
   //ANF support
   use_ANF = try(local.db.use_ANF, false)
   //Scalout subnet is needed if ANF is used and there are more than one hana node 
