@@ -177,13 +177,22 @@ The directories to be exported for this process are:
    1. `mount <scs-vm-IP>:/sapmnt/<SID>/global /sapmnt/<SID>/global`
    1. `mount <scs-vm-IP>:/sapmnt/<SID>/profile /sapmnt/<SID>/profile`
 
+### Database Content Load Prerequisites
+
+The following requirements must be in place on the PAS DB VM before attempting the DB Content Load:
+
+1. `<sid>adm` User must exist and must be a member of the `sapinst` group;
+1. The user ID for `<sid>adm` must match the value provided to hdblcm (`2000` is used in this process);
+1. The Directory `/sapmnt/S1D/global/` must be accessible to SWPM `chown <sid>adm:sapsys /sapmnt/<SID>/global`;
+1. `sapinst` group must exist.
+
 ### Generating unattended installation parameter `inifile` for Database Content Load
 
 :hand: Both HANA and SCS instances must be installed, configured and online before completing the DB content load.
 
 1. Make and change to a temporary directory:
 
-   `mkdir /tmp/db_workdir; cd $_`
+   `sudo install -d -m 0777 <sid>adm -g sapinst "/tmp/db_workdir"; cd $_`
 
 1. Launch SWPM with the following command:
 
