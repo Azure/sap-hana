@@ -90,7 +90,7 @@ variable deployer_vm_count {
 
 variable resource_offset {
   type    = number
-  default = 1
+  default = 0
 }
 
 //Todo: Add to documentation
