@@ -185,10 +185,6 @@ The directories to be exported for this process are:
 
    `mkdir /tmp/db_workdir; cd $_`
 
-1. Ensure SWPM is extracted:
-
-   `/usr/sap/install/SAPCAR_1311-80000935.EXE -xf /usr/sap/install/SWPM20SP07_0-80003424.SAR -R /usr/sap/install/SWPM/`
-
 1. Launch SWPM with the following command:
 
     ```bash
@@ -213,7 +209,7 @@ Distributed System" , click on "Database Instance" and click "Next"
    1. click "Next"
 1. Verify the connection details and click "OK"
 1. Enter the System Database Administrator Password and click "Next"
-1. Enter the path to the SAPEXE Kernel `/usr/sap/install/` and click "Next"
+1. Enter the path to the SAPEXE Kernel `/usr/sap/install/download_basket` and click "Next"
 1. Notice the files are listed as available and click "Next"
 1. Notice the SAPHOSTAGENT file is listed as available and click "Next"
 1. Click "Next" on the SAP System Administrator password confirmation.
@@ -299,7 +295,7 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 1. Ensure the Profile Directory is set to `/sapmnt/<SID>/profile/` or  `/usr/sap/<SID>/SYS/profile` and click "Next"
 1. Set the Message Server Port to `36nn` where `nn` is the ASCS Instance number and click "Next"
 1. Set the Master Password for All Users and click "Next"
-1. On the Software Package Browser Screen set the Search Directory to `/usr/sap/install` then click "Next"
+1. On the Software Package Browser Screen set the Search Directory to `/usr/sap/install/download_basket` then click "Next"
 1. ⌛️ ... wait several minutes for `below-the-fold-list` to populate then click "Next"
 1. Ensure the "Upgrade SAP Host Agent to the version of the provided SAPHOSTAGENT.SAR archive" option is unchecked then click "Next"
 1. Enter the Instance Number of the SAP HANA Database and Database System Administrator Password and click "Next"
