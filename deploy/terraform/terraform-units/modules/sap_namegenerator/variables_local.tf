@@ -88,6 +88,11 @@ variable deployer_vm_count {
   default = 1
 }
 
+variable resource_offset {
+  type    = number
+  default = 1
+}
+
 //Todo: Add to documentation
 variable sapautomation_name_limits {
   description = "Name length for automation resources"
@@ -289,11 +294,6 @@ locals {
 
   //The separator to use between the prefix and resource name
   separator = "_"
-
-  //The offset used in resource naming, default is 0
-  // 0 -> disk0, disk1
-  // 1 -> disk1, disk2
-  offset = 0
 
 }
 

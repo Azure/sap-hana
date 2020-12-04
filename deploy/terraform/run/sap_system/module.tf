@@ -39,6 +39,7 @@ module "sap_namegenerator" {
   scs_zones        = local.scs_zones
   web_zones        = local.web_zones
   db_zones         = local.db_zones
+  resource_offset  = try(var.options.resource_offset,0)
 }
 
 // Create HANA database nodes

@@ -105,6 +105,7 @@
   },
   "options": {
     "enable_secure_transfer": true,
-    "enable_prometheus": true
+    "enable_prometheus": true,
+    "resource_offset" : 0
   }
 }
