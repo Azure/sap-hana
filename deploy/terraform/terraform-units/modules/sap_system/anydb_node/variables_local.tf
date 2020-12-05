@@ -118,7 +118,7 @@ locals {
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
-  anydb_size   = try(local.anydb.size, "Demo")
+  anydb_size   = try(local.anydb.size, "Default")
   anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, false)
@@ -284,8 +284,7 @@ locals {
     }
   ])
 
-  anydb_size_details = lookup(local.sizes, local.anydb_size, [])
-  db_sizing          = local.anydb_size_details != [] ? local.anydb_size_details.storage : []
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.anydb_size).storage : []
 
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
