@@ -1,0 +1,35 @@
+---
+
+- name: "Configure Disk mounted at /usr/sap"
+  become_user: root
+  become: yes
+  block:
+    - name: "Add /usr/sap partition"
+      parted:
+        state: present
+        device: /dev/disk/azure/scsi1/lun0
+        number: 1
+
+    - name: "Create /usr/sap/ filesystem"
+      filesystem:
+        fstype: xfs
+        dev: /dev/disk/azure/scsi1/lun0-part1
+
+    - name: "Create /usr/sap mount point"
+      file:
+        path: "/usr/sap"
+        state: directory
+
+    - name: "Mount /usr/sap"
+      mount:
+        path: "/usr/sap"
+        src: /dev/disk/azure/scsi1/lun0-part1
+        fstype: xfs
+        state: mounted
+
+    - name: "Ensure /usr/sap permissions are correct"
+      file:
+        path: "/usr/sap"
+        state: directory
+        mode: "0777"
+        group: "{{ sapsys_gid }}"

@@ -51,14 +51,21 @@ step|BoM Content
 [3] |version: 001
     |
 [4] |defaults:
-    |  target_location: "{{ target_media_location }}/downloads"
+    |  target_location: "{{ target_media_location }}/download_basket"
     |
-[5] |materials:
-[6] |  dependencies:
+[5] |product_ids:
+    |  scs:
+    |  db:
+    |  pas:
+    |  aas:
+    |  web:
+    |
+[6] |materials:
+[7] |  dependencies:
     |    - name:     HANA2_00_052_v001
     |      version:  001
     |
-[7] |  media:
+[8] |  media:
     |    - name:     SAPCAR
     |      version:  7.21
     |      archive:  SAPCAR_1320-80000935.EXE
@@ -79,9 +86,36 @@ step|BoM Content
     |      version:  104
     |      archive:  S4COREOP104.SAR
     |
-[8] |  templates:
+[9] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
     |      file:     "S4HANA_2020_ISS_v001.inifile.params"
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+[10]|  stackfiles:
+    |
+    |    - name: Download Basket JSON Manifest
+    |      file: downloadbasket.json
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Spreadsheet
+    |      file: MP_Excel_2001017452_20201030_SWC.xls
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Plan doc
+    |      file: MP_Plan_2001017452_20201030_.pdf
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Stack text
+    |      file: MP_Stack_2001017452_20201030_.txt
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket Stack XML
+    |      file: MP_Stack_2001017452_20201030_.xml
+    |      override_target_location: "{{ target_media_location }}/config"
+    |
+    |    - name: Download Basket permalinks
+    |      file: myDownloadBasketFiles.txt
+    |      override_target_location: "{{ target_media_location }}/config"
 ```
 
 ### Create BoM Header
@@ -95,19 +129,21 @@ step|BoM Content
 ### Create Defaults Section
 
 1. `[4]`: This section contains:
-   1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
+   1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown.
+
+### Create Product Ids Section
+
+1. `[5]`: Create the section as shown. You will populate with values as part of the template preparation.
 
 ### Create Materials Section
 
-1. `[5]`: Use exactly as shown. This specifies the start of the list of materials needed.
+1. `[6]`: Use exactly as shown. This specifies the start of the list of materials needed.
 
-1. `[6]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
+1. `[7]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
 
 ### Create List of Media
 
-1. `[7]`: Specify `media:` exactly as shown.
-
-1. Using Microsoft Excel, open the download basket spreadsheet
+1. `[8]`: Specify `media:` exactly as shown.
 
 1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet. :information_source: The `version` property is optional.
 
@@ -117,7 +153,9 @@ step|BoM Content
         archive:  SAPCAR_1320-80000935.EXE
    ```
 
-1. Using your editor, transcribe the Description and Technical Name as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
+1. Using Microsoft Excel, open the download basket spreadsheet.
+
+1. Using your editor, transcribe the Description and Technical Name from the spreasheet as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
 
    ![SAP Download Basket Spreadsheet](../images/sap-xls-download-basket.png)
 
@@ -132,48 +170,66 @@ step|BoM Content
      ... etc ...
    ```
 
-### Override Target Destination
-
-Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown, but could be an unrelated path.
-
-1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
-
-   ```text
-   - name: "Kernel Part I"
-     archive: "SAPEXE_200-80004393.SAR"
-     override_target_location: "{{ target_media_location }}/download_basket/"
-
-   - name: "Kernel Part II (777)"
-     archive: "SAPEXEDB_200-80004392.SAR"
-     override_target_location: "{{ target_media_location }}/download_basket/"
-   ```
-
-### Override Target Filename
-
-By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
-
-1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example:
-
-   ```text
-      - name:     SAPCAR
-        version:  7.21
-        archive:  SAPCAR_1320-80000935.EXE
-        override_target_filename: SAPCAR.EXE
-   ```
-
-### Tidy Up Layout
-
-The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
-
 ### Add Template Name
 
-1. [8]: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+1. `[9]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
 
    ```text
      templates:
        - name:     "S4HANA_2020_ISS_v001 ini file"
          file:     "S4HANA_2020_ISS_v001.inifile.params"
    ```
+
+### Add Stackfiles Section
+
+1. `[10]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+
+   ```text
+   stackfiles:
+     - name: Download Basket JSON Manifest
+        file: downloadbasket.json
+
+     - name: Download Basket Spreadsheet
+        file: MP_Excel_2001017452_20201030_SWC.xls
+   ```
+
+### Override Target Location
+
+Files downloaded or shared from the archive space will need to be extracted to the correct location on the target server. This is normally set using the `defaults -> target_location` property (see [the defaults section](#red_circle-create-defaults-section)). However, you may override this on a case-by-case basis as shown. Overrides will normally reference `{{ target_media_location }}` as shown.
+
+1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
+
+   ```text
+   - name: Download Basket Stack XML
+     file: MP_Stack_2001017452_20201030_.xml
+     override_target_location: "{{ target_media_location }}/config"
+
+   - name: Download Basket permalinks
+     file: myDownloadBasketFiles.txt
+     override_target_location: "{{ target_media_location }}/config"
+   ```
+
+### Override Target Filename
+
+By default, files downloaded or shared from the archive space will be extracted with the same filename as the `archive` filename on the target server.  However, you may override this on a case-by-case basis, although this is not normally necessary.
+
+1. For each relevant entry in the BoM `media` section, add an `override_target_filename:` property with the correct target folder. For example, the following are recommended (the archive name may be different for your system):
+
+   ```text
+      - name:     SAPCAR
+        version:  7.21
+        archive:  SAPCAR_1320-80000935.EXE
+        override_target_filename: SAPCAR.EXE
+
+      - name: "SWPM20SP07"
+        archive: "SWPM20SP07_2-80003424.SAR"
+        override_target_filename: SWPM.SAR
+        sapurl: "https://softwaredownloads.sap.com/file/0020000001812632020"
+   ```
+
+### Tidy Up Layout
+
+The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
 
 ### Upload Files to Archive Location
 

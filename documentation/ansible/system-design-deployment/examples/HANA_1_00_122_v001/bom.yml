@@ -5,7 +5,7 @@ target:  "HANA 1.0"
 version: 001
 
 defaults:
-  target_location: "{{ target_media_location }}/downloads/"
+  target_location: "{{ target_media_location }}/download_basket"
 
 materials:
   media:
@@ -24,6 +24,18 @@ materials:
 
     - name:     "HANA_1_00_122_v001 params"
       file:     "HANA_1_00_122_v001.params"
+      override_target_location: "{{ target_media_location }}/config"
 
     - name:     "HANA_1_00_122_v001 xml"
       file:     "HANA_1_00_122_v001.params.xml"
+      override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"

@@ -2,8 +2,8 @@
 
 - import_tasks: pre_checks.yml
 
-- import_tasks: iterate_bom.yml
-  vars:
-    base_bom: "{{ bom_location_base_path }}/{{ bom_base_name }}/bom.yml"
+- include_tasks: configure_disk.yml
 
-# - import_tasks: post_checks.yml
+- include_tasks: "{{ iterator }}"
+  vars:
+    iterator: "./iterate_bom.yml"

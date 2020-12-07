@@ -90,7 +90,7 @@ The following steps show how to begin the manual install of an ASCS instance in 
    **Note:** `The password of user DBUser may only consist of alphanumeric characters and the special characters #, $, @ and _. The first character must not be a digit or an underscore`.
 
 1. The password fields will be pre-populated based on the master password supplied. Set the `<sid>adm` OS user ID to 2000 and the `sapsys` OS group ID to 2000, and click "Next";
-1. When prompted to supply the path to the SAPEXE kernel file, specify a path of /usr/sap/install/ and click "Next";
+1. When prompted to supply the path to the SAPEXE kernel file, specify a path of `/usr/sap/install/download_basket` and click "Next";
 1. Notice the package status is "Available" click "Next";
 1. Notice the SAP Host Agent installation file status is "Available" click "Next";
 1. Details for the sapadm OS user will be presented next. It is recommended to leave the password as inherited from the master password, and enter in the OS user ID of 2100, and click "Next";
@@ -107,7 +107,7 @@ The following steps show how to begin the manual install of an ASCS instance in 
    `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/ASCS/`
 
 1. Click "Cancel" in SWPM, as the SCS install can now be performed via the unattended method;
-1. Copy and rename `inifile.params` to `/tmp/app_template`:
+1. Copy and rename `inifile.params` to `scs.inifile.params` in `/tmp/app_template`:
 
 `cp <path_to_inifile>/inifile.params /tmp/app_template/scs.inifile.params`
 
@@ -143,7 +143,7 @@ Logon users: [root]
     /usr/sap/install/SWPM/sapinst                                           \
       SAPINST_XML_FILE=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml    \
       SAPINST_USE_HOSTNAME=<target vm hostname>                             \
-      SAPINST_INPUT_PARAMETERS_URL=<path_to_inifile>/inifile.params         \
+      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_template/scs.inifile.params     \
       SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAPHA    \
       SAPINST_START_GUI=false                                               \
       SAPINST_START_GUISERVER=false
@@ -157,9 +157,8 @@ Follow the [SAP instructions for Exporting directories via NFS for Linux](https:
 
 The directories to be exported for this process are:
 
-1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattented installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
+1. `/usr/sap/<SID>/SYS` - Where `<SID>` is replaced with the SID from Step 7 of the [Generating unattended installation parameter `inifile` for ASCS](#generating-unattended-installation-inifile-for-ascs)
 1. `/usr/sap/install`
-1. `/usr/sap/install/config`
 1. `/tmp/app_template`
 1. `/sapmnt/<SID>/global`
 1. `/sapmnt/<SID>/profile`
@@ -235,9 +234,9 @@ Distributed System" , click on "Database Instance" and click "Next"
    `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/HA/ABAP/DB/`
 
 1. Click "Cancel" in SWPM, as the DB Content Load can now be performed via the unattended method;
-1. Copy and rename `inifile.params` to `/tmp/app_template`:
+1. Copy and rename `inifile.params` to `db.inifile.params` in `/tmp/app_template`:
 
-   `cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
+`cp <path_to_inifile>/inifile.params /tmp/app_template/db.inifile.params`
 
 1. Check the version of SWPM's `sapinst` tool:
 
@@ -270,7 +269,7 @@ Distributed System" , click on "Database Instance" and click "Next"
 
       ```bash
       /usr/sap/install/SWPM/sapinst                                           \
-      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_templates/inifile.params          \
+      SAPINST_INPUT_PARAMETERS_URL=/tmp/app_templates/db.inifile.params       \
       SAPINST_STACK_XML=/usr/sap/install/config/MP_STACK_S4_2020_v001.xml     \
       SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_DB:S4HANA2020.CORE.HDB.ABAP          \
       SAPINST_SKIP_DIALOGS=true                                               \
@@ -327,12 +326,11 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 1. On the Warning Screen copy the Key ID and Key Value and store these securely and click "Ok"
 1. Ensure Yes, clean up operating system users is checked
 1. click "Next"
-1. On the Parameter Summary Screen On the Parameter Summary Page a copy of the `inifile.params` file is generated in the temporary SAP installation directory, located at
-1. On only the PAS/AAS node, a copy of the `inifile.params` file is generated in the temporary SAP installation directory:
+1. On the PAS/AAS nodes, a copy of the `inifile.params` file is generated in the temporary SAP installation directory:
    1. PAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params`
    1. AAS inifile path `/tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/AS/APPS/inifile.params`
 1. The inifiles can be used as the basis for unattended deployments
-1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params`:
+1. Create a copy of the `inifile.params` to the `sapbits` container  to the `/templates/` directory and rename to `pas.inifile.params` or `aas.inifile.params` as appropriate:
 
    `cp /tmp/sapinst_instdir/S4HANA2020/CORE/HDB/INSTALL/DISTRIBUTED/ABAP/APP1/inifile.params /mnt/<sapbits fileshare path>/templates/pas.inifile.params`
 
@@ -374,63 +372,126 @@ _**Note:** Steps prefixed with * may not be encountered in 2020 versions of SAP 
 
 ### `inifile` consolidation
 
-To use the inifiles during the installation process, they should be consolidated into one file. The first step is to update the individual template files replacing default values with Ansible variables  for automation purposes.
+To use the inifiles during the installation process, they should be consolidated into one file.
 
-The next step will be to consolidate the files into one inifile. Merge and deduplicate the files then save the new file with a meaningful name relating to the SAP Product e.g `S4HANA_2020_ISS_v001.inifile.params`.
+The overall process is to download the files to your workstation, extract the uncommented key value pairs into a new file, organise for ease of reference later, update values to Ansible variables for use with automation.
 
-1. Edit the SCS inifile, update the following values to the corresponding Ansible variable:
-   1. `NW_GetMasterPassword.masterPwd` = `{{ app_master_password }}`
-   1. `NW_GetSidNoProfiles.sid` = `{{ app_sid | upper }}`
-   1. `NW_SCS_Instance.instanceNumber` = `{{ scs_instance_number }}`
-   1. `NW_SCS_Instance.scsVirtualHostname` = `{{ ansible_hostname }}`
-   1. `NW_getFQDN.FQDN` = `{{ fqdn_hostname }}`
-   1. `archives.downloadBasket` = `{{ app_stackfiles_dir }}`
-   1. `hostAgent.sapAdmPassword` = `{{ app_sapadm_password }}`
-   1. `nwUsers.sapadmUID` = `{{ sapadm_uid }}`
-   1. `nwUsers.sapsysGID` = `{{ sapsys_gid }}`
-   1. `nwUsers.sidAdmUID` = `{{ sidadm_uid }}`
-   1. `nwUsers.sidadmPassword` = `{{ app_base_password }}`
+The file should be saved with a meaningful name relating to the SAP Product, e.g `S4HANA_2020_ISS_v001.inifile.params` and uploaded to the Storage Account.
 
-1. Edit the PAS inifile, update the following values to the corresponding Ansible variable:
-   1. `HDB_Schema_Check_Dialogs.schemaPassword` = `{{ db_system_user_password }}`
-   1. `HDB_Userstore.doNotResolveHostnames` = `{{ db_sid | lower }}-db`
-   1. `NW_ABAP_SPAM_Update.SPAMUpdateArchive` = `{{ hana_install_media_nfs_pas_dir }}/*****.SAR`
-   1. `NW_ABAP_TMSConfig.transportPassword` = `{{ app_sapadm_password }}`
-   1. `NW_CI_Instance.ascsInstanceNumber` = `{{ scs_instance_number }}`
-   1. `NW_CI_Instance.ascsVirtualHostname` = `{{ scs_virtual_hostname }}`
-   1. `NW_CI_Instance.ciInstanceNumber` = `{{ pas_instance_number }}`
-   1. `NW_CI_Instance.ciMSPort` = `36{{ scs_instance_number }}`
-   1. `NW_CI_Instance.ciVirtualHostname` = `{{ pas_virtual_hostname }}`
-   1. `NW_CI_Instance.scsVirtualHostname` = `{{ pas_virtual_hostname }}`
-   1. `NW_GetMasterPassword.masterPwd` = `{{ app_master_password }}`
-   1. `NW_HDB_getDBInfo.instanceNumber` = `{{ hana_instance_number }}`
-   1. `NW_checkMsgServer.abapMSPort` = `36{{ scs_instance_number }}`
-   1. `NW_readProfileDir.profileDir` = `/usr/sap/{{ app_sid | upper }}/SYS/profile`
-   1. `archives.downloadBasket` = `{{ app_stackfiles_dir }}`
-   1. `storageBasedCopy.hdb.instanceNumber` = `{{ hana_instance_number }}`
-   1. `storageBasedCopy.hdb.systemPassword` = `{{ db_system_user_password }}`
+1. Download all `inifile.params` files to your workstation, and make a backup of each file.
+1. In **your editor** open each file.
+1. Create a new consolidation file named for the SAP Product, e.g. `S4HANA_2020_ISS_v001.inifile.params`.
+1. From the SCS inifile, copy the header into the consolidated file and format for readability, e.g.
 
-1. Edit the AAS inifile, update the following values to the corresponding Ansible variable:
-   1. `NW_DI_Instance.virtualHostname` = `{{ aas_virtual_hostname }`
+   ```ini
+   #########################################################################################################################
+   #                                                                                                                       #
+   # Installation service 'SAP S/4HANA Server 2020 > SAP HANA Database > Installation                                      #
+   #   > Application Server ABAP > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAP' #
+   #                                                                                                                       #
+   #########################################################################################################################
+   ```
 
-1. Create a new file `<SAP Product>.inifile.params`, e.g. `S4HANA_2020_ISS_v001.inifile.params`
-   1. Copy in all uncommented values from the SCS template and group key value pairs based on prefix, e.g. `NW_SCS_Instance`
-   1. Copy in all uncommented values from the DB template and group key value pairs based on prefix, e.g. `NW_HDB_DB`
-   1. Copy in all uncommented values from the PAS template and group key value pairs based on prefix, e.g. `NW_CI_Instance`
-   1. Copy in all uncommented values from the AAS template and group key value pairs based on prefix, e.g. `NW_DI_Instance`
-   1. Deduplicate any common key value pairs.
+1. For each `inifile.params` file:
+   1. Copy the product id line from the header and add to the consolidated header:
+
+      ```ini
+      #############################################################################################################################################
+      #                                                                                                                                           #
+      # Installation service 'SAP S/4HANA Server 2020 > SAP HANA Database > Installation                                                          #
+      #   > Application Server ABAP > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAP'                     #
+      #   > Application Server ABAP > Distributed System > Database Instance', product id 'NW_ABAP_DB:S4HANA2020.CORE.HDB.ABAP'                   #
+      #   > Application Server ABAP > Distributed System > Primary Application Server Instance', product id 'NW_ABAP_CI:S4HANA2020.CORE.HDB.ABAP' #
+      #   > Additional SAP System Instances > Additional Application Server Instance', product id 'NW_DI:S4HANA2020.CORE.HDB.PD'                  #
+      #                                                                                                                                           #
+      #############################################################################################################################################
+      ```
+
+   1. Copy the Product ID from the header and update the `bom.yml` `product_ids` section for the relevant file. For example for SCS:
+
+      ```yaml
+      product_ids:
+        scs: "NW_ABAP_ASCS:S4HANA2020.CORE.HDB.ABAP"
+        db:  ""
+        pas: ""
+        aas: ""
+        web: ""
+      ```
+
+   1. Remove all commented and blank lines.
+   1. Copy the remaining lines into the consolidation file.
+1. In the consolidation file:
+   1. To improve readability:
+      1. Sort all lines not in the header, and remove any duplicated lines.
+      1. Align all the equals signs:
+
+         ```ini
+         archives.downloadBasket                             = /usr/sap/install/download_basket
+         HDB_Schema_Check_Dialogs.schemaName                 = SAPHANADB
+         HDB_Schema_Check_Dialogs.schemaPassword             = MyDefaultPassw0rd
+         HDB_Userstore.doNotResolveHostnames                 = x00dx0000l09d4
+         ```
+
+      1. Separate the lines by prefix, e.g. `NW_CI_Instance.*`, `NW_HDB_DB.*` etc.
+   1. Update the following lines to use Ansible variables:
+      1. `archives.downloadBasket                             = {{ download_basket_dir }}`
+      1. `HDB_Schema_Check_Dialogs.schemaPassword             = {{ password_hana_system }}`
+      1. `HDB_Userstore.doNotResolveHostnames                 = {{ hdb_hostname }}`
+      1. `hostAgent.sapAdmPassword                            = {{ password_master }}`
+      1. `NW_AS.instanceNumber                                = {{ aas_instance_number }}`
+      1. `NW_checkMsgServer.abapMSPort                        = 36{{ scs_instance_number }}`
+      1. `NW_CI_Instance.ascsVirtualHostname                  = {{ scs_hostname }}`
+      1. `NW_CI_Instance.ciInstanceNumber                     = {{ pas_instance_number }}`
+      1. `NW_CI_Instance.ciMSPort                             = 36{{ scs_instance_number }}`
+      1. `NW_CI_Instance.ciVirtualHostname                    = {{ pas_hostname }}`
+      1. `NW_CI_Instance.scsVirtualHostname                   = {{ scs_hostname }}`
+      1. `NW_DI_Instance.virtualHostname                      = {{ aas_hostname }}`
+      1. `NW_getFQDN.FQDN                                     = {{ sap_fqdn }}`
+      1. `NW_GetMasterPassword.masterPwd                      = {{ password_master }}`
+      1. `NW_GetSidNoProfiles.sid                             = {{ app_sid | upper }}`
+      1. `NW_HDB_DB.abapSchemaPassword                        = {{ password_master }}`
+      1. `NW_HDB_getDBInfo.dbhost                             = {{ hdb_hostname }}`
+      1. `NW_HDB_getDBInfo.dbsid                              = {{ hdb_sid | upper }}`
+      1. `NW_HDB_getDBInfo.instanceNumber                     = {{ hdb_instance_number }}`
+      1. `NW_HDB_getDBInfo.systemDbPassword                   = {{ password_hana_system }}`
+      1. `NW_HDB_getDBInfo.systemid                           = {{ hdb_sid | upper }}`
+      1. `NW_HDB_getDBInfo.systemPassword                     = {{ password_hana_system }}`
+      1. `NW_readProfileDir.profileDir                        = /usr/sap/{{ app_sid | upper }}/SYS/profile`
+      1. `NW_Recovery_Install_HDB.extractLocation             = /usr/sap/{{ hdb_sid | upper }}/HDB{{ hdb_instance_number }}/backup/data/DB_{{ hdb_sid | upper }}`
+      1. `NW_Recovery_Install_HDB.sidAdmName                  = {{ hdb_sid | lower }}adm`
+      1. `NW_Recovery_Install_HDB.sidAdmPassword              = {{ password_master }}`
+      1. `NW_SAPCrypto.SAPCryptoFile                          = {{ download_basket_dir }}/SAPEXE_300-80004393.SAR`
+      1. `NW_SCS_Instance.instanceNumber                      = {{ scs_instance_number }}`
+      1. `NW_Unpack.igsExeSar                                 = {{ download_basket_dir }}/igsexe_12-80003187.sar`
+      1. `NW_Unpack.igsHelperSar                              = {{ download_basket_dir }}/igshelper_17-10010245.sar`
+      1. `NW_Unpack.sapExeDbSar                               = {{ download_basket_dir }}/SAPEXEDB_300-80004392.SAR`
+      1. `NW_Unpack.sapExeSar                                 = {{ download_basket_dir }}/SAPEXE_300-80004393.SAR`
+      1. `NW_SCS_Instance.scsVirtualHostname                  = {{ scs_hostname }}`
+      1. `nwUsers.sapadmUID                                   = {{ sapadm_uid }}`
+      1. `nwUsers.sapsysGID                                   = {{ sapsys_gid }}`
+      1. `nwUsers.sidadmPassword                              = {{ password_master }}`
+      1. `nwUsers.sidAdmUID                                   = {{ sidadm_uid }}`
+      1. `storageBasedCopy.hdb.instanceNumber                 = {{ hdb_instance_number }}`
+      1. `storageBasedCopy.hdb.systemPassword                 = {{ password_hana_system }}`
 
 1. Upload the consolidated template file to the SAP Library:
     1. In the Azure Portal navigate to the `sapbits` container
-    1. Create a new `templates` directory under `sapbits`
-    1. click "Upload"
+    1. Click "Upload"
     1. In the panel on the right, click Select a file
-    1. Navigate your workstation to the template generation directory `/tmp/app_template`
     1. Select the generated template, e.g. `S4HANA_2020_ISS_v001.inifile.params`
-    1. click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
-    1. click "Upload"
+    1. Click "Upload"
+    1. Click "Advanced" to show the advanced options, and enter `templates` for the Upload Directory
+
+1. Upload the updated BoM file to the SAP Library:
+    1. In the Azure Portal navigate to the `sapbits` container
+    1. Navigate to the product folder for the BoM, e.g. `boms/S4HANA_2020_ISS_v001`
+    1. Click "Upload"
+    1. In the panel on the right, click Select a file
+    1. Select the updated `bom.yml`
+    1. Click "Upload"
 
 ## Results and Outputs
 
 1. A Consolidated `inifile.params` which can be used for the unattended installation of ASCS, PAS and AAS
 1. Consolidated inifile uploaded to `templates` directory in the `sapbits` container
+1. BoM file updated to contain the Product IDs and uploaded to the `sapbits` container

@@ -11,13 +11,12 @@
 1. SAP HANA infrastructure has been deployed;
 1. SAP HANA infrastructure has sufficient disk space configured for Database Content if being used for [Application Template generation](../app/prepare-ini.md);
 1. Workstation has connectivity to SAP HANA Infrastructure (e.g. SSH keys in place);
-1. Prerequisite RPMs installed, See [SAP Note 2886607](https://launchpad.support.sap.com/#/notes/2886607).
 
 ## Inputs
 
 In order to generate the installation templates for SAP HANA, you will need:
 
-1. SAPCAR executable
+1. SAPCAR executable.
 1. SAP HANA infrastructure.
 1. The BoM file for this stack.
 
@@ -44,8 +43,8 @@ Any additional components are not required at this stage as they do not affect t
 1. Extract the HANA Server files (HANA Server SAR file version may change depending on your downloads):
 
    ```text
-   /tmp/hana_template/SAPCAR_1320-80000935.EXE
-   -manifest SAP_HANA_DATABASE/SIGNATURE.SMF -xf
+   /tmp/hana_template/SAPCAR_1320-80000935.EXE     \
+   -manifest SAP_HANA_DATABASE/SIGNATURE.SMF -xf   \
    /tmp/hana_template/IMDB_SERVER20_052_0-80002031.SAR
    ```
 

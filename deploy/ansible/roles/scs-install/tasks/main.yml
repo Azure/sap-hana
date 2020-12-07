@@ -1,0 +1,5 @@
+---
+
+- import_tasks: pre_checks.yml
+
+- include_tasks: install_scs.yml

@@ -5,7 +5,14 @@ target: "SAP BW/4HANA 2.0"
 version: "001"
 
 defaults:
-  target_location: "{{ target_media_location }}/downloads/"
+  target_location: "{{ target_media_location }}/download_basket"
+
+product_ids:
+  scs:
+  db:
+  pas:
+  aas:
+  web:
 
 materials:
   dependencies:
@@ -18,92 +25,80 @@ materials:
 
     - name: "Kernel Part II (777)"
       archive: "SAPEXEDB_200-80004392.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001063182020"
 
     - name: "Kernel Part I"
       archive: "SAPEXE_200-80004393.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001063232020"
 
     - name: "SAP HOST AGENT 7.21 SP49"
       archive: "SAPHOSTAGENT49_49-20009394.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001725602020"
 
     - name: "Patch 1 for SOFTWARE UPDATE MANAGER 2.0 SP09"
       archive: "SUM20SP09_1-80002456.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001781372020"
 
     - name: "SWPM20SP07"
       archive: "SWPM20SP07_1-80003424.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001765102020"
 
     - name: "Installation for SAP IGS integrated in SAP Kernel"
       archive: "igsexe_12-80003187.sar"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001632902020"
 
     - name: "SAP IGS Fonts and Textures"
       archive: "igshelper_17-10010245.sar"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000000703122018"
 
     # db export components
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_1.zip"
       archive: "BW4HANA200_INST_EXPORT_1.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365682019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_2.zip"
       archive: "BW4HANA200_INST_EXPORT_2.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365682019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_3.zip"
       archive: "BW4HANA200_INST_EXPORT_3.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365692019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_4.zip"
       archive: "BW4HANA200_INST_EXPORT_4.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365712019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_5.zip"
       archive: "BW4HANA200_INST_EXPORT_5.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365742019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_6.zip"
       archive: "BW4HANA200_INST_EXPORT_6.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365782019"
 
     - name: "File on DVD - BW4HANA200_INST_EXPORT_7.zip"
       archive: "BW4HANA200_INST_EXPORT_7.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365802019"
 
     - name: "File on DVD - BW4HANA200_NW_LANG_DE.SAR"
       archive: "BW4HANA200_NW_LANG_DE.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365892019"
 
     - name: "File on DVD - BW4HANA200_NW_LANG_EN.SAR"
       archive: "BW4HANA200_NW_LANG_EN.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000365932019"
 
     - name: "File on DVD - BW4HANA200_NW_LANG_UK.SAR"
       archive: "BW4HANA200_NW_LANG_UK.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000000366442019"
 
     # other components
+
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1324-80000935.EXE
+      override_target_filename: SAPCAR.EXE
 
     - name: "Attribute Change Package 02 for DW4CORE 200"
       archive: "DW4CORE200.SAR"
@@ -233,3 +228,30 @@ materials:
 
     - name: "SAP_BW4HANA_2_0 ini file"
       file: "SAP_BW4HANA_2_0.inifile.params"
+      override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Spreadsheet
+      file: MP_Excel_1001059086_20201023_SWC.xls
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Plan doc
+      file: MP_Plan_1001059086_20201023_.pdf
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack text
+      file: MP_Stack_1001059086_20201023_.txt
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack XML
+      file: MP_Stack_1001059086_20201023_.xml
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"

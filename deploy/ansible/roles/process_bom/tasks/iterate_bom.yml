@@ -1,38 +1,48 @@
 ---
 
-- name: "Ensure {{ base_bom }} is used"
+- name: "Ensure {{ bom_base_name }} is available"
+  uri:
+    url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
+    dest: "/tmp/{{ bom_base_name }}_bom.yml"
+  delegate_to: localhost
+
+- name: "Ensure {{ bom_base_name }} is used"
   include_vars:
-    file:       "{{ base_bom }}"
-    name:       bom
+    file: "/tmp/{{ bom_base_name }}_bom.yml"
+    name: bom
+  delegate_to: localhost
 
-- name: Group iterable tasks together
+- name: "Ensure {{ target_media_location }} exists"
+  file:
+    path: "{{ target_media_location }}"
+    state: directory
+  check_mode: "{{ test_mode is defined and test_mode }}"
+
+- name: "Ensure current property is iterated"
+  include_tasks: download_media.yml
   vars:
-    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
-    archive_location: "{{ bom.defaults.archive_location | regex_replace('/$', '') }}"
-    target_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
-  block:
-    - name: Ensure media property is iterated
-      vars:
-        file_source: "{{ archive_location }}/{{ media_iterator.archive }}"
-        file_dest_target_location: "{{ media_iterator.override_target_location is defined | ternary(media_iterator.override_target_location, target_location) | regex_replace('/$', '') }}"
-        file_dest_target_name: "{{ media_iterator.override_target_filename is defined | ternary(media_iterator.override_target_filename, media_iterator.archive) }}"
-        file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
-        bom_media: '{{ bom.materials.media }}'
-      # uri:
-        # url: "{{ file_source }}"
-        # dest: "{{ file_dest }}"
-        # creates: "{{ file_dest }}"
-      debug:
-        msg: "Download {{ file_source }} to {{ file_dest }}"
-      loop: "{{ bom_media | flatten(levels=1) }}"
-      loop_control:
-        loop_var: media_iterator
+    default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+    bom_media: "{{ media_iterator.media }}"
+    source_location: "{{ media_iterator.uri_location }}"
+    file_name: "{{ media_iterator.property_name }}"
+  loop:
+    - uri_location: archives
+      property_name: archive
+      media: "{{ bom.materials.media | flatten(levels=1) }}"
+    - uri_location: templates
+      property_name: file
+      media: "{{ bom.materials.templates | flatten(levels=1) }}"
+    - uri_location: "boms/{{ bom_base_name }}/stackfiles"
+      property_name: file
+      media: "{{ bom.materials.stackfiles | flatten(levels=1) }}"
+  loop_control:
+    loop_var: media_iterator
 
-- name: "Ensure {{ base_bom }} dependencies are followed"
+- name: "Ensure {{ bom_base_name }} dependencies are followed"
   when: bom_dependencies | length != 0
-  include_tasks: "./iterate_bom.yml"
+  include_tasks: "{{ iterator }}"
   vars:
     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
     bom_media: "{{ bom.materials.media }}"
-    base_bom: "{{ bom_location_base_path }}/{{ item.name }}/bom.yml"
+    bom_base_name: "{{ item.name }}"
   loop: "{{ bom_dependencies | flatten(levels=1) }}"

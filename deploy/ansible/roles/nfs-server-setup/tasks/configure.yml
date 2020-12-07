@@ -1,0 +1,40 @@
+---
+
+- name: Ensure the NFS utils package is installed
+  package:
+    name: nfs-utils
+    state: present
+
+- name: Ensure NFS Server is running
+  systemd:
+    name: nfsserver
+    state: started
+    enabled: yes
+
+- name: Ensure expected base directories are present
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: +r
+  loop: "{{ nfs_exports }}"
+
+- name: Ensure exports file exists
+  lineinfile:
+    dest: /etc/exports
+    create: yes
+    line: "{{ item.path }}    {{ item.export_settings }}"
+    regexp: '^{{ item.path }}\s+'
+    owner: root
+    group: root
+    mode: 0644
+    state: present
+  loop: "{{ nfs_exports }}"
+
+- name: Ensure nfsserver is running
+  systemd:
+    state: started
+    name: nfsserver
+    daemon_reload: yes
+
+- name: Ensure file systems are exported
+  command: exportfs -a

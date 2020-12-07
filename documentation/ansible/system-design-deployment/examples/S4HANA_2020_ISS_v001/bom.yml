@@ -5,7 +5,14 @@ target: "ABAP PLATFORM 2020"
 version: "001"
 
 defaults:
-  target_location: "{{ target_media_location }}/downloads/"
+  target_location: "{{ target_media_location }}/download_basket"
+
+product_ids:
+  scs:
+  db:
+  pas:
+  aas:
+  web:
 
 materials:
   dependencies:
@@ -18,192 +25,160 @@ materials:
 
     - name: "SP12 Patch2 for UMML4HANA 1"
       archive: "HANAUMML12_2-70001054.ZIP"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000000878972020"
 
     - name: "Kernel Part II (781)"
       archive: "SAPEXEDB_19-70005282.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001753572020"
 
     - name: "Kernel Part I (781)"
       archive: "SAPEXE_19-70005283.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001753762020"
 
     - name: "SAP HOST AGENT 7.21 SP49"
       archive: "SAPHOSTAGENT49_49-20009394.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001725602020"
 
     - name: "Predi. Analy. APL 2008 for SAP HANA 2.0 SPS03 and beyond"
       archive: "SAPPAAPL4_2008_0-80004547.ZIP"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000000410162020"
 
     - name: "Patch 1 for SOFTWARE UPDATE MANAGER 2.0 SP09"
       archive: "SUM20SP09_1-80002456.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001781372020"
 
     - name: "SWPM20SP07"
       archive: "SWPM20SP07_2-80003424.SAR"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001812632020"
 
     - name: "Installation for SAP IGS integrated in SAP Kernel"
       archive: "igsexe_0-70005417.sar"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000001634982020"
 
     - name: "SAP IGS Fonts and Textures"
       archive: "igshelper_17-10010245.sar"
-      override_target_location: "{{ target_media_location }}/download_basket"
       sapurl: "https://softwaredownloads.sap.com/file/0020000000703122018"
 
     # db export components
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_1.zip"
       archive: "S4CORE105_INST_EXPORT_1.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666752020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_10.zip"
       archive: "S4CORE105_INST_EXPORT_10.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666762020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_11.zip"
       archive: "S4CORE105_INST_EXPORT_11.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666772020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_12.zip"
       archive: "S4CORE105_INST_EXPORT_12.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666782020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_13.zip"
       archive: "S4CORE105_INST_EXPORT_13.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666802020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_14.zip"
       archive: "S4CORE105_INST_EXPORT_14.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666842020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_15.zip"
       archive: "S4CORE105_INST_EXPORT_15.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666862020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_16.zip"
       archive: "S4CORE105_INST_EXPORT_16.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666872020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_17.zip"
       archive: "S4CORE105_INST_EXPORT_17.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666882020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_18.zip"
       archive: "S4CORE105_INST_EXPORT_18.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666892020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_19.zip"
       archive: "S4CORE105_INST_EXPORT_19.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666912020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_2.zip"
       archive: "S4CORE105_INST_EXPORT_2.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666922020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_20.zip"
       archive: "S4CORE105_INST_EXPORT_20.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666932020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_21.zip"
       archive: "S4CORE105_INST_EXPORT_21.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666942020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_22.zip"
       archive: "S4CORE105_INST_EXPORT_22.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666952020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_23.zip"
       archive: "S4CORE105_INST_EXPORT_23.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666982020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_24.zip"
       archive: "S4CORE105_INST_EXPORT_24.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666992020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_3.zip"
       archive: "S4CORE105_INST_EXPORT_3.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667022020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_4.zip"
       archive: "S4CORE105_INST_EXPORT_4.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667022020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_5.zip"
       archive: "S4CORE105_INST_EXPORT_5.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667022020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_6.zip"
       archive: "S4CORE105_INST_EXPORT_6.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667032020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_7.zip"
       archive: "S4CORE105_INST_EXPORT_7.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667052020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_8.zip"
       archive: "S4CORE105_INST_EXPORT_8.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667062020"
 
     - name: "File on DVD - S4CORE105_INST_EXPORT_9.zip"
       archive: "S4CORE105_INST_EXPORT_9.zip"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001667072020"
 
     - name: "File on DVD - S4HANAOP105_ERP_LANG_DE.SAR"
       archive: "S4HANAOP105_ERP_LANG_DE.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001665632020"
 
     - name: "File on DVD - S4HANAOP105_ERP_LANG_EN.SAR"
       archive: "S4HANAOP105_ERP_LANG_EN.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001665642020"
 
     - name: "Attribute Change Package 19 for SRA004 600"
       archive: "SRA004600.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666922020"
 
     - name: "Attribute Change Package 21 for UIILM001 100"
       archive: "UIILM001100.SAR"
-      override_target_location: "{{ target_media_location }}/cd_exports"
       sapurl: "https://softwaredownloads.sap.com/file/0030000001666922020"
 
     # other components
+
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1324-80000935.EXE
+      override_target_filename: SAPCAR.EXE
 
     - name: "Attribute Change Package 16 for EA-HR 608"
       archive: "EA-HR608.SAR"
@@ -485,3 +460,30 @@ materials:
 
     - name: "S4HANA_2020_ISS_v001 ini file"
       file: "S4HANA_2020_ISS_v001.inifile.params"
+      override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Spreadsheet
+      file: MP_Excel_2001017452_20201030_SWC.xls
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Plan doc
+      file: MP_Plan_2001017452_20201030_.pdf
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack text
+      file: MP_Stack_2001017452_20201030_.txt
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack XML
+      file: MP_Stack_2001017452_20201030_.xml
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"

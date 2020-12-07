@@ -8,9 +8,8 @@
 # NOTE: Exactly one of each file is allowed!
 #
 # Limitations of generated BoM:
-# - Hard-coded HANA2 dependency
+# - Hard-coded HANA2 dependency which will need editing
 # - No provision for `version:` in media
-# - No provision for `override_target_filename:` in media
 #
 # Instructions
 # - Run this script from the stackfiles folder on your workstation
@@ -18,11 +17,11 @@
 #   where:
 #   - `archive_location` is the Azure Storage Account path, e.g. "https://npweeusaplib9545.file.core.windows.net/sapbits/archives"
 #     If not supplied or blank, it will default to "https://npweeusaplib9545.file.core.windows.net/sapbits/archives"
-#   - `product` is the documented root BoM name, e.g. "SAP_S4HANA_1809_SP4"
+#   - `product` is the documented root BoM name, e.g. "SAP_S4HANA_1809_SP5_v001"
 #     If not supplied or blank, it will attempt to determine the name from the stack XML file.
 #   For example:
 #   cd stackfiles
-#   /path/to/util/generate_fullbom.sh "" "SAP_S4HANA_1809_S4_v001" >../bom.yml
+#   /path/to/util/generate_fullbom.sh "" "SAP_S4HANA_1809_SP5_v001" >../bom.yml
 
 declare ARCHIVE=${1:-https://npweeusaplib9545.file.core.windows.net/sapbits/archives}
 declare PRODUCT=${2}
@@ -111,7 +110,7 @@ END {
 ' /dev/null
 
 sed -e 's@\(</[^>][^>]*>\)@\1\n@g' ${XML_FILE[0]} | \
-awk -v "archive=${ARCHIVE}" -v "product=${PRODUCT}" '
+awk -v "archive=${ARCHIVE}" -v "product=${PRODUCT}" -v "jsonfile=${JSON_FILE}" -v "xlsfile=${XLS_FILE}" -v "xmlfile=${XML_FILE}" '
 BEGIN {
   phase = "";
   FS = ",";
@@ -128,8 +127,9 @@ BEGIN {
 END {
 
   printf("---\n\nname: \"%s\"\ntarget: \"%s\"\nversion: \"001\"\n", product, targetname);
-  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}/downloads/\"\n");
-  printf("\nmaterials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"003\"\n\n  media:\n");
+  printf("\ndefaults:\n  target_location: \"{{ target_media_location }}/download_basket\"\n");
+  printf("\nproduct_ids:\n  scs:\n  db:\n  pas:\n  aas:\n  web:\n");
+  printf("\nmaterials:\n  dependencies:\n    - name: \"HANA2\"\n      version: \"001\"\n\n  media:\n");
 
   while ( getline < "tempworkfile" ) {
     seq = $1;
@@ -138,19 +138,19 @@ END {
     component = $4;
     if ( component == "File on DVD" ) component = (component " - " $3)
 
-    dir = "{{ target_media_location }}";
+    dir = "";
     current = substr(seq,1,2);
     if (current != phase ) {
       phase = current;
       if ( phase == "AA" ) {
         printf("\n    # kernel components\n");
-        overridedir = "{{ target_media_location }}/download_basket";
+        # overridedir = "{{ target_media_location }}/download_basket";
       } else if ( phase == "BB" ) {
         printf("\n    # db export components\n");
-        overridedir = "{{ target_media_location }}/cd_exports";
+        # overridedir = "{{ target_media_location }}/cd_exports";
       } else {
         printf("\n    # other components\n");
-        overridedir = "";
+        # overridedir = "";
       }
     }
 
@@ -158,9 +158,19 @@ END {
     printf("      archive: \"%s\"\n", filename);
     if ( overridedir != "") printf("      override_target_location: \"%s\"\n", overridedir);
     if (match(filename, /SAPCAR_.*\.EXE/ ) != 0) printf("      override_target_filename: \"SAPCAR.EXE\"\n");
+    if (match(filename, /SWPM.*\.SAR/ ) != 0) printf("      override_target_filename: \"SWPM.SAR\"\n");
     if ( sapurl != "" ) printf("      sapurl: \"https://softwaredownloads.sap.com/file/%s\"\n", sapurl);
   }
 
-  printf("\n  templates:\n\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n", product, product);
+  stackfileid = gensub(/^MP_Excel_([0-9]+_[0-9]+).*/, "\\1", "g", xlsfile);
+  printf("\n  templates:\n    - name: \"%s ini file\"\n      file: \"%s.inifile.params\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", product, product);
+  printf("\n  stackfiles:");
+  printf("\n    - name: \"Download Basket JSON Manifest\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", jsonfile);
+  printf("\n    - name: \"Download Basket Spreadsheet\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", xlsfile);
+  printf("\n    - name: \"Download Basket Plan\"\n      file: \"MP_Plan_%s_.pdf\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack text\"\n      file: \"MP_Stack_%s_.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack text\"\n      file: \"MP_Stack_%s_.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", stackfileid);
+  printf("\n    - name: \"Download Basket Stack XML\"\n      file: \"%s\"\n      override_target_location: \"{{ target_media_location }}/config\"\n", xmlfile);
+  printf("\n    - name: \"Download Basket permalinks\"\n      file: \"myDownloadBasketFiles.txt\"\n      override_target_location: \"{{ target_media_location }}/config\"\n");
 }
 '
