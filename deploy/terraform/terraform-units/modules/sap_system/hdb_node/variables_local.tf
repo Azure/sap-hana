@@ -161,25 +161,36 @@ locals {
   xsa        = try(local.hdb.xsa, { routing = "ports" })
   shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
-  dbnodes = flatten([[for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-    name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-    computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-    role           = try(dbnode.role, "worker")
-    admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-    db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
-    storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[0]
-    }
-    ],
-    [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-      name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-      computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+  dbnodes = local.hdb_ha ? (
+    flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) :
+      [
+        {
+          name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+          role           = try(dbnode.role, "worker")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+          storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[0]
+        },
+        {
+          name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+          role           = try(dbnode.role, "worker")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1]
+          storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[1]
+        }
+      ]
+    ])) : (
+    flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
+      name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+      computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
       role           = try(dbnode.role, "worker")
-      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-      db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1]
-      storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[1]
-      } if local.hdb_ha
-    ]
-    ]
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+      storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[0]
+      }]
+    )
   )
 
   loadbalancer = try(local.hdb.loadbalancer, {})
