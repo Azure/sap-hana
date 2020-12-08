@@ -127,8 +127,8 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes            = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
-  db_sizing        = local.enable_db_deployment ? lookup(local.sizes, var.databases[0].size).storage : []
+  sizes     = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
+  db_sizing = local.enable_db_deployment ? lookup(local.sizes, var.databases[0].size).storage : []
 
   enable_ultradisk = try(
     compact(

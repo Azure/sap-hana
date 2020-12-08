@@ -123,10 +123,11 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.hdb_vms[count.index].size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -164,13 +165,15 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "data_disk" {
-  count                = local.enable_deployment ? length(local.data_disk_list) : 0
-  name                 = local.data_disk_list[count.index].name
-  location             = var.resource_group[0].location
-  resource_group_name  = var.resource_group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.data_disk_list[count.index].storage_account_type
-  disk_size_gb         = local.data_disk_list[count.index].disk_size_gb
+  count                  = local.enable_deployment ? length(local.data_disk_list) : 0
+  name                   = local.data_disk_list[count.index].name
+  location               = var.resource_group[0].location
+  resource_group_name    = var.resource_group[0].name
+  create_option          = "Empty"
+  storage_account_type   = local.data_disk_list[count.index].storage_account_type
+  disk_size_gb           = local.data_disk_list[count.index].disk_size_gb
+  disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
+
   zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
     [azurerm_linux_virtual_machine.vm_dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
     null

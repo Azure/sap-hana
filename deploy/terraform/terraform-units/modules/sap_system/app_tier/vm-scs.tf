@@ -106,10 +106,11 @@ resource "azurerm_linux_virtual_machine" "scs" {
     )
 
     content {
-      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -191,10 +192,11 @@ resource "azurerm_windows_virtual_machine" "scs" {
     )
 
     content {
-      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -219,13 +221,15 @@ resource "azurerm_windows_virtual_machine" "scs" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "scs" {
-  count                = local.enable_deployment ? length(local.scs_data_disks) : 0
-  name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.scs_data_disks[count.index].suffix)
-  location             = var.resource_group[0].location
-  resource_group_name  = var.resource_group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.scs_data_disks[count.index].storage_account_type
-  disk_size_gb         = local.scs_data_disks[count.index].disk_size_gb
+  count                  = local.enable_deployment ? length(local.scs_data_disks) : 0
+  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.scs_data_disks[count.index].suffix)
+  location               = var.resource_group[0].location
+  resource_group_name    = var.resource_group[0].name
+  create_option          = "Empty"
+  storage_account_type   = local.scs_data_disks[count.index].storage_account_type
+  disk_size_gb           = local.scs_data_disks[count.index].disk_size_gb
+  disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
+
   zones = local.scs_zonal_deployment && (local.scs_server_count == local.scs_zone_count) ? (
     upper(local.scs_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.scs[local.scs_data_disks[count.index].vm_index].zone]) : (

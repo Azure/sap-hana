@@ -106,6 +106,7 @@
   "options": {
     "enable_secure_transfer": true,
     "enable_prometheus": true,
-    "resource_offset" : 0
+    "resource_offset" : 0,
+    "disk_encryption_set_id" : ""
   }
 }
