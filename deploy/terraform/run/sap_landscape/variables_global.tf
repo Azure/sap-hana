@@ -20,3 +20,8 @@ variable "sshkey" {
     path_to_private_key = "~/.ssh/id_rsa"
   }
 }
+
+variable "key_vault" {
+  description = "The user brings existing Azure Key Vaults"
+  default     = ""
+}

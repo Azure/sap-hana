@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -45,6 +49,8 @@ locals {
 
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/anydb_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+
   computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
 
@@ -61,6 +67,9 @@ locals {
   prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = try(var.options.resource_offset, 0)
+
   // Zones
   zones            = try(local.anydb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
@@ -69,6 +78,15 @@ locals {
   // Availability Set 
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
+
+  // Return the max fault domain count for the region
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
+
+  // Support dynamic addressing
+  use_DHCP = try(local.anydb.use_DHCP, false)
 
   anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
@@ -100,7 +118,7 @@ locals {
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
-  anydb_size   = try(local.anydb.size, "Demo")
+  anydb_size   = try(local.anydb.size, "Default")
   anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, false)
@@ -120,6 +138,9 @@ locals {
   sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
 
   db_systemdb_password = "db_systemdb_password"
+
+  // Tags
+  tags = try(local.anydb.tags, {})
 
   authentication = try(local.anydb.authentication,
     {
@@ -263,11 +284,13 @@ locals {
     }
   ])
 
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.anydb_size).storage : []
+
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.anydb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count)
+          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -297,10 +320,17 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.anydb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = try(
+    compact(
+      [
+        for storage in local.db_sizing : storage.disk_type == "UltraSSD_LRS" ? true : ""
+      ]
+    )[0],
+    false
+  )
+
+  full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
 
 }

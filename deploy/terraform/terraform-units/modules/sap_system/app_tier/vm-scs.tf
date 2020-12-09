@@ -9,14 +9,17 @@ resource "azurerm_network_interface" "scs" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address = try(local.scs_nic_ips[count.index],
-      cidrhost(local.sub_app_exists ?
-        data.azurerm_subnet.subnet_sap_app[0].address_prefixes[0] :
-        azurerm_subnet.subnet_sap_app[0].address_prefixes[0],
-        tonumber(count.index) + local.ip_offsets.scs_vm
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.scs_nic_ips[count.index],
+        cidrhost(local.sub_app_exists ?
+          data.azurerm_subnet.subnet_sap_app[0].address_prefixes[0] :
+          azurerm_subnet.subnet_sap_app[0].address_prefixes[0],
+          tonumber(count.index) + local.ip_offsets.scs_vm
+        )
       )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -31,12 +34,15 @@ resource "azurerm_network_interface" "scs_admin" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = var.admin_subnet.id
-    private_ip_address = try(local.scs_admin_nic_ips[count.index],
-      cidrhost(var.admin_subnet.id.address_prefixes[0],
-        tonumber(count.index) + local.admin_ip_offsets.scs_vm
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.scs_admin_nic_ips[count.index],
+        cidrhost(var.admin_subnet.id.address_prefixes[0],
+          tonumber(count.index) + local.admin_ip_offsets.scs_vm
+        )
       )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -50,6 +56,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "scs" {
 
 # Create the SCS Linux VM(s)
 resource "azurerm_linux_virtual_machine" "scs" {
+  depends_on          = [var.anydb_vms, var.hdb_vms]
   count               = local.enable_deployment && (upper(local.scs_ostype) == "LINUX") ? local.scs_server_count : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_computer_names[count.index]
@@ -80,10 +87,30 @@ resource "azurerm_linux_virtual_machine" "scs" {
   disable_password_authentication = ! local.enable_auth_password
   admin_password                  = local.sid_auth_password
 
-  os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+  dynamic "os_disk" {
+    iterator = disk
+    for_each = flatten(
+      [
+        for storage_type in local.scs_sizing.storage : [
+          for disk_count in range(storage_type.count) :
+          {
+            name      = storage_type.name,
+            id        = disk_count,
+            disk_type = storage_type.disk_type,
+            size_gb   = storage_type.size_gb,
+            caching   = storage_type.caching
+          }
+        ]
+        if storage_type.name == "os"
+      ]
+    )
+
+    content {
+      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching              = disk.value.caching
+      storage_account_type = disk.value.disk_type
+      disk_size_gb         = disk.value.size_gb
+    }
   }
 
   source_image_id = local.scs_custom_image ? local.scs_os.source_image_id : null
@@ -109,10 +136,13 @@ resource "azurerm_linux_virtual_machine" "scs" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.scs_tags
 }
 
 # Create the SCS Windows VM(s)
 resource "azurerm_windows_virtual_machine" "scs" {
+  depends_on          = [var.anydb_vms, var.hdb_vms]
   count               = local.enable_deployment && (upper(local.scs_ostype) == "WINDOWS") ? local.scs_server_count : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.scs_computer_names[count.index]
@@ -142,10 +172,30 @@ resource "azurerm_windows_virtual_machine" "scs" {
   admin_username = local.sid_auth_username
   admin_password = local.sid_auth_password
 
-  os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+  dynamic "os_disk" {
+    iterator = disk
+    for_each = flatten(
+      [
+        for storage_type in local.scs_sizing.storage : [
+          for disk_count in range(storage_type.count) :
+          {
+            name      = storage_type.name,
+            id        = disk_count,
+            disk_type = storage_type.disk_type,
+            size_gb   = storage_type.size_gb,
+            caching   = storage_type.caching
+          }
+        ]
+        if storage_type.name == "os"
+      ]
+    )
+
+    content {
+      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching              = disk.value.caching
+      storage_account_type = disk.value.disk_type
+      disk_size_gb         = disk.value.size_gb
+    }
   }
 
   source_image_id = local.scs_custom_image ? local.scs_os.source_image_id : null
@@ -163,6 +213,8 @@ resource "azurerm_windows_virtual_machine" "scs" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.scs_tags
 }
 
 # Creates managed data disk

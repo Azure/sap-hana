@@ -86,6 +86,19 @@ locals {
   deployer_tfstate          = var.deployer_tfstate
   deployer_msi_principal_id = local.deployer_tfstate.outputs.deployer_uai.principal_id
 
+  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
+  user_key_vault_id = try(var.key_vault.kv_user_id, "")
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
+  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
+  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
+
+  // Extract information from the specified key vault arm ids
+  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+
+  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+
 }
 
 locals {

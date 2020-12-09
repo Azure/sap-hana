@@ -1,3 +1,11 @@
+variable "anydb_vms" {
+  description = "Deployed anydb VMs"
+}
+
+variable "hdb_vms" {
+  description = "Deployed HDB VMs"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -45,6 +53,7 @@ locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
 
   app_computer_names       = var.naming.virtualmachine_names.APP_COMPUTERNAME
   app_virtualmachine_names = var.naming.virtualmachine_names.APP_VMNAME
@@ -55,7 +64,16 @@ locals {
 
   resource_suffixes = var.naming.resource_suffixes
 
-  region  = try(var.infrastructure.region, "")
+  region = try(var.infrastructure.region, "")
+
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = try(var.options.resource_offset, 0)
+
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
+
   sid     = upper(try(var.application.sid, ""))
   prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
@@ -167,6 +185,8 @@ locals {
   web_nic_ips              = try(var.application.web_nic_ips, [])
   web_admin_nic_ips        = try(var.application.web_admin_nic_ips, [])
 
+  use_DHCP = try(var.application.use_DHCP, false)
+
   // Dual network cards
   apptier_dual_nics = try(var.application.dual_nics, false)
 
@@ -196,6 +216,11 @@ locals {
     "sku"             = try(var.application.scs_os.sku, local.scs_custom_image ? "" : local.app_os.sku)
     "version"         = try(var.application.scs_os.version, local.scs_custom_image ? "" : local.app_os.version)
   }
+
+  // Tags
+  app_tags = try(var.application.app_tags, {})
+  scs_tags = try(var.application.scs_tags, {})
+  web_tags = try(var.application.web_tags, {})
 
   application = merge(var.application,
     { authentication = local.authentication }
@@ -231,11 +256,11 @@ locals {
   }
 
   // Default VM config should be merged with any the user passes in
-  app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))
+  app_sizing = lookup(local.sizes.app, local.vm_sizing)
 
-  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, lookup(local.sizes.scs, "Default"))
+  scs_sizing = lookup(local.sizes.scs, local.vm_sizing)
 
-  web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
+  web_sizing = lookup(local.sizes.web, local.vm_sizing)
 
   // Ports used for specific ASCS, ERS and Web dispatcher
   lb_ports = {
@@ -307,7 +332,7 @@ locals {
     [
       for storage_type in local.app_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -341,7 +366,7 @@ locals {
     [
       for storage_type in local.scs_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -375,7 +400,7 @@ locals {
     [
       for storage_type in local.web_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -404,4 +429,17 @@ locals {
       }
     ]
   ])
+
+
+  full_appserver_names = flatten([for vm in local.app_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
+
+  full_scsserver_names = flatten([for vm in local.scs_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
+
+  full_webserver_names = flatten([for vm in local.web_virtualmachine_names :
+    format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
+  )
 }

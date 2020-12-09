@@ -22,6 +22,10 @@ steps:
 
       # Copy local key pair to deployer. Temporary workaround until kv feature completes.
       scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) ${ws_dir}/sshkey* "$(username)"@"$(publicIP)":${remote_dir}
+
+      echo "=== Add access policy recover for pipeline SPN to deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')  
+      az keyvault set-policy --name ${deployer_kv_name} --secret-permissions get list set delete recover --object-id $(hana-pipeline-spn-objId) --output none
     displayName: "Post deployment"
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)

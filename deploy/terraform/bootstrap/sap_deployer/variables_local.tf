@@ -17,4 +17,6 @@ locals {
   vnet_mgmt_name_part = substr(upper(local.vnet_mgmt_name), -5, 5) == "-VNET" ? split("-", local.vnet_mgmt_name)[(local.vnet_mgmt_parts - 2)] : local.vnet_mgmt_name
 
   deployer_vm_count = length(var.deployers)
+
+  enable_deployer_public_ip = try(var.options.enable_deployer_public_ip, false)
 }

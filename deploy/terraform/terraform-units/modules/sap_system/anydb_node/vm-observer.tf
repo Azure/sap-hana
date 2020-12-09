@@ -10,15 +10,20 @@ resource "azurerm_network_interface" "observer" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = var.db_subnet.id
-    private_ip_address = try(local.observer.nic_ips[count.index],
-      cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.observer_db_vm)
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.observer.nic_ips[count.index],
+        cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.observer_db_vm)
+      )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+
   }
 }
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
+  depends_on          = [var.anchor_vm]
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]
@@ -70,6 +75,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.tags
 }
 
 # Create the Windows Application VM(s)
@@ -121,4 +128,6 @@ resource "azurerm_windows_virtual_machine" "observer" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
+
+  tags = local.tags
 }

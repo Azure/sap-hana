@@ -1,3 +1,7 @@
+variable "anchor_vm" {
+  description = "Deployed anchor VM"
+}
+
 variable "resource_group" {
   description = "Details of the resource group"
 }
@@ -32,6 +36,10 @@ variable "db_subnet" {
   description = "Information about SAP db subnet"
 }
 
+variable "storage_subnet" {
+  description = "Information about storage subnet"
+}
+
 variable "sid_kv_user" {
   description = "Details of the user keyvault for sap_system"
 }
@@ -54,11 +62,16 @@ locals {
   // Imports database sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
+  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+
   region = try(var.infrastructure.region, "")
   sid    = upper(try(var.application.sid, ""))
   prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
 
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
+
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = try(var.options.resource_offset, 0)
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate  = var.landscape_tfstate
@@ -78,14 +91,32 @@ locals {
   // Filter the list of databases to only HANA platform entries
   hdb = try(local.hdb_list[0], {})
 
+  //ANF support
+  use_ANF = try(local.hdb.use_ANF, false)
+  //Scalout subnet is needed if ANF is used and there are more than one hana node 
+  dbnode_per_site       = length(try(local.hdb.dbnodes, [{}]))
+  enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
+
   // Zones
   zones            = try(local.hdb.zones, [])
   zonal_deployment = length(local.zones) > 0 ? true : false
   db_zone_count    = length(local.zones)
 
-    // Availability Set 
+  // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
+
+  // Return the max fault domain count for the region
+  faultdomain_count = try(tonumber(compact(
+    [for pair in local.faults :
+      upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
+  ])[0]), 2)
+
+  // Tags
+  tags = try(local.hdb.tags, {})
+
+  // Support dynamic addressing
+  use_DHCP = try(local.hdb.use_DHCP, false)
 
   hdb_platform = try(local.hdb.platform, "NONE")
   hdb_version  = try(local.hdb.db_version, "2.00.043")
@@ -97,7 +128,7 @@ locals {
     "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
     "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
   }
-  hdb_size = try(local.hdb.size, "Demo")
+  hdb_size = try(local.hdb.size, "Default")
   hdb_fs   = try(local.hdb.filesystem, "xfs")
   hdb_ha   = try(local.hdb.high_availability, false)
 
@@ -131,19 +162,21 @@ locals {
   shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
   dbnodes = flatten([[for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-    computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-    role         = try(dbnode.role, "worker")
-    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-    db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
+    name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+    computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+    role           = try(dbnode.role, "worker")
+    admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
+    db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+    storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[0]
     }
     ],
     [for idx, dbnode in try(local.hdb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-      computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
-      role         = try(dbnode.role, "worker")
-      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-      db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1]
+      name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+      computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+      role           = try(dbnode.role, "worker")
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1]
+      storage_nic_ip = lookup(dbnode, "storage_nic_ips", [false, false])[1]
       } if local.hdb_ha
     ]
     ]
@@ -192,6 +225,7 @@ locals {
       computername   = dbnode.computername
       admin_nic_ip   = dbnode.admin_nic_ip,
       db_nic_ip      = dbnode.db_nic_ip,
+      storage_nic_ip = dbnode.storage_nic_ip,
       size           = local.hdb_size,
       os             = local.hdb_os,
       authentication = local.hdb_auth
@@ -202,9 +236,10 @@ locals {
   // Subnet IP Offsets
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   hdb_ip_offsets = {
-    hdb_lb       = 4
-    hdb_admin_vm = 10
-    hdb_db_vm    = 10
+    hdb_lb         = 4
+    hdb_admin_vm   = 10
+    hdb_db_vm      = 10
+    hdb_storage_vm = 10
   }
 
   // Ports used for specific HANA Versions
@@ -231,12 +266,14 @@ locals {
     }
   ])
 
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.hdb_size).storage : []
+
   // List of data disks to be created for HANA DB nodes
-  data_disk_per_dbnode = (length(local.hdb_vms) > 0) ? flatten(
+  data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.hdb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count)
+          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -267,9 +304,12 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.hdb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = try(
+    compact(
+      [
+        for storage in local.db_sizing : storage.disk_type == "UltraSSD_LRS" ? true : ""
+      ]
+    )[0],
+    false
+  )
 }

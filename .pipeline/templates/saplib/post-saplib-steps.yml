@@ -82,6 +82,26 @@ steps:
 
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_library/
       '
+
+      echo "=== Add access policy recover for pipeline SPN back to deployer KV ==="
+
+      az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+
+      # Modify environment value so it starts with u and with length of 5
+      deployer_env=${{parameters.deployer_env}}
+      buildId=$(Build.BuildId)
+      deployer_isRelease=${deployer_env%%$buildId*}
+      if [ -z "${deployer_isRelease}" ]
+      then 
+        deployer_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        deployer_prefix=${deployer_env}
+      fi
+
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
+
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')  
+      az keyvault set-policy --name ${deployer_kv_name} --secret-permissions get list set delete recover --object-id $(hana-pipeline-spn-objId) --output none
     displayName: "Post saplibrary"
     env:
       ARM_CLIENT_ID: $(hana-pipeline-spn-id)

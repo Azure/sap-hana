@@ -1,7 +1,48 @@
 steps:
   - script: |
+      set +e
+
+      # Modify environment value so it starts with u and with length of 5
+      deployer_env=${{parameters.deployer_env}}
+      buildId=$(Build.BuildId)
+      isRelease=${deployer_env%%$buildId*}
+      if [ -z "${isRelease}" ]
+      then 
+        deployer_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        deployer_prefix=${deployer_env}
+      fi
+      
+      deployer_environment=${deployer_prefix}
+      deployer_rg="${deployer_prefix}-EAUS-DEP00-INFRASTRUCTURE"
+
+      # Modify environment value so it starts with u and with length of 5
+      saplib_env=${{parameters.saplib_env}}
+      buildId=$(Build.BuildId)
+      isRelease=${saplib_env%%$buildId*}
+      if [ -z "${isRelease}" ]
+      then 
+        saplib_prefix="U$(echo $(Build.BuildId) | rev | cut -c1-4 | rev)"
+      else
+        saplib_prefix=${saplib_env}
+      fi
+
+      echo "=== Store SPN in deployer KV ==="
+      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --value $(hana-pipeline-spn-id) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --value $(hana-pipeline-spn-pw) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --value $(landscape-subscription) --output none
+      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --value $(landscape-tenant) --output none
+
+      echo "=== Recovery SPN in deployer KV when rerun same build ==="
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --output none
+      az keyvault secret recover --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --output none
+      echo "=== Wait for 30s for secrets to be available === "
+      sleep 30s
+
       set -e
-      set -o errexit
 
       echo "=== Deploy SAP library from deployer ==="
       ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o ConnectTimeout=$(ssh_timeout_s) "$(username)"@"$(publicIP)" '
@@ -37,13 +78,6 @@ steps:
       repo_dir=$HOME/${saplib_rg}/sap-hana
       ws_dir=$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/${saplib_rg}
       input=${ws_dir}/${saplib_rg}.json
-
-      echo "=== Store SPN in deployer KV ==="
-      deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
-      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --value $(hana-pipeline-spn-id) --output none
-      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --value $(hana-pipeline-spn-pw) --output none
-      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --value $(landscape-subscription) --output none
-      az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-tenant-id --value $(landscape-tenant) --output none
 
       echo "=== Checkout required branch ${{parameters.branch_name}} ==="
       if [ ! -d "${repo_dir}" ]

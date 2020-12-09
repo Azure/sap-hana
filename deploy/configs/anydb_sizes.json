@@ -1,5 +1,5 @@
 {
-    "Demo": {
+    "Default": {
       "compute": {
         "vm_size": "Standard_E4s_v3",
         "swap_size_gb": 2

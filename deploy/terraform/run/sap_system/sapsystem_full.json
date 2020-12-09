@@ -9,6 +9,21 @@
       "is_existing": "false",
       "arm_id": ""
     },
+    "anchor_vms": {
+      "sku": "Standard_D4s_v4",
+      "authentication": {
+        "type": "key",
+        "username": "azureadm"
+      },
+      "accelerated_networking": true,
+      "os": {
+        "publisher": "SUSE",
+        "offer": "sles-sap-12-sp5",
+        "sku": "gen1"
+      },
+      "nic_ips": ["", "", ""],
+      "use_DHCP" : false
+    },
     "vnets": {
       "sap": {
         "is_existing": "false",
@@ -32,7 +47,7 @@
       "platform": "HANA",
       "high_availability": false,
       "db_version": "2.00.050",
-      "size": "Demo",
+      "size": "Default",
       "os": {
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
@@ -49,7 +64,22 @@
       },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
-        ]
+      ],
+      "use_DHCP": false,
+      "dbnodes": [
+        {
+          "name": "hdb1",
+          "role": "worker"
+        },
+        {
+          "name": "hdb2",
+          "role": "worker"
+        },
+        {
+          "name": "hdb3",
+          "role": "standby"
+        }
+      ]
     }
   ],
   "application": {
@@ -60,9 +90,10 @@
     "scs_high_availability": false,
     "application_server_count": 2,
     "webdispatcher_count": 1,
-    "app_zones": ["1","2"],
+    "app_zones": ["1", "2"],
     "scs_zones": ["1"],
     "web_zones": ["1"],
+    "use_DHCP": false,
     "authentication": {
       "type": "key",
       "username": "azureadm"
@@ -74,6 +105,7 @@
   },
   "options": {
     "enable_secure_transfer": true,
-    "enable_prometheus": true
+    "enable_prometheus": true,
+    "resource_offset" : 0
   }
 }

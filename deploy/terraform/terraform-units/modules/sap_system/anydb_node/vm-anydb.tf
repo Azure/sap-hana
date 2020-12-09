@@ -14,12 +14,15 @@ resource "azurerm_network_interface" "anydb_db" {
     name      = "ipconfig1"
     subnet_id = var.db_subnet.id
 
-    private_ip_address = try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
-      local.anydb_vms[count.index].db_nic_ip) : (
-      cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_db_vm)
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
+        local.anydb_vms[count.index].db_nic_ip) : (
+        cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_db_vm)
+      )
     )
 
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -36,16 +39,20 @@ resource "azurerm_network_interface" "anydb_admin" {
     name      = "ipconfig1"
     subnet_id = var.admin_subnet.id
 
-    private_ip_address = try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
-      local.anydb_vms[count.index].admin_nic_ip) : (
-      cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_admin_vm)
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.anydb_vms[count.index].admin_nic_ip, false) != false ? (
+        local.anydb_vms[count.index].admin_nic_ip) : (
+        cidrhost(var.admin_subnet[0].address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_admin_vm)
+      )
     )
-    private_ip_address_allocation = "static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
 // Section for Linux Virtual machine 
 resource "azurerm_linux_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "LINUX") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
@@ -114,14 +121,13 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
-  tags = {
-    environment = "SAP"
-    SID         = upper(local.sap_sid)
-  }
+
+  tags = local.tags
 }
 
 // Section for Windows Virtual machine 
 resource "azurerm_windows_virtual_machine" "dbserver" {
+  depends_on          = [var.anchor_vm]
   count               = local.enable_deployment ? ((upper(local.anydb_ostype) == "WINDOWS") ? local.db_server_count : 0) : 0
   name                = local.anydb_vms[count.index].name
   computer_name       = local.anydb_vms[count.index].computername
@@ -181,10 +187,8 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag.primary_blob_endpoint
   }
-  tags = {
-    environment = "SAP"
-    SID         = upper(local.sap_sid)
-  }
+
+  tags = local.tags
 }
 
 // Creates managed data disks

@@ -98,6 +98,11 @@ variable deployer_vm_count {
   default = 1
 }
 
+variable resource_offset {
+  type    = number
+  default = 0
+}
+
 //Todo: Add to documentation
 variable sapautomation_name_limits {
   description = "Name length for automation resources"
@@ -224,17 +229,20 @@ variable resource_suffixes {
     "osdisk"              = "-OsDisk"
     "pip"                 = "-pip"
     "ppg"                 = "-ppg"
+    "storage_nic"         = "-storage-nic"
+    "storage_subnet"      = "_storage-subnet"
+    "storage_subnet_nsg"  = "_storageSubnet-nsg"
     "scs_alb"             = "scs-alb"
     "scs_alb_bepool"      = "scsAlb-bePool"
     "scs_alb_feip"        = "scsAlb-feip"
     "scs_alb_hp"          = "scsAlb-hp"
     "scs_alb_rule"        = "scsAlb-rule_"
+    "scs_avset"           = "scs-avset"
     "scs_ers_feip"        = "scsErs-feip"
     "scs_ers_hp"          = "scsErs-hp"
     "scs_ers_rule"        = "scsErs-rule_"
     "scs_scs_rule"        = "scsScs-rule_"
     "sdu_rg"              = ""
-    "scs_avset"           = "scs-avset"
     "vm"                  = ""
     "vnet"                = "-vnet"
     "vnet_rg"             = "-INFRASTRUCTURE"

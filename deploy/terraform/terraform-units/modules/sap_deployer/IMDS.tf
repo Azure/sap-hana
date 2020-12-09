@@ -21,7 +21,7 @@ variable "max_timeout" {
 // Registers the current deployment state with Azure's Metadata Service (IMDS)
 resource "null_resource" "IMDS" {
   depends_on = [azurerm_linux_virtual_machine.deployer]
-  count      = length(local.deployers)
+  count      = local.enable_deployer_public_ip ? length(local.deployers) : 0
 
   connection {
     type        = "ssh"

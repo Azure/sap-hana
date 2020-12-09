@@ -20,3 +20,8 @@ variable "deployer" {
   description = "Details of deployer"
   default     = {}
 }
+
+variable "key_vault" {
+  description = "Import existing Azure Key Vaults"
+  default     = {}
+}

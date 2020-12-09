@@ -54,8 +54,8 @@ resource "azurerm_network_interface" "iscsi" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = local.sub_iscsi_exists ? data.azurerm_subnet.iscsi[0].id : azurerm_subnet.iscsi[0].id
-    private_ip_address            = local.sub_iscsi_exists ? local.iscsi_nic_ips[count.index] : cidrhost(local.sub_iscsi_prefix, tonumber(count.index) + 4)
-    private_ip_address_allocation = "static"
+    private_ip_address            = local.use_DHCP ? null : local.sub_iscsi_exists ? local.iscsi_nic_ips[count.index] : cidrhost(local.sub_iscsi_prefix, tonumber(count.index) + 4)
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "static"
   }
 }
 

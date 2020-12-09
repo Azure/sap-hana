@@ -11,12 +11,16 @@ resource "azurerm_lb" "anydb" {
   location            = var.resource_group[0].location
 
   frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-    subnet_id                     = var.db_subnet.id
-    private_ip_address_allocation = "Static"
-    private_ip_address = try(local.anydb.loadbalancer.frontend_ip,
-      cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
+    name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
+    subnet_id = var.db_subnet.id
+
+    private_ip_address = local.use_DHCP ? (
+      null) : (
+      try(local.anydb.loadbalancer.frontend_ip,
+        cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_lb)
+      )
     )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -56,7 +60,7 @@ resource "azurerm_availability_set" "anydb" {
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
-  platform_fault_domain_count  = 2
+  platform_fault_domain_count  = local.faultdomain_count
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % length(local.zones)].id : var.ppg[0].id
   managed                      = true
 }
