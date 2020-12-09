@@ -13,8 +13,7 @@
         }
     },
     "options": {
-        "enable_secure_transfer": true,
-        "enable_deployer_public_ip": false
+        "enable_secure_transfer": true
     },
     "key_vault": {
         "kv_user_id": "",
