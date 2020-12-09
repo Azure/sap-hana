@@ -5,6 +5,7 @@ variable environment {
 
 variable library_environment {
   description = "SAP Library environment type (Prod, Test, Sand, QA)"
+  default     = ""
 }
 
 
