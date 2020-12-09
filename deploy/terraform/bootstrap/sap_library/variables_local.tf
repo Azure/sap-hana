@@ -44,11 +44,10 @@ locals {
   // Derive resource group name for deployer
   deployer                = try(var.deployer, {})
   deployer_environment    = try(local.deployer.environment, "")
-  deployer_location_short = try(var.region_mapping[local.deployer.region], "unkn")
   deployer_vnet           = try(local.deployer.vnet, "")
-  deployer_prefix         = upper(format("%s-%s-%s", local.deployer_environment, local.deployer_location_short, substr(local.deployer_vnet, 0, 7)))
+  deployer_prefix         = module.sap_namegenerator.naming.prefix.DEPLOYER
   // If custom names are used for deployer, providing resource_group_name and msi_name will override the naming convention
-  deployer_rg_name = try(local.deployer.resource_group_name, format("%s-INFRASTRUCTURE", local.deployer_prefix))
+  deployer_rg_name = try(local.deployer.resource_group_name, format("%s%s", local.deployer_prefix, module.sap_namegenerator.naming.resource_suffixes.deployer_rg))
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
   deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
