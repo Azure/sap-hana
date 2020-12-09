@@ -294,9 +294,17 @@ variable custom_prefix {
   default     = ""
 }
 
+variable deployer_location {
+  description = "Deployer Azure region"
+  default     = ""
+}
+
+
 locals {
 
   location_short = upper(try(var.region_mapping[var.location], "unkn"))
+
+  deployer_location_short = length(var.deployer_location) > 0 ? upper(try(var.region_mapping[var.deployer_location], "unkn")) : local.location_short
 
   // If no deployer environment provided use environment
   deployer_environment_temp = length(var.deployer_environment) > 0 ? var.deployer_environment : var.environment
