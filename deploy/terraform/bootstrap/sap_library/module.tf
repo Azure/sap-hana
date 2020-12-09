@@ -16,8 +16,10 @@ module "sap_library" {
 }
 
 module "sap_namegenerator" {
-  source      = "../../terraform-units/modules/sap_namegenerator"
-  environment = lower(try(var.infrastructure.environment, ""))
-  location    = try(var.infrastructure.region, "")
-  random_id   = module.sap_library.random_id
+  source                = "../../terraform-units/modules/sap_namegenerator"
+  environment           = lower(try(var.infrastructure.environment, ""))
+  deployer_environment  = local.deployer_environment
+  management_vnet_name  = local.deployer_vnet
+  location              = try(var.infrastructure.region, "")
+  random_id             = module.sap_library.random_id
 }
