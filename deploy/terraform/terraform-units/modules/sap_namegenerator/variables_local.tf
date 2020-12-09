@@ -16,7 +16,7 @@ variable deployer_environment {
 
 variable landscape_environment {
   description = "Landscape environment type (Prod, Test, Sand, QA)"
-  default     = ""
+  default = ""
 }
 
 variable location {
