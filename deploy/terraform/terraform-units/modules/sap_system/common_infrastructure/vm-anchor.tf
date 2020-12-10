@@ -36,9 +36,10 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    caching                = "ReadWrite"
+    storage_account_type   = "Premium_LRS"
+    disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
   }
 
   source_image_id = local.anchor_custom_image ? local.anchor_os.source_image_id : null

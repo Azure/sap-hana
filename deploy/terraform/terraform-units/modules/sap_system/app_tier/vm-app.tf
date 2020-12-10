@@ -98,10 +98,11 @@ resource "azurerm_linux_virtual_machine" "app" {
     )
 
     content {
-      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -183,10 +184,11 @@ resource "azurerm_windows_virtual_machine" "app" {
     )
 
     content {
-      name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -212,13 +214,15 @@ resource "azurerm_windows_virtual_machine" "app" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
-  count                = local.enable_deployment ? length(local.app_data_disks) : 0
-  name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.app_data_disks[count.index].suffix)
-  location             = var.resource_group[0].location
-  resource_group_name  = var.resource_group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.app_data_disks[count.index].storage_account_type
-  disk_size_gb         = local.app_data_disks[count.index].disk_size_gb
+  count                  = local.enable_deployment ? length(local.app_data_disks) : 0
+  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.app_data_disks[count.index].suffix)
+  location               = var.resource_group[0].location
+  resource_group_name    = var.resource_group[0].name
+  create_option          = "Empty"
+  storage_account_type   = local.app_data_disks[count.index].storage_account_type
+  disk_size_gb           = local.app_data_disks[count.index].disk_size_gb
+  disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
+
   zones = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
     upper(local.app_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.app[local.app_data_disks[count.index].vm_index].zone]) : (

@@ -56,7 +56,7 @@ output "deployer_tfstate_key" {
 }
 
 output "saplibrary_environment" {
-  value = local.environment
+  value = var.infrastructure.environment
 }
 
 output "saplibrary_subscription_id" {
