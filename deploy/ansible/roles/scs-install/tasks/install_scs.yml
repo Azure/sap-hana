@@ -1,27 +1,9 @@
 ---
 
-- name: "Ensure {{ bom_base_name }} is available"
-  uri:
-    url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
-    dest: "/tmp/{{ bom_base_name }}_bom.yml"
-  delegate_to: localhost
-
-- name: "Ensure {{ bom_base_name }} is used"
+- name: "Ensure {{ bom_base_name }} data is available"
   include_vars:
-    file: "/tmp/{{ bom_base_name }}_bom.yml"
+    file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yml"
     name: bom
-  delegate_to: localhost
-
-- name: Ensure /sapmnt is present
-  file:
-    path: "/sapmnt"
-    mode: "0777"
-    state: directory
-
-- name: "Ensure {{ download_basket_dir }} is present"
-  file:
-    path: "{{ download_basket_dir }}"
-    state: directory
 
 - name: Determine Stack XML file name
   set_fact:
@@ -88,7 +70,8 @@
 - name: Ensure SWPM is unarchived
   command: >
     {{ download_basket_dir }}/{{ sapcar_executable }} -xf {{ download_basket_dir }}/{{ swpm_archive }} -R {{ target_media_location }}/SWPM/
-
+  args:
+    creates: "{{ target_media_location }}/SWPM/SIGNATURE.SMF"
 
 - name: Ensure the template is available on the controller
   fetch:
@@ -101,6 +84,14 @@
     dest: "{{ target_media_location }}/config/scs.inifile.params"
     src: "/tmp/{{ inifile }}"
 
+- name: Ensure a temporary directory for executing the installation exists
+  file:
+    path: "/tmp/{{ bom_base_name }}"
+    state: directory
+    owner: root
+    group: sapinst
+    mode: "0777"
+
 - name: Ensure SCS is present and running
   shell: >
     {{ target_media_location }}/SWPM/sapinst
@@ -110,3 +101,5 @@
     SAPINST_EXECUTE_PRODUCT_ID="{{ product_id }}"
     SAPINST_START_GUI=false
     SAPINST_START_GUISERVER=false
+  args:
+    chdir: "/tmp/{{ bom_base_name }}"

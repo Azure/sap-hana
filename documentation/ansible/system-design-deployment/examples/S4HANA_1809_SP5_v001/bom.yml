@@ -21,6 +21,15 @@ materials:
 
   media:
 
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1324-80000935.EXE
+      override_target_filename: "SAPCAR.EXE"
+
+    - name: "SWPM20SP07"
+      archive: "SWPM20SP07_2-80003424.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001988822020"
+
     # kernel components
 
     - name: "Kernel Part II (777)"

@@ -1,0 +1,11 @@
+---
+
+- hosts: scs
+  become: yes
+  vars:
+    tier: preparation
+  roles:
+    - role: disk-setup
+    - role: ensure-bom
+    - role: process_bom
+    - role: nfs-server-setup

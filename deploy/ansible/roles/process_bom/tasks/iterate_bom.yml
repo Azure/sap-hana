@@ -1,14 +1,8 @@
 ---
 
-- name: "Ensure {{ bom_base_name }} is available"
-  uri:
-    url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
-    dest: "/tmp/{{ bom_base_name }}_bom.yml"
-  delegate_to: localhost
-
 - name: "Ensure {{ bom_base_name }} is used"
   include_vars:
-    file: "/tmp/{{ bom_base_name }}_bom.yml"
+    file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yml"
     name: bom
   delegate_to: localhost
 

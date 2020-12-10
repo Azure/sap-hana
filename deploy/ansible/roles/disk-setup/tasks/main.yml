@@ -1,0 +1,43 @@
+---
+
+- name: "Ensure variables are included"
+  include_vars:
+    file: "../../../vars/sap-disks.yml"
+
+- name: "Ensure Volume Group(s) are present"
+  lvg:
+    vg: "{{ item.vg }}"
+    pvs: "{{ item.pvs }}"
+    pesize: 4M
+    state: present
+  loop: "{{ sap_volume_groups }}"
+  when: item.tier == "all" or item.tier == tier
+
+- name: "Ensure Logical Volume(s) are present"
+  lvol:
+    lv: "{{ item.lv }}"
+    vg: "{{ item.vg }}"
+    size: "{{ item.size }}"
+    active: yes
+    state: present
+    shrink: no
+    resizefs: no
+  loop: "{{ sap_volumes }}"
+  when: item.tier == "all" or item.tier == tier
+
+- name: "Ensure Filesystem(s) are present"
+  filesystem:
+    dev: "{{ item.dev }}"
+    fstype: "{{ item.fstype }}"
+  loop: "{{ sap_filesystems }}"
+  when: item.tier == "all" or item.tier == tier
+
+- name: "Ensure Filesystem(s) are mounted"
+  mount:
+    src: "{{ item.dev }}"
+    path: "{{ item.mount_path }}"
+    fstype: "{{ item.fstype }}"
+    opts: defaults
+    state: mounted
+  loop: "{{ sap_filesystems }}"
+  when: item.tier == "all" or item.tier == tier

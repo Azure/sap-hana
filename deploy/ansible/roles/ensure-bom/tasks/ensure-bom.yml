@@ -1,0 +1,20 @@
+---
+
+- name: "Ensure {{ bom_base_name }} is available"
+  get_url:
+    url: "{{ sapbits_location_base_path }}/boms/{{ bom_base_name }}/bom.yml"
+    dest: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yml"
+  delegate_to: localhost
+
+- name: "Ensure {{ bom_base_name }} is available"
+  include_vars:
+    file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yml"
+    name: bom
+
+- name: "Ensure {{ bom_base_name }} dependencies are available"
+  when: bom_dependencies | length != 0
+  include_tasks: "./ensure-bom.yml"
+  vars:
+    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+    bom_base_name: "{{ item.name }}"
+  loop: "{{ bom_dependencies | flatten(levels=1) }}"

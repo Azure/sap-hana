@@ -1,0 +1,7 @@
+---
+
+- hosts: scs
+  become: yes
+  roles:
+    - role: ensure-bom
+    - role: scs-install

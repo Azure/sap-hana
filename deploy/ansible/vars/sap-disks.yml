@@ -1,0 +1,38 @@
+---
+
+# TODO: The below lists are enough for the SCS being configured for the Bill of Materials processing.
+#       The lists will need expanding to cover all expected disks/mount points for all hosts.
+#       This will likely include NFS mounts, and will need to consider different deployment sizes/configurations.
+
+sap_volume_groups:
+  - tier: all
+    vg: vg_sap
+    pvs: /dev/disk/azure/scsi1/lun0
+
+sap_volumes:
+  - tier: all
+    lv: lv_usrsap
+    vg: vg_sap
+    size: 64g
+  - tier: preparation
+    lv: lv_sapmnt
+    vg: vg_sap
+    size: 128g
+  - tier: preparation
+    lv: lv_usrsapinstall
+    vg: vg_sap
+    size: 100%FREE
+
+sap_filesystems:
+  - tier: all
+    fstype: xfs
+    dev: /dev/vg_sap/lv_usrsap
+    mount_path: /usr/sap
+  - tier: preparation
+    fstype: xfs
+    dev: /dev/vg_sap/lv_sapmnt
+    mount_path: /sapmnt
+  - tier: preparation
+    fstype: xfs
+    dev: /dev/vg_sap/lv_usrsapinstall
+    mount_path: /usr/sap/install

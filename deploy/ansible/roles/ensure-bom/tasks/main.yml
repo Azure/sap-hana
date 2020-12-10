@@ -4,5 +4,6 @@
   include_vars:
     file: "../../../vars/sap-config.yml"
 
-- import_tasks: configure.yml
-  become: true
+- include_tasks: pre_checks.yml
+
+- include_tasks: ensure-bom.yml
