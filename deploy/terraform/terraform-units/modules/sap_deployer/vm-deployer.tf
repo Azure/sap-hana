@@ -61,9 +61,10 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   disable_password_authentication = local.deployers[count.index].authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = local.deployers[count.index].disk_type
+    name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.osdisk)
+    caching                = "ReadWrite"
+    storage_account_type   = local.deployers[count.index].disk_type
+    disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
   }
 
   source_image_id = local.deployers[count.index].os.source_image_id != "" ? local.deployers[count.index].os.source_image_id : null
