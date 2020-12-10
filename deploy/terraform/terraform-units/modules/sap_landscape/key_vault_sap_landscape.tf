@@ -94,7 +94,7 @@ resource "azurerm_key_vault_secret" "iscsi_pk" {
 }
 
 resource "azurerm_key_vault_secret" "iscsi_username" {
-  count        = (local.enable_landscape_kv && ! local.iscsi_username_exist) ? 1 : 0
+  count        = (local.enable_landscape_kv && local.enable_iscsi && ! local.iscsi_username_exist) ? 1 : 0
   name         = local.iscsi_username_name
   value        = local.iscsi_auth_username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -139,7 +139,7 @@ data "azurerm_key_vault_secret" "iscsi_password" {
 }
 
 data "azurerm_key_vault_secret" "iscsi_username" {
-  count        = (local.enable_landscape_kv && local.iscsi_username_exist) ? 1 : 0
+  count        = (local.enable_landscape_kv && local.enable_iscsi && local.iscsi_username_exist) ? 1 : 0
   name         = local.iscsi_username_name
   key_vault_id = local.user_key_vault_id
 }
