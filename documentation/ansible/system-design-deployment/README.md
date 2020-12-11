@@ -170,6 +170,7 @@ ansible-playbook -i hosts.yml ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/a
 1. **Preparation**
    1. [Prepare Media](./hana/prepare-sap-library.md)
    1. [Prepare Bill of Materials](./hana/prepare-bom.md)
+   1. [Validate the BoM](./bom-validation.md)
    1. [Prepare Installation Template](./hana/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
@@ -183,6 +184,9 @@ ansible-playbook -i hosts.yml ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/a
 1. **Preparation**
    1. [Prepare Media](./app/prepare-sap-library.md)
    1. [Prepare Bill of Materials](./app/prepare-bom.md)
+   1. [Validate the BoM](./bom-validation.md)
    1. [Prepare Installation Template](./app/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP Application SID](./app/deploy-sid.md)
+
+   1. [Validate the BoM](./bom-validation.md)
