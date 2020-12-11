@@ -188,5 +188,3 @@ ansible-playbook -i hosts.yml ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/a
    1. [Prepare Installation Template](./app/prepare-ini.md)
 1. **Deployment**
    1. [Deploy SAP Application SID](./app/deploy-sid.md)
-
-   1. [Validate the BoM](./bom-validation.md)
