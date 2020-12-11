@@ -4,7 +4,7 @@ name: "S4HANA_2020_ISS_v001"
 target: "ABAP PLATFORM 2020"
 version: "001"
 
-defaults:
+default:
   target_location: "{{ target_media_location }}/download_basket"
 
 product_ids:
@@ -175,9 +175,9 @@ materials:
 
     # other components
 
-    - name: SAPCAR
-      version: 7.21
-      archive: SAPCAR_1324-80000935.EXE
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1324-80000935.EXE
       override_target_filename: SAPCAR.EXE
 
     - name: "Attribute Change Package 16 for EA-HR 608"
@@ -478,7 +478,7 @@ materials:
 
     - name: Download Basket Stack text
       file: MP_Stack_2001017452_20201030_.txt
-      override_target_location: "{{ target_media_location }}/config"
+      overide_target_location: "{{ target_media_location }}/config"
 
     - name: Download Basket Stack XML
       file: MP_Stack_2001017452_20201030_.xml

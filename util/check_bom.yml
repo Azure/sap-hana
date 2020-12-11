@@ -1,0 +1,108 @@
+---
+
+- hosts: localhost
+  vars:
+    target_media_location: /usr/sap/install
+
+  tasks:
+    - name: pre-checks
+      assert:
+        that:
+          - "{{ bom_name is defined }}"
+          - "{{ bom_name | trim | length != 0 }}"
+
+    - name: "Ensure {{ bom_name }} is available"
+      include_vars:
+        file: "{{ bom_name }}"
+        name: bom
+
+    - name: "Check bom dict"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom"
+        dict: "{{ bom }}"
+        required: ['name', 'defaults', 'product_ids', 'materials']
+        optional: ['version', 'target']
+      ignore_errors: true
+
+    - name: "Check bom.defaults dict"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.defaults"
+        dict: "{{ bom.defaults }}"
+        required: ['target_location']
+        optional: []
+      when: bom.defaults is defined
+      ignore_errors: true
+
+    - name: "Check bom.product_ids dict"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.product_ids"
+        dict: "{{ bom.product_ids }}"
+        required: ['scs', 'db', 'pas', 'aas', 'web']
+        optional: []
+      when: bom.product_ids is defined
+      ignore_errors: true
+
+    - name: "Check bom.materials dict"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.materials"
+        dict: "{{ bom.materials }}"
+        required: ['media', 'templates', 'stackfiles']
+        optional: ['dependencies']
+      when: bom.materials is defined
+      ignore_errors: true
+
+    - name: "Check bom.materials.dependencies list"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.materials.dependencies"
+        dict: "{{ dict_item }}"
+        required: ['name']
+        optional: ['version']
+      when: bom.materials.dependencies is defined
+      loop: "{{ bom.materials.dependencies | flatten(levels=1) }}"
+      loop_control:
+        loop_var: dict_item
+      ignore_errors: true
+
+    - name: "Check bom.materials.templates list"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.materials.templates"
+        dict: "{{ dict_item }}"
+        required: ['name', 'file']
+        optional: ['version', 'override_target_location', 'override_target_filename']
+      when: bom.materials.templates is defined
+      loop: "{{ bom.materials.templates | flatten(levels=1) }}"
+      loop_control:
+        loop_var: dict_item
+      ignore_errors: true
+
+    - name: "Check bom.materials.stackfiles list"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.materials.stackfiles"
+        dict: "{{ dict_item }}"
+        required: ['name', 'file']
+        optional: ['version', 'override_target_location', 'override_target_filename']
+      when: bom.materials.stackfiles is defined
+      loop: "{{ bom.materials.stackfiles | flatten(levels=1) }}"
+      loop_control:
+        loop_var: dict_item
+      ignore_errors: true
+
+    - name: "Check bom.materials.media list"
+      include_tasks: "./validate_dict.yml"
+      vars:
+        reference: "bom.materials.media"
+        dict: "{{ dict_item }}"
+        required: ['name', 'archive']
+        optional: ['version', 'sapurl', 'override_target_location', 'override_target_filename']
+      when: bom.materials.media is defined
+      loop: "{{ bom.materials.media | flatten(levels=1) }}"
+      loop_control:
+        loop_var: dict_item
+      ignore_errors: true
