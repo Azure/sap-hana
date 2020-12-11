@@ -12,7 +12,7 @@ data "azurerm_key_vault_secret" "sid_pk" {
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
-  count                      = local.enable_sid_deployment && !local.prvt_kv_exist ? 1 : 0
+  count                      = (local.enable_sid_deployment && ! local.prvt_kv_exist) ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -30,7 +30,13 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
       "get",
     ]
   }
+}
 
+// Import an existing private Key Vault
+data "azurerm_key_vault" "sid_kv_prvt" {
+  count               = (local.enable_sid_deployment && local.prvt_kv_exist) ? 1 : 0
+  name                = local.prvt_kv_name
+  resource_group_name = local.prvt_kv_rg_name
 }
 
 // Import an existing private Key Vault
@@ -42,7 +48,7 @@ data "azurerm_key_vault" "sid_kv_prvt" {
 
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
-  count                      = local.enable_sid_deployment && !local.user_kv_exist ? 1 : 0
+  count                      = (local.enable_sid_deployment && ! local.user_kv_exist) ? 1 : 0
   name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -91,3 +97,38 @@ resource "azurerm_key_vault_access_policy" "sid_kv_user_portal" {
 resource "random_id" "sapsystem" {
   byte_length = 4
 }
+
+// Using TF tls to generate SSH key pair and store in user KV
+resource "tls_private_key" "sdu" {
+  count = (
+    var.options.use_local_keyvault_for_secrets
+    && (try(file(var.sshkey.path_to_public_key), "") == "")
+  ) ? 1 : 0
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+data "azurerm_key_vault_secret" "sdu" {
+  count        = ! var.options.use_local_keyvault_for_secrets ? 1 : 0
+  name         = local.secret_sid_pk_name
+  key_vault_id = local.kv_landscape_id
+}
+
+
+// By default the SSH keys are stored in landscape key vault. By setting
+// var.options.use_sdu_keyvault_for_secrets to true they will be stored in the SDU keyvault
+resource "azurerm_key_vault_secret" "sdu_private_key" {
+  count        = local.enable_sid_deployment && var.options.use_local_keyvault_for_secrets ? 1 : 0
+  name         = format("%s-sshkey", local.prefix)
+  value        = tls_private_key.sdu[0].private_key_pem
+  key_vault_id = azurerm_key_vault.sid_kv_user[0].id
+}
+
+resource "azurerm_key_vault_secret" "sdu_public_key" {
+  count        = local.enable_sid_deployment && var.options.use_local_keyvault_for_secrets ? 1 : 0
+  name         = format("%s-sshkey-pub", local.prefix)
+  value        = tls_private_key.sdu[0].public_key_openssh
+  key_vault_id = azurerm_key_vault.sid_kv_user[0].id
+}
+
+

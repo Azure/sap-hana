@@ -68,12 +68,22 @@ locals {
   deployer_tfstate = var.deployer_tfstate
 
   // Retrieve information about Sap Landscape from tfstate file
+<<<<<<< HEAD
   landscape_tfstate      = var.landscape_tfstate
   kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name     = try(local.landscape_tfstate.sid_public_key_secret_name, "")
   iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
+=======
+  landscape_tfstate = var.landscape_tfstate
+  kv_landscape_id    = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  secret_sid_pk_name = var.options.use_local_keyvault_for_secrets ? (
+    format("%s-sshkey", local.prefix)) : (
+    try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  )
+  iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
+>>>>>>> Add support for SDU specific SSH keys
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -260,6 +270,7 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
+<<<<<<< HEAD
  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
@@ -267,12 +278,30 @@ locals {
   prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
 
   // Extract informatio n from the specified key vault arm ids
+=======
+  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
+  user_key_vault_id = try(var.key_vault.kv_user_id, "")
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
+  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
+  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
+
+  // Extract information from the specified key vault arm ids
+>>>>>>> Add support for SDU specific SSH keys
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
   user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
 
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
+<<<<<<< HEAD
+=======
+  // If the user specifies the secret name of key pair/password in input, the secrets will be imported instead of creating new secrets
+  input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
+  input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
+  sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
+
+
+>>>>>>> Add support for SDU specific SSH keys
   //---- Update infrastructure with defaults ----//
   infrastructure = {
     resource_group = {

@@ -6,7 +6,7 @@
     "region": "eastus",
     "environment": "NP",
     "resource_group": {
-      "is_existing": "false",
+      "name": "",
       "arm_id": ""
     },
     "anchor_vms": {
@@ -22,11 +22,10 @@
         "sku": "gen1"
       },
       "nic_ips": ["", "", ""],
-      "use_DHCP" : false
+      "use_DHCP": false
     },
     "vnets": {
       "sap": {
-        "is_existing": "false",
         "arm_id": "",
         "name": "",
         "address_space": "10.1.0.0/16",
@@ -98,7 +97,15 @@
   "options": {
     "enable_secure_transfer": true,
     "enable_prometheus": true,
-    "resource_offset" : 0,
-    "disk_encryption_set_id" : ""
+    "resource_offset": 0,
+    "disk_encryption_set_id": "",
+    "use_local_keyvault_for_secrets" : false
+  },
+  "key_vault": {
+    "kv_user_id": "",
+    "kv_prvt_id": "",
+    "kv_sid_sshkey_prvt" : "",
+    "kv_sid_sshkey_pub" : "",
+    "kv_spn_id": ""
   }
 }

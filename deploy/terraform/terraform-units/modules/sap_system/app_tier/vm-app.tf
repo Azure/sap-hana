@@ -122,7 +122,7 @@ resource "azurerm_linux_virtual_machine" "app" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
       username   = local.sid_auth_username
-      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+      public_key = length(var.sdu_public_key) > 0 ? var.sdu_public_key :  data.azurerm_key_vault_secret.sid_pk[0].value
     }
   }
 
