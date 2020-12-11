@@ -5,7 +5,7 @@
 
 // retrieve public key from sap landscape's Key vault
 data "azurerm_key_vault_secret" "sid_pk" {
-  count        = local.enable_anchor_auth_key ? 1 : 0
+  count        = local.enable_anchor_auth_key && !var.options.use_local_keyvault_for_secrets ? 1 : 0
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
