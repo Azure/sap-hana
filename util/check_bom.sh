@@ -4,6 +4,11 @@
 #   cd /path/to/util
 #   ./check_bom.sh /some/other/path/to/bom.yml
 
+if [[ -z $1 ]]; then
+  echo "Usage: $0 /path/to/bom.yml"
+  exit 8
+fi
+
 YAML_LINT=$(command -v yamllint) || echo "yamllint not found. To run linting, install yamllint and try again"
 ANSIBLE_LINT=$(command -v ansible-lint) || echo "ansible-lint not found. To run linting, install ansible-lint and try again"
 YAML_LINT_ERRORS=0
