@@ -68,23 +68,15 @@ locals {
   deployer_tfstate = var.deployer_tfstate
 
   // Retrieve information about Sap Landscape from tfstate file
-<<<<<<< HEAD
-  landscape_tfstate      = var.landscape_tfstate
-  kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name     = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-  iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
-  storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
-  storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
-=======
   landscape_tfstate = var.landscape_tfstate
-  kv_landscape_id    = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
-  secret_sid_pk_name = var.options.use_local_keyvault_for_secrets ? (
+  kv_landscape_id   = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  secret_sid_pk_name = try(var.sshkey.ssh_for_sid, false) ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
   iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
->>>>>>> Add support for SDU specific SSH keys
-
+  storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "stgs4hanaswestus2depdiag")
+  storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "rg_Sandbox_S4_WestUS2")
   //Filter the list of databases to only HANA platform entries
   databases = [
     for database in var.databases : database
@@ -109,8 +101,7 @@ locals {
 
   db_auth = try(local.db.authentication,
     {
-      "type"     = "key"
-      "username" = "azureadm"
+      "type" = "key"
   })
 
   //Enable DB deployment 
@@ -166,6 +157,43 @@ locals {
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
   enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
 
+  anchor_auth_password = try(local.anchor_authentication.password, "")
+
+  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
+  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
+
+  sid_local_username_exists = length(
+    coalesce(
+      try(local.anchor.authentication.username, ""),
+      try(var.credentials.username, ""),
+      " "
+  )) > 1
+
+  sid_local_password_exists = length(
+    coalesce(
+      try(local.anchor.authentication.password, ""),
+      try(var.credentials.password, ""),
+      " "
+  )) > 1
+
+
+  use_landscape_credentials = length(local.sid_password_secret_name) > 0 ? true : false
+
+  sid_auth_username = coalesce(
+    try(local.anchor.authentication.username, ""),
+    try(var.credentials.username, ""),
+    try(data.azurerm_key_vault_secret.sid_username[0].value, ""),
+    "azureadm"
+  )
+
+  sid_auth_password = trimspace(coalesce(
+    try(local.anchor.authentication.password, ""),
+    try(var.credentials.password, ""),
+    try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
+    try(random_password.password[0].result, ""),
+    " "
+  ))
+
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
     for zone in local.zones :
@@ -206,6 +234,7 @@ locals {
   // Additional users add to user KV
   kv_users = var.deployer_user
   */
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   //SAP vnet
   vnet_sap_arm_id              = try(local.landscape_tfstate.vnet_sap_arm_id, "")
@@ -270,7 +299,6 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
-<<<<<<< HEAD
  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
@@ -278,30 +306,30 @@ locals {
   prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
 
   // Extract informatio n from the specified key vault arm ids
-=======
-  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
-  user_key_vault_id = try(var.key_vault.kv_user_id, "")
-  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
-  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
-
-  // Extract information from the specified key vault arm ids
->>>>>>> Add support for SDU specific SSH keys
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
   user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
 
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
-<<<<<<< HEAD
-=======
   // If the user specifies the secret name of key pair/password in input, the secrets will be imported instead of creating new secrets
   input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
-  sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
+  sid_key_exist                     = length(local.input_sid_public_key_secret_name) > 0 ? true : false
 
+  app_ostype = upper(try(var.application.os.os_type, "Linux"))
+  scs_ostype = upper(try(var.application.scs_os.os_type, local.app_ostype))
+  web_ostype = upper(try(var.application.web_os.os_type, local.app_ostype))
 
->>>>>>> Add support for SDU specific SSH keys
+  // TODO add the logic for mixed auth on app tier, i.e scs having a different authentication type than app
+  app_tier_on_Linux = (local.app_ostype == "LINUX" || local.scs_ostype == "LINUX" || local.web_ostype == "LINUX") ? true : false
+  app_auth_type     = try(var.application.authentication.type, local.app_tier_on_Linux ? "key" : "password")
+
+  db_auth_type = try(var.databases[0].authentication.type, upper(local.db_ostype) == "LINUX" ? "key" : "password")
+
+  enable_app_auth_password = (local.app_auth_type == "password" || local.db_auth_type == "password") ? true : false
+  enable_db_auth_password  = local.db_auth_type == "password" ? true : false
+
   //---- Update infrastructure with defaults ----//
   infrastructure = {
     resource_group = {
