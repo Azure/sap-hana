@@ -64,5 +64,5 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 ### Deployment
 
 1. [Interim Playbook Preparation](./interim-playbook-preparation.md)
-1. [Deploy SAP Application SID](./app/deploy-sid.md)
 1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
+1. [Deploy SAP Application SID](./app/deploy-sid.md)
