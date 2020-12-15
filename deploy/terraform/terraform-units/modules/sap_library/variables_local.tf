@@ -70,7 +70,10 @@ locals {
   sa_tfstate_delete_retention_policy  = 7
 
   sa_tfstate_container_exists = try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false)
-  sa_tfstate_container_name   = try(var.storage_account_tfstate.tfstate_blob_container.name, local.resource_suffixes.tfstate)
+  sa_tfstate_container_name   = try(var.storage_account_tfstate.tfstate_blob_container.name, "tfstate")
+
+  // Container name for Ansible
+  sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, "ansible")
 
   // deployer
   deployer      = try(var.deployer, {})
