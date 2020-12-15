@@ -8,6 +8,9 @@
         "region": "eastus",
         "vnet": "DEP00"
     },
+    "storage_account_sapbits": {
+
+    },
     "key_vault":{
         "kv_user_id": "",
         "kv_prvt_id": "",
