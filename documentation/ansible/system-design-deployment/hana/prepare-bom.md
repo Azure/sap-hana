@@ -31,14 +31,19 @@ step|BoM Content
 [6] |  media:
     |    - name:     SAPCAR
     |      version:  7.21
-    |      archive:  SAPCAR_1320-80000935.EXE
+    |      archive:  SAPCAR_1324-80000935.EXE
+    |      override_target_filename: "SAPCAR.EXE"
     |
-    |    - name:     IMDB LCAPPS 2.052
+    |    - name:     "LCAPPS for HANA 2.00.052.00 Build 100.46 PL 029"
     |      archive:  IMDB_LCAPPS_2052_0-20010426.SAR
     |
-    |    - name:     HANA 2.0
+    |    - name:     "Revision 2.00.052.0 (SPS05) for HANA DB 2.0"
     |      version:  2.00.052
-    |      archive:  51054623.ZIP
+    |      archive:  IMDB_SERVER20_052_0-80002031.SAR
+    |
+    |    - name:     "Client for HANA 2"
+    |      version:  2.6
+    |      archive:  IMDB_CLIENT20_006_58-80002082.SAR
     |
 [7] |  templates:
     |    - name:     HANA params
@@ -50,7 +55,8 @@ step|BoM Content
 [8] |  stackfiles:
     |    - name: Download Basket permalinks
     |      file: myDownloadBasketFiles.txt
-    |      override_target_location: "{{ target_media_location }}/```
+    |      override_target_location: "{{ target_media_location }}/config"
+```
 
 ## Process
 

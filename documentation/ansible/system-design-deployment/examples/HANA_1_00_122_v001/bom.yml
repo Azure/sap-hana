@@ -32,10 +32,6 @@ materials:
 
   stackfiles:
 
-    - name: Download Basket JSON Manifest
-      file: downloadbasket.json
-      override_target_location: "{{ target_media_location }}/config"
-
     - name: Download Basket permalinks
       file: myDownloadBasketFiles.txt
       override_target_location: "{{ target_media_location }}/config"
