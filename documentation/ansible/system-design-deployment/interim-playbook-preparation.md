@@ -1,8 +1,8 @@
-# Existing Ansible Configuration
+# Existing Ansible Playbook Configuration
 
 ## Notes
 
-1. Prior to following Installation Template Preparation or Deployment documentation, there is some existing configuration which should be run. :hand: There is some overlap between processes which wil be indicated in the documentation, below.
+1. Prior to following Installation Template Preparation or Deployment documentation, there is some existing configuration which should be run. :hand: There is some overlap between existing and new processes which will require changes to the existing playbook, as documented below.
 
 1. The following process assumes that the SAP System deployment has been run from the deployer, thus generating the folder: `Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/XXXXX/ansible_config_files`, where `XXXXX` is the name of your deployment, e.g. `NP-EUS2-SAP0-X00`. The folder will contain three files
 
@@ -14,7 +14,7 @@
 
    These files are used for the automated configuration via Ansible.
 
-## Preparing the Existing Ansible Configuration
+## Preparing the Existing Ansible Playbook
 
 To prevent the overlap, you must log on to the deployer and comment certain lines in `Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/sap_playbook.yml`.
 
