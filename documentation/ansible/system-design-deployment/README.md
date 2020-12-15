@@ -42,7 +42,6 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
    1. [Prepare Media](./hana/prepare-sap-library.md)
    1. [Prepare Bill of Materials](./hana/prepare-bom.md)
-   1. [Validate the BoM](./bom-validation.md)
    1. [Interim Playbook Preparation](./interim-playbook-preparation.md)
    1. [Prepare Installation Template](./hana/prepare-ini.md)
 
@@ -58,7 +57,6 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
    1. [Prepare Media](./app/prepare-sap-library.md)
    1. [Prepare Bill of Materials](./app/prepare-bom.md)
-   1. [Validate the BoM](./bom-validation.md)
    1. [Prepare Installation Template](./app/prepare-ini.md)
 
 ### Deployment

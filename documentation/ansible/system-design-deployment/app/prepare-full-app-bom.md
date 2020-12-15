@@ -325,6 +325,10 @@ By default, files downloaded or shared from the archive space will be extracted 
 
 The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
 
+### Validate the BoM
+
+1. [Validate the BoM](./bom-validation.md)
+
 ### Upload Files to Archive Location
 
 1. From the correct Azure storage account, navigate to "Containers", then to "sapbits";
