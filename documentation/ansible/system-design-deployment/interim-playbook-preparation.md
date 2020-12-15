@@ -2,7 +2,7 @@
 
 ## Notes
 
-1. Prior to following Installation Template Preparation or Deployment documentation, there is some existing configuration which should be run. However, there is some overlap between existing and new processes which will break the deployment, unless the existing playbook is changed as documented below.
+1. Prior to following HANA Installation Template Preparation or any Deployment, there is some existing configuration which should be run. However, the existing and new processes overlap, which will break the deployment, unless the existing playbook is changed as documented below.
 
 1. The following process assumes that the SAP System deployment has been run from the deployer, thus generating the folder: `Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/XXXXX/ansible_config_files`, where `XXXXX` is the name of your deployment, e.g. `NP-EUS2-SAP0-X00`. The folder will contain three files
 
