@@ -48,9 +48,11 @@ step|BoM Content
 [7] |  templates:
     |    - name:     HANA params
     |      file:     HANA_2_00_052_v001.params
+    |      override_target_location: "{{ target_media_location }}/config"
     |
     |    - name:     HANA xml
     |      file:     HANA_2_00_052_v001.params.xml
+    |      override_target_location: "{{ target_media_location }}/config"
     |
 [8] |  stackfiles:
     |    - name: Download Basket permalinks
