@@ -2,7 +2,7 @@
 
 ## Notes
 
-1. Prior to following Installation Template Preparation or Deployment documentation, there is some existing configuration which should be run. :hand: There is some overlap between existing and new processes which will require changes to the existing playbook, as documented below.
+1. Prior to following Installation Template Preparation or Deployment documentation, there is some existing configuration which should be run. However, there is some overlap between existing and new processes which will break the deployment, unless the existing playbook is changed as documented below.
 
 1. The following process assumes that the SAP System deployment has been run from the deployer, thus generating the folder: `Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/XXXXX/ansible_config_files`, where `XXXXX` is the name of your deployment, e.g. `NP-EUS2-SAP0-X00`. The folder will contain three files
 
@@ -16,9 +16,9 @@
 
 ## Preparing the Existing Ansible Playbook
 
-To prevent the overlap, you must log on to the deployer and comment certain lines in `Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/sap_playbook.yml`.
+To enable the deployment to succeed, you must comment out certain lines in `Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/sap_playbook.yml`.
 
-The following Ansible plays need to be commented out to stop the tasks from running:
+Log on to the deployer and comment out the following Ansible plays:
 
 1. Azure File Share mounting, lines 49-65:
 
@@ -116,16 +116,16 @@ The following Ansible plays need to be commented out to stop the tasks from runn
              ip_db: "{{ hana_database.nodes[1].ip_db_nic }}"
    ```
 
-With the above two sections commented out, the Ansible to configure the servers can now be run.
+With the above sections commented out, the Ansible to configure the servers can now be run.
 
-On the deployer, change to the SAP System Ansible configuration files folder, e.g.
+1. On the deployer, change to the SAP System Ansible configuration files folder, e.g.
 
-```shell
-cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/NP-EUS2-SAP0-X00/ansible_config_files
-```
+   ```text
+   cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/NP-EUS2-SAP0-X00/ansible_config_files
+   ```
 
-Run the Ansible playbook:
+1. Run the modified Ansible playbook:
 
-```shell
-ansible-playbook -i hosts.yml ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/sap_playbook.yml
-```
+   ```text
+   ansible-playbook -i hosts.yml ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/sap_playbook.yml
+   ```
