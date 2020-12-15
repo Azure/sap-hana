@@ -78,6 +78,9 @@ locals {
   // Container name for Ansible
   sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, "ansible")
 
+  // Container name for Ansible
+  sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, "ansible")
+
   // deployer
   deployer      = try(var.deployer, {})
   deployer_vnet = try(local.deployer.vnet, "")
