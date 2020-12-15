@@ -48,50 +48,43 @@ step|BoM Content
     |
 [1] |name:    'S4HANA_2020_ISS_v001'
 [2] |target:  'ABAP PLATFORM 1909'
-[3] |version: 001
     |
-[4] |defaults:
+[3] |defaults:
     |  target_location: "{{ target_media_location }}/download_basket"
     |
-[5] |product_ids:
+[4] |product_ids:
     |  scs:
     |  db:
     |  pas:
     |  aas:
     |  web:
     |
-[6] |materials:
-[7] |  dependencies:
+[5] |materials:
+[6] |  dependencies:
     |    - name:     HANA2_00_052_v001
-    |      version:  001
     |
-[8] |  media:
+[7] |  media:
     |    - name:     SAPCAR
-    |      version:  7.21
     |      archive:  SAPCAR_1320-80000935.EXE
     |
     |    - name:     SWPM
-    |      version:  2.0SP06
     |      archive:  SWPM20SP06_6-80003424.SAR
     |
     |    - name:     SAP IGS HELPER
-    |      version:  7.20EXT
     |      archive:  igshelper_17-10010245.sar
     |
     |    - name:     SAP HR 6.08
-    |      version:  608
     |      archive:  SAP_HR608.SAR
     |
     |    - name:     S4COREOP 104
-    |      version:  104
     |      archive:  S4COREOP104.SAR
     |
-[9] |  templates:
+[8] |  templates:
     |    - name:     "S4HANA_2020_ISS_v001 ini file"
     |      file:     "S4HANA_2020_ISS_v001.inifile.params"
     |      override_target_location: "{{ target_media_location }}/config"
     |
-[10]|  stackfiles:
+[9] |  stackfiles:
     |
     |    - name: Download Basket JSON Manifest
     |      file: downloadbasket.json
@@ -122,46 +115,40 @@ step|BoM Content
 
 1. `[1]` and `[2]`: Record appropriate names for the build and target. The `name` must be the same as the BoM folder name in the Storage Account.
 
-### Define BoM Version
-
-1. `[3]` is an arbitrary number, chosen by you, which can be used to distinguish between any different versions you may have of this particular BoM. The value here should match the `_v...` numbering in the `bom.yml` parent folder, as described earlier.
-
 ### Create Defaults Section
 
-1. `[4]`: This section contains:
+1. `[3]`: This section contains:
    1. `target_location`: The folder on the target server, into which the files will be copied for installation. This will normally reference `{{ target_media_location }}` as shown.
 
 ### Create Product Ids Section
 
-1. `[5]`: Create the section as shown. You will populate with values as part of the template preparation.
+1. `[4]`: Create the section as shown. You will populate with values as part of the template preparation.
 
 ### Create Materials Section
 
-1. `[6]`: Use exactly as shown. This specifies the start of the list of materials needed.
+1. `[5]`: Use exactly as shown. This specifies the start of the list of materials needed.
 
-1. `[7]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
+1. `[6]`: You may have dependencies on other BoMs (for example for HANA, as shown here). In order fully define the materials for this build, you should add these dependencies here.
 
 ### Create List of Media
 
-1. `[8]`: Specify `media:` exactly as shown.
+1. `[7]`: Specify `media:` exactly as shown.
 
-1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet. :information_source: The `version` property is optional.
+1. :hand: The `SAPCAR` utility will need to be added separately, because even though it is in the SAP Download Basket, it will not be present in the spreadsheet.
 
    ```text
       - name:     SAPCAR
-        version:  7.21
         archive:  SAPCAR_1320-80000935.EXE
    ```
 
 1. Using Microsoft Excel, open the download basket spreadsheet.
 
-1. Using your editor, transcribe the Description and Technical Name from the spreasheet as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example. :information_source: The `version` property is optional.
+1. Using your editor, transcribe the Description and Technical Name from the spreasheet as `- name` and `archive` respectively into your `bom.yml` file. Do this for the *whole file* under a `media` section as indicated in the example.
 
    ![SAP Download Basket Spreadsheet](../images/sap-xls-download-basket.png)
 
    ```text
    - name: "Attribute Change Package 16 for EA-HR 608"
-     version: 6.08
      archive: "EA-HR608.SAR"
 
    - name: "Attribute Change Package 21 for GBX01HR5 605"
@@ -172,7 +159,7 @@ step|BoM Content
 
 ### Add Template Name
 
-1. `[9]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
+1. `[8]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`.
 
    ```text
      templates:
@@ -182,7 +169,7 @@ step|BoM Content
 
 ### Add Stackfiles Section
 
-1. `[10]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+1. `[9]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
 
    ```text
    stackfiles:
@@ -217,7 +204,6 @@ By default, files downloaded or shared from the archive space will be extracted 
 
    ```text
       - name:     SAPCAR
-        version:  7.21
         archive:  SAPCAR_1320-80000935.EXE
         override_target_filename: SAPCAR.EXE
 

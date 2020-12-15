@@ -22,15 +22,13 @@ step|BoM Content
     |
 [1] |name:    'HANA_2_00_052_v001'
 [2] |target:  'HANA 2.0'
-[3] |version: 001
     |
-[4] |defaults:
+[3] |defaults:
     |  target_location: "{{ target_media_location }}/downloads/"
     |
-[5] |materials:
-[6] |  media:
+[4] |materials:
+[5] |  media:
     |    - name:     SAPCAR
-    |      version:  7.21
     |      archive:  SAPCAR_1324-80000935.EXE
     |      override_target_filename: "SAPCAR.EXE"
     |
@@ -38,14 +36,12 @@ step|BoM Content
     |      archive:  IMDB_LCAPPS_2052_0-20010426.SAR
     |
     |    - name:     "Revision 2.00.052.0 (SPS05) for HANA DB 2.0"
-    |      version:  2.00.052
     |      archive:  IMDB_SERVER20_052_0-80002031.SAR
     |
     |    - name:     "Client for HANA 2"
-    |      version:  2.6
     |      archive:  IMDB_CLIENT20_006_58-80002082.SAR
     |
-[7] |  templates:
+[6] |  templates:
     |    - name:     HANA params
     |      file:     HANA_2_00_052_v001.params
     |      override_target_location: "{{ target_media_location }}/config"
@@ -54,7 +50,7 @@ step|BoM Content
     |      file:     HANA_2_00_052_v001.params.xml
     |      override_target_location: "{{ target_media_location }}/config"
     |
-[8] |  stackfiles:
+[7] |  stackfiles:
     |    - name: Download Basket permalinks
     |      file: myDownloadBasketFiles.txt
     |      override_target_location: "{{ target_media_location }}/config"
@@ -73,41 +69,35 @@ step|BoM Content
 
 1. `[1]` and `[2]`: Record appropriate names for the build and target. The `name` should be the same as that recorded in the Storage Account under `sapbits/boms`.
 
-### Define BoM Version
-
-1. `[3]` is an arbitrary number, chosen by you, which can be used to distinguish between any different versions you may have of this particular BoM. The value here should match the `_v...` numbering in the `bom.yml` parent folder, as described earlier.
-
 ### Create Defaults Section
 
-1. `[4]`: This section contains:
+1. `[3]`: This section contains:
    1. `target_location`: The folder on the target server, into which the files will be copied for installation. Normally, this will reference `{{ target_media_location }}` as shown, but could be an unrelated path.
 
 ### Create Materials Section
 
-1. `[5]`: Use exactly as shown. This specifies the start of the list of materials needed.
+1. `[4]`: Use exactly as shown. This specifies the start of the list of materials needed.
 
 ### Create List of Media
 
-1. `[6]`: Specify `media:` exactly as shown.
+1. `[5]`: Specify `media:` exactly as shown.
 
-1. Using your editor, for each item in your Download Basket, provide a suitable, descriptive name and filename as `- name` and `archive` respectively into your `bom.yml` file. :information_source: The `version` property is optional.
+1. Using your editor, for each item in your Download Basket, provide a suitable, descriptive name and filename as `- name` and `archive` respectively into your `bom.yml` file.
 
    ```text
    - name:     SAPCAR
-     version:  7.21
      archive:  SAPCAR_1320-80000935.EXE
 
    - name:     IMDB LCAPPS 2.052
      archive:  IMDB_LCAPPS_2052_0-20010426.SAR
 
    - name:     HANA 2.0
-     version:  2.00.052
      archive:  51054623.ZIP
    ```
 
 ### Add Templates Section
 
-1. `[7]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`. Entries are needed for `.params` and `.params.xml` files.
+1. `[6]`: Create a `templates` section as shown, with the same filename prefix as the BoM `<stack_version>`. Entries are needed for `.params` and `.params.xml` files.
 
    ```text
      templates:
@@ -120,15 +110,12 @@ step|BoM Content
 
 ### Add Stackfiles Section
 
-1. `[8]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
+1. `[7]`: Create a `stackfiles` section as shown from the steps at the start of **[Process](#process)**.
 
    ```text
    stackfiles:
-     - name: Download Basket JSON Manifest
-        file: downloadbasket.json
-
-     - name: Download Basket Spreadsheet
-        file: MP_Excel_2001017452_20201030_SWC.xls
+     - name: Download Basket permalinks
+       file: myDownloadBasketFiles.txt
    ```
 
 ### Override Target Destination
@@ -138,10 +125,9 @@ Files downloaded or shared from the archive space will need to be extracted to t
 1. For each relevant entry in the BoM `media` section, add an `override_target_location:` property with the correct target folder. For example:
 
    ```text
-   - name:     HANA 2.0
-     version:  2.00.052
-     archive:  51054623.ZIP
-     override_target_location: "{{ target_media_location }}/elsewhere/"
+     - name: Download Basket permalinks
+       file: myDownloadBasketFiles.txt
+       override_target_location: "{{ target_media_location }}/config"
    ```
 
 ### Override Target Filename
@@ -152,7 +138,6 @@ By default, files downloaded or shared from the archive space will be extracted 
 
    ```text
       - name:     SAPCAR
-        version:  7.21
         archive:  SAPCAR_1320-80000935.EXE
         override_target_filename: SAPCAR.EXE
    ```
