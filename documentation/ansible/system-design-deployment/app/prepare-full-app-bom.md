@@ -323,7 +323,15 @@ By default, files downloaded or shared from the archive space will be extracted 
 
 #### Tidy Up Layout
 
-The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
+1. The script-generated dependency placeholder on the `HANA2` BoM will need editing to match the actual BoM name required.
+
+   ```text
+   dependencies:
+     - name: "HANA2"
+       version: "001"
+   ```
+
+1. The order of entries in the `media` section does not matter. However, for improved readability, you may wish to group related items together.
 
 ### Validate the BoM
 
