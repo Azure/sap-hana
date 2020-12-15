@@ -42,7 +42,7 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
    1. [Prepare Media](./hana/prepare-sap-library.md)
    1. [Prepare Bill of Materials](./hana/prepare-bom.md)
-   1. [Interim Playbook Preparation](./interim-playbook-preparation.md)
+   1. [Modify Existing Deployment Process](./interim-playbook-preparation.md)
    1. [Prepare Installation Template](./hana/prepare-ini.md)
 
 ### SAP Application
@@ -61,6 +61,6 @@ Two other phases are involved in the overall end-to-end lifecycle, but these are
 
 ### Deployment
 
-1. [Interim Playbook Preparation](./interim-playbook-preparation.md)
+1. [Modify Existing Deployment Process](./interim-playbook-preparation.md)
 1. [Deploy SAP HANA SID](./hana/deploy-sid.md)
 1. [Deploy SAP Application SID](./app/deploy-sid.md)
