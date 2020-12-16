@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "anydb_db" {
       )
     )
 
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+    private_ip_address_allocation = "Dynamic" //local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
