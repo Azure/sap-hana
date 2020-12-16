@@ -67,6 +67,19 @@ resource "azurerm_network_interface" "nics_dbnodes_storage" {
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
   enable_accelerated_networking = true
+
+  ip_configuration {
+    primary   = true
+    name      = "ipconfig1"
+    subnet_id = var.storage_subnet.id
+
+    private_ip_address = local.use_DHCP ? null : try(local.hdb_vms[count.index].scaleout_nic_ip, false) != false ? (
+      local.hdb_vms[count.index].scaleout_nic_ip) : (
+      cidrhost(var.storage_subnet[0].address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_scaleout_vm)
+
+    )
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+  }
 }
 
 # VIRTUAL MACHINES ================================================================================================
