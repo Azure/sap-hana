@@ -145,7 +145,7 @@ resource "local_file" "ansible_inventory_new_yml" {
   directory_permission = "0770"
 }
 
-resource "azurerm_storage_blob" "example" {
+resource "azurerm_storage_blob" "hostsyaml" {
 
   name                   = format("%s_hosts.yml", trimspace(var.naming.prefix.SDU))
   storage_account_name   = local.tfstate_storage_account_name
@@ -153,4 +153,5 @@ resource "azurerm_storage_blob" "example" {
   storage_container_name = local.ansible_container_name
   type                   = "Block"
   source                 = local_file.ansible_inventory_new_yml.filename
+}
 }
