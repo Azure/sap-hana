@@ -224,14 +224,14 @@ locals {
         {
           name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
           computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
         },
         {
           name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
           computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[1]
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
         }
       ]
     ])) : (
@@ -239,8 +239,8 @@ locals {
       name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
       computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
       role           = try(dbnode.role, "worker")
-      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-      db_nic_ip      = lookup(dbnode, "db_nic_ips", [false, false])[0]
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
       }]
     )
   )
