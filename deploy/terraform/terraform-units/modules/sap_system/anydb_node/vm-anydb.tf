@@ -14,7 +14,7 @@ resource "azurerm_network_interface" "anydb_db" {
     name      = "ipconfig1"
     subnet_id = var.db_subnet.id
 
-    private_ip_address = 1==1 ? (
+    private_ip_address = local.use_DHCP ? (
       null) : (
       try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
         local.anydb_vms[count.index].db_nic_ip) : (
@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "anydb_db" {
       )
     )
 
-    private_ip_address_allocation = 2==2 ? "Dynamic" : "Static"
+    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
