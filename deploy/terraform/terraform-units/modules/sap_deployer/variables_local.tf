@@ -16,8 +16,7 @@ locals {
   resource_suffixes    = var.naming.resource_suffixes
 
   // Default option(s):
-  enable_secure_transfer    = try(var.options.enable_secure_transfer, true)
-  enable_deployer_public_ip = try(var.options.enable_deployer_public_ip, false)
+  enable_secure_transfer = try(var.options.enable_secure_transfer, true)
 
   // Resource group and location
   region  = try(var.infrastructure.region, "")
@@ -117,7 +116,7 @@ locals {
   // Deployer(s) information with updated pip
   deployers_updated = [
     for idx, deployer in local.deployers : merge({
-      "public_ip_address" = local.enable_deployer_public_ip ? azurerm_public_ip.deployer[idx].ip_address : ""
+      "public_ip_address" = azurerm_public_ip.deployer[idx].ip_address
     }, deployer)
   ]
 
@@ -137,7 +136,7 @@ locals {
   ]))
 
   // public ip address of the first deployer
-  deployer_public_ip_address = local.enable_deployers && local.enable_deployer_public_ip ? local.deployer_public_ip_address_list[0] : ""
+  deployer_public_ip_address = local.enable_deployers ? local.deployer_public_ip_address_list[0] : ""
 
   // Comment out code with users.object_id for the time being.
   // deployer_users_id_list = distinct(compact(concat(local.deployer_users_id)))
