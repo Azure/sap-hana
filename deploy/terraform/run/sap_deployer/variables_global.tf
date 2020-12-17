@@ -29,7 +29,12 @@ variable "sshkey" {
   default     = {}
 }
 
-variable "key_vault" {
-  description = "Import existing Azure Key Vaults"
-  default     = {}
+variable "user_key_vault_id" {
+  description = "The user brings an existing user Key Vault"
+  default     = ""
+}
+
+variable "private_key_vault_id" {
+  description = "The user brings an existing private Key Vault"
+  default     = ""
 }

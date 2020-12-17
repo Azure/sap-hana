@@ -16,12 +16,6 @@
         "enable_secure_transfer": true,
         "enable_deployer_public_ip": false
     },
-    "key_vault": {
-        "kv_user_id": "",
-        "kv_prvt_id": "",
-        "kv_sshkey_prvt" : "",
-        "kv_sshkey_pub" : "",
-        "kv_username" : "",
-        "kv_pwd": ""
-    }
+    "user_key_vault_id": "",
+    "private_key_vault_id": ""
 }
