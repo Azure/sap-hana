@@ -244,6 +244,7 @@ locals {
       }]
     )
   )
+
   anydb_vms = [
     for idx, dbnode in local.dbnodes : {
       platform       = local.anydb_platform,
