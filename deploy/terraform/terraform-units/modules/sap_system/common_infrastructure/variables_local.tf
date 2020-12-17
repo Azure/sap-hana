@@ -316,6 +316,7 @@ locals {
   input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = length(local.input_sid_public_key_secret_name) > 0 ? true : false
+<<<<<<< HEAD
 
   app_ostype = upper(try(var.application.os.os_type, "Linux"))
   scs_ostype = upper(try(var.application.scs_os.os_type, local.app_ostype))
@@ -329,6 +330,8 @@ locals {
 
   enable_app_auth_password = (local.app_auth_type == "password" || local.db_auth_type == "password") ? true : false
   enable_db_auth_password  = local.db_auth_type == "password" ? true : false
+=======
+>>>>>>> Don't create KV unless needed
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {
