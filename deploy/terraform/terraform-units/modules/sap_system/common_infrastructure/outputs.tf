@@ -43,7 +43,7 @@ output "sid_kv_user_id" {
   value = local.enable_sid_deployment ? (
     try(var.options.use_local_keyvault_for_secrets, false) && !local.user_kv_exist ? (
       azurerm_key_vault.sid_kv_user[0].id) : (
-      data.azurerm_key_vault.sid_kv_user[0].id
+      ""
     )) : (
     ""
   )
