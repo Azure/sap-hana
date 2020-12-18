@@ -108,19 +108,6 @@ resource "tls_private_key" "sdu" {
   rsa_bits  = 2048
 }
 
-resource "random_password" "password" {
-  count = ((
-    local.enable_app_auth_password || local.enable_db_auth_password
-    ) && ((
-    try(var.application.authentication.password, null) == null)) || (try(var.databases[0].authentication.password, null) == null)
-  ) ? 1 : 0
-
-  length      = 32
-  min_upper   = 2
-  min_lower   = 2
-  min_numeric = 2
-}
-
 
 data "azurerm_key_vault_secret" "sdu" {
   count        = ! var.options.use_local_keyvault_for_secrets ? 1 : 0
@@ -142,20 +129,6 @@ resource "azurerm_key_vault_secret" "sdu_public_key" {
   count        = local.enable_sid_deployment && var.options.use_local_keyvault_for_secrets ? 1 : 0
   name         = format("%s-sshkey-pub", local.prefix)
   value        = tls_private_key.sdu[0].public_key_openssh
-  key_vault_id = azurerm_key_vault.sid_kv_user[0].id
-}
-
-resource "azurerm_key_vault_secret" "sdu_username" {
-  count        = local.enable_sid_deployment && try(var.options.use_local_keyvault_for_secrets, false) ? 1 : 0
-  name         = format("%s-username", local.prefix)
-  value        = random_password.password[0].result
-  key_vault_id = azurerm_key_vault.sid_kv_user[0].id
-}
-
-resource "azurerm_key_vault_secret" "sdu_password" {
-  count        = local.enable_sid_deployment && try(var.options.use_local_keyvault_for_secrets, false) ? 1 : 0
-  name         = format("%s-password", local.prefix)
-  value        = random_password.password[0].result
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
