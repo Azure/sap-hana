@@ -159,6 +159,15 @@ resource "tls_private_key" "sid" {
   rsa_bits  = 2048
 }
 
+resource "random_password" "created_password" {
+
+  length      = 32
+  min_upper   = 2
+  min_lower   = 2
+  min_numeric = 2
+}
+
+
 // Key pair/password will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
 resource "azurerm_key_vault_secret" "sid_ppk" {
   count        = (local.enable_landscape_kv && ! local.sid_key_exist) ? 1 : 0
@@ -185,3 +194,31 @@ data "azurerm_key_vault_secret" "sid_ppk" {
   name         = local.sid_ppk_name
   key_vault_id = local.user_key_vault_id
 }
+
+// Credentials will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
+resource "azurerm_key_vault_secret" "username" {
+  count        = (local.enable_landscape_kv && ! local.sid_credentials_exist) ? 1 : 0
+  name         = local.sid_username
+  value        = local.input_sid_password
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+}
+
+resource "azurerm_key_vault_secret" "password" {
+  count        = (local.enable_landscape_kv && ! local.sid_credentials_exist) ? 1 : 0
+  name         = local.sid_password
+  value        = local.input_sid_password
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+}
+
+data "azurerm_key_vault_secret" "username" {
+  count        = (local.enable_landscape_kv && local.sid_credentials_exist) ? 1 : 0
+  name         = local.sid_username
+  key_vault_id = local.user_key_vault_id
+}
+
+data "azurerm_key_vault_secret" "password" {
+  count        = (local.enable_landscape_kv && local.sid_credentials_exist) ? 1 : 0
+  name         = local.sid_password
+  key_vault_id = local.user_key_vault_id
+}
+

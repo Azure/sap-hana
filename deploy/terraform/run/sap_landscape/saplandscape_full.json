@@ -28,6 +28,8 @@
         "kv_prvt_id": "",
         "kv_sid_sshkey_prvt" : "",
         "kv_sid_sshkey_pub" : "",
+        "kv_sid_username" : "",
+        "kv_sid_pwd" : "",
         "kv_iscsi_username": "",
         "kv_iscsi_sshkey_prvt" : "",
         "kv_iscsi_sshkey_pub" : "",

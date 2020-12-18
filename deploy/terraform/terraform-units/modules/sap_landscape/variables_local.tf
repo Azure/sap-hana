@@ -170,6 +170,10 @@ locals {
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
 
+  input_sid_username    = try(var.key_vault.kv_sid_username, "azureadm")
+  input_sid_password    = try(var.key_vault.kv_sid_pwd, random_password.created_password.result)
+  sid_credentials_exist = try(length(try(var.key_vault.kv_sid_username, "")) > 0, false)
+
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
   input_iscsi_private_key_secret_name = try(var.key_vault.kv_iscsi_sshkey_prvt, "")
   input_iscsi_password_secret_name    = try(var.key_vault.kv_iscsi_pwd, "")
@@ -180,6 +184,10 @@ locals {
 
   sid_ppk_name = local.sid_key_exist ? local.input_sid_private_key_secret_name : format("%s-sid-sshkey", local.prefix)
   sid_pk_name  = local.sid_key_exist ? local.input_sid_public_key_secret_name : format("%s-sid-sshkey-pub", local.prefix)
+
+  sid_username = local.sid_key_exist ? local.input_sid_username : format("%s-sid-username", local.prefix)
+  sid_password = local.sid_key_exist ? local.input_sid_password : format("%s-sid-password", local.prefix)
+
 
   iscsi_ppk_name      = local.iscsi_key_exist ? local.input_iscsi_private_key_secret_name : format("%s-iscsi-sshkey", local.prefix)
   iscsi_pk_name       = local.iscsi_key_exist ? local.input_iscsi_public_key_secret_name : format("%s-iscsi-sshkey-pub", local.prefix)
