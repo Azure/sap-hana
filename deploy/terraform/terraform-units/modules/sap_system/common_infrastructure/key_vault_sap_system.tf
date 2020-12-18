@@ -5,7 +5,7 @@
 
 // retrieve public key from sap landscape's Key vault
 data "azurerm_key_vault_secret" "sid_pk" {
-  count        = local.enable_anchor_auth_key && ! try(var.options.use_local_keyvault_for_secrets, false) ? 1 : 0
+  count        = local.enable_anchor_auth_key && ! try(var.sshkey.ssh_for_sid, false) ? 1 : 0
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
@@ -101,7 +101,7 @@ resource "random_id" "sapsystem" {
 // Using TF tls to generate SSH key pair and store in user KV
 resource "tls_private_key" "sdu" {
   count = (
-    var.options.use_local_keyvault_for_secrets
+    try(var.sshkey.ssh_for_sid, false)
     && (try(file(var.sshkey.path_to_public_key), "") == "")
   ) ? 1 : 0
   algorithm = "RSA"
@@ -110,7 +110,7 @@ resource "tls_private_key" "sdu" {
 
 
 data "azurerm_key_vault_secret" "sdu" {
-  count        = ! var.options.use_local_keyvault_for_secrets ? 1 : 0
+  count        = ! try(var.sshkey.ssh_for_sid, false) ? 1 : 0
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
@@ -119,14 +119,14 @@ data "azurerm_key_vault_secret" "sdu" {
 // By default the SSH keys are stored in landscape key vault. By setting
 // var.options.use_sdu_keyvault_for_secrets to true they will be stored in the SDU keyvault
 resource "azurerm_key_vault_secret" "sdu_private_key" {
-  count        = local.enable_sid_deployment && var.options.use_local_keyvault_for_secrets ? 1 : 0
+  count        = local.enable_sid_deployment && try(var.sshkey.ssh_for_sid, false) ? 1 : 0
   name         = format("%s-sshkey", local.prefix)
   value        = tls_private_key.sdu[0].private_key_pem
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
 resource "azurerm_key_vault_secret" "sdu_public_key" {
-  count        = local.enable_sid_deployment && var.options.use_local_keyvault_for_secrets ? 1 : 0
+  count        = local.enable_sid_deployment && try(var.sshkey.ssh_for_sid, false) ? 1 : 0
   name         = format("%s-sshkey-pub", local.prefix)
   value        = tls_private_key.sdu[0].public_key_openssh
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id

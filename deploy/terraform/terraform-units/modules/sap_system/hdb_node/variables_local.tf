@@ -77,10 +77,12 @@ locals {
   //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
   offset = try(var.options.resource_offset, 0)
 
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
+
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate  = var.landscape_tfstate
   kv_landscape_id    = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
-  secret_sid_pk_name = var.options.use_local_keyvault_for_secrets ? (
+  secret_sid_pk_name = local.use_local_keyvault ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
@@ -152,7 +154,7 @@ locals {
   hdb_auth = {
     "type"     = local.sid_auth_type
     "username" = local.sid_auth_username
-    "password" = "hdb_vm_password"
+    "password" =  "hdb_vm_password"
   }
 
   node_count      = try(length(local.hdb.dbnodes), 1)
