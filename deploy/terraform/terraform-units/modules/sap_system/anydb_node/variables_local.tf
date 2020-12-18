@@ -37,7 +37,7 @@ variable "db_subnet" {
 }
 
 variable "sid_kv_user_id" {
-  description = "ID of the user keyvault for sap_system"
+  description = "Details of the user keyvault for sap_system"
 }
 
 variable "landscape_tfstate" {
@@ -117,10 +117,6 @@ locals {
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
-
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user_id = var.sid_kv_user_id
 
   // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
