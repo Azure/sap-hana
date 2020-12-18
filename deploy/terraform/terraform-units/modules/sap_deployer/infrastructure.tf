@@ -12,7 +12,7 @@ resource "azurerm_resource_group" "deployer" {
 }
 
 data "azurerm_resource_group" "deployer" {
-  count = local.rg_exists ? 1 : 0
+  count = local.enable_deployers && local.rg_exists ? 1 : 0
   name  = local.rg_name
 }
 // TODO: Add management lock when this issue is addressed https://github.com/terraform-providers/terraform-provider-azurerm/issues/5473
