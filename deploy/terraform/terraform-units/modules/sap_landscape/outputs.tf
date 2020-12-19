@@ -38,6 +38,16 @@ output "sid_private_key_secret_name" {
   value = local.enable_landscape_kv ? local.sid_ppk_name : ""
 }
 
+
+output "sid_username_secret_name" {
+  value = local.enable_landscape_kv ? local.sid_username : ""
+}
+
+output "sid_password_secret_name" {
+  value = local.enable_landscape_kv ? local.sid_password : ""
+}
+
+
 output "iscsi_authentication_type" {
   value = local.iscsi_auth_type
 }

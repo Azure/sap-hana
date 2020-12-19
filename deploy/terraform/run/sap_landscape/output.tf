@@ -17,6 +17,12 @@ output "sid_public_key_secret_name" {
 output "iscsi_private_ip" {
   value = try(module.sap_landscape.nics_iscsi[*].private_ip_address, [])
 }
+output "sid_username_secret_name" {
+  value = module.sap_landscape.sid_username_secret_name
+}
+output "sid_password_secret_name" {
+  value = try(module.sap_landscape.sid_password_secret_name, "")
+}
 
 output "iscsi_authentication_type" {
   value = try(module.sap_landscape.iscsi_authentication_type, "")
