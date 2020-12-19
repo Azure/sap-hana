@@ -3,11 +3,11 @@ output "vnet_sap_arm_id" {
 }
 
 output "landscape_key_vault_user_arm_id" {
-  value = try(module.sap_landscape.kv_user[0].id, "")
+  value = try(module.sap_landscape.kv_user, "")
 }
 
 output "landscape_key_vault_private_arm_id" {
-  value = try(module.sap_landscape.kv_prvt[0].id, "")
+  value = try(module.sap_landscape.kv_prvt, "")
 }
 
 output "sid_public_key_secret_name" {

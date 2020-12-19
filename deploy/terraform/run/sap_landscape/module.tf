@@ -13,6 +13,7 @@ module "sap_landscape" {
   service_principal = local.service_principal
   key_vault         = var.key_vault
   deployer_tfstate  = data.terraform_remote_state.deployer.outputs
+  credentials       = var.credentials
 }
 
 module "sap_namegenerator" {
