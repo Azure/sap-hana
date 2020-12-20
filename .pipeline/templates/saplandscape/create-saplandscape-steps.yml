@@ -159,9 +159,9 @@ steps:
         --backend-config "key=${sap_landscape_key}" \
         ${repo_dir}/deploy/terraform/run/sap_landscape/
       
-      terraform force-unlock -force 5da74398-9ad3-d607-8d1a-a271ce4419b2
+      terraform force-unlock -force a590fda9-047f-b2dd-c650-9c31dbc5b8fd
 
-      terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_landscape/
+      terraform apply -auto-approve -lock=false -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_landscape/
       '
     displayName: "Deploy new sap landscape: Branch ${{parameters.branch_name}}"
     condition: or(succeededOrFailed(), always())
