@@ -210,15 +210,3 @@ resource "azurerm_key_vault_secret" "sid_password" {
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
-data "azurerm_key_vault_secret" "sid_username" {
-  count        = (local.enable_landscape_kv && !local.sid_credentials_exist) ? 1 : 0
-  name         = local.sid_username
-  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
-}
-
-data "azurerm_key_vault_secret" "sid_password" {
-  count        = (local.enable_landscape_kv && !local.sid_credentials_exist) ? 1 : 0
-  name         = local.sid_password
-  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
-}
-
