@@ -39,6 +39,7 @@ stages:
         parameters:
           branch_name: $(sourceBranchName)
           saplandscape_env: "$(Build.BuildId)"
+          timeoutInMinutes: 20 # how long to run the step before automatically cancelling  
       - template: templates/saplandscape/create-saplandscape-steps.yml
         parameters:
           branch_name: $(sourceBranchName)
