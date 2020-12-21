@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "deployer" {
 resource "azurerm_user_assigned_identity" "deployer" {
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
-  name                = format("%s-msi", local.prefix)
+  name                = format("%s%s", local.prefix, local.resource_suffixes.msi)
 }
 
 // Add role to be able to deploy resources
