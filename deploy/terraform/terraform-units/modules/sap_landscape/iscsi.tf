@@ -9,7 +9,7 @@
 
 // Creates iSCSI subnet of SAP VNET
 resource "azurerm_subnet" "iscsi" {
-  count                = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_exists ? 0 : 1)
+  count                = local.enable_sub_iscsi ? (local.sub_iscsi_exists ? 0 : 1) : 0
   name                 = local.sub_iscsi_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
@@ -18,7 +18,7 @@ resource "azurerm_subnet" "iscsi" {
 
 // Imports data of existing SAP iSCSI subnet
 data "azurerm_subnet" "iscsi" {
-  count                = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_exists ? 1 : 0)
+  count                = local.enable_sub_iscsi ? (local.sub_iscsi_exists ? 1 : 0) : 0
   name                 = split("/", local.sub_iscsi_arm_id)[10]
   resource_group_name  = split("/", local.sub_iscsi_arm_id)[4]
   virtual_network_name = split("/", local.sub_iscsi_arm_id)[8]
@@ -26,7 +26,7 @@ data "azurerm_subnet" "iscsi" {
 
 // Creates SAP iSCSI subnet nsg
 resource "azurerm_network_security_group" "iscsi" {
-  count               = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_nsg_exists ? 0 : 1)
+  count               = local.enable_sub_iscsi ? (local.sub_iscsi_nsg_exists ? 0 : 1) : 0
   name                = local.sub_iscsi_nsg_name
   location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -34,7 +34,7 @@ resource "azurerm_network_security_group" "iscsi" {
 
 // Imports the SAP iSCSI subnet nsg data
 data "azurerm_network_security_group" "iscsi" {
-  count               = local.iscsi_count == 0 ? 0 : (local.sub_iscsi_nsg_exists ? 1 : 0)
+  count               = local.enable_sub_iscsi ? (local.sub_iscsi_nsg_exists ? 1 : 0) : 0
   name                = split("/", local.sub_iscsi_nsg_arm_id)[8]
   resource_group_name = split("/", local.sub_iscsi_nsg_arm_id)[4]
 }

@@ -6,7 +6,10 @@ Description:
 
 // Deployer resource group name
 output "deployer_rg_name" {
-  value = local.enable_deployers ? azurerm_resource_group.deployer[0].name : ""
+  value = local.enable_deployers ? (
+    local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name) : (
+    ""
+  )
 }
 
 // Unique ID for deployer

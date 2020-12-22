@@ -32,10 +32,10 @@ locals {
 
   // Resource group
   var_rg    = try(local.var_infra.resource_group, {})
-  rg_exists = try(local.var_rg.is_existing, false)
-  rg_arm_id = local.rg_exists ? try(local.var_rg.arm_id, "") : ""
+  rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
+  rg_exists = length(local.rg_arm_id) > 0 
 
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
+  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
 
   // Storage account for sapbits
   sa_sapbits_arm_id = try(var.storage_account_sapbits.arm_id, "")
@@ -89,8 +89,8 @@ locals {
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
-  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
+  user_kv_exist     = length(local.user_key_vault_id) > 0
+  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0
 
   // Extract information from the specified key vault arm ids
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.keyvault_names.user_access

@@ -60,7 +60,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
+    storage_account_uri = data.azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
   }
 
   additional_capabilities {
@@ -106,7 +106,7 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   }
 
   boot_diagnostics {
-    storage_account_uri = azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
+    storage_account_uri = data.azurerm_storage_account.storage_bootdiag.primary_blob_endpoint
   }
 
   additional_capabilities {

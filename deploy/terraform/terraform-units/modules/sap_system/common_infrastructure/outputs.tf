@@ -11,7 +11,7 @@ output "vnet_sap" {
 }
 
 output "storage_bootdiag" {
-  value = azurerm_storage_account.storage_bootdiag
+  value = data.azurerm_storage_account.storage_bootdiag
 }
 
 output "random_id" {

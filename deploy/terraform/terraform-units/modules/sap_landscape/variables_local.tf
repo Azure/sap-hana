@@ -45,9 +45,10 @@ locals {
   rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(local.var_rg.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
 
   // iSCSI
-  var_iscsi   = try(local.var_infra.iscsi, {})
-  iscsi_count = try(local.var_iscsi.iscsi_count, 0)
-  iscsi_size  = try(local.var_iscsi.size, "Standard_D2s_v3")
+  var_iscsi    = try(local.var_infra.iscsi, {})
+  iscsi_count  = try(local.var_iscsi.iscsi_count, 0)
+  enable_iscsi = local.iscsi_count > 0
+  iscsi_size   = try(local.var_iscsi.size, "Standard_D2s_v3")
 
   use_DHCP = try(local.var_iscsi.use_DHCP, false)
 
@@ -58,17 +59,17 @@ locals {
       "sku"       = try(local.var_iscsi.os.sku, "gen1")
       "version"   = try(local.var_iscsi.os.version, "latest")
   })
-  iscsi_auth_type     = local.iscsi_count > 0 ? try(local.var_iscsi.authentication.type, "key") : ""
-  iscsi_auth_username = local.iscsi_count > 0 ? (local.iscsi_username_exist ? data.azurerm_key_vault_secret.iscsi_username[0].value : try(local.var_iscsi.authentication.username, "azureadm")) : ""
+  iscsi_auth_type     = local.enable_iscsi ? try(local.var_iscsi.authentication.type, "key") : ""
+  iscsi_auth_username = local.enable_iscsi ? (local.iscsi_username_exist ? data.azurerm_key_vault_secret.iscsi_username[0].value : try(local.var_iscsi.authentication.username, "azureadm")) : ""
   iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  enable_iscsi_auth_key = local.iscsi_count > 0 && local.iscsi_auth_type == "key"
+  enable_iscsi_auth_key = local.enable_iscsi && local.iscsi_auth_type == "key"
   iscsi_public_key      = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh)) : null
   iscsi_private_key     = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem)) : null
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
-  enable_iscsi_auth_password = local.iscsi_count > 0 && local.iscsi_auth_type == "password"
+  enable_iscsi_auth_password = local.enable_iscsi && local.iscsi_auth_type == "password"
   iscsi_auth_password        = local.enable_iscsi_auth_password ? (local.iscsi_pwd_exist ? data.azurerm_key_vault_secret.iscsi_password[0].value : try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result)) : null
 
   iscsi = merge(local.var_iscsi, {
@@ -95,9 +96,10 @@ locals {
   sid_private_key     = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem)) : null
 
   // iSCSI subnet
-  var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, {})
+  var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, null)
+  enable_sub_iscsi = local.var_sub_iscsi != null
   sub_iscsi_arm_id = try(local.var_sub_iscsi.arm_id, "")
-  sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0 ? true : false
+  sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0
   sub_iscsi_name = local.sub_iscsi_exists ? (
     try(split("/", local.sub_iscsi_arm_id)[10], "")) : (
     try(local.var_sub_iscsi.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet))
@@ -107,7 +109,7 @@ locals {
   // iSCSI NSG
   var_sub_iscsi_nsg    = try(local.var_sub_iscsi.nsg, {})
   sub_iscsi_nsg_arm_id = try(local.var_sub_iscsi_nsg.arm_id, "")
-  sub_iscsi_nsg_exists = length(local.sub_iscsi_nsg_arm_id) > 0 ? true : false
+  sub_iscsi_nsg_exists = length(local.sub_iscsi_nsg_arm_id) > 0
   sub_iscsi_nsg_name = local.sub_iscsi_nsg_exists ? (
     try(split("/", local.sub_iscsi_nsg_arm_id)[8], "")) : (
     try(local.var_sub_iscsi_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet_nsg))

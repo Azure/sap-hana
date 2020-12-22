@@ -40,7 +40,6 @@ variable "custom_disk_sizes_filename" {
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
-  storageaccount_name         = var.naming.storageaccount_names.SDU
   sid_keyvault_names          = var.naming.keyvault_names.SDU
   anchor_virtualmachine_names = var.naming.virtualmachine_names.ANCHOR_VMNAME
   anchor_computer_names       = var.naming.virtualmachine_names.ANCHOR_COMPUTERNAME
@@ -69,13 +68,15 @@ locals {
   deployer_tfstate = var.deployer_tfstate
 
   // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate = var.landscape_tfstate
-  kv_landscape_id   = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  landscape_tfstate      = var.landscape_tfstate
+  kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(var.sshkey.ssh_for_sid, false) ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
   )
-  iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
+  iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
+  storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
+  storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
   //Filter the list of databases to only HANA platform entries
   databases = [
