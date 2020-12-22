@@ -174,6 +174,12 @@ resource "azurerm_key_vault_secret" "sid_ppk" {
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
+data "azurerm_key_vault_secret" "sid_ppk" {
+  count        = (local.sid_key_exist) ? 1 : 0
+  name         = local.sid_ppk_name
+  key_vault_id = local.user_key_vault_id
+}
+
 resource "azurerm_key_vault_secret" "sid_pk" {
   count        = (! local.sid_key_exist && length(local.sid_public_key)> 0 ) ? 1 : 0
   name         = local.sid_pk_name
@@ -187,24 +193,30 @@ data "azurerm_key_vault_secret" "sid_pk" {
   key_vault_id = local.user_key_vault_id
 }
 
-data "azurerm_key_vault_secret" "sid_ppk" {
-  count        = (local.sid_key_exist) ? 1 : 0
-  name         = local.sid_ppk_name
-  key_vault_id = local.user_key_vault_id
-}
 
 // Credentials will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
 resource "azurerm_key_vault_secret" "sid_username" {
-  count        = (local.sid_credentials_exist) ? 1 : 0
+  count        = (!local.sid_credentials_secret_exist) ? 1 : 0
   name         = local.sid_username_secret_name
   value        = local.input_sid_username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
+data "azurerm_key_vault_secret" "sid_username" {
+  count        = (local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_username_secret_name
+  key_vault_id = local.user_key_vault_id
+}
+
 resource "azurerm_key_vault_secret" "sid_password" {
-  count        = (local.sid_credentials_exist) ? 1 : 0
+  count        = (!local.sid_credentials_secret_exist) ? 1 : 0
   name         = local.sid_password_secret_name
   value        = local.input_sid_password
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
+data "azurerm_key_vault_secret" "sid_password" {
+  count        = (local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_password_secret_name
+  key_vault_id = local.user_key_vault_id
+}
