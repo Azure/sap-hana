@@ -207,7 +207,7 @@ resource "azurerm_windows_virtual_machine" "web" {
 # Creates managed data disk
 resource "azurerm_managed_disk" "web" {
   count                  = local.enable_deployment ? length(local.web_data_disks) : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.web_data_disks[count.index].suffix)
+  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[local.web_data_disks[count.index].vm_index], local.web_data_disks[count.index].suffix)
   location               = var.resource_group[0].location
   resource_group_name    = var.resource_group[0].name
   create_option          = "Empty"

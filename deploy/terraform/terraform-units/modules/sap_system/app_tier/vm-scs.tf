@@ -222,7 +222,7 @@ resource "azurerm_windows_virtual_machine" "scs" {
 # Creates managed data disk
 resource "azurerm_managed_disk" "scs" {
   count                  = local.enable_deployment ? length(local.scs_data_disks) : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.scs_data_disks[count.index].suffix)
+  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[local.scs_data_disks[count.index].vm_index], local.scs_data_disks[count.index].suffix)
   location               = var.resource_group[0].location
   resource_group_name    = var.resource_group[0].name
   create_option          = "Empty"
