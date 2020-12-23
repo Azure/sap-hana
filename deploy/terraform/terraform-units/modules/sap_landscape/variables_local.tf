@@ -197,8 +197,8 @@ locals {
   input_sid_password_secret_name    = try(var.key_vault.kv_sid_pwd, "")
   sid_credentials_secret_exist      = length(local.input_sid_username_secret_name) > 0
 
-  sid_username_secret_name = local.sid_credentials_exist ? local.input_sid_username_secret_name : trimprefix(format("%s-sid-username", local.prefix),"-")
-  sid_password_secret_name = local.sid_credentials_exist ? local.input_sid_password_secret_name : trimprefix(format("%s-sid-password", local.prefix),"-")
+  sid_username_secret_name = local.sid_credentials_secret_exist ? local.input_sid_username_secret_name : trimprefix(format("%s-sid-username", local.prefix),"-")
+  sid_password_secret_name = local.sid_credentials_secret_exist ? local.input_sid_password_secret_name : trimprefix(format("%s-sid-password", local.prefix),"-")
 
   iscsi_ppk_name      = local.iscsi_key_exist ? local.input_iscsi_private_key_secret_name : format("%s-iscsi-sshkey", local.prefix)
   iscsi_pk_name       = local.iscsi_key_exist ? local.input_iscsi_public_key_secret_name : format("%s-iscsi-sshkey-pub", local.prefix)
