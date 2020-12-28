@@ -168,7 +168,7 @@ resource "random_password" "created_password" {
 
 // Key pair/password will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
 resource "azurerm_key_vault_secret" "sid_ppk" {
-  count        = (! local.sid_key_exist && length(local.sid_private_key) > 0) ? 1 : 0
+  count        = !local.sid_key_exist ? 1 : 0
   name         = local.sid_ppk_name
   value        = local.sid_private_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -181,7 +181,7 @@ data "azurerm_key_vault_secret" "sid_ppk" {
 }
 
 resource "azurerm_key_vault_secret" "sid_pk" {
-  count        = (! local.sid_key_exist && length(local.sid_public_key)> 0 ) ? 1 : 0
+  count        = !local.sid_key_exist ? 1 : 0
   name         = local.sid_pk_name
   value        = local.sid_public_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
