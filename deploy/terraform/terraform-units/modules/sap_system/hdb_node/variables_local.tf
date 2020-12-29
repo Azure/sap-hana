@@ -79,7 +79,7 @@ locals {
   secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
 
   // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = var.sid_kv_user_id
+  sid_kv_user_id = var.sid_kv_user_id
 
   hdb_list = [
     for db in var.databases : db
