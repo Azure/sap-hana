@@ -18,6 +18,7 @@ stages:
     vmImage: "ubuntu-18.04"
   jobs:
   - job: deployerTest
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/deployer/create-deployer-steps.yml

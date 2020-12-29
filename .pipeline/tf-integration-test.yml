@@ -27,6 +27,7 @@ stages:
     ssh_timeout_s: 120
   jobs:
   - job: createDeployer
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/deployer/create-deployer-steps.yml
@@ -47,6 +48,7 @@ stages:
           deployer_env: "$(Build.BuildId)"
   - job: createSAPLib
     dependsOn: createDeployer
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -73,6 +75,7 @@ stages:
           deployer_env: "$(Build.BuildId)"
   - job: createSAPLandscape
     dependsOn: createSAPLib
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -92,6 +95,7 @@ stages:
           deployer_env: "$(Build.BuildId)"
   - job: createSAPSystem
     dependsOn: createSAPLandscape
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml

@@ -55,6 +55,7 @@ stages:
           ARM_SUBSCRIPTION_ID: $(landscape-subscription)
   - job: createDeployer
     dependsOn: deleteAll
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/deployer/create-deployer-steps.yml
@@ -75,6 +76,7 @@ stages:
           deployer_env: "UNIT"
   - job: createSAPLib
     dependsOn: createDeployer
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -100,6 +102,7 @@ stages:
           deployer_env: "UNIT"
   - job: createSAPLandscape
     dependsOn: createSAPLib
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -119,6 +122,7 @@ stages:
           deployer_env: "UNIT"
   - job: createSAPSystemSLES
     dependsOn: createSAPLandscape
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml
@@ -142,6 +146,7 @@ stages:
           deployer_env: "UNIT"
   - job: createSAPSystemRHEL
     dependsOn: createSAPLandscape
+    timeoutInMinutes: 30
     steps:
       - script: |
           sleep 5m
