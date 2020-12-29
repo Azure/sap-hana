@@ -110,7 +110,7 @@ resource "tls_private_key" "sdu" {
 
 
 data "azurerm_key_vault_secret" "sdu" {
-  count        = !local.use_local_keyvault ? 1 : 0
+  count        = ! local.use_local_keyvault ? 1 : 0
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
