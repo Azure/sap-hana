@@ -12,8 +12,8 @@ data "azurerm_key_vault_secret" "sid_pk" {
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
-  count                      = local.enable_sid_deployment ? 1 : 0
-  name                       = local.sid_keyvault_names.private_access
+  count                      = local.enable_sid_deployment && !local.prvt_kv_exist ? 1 : 0
+  name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
@@ -33,10 +33,17 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
 
 }
 
+// Import an existing private Key Vault
+data "azurerm_key_vault" "sid_kv_prvt" {
+  count               = (local.enable_sid_deployment && local.prvt_kv_exist) ? 1 : 0
+  name                = local.prvt_kv_name
+  resource_group_name = local.prvt_kv_rg_name
+}
+
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
-  count                      = local.enable_sid_deployment ? 1 : 0
-  name                       = local.sid_keyvault_names.user_access
+  count                      = local.enable_sid_deployment && !local.user_kv_exist ? 1 : 0
+  name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
@@ -57,6 +64,13 @@ resource "azurerm_key_vault" "sid_kv_user" {
     ]
 
   }
+}
+
+// Import an existing user Key Vault
+data "azurerm_key_vault" "sid_kv_user" {
+  count               = (local.enable_sid_deployment && local.user_kv_exist) ? 1 : 0
+  name                = local.user_kv_name
+  resource_group_name = local.user_kv_rg_name
 }
 
 /* Comment out code with users.object_id for the time being

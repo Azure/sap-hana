@@ -260,6 +260,19 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
+ // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
+  user_key_vault_id = try(var.key_vault.kv_user_id, "")
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
+  user_kv_exist     = length(local.user_key_vault_id) > 0 ? true : false
+  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
+
+  // Extract informatio n from the specified key vault arm ids
+  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+
+  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+
   //---- Update infrastructure with defaults ----//
   infrastructure = {
     resource_group = {
