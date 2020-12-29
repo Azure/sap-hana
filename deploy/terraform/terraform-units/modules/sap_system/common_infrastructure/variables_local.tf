@@ -68,8 +68,8 @@ locals {
   deployer_tfstate = var.deployer_tfstate
 
   // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate      = var.landscape_tfstate
-  kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
+  landscape_tfstate = var.landscape_tfstate
+  kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
   secret_sid_pk_name = try(var.sshkey.ssh_for_sid, false) ? (
     format("%s-sshkey", local.prefix)) : (
     try(local.landscape_tfstate.sid_public_key_secret_name, "")
