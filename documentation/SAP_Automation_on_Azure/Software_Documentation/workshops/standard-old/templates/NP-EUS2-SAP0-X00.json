@@ -1,0 +1,63 @@
+{
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "landscape": {
+      "key_vault_arm_id"                  : "<CHANGE_THIS_TO_THE_USER_KV_OF_THE_LANDSCAPE>",
+      "sid_public_key_secret_name"        : "NP-EUS2-SAP0-INFRASTRUCTURE-sid-sshkey-pub"
+    },
+    "vnets": {
+      "management": {
+        "tfstate_resource_id"             : "<TFSTATE_ARM_ID>",
+        "deployer_tfstate_key"            : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate"
+      },
+      "sap": {
+        "is_existing"                     : "true",
+        "arm_id"                          : "/subscriptions/49dcf07f-3ea3-40f9-a87a-c75a49c32c5f/resourceGroups/NP-EUS2-SAP0-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/NP-EUS2-SAP0-vnet",
+        "subnet_admin": {
+          "prefix"                        : "10.1.1.64/27"
+        },
+        "subnet_db": {
+          "prefix"                        : "10.1.1.0/28"
+        },
+        "subnet_app": {
+          "prefix"                        : "10.1.1.32/27"
+        },
+        "subnet_web": {
+          "prefix"                        : "10.1.1.16/28"
+        }
+      }
+    }
+  },
+  "databases": [
+    {
+      "platform"                          : "HANA",
+      "high_availability"                 : false,
+      "db_version"                        : "2.00.050",
+      "size"                              : "Demo",
+      "os": {
+        "publisher"                       : "SUSE",
+        "offer"                           : "sles-sap-12-sp5",
+        "sku"                             : "gen1"
+      }
+    }
+  ],
+  "application": {
+    "enable_deployment"                   : true,
+    "sid"                                 : "X00",
+    "scs_instance_number"                 : "00",
+    "ers_instance_number"                 : "10",
+    "scs_high_availability"               : false,
+    "application_server_count"            : 3,
+    "webdispatcher_count"                 : 1,
+    "authentication": {
+      "type"                              : "key",
+      "username"                          : "azureadm"
+    }
+  },
+  "options": {
+    "enable_secure_transfer"              : true,
+    "ansible_execution"                   : false,
+    "enable_prometheus"                   : true
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>", 
+  "deployer_tfstate_key"                  : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate",
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "vnets": {
+      "sap": {
+        "name"                            : "SAP00",
+        "address_space"                   : "10.1.0.0/16"
+      }
+    }
+  },
+  "sshkey": {},
+  "options": {}
+}

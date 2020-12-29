@@ -2,6 +2,7 @@ trigger: none
 pr:
   branches:
     include:
+    - master
     - feature/*
   paths:
     include:
@@ -19,6 +20,7 @@ stages:
     ssh_timeout_s: 120
   jobs:
   - job: createSAPLandscape
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml

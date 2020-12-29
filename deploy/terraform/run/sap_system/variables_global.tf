@@ -32,3 +32,8 @@ variable "sshkey" {
   description = "Details of ssh key pair"
   default     = {}
 }
+
+variable "key_vault" {
+  description = "Details of keyvault"
+  default     = {}
+}

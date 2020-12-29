@@ -122,7 +122,7 @@ resource "azurerm_linux_virtual_machine" "app" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
       username   = local.sid_auth_username
-      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+      public_key = var.sdu_public_key
     }
   }
 
@@ -215,7 +215,7 @@ resource "azurerm_windows_virtual_machine" "app" {
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
   count                  = local.enable_deployment ? length(local.app_data_disks) : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.app_data_disks[count.index].suffix)
+  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[local.app_data_disks[count.index].vm_index], local.app_data_disks[count.index].suffix)
   location               = var.resource_group[0].location
   resource_group_name    = var.resource_group[0].name
   create_option          = "Empty"

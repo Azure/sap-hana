@@ -1,0 +1,30 @@
+{
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "resource_group": {
+      "name"                              : "NP-EUS2-SAP0-INFRASTRUCTURE"
+    },
+    "vnets": {
+      "management": {
+        "tfstate_resource_id"             : "/subscriptions/49dcf07f-3ea3-40f9-a87a-c75a49c32c5f/resourceGroups/NP-EUS2-SAP_LIBRARY/providers/Microsoft.Storage/storageAccounts/npeus2tfstate8cea",
+        "deployer_tfstate_key"            : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate"
+      },
+      "sap": {
+        "name"                            : "NP-EUS2-SAP0-vnet",
+        "address_space"                   : "10.1.0.0/16",
+        "subnet_iscsi": {
+            "name"                        : "NP-EUS2-SAP0_iscsi-subnet",
+            "prefix"                      : "10.1.0.0/28"
+        }
+      }
+    },
+    "iscsi": {
+      "iscsi_count"                       : 3
+    }
+  },
+  "databases"                             : [ { "platform"         : "NONE" } ],
+  "application"                           :   { "enable_deployment": false  },
+  "sshkey"                                : {},
+  "options"                               : {}
+}
