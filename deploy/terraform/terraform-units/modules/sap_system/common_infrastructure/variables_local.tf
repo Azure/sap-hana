@@ -69,9 +69,14 @@ locals {
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate      = var.landscape_tfstate
-  kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name     = try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  kv_landscape_id        = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
+  secret_sid_pk_name     = try(var.sshkey.ssh_for_sid, false) ? (
+    format("%s-sshkey", local.prefix)) : (
+    try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  )
+  
   iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
+  
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
@@ -272,6 +277,14 @@ locals {
 
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+
+  //ToDo change ssh key block
+  use_local_credentials = length(try(var.sshkey.username,"")) > 0
+  sid_public_key      = local.use_local_credentials ? try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
+  sid_private_key     = local.use_local_credentials ? try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem) : data.azurerm_key_vault_secret.sid_ppk[0].value
+  
+
+
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {

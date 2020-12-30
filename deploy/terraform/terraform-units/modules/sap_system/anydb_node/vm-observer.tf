@@ -70,7 +70,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
   admin_ssh_key {
     username   = local.observer_authentication.username
-    public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+    public_key = length(var.sdu_public_key) > 0 ? var.sdu_public_key :  data.azurerm_key_vault_secret.sid_pk[0].value
   }
 
   boot_diagnostics {
