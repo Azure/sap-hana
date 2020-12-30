@@ -42,6 +42,10 @@
       }
     }
   },
+  "key_vault": {
+    "kv_user_id": "",
+    "kv_prvt_id": ""
+  },
   "databases": [
     {
       "platform": "HANA",
