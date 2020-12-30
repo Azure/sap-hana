@@ -39,13 +39,6 @@ data "azurerm_key_vault" "sid_kv_prvt" {
   resource_group_name = local.prvt_kv_rg_name
 }
 
-// Import an existing private Key Vault
-data "azurerm_key_vault" "sid_kv_prvt" {
-  count               = (local.enable_sid_deployment && local.prvt_kv_exist) ? 1 : 0
-  name                = local.prvt_kv_name
-  resource_group_name = local.prvt_kv_rg_name
-}
-
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
   count                      = (local.enable_sid_deployment && ! local.user_kv_exist) ? 1 : 0
