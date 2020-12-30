@@ -320,8 +320,8 @@ locals {
   landscape_env_verified = upper(substr(local.landscape_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
   library_env_verified   = upper(substr(local.library_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
 
-  sap_vnet_verified = upper(trim(substr(var.sap_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
-  dep_vnet_verified = upper(trim(substr(var.management_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
+  sap_vnet_verified = upper(trim(substr(replace(var.sap_vnet_name, "/[^A-Za-z0-9]/", ""), 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
+  dep_vnet_verified = upper(trim(substr(replace(var.management_vnet_name, "/[^A-Za-z0-9]/", ""), 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
 
   random_id_verified    = upper(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))
   random_id_vm_verified = lower(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))
