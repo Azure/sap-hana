@@ -15,10 +15,6 @@ variable naming {
   description = "Defines the names for the resources"
 }
 
-variable "credentials" {
-  description = "Defining the landscape credentials, which will be thedefault credentials for all SDUs in the landscape"
-}
-
 locals {
   // Resources naming
   vnet_prefix              = var.naming.prefix.VNET
@@ -177,8 +173,8 @@ locals {
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
 
-  input_sid_username    = try(var.credentials.username, "azureadm")
-  input_sid_password    = length(try(var.credentials.password,"")) > 0 ? var.credentials.password : random_password.created_password.result
+  input_sid_username    = try(var.sshkey.username, "azureadm")
+  input_sid_password    = length(try(var.sshkey.password,"")) > 0 ? var.sshkey.password : random_password.created_password.result
   
 
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
