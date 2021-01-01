@@ -128,6 +128,8 @@ locals {
   sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
 
+  use_local_credentials = length(var.sshkey) > 0
+
   db_systemdb_password = "db_systemdb_password"
 
   // Tags

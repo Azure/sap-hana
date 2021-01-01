@@ -70,10 +70,6 @@ locals {
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate      = var.landscape_tfstate
   kv_landscape_id        = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
-  secret_sid_pk_name     = local.use_local_credentials ? (
-    format("%s-sshkey", local.prefix)) : (
-    try(local.landscape_tfstate.sid_public_key_secret_name, "")
-  )
   
   iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
   
@@ -280,6 +276,7 @@ locals {
 
   //ToDo change ssh key block
   use_local_credentials = length(var.sshkey) > 0
+
   sid_public_key      = local.use_local_credentials ? try(file(var.sshkey.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
   sid_private_key     = local.use_local_credentials ? try(file(var.sshkey.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
