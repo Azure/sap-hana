@@ -43,6 +43,11 @@ variable "storage_subnet" {
 variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
+
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
+}
+
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME

@@ -5,7 +5,7 @@
 
 // retrieve public key from sap landscape's Key vault
 data "azurerm_key_vault_secret" "sid_pk" {
-  count        = local.enable_anchor_auth_key  && !local.use_local_credentials ? 1 : 0
+  count        = local.use_local_credentials ? 0 : 1
   name         = local.secret_sid_pk_name
   key_vault_id = local.kv_landscape_id
 }
@@ -95,7 +95,7 @@ resource "random_id" "sapsystem" {
 // Using TF tls to generate SSH key pair and store in user KV
 resource "tls_private_key" "sdu" {
   count = (
-    try(var.sshkey.ssh_for_sid, false)
+    local.use_local_credentials
     && (try(file(var.sshkey.path_to_public_key), "") == "")
   ) ? 1 : 0
   algorithm = "RSA"

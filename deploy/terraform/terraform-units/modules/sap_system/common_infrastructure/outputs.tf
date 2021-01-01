@@ -40,7 +40,7 @@ output "db_subnet" {
 
 output "sid_kv_user_id" {
   value = local.enable_sid_deployment ? (
-    local.use_local_keyvault ? (
+    local.use_local_credentials ? (
       azurerm_key_vault.sid_kv_user[0].id) : (
       data.azurerm_key_vault.sid_kv_user[0].id
     )) : (
@@ -50,9 +50,9 @@ output "sid_kv_user_id" {
 
 output "sid_kv_prvt_id" {
    value = local.enable_sid_deployment ? (
-    local.use_local_keyvault ? (
+    local.use_local_credentials ? (
       azurerm_key_vault.sid_kv_prvt[0].id) : (
-      data.azurerm_key_vault.sid_kv_prvt[0].id
+      local.prvt_kv_exist ? data.azurerm_key_vault.sid_kv_prvt[0].id : ""
     )) : (
     ""
   )
