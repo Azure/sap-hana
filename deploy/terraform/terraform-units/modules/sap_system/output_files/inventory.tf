@@ -152,5 +152,5 @@ resource "azurerm_storage_blob" "example" {
 
   storage_container_name = local.ansible_container_name
   type                   = "Block"
-  source                 = local_file.ansible_inventory_yml.filename
+  source                 = local_file.ansible_inventory_new_yml.filename
 }
