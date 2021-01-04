@@ -98,16 +98,3 @@ resource "azurerm_role_assignment" "deployer_msi_sa_tfstate" {
   principal_id         = local.deployer_msi_principal_id
 }
 
-// Creates the storage container inside the storage account for sapsystem
-resource "azurerm_storage_container" "storagecontainer_ansible" {
-  count                 = local.sa_ansible_container_exists ? 0 : 1
-  name                  = local.sa_ansible_container_name
-  storage_account_name  = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0].name : azurerm_storage_account.storage_tfstate[0].name
-  container_access_type = local.sa_tfstate_container_access_type
-}
-
-data "azurerm_storage_container" "storagecontainer_ansible" {
-  count                = local.sa_ansible_container_exists ? 1 : 0
-  name                 = local.sa_ansible_container_name
-  storage_account_name = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0].name : azurerm_storage_account.storage_tfstate[0].name
-}
