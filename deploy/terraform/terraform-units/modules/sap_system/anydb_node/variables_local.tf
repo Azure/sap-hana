@@ -35,13 +35,12 @@ variable "admin_subnet" {
 variable "db_subnet" {
   description = "Information about SAP db subnet"
 }
-
 variable "sid_kv_user_id" {
   description = "ID of the user keyvault for sap_system"
 }
 
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
 
 locals {
@@ -105,15 +104,7 @@ locals {
   // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user_id = var.sid_kv_user_id
-
-  // If custom image is used, we do not overwrite os reference with default value
+ // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
@@ -218,7 +209,7 @@ locals {
   )
 
 
-dbnodes = local.anydb_ha ? (
+  dbnodes = local.anydb_ha ? (
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
       [
         {

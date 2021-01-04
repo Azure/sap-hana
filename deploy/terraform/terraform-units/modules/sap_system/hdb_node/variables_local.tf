@@ -44,8 +44,8 @@ variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
 
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
 
 locals {
@@ -72,14 +72,6 @@ locals {
 
   //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
   offset = try(var.options.resource_offset, 0)
-
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user_id = var.sid_kv_user_id
 
   hdb_list = [
     for db in var.databases : db
@@ -161,7 +153,7 @@ locals {
   xsa        = try(local.hdb.xsa, { routing = "ports" })
   shine      = try(local.hdb.shine, { email = "shinedemo@microsoft.com" })
 
-dbnodes = local.hdb_ha ? (
+  dbnodes = local.hdb_ha ? (
     flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) :
       [
         {
@@ -192,7 +184,6 @@ dbnodes = local.hdb_ha ? (
       }]
     )
   )
-
 
   loadbalancer = try(local.hdb.loadbalancer, {})
 

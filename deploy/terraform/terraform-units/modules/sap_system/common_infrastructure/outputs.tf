@@ -55,3 +55,8 @@ output "storage_subnet" {
     null
   )
 }
+
+//Output the SDU specific SSH key
+output "sdu_public_key" {
+  value = local.sid_public_key
+}

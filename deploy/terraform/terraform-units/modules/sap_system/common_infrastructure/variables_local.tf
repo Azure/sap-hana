@@ -273,6 +273,8 @@ locals {
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
+  sid_public_key      = data.azurerm_key_vault_secret.sid_pk[0].value
+
   //---- Update infrastructure with defaults ----//
   infrastructure = {
     resource_group = {
