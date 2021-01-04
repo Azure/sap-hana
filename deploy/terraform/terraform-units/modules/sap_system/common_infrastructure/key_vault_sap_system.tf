@@ -103,19 +103,18 @@ resource "tls_private_key" "sdu" {
 }
 
 
-// By default the SSH keys are stored in landscape key vault. By setting
-// var.options.use_sdu_keyvault_for_secrets to true they will be stored in the SDU keyvault
+// By default the SSH keys are stored in landscape key vault. By defining the authenticationb block the SDU keyvault
 resource "azurerm_key_vault_secret" "sdu_private_key" {
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
-  name         = format("%s-sshkey", replace(local.prefix,"/[^A-Za-z0-9]/",""))
-  value        = tls_private_key.sdu[0].private_key_pem
+  name         = format("%s-sshkey", local.prefix)
+  value        = local.sid_private_key
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
 resource "azurerm_key_vault_secret" "sdu_public_key" {
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-sshkey-pub", replace(local.prefix,"/[^A-Za-z0-9]/",""))
-  value        = tls_private_key.sdu[0].public_key_openssh
+  value        = local.sid_public_key
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
