@@ -154,4 +154,4 @@ resource "azurerm_storage_blob" "hostsyaml" {
   type                   = "Block"
   source                 = local_file.ansible_inventory_new_yml.filename
 }
-}
+
