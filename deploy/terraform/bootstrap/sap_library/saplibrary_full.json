@@ -38,10 +38,6 @@
         "tfstate_blob_container" :{
             "is_existing" : false,
             "name": "tfstate"
-        },
-        "ansible_blob_container" :{
-            "is_existing" : false,
-            "name": "ansible"
         }
     }
 }
