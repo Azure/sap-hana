@@ -43,7 +43,7 @@ output "sid_kv_user_id" {
 }
 
 output "sid_kv_prvt_id" {
-  value = data.azurerm_key_vault.sid_kv_prvt[0].id
+  value = local.prvt_key_vault_id
 }
 
 output "storage_subnet" {
