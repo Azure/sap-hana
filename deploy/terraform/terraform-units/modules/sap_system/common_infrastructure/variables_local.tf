@@ -69,7 +69,6 @@ locals {
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate      = var.landscape_tfstate
-  kv_landscape_id        = try(var.key_vault.kv_user_id, try(local.landscape_tfstate.landscape_key_vault_user_arm_id, ""))
   
   iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
   
@@ -261,11 +260,12 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
- // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
-  user_key_vault_id = try(var.key_vault.kv_user_id, "")
-  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = length(local.user_key_vault_id) > 0 ? true : false
-  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
+ // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
+  user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
+  
+  user_kv_exist     = length(local.user_key_vault_id) > 0
+  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 
 
   // Extract informatio n from the specified key vault arm ids
   user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
