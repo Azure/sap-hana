@@ -113,7 +113,7 @@ resource "azurerm_key_vault_secret" "sdu_private_key" {
 
 resource "azurerm_key_vault_secret" "sdu_public_key" {
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
-  name         = format("%s-sshkey-pub", replace(local.prefix,"/[^A-Za-z0-9]/",""))
+  name         = format("%s-sshkey-pub", local.prefix)
   value        = local.sid_public_key
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
