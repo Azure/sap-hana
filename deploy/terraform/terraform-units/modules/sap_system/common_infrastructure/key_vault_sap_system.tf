@@ -7,7 +7,7 @@
 data "azurerm_key_vault_secret" "sid_pk" {
   count        = local.use_local_credentials ? 0 : 1
   name         = local.landscape_tfstate.sid_public_key_secret_name
-  key_vault_id = local.user_key_vault_id
+  key_vault_id = local.landscape_tfstate.landscape_key_vault_user_arm_id
 }
 
 // Create private KV with access policy
@@ -35,7 +35,7 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
 
 // Import an existing private Key Vault
 data "azurerm_key_vault" "sid_kv_prvt" {
-  count               = (local.enable_sid_deployment && local.prvt_kv_exist) ? 1 : 0
+  count               = (local.enable_sid_deployment && local.prvt_kv_override) ? 1 : 0
   name                = local.prvt_kv_name
   resource_group_name = local.prvt_kv_rg_name
 }
@@ -68,7 +68,7 @@ resource "azurerm_key_vault" "sid_kv_user" {
 
 // Import an existing user Key Vault
 data "azurerm_key_vault" "sid_kv_user" {
-  count               = (local.enable_sid_deployment && local.user_kv_exist) ? 1 : 0
+  count               = (local.enable_sid_deployment && local.user_kv_override) ? 1 : 0
   name                = local.user_kv_name
   resource_group_name = local.user_kv_rg_name
 }

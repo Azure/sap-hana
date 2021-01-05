@@ -264,15 +264,16 @@ locals {
   user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
   
-  user_kv_exist     = length(local.user_key_vault_id) > 0
-  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 
+  //Override 
+  user_kv_override     = length(try(var.key_vault.kv_user_id, "")) > 0
+  prvt_kv_override     = length(try(var.key_vault.kv_prvt_id, "")) > 0 
 
-  // Extract informatio n from the specified key vault arm ids
-  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
-  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+  // Extract information from the specified key vault arm ids
+  user_kv_name    = local.user_kv_override ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_override ? split("/", local.user_key_vault_id)[4] : ""
 
-  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
-  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+  prvt_kv_name    = local.prvt_kv_override ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_override ? split("/", local.prvt_key_vault_id)[4] : ""
 
   //ToDo change ssh key block
   use_local_credentials = length(var.sshkey) > 0
