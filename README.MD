@@ -74,7 +74,12 @@ The software may collect information about you and your use of the software and 
 
 ## How to Turn off Data Collection
 
-To turn off data collection, please remove or comment out this [line](https://github.com/Azure/sap-hana/blob/ea5d0aa75910b40e5604ab916dbaaac28d2779d4/deploy/terraform/ansible.tf#L56).
+To turn off data collection, please remove or comment out below IMDS.tf files:
+- Data collection for deployer [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_deployer/IMDS.tf)
+- Data collection for sap_library [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_library/IMDS.tf)
+- Data collection for sap_landscape [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_landscape/IMDS.tf)
+- Data collection for sap_system [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_system/common_infrastructure/IMDS.tf)
+
 
 ## License & Copyright
 
