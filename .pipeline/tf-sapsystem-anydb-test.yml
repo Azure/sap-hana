@@ -2,6 +2,7 @@ trigger: none
 pr:
   branches:
     include:
+    - master
     - feature/*
   paths:
     include:
