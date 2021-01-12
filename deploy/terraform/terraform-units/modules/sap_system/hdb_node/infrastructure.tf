@@ -1,6 +1,6 @@
 // AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
-  count = local.enable_deployment && !local.availabilitysets_exist ? max(length(local.zones), 1) : 0
+  count = local.enable_deployment && ! local.availabilitysets_exist ? max(length(local.zones), 1) : 0
   name = local.zonal_deployment ? (
     format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.zones[count.index], var.naming.separator, local.resource_suffixes.db_avset)) : (
     format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_avset)
@@ -29,7 +29,7 @@ resource "azurerm_lb" "hdb" {
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
-  sku                 = "Standard"
+  sku                 = local.zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
     name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
