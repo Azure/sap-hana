@@ -144,8 +144,10 @@
         crm configure op_defaults \$id="op-options"
         timeout="600"
 
-    - name: Ensure the STONITH Azure fence agent is created
-      when: hdb_size != "LargeInstance"
+    - name: Ensure the STONITH Azure fence agent is created when SBD not used
+      when: 
+        - hdb_size != "LargeInstance"
+        - groups['iscsi'] | length == 0
       shell: >
         crm configure primitive rsc_st_azure stonith:fence_azure_arm params
         subscriptionId="{{ sap_hana_fencing_agent_subscription_id }}"

@@ -62,3 +62,14 @@ We need to ensure quality along with agility. We need to move to everyone agreei
 1.  Keep PRs in an open published state for at least one working day, which would allow everyone in other regions to review.
 1. For hotfixes, keep PRs open for at least 4 business hrs.
 1. The maintainer is [here](https://github.com/Azure/sap-hana/blob/master/CODEOWNERS).
+
+### Release strategy
+1. All new features should be added to feature branch (eg. `feature/remote-tfstate2`)
+1. All features should stay in beta branch until stable before get into master (eg. `beta/v2.3`)
+1. Only merge beta branches into master.
+1. Create releases of current master before and after merge into master.
+1. Releases naming convention: x.x.x-x (eg. `2.3.1-1`)
+   - major version number
+   - sub version number
+   - maintainance version number
+   - documentation number

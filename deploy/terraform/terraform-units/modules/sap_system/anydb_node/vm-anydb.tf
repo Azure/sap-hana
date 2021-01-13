@@ -16,7 +16,7 @@ resource "azurerm_network_interface" "anydb_db" {
 
     private_ip_address = local.use_DHCP ? (
       null) : (
-      try(local.anydb_vms[count.index].db_nic_ip, false) != false ? (
+      try(local.anydb_vms[count.index].db_nic_ip, "false") != "false" ? (
         local.anydb_vms[count.index].db_nic_ip) : (
         cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.anydb_ip_offsets.anydb_db_vm)
       )
@@ -111,7 +111,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
       username   = local.anydb_vms[count.index].authentication.username
-      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+      public_key = var.sdu_public_key
     }
   }
 

@@ -20,6 +20,7 @@ stages:
     ssh_timeout_s: 120
   jobs:
   - job: createSAPLib
+    timeoutInMinutes: 30
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml

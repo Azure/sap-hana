@@ -42,6 +42,10 @@
       }
     }
   },
+  "key_vault": {
+    "kv_user_id": "",
+    "kv_prvt_id": ""
+  },
   "databases": [
     {
       "platform": "HANA",
@@ -54,14 +58,6 @@
         "sku": "gen1"
       },
       "zones": ["1"],
-      "credentials": {
-        "db_systemdb_password": "<db_systemdb_password>",
-        "os_sidadm_password": "<os_sidadm_password>",
-        "os_sapadm_password": "<os_sapadm_password>",
-        "xsa_admin_password": "<xsa_admin_password>",
-        "cockpit_admin_password": "<cockpit_admin_password>",
-        "ha_cluster_password": "<ha_cluster_password>"
-      },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
       ],
