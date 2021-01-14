@@ -101,7 +101,7 @@ locals {
     "password" = local.sid_auth_password
   }
 
-  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
+  use_local_keyvault = try(var.authentication.ssh_for_sid, false)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})

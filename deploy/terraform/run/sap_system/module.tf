@@ -11,7 +11,7 @@ module "common_infrastructure" {
   infrastructure             = var.infrastructure
   options                    = local.options
   ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
+  authentication             = var.authentication
   naming                     = module.sap_namegenerator.naming
   service_principal          = local.service_principal
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
@@ -51,7 +51,7 @@ module "hdb_node" {
   infrastructure             = var.infrastructure
   options                    = local.options
   ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
+  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -76,7 +76,7 @@ module "app_tier" {
   infrastructure             = var.infrastructure
   options                    = local.options
   ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
+  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -100,7 +100,7 @@ module "anydb_node" {
   infrastructure             = var.infrastructure
   options                    = var.options
   ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
+  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -123,7 +123,7 @@ module "output_files" {
   options                   = local.options
   software                  = var.software
   ssh-timeout               = var.ssh-timeout
-  sshkey                    = var.sshkey
+  authentication            = var.authentication
   iscsi_private_ip          = module.common_infrastructure.iscsi_private_ip
   infrastructure_w_defaults = module.common_infrastructure.infrastructure_w_defaults
   nics_dbnodes_admin        = module.hdb_node.nics_dbnodes_admin
