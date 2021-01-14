@@ -8,7 +8,7 @@ module "sap_landscape" {
   infrastructure    = var.infrastructure
   options           = local.options
   ssh-timeout       = var.ssh-timeout
-  sshkey            = var.sshkey
+  authentication    = var.authentication
   naming            = module.sap_namegenerator.naming
   service_principal = local.service_principal
   key_vault         = var.key_vault

@@ -80,9 +80,9 @@ locals {
     try(deployer.authentication.type, "key") == "key" ? true : false
   ]), "true")
 
-  // By default use generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  public_key  = (local.enable_deployers && local.enable_key) ? (local.key_exist ? data.azurerm_key_vault_secret.pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.deployer[0].public_key_openssh)) : null
-  private_key = (local.enable_deployers && local.enable_key) ? (local.key_exist ? data.azurerm_key_vault_secret.ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.deployer[0].private_key_pem)) : null
+  // By default use generated public key. Provide authentication.path_to_public_key and path_to_private_key overides it
+  public_key  = (local.enable_deployers && local.enable_key) ? (local.key_exist ? data.azurerm_key_vault_secret.pk[0].value : try(file(var.authentication.path_to_public_key), tls_private_key.deployer[0].public_key_openssh)) : null
+  private_key = (local.enable_deployers && local.enable_key) ? (local.key_exist ? data.azurerm_key_vault_secret.ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.deployer[0].private_key_pem)) : null
 
   deployers = [
     for idx, deployer in local.deployer_input : {

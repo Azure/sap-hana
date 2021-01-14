@@ -159,7 +159,7 @@
       }
     }
   },
-  "sshkey": {
+  "authentication": {
     "path_to_public_key": "~/.ssh/id_rsa.pub",
     "path_to_private_key": "~/.ssh/id_rsa"
   },

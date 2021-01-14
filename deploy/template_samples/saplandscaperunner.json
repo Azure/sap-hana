@@ -138,7 +138,7 @@
         },
         "downloader": {}
     },
-    "sshkey": {
+    "authentication": {
         "path_to_public_key": "/tmp/sshkey.pub",
         "path_to_private_key": "/tmp/sshkey"
     },

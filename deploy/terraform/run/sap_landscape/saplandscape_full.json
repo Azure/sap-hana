@@ -34,6 +34,12 @@
         "kv_iscsi_pwd": "",
         "kv_spn_id": ""
     },
-    "sshkey": {},
+    "authentication": {
+        "username": "azureadm",
+        "password" : "SecretPassword",
+        "path_to_public_key": "sshkey.pub",
+        "path_to_private_key": "sshkey"
+   
+    },
     "options": {}
 }

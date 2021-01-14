@@ -17,6 +17,6 @@
       "iscsi_count"                       : 3
     }
   },
-  "sshkey": {},
+  "authentication": {},
   "options": {}
 }
