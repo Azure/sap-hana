@@ -18,7 +18,7 @@ locals {
   saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
   saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
   tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
-  tfstate_container_name       = "tfstate"
+  tfstate_container_name       = module.sap_namegenerator.naming.resource_suffixes.tfstate
   deployer_tfstate_key         = format("%s%s", local.deployer_rg_name, ".terraform.tfstate")
 
   spn = {

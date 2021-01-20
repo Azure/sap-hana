@@ -44,11 +44,9 @@ variable "deployer_user" {
 variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
-
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
-
 locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
@@ -103,13 +101,7 @@ locals {
     "password" = local.sid_auth_password
   }
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user_id = var.sid_kv_user_id
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})

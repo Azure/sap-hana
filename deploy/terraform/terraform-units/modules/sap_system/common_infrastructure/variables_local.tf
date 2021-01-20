@@ -69,9 +69,9 @@ locals {
 
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate      = var.landscape_tfstate
-  kv_landscape_id        = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name     = try(local.landscape_tfstate.sid_public_key_secret_name, "")
+  
   iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
+  
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
@@ -154,7 +154,7 @@ locals {
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key      = local.deploy_anchor && local.anchor_auth_type == "key"
+  enable_anchor_auth_key      = !local.enable_anchor_auth_password
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
@@ -260,18 +260,26 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
- // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
-  user_key_vault_id = try(var.key_vault.kv_user_id, "")
-  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = length(local.user_key_vault_id) > 0 ? true : false
-  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0 ? true : false
+ // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
+  user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
+  
+  //Override 
+  user_kv_override     = length(try(var.key_vault.kv_user_id, "")) > 0
+  prvt_kv_override     = length(try(var.key_vault.kv_prvt_id, "")) > 0 
 
-  // Extract informatio n from the specified key vault arm ids
-  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
-  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+  // Extract information from the specified key vault arm ids
+  user_kv_name    = local.user_kv_override ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_override ? split("/", local.user_key_vault_id)[4] : ""
 
-  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
-  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+  prvt_kv_name    = local.prvt_kv_override ? split("/", local.prvt_key_vault_id)[8] : local.sid_keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_override ? split("/", local.prvt_key_vault_id)[4] : ""
+
+  //ToDo change ssh key block
+  use_local_credentials = length(var.sshkey) > 0
+
+  sid_public_key      = local.use_local_credentials ? try(file(var.sshkey.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
+  sid_private_key     = local.use_local_credentials ? try(file(var.sshkey.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {

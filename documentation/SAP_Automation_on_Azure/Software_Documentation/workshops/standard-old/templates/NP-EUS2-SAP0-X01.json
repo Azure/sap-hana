@@ -1,0 +1,85 @@
+{
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "vnets": {
+      "management": {
+        "saplib_resource_group_name"      : "NP-EUS2-SAP_LIBRARY",
+        "tfstate_storage_account_name"    : "globaeus2tfstate1c46",
+        "deployer_tfstate_key"            : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate"
+      },
+      "sap": {
+        "is_existing"                     : "true",
+        "arm_id"                          : "/subscriptions/49dcf07f-3ea3-40f9-a87a-c75a49c32c5f/resourceGroups/NP-EUS2-SAP0-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/NP-EUS2-SAP0-vnet",
+        "subnet_admin": {
+          "prefix"                        : "10.1.2.64/27"
+        },
+        "subnet_db": {
+          "prefix"                        : "10.1.2.0/28"
+        },
+        "subnet_app": {
+          "prefix"                        : "10.1.2.32/27"
+        },
+        "subnet_web": {
+          "prefix"                        : "10.1.2.16/28"
+        }
+      }
+    }
+  },
+  "databases": [
+    {
+      "platform"                          : "HANA",
+      "high_availability"                 : false,
+      "db_version"                        : "2.00.050",
+      "size"                              : "Demo",
+      "os": { 
+        "publisher"                       : "SUSE",
+        "offer"                           : "sles-sap-12-sp5",
+        "sku"                             : "gen1"
+      }, 
+      "credentials": {
+        "db_systemdb_password"            : "<db_systemdb_password>",
+        "os_sidadm_password"              : "<os_sidadm_password>",
+        "os_sapadm_password"              : "<os_sapadm_password>",
+        "xsa_admin_password"              : "<xsa_admin_password>",
+        "cockpit_admin_password"          : "<cockpit_admin_password>",
+        "ha_cluster_password"             : "<ha_cluster_password>"
+      }
+    }
+  ],
+  "application": {
+    "enable_deployment"                   : true,
+    "sid"                                 : "X01",
+    "scs_instance_number"                 : "00",
+    "ers_instance_number"                 : "10",
+    "scs_high_availability"               : false,
+    "application_server_count"            : 3,
+    "webdispatcher_count"                 : 1,
+    "authentication": {
+      "type"                              : "key",
+      "username"                          : "azureadm"
+    }
+  },
+  "software": {
+    "storage_account_sapbits": {
+      "saplib_resource_group_name"        : "NP-EUS2-SAP_LIBRARY",
+      "tfstate_storage_account_name"      : "globaeus2tfstate1c46",
+      "saplib_tfstate_key"                : "NP-EUS2-SAP_LIBRARY.terraform.tfstate"
+},
+    "downloader": {
+      "credentials": {
+        "sap_user"                        : "<sap_user>",
+        "sap_password"                    : "<sap_password>"
+      }
+    }
+  },
+  "sshkey": {
+    "path_to_public_key"                  : "sshkey.pub",
+    "path_to_private_key"                 : "sshkey"
+  },
+  "options": {
+    "enable_secure_transfer"              : true,
+    "ansible_execution"                   : false,
+    "enable_prometheus"                   : true
+  }
+}

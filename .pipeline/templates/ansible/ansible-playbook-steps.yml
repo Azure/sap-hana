@@ -23,10 +23,10 @@ steps:
 
       echo "=== Retrieving SSH key pairs from sap_landscape KV ==="
       landscape_kv_name=$(az keyvault list --resource-group ${saplandscape_rg} | jq -r "'".[] | select(.name | contains(\\\"user\\\")).name"'")
-      sid_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\") | not).name"'")
-      sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"pub\\\")).name"'")
-      iscsi_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"pub\\\") | not).name"'")
-      iscsi_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"pub\\\")).name"'")
+      sid_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"sshkey\\\")) | select(.name | contains(\\\"pub\\\") | not).name"'")
+      sid_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\") | not) | select(.name | contains(\\\"sshkey\\\")) | select(.name | contains(\\\"pub\\\")).name"'")
+      iscsi_private_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"sshkey\\\")) | select(.name | contains(\\\"pub\\\") | not).name"'")
+      iscsi_public_key_secret_name=$(az keyvault secret list --vault-name ${landscape_kv_name} | jq -r "'".[] | select(.name | contains(\\\"iscsi\\\")) | select(.name | contains(\\\"sshkey\\\")) | select(.name | contains(\\\"pub\\\")).name"'")
 
       rm -f ${ws_dir}/sshkey
       az keyvault secret show --vault-name ${landscape_kv_name} --name ${sid_private_key_secret_name} | jq -r .value > ${ws_dir}/sshkey

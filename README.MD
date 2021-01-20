@@ -1,55 +1,52 @@
-### <img src="documentation/assets/UnicornSAPBlack256x256.png" width="64px"> SAP Automation <!-- omit in toc -->
-# Automated SAP Deployments in Azure Cloud <!-- omit in toc -->
-Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana.v2?branchName=master)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
+### <img src="documentation/SAP_Automation_on_Azure/assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
+<br/>
 
-This repository contains code that can be used to automatically deploy SAP landscapes in the Azure Cloud.
+# Welcome <!-- omit in toc -->
 
-The templates are split into:
-- **Terraform modules**
-which deploy the infrastructure components (such as VMs, network, storage) in Azure.
-- **Ansible playbooks**
-which run different roles to configure and VMs and install SAP HANA and required applications on the already deployed infrastructure.
+Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana?branchName=master&api-version=5.1-preview.1)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
 
-<br>
+<br/><br/>
 
-## Table of contents <!-- omit in toc -->
+## Abstract <!-- omit in toc -->
 
-- [Usage](#usage)
-- [Terraform Deployment Units](#terraform-deployment-units)
+---
+<br/>
+
+Welcome to the **SAP on Azure Deployment Automation Framework** repository.
+This repository contains code that will support the automated deployments of SAP platforms in the Azure Cloud.
+<br/>
+
+Please follow the linke below to the documentation:
+<br/><br/>
+
+
+<center>
+
+[<img src="documentation/SAP_Automation_on_Azure/assets/images/documentation-clipart.png" width="256px">](documentation/SAP_Automation_on_Azure/table_of_contents.md)
+
+## [SAP Deployment Automation Framework Documentation](documentation/SAP_Automation_on_Azure/table_of_contents.md) <!-- omit in toc -->
+
+</center>
+
+
+<br/><br/><br/>
+
+
+# Table of contents <!-- omit in toc -->
+
 - [Contributions](#contributions)
+- [Data Collection](#data-collection)
+- [How to Turn off Data Collection](#how-to-turn-off-data-collection)
 - [License & Copyright](#license--copyright)
 - [Contact](#contact)
 
-<br>
-
-## Usage
-
-A typical deployment lifecycle will require the following steps:
-
-Step 1) [**Preparing your environment**](/documentation/getting-started.md#preparing-your-environment) (this has to be done only once)
-
-Step 2) [**Select Terraform Deployment Unit**](#terraform-deployment-units)
-
-   *(**Note**: There are some script under [sap-hana/util](https://github.com/Azure/sap-hana/tree/master/util) would help if you are using Linux based workstation)*
-
-<br>
-
-## Terraform Deployment Units
-
-- [SAP Landscape](/deploy/terraform/SAPLandscape.md) (Primary Entry Point)
-- [SAP Library](/deploy/terraform-units/workspace/SAP_Library/Readme.md)
-- Deployment Portal (Coming Soon)
-- Logical SAP Network Foundation (Coming Soon)
-- SDU - SAP Deployment Unit (Coming Soon)
-
-
-<br><br><br><br>  
+<br/><br/>
 
 ---
 
 ## Contributions
 
-If you want to contribute to our project, be sure to review the [contributing guidelines](/documentation/contributing.md).
+If you want to contribute to our project, be sure to review the [contributing guidelines](/CONTRIBUTING.md).
 
 We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
 
@@ -74,7 +71,12 @@ The software may collect information about you and your use of the software and 
 
 ## How to Turn off Data Collection
 
-To turn off data collection, please remove or comment out this [line](https://github.com/Azure/sap-hana/blob/ea5d0aa75910b40e5604ab916dbaaac28d2779d4/deploy/terraform/ansible.tf#L56).
+To turn off data collection, please remove or comment out below IMDS.tf files:
+- Data collection for deployer [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_deployer/IMDS.tf)
+- Data collection for sap_library [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_library/IMDS.tf)
+- Data collection for sap_landscape [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_landscape/IMDS.tf)
+- Data collection for sap_system [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_system/common_infrastructure/IMDS.tf)
+
 
 ## License & Copyright
 
@@ -88,4 +90,4 @@ Licensed under the [MIT License](LICENSE).
 
 We look forward to your feedback and welcome any contributions!
 
-Please feel free to reach out to our team at ![image](/documentation/assets/contact.png).
+Please feel free to reach out to our team at ![image](documentation/SAP_Automation_on_Azure/assets/images/contact.png).
