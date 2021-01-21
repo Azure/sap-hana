@@ -17,7 +17,7 @@ variable "infrastructure" {
 
   validation {
     condition = (
-      length(trimspace(try(var.infrastructure.vnets.sap.arm_id, ""))) != 0 || ((length(trimspace(try(var.infrastructure.vnets.sap.name, ""))) != 0) && (length(trimspace(try(var.infrastructure.vnets.sap.address_space, ""))) != 0))
+      length(trimspace(try(var.infrastructure.vnets.sap.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.address_space, ""))) != 0
     )
     error_message = "Either the arm_id or (name and address_space) of the Virtual Network must be specified in the infrastructure.vnets.sap block."
   }
