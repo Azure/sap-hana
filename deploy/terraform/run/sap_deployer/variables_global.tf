@@ -10,7 +10,7 @@ variable "deployers" {
 }
 
 variable "infrastructure" {
-  description = "Details of the Azure infrastructure to deploy the SAP landscape into"
+  description = "Details of the Azure infrastructure to deploy the deployer into"
   default     = {}
 
   validation {
@@ -26,12 +26,11 @@ variable "infrastructure" {
     )
     error_message = "The environment must be specified in the infrastructure.environment field."
   }
-
   validation {
     condition = (
-      length(trimspace(try(var.infrastructure.vnets.management.arm_id, ""))) != 0 || ((length(trimspace(try(var.infrastructure.vnets.management.name, ""))) != 0) && (length(trimspace(try(var.infrastructure.vnets.management.address_space, ""))) != 0))
+      length(trimspace(try(var.infrastructure.vnets.management.arm_id, ""))) != 0 ||  length(trimspace(try(var.infrastructure.vnets.management.address_space, ""))) != 0
     )
-    error_message = "Either the arm_id or (name and address_space) of the VNet must be specified in the infrastructure.vnets.management block."
+    error_message = "Either the arm_id or address_space of the VNet must be specified in the infrastructure.vnets.management block."
   }
 
   validation {
