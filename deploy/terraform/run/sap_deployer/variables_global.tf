@@ -28,14 +28,14 @@ variable "infrastructure" {
   }
   validation {
     condition = (
-      length(trimspace(try(var.infrastructure.vnets.management.arm_id, ""))) != 0 ||  length(trimspace(try(var.infrastructure.vnets.management.address_space, ""))) != 0
+      length(trimspace(try(var.infrastructure.vnets.management.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.management.address_space, ""))) != 0
     )
     error_message = "Either the arm_id or address_space of the VNet must be specified in the infrastructure.vnets.management block."
   }
 
   validation {
     condition = (
-      length(trimspace(try(var.infrastructure.vnets.management.subnet_mgmt.arm_id))) != 0 || length(trimspace(try(var.infrastructure.vnets.management.subnet_mgmt.prefix, ""))) != 0
+      length(trimspace(try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.management.subnet_mgmt.prefix, ""))) != 0
     )
     error_message = "Either the arm_id or prefix of the subnet must be specified in the infrastructure.vnets.management.subnet_mgmt block."
   }
