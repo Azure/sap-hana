@@ -29,7 +29,7 @@ resource "azurerm_lb" "hdb" {
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
-  sku                 = "Standard"
+  sku                 = local.zonal_deployment ? "Standard" : "Basic"
 
   frontend_ip_configuration {
     name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
@@ -71,13 +71,13 @@ resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
 }
 
 resource "azurerm_lb_rule" "hdb" {
-  count                          = local.enable_deployment ? 1 : 0
+  count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.hdb[0].id
-  name                           = format("%s%s%s%05d-%02d", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_rule, 0, count.index)
-  protocol                       = "All"
-  frontend_port                  = 0
-  backend_port                   = 0
+  name                           = format("%s%s%s%05d-%02d", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_rule, local.loadbalancer_ports[count.index].port, count.index)
+  protocol                       = "Tcp"
+  frontend_port                  = local.loadbalancer_ports[count.index].port
+  backend_port                   = local.loadbalancer_ports[count.index].port
   frontend_ip_configuration_name = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
   backend_address_pool_id        = azurerm_lb_backend_address_pool.hdb[0].id
   probe_id                       = azurerm_lb_probe.hdb[0].id
