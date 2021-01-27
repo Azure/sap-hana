@@ -77,16 +77,10 @@ locals {
   //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
   offset = try(var.options.resource_offset, 0)
 
-<<<<<<< HEAD
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate = var.landscape_tfstate
   kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
 
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user_id, "")
-
-=======
->>>>>>> 3f16309e4b964338fae986d5eb6c4a5304e9410f
   hdb_list = [
     for db in var.databases : db
     if try(db.platform, "NONE") == "HANA"
@@ -147,19 +141,19 @@ locals {
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
   // If credentials are specified either for the SDU or for the database use them
-  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false) || try(length(try(local.hdb.authentication.username, "")) > 0, false)
+  sid_local_credentials_exist = try(length(try(var.sshkey.username, "")) > 0, false) || try(length(try(local.hdb.authentication.username, "")) > 0, false)
   use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
 
   sid_auth_username = coalesce(
     try(local.hdb.authentication.username, ""),
-    try(var.credentials.username, ""),
+    try(var.sshkey.username, ""),
     try(data.azurerm_key_vault_secret.sid_username[0].value, ""),
     "azureadm"
   )
 
   sid_auth_password = coalesce(
     try(local.hdb.authentication.password, ""),
-    try(var.credentials.password, ""),
+    try(var.sshkey.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
     var.sid_password
   )

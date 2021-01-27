@@ -104,7 +104,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   }
 
   admin_username                  = local.sid_auth_username
-  admin_password                  = local.sid_auth_password
+  admin_password                  = local.enable_auth_key ? null : local.sid_auth_password
   disable_password_authentication = ! local.enable_auth_password
 
   dynamic "admin_ssh_key" {

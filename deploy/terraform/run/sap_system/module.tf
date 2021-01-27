@@ -63,10 +63,9 @@ module "hdb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   storage_subnet             = module.common_infrastructure.storage_subnet
-  anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
-  // Comment out code with users.object_id for the time being.  
-  // deployer_user    = module.deployer.deployer_user
+  // Workaround to create dependency from anchor to db to app
+  anchor_vm    = module.common_infrastructure.anchor_vm
+  sid_password = module.common_infrastructure.sid_password
 }
 
 // Create Application Tier nodes
@@ -86,11 +85,10 @@ module "app_tier" {
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
   hdb_vms                    = module.hdb_node.hdb_vms
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
-  // Comment out code with users.object_id for the time being.  
-  // deployer_user    = module.deployer.deployer_user
+  sid_password               = module.common_infrastructure.sid_password
 }
 
 // Create anydb database nodes
@@ -111,8 +109,9 @@ module "anydb_node" {
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password               = module.common_infrastructure.sid_password
 }
 
 // Generate output files

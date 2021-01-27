@@ -1,5 +1,4 @@
 // retrieve public key from sap landscape's Key vault
-<<<<<<< HEAD
 data "azurerm_key_vault_secret" "sid_pk" {
   count        = local.enable_auth_key ? 1 : 0
   name         = local.secret_sid_pk_name
@@ -11,7 +10,6 @@ data "azurerm_key_vault_secret" "sid_username" {
   name         = local.sid_username_secret_name
   key_vault_id = local.kv_landscape_id
 }
-=======
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "password" {
   count = (
@@ -24,7 +22,7 @@ resource "random_password" "password" {
   min_numeric      = 2
   special          = true
   override_special = "_%@"
->>>>>>> 3f16309e4b964338fae986d5eb6c4a5304e9410f
+}
 
 data "azurerm_key_vault_secret" "sid_password" {
   count        = local.enable_auth_password ? 1 : 0
@@ -34,30 +32,16 @@ data "azurerm_key_vault_secret" "sid_password" {
 
 // Store the hdb logon username in KV 
 resource "azurerm_key_vault_secret" "auth_username" {
-<<<<<<< HEAD
   count        = local.sid_local_credentials_exist && local.enable_deployment ? 1 : 0
   name         = format("%s-hdb-auth-username", local.prefix)
   value        = local.sid_auth_username
-  key_vault_id = local.sid_kv_user
-=======
-  count        = local.enable_auth_password ? 1 : 0
-  name         = format("%s-hdb-auth-username", local.prefix)
-  value        = local.sid_auth_username
   key_vault_id = var.sid_kv_user_id
->>>>>>> 3f16309e4b964338fae986d5eb6c4a5304e9410f
 }
 
 // Store the hdb logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
-<<<<<<< HEAD
   count        = local.enable_auth_password && local.enable_deployment && local.sid_local_credentials_exist ? 1 : 0
   name         = format("%s-hdb-auth-password", local.prefix)
   value        = local.sid_auth_password
-  key_vault_id = local.sid_kv_user
-=======
-  count        = local.enable_auth_password ? 1 : 0
-  name         = format("%s-hdb-auth-password", local.prefix) 
-  value        = local.sid_auth_password
   key_vault_id = var.sid_kv_user_id
->>>>>>> 3f16309e4b964338fae986d5eb6c4a5304e9410f
 }

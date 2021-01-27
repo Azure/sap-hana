@@ -116,7 +116,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   )
   size                            = lookup(local.sizes, local.hdb_vms[count.index].size).compute.vm_size
   admin_username                  = local.sid_auth_username
-  admin_password                  = local.sid_auth_password
+  admin_password                  = local.enable_auth_key ? null : local.sid_auth_password
   disable_password_authentication = ! local.enable_auth_password
 
   dynamic "os_disk" {

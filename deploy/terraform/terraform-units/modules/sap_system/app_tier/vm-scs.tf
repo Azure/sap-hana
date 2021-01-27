@@ -85,7 +85,7 @@ resource "azurerm_linux_virtual_machine" "scs" {
   size                            = local.scs_sizing.compute.vm_size
   admin_username                  = local.sid_auth_username
   disable_password_authentication = ! local.enable_auth_password
-  admin_password                  = local.sid_auth_password
+  admin_password                  = local.enable_auth_key ? null : local.sid_auth_password
 
   dynamic "os_disk" {
     iterator = disk

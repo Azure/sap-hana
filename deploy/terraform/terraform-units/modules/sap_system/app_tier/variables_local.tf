@@ -102,19 +102,19 @@ locals {
   sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
 
   // If credentials are specified either for the SDU or for the application use them
-  sid_local_credentials_exist = try(length(try(var.credentials.username, "")) > 0, false) || try(length(try(var.application.authentication.username, "")) > 0, false)
+  sid_local_credentials_exist = try(length(try(var.sshkey.username, "")) > 0, false) || try(length(try(var.application.authentication.username, "")) > 0, false)
   use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
 
   sid_auth_username = coalesce(
     try(var.application.authentication.username, ""),
-    try(var.credentials.username, ""),
+    try(var.sshkey.username, ""),
     try(data.azurerm_key_vault_secret.sid_username[0].value, ""),
     "azureadm"
   )
 
   sid_auth_password = coalesce(
     try(var.application.authentication.password, ""),
-    try(var.credentials.password, ""),
+    try(var.sshkey.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
     var.sid_password
   )

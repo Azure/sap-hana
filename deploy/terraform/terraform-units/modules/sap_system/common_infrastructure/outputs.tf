@@ -39,11 +39,11 @@ output "db_subnet" {
 }
 
 output "sid_kv_user_id" {
-  value = local.enable_sid_deployment && local.sid_local_password_exists ? azurerm_key_vault.sid_kv_user[0].id : local.kv_landscape_id
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user[0].id : data.azurerm_key_vault.sid_kv_user[0].id
 }
 
 output "sid_kv_prvt_id" {
-  value = local.enable_sid_deployment && local.sid_local_password_exists ? azurerm_key_vault.sid_kv_prvt[0].id : local.kv_landscape_id
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt[0].id : data.azurerm_key_vault.sid_kv_prvt[0].id
 }
 
 output "storage_subnet" {
@@ -57,11 +57,12 @@ output "storage_subnet" {
 }
 
 output "sid_password" {
-  value = coalesce(
-    try(var.credentials.password, ""),
+  value = trimspace(coalesce(
+    try(var.sshkey.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    random_password.password[0].result
-  )
+    try(random_password.password[0].result, ""),
+    " "
+  ))
 }
 
 //Output the SDU specific SSH key
