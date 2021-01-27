@@ -35,13 +35,12 @@ variable "admin_subnet" {
 variable "db_subnet" {
   description = "Information about SAP db subnet"
 }
-
 variable "sid_kv_user_id" {
-  description = "Details of the user keyvault for sap_system"
+  description = "ID of the user keyvault for sap_system"
 }
 
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
 
 variable "sid_password" {
@@ -109,14 +108,7 @@ locals {
   // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate = var.landscape_tfstate
-  kv_landscape_id   = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user_id, "")
-
-  // If custom image is used, we do not overwrite os reference with default value
+ // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
@@ -159,6 +151,8 @@ locals {
     try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
     var.sid_password
   )
+
+  use_local_credentials = length(var.sshkey) > 0
 
   db_systemdb_password = "db_systemdb_password"
 
@@ -240,24 +234,36 @@ locals {
     { loadbalancer = local.loadbalancer }
   )
 
-  dbnodes = flatten([[for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-    computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-    role         = try(dbnode.role, "worker"),
-    db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
-    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-    }
-    ],
-    [for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-      computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count], local.resource_suffixes.vm)
-      role         = try(dbnode.role, "worker"),
-      db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1],
-      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-      } if local.anydb_ha
-    ]
-    ]
+
+  dbnodes = local.anydb_ha ? (
+    flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
+      [
+        {
+          name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+          role           = try(dbnode.role, "db")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+        },
+        {
+          name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+          role           = try(dbnode.role, "db")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
+        }
+      ]
+    ])) : (
+    flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
+      name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+      computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+      role           = try(dbnode.role, "db")
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+      }]
+    )
   )
+
 
   anydb_vms = [
     for idx, dbnode in local.dbnodes : {

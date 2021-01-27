@@ -63,3 +63,8 @@ output "sid_password" {
     random_password.password[0].result
   )
 }
+
+//Output the SDU specific SSH key
+output "sdu_public_key" {
+  value = local.sid_public_key
+}
