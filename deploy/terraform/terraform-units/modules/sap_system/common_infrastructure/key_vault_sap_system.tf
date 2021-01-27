@@ -11,14 +11,14 @@ data "azurerm_key_vault_secret" "sid_pk" {
 }
 
 data "azurerm_key_vault_secret" "sid_username" {
-  count        = local.use_local_credentials ? 0 : 1
-  name         = local.sid_username_secret_name
+  count        = local.use_local_credentials || length(try(local.landscape_tfstate.sid_username_secret_name, "")) ? 0 : 1
+  name         = try(local.landscape_tfstate.sid_username_secret_name, "")
   key_vault_id = local.landscape_tfstate.landscape_key_vault_user_arm_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
-  count        = local.use_local_credentials ? 0 : 1
-  name         = local.sid_password_secret_name
+  count        = local.use_local_credentials || length(try(local.landscape_tfstate.sid_password_secret_name, "")) ? 0 : 1
+  name         = try(local.landscape_tfstate.sid_password_secret_name, "")
   key_vault_id = local.landscape_tfstate.landscape_key_vault_user_arm_id
 }
 
