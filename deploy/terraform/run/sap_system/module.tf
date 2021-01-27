@@ -10,15 +10,13 @@ module "common_infrastructure" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
   key_vault                  = var.key_vault
   naming                     = module.sap_namegenerator.naming
   service_principal          = local.service_principal
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
-  credentials                = var.authentication
+  authentication             = var.authentication
 }
 
 module "sap_namegenerator" {
@@ -47,12 +45,9 @@ module "sap_namegenerator" {
 // Create HANA database nodes
 module "hdb_node" {
   source                     = "../../terraform-units/modules/sap_system/hdb_node"
-  application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -63,20 +58,19 @@ module "hdb_node" {
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
   storage_subnet             = module.common_infrastructure.storage_subnet
-  // Workaround to create dependency from anchor to db to app
-  anchor_vm    = module.common_infrastructure.anchor_vm
-  sid_password = module.common_infrastructure.sid_password
+  anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
+  sdu_public_key             = module.common_infrastructure.sdu_public_key
+  sap_sid                    = local.sap_sid
 }
 
 // Create Application Tier nodes
 module "app_tier" {
   source                     = "../../terraform-units/modules/sap_system/app_tier"
   application                = var.application
-  databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -85,21 +79,21 @@ module "app_tier" {
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
   hdb_vms                    = module.hdb_node.hdb_vms
   sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
+  sdu_public_key             = module.common_infrastructure.sdu_public_key
+  sap_sid                    = local.sap_sid
+
 }
 
 // Create anydb database nodes
 module "anydb_node" {
   source                     = "../../terraform-units/modules/sap_system/anydb_node"
-  application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = var.options
-  ssh-timeout                = var.ssh-timeout
-  sshkey                     = var.sshkey
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -109,9 +103,11 @@ module "anydb_node" {
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
   sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
+  sdu_public_key             = module.common_infrastructure.sdu_public_key
+  sap_sid                    = local.sap_sid
 }
 
 // Generate output files
@@ -123,7 +119,7 @@ module "output_files" {
   options                   = local.options
   software                  = var.software
   ssh-timeout               = var.ssh-timeout
-  sshkey                    = var.sshkey
+  sshkey                    = var.authentication
   iscsi_private_ip          = module.common_infrastructure.iscsi_private_ip
   infrastructure_w_defaults = module.common_infrastructure.infrastructure_w_defaults
   nics_dbnodes_admin        = module.hdb_node.nics_dbnodes_admin

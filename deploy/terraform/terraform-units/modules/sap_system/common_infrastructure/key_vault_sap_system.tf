@@ -11,15 +11,15 @@ data "azurerm_key_vault_secret" "sid_pk" {
 }
 
 data "azurerm_key_vault_secret" "sid_username" {
-  count        = ! local.sid_local_password_exists && (length(trimspace(local.sid_username_secret_name)) > 0) ? 1 : 0
+  count        = local.use_local_credentials ? 0 : 1
   name         = local.sid_username_secret_name
-  key_vault_id = local.kv_landscape_id
+  key_vault_id = local.landscape_tfstate.landscape_key_vault_user_arm_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
-  count        = ! local.sid_local_password_exists && (length(trimspace(local.sid_password_secret_name)) > 0) ? 1 : 0
+  count        = local.use_local_credentials ? 0 : 1
   name         = local.sid_password_secret_name
-  key_vault_id = local.kv_landscape_id
+  key_vault_id = local.landscape_tfstate.landscape_key_vault_user_arm_id
 }
 
 
@@ -107,7 +107,7 @@ resource "random_id" "sapsystem" {
 
 // Generate random password if password is set as authentication type and user doesn't specify a password, and save in KV
 resource "random_password" "password" {
-  count            = local.sid_local_username_exists && ! local.sid_local_password_exists ? 0 : 1
+  count            = local.use_local_credentials && length(try(var.authentication.password, "")) > 0 ? 0 : 1
   length           = 32
   special          = true
   override_special = "_%@"
@@ -115,7 +115,7 @@ resource "random_password" "password" {
 
 // Store the logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
-  count        = local.sid_local_username_exists ? 1 : 0
+  count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-username", local.prefix)
   value        = local.sid_auth_username
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
@@ -123,9 +123,9 @@ resource "azurerm_key_vault_secret" "auth_username" {
 
 // Store the password in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
-  count        = local.sid_local_password_exists ? 1 : 0
+  count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-password", local.prefix)
-  value        = local.sid_auth_password
+  value        = var.authentication.password
   key_vault_id = azurerm_key_vault.sid_kv_user[0].id
 }
 
@@ -133,7 +133,7 @@ resource "azurerm_key_vault_secret" "auth_password" {
 resource "tls_private_key" "sdu" {
   count = (
     local.use_local_credentials
-    && (try(file(var.sshkey.path_to_public_key), "") == "")
+    && (try(file(var.authentication.path_to_public_key), "") == "")
   ) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048

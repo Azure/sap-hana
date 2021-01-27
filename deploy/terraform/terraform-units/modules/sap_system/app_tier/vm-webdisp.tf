@@ -69,9 +69,9 @@ resource "azurerm_linux_virtual_machine" "web" {
   )
 
   size                            = local.web_sizing.compute.vm_size
-  admin_username                  = local.sid_auth_username
+  admin_username                  = var.sid_username
   disable_password_authentication = ! local.enable_auth_password
-  admin_password                  = local.enable_auth_key ? null : local.sid_auth_password
+  admin_password                  = local.enable_auth_key ? null : var.sid_password
 
   dynamic "os_disk" {
     iterator = disk
@@ -115,7 +115,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   dynamic "admin_ssh_key" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
-      username   = local.sid_auth_username
+      username   = var.sid_username
       public_key = var.sdu_public_key
     }
   }
@@ -155,8 +155,8 @@ resource "azurerm_windows_virtual_machine" "web" {
   )
 
   size           = local.web_sizing.compute.vm_size
-  admin_username = local.sid_auth_username
-  admin_password = local.sid_auth_password
+  admin_username = var.sid_username
+  admin_password = var.sid_password
 
   dynamic "os_disk" {
     iterator = disk

@@ -44,11 +44,21 @@ variable "deployer_user" {
 variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
+
 variable "sdu_public_key" {
   description = "Public key used for authentication"
 }
+
 variable "sid_password" {
-  description = "SDU specific password"
+  description = "SDU password"
+}
+
+variable "sid_username" {
+  description = "SDU username"
+}
+
+variable "sap_sid" {
+  description = "The SID of the application"
 }
 
 locals {
@@ -97,35 +107,11 @@ locals {
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
 
-  secret_sid_pk_name       = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-  sid_username_secret_name = try(local.landscape_tfstate.sid_username_secret_name, "")
-  sid_password_secret_name = try(local.landscape_tfstate.sid_password_secret_name, "")
-
-  // If credentials are specified either for the SDU or for the application use them
-  sid_local_credentials_exist = try(length(try(var.sshkey.username, "")) > 0, false) || try(length(try(var.application.authentication.username, "")) > 0, false)
-  use_landscape_credentials   = length(local.sid_password_secret_name) > 0 ? true : false
-
-  sid_auth_username = coalesce(
-    try(var.application.authentication.username, ""),
-    try(var.sshkey.username, ""),
-    try(data.azurerm_key_vault_secret.sid_username[0].value, ""),
-    "azureadm"
-  )
-
-  sid_auth_password = coalesce(
-    try(var.application.authentication.password, ""),
-    try(var.sshkey.password, ""),
-    try(data.azurerm_key_vault_secret.sid_password[0].value, ""),
-    var.sid_password
-  )
-
   authentication = {
     "type"     = local.sid_auth_type
-    "username" = local.sid_auth_username
-    "password" = local.sid_auth_password
+    "username" = var.sid_username
+    "password" = var.sid_password
   }
-
-  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})
