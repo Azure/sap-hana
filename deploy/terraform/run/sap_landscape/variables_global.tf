@@ -7,12 +7,6 @@ variable "options" {
   description = "Configuration options"
   default     = {}
 }
-
-variable "ssh-timeout" {
-  description = "Timeout for connection that is used by provisioner"
-  default     = "30s"
-}
-
 variable "sshkey" {
   description = "Details of ssh key pair"
   default = {
@@ -21,7 +15,7 @@ variable "sshkey" {
 
   validation {
     condition = (
-      length(var.sshkey) > 1
+      length(var.sshkey) >= 1
     )
     error_message = "Either ssh keys or user credentials must be specified."
   }
