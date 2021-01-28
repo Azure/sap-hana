@@ -173,8 +173,8 @@ locals {
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
 
-  input_sid_username    = try(var.sshkey.username, "azureadm")
-  input_sid_password    = length(try(var.sshkey.password,"")) > 0 ? var.sshkey.password : random_password.created_password.result
+  input_sid_username    = try(var.authentication.username, "azureadm")
+  input_sid_password    = length(try(var.authentication.password,"")) > 0 ? var.authentication.password : random_password.created_password.result
   
 
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
