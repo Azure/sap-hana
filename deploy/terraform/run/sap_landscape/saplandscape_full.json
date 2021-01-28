@@ -36,6 +36,7 @@
         "kv_iscsi_pwd": "",
         "kv_spn_id": ""
     },
+    "sshkey": {},
     "options": {},
     "authentication" : {
         "username" : "azureadm",
