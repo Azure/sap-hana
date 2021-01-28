@@ -4,16 +4,15 @@
 */
 
 module "sap_landscape" {
-  source                      = "../../terraform-units/modules/sap_landscape"
-  infrastructure              = var.infrastructure
-  options                     = local.options
-  ssh-timeout                 = var.ssh-timeout
-  sshkey                      = var.sshkey
-  naming                      = module.sap_namegenerator.naming
-  service_principal           = local.service_principal
-  key_vault                   = var.key_vault
-  deployer_tfstate            = data.terraform_remote_state.deployer.outputs
-  diagnostics_storage_account = var.diagnostics_storage_account
+  source            = "../../terraform-units/modules/sap_landscape"
+  infrastructure    = var.infrastructure
+  options           = local.options
+  ssh-timeout       = var.ssh-timeout
+  authentication    = var.authentication
+  naming            = module.sap_namegenerator.naming
+  service_principal = local.service_principal
+  key_vault         = var.key_vault
+  deployer_tfstate  = data.terraform_remote_state.deployer.outputs
 }
 
 module "sap_namegenerator" {

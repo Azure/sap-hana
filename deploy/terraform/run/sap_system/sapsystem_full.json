@@ -6,14 +6,12 @@
     "region": "eastus",
     "environment": "NP",
     "resource_group": {
-      "is_existing": "false",
       "arm_id": ""
     },
     "anchor_vms": {
       "sku": "Standard_D4s_v4",
       "authentication": {
-        "type": "key",
-        "username": "azureadm"
+        "type": "key"
       },
       "accelerated_networking": true,
       "os": {
@@ -26,7 +24,6 @@
     },
     "vnets": {
       "sap": {
-        "is_existing": "false",
         "arm_id": "",
         "name": "",
         "address_space": "10.1.0.0/16",
@@ -58,6 +55,9 @@
         "sku": "gen1"
       },
       "zones": ["1"],
+      "authentication": {
+        "type": "key"
+      },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
       ],
@@ -91,17 +91,17 @@
     "web_zones": ["1"],
     "use_DHCP": false,
     "authentication": {
-      "type": "key",
-      "username": "azureadm"
+      "type": "key"
     }
   },
-  "sshkey": {
+  "authentication": {
+    "username": "azureadm",
+    "password": "T0pS€cr€t",
     "path_to_public_key": "sshkey.pub",
     "path_to_private_key": "sshkey"
   },
   "options": {
     "enable_secure_transfer": true,
-    "enable_prometheus": true,
     "resource_offset" : 0,
     "disk_encryption_set_id" : ""
   }

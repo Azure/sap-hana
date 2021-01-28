@@ -33,9 +33,9 @@ locals {
   // Resource group
   var_rg    = try(local.var_infra.resource_group, {})
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
-  rg_exists = length(local.rg_arm_id) > 0 
+  rg_exists = length(local.rg_arm_id) > 0
 
-  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
+  rg_name = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
 
   // Storage account for sapbits
   sa_sapbits_arm_id = try(var.storage_account_sapbits.arm_id, "")

@@ -65,8 +65,8 @@ locals {
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_iscsi_auth_key = local.enable_iscsi && local.iscsi_auth_type == "key"
-  iscsi_public_key      = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh)) : null
-  iscsi_private_key     = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem)) : null
+  iscsi_public_key      = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_pk[0].value : try(file(var.authentication.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh)) : null
+  iscsi_private_key     = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.iscsi[0].private_key_pem)) : null
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
   enable_iscsi_auth_password = local.enable_iscsi && local.iscsi_auth_type == "password"
@@ -92,8 +92,8 @@ locals {
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_landscape_kv = true
-  sid_public_key      = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh)) : null
-  sid_private_key     = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem)) : null
+  sid_public_key      = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_pk[0].value : try(file(var.authentication.path_to_public_key), tls_private_key.sid[0].public_key_openssh)) : null
+  sid_private_key     = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.sid[0].private_key_pem)) : null
 
   // iSCSI subnet
   var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, null)
