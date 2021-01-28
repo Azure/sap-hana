@@ -21,7 +21,7 @@ variable "sshkey" {
 
   validation {
     condition = (
-      length(var.sshkey) > 1
+      length(var.sshkey) >= 1
     )
     error_message = "Either ssh keys or user credentials must be specified."
   }
