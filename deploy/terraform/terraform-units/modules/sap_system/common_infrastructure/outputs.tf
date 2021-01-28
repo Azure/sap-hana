@@ -19,7 +19,7 @@ output "random_id" {
 }
 
 output "iscsi_private_ip" {
-  value = local.iscsi_private_ip
+  value = try(local.landscape_tfstate.iscsi_private_ip, [])
 }
 
 output "ppg" {
@@ -63,7 +63,6 @@ output "sid_password" {
 output "sid_username" {
   value = local.sid_auth_username
 }
-
 
 //Output the SDU specific SSH key
 output "sdu_public_key" {

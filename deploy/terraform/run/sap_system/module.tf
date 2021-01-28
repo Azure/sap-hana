@@ -48,11 +48,6 @@ module "hdb_node" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-<<<<<<< HEAD
-=======
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
->>>>>>> 589f5eb1f3c4f528905c30bd7b75b1ea45406667
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -76,11 +71,6 @@ module "app_tier" {
   application                = var.application
   infrastructure             = var.infrastructure
   options                    = local.options
-<<<<<<< HEAD
-=======
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
->>>>>>> 589f5eb1f3c4f528905c30bd7b75b1ea45406667
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -104,11 +94,6 @@ module "anydb_node" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = var.options
-<<<<<<< HEAD
-=======
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
->>>>>>> 589f5eb1f3c4f528905c30bd7b75b1ea45406667
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag           = module.common_infrastructure.storage_bootdiag
@@ -134,11 +119,7 @@ module "output_files" {
   options                   = local.options
   software                  = var.software
   ssh-timeout               = var.ssh-timeout
-<<<<<<< HEAD
-  sshkey                    = var.authentication
-=======
   authentication            = var.authentication
->>>>>>> 589f5eb1f3c4f528905c30bd7b75b1ea45406667
   iscsi_private_ip          = module.common_infrastructure.iscsi_private_ip
   infrastructure_w_defaults = module.common_infrastructure.infrastructure_w_defaults
   nics_dbnodes_admin        = module.hdb_node.nics_dbnodes_admin

@@ -70,8 +70,6 @@ locals {
   // Retrieve information about Sap Landscape from tfstate file
   landscape_tfstate = var.landscape_tfstate
 
-  iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
-
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
@@ -178,7 +176,6 @@ locals {
   // Support dynamic addressing
   anchor_use_DHCP = try(local.anchor.use_DHCP, false)
 
-
   //Resource group
   var_rg    = try(local.var_infra.resource_group, {})
   rg_arm_id = try(local.var_rg.arm_id, "")
@@ -279,8 +276,15 @@ locals {
   // If local credentials are used then try the parameter file.
   // If the username is empty retrieve it from the keyvault
   // If password or sshkeys are empty create them
-  sid_auth_username = local.use_local_credentials ? try(var.authentication.username, try(data.azurerm_key_vault_secret.sid_username[0].value, "")) : try(data.azurerm_key_vault_secret.sid_username[0].value, "")
-  sid_auth_password = local.use_local_credentials ? try(var.authentication.password, random_password.password[0].result) : try(data.azurerm_key_vault_secret.sid_password[0].value, "")
+  sid_auth_username = coalesce(
+    try(var.authentication.username, ""),
+    try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
+  )
+  sid_auth_password = coalesce(
+    try(var.authentication.password, ""),
+    try(data.azurerm_key_vault_secret.sid_password[0].value, random_password.password[0].result)
+  )
+
   sid_public_key    = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
   sid_private_key   = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
