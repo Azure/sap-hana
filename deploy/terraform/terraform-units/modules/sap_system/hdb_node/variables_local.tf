@@ -245,6 +245,30 @@ locals {
     hdb_storage_vm = 10
   }
 
+  // Ports used for specific HANA Versions
+  lb_ports = {
+    "1" = [
+      "30015",
+      "30017",
+    ]
+
+    "2" = [
+      "30013",
+      "30014",
+      "30015",
+      "30040",
+      "30041",
+      "30042",
+    ]
+  }
+
+  loadbalancer_ports = flatten([
+    for port in local.lb_ports[split(".", local.hdb_version)[0]] : {
+      sid  = local.sap_sid
+      port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
+    }
+  ])
+
   db_sizing = local.enable_deployment ? lookup(local.sizes, local.hdb_size).storage : []
 
   // List of data disks to be created for HANA DB nodes

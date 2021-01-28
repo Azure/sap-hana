@@ -20,8 +20,8 @@
     "sshkey": {
         "username": "azureadm"
     },
-    "options": {},
     "authentication": {
         "username": "azureadm"
-    }
+    },
+    "options": {}
 }
