@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
     azurerm_network_interface.observer[count.index].id
   ]
   size                            = local.observer_size
-  admin_username                  = var.sid_username
+  admin_username                  = local.sid_auth_username
   disable_password_authentication = true
 
   os_disk {
@@ -69,8 +69,8 @@ resource "azurerm_linux_virtual_machine" "observer" {
   }
 
   admin_ssh_key {
-    username   = var.sid_username
-    public_key = var.sdu_public_key
+    username   = local.sid_auth_username
+    public_key = data.azurerm_key_vault_secret.sid_pk[0].value
   }
 
   boot_diagnostics {
@@ -105,8 +105,8 @@ resource "azurerm_windows_virtual_machine" "observer" {
   ]
 
   size           = local.observer_size
-  admin_username = var.sid_username
-  admin_password = var.sid_password
+  admin_username = local.sid_auth_username
+  admin_password = local.sid_auth_password
 
   os_disk {
     name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
