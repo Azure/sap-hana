@@ -7,12 +7,6 @@ variable "options" {
   description = "Configuration options"
   default     = {}
 }
-
-variable "ssh-timeout" {
-  description = "Timeout for connection that is used by provisioner"
-  default     = "30s"
-}
-
 variable "sshkey" {
   description = "Details of ssh key pair"
   default = {
