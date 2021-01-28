@@ -104,7 +104,7 @@ locals {
   // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
- // If custom image is used, we do not overwrite os reference with default value
+  // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
@@ -128,7 +128,7 @@ locals {
   sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
 
-  use_local_credentials = length(var.sshkey) > 0
+  use_local_credentials = length(var.authentication) > 0
 
   db_systemdb_password = "db_systemdb_password"
 
@@ -215,27 +215,27 @@ locals {
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
       [
         {
-          name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-          computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-          role           = try(dbnode.role, "db")
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+          name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+          computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+          role         = try(dbnode.role, "db")
+          admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+          db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
         },
         {
-          name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-          computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
-          role           = try(dbnode.role, "db")
-          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
-          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
+          name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+          computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+          role         = try(dbnode.role, "db")
+          admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
+          db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
         }
       ]
     ])) : (
     flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-      name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-      computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-      role           = try(dbnode.role, "db")
-      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
-      db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+      name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+      computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+      role         = try(dbnode.role, "db")
+      admin_nic_ip = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+      db_nic_ip    = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
       }]
     )
   )

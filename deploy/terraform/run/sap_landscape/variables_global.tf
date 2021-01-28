@@ -7,7 +7,8 @@ variable "options" {
   description = "Configuration options"
   default     = {}
 }
-variable "sshkey" {
+
+variable "authentication" {
   description = "Details of ssh key pair"
   default = {
     username = "azureadm"

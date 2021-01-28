@@ -19,7 +19,7 @@
     },
     "authentication": {
         "username": "azureadm",
-        "password" :""
+        "password": ""
     },
     "options": {}
 }

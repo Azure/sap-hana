@@ -96,7 +96,7 @@ resource "random_id" "sapsystem" {
 resource "tls_private_key" "sdu" {
   count = (
     local.use_local_credentials
-    && (try(file(var.sshkey.path_to_public_key), "") == "")
+    && (try(file(var.authentication.path_to_public_key), "") == "")
   ) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
