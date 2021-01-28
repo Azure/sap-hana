@@ -20,17 +20,8 @@
     "sshkey": {
         "username": "azureadm"
     },
-<<<<<<< HEAD
-    "options": {},
-    "authentication": {
-        "username": "azureadm"
-    }
-}
-=======
     "authentication": {
         "username": "azureadm"
     },
-
     "options": {}
 }
->>>>>>> 90806d9c... Added the username to the saplandscape.json
