@@ -42,8 +42,8 @@ output "dns_info_vms" {
         slice(var.naming.virtualmachine_names.ANYDB_SECONDARY_DNSNAME, 0, local.db_server_count)
       )),
       compact(concat(
-        azurerm_network_interface.anydb_admin[*].private_ip_address,
-        azurerm_network_interface.anydb_db[*].private_ip_address
+        slice(azurerm_network_interface.anydb_admin[*].private_ip_address, 0, local.db_server_count),
+        slice(azurerm_network_interface.anydb_db[*].private_ip_address, 0, local.db_server_count)
       ))
     )
     ) : (
