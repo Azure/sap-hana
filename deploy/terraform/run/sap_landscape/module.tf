@@ -7,7 +7,6 @@ module "sap_landscape" {
   source            = "../../terraform-units/modules/sap_landscape"
   infrastructure    = var.infrastructure
   options           = local.options
-  ssh-timeout       = var.ssh-timeout
   authentication    = var.authentication
   naming            = module.sap_namegenerator.naming
   service_principal = local.service_principal

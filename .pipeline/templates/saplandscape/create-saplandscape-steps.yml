@@ -158,6 +158,7 @@ steps:
         --backend-config "container_name=tfstate" \
         --backend-config "key=${sap_landscape_key}" \
         ${repo_dir}/deploy/terraform/run/sap_landscape/
+      terraform refresh -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_landscape/
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_landscape/
       '
     displayName: "Deploy new sap landscape: Branch ${{parameters.branch_name}}"

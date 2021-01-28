@@ -18,7 +18,8 @@
         }
     },
     "authentication": {
-        "username" : "azureadm"
+        "username": "azureadm",
+        "password": ""
     },
     "options": {}
 }
