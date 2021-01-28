@@ -16,7 +16,9 @@ variable "ssh-timeout" {
 variable "sshkey" {
   description = "Details of ssh key pair"
   default = {
+    username = "azureadm"
   }
+
   validation {
     condition = (
       length(var.sshkey) > 1
