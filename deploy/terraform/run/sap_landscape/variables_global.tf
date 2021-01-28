@@ -8,20 +8,31 @@ variable "options" {
   default     = {}
 }
 
-variable "ssh-timeout" {
-  description = "Timeout for connection that is used by provisioner"
-  default     = "30s"
-}
-
-variable "sshkey" {
+variable "authentication" {
   description = "Details of ssh key pair"
   default = {
-    path_to_public_key  = "~/.ssh/id_rsa.pub",
-    path_to_private_key = "~/.ssh/id_rsa"
+    username = "azureadm"
+  }
+
+  validation {
+    condition = (
+      length(var.authentication) >= 1
+    )
+    error_message = "Either ssh keys or user credentials must be specified."
+  }
+  validation {
+    condition = (
+      length(trimspace(var.authentication.username)) != 0
+    )
+    error_message = "The default username for the Virtual machines must be specified."
   }
 }
 
 variable "key_vault" {
   description = "The user brings existing Azure Key Vaults"
-  default     = ""
+  default = {
+    kv_user_id = "",
+    kv_prvt_id = "",
+  }
 }
+

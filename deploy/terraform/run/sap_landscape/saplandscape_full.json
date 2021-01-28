@@ -28,12 +28,20 @@
         "kv_prvt_id": "",
         "kv_sid_sshkey_prvt" : "",
         "kv_sid_sshkey_pub" : "",
+        "kv_sid_username" : "",
+        "kv_sid_pwd" : "",
         "kv_iscsi_username": "",
         "kv_iscsi_sshkey_prvt" : "",
         "kv_iscsi_sshkey_pub" : "",
         "kv_iscsi_pwd": "",
         "kv_spn_id": ""
     },
-    "sshkey": {},
+    "authentication": {
+        "username": "azureadm",
+        "password" : "SecretPassword",
+        "path_to_public_key": "sshkey.pub",
+        "path_to_private_key": "sshkey"
+   
+    },
     "options": {}
 }

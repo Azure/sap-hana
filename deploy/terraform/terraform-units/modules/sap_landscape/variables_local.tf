@@ -65,8 +65,8 @@ locals {
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_iscsi_auth_key = local.enable_iscsi && local.iscsi_auth_type == "key"
-  iscsi_public_key      = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh)) : null
-  iscsi_private_key     = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.iscsi[0].private_key_pem)) : null
+  iscsi_public_key      = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_pk[0].value : try(file(var.authentication.path_to_public_key), tls_private_key.iscsi[0].public_key_openssh)) : null
+  iscsi_private_key     = local.enable_iscsi_auth_key ? (local.iscsi_key_exist ? data.azurerm_key_vault_secret.iscsi_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.iscsi[0].private_key_pem)) : null
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
   enable_iscsi_auth_password = local.enable_iscsi && local.iscsi_auth_type == "password"
@@ -91,9 +91,9 @@ locals {
   vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
-  enable_landscape_kv = true
-  sid_public_key      = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_pk[0].value : try(file(var.sshkey.path_to_public_key), tls_private_key.sid[0].public_key_openssh)) : null
-  sid_private_key     = local.enable_landscape_kv ? (local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.sshkey.path_to_private_key), tls_private_key.sid[0].private_key_pem)) : null
+  
+  sid_public_key      = local.sid_key_exist ? data.azurerm_key_vault_secret.sid_pk[0].value : try(file(var.authentication.path_to_public_key), tls_private_key.sid[0].public_key_openssh) 
+  sid_private_key     = local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.sid[0].private_key_pem) 
 
   // iSCSI subnet
   var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, null)
@@ -160,15 +160,22 @@ locals {
   )
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
+  
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
-  user_kv_exist     = try(length(local.user_key_vault_id) > 0, false)
-  prvt_kv_exist     = try(length(local.prvt_key_vault_id) > 0, false)
+  user_kv_exist     = length(local.user_key_vault_id) > 0
+  prvt_kv_exist     = length(local.prvt_key_vault_id) > 0
+
+  enable_landscape_kv = !local.user_kv_exist
 
   // If the user specifies the secret name of key pair/password in input, the secrets will be imported instead of creating new secrets
   input_sid_public_key_secret_name  = try(var.key_vault.kv_sid_sshkey_pub, "")
   input_sid_private_key_secret_name = try(var.key_vault.kv_sid_sshkey_prvt, "")
   sid_key_exist                     = try(length(local.input_sid_public_key_secret_name) > 0, false)
+
+  input_sid_username    = try(var.authentication.username, "azureadm")
+  input_sid_password    = length(try(var.authentication.password,"")) > 0 ? var.authentication.password : random_password.created_password.result
+  
 
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
   input_iscsi_private_key_secret_name = try(var.key_vault.kv_iscsi_sshkey_prvt, "")
@@ -180,6 +187,14 @@ locals {
 
   sid_ppk_name = local.sid_key_exist ? local.input_sid_private_key_secret_name : format("%s-sid-sshkey", local.prefix)
   sid_pk_name  = local.sid_key_exist ? local.input_sid_public_key_secret_name : format("%s-sid-sshkey-pub", local.prefix)
+
+  
+  input_sid_username_secret_name    = try(var.key_vault.kv_sid_username, "")
+  input_sid_password_secret_name    = try(var.key_vault.kv_sid_pwd, "")
+  sid_credentials_secret_exist      = length(local.input_sid_username_secret_name) > 0
+
+  sid_username_secret_name = local.sid_credentials_secret_exist ? local.input_sid_username_secret_name : trimprefix(format("%s-sid-username", local.prefix),"-")
+  sid_password_secret_name = local.sid_credentials_secret_exist ? local.input_sid_password_secret_name : trimprefix(format("%s-sid-password", local.prefix),"-")
 
   iscsi_ppk_name      = local.iscsi_key_exist ? local.input_iscsi_private_key_secret_name : format("%s-iscsi-sshkey", local.prefix)
   iscsi_pk_name       = local.iscsi_key_exist ? local.input_iscsi_public_key_secret_name : format("%s-iscsi-sshkey-pub", local.prefix)

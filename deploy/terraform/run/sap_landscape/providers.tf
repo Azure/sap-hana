@@ -51,12 +51,16 @@ terraform {
       version = "~> 3.0.0"
     }
     azuread = {
-      source = "hashicorp/azuread"
+      source  = "hashicorp/azuread"
       version = "~> 1.0.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 2.35.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 3.0.0"
     }
   }
 }

@@ -28,7 +28,7 @@ resource "azurerm_key_vault" "kv_prvt" {
 
 // Import an existing private Key Vault
 data "azurerm_key_vault" "kv_prvt" {
-  count               = (local.enable_landscape_kv && local.prvt_kv_exist) ? 1 : 0
+  count               = (local.prvt_kv_exist) ? 1 : 0
   name                = local.prvt_kv_name
   resource_group_name = local.prvt_kv_rg_name
 }
@@ -62,7 +62,7 @@ resource "azurerm_key_vault" "kv_user" {
 
 // Import an existing user Key Vault
 data "azurerm_key_vault" "kv_user" {
-  count               = (local.enable_landscape_kv && local.user_kv_exist) ? 1 : 0
+  count               = (local.user_kv_exist) ? 1 : 0
   name                = local.user_kv_name
   resource_group_name = local.user_kv_rg_name
 }
@@ -73,7 +73,7 @@ resource "tls_private_key" "iscsi" {
     local.enable_landscape_kv
     && local.enable_iscsi_auth_key
     && ! local.iscsi_key_exist
-    && try(file(var.sshkey.path_to_public_key), null) == null
+    && try(file(var.authentication.path_to_public_key), null) == null
   ) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
@@ -152,36 +152,73 @@ data "azurerm_key_vault_secret" "iscsi_username" {
 resource "tls_private_key" "sid" {
   count = (
     local.enable_landscape_kv
-    && try(file(var.sshkey.path_to_public_key), null) == null
+    && try(file(var.authentication.path_to_public_key), null) == null
     && ! local.sid_key_exist
   ) ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
+resource "random_password" "created_password" {
+
+  length      = 32
+  min_upper   = 2
+  min_lower   = 2
+  min_numeric = 2
+}
+
+
 // Key pair/password will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
 resource "azurerm_key_vault_secret" "sid_ppk" {
-  count        = (local.enable_landscape_kv && ! local.sid_key_exist) ? 1 : 0
+  count        = !local.sid_key_exist ? 1 : 0
   name         = local.sid_ppk_name
   value        = local.sid_private_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
+data "azurerm_key_vault_secret" "sid_ppk" {
+  count        = (local.sid_key_exist) ? 1 : 0
+  name         = local.sid_ppk_name
+  key_vault_id = local.user_key_vault_id
+}
+
 resource "azurerm_key_vault_secret" "sid_pk" {
-  count        = (local.enable_landscape_kv && ! local.sid_key_exist) ? 1 : 0
+  count        = !local.sid_key_exist ? 1 : 0
   name         = local.sid_pk_name
   value        = local.sid_public_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
 data "azurerm_key_vault_secret" "sid_pk" {
-  count        = (local.enable_landscape_kv && local.sid_key_exist) ? 1 : 0
+  count        = (local.sid_key_exist) ? 1 : 0
   name         = local.sid_pk_name
   key_vault_id = local.user_key_vault_id
 }
 
-data "azurerm_key_vault_secret" "sid_ppk" {
-  count        = (local.enable_landscape_kv && local.sid_key_exist) ? 1 : 0
-  name         = local.sid_ppk_name
+
+// Credentials will be stored in the existing KV if specified, otherwise will be stored in a newly provisioned KV 
+resource "azurerm_key_vault_secret" "sid_username" {
+  count        = (!local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_username_secret_name
+  value        = local.input_sid_username
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+}
+
+data "azurerm_key_vault_secret" "sid_username" {
+  count        = (local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_username_secret_name
+  key_vault_id = local.user_key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "sid_password" {
+  count        = (!local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_password_secret_name
+  value        = local.input_sid_password
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+}
+
+data "azurerm_key_vault_secret" "sid_password" {
+  count        = (local.sid_credentials_secret_exist) ? 1 : 0
+  name         = local.sid_password_secret_name
   key_vault_id = local.user_key_vault_id
 }
