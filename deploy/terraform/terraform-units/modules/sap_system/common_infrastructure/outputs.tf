@@ -19,7 +19,7 @@ output "random_id" {
 }
 
 output "iscsi_private_ip" {
-  value = try(local.landscape_tfstate.iscsi_private_ip, [])
+  value = try(var.landscape_tfstate.iscsi_private_ip, [])
 }
 
 output "ppg" {
