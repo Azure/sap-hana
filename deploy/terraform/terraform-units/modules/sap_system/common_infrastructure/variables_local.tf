@@ -67,11 +67,8 @@ locals {
   // Retrieve information about Deployer from tfstate file
   deployer_tfstate = var.deployer_tfstate
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate = var.landscape_tfstate
-
-  storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
-  storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
+  storageaccount_name    = try(var.landscape_tfstate.storageaccount_name, "")
+  storageaccount_rg_name = try(var.landscape_tfstate.storageaccount_rg_name, "")
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -194,7 +191,7 @@ locals {
   */
 
   //SAP vnet
-  vnet_sap_arm_id              = try(local.landscape_tfstate.vnet_sap_arm_id, "")
+  vnet_sap_arm_id              = try(var.landscape_tfstate.vnet_sap_arm_id, "")
   vnet_sap_name                = split("/", local.vnet_sap_arm_id)[8]
   vnet_sap_resource_group_name = split("/", local.vnet_sap_arm_id)[4]
   vnet_sap                     = data.azurerm_virtual_network.vnet_sap
@@ -257,8 +254,8 @@ locals {
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
-  user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
-  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
+  user_key_vault_id = try(var.key_vault.kv_user_id, var.landscape_tfstate.landscape_key_vault_user_arm_id)
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, var.landscape_tfstate.landscape_key_vault_private_arm_id)
 
   //Override 
   user_kv_override = length(try(var.key_vault.kv_user_id, "")) > 0
@@ -280,6 +277,7 @@ locals {
     try(var.authentication.username, ""),
     try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
   )
+  
   sid_auth_password = coalesce(
     try(var.authentication.password, ""),
     try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
