@@ -282,7 +282,7 @@ locals {
   )
   sid_auth_password = coalesce(
     try(var.authentication.password, ""),
-    try(data.azurerm_key_vault_secret.sid_password[0].value, random_password.password[0].result)
+    try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
   )
 
   sid_public_key    = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
