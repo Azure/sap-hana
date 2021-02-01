@@ -48,6 +48,18 @@ variable "sdu_public_key" {
   description = "Public key used for authentication"
 }
 
+variable "sid_password" {
+  description = "SDU password"
+}
+
+variable "sid_username" {
+  description = "SDU username"
+}
+
+variable "sap_sid" {
+  description = "The SID of the application"
+}
+
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
@@ -65,7 +77,7 @@ locals {
   faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
 
   region = try(var.infrastructure.region, "")
-  sid    = upper(try(var.application.sid, ""))
+  sid    = upper(var.sap_sid)
   prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
 
   rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
@@ -127,20 +139,11 @@ locals {
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(local.hdb.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.hdb.authentication.password, random_password.password[0].result) : ""
-
-  db_systemdb_password   = "db_systemdb_password"
-  os_sidadm_password     = "os_sidadm_password"
-  os_sapadm_password     = "os_sapadm_password"
-  xsa_admin_password     = "xsa_admin_password"
-  cockpit_admin_password = "cockpit_admin_password"
-  ha_cluster_password    = "ha_cluster_password"
 
   hdb_auth = {
     "type"     = local.sid_auth_type
-    "username" = local.sid_auth_username
-    "password" = "hdb_vm_password"
+    "username" = var.sid_username
+    "password" = var.sid_password
   }
 
   node_count      = try(length(local.hdb.dbnodes), 1)
@@ -202,12 +205,12 @@ locals {
       }
     },
     { credentials = {
-      db_systemdb_password   = local.db_systemdb_password,
-      os_sidadm_password     = local.os_sidadm_password,
-      os_sapadm_password     = local.os_sapadm_password,
-      xsa_admin_password     = local.xsa_admin_password,
-      cockpit_admin_password = local.cockpit_admin_password,
-      ha_cluster_password    = local.ha_cluster_password
+      db_systemdb_password   = "obsolete"
+      os_sidadm_password     = "obsolete"
+      os_sapadm_password     = "obsolete"
+      xsa_admin_password     = "obsolete"
+      cockpit_admin_password = "obsolete"
+      ha_cluster_password    = "obsolete"
       }
     },
     { components = local.components },
@@ -216,9 +219,6 @@ locals {
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
-
-  // SAP SID used in HDB resource naming convention
-  sap_sid = try(var.application.sid, local.sid)
 
   // Numerically indexed Hash of HANA DB nodes to be created
   hdb_vms = [
@@ -264,7 +264,7 @@ locals {
 
   loadbalancer_ports = flatten([
     for port in local.lb_ports[split(".", local.hdb_version)[0]] : {
-      sid  = local.sap_sid
+      sid  = var.sap_sid
       port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
     }
   ])

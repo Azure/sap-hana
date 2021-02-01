@@ -40,3 +40,7 @@ output "hanadb_vm_ids" {
 output "anydb_vm_ids" {
   value = module.anydb_node.anydb_vm_ids
 }
+
+output "temp" {
+  value = data.terraform_remote_state.landscape.outputs
+}

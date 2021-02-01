@@ -33,6 +33,9 @@
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
+      },
+      "authentication": {
+        "type": "key"
       }
     }
   ],
@@ -45,8 +48,7 @@
     "application_server_count": 1,
     "webdispatcher_count": 1,
     "authentication": {
-      "type": "key",
-      "username": "azureadm"
+      "type": "key"
     }
   },
   "options": {

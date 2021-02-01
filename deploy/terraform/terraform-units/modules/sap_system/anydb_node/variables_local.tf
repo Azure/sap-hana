@@ -43,6 +43,18 @@ variable "sdu_public_key" {
   description = "Public key used for authentication"
 }
 
+variable "sid_password" {
+  description = "SDU password"
+}
+
+variable "sid_username" {
+  description = "SDU username"
+}
+
+variable "sap_sid" {
+  description = "The SID of the application"
+}
+
 locals {
   // Imports database sizing information
 
@@ -60,9 +72,8 @@ locals {
   resource_suffixes    = var.naming.resource_suffixes
 
   region    = try(var.infrastructure.region, "")
-  sap_sid   = upper(try(var.application.sid, ""))
   anydb_sid = (length(local.anydb_databases) > 0) ? try(local.anydb.instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
-  sid       = upper(try(var.application.sid, local.anydb_sid))
+  sid       = length(var.sap_sid) > 0 ? var.sap_sid : local.anydb_sid
   prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
@@ -125,22 +136,15 @@ locals {
   sid_auth_type        = try(local.anydb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
-
-  use_local_credentials = length(var.authentication) > 0
-
-  db_systemdb_password = "db_systemdb_password"
 
   // Tags
   tags = try(local.anydb.tags, {})
 
-  authentication = try(local.anydb.authentication,
-    {
-      "type"     = local.sid_auth_type
-      "username" = local.sid_auth_username
-      "password" = "anydb_vm_password"
-  })
+  authentication = {
+    "type"     = local.sid_auth_type
+    "username" = var.sid_username
+    "password" = var.sid_password
+  }
 
   // Default values in case not provided
   os_defaults = {
@@ -203,7 +207,7 @@ locals {
     { high_availability = local.anydb_ha },
     { authentication = local.authentication },
     { credentials = {
-      db_systemdb_password = local.db_systemdb_password
+      db_systemdb_password = "obsolete"
       }
     },
     { dbnodes = local.dbnodes },
@@ -251,7 +255,7 @@ locals {
       size           = local.anydb_sku
       os             = local.anydb_ostype,
       authentication = local.authentication
-      sid            = local.sap_sid
+      sid            = var.sap_sid
     }
   ]
 

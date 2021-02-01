@@ -44,9 +44,23 @@ variable "deployer_user" {
 variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
+
 variable "sdu_public_key" {
   description = "Public key used for authentication"
 }
+
+variable "sid_password" {
+  description = "SDU password"
+}
+
+variable "sid_username" {
+  description = "SDU username"
+}
+
+variable "sap_sid" {
+  description = "The SID of the application"
+}
+
 locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
@@ -92,16 +106,12 @@ locals {
   sid_auth_type        = try(var.application.authentication.type, upper(local.app_ostype) == "LINUX" ? "key" : "password")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
-  sid_auth_username    = try(var.application.authentication.username, "azureadm")
-  sid_auth_password    = local.enable_auth_password ? try(var.application.authentication.password, random_password.password[0].result) : ""
 
   authentication = {
     "type"     = local.sid_auth_type
-    "username" = local.sid_auth_username
-    "password" = local.sid_auth_password
+    "username" = var.sid_username
+    "password" = var.sid_password
   }
-
-  use_local_keyvault = try(var.authentication.ssh_for_sid, false)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})

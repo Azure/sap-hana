@@ -10,14 +10,13 @@ module "common_infrastructure" {
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
+  key_vault                  = var.key_vault
   naming                     = module.sap_namegenerator.naming
   service_principal          = local.service_principal
   deployer_tfstate           = data.terraform_remote_state.deployer.outputs
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
-  key_vault                  = var.key_vault
+  authentication             = var.authentication
 }
 
 module "sap_namegenerator" {
@@ -46,12 +45,9 @@ module "sap_namegenerator" {
 // Create HANA database nodes
 module "hdb_node" {
   source                     = "../../terraform-units/modules/sap_system/hdb_node"
-  application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
@@ -63,20 +59,18 @@ module "hdb_node" {
   db_subnet                  = module.common_infrastructure.db_subnet
   storage_subnet             = module.common_infrastructure.storage_subnet
   anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
-  // Comment out code with users.object_id for the time being.  
-  // deployer_user    = module.deployer.deployer_user
+  sap_sid                    = local.sap_sid
 }
 
 // Create Application Tier nodes
 module "app_tier" {
   source                     = "../../terraform-units/modules/sap_system/app_tier"
   application                = var.application
-  databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = local.options
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
@@ -87,20 +81,19 @@ module "app_tier" {
   custom_disk_sizes_filename = var.app_disk_sizes_filename
   anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
   hdb_vms                    = module.hdb_node.hdb_vms
+  sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
-  // Comment out code with users.object_id for the time being.  
-  // deployer_user    = module.deployer.deployer_user
+  sap_sid                    = local.sap_sid
+
 }
 
 // Create anydb database nodes
 module "anydb_node" {
   source                     = "../../terraform-units/modules/sap_system/anydb_node"
-  application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = var.options
-  ssh-timeout                = var.ssh-timeout
-  authentication             = var.authentication
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
@@ -110,8 +103,11 @@ module "anydb_node" {
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   admin_subnet               = module.common_infrastructure.admin_subnet
   db_subnet                  = module.common_infrastructure.db_subnet
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
   anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password               = module.common_infrastructure.sid_password
+  sid_username               = module.common_infrastructure.sid_username
+  sdu_public_key             = module.common_infrastructure.sdu_public_key
+  sap_sid                    = local.sap_sid
 }
 
 // Generate output files

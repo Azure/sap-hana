@@ -19,7 +19,7 @@ output "random_id" {
 }
 
 output "iscsi_private_ip" {
-  value = local.iscsi_private_ip
+  value = try(var.landscape_tfstate.iscsi_private_ip, [])
 }
 
 output "ppg" {
@@ -39,15 +39,11 @@ output "db_subnet" {
 }
 
 output "sid_kv_user_id" {
-  value = local.enable_sid_deployment && local.use_local_credentials ? (
-    azurerm_key_vault.sid_kv_user[0].id) : (
-  local.user_key_vault_id)
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user[0].id : data.azurerm_key_vault.sid_kv_user[0].id
 }
 
 output "sid_kv_prvt_id" {
-  value = local.enable_sid_deployment && local.use_local_credentials ? (
-    azurerm_key_vault.sid_kv_prvt[0].id) : (
-  local.prvt_key_vault_id)
+  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt[0].id : data.azurerm_key_vault.sid_kv_prvt[0].id
 }
 
 output "storage_subnet" {
@@ -58,6 +54,14 @@ output "storage_subnet" {
     )) : (
     null
   )
+}
+
+output "sid_password" {
+  value = local.sid_auth_password
+}
+
+output "sid_username" {
+  value = local.sid_auth_username
 }
 
 //Output the SDU specific SSH key
