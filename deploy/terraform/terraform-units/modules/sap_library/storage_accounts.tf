@@ -54,7 +54,7 @@ data "azurerm_storage_container" "storagecontainer_ansible" {
 resource "azurerm_storage_container" "storagecontainer_ansible" {
   count                 = local.sa_ansible_container_exists ? 0 : 1
   name                  = local.sa_ansible_container_name
-  storage_account_name  = local.sa_ansible_exists ? data.azurerm_storage_account.storage_ansible[0].name : azurerm_storage_account.storage_ansible[0].name
+  storage_account_name  = local.sa_ansible_exists ? data.azurerm_storage_account.storage_tfstate[0].name : azurerm_storage_account.storage_tfstate[0].name
   container_access_type = local.sa_ansible_container_access_type
 }
 
