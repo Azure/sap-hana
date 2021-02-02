@@ -1,73 +1,47 @@
-all:
-  children:
-      ${sid}:
-  
-        DB:
-          hosts:
+# SAPSID: ${sid}
+${sid}_DB:
+  hosts:
 %{~ for idx,ips_dbnode in ips_dbnodes }
-            ${dbnodes[idx].name}:
-              ansible_host:  ${ips_dbnode}
-              ansible_connection: "ssh"
+    ${dbnodes[idx].name}:
+      ansible_host:  ${ips_dbnode}
 %{~ endfor }
-          vars:
-            tier: ${platform}
-            ansible_user:        "${dbnodes[0].authentication.username}"
-%{~ if dbnodes[0].authentication.type == "password" }
-            ansible_user:        "${dbnodes[0].authentication.username}"
-            ansible_ssh_pass:    "${dbnodes[0].authentication.password}"
-            ansible_become_pass: "${dbnodes[0].authentication.password}"
-%{~ endif }
+  vars:
+    tier: ${platform}
 
-        SCS:
-          hosts:
-  %{~ for idx,ip_scs in ips_scs ~}
-            ${scsservers[idx]}:
-              ansible_connection: "ssh"
-              ansible_host: ${ip_scs}
-              ansible_user:       "${application.authentication.username}"
-  %{~ if application.authentication.type == "password" }
-              ansible_ssh_pass:    "${application.authentication.password}"
-              ansible_become_pass: "${application.authentication.password}"
-  %{~ endif }
-  %{~ endfor ~}
+${sid}_SCS:
+  hosts:
+%{~ for idx,ip_scs in ips_scs ~}
+    ${scsservers[idx]}:
+      ansible_host: ${ip_scs}
+%{~ endfor ~}
+  vars:
+    tier: SCS
 
-        PAS:
-          hosts:
-  %{~ for idx,ip_pas in ips_pas ~}
-            ${passervers[idx]}:
-              ansible_connection: "ssh"
-              ansible_host: ${ip_pas}
-              ansible_user:       "${application.authentication.username}"
-  %{~ if application.authentication.type == "password" }
-              ansible_ssh_pass:    "${application.authentication.password}"
-              ansible_become_pass: "${application.authentication.password}"
-  %{~ endif }
-  %{~ endfor ~}
+${sid}_PAS:
+  hosts:
+%{~ for idx,ip_pas in ips_pas ~}
+    ${passervers[idx]}:
+      ansible_host: ${ip_pas}
+%{~ endfor ~}
+  vars:
+    tier: PAS
 
-        APP:
-          hosts:
-  %{~ for idx,ip_app in ips_app ~}
-            ${appservers[idx]}:
-              ansible_connection: "ssh"
-              ansible_host: ${ip_app}
-              ansible_user:       "${application.authentication.username}"
-  %{~ if application.authentication.type == "password" }
-              ansible_ssh_pass:    "${application.authentication.password}"
-              ansible_become_pass: "${application.authentication.password}"
-  %{~ endif }
-  %{~ endfor ~}
+${sid}_APP:
+  hosts:
+%{~ for idx,ip_app in ips_app ~}
+    ${appservers[idx]}:
+      ansible_host: ${ip_app}
+%{~ endfor ~}
+  vars:
+    tier: APP
 
-        WEB:
-          hosts:
-  %{~ for idx,ip_web in ips_web ~}
-            {$webservers[idx]}:
-              ansible_connection: "ssh"
-              ansible_host: ${ip_web}:
-              ansible_user:       "${application.authentication.username}"
-  %{~ if application.authentication.type == "password" }
-              ansible_ssh_pass:    "${application.authentication.password}"
-              ansible_become_pass: "${application.authentication.password}"
-  %{~ endif }
-  %{~ endfor }
+${sid}_WEB:
+  hosts:
+%{~ for idx,ip_web in ips_web ~}
+    {$webservers[idx]}:
+      ansible_host: ${ip_web}:
+%{~ endfor }
+  vars:
+    tier: WEB
 
 
