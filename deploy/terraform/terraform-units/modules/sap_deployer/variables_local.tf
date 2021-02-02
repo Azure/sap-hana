@@ -58,11 +58,11 @@ locals {
   sub_mgmt_nsg_deployed    = try(local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0], null)
 
   // Firewall subnet
-  sub_fw          = try(local.vnet_mgmt.subnet_fw, {})
-  sub_fw_arm_id   = try(local.sub_fw.arm_id, "")
-  sub_fw_exists   = length(local.sub_fw_arm_id) > 0 ? true : false
-  sub_fw_name     = "AzureFirewallSubnet"
-  sub_fw_prefix   = local.sub_fw_exists ? "" : try(local.sub_fw.prefix, "")
+  sub_fw_snet        = try(local.vnet_mgmt.subnet_fw, {})
+  sub_fw_snet_arm_id = try(local.sub_fw_snet.arm_id, "")
+  sub_fw_snet_exists = length(local.sub_fw_snet_arm_id) > 0 ? true : false
+  sub_fw_snet_name   = "AzureFirewallSubnet"
+  sub_fw_snet_prefix = local.sub_fw_snet_exists ? "" : try(local.sub_fw_snet.prefix, "")
 
 
   // Deployer(s) information from input
