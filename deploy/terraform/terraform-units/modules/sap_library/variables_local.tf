@@ -72,6 +72,10 @@ locals {
   sa_tfstate_container_exists = try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false)
   sa_tfstate_container_name   = try(var.storage_account_tfstate.tfstate_blob_container.name, local.resource_suffixes.tfstate)
 
+  //Ansible
+  sa_ansible_container_exists = try(var.storage_account_tfstate.ansible_blob_container.is_existing, false)
+  sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, local.resource_suffixes.ansible)
+
   // deployer
   deployer      = try(var.deployer, {})
   deployer_vnet = try(local.deployer.vnet, "")

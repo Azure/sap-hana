@@ -208,6 +208,7 @@ variable resource_suffixes {
     "admin_nic"           = "-admin-nic"
     "admin_subnet"        = "admin-subnet"
     "admin_subnet_nsg"    = "adminSubnet-nsg"
+    "ansible"             = "ansible"
     "app_alb"             = "app-alb"
     "app_avset"           = "app-avset"
     "app_subnet"          = "app-subnet"
