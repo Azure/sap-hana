@@ -120,3 +120,38 @@ resource "local_file" "ansible_inventory_yml" {
   file_permission      = "0660"
   directory_permission = "0770"
 }
+
+resource "local_file" "ansible_inventory_new_yml" {
+  content = templatefile("${path.module}/ansible_inventory_new.yml.tmpl", {
+    ips_dbnodes       = length(local.hdb_vms) > 0 ? local.ips_dbnodes_admin : local.ips_anydbnodes,
+    dbnodes           = length(local.hdb_vms) > 0 ? local.hdb_vms : local.anydb_vms
+    application       = var.application,
+    ips_scs           = local.ips_scs,
+    ips_pas           = length(local.ips_app) > 0 ? slice(local.ips_app,0,1) : null,
+    ips_app           = length(local.ips_app) > 0 ? slice(local.ips_app,1, length(local.ips_app) -1 ) : null
+    ips_web           = local.ips_web,
+    sid               = var.hdb_sid,
+    passervers        = length(local.ips_app) > 0 ? slice(var.naming.virtualmachine_names.APP_VMNAME,0, 1) : [],
+    appservers        = length(local.ips_app) > 1 ? slice(var.naming.virtualmachine_names.APP_VMNAME,1, length(local.ips_app) ) : [],
+    scsservers        = length(local.ips_scs) > 0 ? var.naming.virtualmachine_names.SCS_VMNAME : [],
+    webservers        = length(local.ips_web) > 0 ? var.naming.virtualmachine_names.WEB_VMNAME : [],
+    prefix            = var.naming.prefix.SDU,
+    separator         = var.naming.separator,
+    platform          = length(local.hdb_vms) > 0 ? "HANA" : local.anydb_vms[0].platform
+    }
+  )
+  filename             = "${path.cwd}/ansible_config_files/${var.hdb_sid}_hosts.yml"
+  file_permission      = "0660"
+  directory_permission = "0770"
+}
+
+resource "azurerm_storage_blob" "hosts_yaml" {
+
+  name                   = format("%s_hosts.yml", trimspace(var.naming.prefix.SDU))
+  storage_account_name   = local.tfstate_storage_account_name
+
+  storage_container_name = local.ansible_container_name
+  type                   = "Block"
+  source                 = local_file.ansible_inventory_new_yml.filename
+}
+
