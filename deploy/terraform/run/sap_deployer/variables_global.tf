@@ -33,3 +33,8 @@ variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
 }
+
+variable "deploy_firewall" {
+  description = "Boolean flag indicating if an Azure Firewall should be deployed"
+  default     = false
+}

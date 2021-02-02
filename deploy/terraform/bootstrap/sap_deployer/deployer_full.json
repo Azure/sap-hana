@@ -19,9 +19,10 @@
     "key_vault": {
         "kv_user_id": "",
         "kv_prvt_id": "",
-        "kv_sshkey_prvt" : "",
-        "kv_sshkey_pub" : "",
-        "kv_username" : "",
+        "kv_sshkey_prvt": "",
+        "kv_sshkey_pub": "",
+        "kv_username": "",
         "kv_pwd": ""
-    }
+    },
+    "deploy_firewall" : false
 }

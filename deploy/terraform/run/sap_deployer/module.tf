@@ -12,6 +12,7 @@ module "sap_deployer" {
   sshkey               = var.sshkey
   key_vault            = var.key_vault
   naming               = module.sap_namegenerator.naming
+  deploy_firewall      = var.deploy_firewall
 }
 
 module "sap_namegenerator" {
