@@ -140,7 +140,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     platform          = length(local.hdb_vms) > 0 ? "HANA" : local.anydb_vms[0].platform
     }
   )
-  filename             = "${path.cwd}/ansible_config_files/new_hosts.yml"
+  filename             = "${path.cwd}/ansible_config_files/${var.hdb_sid}_hosts.yml"
   file_permission      = "0660"
   directory_permission = "0770"
 }
@@ -154,3 +154,4 @@ resource "azurerm_storage_blob" "hostsyaml" {
   type                   = "Block"
   source                 = local_file.ansible_inventory_new_yml.filename
 }
+

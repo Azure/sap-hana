@@ -10,38 +10,36 @@ ${sid}_DB:
 
 ${sid}_SCS:
   hosts:
-%{~ for idx,ip_scs in ips_scs ~}
+%{~ for idx,ip_scs in ips_scs }
     ${scsservers[idx]}:
       ansible_host: ${ip_scs}
-%{~ endfor ~}
+%{~ endfor }
   vars:
     tier: SCS
 
 ${sid}_PAS:
   hosts:
-%{~ for idx,ip_pas in ips_pas ~}
+%{~ for idx,ip_pas in ips_pas }
     ${passervers[idx]}:
       ansible_host: ${ip_pas}
-%{~ endfor ~}
+%{~ endfor }
   vars:
     tier: PAS
 
 ${sid}_APP:
   hosts:
-%{~ for idx,ip_app in ips_app ~}
+%{~ for idx,ip_app in ips_app }
     ${appservers[idx]}:
       ansible_host: ${ip_app}
-%{~ endfor ~}
+%{~ endfor }
   vars:
     tier: APP
 
 ${sid}_WEB:
   hosts:
-%{~ for idx,ip_web in ips_web ~}
+%{~ for idx,ip_web in ips_web }
     {$webservers[idx]}:
       ansible_host: ${ip_web}:
 %{~ endfor }
   vars:
     tier: WEB
-
-
