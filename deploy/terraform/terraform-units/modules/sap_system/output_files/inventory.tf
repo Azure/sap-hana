@@ -128,7 +128,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     application       = var.application,
     ips_scs           = local.ips_scs,
     ips_pas           = length(local.ips_app) > 0 ? slice(local.ips_app,0,1) : null,
-    ips_app           = length(local.ips_app) > 0 ? slice(local.ips_app,1, length(local.ips_app) -1 ) : null
+    ips_app           = length(local.ips_app) > 1 ? slice(local.ips_app,1, length(local.ips_app) -1 ) : null
     ips_web           = local.ips_web,
     sid               = var.hdb_sid,
     passervers        = length(local.ips_app) > 0 ? slice(var.naming.virtualmachine_names.APP_VMNAME,0, 1) : [],
