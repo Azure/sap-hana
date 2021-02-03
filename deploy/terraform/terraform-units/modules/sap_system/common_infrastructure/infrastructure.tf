@@ -26,6 +26,12 @@ resource "azurerm_subnet" "admin" {
   address_prefixes     = [local.sub_admin_prefix]
 }
 
+resource "azurerm_subnet_route_table_association" "admin" {
+  count          = ! local.sub_admin_exists && length(local.route_table_id) > 0 ? 1 : 0
+  subnet_id      = azurerm_subnet.admin[0].id
+  route_table_id = local.route_table_id
+}
+
 // Imports data of existing SAP admin subnet
 data "azurerm_subnet" "admin" {
   count                = local.sub_admin_exists && local.enable_admin_subnet ? 1 : 0
@@ -41,6 +47,12 @@ resource "azurerm_subnet" "db" {
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_db_prefix]
+}
+
+resource "azurerm_subnet_route_table_association" "db" {
+  count          = ! local.sub_admin_exists && length(local.route_table_id) > 0 ? 1 : 0
+  subnet_id      = azurerm_subnet.db[0].id
+  route_table_id = local.route_table_id
 }
 
 // Imports data of existing db subnet

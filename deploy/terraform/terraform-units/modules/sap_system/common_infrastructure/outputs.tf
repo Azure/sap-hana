@@ -64,3 +64,7 @@ output "storage_subnet" {
 output "sdu_public_key" {
   value = local.sid_public_key
 }
+
+output "route_table_id" {
+  value = local.route_table_id
+}

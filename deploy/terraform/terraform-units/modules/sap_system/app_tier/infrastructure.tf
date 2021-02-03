@@ -8,6 +8,12 @@ resource "azurerm_subnet" "subnet_sap_app" {
   address_prefixes     = [local.sub_app_prefix]
 }
 
+resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
+  count          = ! local.sub_app_exists && length(var.route_table_id) > 0 ? 1 : 0
+  subnet_id      = azurerm_subnet.subnet_sap_app[0].id
+  route_table_id = var.route_table_id
+}
+
 # Imports data of existing SAP app subnet
 data "azurerm_subnet" "subnet_sap_app" {
   count                = local.enable_deployment ? (local.sub_app_exists ? 1 : 0) : 0
@@ -23,6 +29,12 @@ resource "azurerm_subnet" "subnet_sap_web" {
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_web_prefix]
+}
+
+resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
+  count          = ! local.sub_web_exists && length(var.route_table_id) > 0 ? 1 : 0
+  subnet_id      = azurerm_subnet.subnet_sap_web[0].id
+  route_table_id = var.route_table_id
 }
 
 # Imports data of existing SAP web dispatcher subnet

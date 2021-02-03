@@ -75,6 +75,11 @@ locals {
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
+  // Firewall routing logic
+  // If the environment deployment created a route table use it to populate a route
+
+  route_table_id = try(var.landscape_tfstate.route_table_id, "")
+
   //Filter the list of databases to only HANA platform entries
   databases = [
     for database in var.databases : database

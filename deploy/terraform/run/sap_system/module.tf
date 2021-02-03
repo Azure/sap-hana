@@ -88,6 +88,7 @@ module "app_tier" {
   anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
   hdb_vms                    = module.hdb_node.hdb_vms
   sdu_public_key             = module.common_infrastructure.sdu_public_key
+  route_table_id             = module.common_infrastructure.route_table_id
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
 }

@@ -44,9 +44,15 @@ variable "deployer_user" {
 variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
+
 variable "sdu_public_key" {
   description = "Public key used for authentication"
 }
+
+variable "route_table_id" {
+  description = "Route table (if any) id"
+}
+
 locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
