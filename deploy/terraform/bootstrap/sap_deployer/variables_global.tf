@@ -34,7 +34,17 @@ variable "key_vault" {
   default     = ""
 }
 
-variable "deploy_firewall" {
+variable "firewall_deployment" {
   description = "Boolean flag indicating if an Azure Firewall should be deployed"
   default     = false
+}
+
+variable "firewall_rule_subnets" {
+  description = "List of subnets that are part of the firewall rule"
+  default     = []
+}
+
+variable "firewall_allowed_ipaddresses" {
+  description = "List of allowed IP addresses to be part of the firewall rule"
+  default     = []
 }

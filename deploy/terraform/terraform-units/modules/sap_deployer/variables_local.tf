@@ -7,8 +7,16 @@ variable naming {
   description = "naming convention"
 }
 
-variable "deploy_firewall" {
+variable "firewall_deployment" {
   description = "Boolean flag indicating if an Azure Firewall should be deployed"
+}
+
+variable "firewall_rule_subnets" {
+  description = "List of subnets that are part of the firewall rule"
+}
+
+variable "firewall_allowed_ipaddresses" {
+  description = "List of allowed IP addresses to be part of the firewall rule"
 }
 
 // Set defaults
@@ -64,6 +72,7 @@ locals {
   sub_fw_snet_name   = "AzureFirewallSubnet"
   sub_fw_snet_prefix = local.sub_fw_snet_exists ? "" : try(local.sub_fw_snet.prefix, "")
 
+  firewall_service_tags = format("AzureCloud.%s", local.region)
 
   // Deployer(s) information from input
   deployer_input = var.deployers
