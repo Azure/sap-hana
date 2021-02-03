@@ -44,7 +44,7 @@ resource "azurerm_lb" "scs" {
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
-  sku                 = local.scs_zonal_deployment ? "Standard" : "Basic"
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_feip)
@@ -158,7 +158,7 @@ resource "azurerm_lb" "web" {
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
-  sku                 = local.web_zonal_deployment ? "Standard" : "Basic"
+  sku                 = "Standard"
 
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
