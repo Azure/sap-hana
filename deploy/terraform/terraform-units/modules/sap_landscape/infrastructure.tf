@@ -62,3 +62,14 @@ resource "azurerm_storage_account" "storage_bootdiag" {
   account_tier              = "Standard"
   enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 }
+
+//Route table
+
+resource "azurerm_route_table" "rt" {
+  count                         = local.vnet_sap_exists ? 0 : 1
+  name                          = format("%s%s%s", local.prefix, var.naming.separator, "route_table")
+  resource_group_name           = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  location                      = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].location : azurerm_virtual_network.vnet_sap[0].location
+  disable_bgp_route_propagation = false
+}
+

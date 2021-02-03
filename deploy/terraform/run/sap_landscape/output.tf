@@ -38,3 +38,7 @@ output "storageaccount_rg_name" {
 output "dns_info_iscsi" {
   value = module.sap_landscape.dns_info_vms
 }
+
+output "route_table_id" {
+  value = module.sap_landscape.route_table_id
+}
