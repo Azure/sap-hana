@@ -89,6 +89,7 @@ module "app_tier" {
   hdb_vms                    = module.hdb_node.hdb_vms
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   route_table_id             = module.common_infrastructure.route_table_id
+  firewall_id                = module.common_infrastructure.firewall_id
   // Comment out code with users.object_id for the time being.  
   // deployer_user    = module.deployer.deployer_user
 }

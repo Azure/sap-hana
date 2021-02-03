@@ -68,10 +68,10 @@ locals {
   deployer_tfstate = var.deployer_tfstate
 
   // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate      = var.landscape_tfstate
-  
-  iscsi_private_ip       = try(local.landscape_tfstate.iscsi_private_ip, [])
-  
+  landscape_tfstate = var.landscape_tfstate
+
+  iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
+
   storageaccount_name    = try(local.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(local.landscape_tfstate.storageaccount_rg_name, "")
 
@@ -79,6 +79,8 @@ locals {
   // If the environment deployment created a route table use it to populate a route
 
   route_table_id = try(var.landscape_tfstate.route_table_id, "")
+
+  firewall_id = try(var.deployer_tfstate.firewall_ip, "")
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -159,7 +161,7 @@ locals {
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key      = !local.enable_anchor_auth_password
+  enable_anchor_auth_key      = ! local.enable_anchor_auth_password
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
@@ -265,13 +267,13 @@ locals {
   sub_storage_nsg_exists = length(local.sub_storage_nsg_arm_id) > 0 ? true : false
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
- // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
+  // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
   user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
-  
+
   //Override 
-  user_kv_override     = length(try(var.key_vault.kv_user_id, "")) > 0
-  prvt_kv_override     = length(try(var.key_vault.kv_prvt_id, "")) > 0 
+  user_kv_override = length(try(var.key_vault.kv_user_id, "")) > 0
+  prvt_kv_override = length(try(var.key_vault.kv_prvt_id, "")) > 0
 
   // Extract information from the specified key vault arm ids
   user_kv_name    = local.user_kv_override ? split("/", local.user_key_vault_id)[8] : local.sid_keyvault_names.user_access
@@ -283,8 +285,8 @@ locals {
   //ToDo change ssh key block
   use_local_credentials = length(var.sshkey) > 0
 
-  sid_public_key      = local.use_local_credentials ? try(file(var.sshkey.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
-  sid_private_key     = local.use_local_credentials ? try(file(var.sshkey.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
+  sid_public_key  = local.use_local_credentials ? try(file(var.sshkey.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
+  sid_private_key = local.use_local_credentials ? try(file(var.sshkey.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {
