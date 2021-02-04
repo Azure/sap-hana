@@ -24,5 +24,7 @@
         "kv_username": "",
         "kv_pwd": ""
     },
-    "deploy_firewall" : false
+    "firewall_deployment": false,
+    "firewall_rule_subnets": [],
+    "firewall_allowed_ipaddresses": []
 }
