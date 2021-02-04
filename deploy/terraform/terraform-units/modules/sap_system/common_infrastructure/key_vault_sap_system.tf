@@ -12,7 +12,7 @@ data "azurerm_key_vault_secret" "sid_pk" {
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
-  count                      = local.enable_sid_deployment ? 1 : 0
+  count                      = local.enable_sid_deployment  && !local.prvt_kv_override ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -42,7 +42,7 @@ data "azurerm_key_vault" "sid_kv_prvt" {
 
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
-  count                      = local.enable_sid_deployment ? 1 : 0
+  count                      = local.enable_sid_deployment && !local.user_kv_override ? 1 : 0
   name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
