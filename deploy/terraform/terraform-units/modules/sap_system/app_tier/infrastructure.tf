@@ -14,16 +14,6 @@ resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
   route_table_id = var.route_table_id
 }
 
-resource "azurerm_route" "subnet_sap_app" {
-  count                  = ! local.sub_app_exists && length(var.firewall_id) > 0 ? 1 : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, "app", "-route")
-  resource_group_name    = local.vnet_sap_resource_group_name
-  route_table_name       = format("%s%s%s", var.naming.prefix.VNET, var.naming.separator, "route_table")
-  address_prefix         = azurerm_subnet.subnet_sap_app[0].address_prefix
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = var.firewall_id
-}
-
 # Imports data of existing SAP app subnet
 data "azurerm_subnet" "subnet_sap_app" {
   count                = local.enable_deployment ? (local.sub_app_exists ? 1 : 0) : 0
@@ -45,16 +35,6 @@ resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
   count          = ! local.sub_web_exists && length(var.route_table_id) > 0 ? 1 : 0
   subnet_id      = azurerm_subnet.subnet_sap_web[0].id
   route_table_id = var.route_table_id
-}
-
-resource "azurerm_route" "subnet_sap_web" {
-  count                  = ! local.sub_web_exists && length(var.firewall_id) > 0 ? 1 : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, "web", "-route")
-  resource_group_name    = local.vnet_sap_resource_group_name
-  route_table_name       = format("%s%s%s", var.naming.prefix.VNET, var.naming.separator, "route_table")
-  address_prefix         = azurerm_subnet.subnet_sap_web[0].address_prefix
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = var.firewall_id
 }
 
 # Imports data of existing SAP web dispatcher subnet

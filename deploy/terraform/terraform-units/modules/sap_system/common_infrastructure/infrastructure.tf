@@ -37,7 +37,7 @@ resource "azurerm_route" "admin" {
   name                   = format("%s%s%s%s", local.prefix, var.naming.separator, "admin", "route")
   resource_group_name    = local.vnet_sap_resource_group_name
   route_table_name       = format("%s%s%s", var.naming.prefix.VNET, var.naming.separator, "route_table")
-  address_prefix         = azurerm_subnet.admin[0].address_prefix
+  address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = local.firewall_id
 }
@@ -64,17 +64,6 @@ resource "azurerm_subnet_route_table_association" "db" {
   subnet_id      = azurerm_subnet.db[0].id
   route_table_id = local.route_table_id
 }
-
-resource "azurerm_route" "db" {
-  count                  = ! local.sub_db_exists && length(local.firewall_id) > 0 ? 1 : 0
-  name                   = format("%s%s%s%s", local.prefix, var.naming.separator, "db", "route")
-  resource_group_name    = local.vnet_sap_resource_group_name
-  route_table_name       = format("%s%s%s", var.naming.prefix.VNET, var.naming.separator, "route_table")
-  address_prefix         = azurerm_subnet.db[0].address_prefix
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = local.firewall_id
-}
-
 
 // Imports data of existing db subnet
 data "azurerm_subnet" "db" {
