@@ -19,6 +19,10 @@ variable "firewall_allowed_ipaddresses" {
   description = "List of allowed IP addresses to be part of the firewall rule"
 }
 
+variable "assign_subscription_permissions" {
+  description = "Assign permissions on the subscription"
+}
+
 // Set defaults
 locals {
 

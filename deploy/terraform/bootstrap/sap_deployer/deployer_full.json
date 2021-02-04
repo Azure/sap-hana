@@ -26,5 +26,6 @@
     },
     "firewall_deployment": false,
     "firewall_rule_subnets": [],
-    "firewall_allowed_ipaddresses": []
+    "firewall_allowed_ipaddresses": [],
+    "assign_subscription_permissions": true
 }

@@ -41,11 +41,12 @@ resource "azurerm_user_assigned_identity" "deployer" {
 }
 
 # // Add role to be able to deploy resources
-# resource "azurerm_role_assignment" "sub_contributor" {
-#   scope                = data.azurerm_subscription.primary.id
-#   role_definition_name = "Contributor"
-#   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
-# }
+resource "azurerm_role_assignment" "sub_contributor" {
+  count                = var.assign_subscription_permissions ? 1 : 0
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.deployer.principal_id
+}
 
 // Linux Virtual Machine for Deployer
 resource "azurerm_linux_virtual_machine" "deployer" {
