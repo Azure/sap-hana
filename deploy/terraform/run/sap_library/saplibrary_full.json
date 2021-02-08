@@ -8,9 +8,27 @@
         "region": "eastus",
         "vnet": "DEP00"
     },
-    "key_vault":{
+    "key_vault": {
         "kv_user_id": "",
         "kv_prvt_id": "",
         "kv_spn_id": ""
+    },
+    "storage_account_sapbits": {
+        "arm_id": "",
+        "file_share": {
+            "is_existing": true
+        },
+        "sapbits_blob_container": {
+            "is_existing": true
+        }
+    },
+    "storage_account_tfstate": {
+        "arm_id": "",
+        "tfstate_blob_container": {
+            "is_existing": true
+        },
+        "ansible_blob_container": {
+            "is_existing": true
+        }
     }
 }

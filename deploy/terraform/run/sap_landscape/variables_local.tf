@@ -15,10 +15,24 @@ variable "scenario" {
 
 variable "tfstate_resource_id" {
   description = "Resource id of tfstate storage account"
+  validation {
+    condition = (
+      length(trimspace(try(var.tfstate_resource_id, ""))) != 0
+    )
+    error_message = "The Azure Resource ID for the storage account containing the Terraform state files must be provided."
+  }
+
 }
 
 variable "deployer_tfstate_key" {
   description = "The key of deployer's remote tfstate file"
+  validation {
+    condition = (
+      length(trimspace(try(var.deployer_tfstate_key, ""))) != 0
+    )
+    error_message = "The Deployer Terraform Statefile name must be provided."
+  }
+
 }
 
 locals {
