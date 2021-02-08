@@ -36,10 +36,12 @@
     },
     "authentication": {
         "username": "azureadm",
-        "password" : "SecretPassword",
+        "password": "SecretPassword",
         "path_to_public_key": "sshkey.pub",
         "path_to_private_key": "sshkey"
-   
     },
-    "options": {}
+    "options": {},
+    "diagnostics_storage_account": {
+        "arm_id": ""
+    }
 }
