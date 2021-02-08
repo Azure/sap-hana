@@ -12,13 +12,13 @@ data "azurerm_key_vault_secret" "sid_pk" {
 
 data "azurerm_key_vault_secret" "sid_username" {
   count        = local.use_local_credentials ? 0 : 1
-  name         = var.landscape_tfstate.sid_username_secret_name
+  name         = try(var.landscape_tfstate.sid_username_secret_name, trimprefix(format("%s-sid-username", var.naming.prefix.VNET), "-"))
   key_vault_id = local.user_key_vault_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
   count        = local.use_local_credentials ? 0 : 1
-  name         = var.landscape_tfstate.sid_password_secret_name
+  name         = try(var.landscape_tfstate.sid_password_secret_name, trimprefix(format("%s-sid-password", var.naming.prefix.VNET), "-"))
   key_vault_id = local.user_key_vault_id
 }
 
