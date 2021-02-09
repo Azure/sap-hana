@@ -40,3 +40,15 @@ output "hanadb_vm_ids" {
 output "anydb_vm_ids" {
   value = module.anydb_node.anydb_vm_ids
 }
+
+output "region" {
+  value = var.infrastructure.region
+}
+
+output "environment" {
+  value = var.infrastructure.environment
+}
+
+output "sid" {
+  value = var.application.sid
+}
