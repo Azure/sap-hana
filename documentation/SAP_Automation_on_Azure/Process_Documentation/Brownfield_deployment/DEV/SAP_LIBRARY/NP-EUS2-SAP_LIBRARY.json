@@ -1,0 +1,11 @@
+{
+  "infrastructure": {
+    "environment"                         : "DEV",
+    "region"                              : "eastus2"
+  },
+  "deployer": {
+    "environment"                         : "DEV",
+    "region"                              : "eastus2",
+    "vnet"                                : "DEP01"
+  }
+}

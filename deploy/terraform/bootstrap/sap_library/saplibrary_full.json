@@ -10,6 +10,34 @@
     },
     "key_vault":{
         "kv_user_id": "",
-        "kv_prvt_id": ""
+        "kv_prvt_id": "",
+        "kv_spn_id": ""
+    },
+    "storage_account_sapbits":{
+        "arm_id" :"",
+        "account_tier": "Standard",
+        "account_replication_type" : "LRS",
+        "account_kind": "StorageV2",
+        "file_share" :{
+            "enable_deployment" : true,
+            "is_existing" : false,
+            "name": "sapbits"
+        },
+        "sapbits_blob_container" :{
+            "enable_deployment": true,
+            "is_existing" : false,
+            "name": "sapbits"
+
+        }
+    },
+    "storage_account_tfstate":{
+        "arm_id" :"",
+        "account_tier": "Standard",
+        "account_replication_type" : "LRS",
+        "account_kind": "StorageV2",
+        "tfstate_blob_container" :{
+            "is_existing" : false,
+            "name": "tfstate"
+        }
     }
 }

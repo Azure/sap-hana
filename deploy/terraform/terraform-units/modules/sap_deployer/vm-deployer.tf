@@ -13,16 +13,16 @@ data azurerm_client_config "current" {}
 resource "azurerm_public_ip" "deployer" {
   count               = local.enable_deployer_public_ip ? length(local.deployers) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.pip)
-  location            = azurerm_resource_group.deployer[0].location
-  resource_group_name = azurerm_resource_group.deployer[0].name
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   allocation_method   = "Static"
 }
 
 resource "azurerm_network_interface" "deployer" {
   count               = length(local.deployers)
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.nic)
-  location            = azurerm_resource_group.deployer[0].location
-  resource_group_name = azurerm_resource_group.deployer[0].name
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
 
   ip_configuration {
     name                          = "ipconfig1"
@@ -35,9 +35,9 @@ resource "azurerm_network_interface" "deployer" {
 
 // User defined identity for all Deployer, assign contributor to the current subscription
 resource "azurerm_user_assigned_identity" "deployer" {
-  resource_group_name = azurerm_resource_group.deployer[0].name
-  location            = azurerm_resource_group.deployer[0].location
-  name                = format("%s-msi", local.prefix)
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
+  name                = format("%s%s", local.prefix, local.resource_suffixes.msi)
 }
 
 // Add role to be able to deploy resources
@@ -52,8 +52,8 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   count                           = length(local.deployers)
   name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.vm)
   computer_name                   = local.deployers[count.index].name
-  location                        = azurerm_resource_group.deployer[0].location
-  resource_group_name             = azurerm_resource_group.deployer[0].name
+  resource_group_name             = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location                        = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   network_interface_ids           = [azurerm_network_interface.deployer[count.index].id]
   size                            = local.deployers[count.index].size
   admin_username                  = local.deployers[count.index].authentication.username
@@ -61,9 +61,10 @@ resource "azurerm_linux_virtual_machine" "deployer" {
   disable_password_authentication = local.deployers[count.index].authentication.type != "password" ? true : false
 
   os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = local.deployers[count.index].disk_type
+    name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.osdisk)
+    caching                = "ReadWrite"
+    storage_account_type   = local.deployers[count.index].disk_type
+    disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
   }
 
   source_image_id = local.deployers[count.index].os.source_image_id != "" ? local.deployers[count.index].os.source_image_id : null
@@ -146,6 +147,8 @@ resource "null_resource" "prepare-deployer" {
       "sudo sh -c \"echo export ARM_SUBSCRIPTION_ID=${data.azurerm_subscription.primary.subscription_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_TENANT_ID=${data.azurerm_subscription.primary.tenant_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo az login --identity --output none >> /etc/profile.d/deploy_server.sh\"",
+      // Set env for ansible
+      "sudo sh -c \"echo export ANSIBLE_HOST_KEY_CHECKING=False >> /etc/profile.d/deploy_server.sh\"",
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
       // Install Git
@@ -158,7 +161,11 @@ resource "null_resource" "prepare-deployer" {
       // Installs Ansible
       "sudo -H pip3 install \"ansible>=2.8,<2.9\"",
       // Install pywinrm
-      "sudo -H pip3 install \"pywinrm>=0.3.0\""
+      "sudo -H pip3 install \"pywinrm>=0.3.0\"",
+      // Install yamllint
+      "sudo -H pip3 install \"yamllint==1.25.0\"",
+      // Install ansible-lint
+      "sudo -H pip3 install \"ansible-lint==4.3.7\""
     ]
   }
 }

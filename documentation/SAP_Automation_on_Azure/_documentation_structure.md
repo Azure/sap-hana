@@ -8,7 +8,7 @@ documentation
 │   │   ├── configuration-deployer.md
 │   │   ├── configuration-sap_deployment_unit.md
 │   │   ├── configuration-sap_library.md
-│   │   ├── configuration-sap_workload_vnet.md
+│   │   ├── configuration-sap_landscape.md
 │   │   ├── configuration.md                                              
 │   │   ├── product_documentation-capabilities.md
 │   │   ├── product_documentation-deployer.md

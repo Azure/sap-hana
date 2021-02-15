@@ -1,0 +1,56 @@
+{
+  "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>",
+  "deployer_tfstate_key"                  : "DEV-EUS2-DEP01-INFRASTRUCTURE.terraform.tfstate",
+  "landscape_tfstate_key"                 : "DEV-EUS2-SAP01-INFRASTRUCTURE.terraform.tfstate",
+  "infrastructure": {
+    "environment"                         : "DEV",
+    "region"                              : "eastus2",
+    "vnets": {
+      "sap": {
+        "subnet_db": {
+          "arm_id"                        : "<RESOURCE_ID_FOR_DB_SUBNET>"
+        },
+        "subnet_web": {
+          "arm_id"                        : "<RESOURCE_ID_FOR_WEB_SUBNET>"
+        },
+        "subnet_app": {
+          "arm_id"                        : "<RESOURCE_ID_FOR_APP_SUBNET>"
+        },
+        "subnet_admin": {
+          "arm_id"                        : "<RESOURCE_ID_FOR_ADMIN_SUBNET>"
+        }
+      }
+    }
+  },
+  "databases": [
+    {
+      "platform"                          : "HANA",
+      "high_availability"                 : false,
+      "db_version"                        : "2.00.050",
+      "size"                              : "Demo",
+      "os": {
+        "publisher"                       : "SUSE",
+        "offer"                           : "sles-sap-12-sp5",
+        "sku"                             : "gen1"
+      },
+      "zones": []
+    }
+  ],
+  "application": {
+    "enable_deployment"                   : true,
+    "sid"                                 : "X01",
+    "scs_instance_number"                 : "00",
+    "ers_instance_number"                 : "10",
+    "scs_high_availability"               : false,
+    "application_server_count"            : 2,
+    "webdispatcher_count"                 : 1,
+    "app_zones": ["1", "2"],
+    "scs_zones": [],
+    "web_zones": [],
+    "authentication": {
+      "type"                              : "key"
+    }
+  },
+  "options": {
+    }
+}

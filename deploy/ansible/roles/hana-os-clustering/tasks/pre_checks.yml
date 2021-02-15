@@ -1,7 +1,9 @@
 ---
 
 - name: Check the fencing agent configuration variables are set
-  when: hdb_size != "LargeInstance"
+  when: 
+    - hdb_size != "LargeInstance"
+    - groups['iscsi'] | length == 0
   assert:
     that:
       - "sap_hana_fencing_agent_subscription_id is defined"

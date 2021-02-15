@@ -52,7 +52,7 @@ output "remote_state_container_name" {
 }
 
 output "saplibrary_environment" {
-  value = local.environment
+  value = var.infrastructure.environment
 }
 
 output "saplibrary_subscription_id" {

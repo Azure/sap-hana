@@ -56,11 +56,11 @@ locals {
   saplib_subscription_id       = split("/", local.tfstate_resource_id)[2]
   saplib_resource_group_name   = split("/", local.tfstate_resource_id)[4]
   tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
-  tfstate_container_name       = "tfstate"
+  tfstate_container_name       = module.sap_namegenerator.naming.resource_suffixes.tfstate
   deployer_tfstate_key         = try(var.deployer_tfstate_key, "")
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
-  deployer_key_vault_arm_id = try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, "")
+  deployer_key_vault_arm_id = try(var.key_vault.kv_spn_id, try(data.terraform_remote_state.deployer.outputs.deployer_kv_user_arm_id, ""))
 
   spn = {
     subscription_id = data.azurerm_key_vault_secret.subscription_id.value,

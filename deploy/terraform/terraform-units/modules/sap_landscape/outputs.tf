@@ -46,6 +46,14 @@ output "iscsi_authentication_username" {
   value = local.iscsi_auth_username
 }
 
+output "storageaccount_name" {
+  value = azurerm_storage_account.storage_bootdiag.name
+}
+
+output "storageaccount_rg_name" {
+  value = azurerm_storage_account.storage_bootdiag.resource_group_name
+}
+
 // Output for DNS
 output "dns_info_vms" {
   value = local.iscsi_count > 0 ? zipmap(local.full_iscsiserver_names, azurerm_network_interface.iscsi[*].private_ip_address) : null

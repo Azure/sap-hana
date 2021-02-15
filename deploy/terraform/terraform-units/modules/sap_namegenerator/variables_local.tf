@@ -3,6 +3,22 @@ variable environment {
   description = "Environment type (Prod, Test, Sand, QA)"
 }
 
+variable library_environment {
+  description = "SAP Library environment type (Prod, Test, Sand, QA)"
+  default     = ""
+}
+
+
+variable deployer_environment {
+  description = "Deployer environment type (Prod, Test, Sand, QA)"
+  default     = ""
+}
+
+variable landscape_environment {
+  description = "Landscape environment type (Prod, Test, Sand, QA)"
+  default     = ""
+}
+
 variable location {
   description = "Azure region"
 }
@@ -86,6 +102,11 @@ variable iscsi_server_count {
 variable deployer_vm_count {
   type    = number
   default = 1
+}
+
+variable resource_offset {
+  type    = number
+  default = 0
 }
 
 //Todo: Add to documentation
@@ -214,6 +235,7 @@ variable resource_suffixes {
     "osdisk"              = "-OsDisk"
     "pip"                 = "-pip"
     "ppg"                 = "-ppg"
+    "sapbits"             = "sapbits"
     "storage_nic"         = "-storage-nic"
     "storage_subnet"      = "_storage-subnet"
     "storage_subnet_nsg"  = "_storageSubnet-nsg"
@@ -228,6 +250,7 @@ variable resource_suffixes {
     "scs_ers_rule"        = "scsErs-rule_"
     "scs_scs_rule"        = "scsScs-rule_"
     "sdu_rg"              = ""
+    "tfstate"             = "tfstate"
     "vm"                  = ""
     "vnet"                = "-vnet"
     "vnet_rg"             = "-INFRASTRUCTURE"
@@ -273,13 +296,34 @@ variable custom_prefix {
   default     = ""
 }
 
+variable deployer_location {
+  description = "Deployer Azure region"
+  default     = ""
+}
+
+
 locals {
 
   location_short = upper(try(var.region_mapping[var.location], "unkn"))
 
-  env_verified      = upper(substr(var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
-  vnet_verified     = upper(trim(substr(var.sap_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
-  dep_vnet_verified = upper(trim(substr(var.management_vnet_name, 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
+  deployer_location_short = length(var.deployer_location) > 0 ? upper(try(var.region_mapping[var.deployer_location], "unkn")) : local.location_short
+
+  // If no deployer environment provided use environment
+  deployer_environment_temp = length(var.deployer_environment) > 0 ? var.deployer_environment : var.environment
+
+  // If no landscape environment provided use environment
+  landscape_environment_temp = length(var.landscape_environment) > 0 ? var.landscape_environment : var.environment
+
+  // If no library environment provided use environment
+  library_environment_temp = length(var.library_environment) > 0 ? var.library_environment : var.environment
+
+  deployer_env_verified  = upper(substr(local.deployer_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
+  env_verified           = upper(substr(var.environment, 0, var.sapautomation_name_limits.environment_variable_length))
+  landscape_env_verified = upper(substr(local.landscape_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
+  library_env_verified   = upper(substr(local.library_environment_temp, 0, var.sapautomation_name_limits.environment_variable_length))
+
+  sap_vnet_verified = upper(trim(substr(replace(var.sap_vnet_name, "/[^A-Za-z0-9]/", ""), 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
+  dep_vnet_verified = upper(trim(substr(replace(var.management_vnet_name, "/[^A-Za-z0-9]/", ""), 0, var.sapautomation_name_limits.sap_vnet_length), "-_"))
 
   random_id_verified    = upper(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))
   random_id_vm_verified = lower(substr(var.random_id, 0, var.sapautomation_name_limits.random_id_length))

@@ -155,32 +155,45 @@ JSON structure
 ```
 
 
-| Parameter                                             | Type          | Default  | Description |
-| :---------------------------------------------------- | ------------- | :------- | :---------- |
-| `tfstate_resource_id`                                 | **required**  | -------- | This is the Azure Resource ID for the Storage Account in which the Statefiles are stored. Typically this is deployed by the SAP Library execution unit. |
-| `deployer_tfstate_key`                                | **required**  | -------- | <!-- TODO: --> |
-| `landscape_tfstate_key`                               | **required**  | -------- | <!-- TODO: --> |
-| infrastructure.`environment`                          | **required**  | -------- | The Environment is a 5 Character designator used for partitioning. An example of partitioning would be, PROD / NP (Production and Non-Production). Environments may also be tied to a unique SPN or Subscription. |
-| infrastructure.`region`                               | **required**  | -------- | This specifies the Azure Region in which to deploy. |
-| infrastructure.resource_group.`is_existing`           | deprecate     |          | to be deprecated <!-- TODO: --> |
-| infrastructure.resource_group.`arm_id`                | optional      |          | <!-- TODO: --> |
-| infrastructure.anchor_vms.`sku`                       |               |          | This is populated if a anchor vm is needed to anchor the proximity placement groups to a specific zone.  |
-| infrastructure.anchor_vms.authentication.`type`       |               |          | Authentication type for the anchor VM,  |
-| infrastructure.anchor_vms.authentication.`username`   |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.`accelerated_networking`    |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.os.`publisher`              |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.os.`offer`                  |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.os.`sku`                    |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.`nic_ips`                   |               |          | <!-- TODO: Kimmo --> |
-| infrastructure.anchor_vms.`use_DHCP`                  |               | false    | If set to true the IP addresses for the VMs will be provided by the subnet |
-| infrastructure.vnets.sap.`is_existing`                |               |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.`arm_id`                     |               |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.`name`                       |               |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.`address_space`              |               |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.subnet_db.`prefix`           | **required**  |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.subnet_web.`prefix`          | optional      |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.subnet_app.`prefix`          | **required**  |          | <!-- TODO: --> |
-| infrastructure.vnets.sap.subnet_admin.`prefix`        | **required**  |          | <!-- TODO: --> |
+Object Path                                   | Parameter                     | Type          | Default  | Description |
+| :------------------------------------------ | ------------------------------| :------------ | :------- | :---------- |
+| `tfstate_resource_id`                       |                               | **required**  |          | This is the Azure Resource ID for the Storage Account in which the Statefiles are stored. Typically this is deployed by the SAP Library execution unit. |
+| `deployer_tfstate_key`                      | `Remote State`                | **required**  |          | This is the deployer state file name, used for finding the correct state file.  <br/>**Case-sensitive**  |
+| `landscape_tfstate_key`                     | `Remote State`                | **required**  |          | This is the landscape state file name, used for finding the correct state file.  <br/>**Case-sensitive**   |
+| infrastructure.                             | `environment`                 | **required**  | -------- | The Environment is a 5 Character designator used for partitioning. An example of partitioning would be, PROD / NP (Production and Non-Production). Environments may also be tied to a unique SPN or Subscription. |
+| infrastructure.                             | `region`                      | **required**  |          | This specifies the Azure Region in which to deploy. |
+| infrastructure.resource_group.              | `arm_id`                      | optional      |          | If specified the Azure Resource ID of Resource Group to use for the deployment |
+| | <br/> | 
+| infrastructure.anchor_vms.                  | `sku`                         | optional      |          | This is populated if a anchor vm is needed to anchor the proximity placement groups to a specific zone.  |
+| infrastructure.anchor_vms.authentication.   | `type`                        | optional              |          | Authentication type for the anchor VM, key or password |
+| infrastructure.anchor_vms.authentication.   | `username`                    | optional      |          | Username for the Anchor VM |
+| infrastructure.anchor_vms.                  | `accelerated_networking`      | optional      | false    | Boolean flag indicationg if the Anchor VM should use accelerated networking. |
+| infrastructure.anchor_vms.os.               | `publisher`                   | optional      |          | This is the marketplace image publisher |
+| infrastructure.anchor_vms.os.               | `offer`                       | optional      |          | This is the marketplace image offer |
+| infrastructure.anchor_vms.os.               | `sku`                         | optional      |          | This is the marketplace image sku |
+| infrastructure.anchor_vms.                  | `nic_ips`                     | optional      |          | This is the list of IP addresses that the anchor VMs should use. The list needs as many entries as the total Availability Zone count for all the Virtual Machines in the deployment, not needed if use_DCHP is true |
+| infrastructure.anchor_vms.                  | `use_DHCP`                    | optional      | false    | If set to true the IP addresses for the VMs will be provided by the subnet |
+| | <br/> | 
+| infrastructure.vnets.sap.subnet_admin       |`arm_id`                       | **required**  |          | If provided, the Azure resource ID for the admin subnet |
+| | **or** | 
+| infrastructure.vnets.sap.subnet_admin       |`name`                         | **required**  |          | If provided, the name for the admin subnet to be created
+| infrastructure.vnets.sap.subnet_admin       |`prefix`                       | **required**  |          | If provided, the admin subnet address prefix of the subnet |
+| | <br/> | 
+| infrastructure.vnets.sap.subnet_app         |`arm_id`                       | **required**  |          | If provided, the Azure resource ID for the application subnet |
+| | **or** | 
+| infrastructure.vnets.sap.subnet_app         |`name`                         | **required**  |          | If provided, the name for the application subnet to be created
+| infrastructure.vnets.sap.subnet_app         |`prefix`                       | **required**  |          | If provided, the application subnet address prefix of the subnet |
+| | <br/> | 
+| infrastructure.vnets.sap.subnet_db          |`arm_id`                       | **required**  |          | If provided, the Azure resource ID for the database subnet |
+| | **or** | 
+| infrastructure.vnets.sap.subnet_db          |`name`                         | **required**  |          | If provided, the name for the database subnet to be created
+| infrastructure.vnets.sap.subnet_db          |`prefix`                       | **required**  |          | If provided, the database subnet address prefix of the subnet |
+| | <br/> | 
+| infrastructure.vnets.sap.subnet_web         |`arm_id`                       | optional      |          | If provided, the Azure resource ID for the web dispatcher subnet |
+| | **or** | 
+| infrastructure.vnets.sap.subnet_web         |`name`                         | optional      |          | If provided, the name for the web dispatcher subnet to be created
+| infrastructure.vnets.sap.subnet_web         |`prefix`                       | optional      |          | If provided, the web dispatcher subnet address prefix of the subnet |
+| | <br/> | 
 | databases.[].`platform`                               | **required**  |          | <!-- TODO: --> |
 | databases.[].`high_availability`                      |               |          | <!-- TODO: --> |
 | databases.[].`db_version`                             | deprecate     |          | <!-- TODO: --> |

@@ -1,0 +1,18 @@
+{
+  "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>", 
+  "deployer_tfstate_key"                  : "DEV-EUS2-DEP01-INFRASTRUCTURE.terraform.tfstate",
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "vnets": {
+      "sap": {
+        "arm_id"                   : "<RESOURCE_ID_FOR_SAP01_VNET>"
+      }
+    }
+  },
+  "authentication": {
+    "username" : "azureadm",
+    "password" : ""
+  },
+  "options": {}
+}

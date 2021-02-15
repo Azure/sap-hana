@@ -50,9 +50,10 @@ resource "azurerm_linux_virtual_machine" "observer" {
   disable_password_authentication = true
 
   os_disk {
-    name                 = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
+    caching                = "ReadWrite"
+    storage_account_type   = "Premium_LRS"
+    disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
   }
 
   source_image_id = local.observer_custom_image ? local.observer_custom_image_id : null
@@ -69,7 +70,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
   admin_ssh_key {
     username   = local.observer_authentication.username
-    public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+    public_key = var.sdu_public_key
   }
 
   boot_diagnostics {

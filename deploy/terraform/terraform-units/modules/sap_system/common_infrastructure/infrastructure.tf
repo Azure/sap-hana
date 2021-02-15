@@ -68,14 +68,10 @@ data "azurerm_subnet" "storage" {
   virtual_network_name = split("/", local.sub_storage_arm_id)[8]
 }
 
-// Creates boot diagnostics storage account
-resource "azurerm_storage_account" "storage_bootdiag" {
-  name                      = local.storageaccount_name
-  resource_group_name       = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
-  location                  = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
-  account_replication_type  = "LRS"
-  account_tier              = "Standard"
-  enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
+// Import boot diagnostics storage account from sap_landscape
+data "azurerm_storage_account" "storage_bootdiag" {
+  name                = local.storageaccount_name
+  resource_group_name = local.storageaccount_rg_name
 }
 
 // PROXIMITY PLACEMENT GROUP

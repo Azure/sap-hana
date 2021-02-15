@@ -29,7 +29,7 @@
             }
         ]
     },
-    "Demo": {
+    "Default": {
         "compute": {
             "vm_size": "Standard_D8s_v3",
             "swap_size_gb": 2

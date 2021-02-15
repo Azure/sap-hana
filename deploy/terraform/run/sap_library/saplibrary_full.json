@@ -10,6 +10,7 @@
     },
     "key_vault":{
         "kv_user_id": "",
-        "kv_prvt_id": ""
+        "kv_prvt_id": "",
+        "kv_spn_id": ""
     }
 }

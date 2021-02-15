@@ -94,7 +94,7 @@ resource "azurerm_key_vault_secret" "iscsi_pk" {
 }
 
 resource "azurerm_key_vault_secret" "iscsi_username" {
-  count        = (local.enable_landscape_kv && ! local.iscsi_username_exist) ? 1 : 0
+  count        = (local.enable_landscape_kv && local.enable_iscsi && ! local.iscsi_username_exist) ? 1 : 0
   name         = local.iscsi_username_name
   value        = local.iscsi_auth_username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -114,7 +114,11 @@ resource "random_password" "iscsi_password" {
     && local.enable_iscsi_auth_password
     && ! local.iscsi_pwd_exist
   && try(local.var_iscsi.authentication.password, null) == null) ? 1 : 0
-  length           = 16
+
+  length           = 32
+  min_upper        = 2
+  min_lower        = 2
+  min_numeric      = 2
   special          = true
   override_special = "_%@"
 }
@@ -139,7 +143,7 @@ data "azurerm_key_vault_secret" "iscsi_password" {
 }
 
 data "azurerm_key_vault_secret" "iscsi_username" {
-  count        = (local.enable_landscape_kv && local.iscsi_username_exist) ? 1 : 0
+  count        = (local.enable_landscape_kv && local.enable_iscsi && local.iscsi_username_exist) ? 1 : 0
   name         = local.iscsi_username_name
   key_vault_id = local.user_key_vault_id
 }

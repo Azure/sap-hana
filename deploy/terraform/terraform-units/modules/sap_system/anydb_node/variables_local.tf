@@ -35,13 +35,12 @@ variable "admin_subnet" {
 variable "db_subnet" {
   description = "Information about SAP db subnet"
 }
-
-variable "sid_kv_user" {
-  description = "Details of the user keyvault for sap_system"
+variable "sid_kv_user_id" {
+  description = "ID of the user keyvault for sap_system"
 }
 
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
 
 locals {
@@ -66,6 +65,9 @@ locals {
   sid       = upper(try(var.application.sid, local.anydb_sid))
   prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
   rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
+
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = try(var.options.resource_offset, 0)
 
   // Zones
   zones            = try(local.anydb.zones, [])
@@ -102,20 +104,12 @@ locals {
   // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user[0], null)
-
-  // If custom image is used, we do not overwrite os reference with default value
+ // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
   anydb_ostype = try(local.anydb.os.os_type, "Linux")
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
-  anydb_size   = try(local.anydb.size, "Demo")
+  anydb_size   = try(local.anydb.size, "Default")
   anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
   anydb_fs     = try(local.anydb.filesystem, "xfs")
   anydb_ha     = try(local.anydb.high_availability, false)
@@ -133,6 +127,8 @@ locals {
   enable_auth_key      = local.enable_deployment && local.sid_auth_type == "key"
   sid_auth_username    = try(local.anydb.authentication.username, "azureadm")
   sid_auth_password    = local.enable_auth_password ? try(local.anydb.authentication.password, random_password.password[0].result) : ""
+
+  use_local_credentials = length(var.sshkey) > 0
 
   db_systemdb_password = "db_systemdb_password"
 
@@ -214,24 +210,36 @@ locals {
     { loadbalancer = local.loadbalancer }
   )
 
-  dbnodes = flatten([[for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-    name         = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
-    computername = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
-    role         = try(dbnode.role, "worker"),
-    db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[0]
-    admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[0]
-    }
-    ],
-    [for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
-      name         = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
-      computername = try("${dbnode.name}-1", local.computer_names[idx + local.node_count], local.resource_suffixes.vm)
-      role         = try(dbnode.role, "worker"),
-      db_nic_ip    = lookup(dbnode, "db_nic_ips", [false, false])[1],
-      admin_nic_ip = lookup(dbnode, "admin_nic_ips", [false, false])[1]
-      } if local.anydb_ha
-    ]
-    ]
+
+  dbnodes = local.anydb_ha ? (
+    flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) :
+      [
+        {
+          name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+          role           = try(dbnode.role, "db")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+        },
+        {
+          name           = try("${dbnode.name}-1", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx + local.node_count], local.resource_suffixes.vm))
+          computername   = try("${dbnode.name}-1", local.computer_names[idx + local.node_count])
+          role           = try(dbnode.role, "db")
+          admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[1]
+          db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[1]
+        }
+      ]
+    ])) : (
+    flatten([for idx, dbnode in try(local.anydb.dbnodes, [{}]) : {
+      name           = try("${dbnode.name}-0", format("%s%s%s%s", local.prefix, var.naming.separator, local.virtualmachine_names[idx], local.resource_suffixes.vm))
+      computername   = try("${dbnode.name}-0", local.computer_names[idx], local.resource_suffixes.vm)
+      role           = try(dbnode.role, "db")
+      admin_nic_ip   = lookup(dbnode, "admin_nic_ips", ["false", "false"])[0]
+      db_nic_ip      = lookup(dbnode, "db_nic_ips", ["false", "false"])[0]
+      }]
+    )
   )
+
 
   anydb_vms = [
     for idx, dbnode in local.dbnodes : {
@@ -281,11 +289,13 @@ locals {
     }
   ])
 
+  db_sizing = local.enable_deployment ? lookup(local.sizes, local.anydb_size).storage : []
+
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
-      for storage_type in lookup(local.sizes, local.anydb_size).storage : [
+      for storage_type in local.db_sizing : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count)
+          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -315,11 +325,14 @@ locals {
     ]
   ])
 
-  storage_list = lookup(local.sizes, local.anydb_size).storage
-  enable_ultradisk = try(compact([
-    for storage in local.storage_list :
-    storage.disk_type == "UltraSSD_LRS" ? true : ""
-  ])[0], false)
+  enable_ultradisk = try(
+    compact(
+      [
+        for storage in local.db_sizing : storage.disk_type == "UltraSSD_LRS" ? true : ""
+      ]
+    )[0],
+    false
+  )
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]

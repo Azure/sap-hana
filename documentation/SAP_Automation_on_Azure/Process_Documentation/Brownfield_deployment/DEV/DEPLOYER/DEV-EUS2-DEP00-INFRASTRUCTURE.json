@@ -1,0 +1,18 @@
+{
+  "infrastructure": {
+    "environment"                         : "DEV",
+    "region"                              : "eastus2",
+    "vnets": {
+      "management": {
+        "name"                            : "DEP01",
+        "address_space"                   : "<RESOURCE_ID_FOR_MGMT_VNET>",
+        "subnet_mgmt": {
+          "arm_id"                        : "<RESOURCE_ID_FOR_MGMT_SUBNET>"
+        }
+      }
+    }
+  },
+  "options": {
+    "enable_deployer_public_ip"           : true
+  }
+}

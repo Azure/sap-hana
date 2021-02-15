@@ -1,0 +1,18 @@
+{
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "vnets": {
+      "management": {
+        "name"                            : "DEP00",
+        "address_space"                   : "10.0.0.0/27",
+        "subnet_mgmt": {
+          "prefix"                        : "10.0.0.16/28"
+        }
+      }
+    }
+  },
+  "options": {
+    "enable_deployer_public_ip"           : true
+  }
+}

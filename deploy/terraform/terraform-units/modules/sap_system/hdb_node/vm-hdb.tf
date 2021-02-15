@@ -82,73 +82,6 @@ resource "azurerm_network_interface" "nics_dbnodes_storage" {
   }
 }
 
-
-# LOAD BALANCER ===================================================================================================
-
-/*-----------------------------------------------------------------------------8
-Load balancer front IP address range: .4 - .9
-+--------------------------------------4--------------------------------------*/
-
-resource "azurerm_lb" "hdb" {
-  count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
-  resource_group_name = var.resource_group[0].name
-  location            = var.resource_group[0].location
-  sku                 = local.zonal_deployment ? "Standard" : "Basic"
-
-  frontend_ip_configuration {
-    name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-    subnet_id                     = var.db_subnet.id
-    private_ip_address            = local.use_DHCP ? null : try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
-  }
-
-}
-
-resource "azurerm_lb_backend_address_pool" "hdb" {
-  count               = local.enable_deployment ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_bepool)
-  resource_group_name = var.resource_group[0].name
-  loadbalancer_id     = azurerm_lb.hdb[count.index].id
-
-}
-
-resource "azurerm_lb_probe" "hdb" {
-  count               = local.enable_deployment ? 1 : 0
-  resource_group_name = var.resource_group[0].name
-  loadbalancer_id     = azurerm_lb.hdb[count.index].id
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_hp)
-  port                = "625${local.hana_database.instance.instance_number}"
-  protocol            = "Tcp"
-  interval_in_seconds = 5
-  number_of_probes    = 2
-}
-
-# TODO:
-# Current behavior, it will try to add all VMs in the cluster into the backend pool, which would not work since we do not have availability sets created yet.
-# In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
-resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
-  depends_on              = [azurerm_network_interface.nics_dbnodes_db]
-  count                   = local.enable_deployment ? length(local.hdb_vms) : 0
-  network_interface_id    = azurerm_network_interface.nics_dbnodes_db[count.index].id
-  ip_configuration_name   = azurerm_network_interface.nics_dbnodes_db[count.index].ip_configuration[0].name
-  backend_address_pool_id = azurerm_lb_backend_address_pool.hdb[0].id
-}
-
-resource "azurerm_lb_rule" "hdb" {
-  count                          = local.enable_deployment ? length(local.loadbalancer_ports) : 0
-  resource_group_name            = var.resource_group[0].name
-  loadbalancer_id                = azurerm_lb.hdb[0].id
-  name                           = format("%s%s%s%05d-%02d", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_rule, local.loadbalancer_ports[count.index].port, count.index)
-  protocol                       = "Tcp"
-  frontend_port                  = local.loadbalancer_ports[count.index].port
-  backend_port                   = local.loadbalancer_ports[count.index].port
-  frontend_ip_configuration_name = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.hdb[0].id
-  probe_id                       = azurerm_lb_probe.hdb[0].id
-  enable_floating_ip             = true
-}
-
 # VIRTUAL MACHINES ================================================================================================
 
 # Manages Linux Virtual Machine for HANA DB servers
@@ -190,10 +123,11 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     iterator = disk
     for_each = flatten([for storage_type in lookup(local.sizes, local.hdb_vms[count.index].size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
-      name                 = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.osdisk)
-      caching              = disk.value.caching
-      storage_account_type = disk.value.disk_type
-      disk_size_gb         = disk.value.size_gb
+      name                   = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.osdisk)
+      caching                = disk.value.caching
+      storage_account_type   = disk.value.disk_type
+      disk_size_gb           = disk.value.size_gb
+      disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
     }
   }
 
@@ -214,7 +148,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     for_each = range(local.enable_auth_password ? 0 : 1)
     content {
       username   = local.hdb_vms[count.index].authentication.username
-      public_key = data.azurerm_key_vault_secret.sid_pk[0].value
+      public_key = var.sdu_public_key
     }
   }
 
@@ -231,13 +165,15 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "data_disk" {
-  count                = local.enable_deployment ? length(local.data_disk_list) : 0
-  name                 = local.data_disk_list[count.index].name
-  location             = var.resource_group[0].location
-  resource_group_name  = var.resource_group[0].name
-  create_option        = "Empty"
-  storage_account_type = local.data_disk_list[count.index].storage_account_type
-  disk_size_gb         = local.data_disk_list[count.index].disk_size_gb
+  count                  = local.enable_deployment ? length(local.data_disk_list) : 0
+  name                   = local.data_disk_list[count.index].name
+  location               = var.resource_group[0].location
+  resource_group_name    = var.resource_group[0].name
+  create_option          = "Empty"
+  storage_account_type   = local.data_disk_list[count.index].storage_account_type
+  disk_size_gb           = local.data_disk_list[count.index].disk_size_gb
+  disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
+
   zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
     [azurerm_linux_virtual_machine.vm_dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
     null

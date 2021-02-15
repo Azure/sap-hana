@@ -11,7 +11,7 @@ output "vnet_sap" {
 }
 
 output "storage_bootdiag" {
-  value = azurerm_storage_account.storage_bootdiag
+  value = data.azurerm_storage_account.storage_bootdiag
 }
 
 output "random_id" {
@@ -38,12 +38,16 @@ output "db_subnet" {
   value = local.enable_db_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
 }
 
-output "sid_kv_user" {
-  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_user : null
+output "sid_kv_user_id" {
+  value = local.enable_sid_deployment && local.use_local_credentials ? (
+      azurerm_key_vault.sid_kv_user[0].id) : (
+      local.user_key_vault_id )
 }
 
-output "sid_kv_prvt" {
-  value = local.enable_sid_deployment ? azurerm_key_vault.sid_kv_prvt : null
+output "sid_kv_prvt_id" {
+  value = local.enable_sid_deployment && local.use_local_credentials ? (
+      azurerm_key_vault.sid_kv_prvt[0].id) : (
+      local.prvt_key_vault_id )
 }
 
 output "storage_subnet" {
@@ -54,4 +58,9 @@ output "storage_subnet" {
     )) : (
     null
   )
+}
+
+//Output the SDU specific SSH key
+output "sdu_public_key" {
+  value = local.sid_public_key
 }

@@ -41,14 +41,12 @@ variable "deployer_user" {
   default     = []
 }
 
-variable "sid_kv_user" {
+variable "sid_kv_user_id" {
   description = "Details of the user keyvault for sap_system"
 }
-
-variable "landscape_tfstate" {
-  description = "Landscape remote tfstate file"
+variable "sdu_public_key" {
+  description = "Public key used for authentication"
 }
-
 locals {
   // Imports Disk sizing sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/app_sizes.json"))
@@ -64,12 +62,15 @@ locals {
 
   resource_suffixes = var.naming.resource_suffixes
 
-  region  = try(var.infrastructure.region, "")
+  region = try(var.infrastructure.region, "")
+
+  //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
+  offset = try(var.options.resource_offset, 0)
 
   faultdomain_count = try(tonumber(compact(
-    [for pair in local.faults : 
+    [for pair in local.faults :
       upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
-    ])[0]),2)
+  ])[0]), 2)
 
   sid     = upper(try(var.application.sid, ""))
   prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
@@ -100,13 +101,7 @@ locals {
     "password" = local.sid_auth_password
   }
 
-  // Retrieve information about Sap Landscape from tfstate file
-  landscape_tfstate  = var.landscape_tfstate
-  kv_landscape_id    = try(local.landscape_tfstate.landscape_key_vault_user_arm_id, "")
-  secret_sid_pk_name = try(local.landscape_tfstate.sid_public_key_secret_name, "")
-
-  // Define this variable to make it easier when implementing existing kv.
-  sid_kv_user = try(var.sid_kv_user[0], null)
+  use_local_keyvault = try(var.sshkey.ssh_for_sid, false)
 
   // SAP vnet
   vnet_sap                     = try(var.vnet_sap, {})
@@ -214,11 +209,11 @@ locals {
     "version"         = try(var.application.scs_os.version, local.scs_custom_image ? "" : local.app_os.version)
   }
 
- // Tags
-  app_tags = try(var.application.app_tags,{})
-  scs_tags = try(var.application.scs_tags,{})
-  web_tags = try(var.application.web_tags,{})
-  
+  // Tags
+  app_tags = try(var.application.app_tags, {})
+  scs_tags = try(var.application.scs_tags, {})
+  web_tags = try(var.application.web_tags, {})
+
   application = merge(var.application,
     { authentication = local.authentication }
   )
@@ -253,11 +248,11 @@ locals {
   }
 
   // Default VM config should be merged with any the user passes in
-  app_sizing = lookup(local.sizes.app, local.vm_sizing, lookup(local.sizes.app, "Default"))
+  app_sizing = lookup(local.sizes.app, local.vm_sizing)
 
-  scs_sizing = lookup(local.sizes.scs, local.vm_sizing, lookup(local.sizes.scs, "Default"))
+  scs_sizing = lookup(local.sizes.scs, local.vm_sizing)
 
-  web_sizing = lookup(local.sizes.web, local.vm_sizing, lookup(local.sizes.web, "Default"))
+  web_sizing = lookup(local.sizes.web, local.vm_sizing)
 
   // Ports used for specific ASCS, ERS and Web dispatcher
   lb_ports = {
@@ -329,7 +324,7 @@ locals {
     [
       for storage_type in local.app_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -363,7 +358,7 @@ locals {
     [
       for storage_type in local.scs_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -397,7 +392,7 @@ locals {
     [
       for storage_type in local.web_sizing.storage : [
         for disk_count in range(storage_type.count) : {
-          suffix               = format("-%s%02d", storage_type.name, disk_count)
+          suffix               = format("-%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only

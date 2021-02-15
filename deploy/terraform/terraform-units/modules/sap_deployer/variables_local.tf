@@ -20,9 +20,12 @@ locals {
   enable_deployer_public_ip = try(var.options.enable_deployer_public_ip, false)
 
   // Resource group and location
-  region  = try(var.infrastructure.region, "")
-  prefix  = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
-  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
+  region = try(var.infrastructure.region, "")
+  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
+
+  rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
+  rg_exists = length(local.rg_arm_id) > 0 ? true : false
+  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_rg))
 
   // Post fix for all deployed resources
   postfix = random_id.deployer.hex
@@ -31,14 +34,14 @@ locals {
   vnet_mgmt        = try(var.infrastructure.vnets.management, {})
   vnet_mgmt_arm_id = try(local.vnet_mgmt.arm_id, "")
   vnet_mgmt_exists = length(local.vnet_mgmt_arm_id) > 0 ? true : false
-  vnet_mgmt_name   = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, format("%s-vnet", local.prefix))
+  vnet_mgmt_name   = local.vnet_mgmt_exists ? split("/", local.vnet_mgmt_arm_id)[8] : try(local.vnet_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.vnet))
   vnet_mgmt_addr   = local.vnet_mgmt_exists ? "" : try(local.vnet_mgmt.address_space, "")
 
   // Management subnet
   sub_mgmt          = try(local.vnet_mgmt.subnet_mgmt, {})
   sub_mgmt_arm_id   = try(local.sub_mgmt.arm_id, "")
   sub_mgmt_exists   = length(local.sub_mgmt_arm_id) > 0 ? true : false
-  sub_mgmt_name     = local.sub_mgmt_exists ? split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s_deployment-subnet", local.prefix))
+  sub_mgmt_name     = local.sub_mgmt_exists ? split("/", local.sub_mgmt_arm_id)[10] : try(local.sub_mgmt.name, format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet))
   sub_mgmt_prefix   = local.sub_mgmt_exists ? "" : try(local.sub_mgmt.prefix, "")
   sub_mgmt_deployed = try(local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0] : azurerm_subnet.subnet_mgmt[0], null)
 
@@ -62,7 +65,7 @@ locals {
     try(deployer.authentication.type, "key") == "password" ? true : false
   ]), "true")
 
-  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")): "" 
+  username = local.enable_deployers ? (local.username_exist ? data.azurerm_key_vault_secret.username[0].value : try(local.deployer_input[0].authentication.username, "azureadm")) : ""
 
   // By default use generated password. Provide password under authentication overides it
   input_pwd_list = compact([

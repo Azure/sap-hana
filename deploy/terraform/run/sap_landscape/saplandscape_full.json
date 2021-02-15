@@ -31,7 +31,8 @@
         "kv_iscsi_username": "",
         "kv_iscsi_sshkey_prvt" : "",
         "kv_iscsi_sshkey_pub" : "",
-        "kv_iscsi_pwd": ""
+        "kv_iscsi_pwd": "",
+        "kv_spn_id": ""
     },
     "sshkey": {},
     "options": {}

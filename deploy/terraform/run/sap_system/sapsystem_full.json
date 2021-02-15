@@ -42,26 +42,22 @@
       }
     }
   },
+  "key_vault": {
+    "kv_user_id": "",
+    "kv_prvt_id": ""
+  },
   "databases": [
     {
       "platform": "HANA",
       "high_availability": false,
       "db_version": "2.00.050",
-      "size": "Demo",
+      "size": "Default",
       "os": {
         "publisher": "SUSE",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
       },
       "zones": ["1"],
-      "credentials": {
-        "db_systemdb_password": "<db_systemdb_password>",
-        "os_sidadm_password": "<os_sidadm_password>",
-        "os_sapadm_password": "<os_sapadm_password>",
-        "xsa_admin_password": "<xsa_admin_password>",
-        "cockpit_admin_password": "<cockpit_admin_password>",
-        "ha_cluster_password": "<ha_cluster_password>"
-      },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
       ],
@@ -105,6 +101,8 @@
   },
   "options": {
     "enable_secure_transfer": true,
-    "enable_prometheus": true
+    "enable_prometheus": true,
+    "resource_offset" : 0,
+    "disk_encryption_set_id" : ""
   }
 }

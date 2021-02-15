@@ -3,13 +3,13 @@ output naming {
     prefix = {
       DEPLOYER = local.deployer_name
       SDU      = length(var.custom_prefix) > 0 ? var.custom_prefix : local.sdu_name
-      VNET     = local.vnet_name
+      VNET     = local.landscape_name
       LIBRARY  = local.library_name
     }
     storageaccount_names = {
       DEPLOYER = local.deployer_storageaccount_name
       SDU      = local.sdu_storageaccount_name
-      VNET     = local.vnet_storageaccount_name
+      VNET     = local.landscape_storageaccount_name
       LIBRARY = {
         library_storageaccount_name        = local.library_storageaccount_name
         terraformstate_storageaccount_name = local.terraformstate_storageaccount_name
@@ -29,8 +29,8 @@ output naming {
         user_access    = local.sdu_user_keyvault_name
       }
       VNET = {
-        private_access = local.vnet_private_keyvault_name
-        user_access    = local.vnet_user_keyvault_name
+        private_access = local.landscape_private_keyvault_name
+        user_access    = local.landscape_user_keyvault_name
       }
     }
     virtualmachine_names = {

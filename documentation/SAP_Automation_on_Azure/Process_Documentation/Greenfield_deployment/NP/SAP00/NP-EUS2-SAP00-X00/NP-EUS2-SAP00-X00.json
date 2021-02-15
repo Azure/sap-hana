@@ -1,0 +1,60 @@
+{
+  "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>",
+  "deployer_tfstate_key"                  : "NP-EUS2-DEP00-INFRASTRUCTURE.terraform.tfstate",
+  "landscape_tfstate_key"                 : "NP-EUS2-SAP00-INFRASTRUCTURE.terraform.tfstate",
+  "infrastructure": {
+    "environment"                         : "NP",
+    "region"                              : "eastus2",
+    "vnets": {
+      "sap": {
+        "subnet_db": {
+          "prefix"                        : "10.1.1.0/28"
+        },
+        "subnet_web": {
+          "prefix"                        : "10.1.1.16/28"
+        },
+        "subnet_app": {
+          "prefix"                        : "10.1.1.32/27"
+        },
+        "subnet_admin": {
+          "prefix"                        : "10.1.1.64/27"
+        }
+      }
+    }
+  },
+  "databases": [
+    {
+      "platform"                          : "HANA",
+      "high_availability"                 : false,
+      "db_version"                        : "2.00.050",
+      "size"                              : "Demo",
+      "os": {
+        "publisher"                       : "SUSE",
+        "offer"                           : "sles-sap-12-sp5",
+        "sku"                             : "gen1"
+      },
+      "zones": []
+    }
+  ],
+  "application": {
+    "enable_deployment"                   : true,
+    "sid"                                 : "X00",
+    "scs_instance_number"                 : "00",
+    "ers_instance_number"                 : "10",
+    "scs_high_availability"               : false,
+    "application_server_count"            : 3,
+    "webdispatcher_count"                 : 1,
+    "app_zones": [],
+    "scs_zones": [],
+    "web_zones": [],
+    "authentication": {
+      "type"                              : "key",
+      "username"                          : "azureadm"
+    }
+  },
+  "options": {
+    "enable_secure_transfer"              : true,
+    "ansible_execution"                   : false,
+    "enable_prometheus"                   : true
+  }
+}

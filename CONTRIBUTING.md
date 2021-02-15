@@ -17,6 +17,7 @@ Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azur
     - [PR guidelines](#pr-guidelines)
     - [Terraform guidelines](#terraform-guidelines)
   - [PR reviews guidelines](#pr-reviews-guidelines)
+  - [Release strategy](#release-strategy)
 
 <br/><br/>
 
@@ -97,3 +98,14 @@ We need to ensure quality along with agility. We need to move to everyone agreei
 4. For hotfixes, keep PRs open for at least 4 business hrs.
 5. The maintainer is [here](https://github.com/Azure/sap-hana/blob/master/CODEOWNERS).
 <br/><br/><br/>
+
+### Release strategy
+1. All new features should be added to feature branch (eg. `feature/remote-tfstate2`)
+2. All features should stay in beta branch until stable before get into master (eg. `beta/v2.3`)
+3. Only merge beta branches into master.
+4. Create releases of current master before and after merge into master.
+5. Releases naming convention: x.x.x-x (eg. `2.3.1-1`)
+   - major version number
+   - sub version number
+   - maintainance version number
+   - documentation number
