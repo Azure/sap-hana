@@ -57,7 +57,7 @@ Description = 'SAP Deployment Automation utilities'
 # RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-ScriptsToProcess = @("set_secrets.ps1", "installer.ps1", "install_library.ps1", "install_environment.ps1", "install_deployer.ps1", "helper_functions.ps1")
+#ScriptsToProcess = @("set_secrets.ps1", "installer.ps1", "install_library.ps1", "install_environment.ps1", "install_deployer.ps1", "helper_functions.ps1")
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
