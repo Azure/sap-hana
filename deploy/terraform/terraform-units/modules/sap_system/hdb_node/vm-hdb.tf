@@ -108,11 +108,11 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
 
   network_interface_ids = local.enable_storage_subnet ? ([
-    azurerm_network_interface.nics_dbnodes_admin[count.index].id,
     azurerm_network_interface.nics_dbnodes_db[count.index].id,
-    azurerm_network_interface.nics_dbnodes_storage[count.index].id]) : ([
     azurerm_network_interface.nics_dbnodes_admin[count.index].id,
-    azurerm_network_interface.nics_dbnodes_db[count.index].id]
+    azurerm_network_interface.nics_dbnodes_storage[count.index].id]) : ([
+    azurerm_network_interface.nics_dbnodes_db[count.index].id,
+    azurerm_network_interface.nics_dbnodes_admin[count.index].id]
   )
   size                            = lookup(local.sizes, local.hdb_vms[count.index].size).compute.vm_size
   admin_username                  = var.sid_username
