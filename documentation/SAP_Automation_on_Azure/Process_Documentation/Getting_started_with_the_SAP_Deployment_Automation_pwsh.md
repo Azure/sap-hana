@@ -1,32 +1,32 @@
 ﻿
 # Running the automation from a Windows PC
 
-In order to be able to run the automation from a local Winds PC the following components need to be installed.
+To run the automation from a local Windows PC, following components need to be installed.
+## **Pre-Requisites**
+1. **Terraform** - Terraform can be downloaded from [Download Terraform - Terraform by HashiCorp](https://www.terraform.io/downloads.html). Once downloaded and extracted, ensure that the Terraform.exe executable is in a directory which is included in the SYSTEM PATH variable.
+2. **Git** - Git can be installed from [Git (git-scm.com)](https://git-scm.com/)
+3. **Azure CLI** - Azure CLI can be installed from <https://aka.ms/installazurecliwindows> 
+4. **Azure PowerShell** - Azure PowerShell can be installed from [Install Azure PowerShell with PowerShellGet | Microsoft Docs](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.5.0)
+5. **The latest Azure PowerShell modules** - If you already have Azure PowerShell modules, you can update to the latest version from here [Update the Azure PowerShell module](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.5.0#update-the-azure-powershell-module)
 
-1. Terraform, Terraform can be downloaded from [Download Terraform - Terraform by HashiCorp](https://www.terraform.io/downloads.html), once downloaded and extracted ensure that the Terraform.exe executable is in a directory that is included in the SYSTEM PATH variable.
-2. Git, Git can be installed from [Git (git-scm.com)](https://git-scm.com/)
-3. Azure CLI, Azure CLI can be installed from <https://aka.ms/installazurecliwindows> 
-4. Azure PowerShell, Azure PowerShell can be installed from [Install Azure PowerShell with PowerShellGet | Microsoft Docs](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.5.0)
-5. The latest Azure PowerShell modules, <https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.5.0#update-the-azure-powershell-module>
-
-Once the pre-requisites are met proceed to the next step.
+## **Setting up the samples for execution**
+Once the pre-requisites are met, proceed with the next steps.
 
 1. Create a root directory "Azure_SAP_Automated_Deployment"
 2. Navigate to the "Azure_SAP_Automated_Deployment" directory
-3. Clone the sap-hana repository by running the
+3. Clone the sap-hana repository by running the following command
+   
+   ```bash
+    git clone https://github.com/Azure/sap-hana.git
+    ```
 
-```bash
-git clone <https://github.com/Azure/sap-hana.git> command
-```
+4. Copy the sample parameter folder from
+```sap-hana\documentation\SAP_Automation_on_Azure\Process_Documentation\WORKSPACES``` to the ```Azure_SAP_Automated_Deployment``` folder.
 
-1. Copy the sample parameter folder from
+5. Navigate to the ```Azure_SAP_Automated_Deployment\WORKSPACES\DEPLOYMENT-ORCHESTRATION``` folder.
 
-sap-hana\documentation\SAP_Automation_on_Azure\Process_Documentation\WORKSPACES to the “Azure_SAP_Automated_Deployment” folder.
+6. Kindly note, that triggering the deployment will need the Service Principal details (application id, secret and tenant ID)
 
-Navigate to the Azure_SAP_Automated_Deployment\WORKSPACES\DEPLOYMENT-ORCHESTRATION folder.
-
-
-The deployment will need the Service Principal details (application id, secret and tenant ID)
 
 ## **Deploying the environment**
 
@@ -42,7 +42,11 @@ For deploying the supporting infrastructure (Deployer, Library and Workload zone
 New-Environment -DeployerParameterfile .\DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\PROD-WEEU-DEP00-INFRASTRUCTURE.json  -LibraryParameterfile .\LIBRARY\PROD-WEEU-SAP_LIBRARY\PROD-WEEU-SAP_LIBRARY.json -EnvironmentParameterfile .\LANDSCAPE\PROD-WEEU-SAP00-INFRASTRUCTURE\PROD-WEEU-SAP00-INFRASTRUCTURE.json
 ```
 
-The script will deploy the deployment infrastructure and create the Azure keyvault for storing the Service Principal details. When prompted for the environment details enter "PROD" and then enter the Service Principal details. The script will them deploy the rest of the resources required.
+The script will deploy the deployment infrastructure and create the Azure keyvault for storing the Service Principal details.
+
+When prompted for the environment details enter "PROD" and then enter the Service Principal details. 
+
+The script will them deploy the rest of the resources required.
 
 ## **Deploying the SAP system**
 
@@ -58,14 +62,8 @@ The script below removes the two deployments and their supporting terraform file
 
 ```PowerShell
 Remove-Module SAPDeploymentUtilities -ErrorAction SilentlyContinue
-Remove-Module install_library -ErrorAction SilentlyContinue
-Remove-Module set_secrets -ErrorAction SilentlyContinue
-Remove-Module install_environment -ErrorAction SilentlyContinue
-Remove-Module installer -ErrorAction SilentlyContinue
-Remove-Module install_deployer -ErrorAction SilentlyContinue
-Remove-Module helper_functions -ErrorAction SilentlyContinue
 
-function Remove-Items {
+function Remove-TfDeploymentItems {
     param (
         $rgName,
         $dirname
@@ -104,26 +102,24 @@ function Remove-Items {
 $rgname = "PROD-WEEU-SAP00-ZZZ"
 $dirname = "SYSTEM\PROD-WEEU-SAP00-ZZZ\"
 
-Remove-Items -rgName $rgname -dirname $dirname
+Remove-TfDeploymentItems -rgName $rgname -dirname $dirname
 
 
 $rgname = "PROD-WEEU-DEP00-INFRASTRUCTURE"
 $dirname = "DEPLOYER\PROD-WEEU-DEP00-INFRASTRUCTURE\"
 
-Remove-Items -rgName $rgname -dirname $dirname
+Remove-TfDeploymentItems -rgName $rgname -dirname $dirname
 
 $rgname = "PROD-WEEU-SAP00-INFRASTRUCTURE"
 $dirname = "LANDSCAPE\PROD-WEEU-SAP00-INFRASTRUCTURE\"
 
-Remove-Items -rgName $rgname -dirname $dirname
+Remove-TfDeploymentItems -rgName $rgname -dirname $dirname
 
 $rgname = "PROD-WEEU-SAP_LIBRARY"
 $dirname = "LIBRARY\PROD-WEEU-SAP_LIBRARY\"
 
-Remove-Items -rgName $rgname -dirname $dirname
+Remove-TfDeploymentItems -rgName $rgname -dirname $dirname
 
 
-Get-Module
-
-
+Get-Module -Name SAPDeploymentUtilities #should not return any result
 ```
