@@ -46,7 +46,7 @@ ${DEPLOYMENT_REPO_PATH}deploy/scripts/install_environment
 -d DEPLOYER/DEV-WEEU-DEP00-INFRASTRUCTURE/DEV-WEEU-DEP00-INFRASTRUCTURE.json -l LIBRARY/DEV-WEEU-SAP_LIBRARY/DEV-WEEU-SAP_LIBRARY.json -e LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json
 ```
 
-The script will deploy the deployment infrastructure and create the Azure keyvault for storing the Service Principal details. When prompted for the environment details enter “PROD” and then enter the Service Principal details. The script will them deploy the rest of the resources required.
+The script will deploy the deployment infrastructure and create the Azure keyvault for storing the Service Principal details. When prompted for the environment details enter “DEV” and then enter the Service Principal details. The script will them deploy the rest of the resources required.
 
 ## **Deploying the SAP system**
 
