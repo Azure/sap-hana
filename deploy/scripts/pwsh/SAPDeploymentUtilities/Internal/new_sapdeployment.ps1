@@ -54,6 +54,11 @@ Licensed under the MIT license.
     $iniContent = Get-IniContent $filePath
     $changed = $false
 
+    if ($Parameterfile.Contains("\")) {
+        Write-Error "Please execute the script from the folder containing the json file and not from a parent folder"
+        return;
+    }
+
     [IO.FileInfo] $fInfo = $Parameterfile
     $environment = ($fInfo.Name -split "-")[0]
     $region = ($fInfo.Name -split "-")[1]
@@ -110,10 +115,9 @@ Licensed under the MIT license.
     $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"" " +  $terraform_module_directory
 
     if (Test-Path ".terraform" -PathType Container) {
+        $Command = " init -upgrade=true"
         $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
-
         if ("azurerm" -eq $jsonData.backend.type) {
-            $Command = " init -upgrade=true"
 
             $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
             if ("Y" -ne $ans) {
