@@ -43,7 +43,6 @@ Licensed under the MIT license.
 
     Add-Content -Path "log.txt" -Value "Bootstrap the deployer"
     Add-Content -Path "log.txt" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
-    
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
@@ -114,9 +113,8 @@ Licensed under the MIT license.
         }
     }
 
-    Add-Content -Path "log.txt" -Value $Command
-
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
@@ -125,8 +123,9 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green "Running plan"
     $Command = " plan -var-file " + $Parameterfile + " " + $terraform_module_directory
 
-    Add-Content -Path "log.txt" -Value $Command
+    
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
     if ($LASTEXITCODE -ne 0) {
@@ -154,9 +153,8 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green "Running apply"
 
     $Command = " apply -var-file " + $Parameterfile + " " + $terraform_module_directory
-    Add-Content -Path "log.txt" -Value $Command
-    
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"

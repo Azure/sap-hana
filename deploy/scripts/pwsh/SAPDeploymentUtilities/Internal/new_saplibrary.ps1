@@ -101,9 +101,8 @@ Licensed under the MIT license.
         }
     }
     
-    Add-Content -Path "log.txt" -Value $Command
-
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
@@ -118,8 +117,8 @@ Licensed under the MIT license.
     }
 
     
-    Add-Content -Path "log.txt" -Value $Command
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
     if ($LASTEXITCODE -ne 0) {
@@ -152,8 +151,8 @@ Licensed under the MIT license.
         $Command = " apply -var-file " + $Parameterfile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath + " " + $terraform_module_directory
     }
 
-    Add-Content -Path "log.txt" -Value $Command
     $Cmd = "terraform $Command"
+    Add-Content -Path "log.txt" -Value $Cmd
     & ([ScriptBlock]::Create($Cmd))  
     if ($LASTEXITCODE -ne 0) {
         throw "Error executing command: $Cmd"
