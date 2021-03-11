@@ -82,7 +82,6 @@ resource "azurerm_lb" "scs" {
 resource "azurerm_lb_backend_address_pool" "scs" {
   count               = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_bepool)
-  resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.scs[0].id
 
 }

@@ -43,7 +43,6 @@ resource "azurerm_lb" "hdb" {
 resource "azurerm_lb_backend_address_pool" "hdb" {
   count               = local.enable_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_bepool)
-  resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
 
 }

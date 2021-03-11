@@ -137,11 +137,13 @@ resource "null_resource" "prepare-deployer" {
       "git clone https://github.com/Azure/sap-hana.git $HOME/Azure_SAP_Automated_Deployment/sap-hana",
       // Install terraform for all users
       "sudo apt-get install unzip",
-      "sudo mkdir -p /opt/terraform/terraform_0.13.5",
+      "tfversion=terraform_0.14.7",
+      "tfdir=0.14.7",
+      "sudo mkdir -p /opt/terraform/${tfversion}",
       "sudo mkdir -p /opt/terraform/bin/",
-      "sudo wget -P /opt/terraform/terraform_0.13.5 https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip",
-      "sudo unzip /opt/terraform/terraform_0.13.5/terraform_0.13.5_linux_amd64.zip -d /opt/terraform/terraform_0.13.5/",
-      "sudo ln -s /opt/terraform/terraform_0.13.5/terraform /opt/terraform/bin/terraform",
+      "sudo wget -P /opt/terraform/${tfversion} https://releases.hashicorp.com/terraform/${tfdir}/${tfversion}_linux_amd64.zip",
+      "sudo unzip /opt/terraform/${tfversion}/${tfversion}_linux_amd64.zip -d /opt/terraform/${tfversion}/",
+      "sudo ln -s /opt/terraform/${tfversion}/terraform /opt/terraform/bin/terraform",
       "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Set env for MSI
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",

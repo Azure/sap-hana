@@ -7,7 +7,6 @@ resource "azurerm_key_vault" "kv_prvt" {
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location                   = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
-  soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
 
@@ -40,7 +39,6 @@ resource "azurerm_key_vault" "kv_user" {
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location                   = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
-  soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
 
