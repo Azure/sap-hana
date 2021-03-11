@@ -46,6 +46,10 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Bootstrap the library"
 
+    Add-Content -Path "log.txt" -Value "Bootstrap the library"
+    Add-Content -Path "log.txt" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
+    
+
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent $filePath
@@ -96,6 +100,8 @@ Licensed under the MIT license.
             }
         }
     }
+    
+    Add-Content -Path "log.txt" -Value $Command
 
     $Cmd = "terraform $Command"
     & ([ScriptBlock]::Create($Cmd)) 
@@ -111,6 +117,8 @@ Licensed under the MIT license.
         $Command = " plan -var-file " + $Parameterfile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath + " " + $terraform_module_directory
     }
 
+    
+    Add-Content -Path "log.txt" -Value $Command
     $Cmd = "terraform $Command"
     $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
@@ -144,6 +152,7 @@ Licensed under the MIT license.
         $Command = " apply -var-file " + $Parameterfile + " -var deployer_statefile_foldername=" + $DeployerFolderRelativePath + " " + $terraform_module_directory
     }
 
+    Add-Content -Path "log.txt" -Value $Command
     $Cmd = "terraform $Command"
     & ([ScriptBlock]::Create($Cmd))  
     if ($LASTEXITCODE -ne 0) {
