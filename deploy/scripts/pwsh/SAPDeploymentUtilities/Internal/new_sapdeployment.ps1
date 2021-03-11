@@ -49,7 +49,7 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Deploying the" $Type
 
-    Add-Content -Path "log.txt" -Value "Deploying the" + $Type
+    Add-Content -Path "log.txt" -Value ("Deploying the" + $Type)
     Add-Content -Path "log.txt" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
     
 
