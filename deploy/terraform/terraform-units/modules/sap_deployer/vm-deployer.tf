@@ -16,6 +16,7 @@ resource "azurerm_public_ip" "deployer" {
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "deployer" {
@@ -137,13 +138,13 @@ resource "null_resource" "prepare-deployer" {
       "git clone https://github.com/Azure/sap-hana.git $HOME/Azure_SAP_Automated_Deployment/sap-hana",
       // Install terraform for all users
       "sudo apt-get install unzip",
-      "tfversion=terraform_0.14.7",
+      "tfversion=",
       "tfdir=0.14.7",
-      "sudo mkdir -p /opt/terraform/${tfversion}",
+      "sudo mkdir -p /opt/terraform/terraform_0.14.7",
       "sudo mkdir -p /opt/terraform/bin/",
-      "sudo wget -P /opt/terraform/${tfversion} https://releases.hashicorp.com/terraform/${tfdir}/${tfversion}_linux_amd64.zip",
-      "sudo unzip /opt/terraform/${tfversion}/${tfversion}_linux_amd64.zip -d /opt/terraform/${tfversion}/",
-      "sudo ln -s /opt/terraform/${tfversion}/terraform /opt/terraform/bin/terraform",
+      "sudo wget -P /opt/terraform/terraform_0.14.7 https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip",
+      "sudo unzip /opt/terraform/terraform_0.14.7/terraform_0.14.7_linux_amd64.zip -d /opt/terraform/terraform_0.14.7/",
+      "sudo ln -s /opt/terraform/terraform_0.14.7/terraform /opt/terraform/bin/terraform",
       "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Set env for MSI
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",
