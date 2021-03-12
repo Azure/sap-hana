@@ -5,7 +5,7 @@
 
 data "terraform_remote_state" "deployer" {
   backend = "azurerm"
-  count   = length(var.deployer_tfstate_key) > 0 ? 1 : 0
+  count   = length(var.deployer_tfstate_key) > 0 || local.use_deployer ? 1 : 0
   config = {
     resource_group_name  = local.saplib_resource_group_name
     storage_account_name = local.tfstate_storage_account_name

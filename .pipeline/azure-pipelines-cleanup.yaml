@@ -61,7 +61,7 @@ jobs:
       az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n rdp --source-address-prefixes ${prefix_list} --output none
       az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n winrm --source-address-prefixes ${prefix_list} --output none
 
-      echo "=== Assgin ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
+      echo "=== Assign ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
       az network vnet subnet update -g ${rg_name} -n ${subnet_name} --vnet-name ${vnet_name} --network-security-group ${nsg_name} --output none
     displayName: 'Clean up NSG'
 - job: scheduled_Subnet_Cleanup

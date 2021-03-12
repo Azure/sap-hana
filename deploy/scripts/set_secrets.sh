@@ -177,6 +177,15 @@ result=$(grep "ERROR: The user, group or application" stdout.az)
 
 rm stdout.az
 if [ -n "${result}" ]; then 
+    upn=$(az account show | grep name | grep @ | cut -d: -f2 | cut -d, -f1 | tr -d \")
+    az keyvault set-policy -n "${vaultname}" --secret-permissions get list recover restore set --upn "${upn}"
+fi
+    
+az keyvault secret set --name "${secretname}" --vault-name "${vaultname}" --value "${ARM_SUBSCRIPTION_ID}"  > stdout.az 2>&1
+result=$(grep "ERROR: The user, group or application" stdout.az)
+
+rm stdout.az
+if [ -n "${result}" ]; then 
     echo "#########################################################################################"
     echo "#                                                                                       #" 
     echo "#          No access to add the secrets in the" "${vaultname}" "keyvault             #"

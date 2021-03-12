@@ -2,7 +2,7 @@
 Function Set-SAPSPNSecrets {
     <#
     .SYNOPSIS
-        Sets the Secrets in Azure Keyvault
+        Sets the SPN Secrets in Azure Keyvault
 
     .DESCRIPTION
         Sets the secrets in Azure Keyvault that are required for the deployment automation
@@ -70,6 +70,11 @@ Licensed under the MIT license.
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent $filePath
+az a
+    $UserUPN = ([ADSI]"LDAP://<SID=$([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)>").UserPrincipalName
+    If ($UserUPN) {
+        Set-AzKeyVaultAccessPolicy -VaultName $VaultName -UserPrincipalName $UserUPN -PermissionsToSecrets Get,List,Set,Recover,Restore
+    }
 
     # Subscription
     $sub = $iniContent[$Region]["subscription"]

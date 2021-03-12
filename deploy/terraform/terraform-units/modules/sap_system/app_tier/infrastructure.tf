@@ -32,7 +32,7 @@ resource "azurerm_subnet" "subnet_sap_web" {
 }
 
 resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
-  count          = ! local.sub_web_exists && length(var.route_table_id) > 0 ? 1 : 0
+  count          = local.enable_deployment && local.sub_web_defined && length(var.route_table_id) > 0 ? (local.sub_web_exists ? 0 : 1) : 0
   subnet_id      = azurerm_subnet.subnet_sap_web[0].id
   route_table_id = var.route_table_id
 }

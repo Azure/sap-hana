@@ -81,7 +81,7 @@ locals {
   offset = try(var.options.resource_offset, 0)
 
   //Allowing to keep the old nic order
-  legacy_nic_order = try(var.options.legacy_nic_order, false)
+  legacy_nic_order = try(var.options.legacy_nic_order, "false") == "true"
 
   // Zones
   zones            = try(local.anydb.zones, [])

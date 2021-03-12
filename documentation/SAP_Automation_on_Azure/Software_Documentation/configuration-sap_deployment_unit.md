@@ -3,28 +3,21 @@ Remove files and maintain here in documentation
 deploy/terraform/run/sap_system/sapsystem_full.json
 deploy/terraform/run/sap_system/sapsystem.json
 -->
-### <img src="../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
-<br/><br/>
+### <img src="../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework ###
 
-# Configuration - SAP Deployment Unit <!-- omit in toc -->
+# Configuration - SAP Deployment Unit #
 
-<br/>
 
-## Table of Contents <!-- omit in toc -->
-<br/>
+## Table of Contents <!-- omit in toc --> ##
 
 - [Parameter file construction](#parameter-file-construction)
 - [Examples](#examples)
   - [Minimal (Default) input parameter JSON](#minimal-default-input-parameter-json)
   - [Complete input parameter JSON](#complete-input-parameter-json)
 
-
-<br/><br/><br/><br/>
-
 ---
-<br/>
 
-# Parameter file construction
+# Parameter file construction #
 
 The parameters to the automation are passed in a JSON structure with a set of root nodes defining the properties of the system.
 
@@ -36,7 +29,6 @@ Node                                   |  Description |
 | authentication|If specified - This node defines the authentication details for the system. The default setup uses the information from the workload zone key vault. |
 | options |If specified - This node defines special settings for the environment |
 
-<br/>
 
 A comprehensive representation of the json is shown below.
 

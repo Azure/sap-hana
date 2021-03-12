@@ -6,6 +6,7 @@
     "deployer": {
         "environment": "np",
         "region": "westeurope",
-        "vnet": "DEP00"
+        "vnet": "DEP00",
+        "use" : "true"
     }
 }

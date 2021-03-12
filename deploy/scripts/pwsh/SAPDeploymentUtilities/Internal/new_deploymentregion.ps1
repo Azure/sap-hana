@@ -90,7 +90,7 @@ Licensed under the MIT license.
     # Re-read ini file
     $iniContent = Get-IniContent $filePath
 
-    $ans = Read-Host -Prompt "Do you want to enter the Keyvault secrets Y/N?"
+    $ans = Read-Host -Prompt "Do you want to enter the SPN secrets Y/N?"
     if ("Y" -eq $ans) {
         $vault = ""
         if ($null -ne $iniContent[$region] ) {

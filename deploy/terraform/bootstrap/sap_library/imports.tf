@@ -5,7 +5,7 @@
 
 data "terraform_remote_state" "deployer" {
   backend = "local"
-  count   = length(var.deployer_tfstate_key) > 0 ? 1 : 0
+  count   = length(var.deployer_statefile_foldername) > 0 || local.use_deployer ? 1 : 0
   config = {
     path = length(var.deployer_statefile_foldername)>0 ? "${var.deployer_statefile_foldername}/terraform.tfstate" :  "${abspath(path.cwd)}/../../LOCAL/${local.deployer_rg_name}/terraform.tfstate"
   }

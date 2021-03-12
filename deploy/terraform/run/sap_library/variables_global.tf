@@ -59,3 +59,11 @@ variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
 }
+
+
+variable "deployer_tfstate_key" {
+  description = "The key of deployer's remote tfstate file"
+  default=""
+}
+
+
