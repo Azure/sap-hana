@@ -11,6 +11,7 @@
     },
     "vnets": {
       "sap": {
+        "name": "SAP",
         "subnet_admin": {
           "prefix": "10.1.1.0/24"
         },
