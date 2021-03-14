@@ -204,6 +204,8 @@ steps:
         --backend-config "container_name=tfstate" \
         --backend-config "key=${sap_system_key}" \
         ${repo_dir}/deploy/terraform/run/sap_system/
+      
+      terraform refresh -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       '
     displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"
