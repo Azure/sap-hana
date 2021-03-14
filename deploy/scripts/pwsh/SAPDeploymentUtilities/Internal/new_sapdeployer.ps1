@@ -49,7 +49,11 @@ Licensed under the MIT license.
     $iniContent = Get-IniContent $filePath
 
     [IO.FileInfo] $fInfo = $Parameterfile
-    $region = ($fInfo.Name -split "-")[1]
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     if ($null -ne $iniContent[$region] ) {
         $sub = $iniContent[$region]["subscription"] 

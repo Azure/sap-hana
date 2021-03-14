@@ -53,14 +53,16 @@ Licensed under the MIT license.
 
     $DeployerRelativePath = "..\..\" + $fInfo.Directory.FullName.Replace($dirInfo.ToString() + "\", "")
 
-    $Environment = ($fInfo.Name -split "-")[0]
-    $region = ($fInfo.Name -split "-")[1]
+    $jsonData = Get-Content -Path $DeployerParameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
 
     if ( -not (Test-Path -Path $FilePath)) {
-        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$Environment-$region]`nDeployer=" -Force
+        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$Environment$region]`nDeployer=" -Force
     }
 
     $iniContent = Get-IniContent $filePath

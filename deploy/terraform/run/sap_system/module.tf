@@ -25,7 +25,7 @@ module "sap_namegenerator" {
   location         = var.infrastructure.region
   codename         = lower(try(var.infrastructure.codename, ""))
   random_id        = module.common_infrastructure.random_id
-  sap_vnet_name    = local.vnet_sap_name_part
+  sap_vnet_name    = local.vnet_logical_name
   sap_sid          = local.sap_sid
   db_sid           = local.db_sid
   app_ostype       = local.app_ostype

@@ -14,9 +14,8 @@ function showhelp {
     echo "#   ~/.sap_deployment_automation folder                                                 #"
     echo "#                                                                                       #"
     echo "#                                                                                       #"
-    echo "#   Usage: installer.sh                                                                 #"
+    echo "#   Usage: remover.sh                                                                 #"
     echo "#    -p parameter file                                                                  #"
-    echo "#    -i interactive true/false setting the value to false will not prompt before apply  #"
     echo "#    -h Show help                                                                       #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
@@ -123,20 +122,6 @@ else
         config_stored=1
     else
         config_stored=0
-    fi
-
-    temp=$(grep "REMOTE_STATE_RG" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Remote state storage group was specified in ~/.sap_deployment_automation library config
-        REMOTE_STATE_RG=$(echo "${temp}" | cut -d= -f2)
-    fi
-
-    temp=$(grep "REMOTE_STATE_SA" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Remmote state storage group was specified in ~/.sap_deployment_automation library config
-        REMOTE_STATE_SA=$(echo "${temp}" | cut -d= -f2)
     fi
 
     temp=$(grep "tfstate_resource_id" "${library_config_information}")
@@ -254,185 +239,15 @@ fi
 
 check_output=0
 
-if [ ! -d ./.terraform/ ]; 
-then
-    terraform init -upgrade=true -force-copy --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
-    --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-    --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-    --backend-config "container_name=tfstate" \
-    --backend-config "key=${key}.terraform.tfstate" \
-    $terraform_module_directory
-else
-    temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
-    echo $temp
-    cat .terraform/terraform.tfstate
-    if [ ! -z "${temp}" ]
-    then
-        echo "${REMOTE_STATE_SA}"
-        terraform init -upgrade=true -force-copy --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
-        --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-        --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-        --backend-config "container_name=tfstate" \
-        --backend-config "key=${key}.terraform.tfstate" \
-        $terraform_module_directory
-    else
-        terraform init -upgrade=true
-        check_output=1
-    fi
-
-fi
-
-if [ 1 == $check_output ]
-then
-    outputs=$(terraform output)
-    if echo "${outputs}" | grep "No outputs"; then
-        ok_to_proceed=true
-        new_deployment=true
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                                   New deployment                                      #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-    else
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                           Existing deployment was detected                            #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-
-        deployed_using_version=$(terraform output automation_version)
-        if [ ! -n "${deployed_using_version}" ]; then
-            echo ""
-            echo "#########################################################################################"
-            echo "#                                                                                       #"
-            echo "#    The environment was deployed using an older version of the Terrafrom templates     #"
-            echo "#                                                                                       #"
-            echo "#                               !!! Risk for Data loss !!!                              #"
-            echo "#                                                                                       #"
-            echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
-            echo "#                                                                                       #"
-            echo "#########################################################################################"
-
-            read -p "Do you want to continue Y/N?"  ans
-            answer=${ans^^}
-            if [ $answer == 'Y' ]; then
-                ok_to_proceed=true
-            else
-                exit 1
-            fi
-        else
-
-            echo ""
-            echo "#########################################################################################"
-            echo "#                                                                                       #"
-            echo "# Terraform templates version:" $deployed_using_version "were used in the deployment "
-            echo "#                                                                                       #"
-            echo "#########################################################################################"
-            echo ""
-            #Add version logic here
-        fi
-    fi
-fi
 
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo "#                             Running Terraform plan                                    #"
+echo "#                             Running Terraform apply                                   #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
 
-terraform plan -var-file=${parameterfile} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter $terraform_module_directory > plan_output.log
-
-if ! $new_deployment; then
-    if grep "No changes" plan_output.log ; then
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                           Infrastructure is up to date                                #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-        rm plan_output.log
-
-        if [ $deployment_system == sap_deployer ]
-        then
-            if [ $deployer_tfstate_key_exists == false ]
-            then
-                echo "Saving the deployer state file name"
-                echo "deployer_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
-                deployer_tfstate_key_exists=true
-            fi
-        fi
-        if [ $deployment_system == sap_landscape ]
-        then
-            if [ $landscape_tfstate_key_exists == false ]
-            then
-                echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $workload_config_information
-                landscape_tfstate_key_exists=true
-            fi
-        fi
-        exit 0
-    fi
-    if ! grep "0 to change, 0 to destroy" plan_output.log ; then
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo "#                               !!! Risk for Data loss !!!                              #"
-        echo "#                                                                                       #"
-        echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-        read -n 1 -r -s -p $'Press enter to continue...\n'
-
-        cat plan_output.log
-        read -p "Do you want to continue with the deployment Y/N?"  ans
-        answer=${ans^^}
-        if [ $answer == 'Y' ]; then
-            ok_to_proceed=true
-        else
-            exit -1
-        fi
-    else
-        ok_to_proceed=true
-    fi
-fi
-
-if [ $ok_to_proceed ]; then
-
-    rm plan_output.log
-
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                             Running Terraform apply                                   #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-
-    terraform apply ${approve} -var-file=${parameterfile} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter $terraform_module_directory
-fi
-
-if [ $deployment_system == sap_deployer ]
-then
-echo $deployer_tfstate_key_exists
-    if [ $deployer_tfstate_key_exists == false ]
-    then
-        sed -i /deployer_tfstate_key/d  "${library_config_information}"
-        echo "deployer_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
-    fi
-fi
-
-if [ $deployment_system == sap_landscape ]
-then
-    if [ $landscape_tfstate_key_exists == false ]
-    then
-        sed -i /landscape_tfstate_key/d  "${workload_config_information}"
-        echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $workload_config_information
-    fi
-fi
+terraform destroy -var-file=${parameterfile} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter $terraform_module_directory
 
 exit 0

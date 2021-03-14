@@ -10,5 +10,13 @@
         }
       }
     }
-  }
+  },
+  "deployers": [
+    {
+      "size": "Standard_D4ds_v4",
+      "disk_type" : "Premium_LRS"
+    }
+  ]
+
+
 }

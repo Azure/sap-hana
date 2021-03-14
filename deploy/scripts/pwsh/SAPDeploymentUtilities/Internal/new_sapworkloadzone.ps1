@@ -46,22 +46,24 @@ Licensed under the MIT license.
     $iniContent = Get-IniContent $filePath
 
     [IO.FileInfo] $fInfo = $Parameterfile
-    $environment = ($fInfo.Name -split "-")[0]
-    $region = ($fInfo.Name -split "-")[1]
-    $environmentname = $environment + $region
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     $envkey = $fInfo.Name.replace(".json", ".terraform.tfstate")
 
     $deployer_tfstate_key = $iniContent[$region]["Deployer"]
 
     try {
-        if ($null -ne $iniContent[$environmentname] ) {
-            $iniContent[$environmentname]["Landscape"] = $envkey
+        if ($null -ne $iniContent[$combined] ) {
+            $iniContent[$combined]["Landscape"] = $envkey
             Out-IniFile -InputObject $iniContent -FilePath $filePath
         }
         else {
             $Category1 = @{"Landscape" = $envkey }
-            $iniContent += @{$environmentname = $Category1 }
+            $iniContent += @{$combined = $Category1 }
             Out-IniFile -InputObject $iniContent -FilePath $filePath
         }
                 
@@ -82,7 +84,7 @@ Licensed under the MIT license.
 
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$environmentname]["Subscription"] = $sub
+        $iniContent[$combined]["Subscription"] = $sub
         $changed = $true
     }
 

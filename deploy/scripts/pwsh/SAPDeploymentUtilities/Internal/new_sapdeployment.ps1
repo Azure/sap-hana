@@ -67,11 +67,7 @@ Licensed under the MIT license.
         }
     }
 
-
-    $environment = ($fInfo.Name -split "-")[0]
-    $region = ($fInfo.Name -split "-")[1]
-    $environmentname = $environment + $region
-
+    $region = $jsonData.infrastructure.environment
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     if ("sap_deployer" -eq $Type) {
         $iniContent[$region]["Deployer"] = $key
@@ -84,8 +80,8 @@ Licensed under the MIT license.
     
 
     if ($Type -eq "sap_system") {
-        if ($null -ne $iniContent[$environmentname] ) {
-            $landscape_tfstate_key = $iniContent[$environmentname]["Landscape"]
+        if ($null -ne $iniContent[$Environment] ) {
+            $landscape_tfstate_key = $iniContent[$Environment]["Landscape"]
         }
         else {
             Write-Host -ForegroundColor Red "The workload zone for " $environment "in " $region " is not deployed"

@@ -77,8 +77,8 @@ workload_file_parametername=$(basename "${parameterfile}")
 
 
 # Read environment
-readarray -d '-' -t environment<<<"${workload_file_parametername}"
-readarray -d '-' -t -s 1 region<<<"${workload_file_parametername}"
+environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
+region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
 key=$(echo "${workload_file_parametername}" | cut -d. -f1)
 
 if [ ! -f "${workload_file_parametername}" ]
@@ -98,6 +98,7 @@ fi
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 library_config_information="${automation_config_directory}""${region}"
+workload_config_information="${automation_config_directory}""${region}""${environment}"
 
 if [ ! -d ${automation_config_directory} ]
 then
@@ -342,7 +343,7 @@ if ! $new_deployment; then
         then
             if [ $landscape_tfstate_key_exists == false ]
             then
-                echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
+                echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $workload_config_information
                 landscape_tfstate_key_exists=true
             fi
         fi
@@ -392,9 +393,9 @@ if [ $deployment_system == sap_landscape ]
 then
     if [ $landscape_tfstate_key_exists == false ]
     then
-        sed -i /landscape_tfstate_key/d  "${library_config_information}"
+        sed -i /landscape_tfstate_key/d  "${workload_config_information}"
 
-        echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
+        echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $workload_config_information
     fi
 fi
 

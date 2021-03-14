@@ -54,26 +54,27 @@ Licensed under the MIT license.
     $iniContent = Get-IniContent $filePath
 
     [IO.FileInfo] $fInfo = $Parameterfile
-    $environmentname = ($fInfo.Name -split "-")[0]
-    $region = ($fInfo.Name -split "-")[1]
-    $combined = $environmentname + $region
+
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
-    $deployer_tfstate_key = $iniContent[$combined]["Deployer"]
-    $landscape_tfstate_key = $iniContent[$combined]["Landscape"]
-
-    $rgName = $iniContent[$environmentname]["REMOTE_STATE_RG"] 
-    $saName = $iniContent[$environmentname]["REMOTE_STATE_SA"] 
-    $tfstate_resource_id = $iniContent[$environmentname]["tfstate_resource_id"] 
+ 
+    $rgName = $iniContent[$region]["REMOTE_STATE_RG"] 
+    $saName = $iniContent[$region]["REMOTE_STATE_SA"] 
+    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"] 
 
     # Subscription
-    $sub = $iniContent[$environmentname]["subscription"] 
+    $sub = $iniContent[$combined]["subscription"] 
     $repo = $iniContent["Common"]["repo"]
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$environmentname]["Subscription"] = $sub
+        $iniContent[$combined]["Subscription"] = $sub
         $changed = $true
     }
 
@@ -115,18 +116,27 @@ Licensed under the MIT license.
 
     if ($Type -ne "sap_deployer") {
         $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
+        $deployer_tfstate_key = $iniContent[$region]["Deployer"]
+
     }
     else {
         # Removing the bootsrap shell script
         if (Test-Path ".\post_deployment.sh" -PathType Leaf) {
             Remove-Item -Path ".\post_deployment.sh"  -Force 
         }
+        $iniContent[$region]["Deployer"] = $key
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
         
     }
 
     if ($Type -eq "sap_landscape") {
         $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
         $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key
+        $iniContent[$combined]["Landscape"] = $key
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+    }
+    else {
+        $landscape_tfstate_key = $iniContent[$combined]["Landscape"]
     }
 
     if ($Type -eq "sap_library") {

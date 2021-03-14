@@ -159,11 +159,10 @@ deployer_dirname=$(dirname "${deployer_parameter_file}")
 deployer_file_parametername=$(basename "${deployer_parameter_file}")
 
 # Read environment
-readarray -d '-' -t environment<<<"${deployer_file_parametername}"
-readarray -d '-' -t -s 1 region<<<"${deployer_file_parametername}"
+environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
+region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
 
 deployer_key=$(echo "${deployer_file_parametername}" | cut -d. -f1)
-deployer_config_information="${automation_config_directory}""${deployer_key}"
 
 library_config_information="${automation_config_directory}""${region}"
 
