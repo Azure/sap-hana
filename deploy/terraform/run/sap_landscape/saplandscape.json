@@ -6,10 +6,10 @@
         "region": "westeurope",
         "vnets": {
             "sap": {
-                "name": "SAP0",
+                "name": "SAP01",
                 "address_space": "10.1.0.0/16",
                 "subnet_iscsi": {
-                    "name": "global-WEEU-sap0_iscsi-subnet",
+                    "name": "global-WEEU-SAP01_iscsi-subnet",
                     "prefix": "10.1.0.0/24"
                 }
             }
