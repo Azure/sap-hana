@@ -4,6 +4,10 @@
 */
 
 module "sap_landscape" {
+   providers = {
+    azurerm.main = "azurerm.main"
+    azurerm.deployer = "azurerm.deployer"
+  }
   source                      = "../../terraform-units/modules/sap_landscape"
   infrastructure              = var.infrastructure
   options                     = local.options
