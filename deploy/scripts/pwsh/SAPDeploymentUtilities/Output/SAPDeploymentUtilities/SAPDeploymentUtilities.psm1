@@ -141,12 +141,13 @@ Licensed under the MIT license.
 
     $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
 
     if ( -not (Test-Path -Path $FilePath)) {
-        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$Environment$region]`nDeployer=" -Force
+        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$combined]`nDeployer=`nSubscription=" -Force
     }
 
     $iniContent = Get-IniContent $filePath
@@ -160,8 +161,7 @@ Licensed under the MIT license.
         else {
             $Category1 = @{"Deployer" = $key }
             $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
-                    
+            Out-IniFile -InputObject $iniContent -FilePath $filePath                    
         }
                 
     }
@@ -471,6 +471,21 @@ Licensed under the MIT license.
         }
     }
 
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+
+        $rgName = Read-Host -Prompt "Please specify the resource group name for the terraform storage account"
+        $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
+
+        $tfstate_resource_id = Read-Host -Prompt "Please specify the storage account resource ID for the terraform storage account"
+        
+        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+
+    }
+
+
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
     $Environment = $jsonData.infrastructure.environment
@@ -502,12 +517,24 @@ Licensed under the MIT license.
     $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"] 
 
     # Subscription
-    $sub = $iniContent[$combined]["subscription"] 
+    if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+        $sub = $iniContent[$combined]["subscription"] 
+    }
+    else {
+        $sub = $iniContent[$region]["subscription"] 
+    }
+    
     $repo = $iniContent["Common"]["repo"]
 
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$combined]["Subscription"] = $sub
+        if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+            $iniContent[$combined]["subscription"] = $sub
+        }
+        else {
+            $iniContent[$region]["subscription"] = $sub 
+        }
+    
         $changed = $true
     }
 
@@ -710,12 +737,8 @@ Licensed under the MIT license.
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent $filePath
 
-    [IO.FileInfo] $fInfo = $Parameterfile
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
-
-    $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
-    $combined = $Environment + $region
 
     # Subscription
     try {
@@ -726,7 +749,7 @@ Licensed under the MIT license.
         $sub = Read-Host -Prompt "Please enter the subscription"
         $iniContent[$region]["subscription"] = $sub
         $changed = $true
-        
+      
     }
 
     try {
@@ -1268,9 +1291,15 @@ Licensed under the MIT license.
 
     $combined = $Environment + $region
 
+    if ($null -eq $iniContent[$combined]) {
+        $Category1 = @{"subscription" = "" }
+        $iniContent += @{$combined = $Category1 }
+    }
+
     $UserUPN = ([ADSI]"LDAP://<SID=$([System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)>").UserPrincipalName
     If ($UserUPN) {
-        Set-AzKeyVaultAccessPolicy -VaultName $VaultName -UserPrincipalName $UserUPN -PermissionsToSecrets Get,List,Set,Recover,Restore
+        $UPNAsString = $UserUPN.ToString()
+        Set-AzKeyVaultAccessPolicy -VaultName $VaultName -UserPrincipalName $UPNAsString -PermissionsToSecrets Get, List, Set, Recover, Restore
     }
 
     # Subscription
@@ -1278,31 +1307,26 @@ Licensed under the MIT license.
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription for the key vault"
         $iniContent[$combined]["subscription"] = $sub
-        $changed = $true
     }
-
 
     Write-Host "Setting the secrets for " $Environment
 
     # Read keyvault
-    $v = $iniContent[$combined]["Vault"]
+    $vault = $iniContent[$combined]["Vault"]
 
-    Write-Host $v
-
-
-    if ($VaultName -eq "") {
-        if ($v -eq "" -or $null -eq $v) {
-            $v = Read-Host -Prompt 'Keyvault:'
+    if ("" -eq $VaultName) {
+        if ($vault -eq "" -or $null -eq $vault) {
+            $vault = Read-Host -Prompt 'Keyvault:'
         }
     }
     else {
-        $v = $VaultName
+        $vault = $VaultName
     }
 
     # Read SPN ID
     $spnid = $iniContent[$combined]["Client_id"]
 
-    if ($Client_id -eq "") {
+    if ("" -eq $Client_id ) {
         if ($spnid -eq "" -or $null -eq $spnid) {
             $spnid = Read-Host -Prompt 'SPN App ID:'
             $iniContent[$combined]["Client_id"] = $spnid 
@@ -1316,7 +1340,7 @@ Licensed under the MIT license.
     # Read Tenant
     $t = $iniContent[$combined]["Tenant"]
 
-    if ($Tenant -eq "") {
+    if ("" -eq $Tenant) {
         if ($t -eq "" -or $null -eq $t) {
             $t = Read-Host -Prompt 'Tenant:'
             $iniContent[$combined]["Tenant"] = $t 
@@ -1327,7 +1351,7 @@ Licensed under the MIT license.
         $iniContent[$combined]["Tenant"] = $Tenant
     }
 
-    if ($Client_secret -eq "") {
+    if ("" -eq $Client_secret) {
         $spnpwd = Read-Host -Prompt 'SPN Password:'
     }
     else {
@@ -1338,29 +1362,29 @@ Licensed under the MIT license.
 
     $Secret = ConvertTo-SecureString -String $sub -AsPlainText -Force
     $Secret_name = $Environment + "-subscription-id"
-    Write-Host "Setting the secret "$Secret_name " in vault " $v
-    Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
+    Write-Host "Setting the secret "$Secret_name " in vault " $vault
+    Set-AzKeyVaultSecret -VaultName $vault -Name $Secret_name -SecretValue $Secret
 
     $Secret = ConvertTo-SecureString -String $spnid -AsPlainText -Force
     $Secret_name = $Environment + "-client-id"
-    Write-Host "Setting the secret "$Secret_name " in vault " $v
-    Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
+    Write-Host "Setting the secret "$Secret_name " in vault " $vault
+    Set-AzKeyVaultSecret -VaultName $vault -Name $Secret_name -SecretValue $Secret
 
 
     $Secret = ConvertTo-SecureString -String $t -AsPlainText -Force
     $Secret_name = $Environment + "-tenant-id"
-    Write-Host "Setting the secret "$Secret_name " in vault " $v
-    Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
+    Write-Host "Setting the secret "$Secret_name " in vault " $vault
+    Set-AzKeyVaultSecret -VaultName $vault -Name $Secret_name -SecretValue $Secret
 
     $Secret = ConvertTo-SecureString -String $spnpwd -AsPlainText -Force
     $Secret_name = $Environment + "-client-secret"
-    Write-Host "Setting the secret "$Secret_name " in vault " $v
-    Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
+    Write-Host "Setting the secret "$Secret_name " in vault " $vault
+    Set-AzKeyVaultSecret -VaultName $vault -Name $Secret_name -SecretValue $Secret
 
     $Secret = ConvertTo-SecureString -String $sub -AsPlainText -Force
     $Secret_name = $Environment + "-subscription"
-    Write-Host "Setting the secret "$Secret_name + " in vault " + $v
-    Set-AzKeyVaultSecret -VaultName $v -Name $Secret_name -SecretValue $Secret
+    Write-Host "Setting the secret "$Secret_name " in vault " $vault
+    Set-AzKeyVaultSecret -VaultName $vault -Name $Secret_name -SecretValue $Secret
 
 }
 

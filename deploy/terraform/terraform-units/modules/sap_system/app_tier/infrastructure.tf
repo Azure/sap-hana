@@ -230,13 +230,25 @@ resource "azurerm_availability_set" "web" {
 
 # FIREWALL
 
+# The following example shows how to generate a random priority
+# between 1 and 50000 for a aws_alb_listener_rule resource:
+
+resource "random_integer" "app_priority" {
+  min = 3000
+  max = 3999
+  keepers = {
+     # Generate a new ID only when a new resource group is defined
+      resource_group = var.resource_group[0].name
+  }
+}
+
 # Create a Azure Firewall Network Rule for Azure Management API
 resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
   count               = local.firewall_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, "firewall-rule-app")
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
-  priority            = 10006
+  priority            = random_integer.app_priority.result
   action              = "Allow"
   rule {
     name                  = "Azure-Cloud"

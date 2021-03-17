@@ -34,7 +34,8 @@ resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
   object_id = azurerm_user_assigned_identity.deployer.principal_id
 
   secret_permissions = [
-    "get",
+    "Get",
+    "List"
   ]
 }
 
@@ -72,13 +73,13 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   object_id = azurerm_user_assigned_identity.deployer.principal_id
 
   secret_permissions = [
-    "delete",
-    "get",
-    "list",
-    "set",
-    "restore",
-    "recover",
-    "purge"
+    "Delete",
+    "Get",
+    "List",
+    "Set",
+    "Restore",
+    "Recover",
+    "Purge"
   ]
 }
 
@@ -90,13 +91,13 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
   object_id = data.azurerm_client_config.deployer.object_id != "" ? data.azurerm_client_config.deployer.object_id : "00000000-0000-0000-0000-000000000000"
 
   secret_permissions = [
-    "delete",
-    "get",
-    "list",
-    "set",
-    "restore",
-    "recover",
-    "purge"
+    "Delete",
+    "Get",
+    "List",
+    "Set",
+    "Restore",
+    "Recover",
+    "Purge"
   ]
   lifecycle {
     ignore_changes = [

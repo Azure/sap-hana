@@ -57,12 +57,13 @@ Licensed under the MIT license.
 
     $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
 
     if ( -not (Test-Path -Path $FilePath)) {
-        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$Environment$region]`nDeployer=" -Force
+        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$combined]`nDeployer=`nSubscription=" -Force
     }
 
     $iniContent = Get-IniContent $filePath
@@ -76,8 +77,7 @@ Licensed under the MIT license.
         else {
             $Category1 = @{"Deployer" = $key }
             $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
-                    
+            Out-IniFile -InputObject $iniContent -FilePath $filePath                    
         }
                 
     }

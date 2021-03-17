@@ -6,18 +6,6 @@
 
 <br/>
 
-Welcome to the [**SAP on Azure Deployment Automation Framework**](table_of_contents.md) repository.
-This repository contains code that will support the automated deployments of SAP platforms in the Azure Cloud.
-<br/>
+**SAP\_Automation\_on\_Azure**
 
-Please follow the linke below to the documentation:
-<br/><br/>
-
-
-<center>
-
-[<img src="assets/images/documentation-clipart.png" width="256px">](table_of_contents.md)
-
-## [SAP Deployment Automation Framework Documentation](table_of_contents.md) <!-- omit in toc -->
-
-</center>
+[table of contents](table_of_contents.md)

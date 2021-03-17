@@ -23,7 +23,7 @@ The configuration of the deployement infrastructure is achieved using a json for
 
 ### JSON structure ###
 
-```json
+```
 {                                                                                 <-- JSON opening tag
   "infrastructure": {
     "environment"                     : "NP",                                     <-- Required Parameter
@@ -32,15 +32,15 @@ The configuration of the deployement infrastructure is achieved using a json for
     "vnets": {
       "management": {
         "arm_id"                      : "",                                       <-- Optional Identifier
-        "name"                        : "DEP00",                                  <-- Required Parameter if arm_id is not specified
+        "name"                        : "DEP00",                                  <-- Required Parameter
         "address_space"               : "10.0.0.0/25",                            <-- Required Parameter if arm_id is not specified
         "subnet_mgmt": {
-          "arm_id"                    : ""                                        <-- Optional Identifier
-          "name"                      : "deployment_subnet"                       <-- Optional Identifier
+          "arm_id"                    : "",                                       <-- Optional Identifier
+          "name"                      : "deployment_subnet",                      <-- Optional Identifier
           "prefix"                    : "10.0.0.16/28"                            <-- Required Parameter
         }
         "subnet_fw": {
-          "arm_id"                    : ""                                        <-- Optional Identifier
+          "arm_id"                    : "",                                       <-- Optional Identifier
           "prefix"                    : "10.0.0.32/26"                            <-- Required Parameter
         }
       }
@@ -83,7 +83,7 @@ The complete set of configuratiuon options is listed in the table below.
 | |  |
 | infrastructure.vnets.management               | `arm_id`                      | **required**      | -        | If provided, The Azure Resource Identifier of the VNet to use
 | | **or** |
-| infrastructure.vnets.management               | `name`                      | optional  | -        | The name of the VNet| infrastructure.vnets.management               | `name`                        | **required**  | -        | This assigns a 7 Character designator for the Deployer VNET. Recommended value: DEP00 |
+| infrastructure.vnets.management               | `name`                      | **required**  | -        | The logical identifier of the VNet| infrastructure.vnets.management               | `name`                        | **required**  | -        | This assigns a 7 Character designator for the Deployer VNET. Recommended value: DEP00 |
 | <p>                                           | `address_space`               | **required**  | -        | CIDR of the VNET Address Space. We recommend a /27 CIDR (32 IP's).<br/>This allows space for 2x /28 CIDR (16 IP's). <br/> If you want to include the Azure Firewall use a /25 CIDR as Azure Firewall requires a /26 range |
 ||<p>| 
 | infrastructure.vnets.management.subnet_mgmt               | `arm_id`                      | **required**      | -        | If provided, The Azure Resource Identifier of the subnet to use
@@ -141,7 +141,7 @@ The complete set of configuratiuon options is listed in the table below.
       "region"                          : "eastus2",
       "vnets": {
         "management": {
-          "name"                        : "NP-EUS2-DEP00-vnet",
+          "name"                        : "DEP00",
           "address_space"               : "10.0.0.0/25",
           "subnet_mgmt": {
             "prefix"                    : "10.0.0.16/28"
