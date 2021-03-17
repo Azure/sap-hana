@@ -39,26 +39,30 @@ function New-SAPSystem {
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess)]
     param(
         #Parameter file
         [Parameter(Mandatory = $true)][string]$Parameterfile ,
-        [Parameter(Mandatory = $true)][string]$Type
+        [Parameter(Mandatory = $true)][SAP_Types]$Type
     )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Deploying the" $Type
 
+    $fInfo = Get-ItemProperty -Path $Parameterfile
+
+    if ($false -eq $fInfo.Exists ) {
+        Write-Error ("File " + $Parameterfile + " does not exist")
+        return
+    }
+
     Add-Content -Path "deployment.log" -Value ("Deploying the: " + $Type)
     Add-Content -Path "deployment.log" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
     
-
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
-    $iniContent = Get-IniContent $filePath
+    $iniContent = Get-IniContent -Path $filePath
     $changed = $false
-
-    [IO.FileInfo] $fInfo = $Parameterfile
 
     if ($Parameterfile.StartsWith(".\")) {
         if ($Parameterfile.Substring(2).Contains("\")) {
@@ -67,57 +71,104 @@ Licensed under the MIT license.
         }
     }
 
+    $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
+    $landscapeKey = ""
+    if ($Type -eq "sap_landscape") {
+        $landscapeKey = $key
+    }
+  
+    
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
     $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
     $combined = $Environment + $region
+
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+
+        $rgName = Read-Host -Prompt "Please specify the resource group name for the terraform storage account"
+        $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
+
+        $tfstate_resource_id = Read-Host -Prompt "Please specify the storage account resource ID for the terraform storage account"
+        
+        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -Path $filePath
+
+    }
+
+    if ($null -eq $iniContent[$combined]) {
+        $Category1 = @{"Landscape" = $landscapeKey; "Subscription" = "" }
+        $iniContent += @{$combined = $Category1 }
+        Out-IniFile -InputObject $iniContent -Path $filePath
+    }
+
     
-    $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     if ("sap_deployer" -eq $Type) {
-        $iniContent[$region]["Deployer"] = $key
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
-        $iniContent = Get-IniContent $filePath
+        $iniContent[$region]["Deployer"] = $key.Trim()
+        Out-IniFile -InputObject $iniContent -Path $filePath
+        $iniContent = Get-IniContent -Path $filePath
     }
     else {
-        $deployer_tfstate_key = $iniContent[$region]["Deployer"]    
+        $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()    
     }
-    
 
     if ($Type -eq "sap_system") {
         if ($null -ne $iniContent[$combined] ) {
-            $landscape_tfstate_key = $iniContent[$combined]["Landscape"]
+            $landscape_tfstate_key = $iniContent[$combined]["Landscape"].Trim()
         }
         else {
             Write-Host -ForegroundColor Red "The workload zone for " $environment "in " $region " is not deployed"
         }
     }
 
-    $rgName = $iniContent[$region]["REMOTE_STATE_RG"] 
-    $saName = $iniContent[$region]["REMOTE_STATE_SA"] 
-    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"] 
+    $rgName = $iniContent[$region]["REMOTE_STATE_RG"].Trim() 
+    $saName = $iniContent[$region]["REMOTE_STATE_SA"].Trim()  
+    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim() 
 
     # Subscription
-    $sub = $iniContent[$combined]["subscription"] 
-    $repo = $iniContent["Common"]["repo"]
+    if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+        $sub = $iniContent[$combined]["subscription"].Trim()  
+    }
+    else {
+        $sub = $iniContent[$region]["subscription"].Trim()  
+    }
+    
+    $repo = $iniContent["Common"]["repo"].Trim() 
+
+    if ($null -eq $landscape_tfstate_key -or "" -eq $landscape_tfstate_key) {
+        $landscape_tfstate_key = Read-Host -Prompt "Please enter the subscription for the deployment"
+        if ($Type -eq "sap_system") {
+            $iniContent[$combined]["Landscape"] = $landscape_tfstate_key.Trim()
+        }
+    
+        $changed = $true
+    }
 
     if ($null -eq $sub -or "" -eq $sub) {
-        $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$combined]["Subscription"] = $sub
+        $sub = Read-Host -Prompt "Please enter the subscription for the deployment"
+        if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+            $iniContent[$combined]["subscription"] = $sub.Trim() 
+        }
+        else {
+            $iniContent[$region]["subscription"] = $sub.Trim()  
+        }
         $changed = $true
     }
 
     if ($null -eq $repo -or "" -eq $repo) {
         $repo = Read-Host -Prompt "Please enter the path to the repo"
-        $iniContent["Common"]["repo"] = $repo
+        $iniContent["Common"]["repo"] = $repo.Trim() 
         $changed = $true
     }
 
     if ($changed) {
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -Path $filePath
     }
 
-    $terraform_module_directory = $repo + "\deploy\terraform\run\" + $Type
+    
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
 
     Write-Host -ForegroundColor green "Initializing Terraform"
 
@@ -128,7 +179,7 @@ Licensed under the MIT license.
         if ("azurerm" -eq $jsonData.backend.type) {
             $Command = " init -upgrade=true"
 
-            $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
+            $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
             if ("Y" -ne $ans) {
                 return
             }
@@ -151,7 +202,6 @@ Licensed under the MIT license.
         if (Test-Path ".\post_deployment.sh" -PathType Leaf) {
             Remove-Item -Path ".\post_deployment.sh"  -Force 
         }
-        
     }
 
     if ($Type -eq "sap_landscape") {
@@ -186,12 +236,14 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
         Write-Host ""
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -eq $ans) {
+        if ($PSCmdlet.ShouldProcess($Parameterfile ,$Type)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -eq $ans) {
     
-        }
-        else {
-            return 
+            }
+            else {
+                return 
+            }        
         }
     }
     else {
@@ -228,21 +280,26 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
         Write-Host ""
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -ne $ans) {
-            return 
+        if ($PSCmdlet.ShouldProcess($Parameterfile ,$Type)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -ne $ans) {
+                return 
+            }
         }
 
     }
 
-    Write-Host -ForegroundColor green "Running apply"
-    $Command = " apply -var-file " + $Parameterfile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + " " + $terraform_module_directory
+    if ($PSCmdlet.ShouldProcess($Parameterfile ,$Type)) {
 
-    $Cmd = "terraform $Command"
-    Add-Content -Path "deployment.log" -Value $Cmd
-    & ([ScriptBlock]::Create($Cmd))  
-    if ($LASTEXITCODE -ne 0) {
-        throw "Error executing command: $Cmd"
+        Write-Host -ForegroundColor green "Running apply"
+        $Command = " apply -var-file " + $Parameterfile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + " " + $terraform_module_directory
+
+        $Cmd = "terraform $Command"
+        Add-Content -Path "deployment.log" -Value $Cmd
+        & ([ScriptBlock]::Create($Cmd))  
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing command: $Cmd"
+        }
     }
 
     if (Test-Path ".\backend.tf" -PathType Leaf) {

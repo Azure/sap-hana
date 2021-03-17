@@ -18,6 +18,7 @@ provider "azurerm" {
   client_id       = local.spn.client_id
   client_secret   = local.spn.client_secret
   tenant_id       = local.spn.tenant_id
+  alias           = "main"
 }
 
 provider "azurerm" {

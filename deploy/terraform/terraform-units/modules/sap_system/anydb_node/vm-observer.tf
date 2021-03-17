@@ -1,6 +1,7 @@
 
 # Create observer VM
 resource "azurerm_network_interface" "observer" {
+  provider                      = azurerm.main
   count                         = local.deploy_observer ? length(local.zones) : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.nic)
   resource_group_name           = var.resource_group[0].name
@@ -23,6 +24,7 @@ resource "azurerm_network_interface" "observer" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
+  provider            = azurerm.main
   depends_on          = [var.anchor_vm]
   count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
@@ -82,6 +84,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "observer" {
+  provider            = azurerm.main
   count               = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]

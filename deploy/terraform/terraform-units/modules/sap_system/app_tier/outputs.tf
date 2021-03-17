@@ -75,7 +75,7 @@ output "dns_info_vms" {
           local.full_webserver_names,
           var.naming.virtualmachine_names.WEB_SECONDARY_DNSNAME
         ),
-       concat(
+        concat(
           slice(azurerm_network_interface.app_admin[*].private_ip_address, 0, local.application_server_count),
           slice(azurerm_network_interface.app[*].private_ip_address, 0, local.application_server_count),
           slice(azurerm_network_interface.scs_admin[*].private_ip_address, 0, local.scs_server_count),
@@ -92,15 +92,15 @@ output "dns_info_vms" {
         concat(
           slice(azurerm_network_interface.app[*].private_ip_address, 0, local.application_server_count),
           slice(azurerm_network_interface.scs[*].private_ip_address, 0, local.scs_server_count),
-          slice(azurerm_network_interface.web[*].private_ip_address, 0, local.webdispatcher_count)      
-        )))
+          slice(azurerm_network_interface.web[*].private_ip_address, 0, local.webdispatcher_count)
+    )))
     ) : (
     null
   )
 }
 
 output "dns_info_loadbalancers" {
-  value = ! local.enable_deployment ? null : (
+  value = !local.enable_deployment ? null : (
     zipmap(
       [
         local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",

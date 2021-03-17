@@ -31,7 +31,7 @@ function New-SAPWorkloadZone {
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess)]
     param(
         #Parameter file
         [Parameter(Mandatory = $true)][string]$Parameterfile 
@@ -41,45 +41,77 @@ Licensed under the MIT license.
     $Type = "sap_landscape"
     Write-Host -ForegroundColor green "Deploying the" $Type
 
-    $mydocuments = [environment]::getfolderpath("mydocuments")
-    $filePath = $mydocuments + "\sap_deployment_automation.ini"
-    $iniContent = Get-IniContent $filePath
+    $fInfo = Get-ItemProperty -Path $Parameterfile
 
-    [IO.FileInfo] $fInfo = $Parameterfile
+    if ($false -eq $fInfo.Exists ) {
+        Write-Error ("File " + $Parameterfile + " does not exist")
+        return
+    }
+
+    $mydocuments = [environment]::getfolderpath("mydocuments")
+    $fileINIPath = $mydocuments + "\sap_deployment_automation.ini"
+    $iniContent = Get-IniContent -Path $fileINIPath
+
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
     $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
     $combined = $Environment + $region
+    $changed = $false
 
     $envkey = $fInfo.Name.replace(".json", ".terraform.tfstate")
 
-    $deployer_tfstate_key = $iniContent[$region]["Deployer"]
-
-    try {
-        if ($null -ne $iniContent[$combined] ) {
-            $iniContent[$combined]["Landscape"] = $envkey
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
-        }
-        else {
-            $Category1 = @{"Landscape" = $envkey }
-            $iniContent += @{$combined = $Category1 }
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
-        }
-                
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+        $deployer_tfstate_key = Read-Host ("Please provide the deployer state file name for the " + $region + " region")
+        $Category1 = @{"Deployer" = $deployer_tfstate_key }
+        $iniContent += @{$region = $Category1 }
     }
-    catch {
-        
+    else {
+        $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()
     }
 
-    $rgName = $iniContent[$region]["REMOTE_STATE_RG"] 
-    $saName = $iniContent[$region]["REMOTE_STATE_SA"] 
-    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"] 
+    if ($null -ne $iniContent[$combined] ) {
+        $iniContent[$combined]["Landscape"] = $envkey
+        $changed = $true
+    }
+    else {
+        $Category1 = @{"Landscape" = $envkey; "Subscription" = "" }
+        $iniContent += @{$combined = $Category1 }
+        $changed = $true
+    }
 
+    if ($changed) {
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+    }
+
+    $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
+    if ("Y" -eq $ans) {
+        $vault = $iniContent[$region]["Vault"]
+
+        if (($null -eq $vault ) -or ("" -eq $vault)) {
+            $vault = Read-Host -Prompt "Please enter the vault name"
+            $iniContent[$region]["Vault"] = $vault 
+            Out-IniFile -InputObject $iniContent -Path $fileINIPath
+    
+        }
+        try {
+            Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Workload $true
+            $iniContent = Get-IniContent -Path $fileINIPath
+        }
+        catch {
+            return
+        }
+    }
+
+    $rgName = $iniContent[$region]["REMOTE_STATE_RG"].Trim() 
+    $saName = $iniContent[$region]["REMOTE_STATE_SA"].Trim() 
+    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim()
 
     # Subscription
-    $sub = $iniContent[$region]["subscription"] 
-    $repo = $iniContent["Common"]["repo"]
+    $sub = $iniContent[$combined]["subscription"].Trim() 
+    $repo = $iniContent["Common"]["repo"].Trim()
+
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {
@@ -95,14 +127,14 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-    $terraform_module_directory = $repo + "\deploy\terraform\run\" + $Type
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
 
     Write-Host -ForegroundColor green "Initializing Terraform"
 
-    $Command = " init -upgrade=true -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" " +  $terraform_module_directory
+    $Command = " init -upgrade=true -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" " + $terraform_module_directory
 
     if (Test-Path ".terraform" -PathType Container) {
 
@@ -143,12 +175,14 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
         Write-Host ""
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -eq $ans) {
+        if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -eq $ans) {
     
-        }
-        else {
-            return 
+            }
+            else {
+                return 
+            }
         }
     }
     else {
@@ -184,22 +218,24 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
         Write-Host ""
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -ne $ans) {
-            return 
+        if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -ne $ans) {
+                return 
+            }
         }
-
     }
 
-    Write-Host -ForegroundColor green "Running apply"
-    $Command = " apply -var-file " + $Parameterfile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + " " + $terraform_module_directory
+    if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+        Write-Host -ForegroundColor green "Running apply"
+        $Command = " apply -var-file " + $Parameterfile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + " " + $terraform_module_directory
 
-    $Cmd = "terraform $Command"
-    & ([ScriptBlock]::Create($Cmd))  
-    if ($LASTEXITCODE -ne 0) {
-        throw "Error executing command: $Cmd"
+        $Cmd = "terraform $Command"
+        & ([ScriptBlock]::Create($Cmd))  
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing command: $Cmd"
+        }
     }
-
     if (Test-Path ".\backend.tf" -PathType Leaf) {
         Remove-Item -Path ".\backend.tf"  -Force 
     }

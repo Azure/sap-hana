@@ -52,14 +52,19 @@ Licensed under the MIT license.
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Remove the" $Type
 
+    $fInfo = Get-ItemProperty -Path $Parameterfile
+    if (!$fInfo.Exists ) {
+        Write-Error ("File " + $Parameterfile + " does not exist")
+        return
+    }
+
     Add-Content -Path "deployment.log" -Value ("Removing the: " + $Type)
     Add-Content -Path "deployment.log" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
-    $iniContent = Get-IniContent $filePath
+    $iniContent = Get-IniContent -Path $filePath
 
-    [IO.FileInfo] $fInfo = $Parameterfile
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
     $Environment = $jsonData.infrastructure.environment
@@ -92,10 +97,10 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -Path $filePath
     }
-
-    $terraform_module_directory = $repo + "\deploy\terraform\run\" + $Type
+    
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"$terraform_module_directory = $repo + "\deploy\terraform\run\" + $Type
 
     if ($Type -ne "sap_deployer") {
         $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id

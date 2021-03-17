@@ -6,8 +6,8 @@ Description:
   Define 0..n Deployer(s).
 */
 
-data azurerm_subscription "primary" {}
-data azurerm_client_config "current" {}
+data "azurerm_subscription" "primary" {}
+data "azurerm_client_config" "current" {}
 
 // Public IP addresse and nic for Deployer
 resource "azurerm_public_ip" "deployer" {
@@ -15,8 +15,7 @@ resource "azurerm_public_ip" "deployer" {
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.pip)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
-  allocation_method   = "Static"
-  sku                 = "Standard"
+  sku                 = "Basic"
 }
 
 resource "azurerm_network_interface" "deployer" {
@@ -28,8 +27,8 @@ resource "azurerm_network_interface" "deployer" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = local.sub_mgmt_deployed.id
-    private_ip_address            = local.deployers[count.index].private_ip_address
-    private_ip_address_allocation = "static"
+    private_ip_address            = local.deployers[count.index].use_DHCP ? "" : local.deployers[count.index].private_ip_address
+    private_ip_address_allocation = local.deployers[count.index].use_DHCP ? "Dynamic" : "Static"
     public_ip_address_id          = local.enable_deployer_public_ip ? azurerm_public_ip.deployer[count.index].id : ""
   }
 }

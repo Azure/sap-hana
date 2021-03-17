@@ -33,7 +33,7 @@ output "dns_info_vms" {
       concat(
         slice(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, 0, local.db_server_count),
         slice(azurerm_network_interface.nics_dbnodes_db[*].private_ip_address, 0, local.db_server_count)
-      )    )) : (
+    ))) : (
     null
   )
 }

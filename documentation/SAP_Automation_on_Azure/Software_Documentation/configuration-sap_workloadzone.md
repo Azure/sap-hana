@@ -25,6 +25,7 @@ The parameters to the automation are passed in a JSON structure with a set of ro
 Node                                   |  Description |
 | :------------------------------------------|  :---------- |
 | infrastructure|This node defines the resource group and the networking information. |
+| key_vault|This node defines the key vault details for the system. |
 | authentication|This node defines the authentication details for the system. |
 | options |If specified - This node defines special settings for the environment |
 

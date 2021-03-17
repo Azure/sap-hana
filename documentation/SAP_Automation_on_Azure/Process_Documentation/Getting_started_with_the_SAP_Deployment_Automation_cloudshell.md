@@ -35,9 +35,97 @@ git checkout beta
     cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES/ -r
     ```
 
-Navigate to the ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYMENT-ORCHESTRATION folder.
+6. Navigate to the ```Azure_SAP_Automated_Deployment\WORKSPACES\DEPLOYMENT-ORCHESTRATION``` folder.
 
-The deployment will need the Service Principal details (application id, secret and tenant ID)
+Kindly note, that triggering the deployment will need the Service Principal details (application id, secret and tenant ID)
+
+## **Listing the contents of the deployment**
+
+For a highlevel overview of what will be deployed use the validate.sh script to list the resources deployed by the deployment. **Note** The list does not contain all artifacts
+
+```bash
+ ${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh -p DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json -t sap_deployer
+
+${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh -p LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json -t sap_library
+
+${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh -p LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json -t sap_landscape
+
+${DEPLOYMENT_REPO_PATH}deploy/scripts/validate.sh -p SYSTEM/DEV-WEEU-SAP01-ZZZ/DEV-WEEU-SAP01-ZZZ.json -t sap_system
+
+```
+
+A sample output is listed below
+
+```txt
+    Deployment information
+    ----------------------------------------------------------------------------
+    Environment:                  DEV
+    Region:                       westeurope
+    * Resource group:             (name defined by automation)
+
+    Networking
+    ----------------------------------------------------------------------------
+    VNet Logical Name:            SAP01
+    * Admin subnet:               (name defined by automation)
+    * Admin subnet prefix:        10.110.0.0/27
+    * Admin subnet nsg:           (name defined by automation)
+    * Database subnet:            (name defined by automation)
+    * Database subnet prefix:     10.110.0.64/27
+    * Database subnet nsg:        (name defined by automation)
+    * Application subnet:         (name defined by automation)
+    * Application subnet prefix:  10.110.0.32/27
+    * Application subnet nsg:     (name defined by automation)
+    * Web subnet:                 (name defined by automation)
+    * Web subnet prefix:          10.110.0.96/27
+    * Web subnet nsg:             (name defined by automation)
+
+    Database tier
+    ----------------------------------------------------------------------------
+    Platform:                     HANA
+    High availability:            false
+    Number of servers:            1
+    Database sizing:              Default
+    Image publisher:              SUSE
+    Image offer:                  sles-sap-12-sp5
+    Image sku:                    gen1
+    Image version:                latest
+    Deployment:                   Regional
+    Networking:                   Use Azure provided IP addresses
+    Authentication:               key
+
+    Application tier
+    ----------------------------------------------------------------------------
+    Authentication:               key
+    Application servers
+    Number of servers:          2
+    Image publisher:            SUSE
+    Image offer:                sles-sap-12-sp5
+    Image sku:                  gen1
+    Image version:              latest
+    Deployment:                 Regional
+    Central Services
+    Number of servers:          1
+    High availability:          true
+    Image publisher:            SUSE
+    Image offer:                sles-sap-12-sp5
+    Image sku:                  gen1
+    Image version:              latest
+    Deployment:                 Regional
+    Web dispatcher
+    Number of servers:          1
+    Image publisher:            SUSE
+    Image offer:                sles-sap-12-sp5
+    Image sku:                  gen1
+    Image version:              latest
+    Deployment:                 Regional
+
+    Key Vault
+    ----------------------------------------------------------------------------
+    SPN Key Vault:              Deployer keyvault
+    User Key Vault:             Workload keyvault
+    Automation Key Vault:       Workload keyvault
+
+```
 
 ## **Preparing the region**
 

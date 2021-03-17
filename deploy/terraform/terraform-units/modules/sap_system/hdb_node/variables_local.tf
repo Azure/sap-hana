@@ -18,7 +18,7 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-variable naming {
+variable "naming" {
   description = "Defines the names for the resources"
 }
 
@@ -60,6 +60,13 @@ variable "sap_sid" {
   description = "The SID of the application"
 }
 
+
+variable "db_asg_id" {
+  description = "Database Application Security Group"
+}
+
+
+
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
@@ -68,9 +75,6 @@ locals {
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
-}
-
-locals {
   // Imports database sizing information
   sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
 
@@ -100,11 +104,6 @@ locals {
   //Scalout subnet is needed if ANF is used and there are more than one hana node 
   dbnode_per_site       = length(try(local.hdb.dbnodes, [{}]))
   enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
-
-  // Zones
-  zones            = try(local.hdb.zones, [])
-  zonal_deployment = length(local.zones) > 0 ? true : false
-  db_zone_count    = length(local.zones)
 
   // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
@@ -315,4 +314,15 @@ locals {
     )[0],
     false
   )
+
+  // Zones
+  zones         = try(local.hdb.zones, [])
+  db_zone_count = length(local.zones)
+
+  //Ultra disk requires zonal deployment
+  zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
+
+  //If we deploy more than one server in zone put them in an availability set
+  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
+
 }

@@ -1,7 +1,7 @@
 
 // Create/Import management subnet
 resource "azurerm_subnet" "firewall" {
-  count                = var.firewall_deployment && ! local.sub_fw_snet_exists ? 1 : 0
+  count                = var.firewall_deployment && !local.sub_fw_snet_exists ? 1 : 0
   name                 = local.sub_fw_snet_name
   resource_group_name  = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].resource_group_name : azurerm_virtual_network.vnet_mgmt[0].resource_group_name
   virtual_network_name = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].name : azurerm_virtual_network.vnet_mgmt[0].name

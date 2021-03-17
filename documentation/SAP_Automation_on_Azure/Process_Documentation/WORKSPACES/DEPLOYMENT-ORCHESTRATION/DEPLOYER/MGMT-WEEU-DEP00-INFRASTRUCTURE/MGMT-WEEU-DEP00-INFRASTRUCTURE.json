@@ -1,7 +1,7 @@
 {
   "infrastructure": {
     "region": "westeurope",
-    "environment": "DEV",
+    "environment": "MGMT",
     "vnets": {
       "management": {
         "address_space": "10.10.20.0/25",
@@ -14,7 +14,7 @@
       }
     },
     "resource_group": {
-      "name": "WEEU-DEP00-INFRASTRUCTURE"
+      "name": "MGMT-DEP00-INFRASTRUCTURE"
     }
   },
   "options": {

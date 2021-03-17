@@ -57,15 +57,16 @@ Licensed under the MIT license.
 
     $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
 
     $mydocuments = [environment]::getfolderpath("mydocuments")
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
 
     if ( -not (Test-Path -Path $FilePath)) {
-        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$Environment$region]`nDeployer=" -Force
+        New-Item -Path $mydocuments -Name "sap_deployment_automation.ini" -ItemType "file" -Value "[Common]`nrepo=`nsubscription=`n[$region]`nDeployer=`nLandscape=`n[$Environment]`nDeployer=`n[$combined]`nDeployer=`nSubscription=" -Force
     }
 
-    $iniContent = Get-IniContent $filePath
+    $iniContent = Get-IniContent -Path $filePath
 
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     
@@ -76,8 +77,7 @@ Licensed under the MIT license.
         else {
             $Category1 = @{"Deployer" = $key }
             $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
-                    
+            Out-IniFile -InputObject $iniContent -Path $filePath                    
         }
                 
     }
@@ -85,12 +85,21 @@ Licensed under the MIT license.
         
     }
 
+    $errors_occurred = $false
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPDeployer -Parameterfile $fInfo.Name 
+    try {
+        New-SAPDeployer -Parameterfile $fInfo.Name 
+    }
+    catch {
+        $errors_occurred = true
+    }
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     # Re-read ini file
-    $iniContent = Get-IniContent $filePath
+    $iniContent = Get-IniContent -Path $filePath
 
     $ans = Read-Host -Prompt "Do you want to enter the SPN secrets Y/N?"
     if ("Y" -eq $ans) {
@@ -99,33 +108,66 @@ Licensed under the MIT license.
             $vault = $iniContent[$region]["Vault"]
         }
 
-        if(($null -eq $vault ) -or ("" -eq $vault))        {
+        if (($null -eq $vault ) -or ("" -eq $vault)) {
             $vault = Read-Host -Prompt "Please enter the vault name"
             $iniContent[$region]["Vault"] = $vault 
-            Out-IniFile -InputObject $iniContent -FilePath $filePath
+            Out-IniFile -InputObject $iniContent -Path $filePath
     
         }
-
-        Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault
+        try {
+            Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault  -Workload $false
+        }
+        catch {
+            $errors_occurred = true
+            return
+        }
+    
         
     }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    try {
+        New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $DeployerParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type [SAP_Types]::sap_deployer
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type [SAP_Types]::sap_library
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
 }

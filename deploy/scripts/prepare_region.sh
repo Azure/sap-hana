@@ -154,17 +154,100 @@ fi
 # Helper variables
 
 automation_config_directory=~/.sap_deployment_automation/
+generic_config_information="${automation_config_directory}"config
+deployer_config_information="${automation_config_directory}""${region}"
+
+if [ ! -d "${automation_config_directory}" ]
+then
+    # No configuration directory exists
+    mkdir "${automation_config_directory}"
+    touch "${deployer_config_information}
+    touch "${generic_config_information}
+    if [ -n "${DEPLOYMENT_REPO_PATH}" ]; then
+        # Store repo path in ~/.sap_deployment_automation/config
+        echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> "${generic_config_information}"
+        config_stored=true
+    fi
+    if [ -n "$ARM_SUBSCRIPTION_ID" ]; then
+        # Store ARM Subscription info in ~/.sap_deployment_automation
+        echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> $deployer_config_information
+        arm_config_stored=true
+    fi
+
+else
+    temp=$(grep "DEPLOYMENT_REPO_PATH" "${generic_config_information}")
+    if [ $temp ]
+    then
+        # Repo path was specified in ~/.sap_deployment_automation/config
+        DEPLOYMENT_REPO_PATH=$(echo "${temp}" | cut -d= -f2)
+        config_stored=true
+    fi
+fi
+
+if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#   Missing environment variables (DEPLOYMENT_REPO_PATH)!!!                             #"
+    echo "#                                                                                       #" 
+    echo "#   Please export the folloing variables:                                               #"
+    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
+    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    exit 4
+else
+    if [ $config_stored == false ]
+    then
+        echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> ${automation_config_directory}config
+    fi
+fi
+
+temp=$(grep "ARM_SUBSCRIPTION_ID" $deployer_config_information | cut -d= -f2)
+templen=$(echo $temp | wc -c)
+# Subscription length is 37
+
+if [ 37 == $templen ] 
+then
+    echo "Reading the configuration"
+    # ARM_SUBSCRIPTION_ID was specified in ~/.sap_deployment_automation/configuration file for deployer
+    ARM_SUBSCRIPTION_ID="${temp}"
+    arm_config_stored=true
+else    
+    arm_config_stored=false
+fi
+
+if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #" 
+    echo "#   Missing environment variables (ARM_SUBSCRIPTION_ID)!!!                              #"
+    echo "#                                                                                       #" 
+    echo "#   Please export the folloing variables:                                               #"
+    echo "#      DEPLOYMENT_REPO_PATH (path to the repo folder (sap-hana))                        #"
+    echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
+    echo "#                                                                                       #" 
+    echo "#########################################################################################"
+    exit 3
+else
+    if [  $arm_config_stored  == false ]
+    then
+        echo "Storing the configuration"
+        sed -i /ARM_SUBSCRIPTION_ID/d  "${deployer_config_information}"
+        echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> "${deployer_config_information}"
+    fi
+fi
 
 deployer_dirname=$(dirname "${deployer_parameter_file}")
 deployer_file_parametername=$(basename "${deployer_parameter_file}")
 
 # Read environment
-environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
-region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
+environment=$(cat "${deployer_parameter_file}" | jq .infrastructure.environment | tr -d \")
+region=$(cat "${deployer_parameter_file}" | jq .infrastructure.region | tr -d \")
 
 deployer_key=$(echo "${deployer_file_parametername}" | cut -d. -f1)
-
 library_config_information="${automation_config_directory}""${region}"
+touch $library_config_information
 
 library_dirname=$(dirname "${library_parameter_file}")
 library_file_parametername=$(basename "${library_parameter_file}")
@@ -209,26 +292,31 @@ echo ""
 cd "${deployer_dirname}"
 "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh -p $deployer_file_parametername -i true
 if [ $? -eq 255 ]
-    then
-    exit $?
+   then
+   exit $?
 fi 
 cd "${curdir}"
 
 read -p "Do you want to specify the SPN Details Y/N?"  ans
 answer=${ans^^}
 if [ $answer == 'Y' ]; then
+echo $library_config_information
     temp=$(grep "keyvault=" $library_config_information)
     if [ ! -z $temp ]
     then
         # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-        keyvault_name=$(echo $temp | cut -d= -f2)
-        keyvault_param=$(printf " -v %s " $keyvault_name)
+        keyvault_name=$(echo $temp | cut -d= -f2 | xargs)
+        keyvault_param=$(printf " -v %s " "${keyvault_name}")
     fi    
-    env_param=$environment
-    region_param=$(printf " -r %s " $region)
     
-    allParams=${env_param}${keyvault_param}${region_param}
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh -e $allParams 
+    env_param=$(printf " -e %s " "${environment}")
+    region_param=$(printf " -r %s " "${region}")
+    
+    allParams="${env_param}""${keyvault_param}""${region_param}"
+
+    echo $allParams
+
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
     if [ $? -eq 255 ]
         then
         exit $?
@@ -262,8 +350,10 @@ echo ""
 cd "${deployer_dirname}"
 
 # Remove the script file
-rm ./post_deployment.sh
-echo pwd
+if [ -f post_deployment.sh ]
+then
+    rm post_deployment.sh
+fi
 "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh -p $deployer_file_parametername -i true -t sap_deployer
 if [ $? -eq 255 ]
     then

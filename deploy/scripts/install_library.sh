@@ -47,8 +47,8 @@ while getopts ":p:i:d:h" option; do
 done
 
 # Read environment
-environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
-region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
+environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
+region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
 key=$(echo "${parameterfile}" | cut -d. -f1)
 deployment_system=sap_library
 
@@ -182,10 +182,11 @@ new_deployment=false
 rm backend.tf
 
 reinitialized=0
+
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+
 if [ -f ./backend-config.tfvars ]
 then
-    terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
-
     echo "#########################################################################################"
     echo "#                                                                                       #" 
     echo "#                          The bootstrapping has already been done!                     #"
@@ -194,6 +195,7 @@ then
 else
     sed -i /REMOTE_STATE_RG/d  "${library_config_information}"
     sed -i /REMOTE_STATE_SA/d  "${library_config_information}"
+    sed -i /tfstate_resource_id/d  "${library_config_information}"
 fi
 
 if [ ! -d ./.terraform/ ]; then
@@ -205,6 +207,7 @@ if [ ! -d ./.terraform/ ]; then
     terraform init -upgrade=true "${terraform_module_directory}"
     sed -i /REMOTE_STATE_RG/d  "${library_config_information}"
     sed -i /REMOTE_STATE_SA/d  "${library_config_information}"
+    sed -i /tfstate_resource_id/d  "${library_config_information}"
 
 else
     if [ $reinitialized -eq 0 ]
@@ -224,13 +227,12 @@ else
                     echo "#                     The state is already migrated to Azure!!!                         #"
                     echo "#                                                                                       #" 
                     echo "#########################################################################################"
-                    return 0
+                    exit 0
                 fi
             fi
-
-            terraform init -upgrade=true "{$terraform_module_directory}"
+            terraform init -upgrade=true -reconfigure "${terraform_module_directory}"
         else
-            return 0
+            exit 0
         fi
     fi
 fi
@@ -299,10 +301,10 @@ then
 fi
 
 tfstate_resource_id=$(terraform output tfstate_resource_id| tr -d \")
-temp=$(echo "${tfstate_resource_id}" | grep "Warning")
+temp=$(echo "${tfstate_resource_id}" | grep "Warning" -m1 )
 if [ -z "${temp}" ]
 then
-    temp=$(echo $tfstate_resource_id | grep "Backend reinitialization required")
+    temp=$(echo $tfstate_resource_id | grep "Backend reinitialization required" -m1 )
     if [ -z $temp ]
     then
         sed -i /tfstate_resource_id/d  "${library_config_information}"

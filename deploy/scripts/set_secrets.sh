@@ -50,20 +50,25 @@ while getopts ":e:c:s:t:h:v:r:x" option; do
 done
 
 automation_config_directory=~/.sap_deployment_automation/
-library_config_information="${automation_config_directory}""${region}"
-environment_config_information="${automation_config_directory}""${environment}"-"${region}"
-touch $environment_config_information
-    
+
+if [ ! -n "${environment}" ]; then
+    read -p "Environment name:"  environment
+fi
+
+
+environment_config_information="${automation_config_directory}""${environment}"
+touch "${environment_config_information}"
+
 if [ ! -d "${automation_config_directory}" ]
 then
     # No configuration directory exists
     mkdir "${automation_config_directory}"
 else
-    
-    temp=$(grep "keyvault" "${library_config_information}")
+    touch "${environment_config_information}"
+    temp=$(grep "keyvault" "${environment_config_information}")
     if [ ! -z "${temp}" ]
     then
-        vaultname=$(echo "${temp}" | cut -d= -f2)
+        vaultname=$(echo "${temp}" | cut -d= -f2 | xargs)
         vaultname_exists=1
     else
         vaultname_exists=0
@@ -86,10 +91,16 @@ else
     else
         tenant_exists=0
     fi
-fi
 
-if [ ! -n "${environment}" ]; then
-    read -p "Environment name:"  environment
+    temp=$(grep "Subscription" "${environment_config_information}")
+    if [ ! -z "${temp}" ]
+    then
+        subscription=$(echo "${temp}" | cut -d= -f2)
+        subscription_exists=1
+    else
+        subscription_exists=0
+    fi
+
 fi
 
 if [ ! -n "$vaultname" ]; then
@@ -106,14 +117,8 @@ if [ ! -n "${tenant}" ]; then
     read -p "SPN Tenant ID:"  tenant
 fi 
 
-if [ ! -n "{$ARM_SUBSCRIPTION_ID}" ]; then
-    echo ""
-    echo "####################################################################################"
-    echo "# Missing environment variables (ARM_SUBSCRIPTION_ID)!!!                           #"
-    echo "# Please export the folloing variables:                                            #"
-    echo "# ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
-    echo "####################################################################################"
-    exit 1
+if [ ! -n "$subscription" ]; then
+    read -p "SPN Subscription:"  subscription
 fi
 
 if [ ! -n "${environment}" ]; then
@@ -150,13 +155,20 @@ echo ""
 
 touch "${environment_config_information}"
 sed -i /Environment/d  "${environment_config_information}"
-echo "Environment=${environment} >> ${environment_config_information}"
+echo "Environment=${environment}" >> "${environment_config_information}"
 
 if [ $vaultname_exists -eq 0 ]
     then
-    sed -i /keyvault/d  "{$library_config_information}"
-    echo "keyvault=${vaultname}" >> "${library_config_information}"
+    sed -i /keyvault/d  "{$environment_config_information}"
+    echo "keyvault=${vaultname}" >> "${environment_config_information}"
 fi
+
+if [ $subscription_exists -eq 0 ]
+    then
+    sed -i /Subscription/d  "{$environment_config_information}"
+    echo "Subscription=${subscription}" >> "${environment_config_information}"
+fi
+
 
 if [ $client_id_exists -eq 0 ]
     then
@@ -172,16 +184,16 @@ fi
 
 secretname="${environment}"-subscription-id
 
-az keyvault secret set --name "${secretname}" --vault-name "${vaultname}" --value "${ARM_SUBSCRIPTION_ID}"  > stdout.az 2>&1
+az keyvault secret set --name "${secretname}" --vault-name "${vaultname}" --value "${subscription}"  > stdout.az 2>&1
 result=$(grep "ERROR: The user, group or application" stdout.az)
 
 rm stdout.az
 if [ -n "${result}" ]; then 
-    upn=$(az account show | grep name | grep @ | cut -d: -f2 | cut -d, -f1 | tr -d \")
+    upn=$(az account show | grep name | grep @ | cut -d: -f2 | cut -d, -f1 | tr -d \" | xargs)
     az keyvault set-policy -n "${vaultname}" --secret-permissions get list recover restore set --upn "${upn}"
 fi
     
-az keyvault secret set --name "${secretname}" --vault-name "${vaultname}" --value "${ARM_SUBSCRIPTION_ID}"  > stdout.az 2>&1
+az keyvault secret set --name "${secretname}" --vault-name "${vaultname}" --value "${subscription}"  > stdout.az 2>&1
 result=$(grep "ERROR: The user, group or application" stdout.az)
 
 rm stdout.az

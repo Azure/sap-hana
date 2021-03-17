@@ -13,10 +13,10 @@ function Get-IniContent {
     [cmdletbinding()]
     param(
         #Parameter file
-        [Parameter(Mandatory = $true)][string]$FilePath
+        [Parameter(Mandatory = $true)][string]$Path
     )
     $ini = @{}
-    switch -regex -file $FilePath {
+    switch -regex -file $Path {
         "^\[(.+)\]" {
             # Section
             $section = $matches[1]
@@ -56,10 +56,12 @@ function Out-IniFile {
         # Object
         [Parameter(Mandatory = $true)]$InputObject,
         #Ini file
-        [Parameter(Mandatory = $true)][string]$FilePath
+        [Parameter(Mandatory = $true)][string]$Path
     )
-    
-    $outFile = New-Item -ItemType file -Path $FilePath -Force
+
+    New-Item -ItemType file -Path $Path -Force
+    $outFile = $Path
+
     foreach ($i in $InputObject.keys) {
         if (!($($InputObject[$i].GetType().Name) -eq "Hashtable")) {
             #No Sections

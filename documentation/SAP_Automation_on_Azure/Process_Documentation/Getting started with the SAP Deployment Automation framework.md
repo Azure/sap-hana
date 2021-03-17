@@ -17,18 +17,32 @@ The SAP Deployment Automation Framework provides both Terraform templates and An
 
 ## Planning ##
 
-Before deploying the SAP Systems there are a few design decisions that need to be made. This section covers the high level steps for the planning process
+Before deploying the SAP Systems there are a few design decisions that need to be made. This section covers the high level steps for the planning process.
+
+The Terraform deployment will use the Microsft provided Terraform templates and the customer provided parameter files that contain the system specific information. During the deployment information from both will be used to create the actual deployment.
+
+### **Credentials management** ###
+
+The SAP Deployment Automation leverages Service Principals to perform the deployment activities. The Automation has the ability to use different deployment credentials for each workload zone. These credentials are persisted in the deployer Key Vault and are dynamically retrieved during the deployment.
+
+The other type of credentials used by the automation are the default Virtual Machine accounts - these are the accounts provided during the virtual machine creation time. The table below lists the different credential types used by the SAP Deployment Automation.
+
+Credential                   |  Scope       | Storage            | Description                    |
+| :--------------------------|  :---------- | :----------------- | :----------------------------- |
+| Local user                 | Deployer     |                    | Used to bootstrap the deployer |
+| Service Principal          | Environment  | Deployer Key Vault | Used for deployment            |
+| Virtual Machine credential | Environment  | Workload Key Vault | Default Virtual Machine user   |
 
 ### **SPN Creation** ###
 
-The deployment will require using a Service principal.
+Service Principals can be created using the following steps.
 
 1. Create SPN
 
-From a privilaged account, create an SPN.
+From a privilaged account, create an Service Principal. Use a descriptive name that includes the environment name.
 
    ```bash
-   az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="Deployment Account-DEV"
+   az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="DEV-Deployment-Account"
    ```
 
 2. Record the credential outputs.
@@ -41,8 +55,8 @@ From a privilaged account, create an SPN.
 ```json
     {
       "appId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-      "displayName": "Deployment Account-NP",
-      "name": "http://Deployment-Account-NP",
+      "displayName": "DEV-Deployment-Account",
+      "name": "http://DEV-Deployment-Account",
       "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx""
     }
@@ -73,6 +87,12 @@ The SAP Deployment Automation supports deployments in multiple Azure Regions. Ea
 
 <img src="./assets/SAP_DevOps_strategy.png" width=600px>
 
+#### **Deployment environment** ####
+
+If the deployment infrastructure and the SAP Library will support multiple workload zones in the region it is recommended that the deployment environment and the SAP Library would use an environment identifier that is different from the workload zones, for example "MGMT"
+
+The automation also supports having the deployment environment and the SAP Library in a separate subscriptions from the workload zones.
+
 #### Design questions - regions ####
 
 - Which Azure regions are in scope?
@@ -93,7 +113,7 @@ The deployment configuration file defines the region and the environment name an
    {
       "infrastructure": {
          "region": "westeurope",
-         "environment": "DEV",
+         "environment": "MGMT",
          "vnets": {
                "management": {
                   "address_space": "10.10.20.0/25",
@@ -106,7 +126,7 @@ The deployment configuration file defines the region and the environment name an
    }
    ```
 
-A sample deployment environment configuration is specified in [Deployment Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/DEPLOYER/DEV-WEEU-DEP00-INFRASTRUCTURE/DEV-WEEU-DEP00-INFRASTRUCTURE.json)
+A sample deployment environment configuration is specified in [Deployment Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
 
 For more details on the deployer see [Deployer](../Software_Documentation\product_documentation-deployer.md)
 
@@ -127,20 +147,20 @@ The SAP Library configuration file defines the region and the environment name .
    {
       "infrastructure": {
          "region": "westeurope",
-         "environment": "DEV",
+         "environment": "MGMT",
          "resource_group": {
             "name" : "WEEU-SAP_LIBRARY"
          }
       },
       "deployer": {
-         "environment": "DEV",
+         "environment": "MGMT",
          "region": "westeurope",
          "vnet": "MGMT00"
       }
    }
 ```
 
-A sample deployment for the SAP library configuration is specified in [Library Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/LIBRARY/DEV-WEEU-SAP_LIBRARY/DEV-WEEU-SAP_LIBRARY.json)
+A sample deployment for the SAP library configuration is specified in [Library Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
 
 For more details on the SAP Library see [SAP Library](../Software_Documentation\product_documentation-sap_library.md)
 For more details on the configuration of the SAP Library see [SAP Library Configuration](../Software_Documentation/configuration-sap_library.md)

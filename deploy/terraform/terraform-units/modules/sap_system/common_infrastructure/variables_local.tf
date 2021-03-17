@@ -27,7 +27,7 @@ variable "deployer_user" {
 }
 */
 
-variable naming {
+variable "naming" {
   description = "Defines the names for the resources"
 }
 
@@ -77,7 +77,7 @@ locals {
   // Firewall routing logic
   // If the environment deployment created a route table use it to populate a route
 
-  route_table_id = try(var.landscape_tfstate.route_table_id, "")
+  route_table_id   = try(var.landscape_tfstate.route_table_id, "")
   route_table_name = try(split("/", var.landscape_tfstate.route_table_id)[8], "")
 
   firewall_ip = try(var.deployer_tfstate.firewall_ip, "")
@@ -168,7 +168,7 @@ locals {
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key      = ! local.enable_anchor_auth_password
+  enable_anchor_auth_key      = !local.enable_anchor_auth_password
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
@@ -211,7 +211,7 @@ locals {
   */
 
   //SAP vnet
-  vnet_sap_arm_id              = try(var.landscape_tfstate.vnet_sap_arm_id, "")
+  vnet_sap_arm_id              = var.landscape_tfstate.vnet_sap_arm_id
   vnet_sap_name                = split("/", local.vnet_sap_arm_id)[8]
   vnet_sap_resource_group_name = split("/", local.vnet_sap_arm_id)[4]
   vnet_sap                     = data.azurerm_virtual_network.vnet_sap
@@ -224,8 +224,14 @@ locals {
   sub_admin_arm_id    = try(local.var_sub_admin.arm_id, "")
   sub_admin_exists    = length(local.sub_admin_arm_id) > 0
 
-  sub_admin_name   = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
-  sub_admin_prefix = local.sub_admin_exists ? data.azurerm_subnet.admin[0].address_prefixes[0] : try(local.var_sub_admin.prefix, "")
+  sub_admin_name = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
+  sub_admin_prefix = local.enable_admin_subnet ? (
+    local.sub_admin_exists ? (
+      data.azurerm_subnet.admin[0].address_prefixes[0]) : (
+      try(local.var_sub_admin.prefix, "")
+    )) : (
+    ""
+  )
 
   //Admin NSG
   var_sub_admin_nsg    = try(local.var_sub_admin.nsg, {})

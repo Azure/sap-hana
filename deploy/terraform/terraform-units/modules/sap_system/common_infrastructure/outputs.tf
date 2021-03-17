@@ -31,7 +31,7 @@ output "infrastructure_w_defaults" {
 }
 
 output "admin_subnet" {
-  value = ! local.enable_admin_subnet ? null : (local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0])
+  value = !local.enable_admin_subnet ? null : (local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0])
 }
 
 output "db_subnet" {
@@ -40,14 +40,14 @@ output "db_subnet" {
 
 output "sid_kv_user_id" {
   value = local.enable_sid_deployment && local.use_local_credentials ? (
-      azurerm_key_vault.sid_kv_user[0].id) : (
-      local.user_key_vault_id )
+    azurerm_key_vault.sid_kv_user[0].id) : (
+  local.user_key_vault_id)
 }
 
 output "sid_kv_prvt_id" {
   value = local.enable_sid_deployment && local.use_local_credentials ? (
-      azurerm_key_vault.sid_kv_prvt[0].id) : (
-      local.prvt_key_vault_id )
+    azurerm_key_vault.sid_kv_prvt[0].id) : (
+  local.prvt_key_vault_id)
 }
 
 output "storage_subnet" {
@@ -79,4 +79,8 @@ output "route_table_id" {
 
 output "firewall_id" {
   value = local.firewall_id
+}
+
+output "db_asg_id" {
+  value = azurerm_application_security_group.db.id
 }

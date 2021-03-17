@@ -74,8 +74,8 @@ parameterfile_name=$(basename "${parameterfile}")
 
 
 # Read environment
-environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
-region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \")
+environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
+region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
 
 key=$(echo "${parameterfile_name}" | cut -d. -f1)
 
@@ -96,7 +96,7 @@ fi
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 library_config_information="${automation_config_directory}""${region}"
-workload_config_information="${automation_config_directory}""${region}""${environment}"
+workload_config_information="${automation_config_directory}""${environment}"
 
 if [ ! -d ${automation_config_directory} ]
 then
@@ -127,7 +127,6 @@ else
     temp=$(grep "tfstate_resource_id" "${library_config_information}")
     if [ ! -z "${temp}" ]
     then
-        echo "tfstate_resource_id specified"
         tfstate_resource_id=$(echo "${temp}" | cut -d= -f2)
         if [ "${deployment_system}" != sap_deployer ]
         then
@@ -144,8 +143,6 @@ else
         if [ "${deployment_system}" != sap_deployer ]
         then
             deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-        else
-            rm post_deployment.sh
         fi
 
         deployer_tfstate_key_exists=true
@@ -172,27 +169,7 @@ if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     exit -1
 fi
 
-if [ ! -n "${ARM_SUBSCRIPTION_ID}" ]; then
-    option="ARM_SUBSCRIPTION_ID"
-    missing
-    exit -1
-fi
-
-if [ ! -n "${REMOTE_STATE_RG}" ]; then
-    option="REMOTE_STATE_RG"
-    missing
-    exit -1
-fi
-
-if [ ! -n "${REMOTE_STATE_SA}" ]; then
-    option="REMOTE_STATE_SA"
-    missing
-    exit -1
-fi
-
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
-
-echo $terraform_module_directory
 
 if [ ! -d "${terraform_module_directory}" ]
 then
@@ -243,7 +220,7 @@ check_output=0
 echo ""
 echo "#########################################################################################"
 echo "#                                                                                       #"
-echo "#                             Running Terraform apply                                   #"
+echo "#                             Running Terraform destroy                                 #"
 echo "#                                                                                       #"
 echo "#########################################################################################"
 echo ""
