@@ -34,7 +34,7 @@ A comprehensive representation of the json is shown below.
 
 JSON structure
 
-```json
+```
 {
   "infrastructure": {                                                             <-- Required Block
     "environment"                     : "NP",                                     <-- Required Parameter
@@ -60,7 +60,7 @@ JSON structure
     },
     "vnets": {
       "sap": {
-        "name"                        : "",
+        "name"                        : "",                                       <-- Required Parameter
         "subnet_db": {
           "prefix"                    : "10.1.1.0/28"                             <-- Required Parameter
         },
@@ -87,36 +87,29 @@ JSON structure
         "offer"                       : "sles-sap-12-sp5",                        <-- Required Parameter
         "sku"                         : "gen2"                                    <-- Required Parameter
       },
-      "zones"                         : ["1"],
-      "avset_arm_ids"                 : [
-                                          ""
-                                        ],
-      "use_DHCP"                      : false,
-      "dbnodes": [
-        {
-        },
-        {
-        }
-      ]
+      "zones"                         : ["1"],                                    <-- Optional Parameter
+      "avset_arm_ids"                 : [""],                                     <-- Optional Parameter
+      "use_DHCP"                      : false,                                    <-- Optional Parameter
+      "dbnodes"                       : [{},{}]                                   <-- Required Parameter
     }
   ],
   "application": {                                                                <-- Required Block
-    "enable_deployment"               : true,
-    "sid"                             : "PRD",
-    "os": {
+    "enable_deployment"               : true,                                     <-- Required Parameter
+    "sid"                             : "PRD",                                    <-- Required Parameter
+    "os" : {
         "publisher"                   : "SUSE",                                   <-- Required Parameter
         "offer"                       : "sles-sap-12-sp5",                        <-- Required Parameter
         "sku"                         : "gen2"                                    <-- Required Parameter
       },
-    "scs_instance_number"             : "00",
-    "ers_instance_number"             : "10",
-    "scs_high_availability"           : false,
-    "application_server_count"        : 3,
-    "webdispatcher_count"             : 1,
-    "app_zones"                       : ["1", "2"],
-    "scs_zones"                       : ["1"],
-    "web_zones"                       : ["1"],
-    "use_DHCP"                        : false,
+    "scs_instance_number"             : "00",                                     <-- Required Parameter
+    "ers_instance_number"             : "10",                                     <-- Required Parameter
+    "scs_high_availability"           : false,                                    <-- Required Parameter
+    "application_server_count"        : 3,                                        <-- Required Parameter
+    "webdispatcher_count"             : 1,                                        <-- Required Parameter
+    "app_zones"                       : ["1", "2"],                               <-- Optional Parameter
+    "scs_zones"                       : ["1"],                                    <-- Optional Parameter
+    "web_zones"                       : ["1"],                                    <-- Optional Parameter
+    "use_DHCP"                        : false,                                    <-- Optional Parameter
     "authentication": {
       "type"                          : "key",
     }
@@ -130,13 +123,13 @@ JSON structure
     "kv_sid_sshkey_prvt" : "",
     "kv_sid_sshkey_pub" : "",
     "kv_spn_id": ""
-  }
+  },
   "authentication": {                                                             <-- Optional Block
     "username"                        : "azureadm"
     "password"                        : "T0pSecret"
     "path_to_public_key"              : "sshkey.pub",
     "path_to_private_key"             : "sshkey"
-  }
+  },
   "tfstate_resource_id"               : "",                                       <-- Required Parameter
   "deployer_tfstate_key"              : "",                                       <-- Required Parameter
   "landscape_tfstate_key"             : "",                                       <-- Required Parameter
@@ -277,9 +270,8 @@ Node                                   | Attribute                     | Type   
     }
   },
   "options": {
-    "enable_secure_transfer"          : true,
-    "enable_prometheus"               : true
-  }
+    "resource_offset"                 : 0,
+  },
   "tfstate_resource_id"               : "",
   "deployer_tfstate_key"              : "",
   "landscape_tfstate_key"             : ""
@@ -388,8 +380,7 @@ Node                                   | Attribute                     | Type   
     "path_to_private_key"             : "sshkey"
   },
   "options": {
-    "enable_secure_transfer"          : true,
-    "enable_prometheus"               : true
+    "resource_offset"                 : 0,
   },
   "tfstate_resource_id"               : "",
   "deployer_tfstate_key"              : "",

@@ -13,8 +13,9 @@
 1. [Overview](overview.md)
 2. [Process Documentation](readme.md)
     1. [Glossary](glossary.md)
-    2. [customer requirements](customer_requirements.md)
-3. [Product Documentation](Software_Documentation/product_documentation.md)
+    2. [information needed before deployment](customer_requirements.md)
+    3. [deployment steps](Getting_started_with_the_SAP_Deployment_Automation_framework.md)
+1. [Product Documentation](Software_Documentation/product_documentation.md)
    1. [Capabilities](Software_Documentation/product_documentation-capabilities.md)
    2. [Deployer](Software_Documentation/product_documentation-deployer.md)
    3. [SAP Library](Software_Documentation/product_documentation-sap_library.md)
@@ -22,25 +23,25 @@
    5. [SAP Deployment Unit (SDU)](Software_Documentation/product_documentation-sap_deployment_unit.md)
    6. [Features](Software_Documentation/product_documentation-features.md)
       1. [Detail 1]()
-4. [Configuration](Software_Documentation/configuration.md)
+1. [Configuration](Software_Documentation/configuration.md)
    1. [Deployer](Software_Documentation/configuration-deployer.md)
    2. [SAP Library](Software_Documentation/configuration-sap_library.md)
    3. [SAP Workload VNET](Software_Documentation/configuration-sap_workload_vnet.md)
    4. [SAP Deployment Unit (SDU)](Software_Documentation/configuration-sap_deployment_unit.md)
-5. [Execution]
+1. [Execution]
    1. [Terraform]
    2. [Ansible]
-6. [Operations]
+1. [Operations]
    1. [Terraform]
    2. [Ansible]
-7. [Workshops](Software_Documentation/workshops/workshops.md)
-8. Appendix
+1. [Workshops](Software_Documentation/workshops/workshops.md)
+1. Appendix
    1. Standards
       1. [Naming Standards](Software_Documentation/standards-naming.md)
    2. [FAQ](Software_Documentation/appendix-faq.md)
    3. [Troubleshooting Guides](Software_Documentation/appendix-troubleshooting_guides.md)
       1. [Doc 00001](Software_Documentation/appendix-troubleshooting_guides-doc_00001.md)
-8. Legacy - Folders
+1. Legacy - Folders
    1. [Templates](../sort/templates-readme.md)
    2. [Tools](../sort/tools-readme.md)
    3. [Tools - dumpsys](../sort/tools-dumpsystem-readme.md)

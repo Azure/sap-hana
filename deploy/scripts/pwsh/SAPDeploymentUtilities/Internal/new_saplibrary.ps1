@@ -54,12 +54,8 @@ Licensed under the MIT license.
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent $filePath
 
-    [IO.FileInfo] $fInfo = $Parameterfile
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
-
-    $Environment = $jsonData.infrastructure.environment
     $region = $jsonData.infrastructure.region
-    $combined = $Environment + $region
 
     # Subscription
     try {
@@ -70,7 +66,7 @@ Licensed under the MIT license.
         $sub = Read-Host -Prompt "Please enter the subscription"
         $iniContent[$region]["subscription"] = $sub
         $changed = $true
-        
+      
     }
 
     try {

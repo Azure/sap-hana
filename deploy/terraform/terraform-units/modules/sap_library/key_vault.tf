@@ -47,12 +47,13 @@ resource "azurerm_key_vault" "kv_user" {
     object_id = local.service_principal.object_id
 
     secret_permissions = [
-      "delete",
-      "get",
-      "list",
-      "set",
-      "restore",
-      "recover"
+      "Delete",
+      "Get",
+      "List",
+      "Set",
+      "Restore",
+      "Recover",
+      "Purge"
     ]
   }
 

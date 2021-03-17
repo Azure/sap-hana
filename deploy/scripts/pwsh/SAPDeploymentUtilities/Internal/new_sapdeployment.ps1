@@ -67,6 +67,21 @@ Licensed under the MIT license.
         }
     }
 
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+
+        $rgName = Read-Host -Prompt "Please specify the resource group name for the terraform storage account"
+        $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
+
+        $tfstate_resource_id = Read-Host -Prompt "Please specify the storage account resource ID for the terraform storage account"
+        
+        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+
+    }
+
+
     $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
 
     $Environment = $jsonData.infrastructure.environment
@@ -98,12 +113,24 @@ Licensed under the MIT license.
     $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"] 
 
     # Subscription
-    $sub = $iniContent[$combined]["subscription"] 
+    if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+        $sub = $iniContent[$combined]["subscription"] 
+    }
+    else {
+        $sub = $iniContent[$region]["subscription"] 
+    }
+    
     $repo = $iniContent["Common"]["repo"]
 
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$combined]["Subscription"] = $sub
+        if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
+            $iniContent[$combined]["subscription"] = $sub
+        }
+        else {
+            $iniContent[$region]["subscription"] = $sub 
+        }
+    
         $changed = $true
     }
 
