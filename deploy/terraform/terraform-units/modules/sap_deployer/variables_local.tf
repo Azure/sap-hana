@@ -107,6 +107,7 @@ locals {
       "destroy_after_deploy" = true,
       "size"                 = try(deployer.size, "Standard_D4ds_v4"),
       "disk_type"            = try(deployer.disk_type, "StandardSSD_LRS")
+      "use_DHCP"             = try(deployer.use_DHCP, false)
       "os" = {
         "source_image_id" = try(deployer.os.source_image_id, "")
         "publisher"       = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.publisher, "Canonical") : ""

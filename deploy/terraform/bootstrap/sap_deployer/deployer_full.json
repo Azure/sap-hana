@@ -24,6 +24,13 @@
         "kv_username": "",
         "kv_pwd": ""
     },
+    "deployers": [
+        {
+            "size": "Standard_D4ds_v4",
+            "disk_type": "Premium_LRS",
+            "use_DHCP": false
+        }
+    ],
     "firewall_deployment": false,
     "firewall_rule_subnets": [],
     "firewall_allowed_ipaddresses": [],

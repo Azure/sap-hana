@@ -15,7 +15,7 @@ resource "azurerm_public_ip" "deployer" {
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.deployers[count.index].name, local.resource_suffixes.pip)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
-  allocation_method   = "Static"
+  allocation_method   = local.deployers[count.index].use_DHCP ? "Dynamic" : "Static"
   sku                 = "Standard"
 }
 
