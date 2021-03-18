@@ -99,6 +99,13 @@ Licensed under the MIT license.
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
             }
         }
+        else
+        {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
+            }
+        }
     }
     
     $Cmd = "terraform $Command"

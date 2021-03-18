@@ -85,9 +85,18 @@ Licensed under the MIT license.
         
     }
 
+    $errors_occurred = $false
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPDeployer -Parameterfile $fInfo.Name 
+    try {
+        New-SAPDeployer -Parameterfile $fInfo.Name 
+    }
+    catch {
+        $errors_occurred = true
+    }
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     # Re-read ini file
     $iniContent = Get-IniContent $filePath
@@ -99,33 +108,66 @@ Licensed under the MIT license.
             $vault = $iniContent[$region]["Vault"]
         }
 
-        if(($null -eq $vault ) -or ("" -eq $vault))        {
+        if (($null -eq $vault ) -or ("" -eq $vault)) {
             $vault = Read-Host -Prompt "Please enter the vault name"
             $iniContent[$region]["Vault"] = $vault 
             Out-IniFile -InputObject $iniContent -FilePath $filePath
     
         }
-
-        Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault
+        try {
+            Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault
+        }
+        catch {
+            $errors_occurred = true
+            return
+        }
+    
         
     }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    try {
+        New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $DeployerParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
 }

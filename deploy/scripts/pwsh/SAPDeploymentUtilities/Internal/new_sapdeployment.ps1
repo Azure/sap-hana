@@ -67,6 +67,13 @@ Licensed under the MIT license.
         }
     }
 
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
+
+
     if ($null -eq $iniContent[$region]) {
         Write-Error "The region data is not available"
 
@@ -82,11 +89,6 @@ Licensed under the MIT license.
     }
 
 
-    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
-
-    $Environment = $jsonData.infrastructure.environment
-    $region = $jsonData.infrastructure.region
-    $combined = $Environment + $region
     
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     if ("sap_deployer" -eq $Type) {
@@ -155,7 +157,7 @@ Licensed under the MIT license.
         if ("azurerm" -eq $jsonData.backend.type) {
             $Command = " init -upgrade=true"
 
-            $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
+            $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
             if ("Y" -ne $ans) {
                 return
             }

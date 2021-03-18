@@ -135,7 +135,7 @@ else
     temp=$(grep "REMOTE_STATE_SA" "${library_config_information}")
     if [ ! -z "${temp}" ]
     then
-        # Remmote state storage group was specified in ~/.sap_deployment_automation library config
+        # Remote state storage group was specified in ~/.sap_deployment_automation library config
         REMOTE_STATE_SA=$(echo "${temp}" | cut -d= -f2)
     fi
 
@@ -264,8 +264,6 @@ then
     $terraform_module_directory
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
-    echo $temp
-    cat .terraform/terraform.tfstate
     if [ ! -z "${temp}" ]
     then
         echo "${REMOTE_STATE_SA}"
@@ -276,8 +274,23 @@ else
         --backend-config "key=${key}.terraform.tfstate" \
         $terraform_module_directory
     else
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo "#             The system has already been deployed and the statefile is in Azure        #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+        read -p "Do you want to redeploy Y/N?"  ans
+        answer=${ans^^}
+        if [ $answer == 'Y' ]; then
+            ok_to_proceed=true
+        else
+            exit 1
+        fi
         terraform init -upgrade=true
         check_output=1
+
     fi
 
 fi

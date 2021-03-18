@@ -26,6 +26,12 @@ resource "azurerm_network_interface" "anydb_db" {
   }
 }
 
+resource "azurerm_network_interface_application_security_group_association" "db" {
+  count                         = local.enable_deployment ? local.db_server_count : 0
+  network_interface_id          = azurerm_network_interface.anydb_db[count.index].id
+  application_security_group_id = var.db_asg_id
+}
+
 # Creates the Admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "anydb_admin" {
   count                         = local.enable_deployment && local.anydb_dual_nics ? local.db_server_count : 0
@@ -60,17 +66,15 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   location            = var.resource_group[0].location
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
-  //Ultra disk requires zonal deployment
-  availability_set_id = local.enable_ultradisk ? null : (
-    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : (
-      local.availabilitysets_exist ? (
-        data.azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id) : (
-        azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id
-      )
-    )
-  )
 
-  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_avset ? (
+    local.availabilitysets_exist ? (
+      data.azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id) : (
+      azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id
+    )
+  ) : null
+  zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
   network_interface_ids = local.anydb_dual_nics ? (
     local.legacy_nic_order ? (
@@ -139,18 +143,15 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   location            = var.resource_group[0].location
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
-  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
-  //Ultra disk requires zonal deployment
-  availability_set_id = local.enable_ultradisk ? null : (
-    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : (
-      local.availabilitysets_exist ? (
-        data.azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id) : (
-        azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id
-      )
-    )
-  )
 
-  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_avset ? (
+    local.availabilitysets_exist ? (
+      data.azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id) : (
+      azurerm_availability_set.anydb[count.index % max(local.db_zone_count, 1)].id
+    )
+  ) : null
+  zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
   network_interface_ids = local.anydb_dual_nics ? (
     local.legacy_nic_order ? (

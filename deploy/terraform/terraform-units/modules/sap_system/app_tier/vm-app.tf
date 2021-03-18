@@ -20,7 +20,14 @@ resource "azurerm_network_interface" "app" {
       )
     )
     private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+
   }
+}
+
+resource "azurerm_network_interface_application_security_group_association" "app" {
+  count                         = local.enable_deployment ? local.application_server_count : 0
+  network_interface_id          = azurerm_network_interface.app[count.index].id
+  application_security_group_id = azurerm_application_security_group.app.id
 }
 
 # Create Application NICs
@@ -55,19 +62,13 @@ resource "azurerm_linux_virtual_machine" "app" {
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    null) : (
-    local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
-      azurerm_availability_set.app[0].id
-    )
-  )
-
   proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
-  zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
-  null)
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_app_avset ? azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id : null
+
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
     local.legacy_nic_order ? (
@@ -147,18 +148,12 @@ resource "azurerm_windows_virtual_machine" "app" {
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    null) : (
-    local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
-      azurerm_availability_set.app[0].id
-    )
-  )
   proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
-  zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
-  null)
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_app_avset ? azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id : null
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
     local.legacy_nic_order ? (

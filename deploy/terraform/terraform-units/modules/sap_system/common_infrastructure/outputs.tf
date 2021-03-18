@@ -80,3 +80,7 @@ output "route_table_id" {
 output "firewall_id" {
   value = local.firewall_id
 }
+
+output "db_asg_id" {
+  value = azurerm_application_security_group.db.id
+}

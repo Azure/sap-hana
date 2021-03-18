@@ -59,6 +59,13 @@ resource "azurerm_network_interface" "nics_dbnodes_db" {
   }
 }
 
+resource "azurerm_network_interface_application_security_group_association" "db" {
+  count                         = local.enable_deployment ? length(local.hdb_vms) : 0
+  network_interface_id          = azurerm_network_interface.nics_dbnodes_db[count.index].id
+  application_security_group_id = var.db_asg_id
+}
+
+
 // Creates the NIC for Hana storage
 resource "azurerm_network_interface" "nics_dbnodes_storage" {
   count = local.enable_deployment && local.enable_storage_subnet ? length(local.hdb_vms) : 0
@@ -94,18 +101,15 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   resource_group_name = var.resource_group[0].name
 
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
-  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
-  //Ultra disk requires zonal deployment
-  availability_set_id = local.enable_ultradisk ? null : (
-    local.zonal_deployment && local.db_server_count == local.db_zone_count ? null : (
-      local.availabilitysets_exist ? (
-        data.azurerm_availability_set.hdb[count.index % max(local.db_zone_count, 1)].id) : (
-        azurerm_availability_set.hdb[count.index % max(local.db_zone_count, 1)].id
-      )
-    )
-  )
 
-  zone = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? local.zones[count.index % max(local.db_zone_count, 1)] : null
+    //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_avset ? (
+    local.availabilitysets_exist ? (
+      data.azurerm_availability_set.hdb[count.index % max(local.db_zone_count, 1)].id) : (
+      azurerm_availability_set.hdb[count.index % max(local.db_zone_count, 1)].id
+    )
+  ) : null
+  zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
   network_interface_ids = local.enable_storage_subnet ? ([
     azurerm_network_interface.nics_dbnodes_db[count.index].id,

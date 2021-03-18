@@ -63,6 +63,7 @@ module "hdb_node" {
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
+  db_asg_id                  = module.common_infrastructure.db_asg_id
 }
 
 // Create Application Tier nodes
@@ -113,6 +114,7 @@ module "anydb_node" {
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
+  db_asg_id                  = module.common_infrastructure.db_asg_id
 }
 
 // Generate output files

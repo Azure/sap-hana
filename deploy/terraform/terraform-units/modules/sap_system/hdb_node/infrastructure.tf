@@ -1,6 +1,6 @@
 // AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
-  count = local.enable_deployment && ! local.availabilitysets_exist ? max(length(local.zones), 1) : 0
+  count = local.enable_deployment && local.use_avset && ! local.availabilitysets_exist ? max(length(local.zones), 1) : 0
   name = local.zonal_deployment ? (
     format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.zones[count.index], var.naming.separator, local.resource_suffixes.db_avset)) : (
     format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_avset)
@@ -14,7 +14,7 @@ resource "azurerm_availability_set" "hdb" {
 }
 
 data "azurerm_availability_set" "hdb" {
-  count               = local.enable_deployment && local.availabilitysets_exist ? max(length(local.zones), 1) : 0
+  count               = local.enable_deployment && local.use_avset && local.availabilitysets_exist ? max(length(local.zones), 1) : 0
   name                = split("/", local.availabilityset_arm_ids[count.index])[8]
   resource_group_name = split("/", local.availabilityset_arm_ids[count.index])[4]
 }

@@ -84,15 +84,14 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-         Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
     $terraform_module_directory = $repo + "\deploy\terraform\bootstrap\sap_deployer"
 
-    if (-not (Test-Path $terraform_module_directory) )
-    {
+    if (-not (Test-Path $terraform_module_directory) ) {
         Write-Host -ForegroundColor Red "The repository path: $repo is incorrect!"
-        $iniContent["Common"]["repo"] =""
+        $iniContent["Common"]["repo"] = ""
         Out-IniFile -InputObject $iniContent -FilePath $filePath
         throw "The repository path: $repo is incorrect!"
         return
@@ -113,6 +112,12 @@ Licensed under the MIT license.
             }
             else {
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
+            }
+        }
+        else {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
             }
         }
     }

@@ -169,9 +169,18 @@ Licensed under the MIT license.
         
     }
 
+    $errors_occurred = $false
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPDeployer -Parameterfile $fInfo.Name 
+    try {
+        New-SAPDeployer -Parameterfile $fInfo.Name 
+    }
+    catch {
+        $errors_occurred = true
+    }
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     # Re-read ini file
     $iniContent = Get-IniContent $filePath
@@ -183,34 +192,67 @@ Licensed under the MIT license.
             $vault = $iniContent[$region]["Vault"]
         }
 
-        if(($null -eq $vault ) -or ("" -eq $vault))        {
+        if (($null -eq $vault ) -or ("" -eq $vault)) {
             $vault = Read-Host -Prompt "Please enter the vault name"
             $iniContent[$region]["Vault"] = $vault 
             Out-IniFile -InputObject $iniContent -FilePath $filePath
     
         }
-
-        Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault
+        try {
+            Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault
+        }
+        catch {
+            $errors_occurred = true
+            return
+        }
+    
         
     }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    try {
+        New-SAPLibrary -Parameterfile $fInfo.Name -DeployerFolderRelativePath $DeployerRelativePath
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $DeployerParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
     $fileDir = $dirInfo.ToString() + $LibraryParameterfile
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
-    New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
+    try {
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
+    }
+    catch {
+        $errors_occurred = true
+    }
+
     Set-Location -Path $curDir
+    if ($errors_occurred) {
+        return
+    }
 
 }
 
@@ -299,15 +341,14 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-         Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
     $terraform_module_directory = $repo + "\deploy\terraform\bootstrap\sap_deployer"
 
-    if (-not (Test-Path $terraform_module_directory) )
-    {
+    if (-not (Test-Path $terraform_module_directory) ) {
         Write-Host -ForegroundColor Red "The repository path: $repo is incorrect!"
-        $iniContent["Common"]["repo"] =""
+        $iniContent["Common"]["repo"] = ""
         Out-IniFile -InputObject $iniContent -FilePath $filePath
         throw "The repository path: $repo is incorrect!"
         return
@@ -328,6 +369,12 @@ Licensed under the MIT license.
             }
             else {
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
+            }
+        }
+        else {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
             }
         }
     }
@@ -471,6 +518,13 @@ Licensed under the MIT license.
         }
     }
 
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
+
+
     if ($null -eq $iniContent[$region]) {
         Write-Error "The region data is not available"
 
@@ -486,11 +540,6 @@ Licensed under the MIT license.
     }
 
 
-    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
-
-    $Environment = $jsonData.infrastructure.environment
-    $region = $jsonData.infrastructure.region
-    $combined = $Environment + $region
     
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     if ("sap_deployer" -eq $Type) {
@@ -559,7 +608,7 @@ Licensed under the MIT license.
         if ("azurerm" -eq $jsonData.backend.type) {
             $Command = " init -upgrade=true"
 
-            $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
+            $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
             if ("Y" -ne $ans) {
                 return
             }
@@ -782,6 +831,13 @@ Licensed under the MIT license.
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
             }
         }
+        else
+        {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
+            }
+        }
     }
     
     $Cmd = "terraform $Command"
@@ -930,7 +986,16 @@ Licensed under the MIT license.
 
     $envkey = $fInfo.Name.replace(".json", ".terraform.tfstate")
 
-    $deployer_tfstate_key = $iniContent[$region]["Deployer"]
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+        $deployer_tfstate_key = Read-Host ("Please provide the deployer state file name for the " + $region + " region")
+        $Category1 = @{"Deployer" = $deployer_tfstate_key }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+    }
+    else {
+        $deployer_tfstate_key = $iniContent[$region]["Deployer"]
+    }
 
     try {
         if ($null -ne $iniContent[$combined] ) {

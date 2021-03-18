@@ -54,7 +54,16 @@ Licensed under the MIT license.
 
     $envkey = $fInfo.Name.replace(".json", ".terraform.tfstate")
 
-    $deployer_tfstate_key = $iniContent[$region]["Deployer"]
+    if ($null -eq $iniContent[$region]) {
+        Write-Error "The region data is not available"
+        $deployer_tfstate_key = Read-Host ("Please provide the deployer state file name for the " + $region + " region")
+        $Category1 = @{"Deployer" = $deployer_tfstate_key }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+    }
+    else {
+        $deployer_tfstate_key = $iniContent[$region]["Deployer"]
+    }
 
     try {
         if ($null -ne $iniContent[$combined] ) {
