@@ -89,8 +89,12 @@ locals {
   //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
   offset = try(var.options.resource_offset, 0)
 
+  //Flag to control if nsg is creates in virtual network resource group
+  nsg_asg_with_vnet = try(var.options.nsg_asg_with_vnet, false) 
+
   //Allowing to keep the old nic order
   legacy_nic_order = try(var.options.legacy_nic_order, false)
+
 
   faultdomain_count = try(tonumber(compact(
     [for pair in local.faults :
@@ -112,10 +116,11 @@ locals {
   }
 
   // SAP vnet
-  vnet_sap                     = try(var.vnet_sap, {})
-  vnet_sap_name                = try(local.vnet_sap.name, "")
-  vnet_sap_resource_group_name = try(local.vnet_sap.resource_group_name, "")
-  vnet_sap_address_space       = try(local.vnet_sap.address_space, [])
+  vnet_sap                         = try(var.vnet_sap, {})
+  vnet_sap_name                    = try(local.vnet_sap.name, "")
+  vnet_sap_resource_group_name     = try(local.vnet_sap.resource_group_name, "")
+  vnet_sap_resource_group_location = try(local.vnet_sap.location, "")
+  vnet_sap_address_space           = try(local.vnet_sap.address_space, [])
 
   // APP subnet
   var_sub_app    = try(var.infrastructure.vnets.sap.subnet_app, {})

@@ -298,14 +298,14 @@ resource "azurerm_application_security_group" "app" {
   provider            = azurerm.main
   count               = local.enable_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_asg)
-  resource_group_name = var.resource_group[0].name
-  location            = var.resource_group[0].location
+  resource_group_name = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_name : var.resource_group[0].name
+  location            = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_location : var.resource_group[0].location
 }
 
 resource "azurerm_application_security_group" "web" {
   provider            = azurerm.main
   count               = local.webdispatcher_count > 0 ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_asg)
-  resource_group_name = var.resource_group[0].name
-  location            = var.resource_group[0].location
+  resource_group_name = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_name : var.resource_group[0].name
+  location            = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_location : var.resource_group[0].location
 }
