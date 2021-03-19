@@ -3,8 +3,8 @@ resource "azurerm_network_security_group" "nsg_app" {
   provider            = azurerm.main
   count               = local.enable_deployment ? (local.sub_app_nsg_exists ? 0 : 1) : 0
   name                = local.sub_app_nsg_name
-  location            = var.resource_group[0].location
-  resource_group_name = var.resource_group[0].name
+  resource_group_name = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_name : var.resource_group[0].name
+  location            = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_location : var.resource_group[0].location
 }
 
 # Imports the SAP app subnet nsg data

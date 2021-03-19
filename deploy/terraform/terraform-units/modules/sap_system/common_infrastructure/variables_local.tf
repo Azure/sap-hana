@@ -64,6 +64,9 @@ locals {
   zones            = distinct(concat(local.db_zones, local.app_zones, local.scs_zones, local.web_zones))
   zonal_deployment = length(local.zones) > 0 ? true : false
 
+  //Flag to control if nsg is creates in virtual network resource group
+  nsg_asg_with_vnet = try(var.options.nsg_asg_with_vnet, false)
+
   // Retrieve information about Deployer from tfstate file
   deployer_tfstate = var.deployer_tfstate
 
@@ -211,12 +214,13 @@ locals {
   */
 
   //SAP vnet
-  vnet_sap_arm_id              = var.landscape_tfstate.vnet_sap_arm_id
-  vnet_sap_name                = split("/", local.vnet_sap_arm_id)[8]
-  vnet_sap_resource_group_name = split("/", local.vnet_sap_arm_id)[4]
-  vnet_sap                     = data.azurerm_virtual_network.vnet_sap
-  vnet_sap_addr                = local.vnet_sap.address_space
-  var_vnet_sap                 = try(local.var_infra.vnets.sap, {})
+  vnet_sap_arm_id                  = try(var.landscape_tfstate.vnet_sap_arm_id, "")
+  vnet_sap_name                    = split("/", local.vnet_sap_arm_id)[8]
+  vnet_sap_resource_group_name     = split("/", local.vnet_sap_arm_id)[4]
+  vnet_sap                         = data.azurerm_virtual_network.vnet_sap
+  vnet_sap_resource_group_location = try(local.vnet_sap.location, "")
+  vnet_sap_addr                    = local.vnet_sap.address_space
+  var_vnet_sap                     = try(local.var_infra.vnets.sap, {})
 
   //Admin subnet
   enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
