@@ -246,7 +246,7 @@ resource "random_integer" "app_priority" {
 # Create a Azure Firewall Network Rule for Azure Management API
 resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
   provider            = azurerm.deployer
-  count               = local.firewall_exists ? 1 : 0
+  count               = local.firewall_exists && !local.sub_app_exists? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
