@@ -1,7 +1,10 @@
 // AVAILABILITY SET
 resource "azurerm_availability_set" "hdb" {
-  count                        = local.enable_deployment && local.use_avset && !local.availabilitysets_exist ? max(length(local.zones), 1) : 0
-  name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.db_avset_names[count.index])
+  count = local.enable_deployment && local.use_avset && ! local.availabilitysets_exist ? max(length(local.zones), 1) : 0
+  name = local.zonal_deployment ? (
+    format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.zones[count.index], var.naming.separator, local.resource_suffixes.db_avset)) : (
+    format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_avset)
+  )
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
@@ -11,7 +14,6 @@ resource "azurerm_availability_set" "hdb" {
 }
 
 data "azurerm_availability_set" "hdb" {
-  provider            = azurerm.main
   count               = local.enable_deployment && local.use_avset && local.availabilitysets_exist ? max(length(local.zones), 1) : 0
   name                = split("/", local.availabilityset_arm_ids[count.index])[8]
   resource_group_name = split("/", local.availabilityset_arm_ids[count.index])[4]

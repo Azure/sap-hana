@@ -163,7 +163,7 @@ Licensed under the MIT license.
         else {
             $Category1 = @{"Deployer" = $key }
             $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -Path $filePath                    
+            Out-IniFile -InputObject $iniContent -FilePath $filePath                    
         }
                 
     }
@@ -230,7 +230,7 @@ Licensed under the MIT license.
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
     try {
-        New-SAPSystem -Parameterfile $fInfo.Name -Type [SAP_Types]::sap_deployer
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_deployer"
     }
     catch {
         $errors_occurred = true
@@ -245,7 +245,7 @@ Licensed under the MIT license.
     [IO.FileInfo] $fInfo = $fileDir
     Set-Location -Path $fInfo.Directory.FullName
     try {
-        New-SAPSystem -Parameterfile $fInfo.Name -Type [SAP_Types]::sap_library
+        New-SAPSystem -Parameterfile $fInfo.Name -Type "sap_library"
     }
     catch {
         $errors_occurred = true
@@ -345,7 +345,7 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
     $terraform_module_directory = $repo + "\deploy\terraform\bootstrap\sap_deployer"
@@ -353,7 +353,7 @@ Licensed under the MIT license.
     if (-not (Test-Path $terraform_module_directory) ) {
         Write-Host -ForegroundColor Red "The repository path: $repo is incorrect!"
         $iniContent["Common"]["repo"] = ""
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
         throw "The repository path: $repo is incorrect!"
         return
 
@@ -546,21 +546,21 @@ Licensed under the MIT license.
         
         $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id }
         $iniContent += @{$region = $Category1 }
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
 
     }
 
     if ($null -eq $iniContent[$combined]) {
         $Category1 = @{"Landscape" = $landscapeKey; "Subscription" = "" }
         $iniContent += @{$combined = $Category1 }
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
     
     if ("sap_deployer" -eq $Type) {
         $iniContent[$region]["Deployer"] = $key.Trim()
-        Out-IniFile -InputObject $iniContent -Path $filePath
-        $iniContent = Get-IniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        $iniContent = Get-IniContent $filePath
     }
     else {
         $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()    
@@ -589,15 +589,6 @@ Licensed under the MIT license.
     
     $repo = $iniContent["Common"]["repo"].Trim() 
 
-    if ($null -eq $landscape_tfstate_key -or "" -eq $landscape_tfstate_key) {
-        $landscape_tfstate_key = Read-Host -Prompt "Please enter the subscription for the deployment"
-        if ($Type -eq "sap_system") {
-            $iniContent[$combined]["Landscape"] = $landscape_tfstate_key.Trim()
-        }
-    
-        $changed = $true
-    }
-
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription for the deployment"
         if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
@@ -606,6 +597,7 @@ Licensed under the MIT license.
         else {
             $iniContent[$region]["subscription"] = $sub.Trim()  
         }
+    
         $changed = $true
     }
 
@@ -834,6 +826,7 @@ Licensed under the MIT license.
         $sub = Read-Host -Prompt "Please enter the subscription"
         $iniContent[$region]["subscription"] = $sub
         $changed = $true
+      
     }
 
     if ($null -eq $repo -or "" -eq $repo) {
@@ -864,12 +857,11 @@ Licensed under the MIT license.
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
             }
         }
-        else {
-            if ($PSCmdlet.ShouldProcess($Parameterfile, $DeployerFolderRelativePath)) {
-                $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
-                if ("Y" -ne $ans) {
-                    return
-                }
+        else
+        {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
             }
         }
     }
@@ -1035,6 +1027,7 @@ Licensed under the MIT license.
         $deployer_tfstate_key = Read-Host ("Please provide the deployer state file name for the " + $region + " region")
         $Category1 = @{"Deployer" = $deployer_tfstate_key }
         $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
     else {
         $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()
@@ -1050,37 +1043,43 @@ Licensed under the MIT license.
         $changed = $true
     }
 
-    if ($changed) {
-        Out-IniFile -InputObject $iniContent -Path $fileINIPath
-    }
-
     $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
     if ("Y" -eq $ans) {
-        $vault = $iniContent[$region]["Vault"]
+        $vault = ""
+        if ($null -ne $iniContent[$region] ) {
+            $vault = $iniContent[$region]["Vault"]
+        }
 
         if (($null -eq $vault ) -or ("" -eq $vault)) {
             $vault = Read-Host -Prompt "Please enter the vault name"
             $iniContent[$region]["Vault"] = $vault 
-            Out-IniFile -InputObject $iniContent -Path $fileINIPath
+            Out-IniFile -InputObject $iniContent -FilePath $filePath
     
         }
         try {
             Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Workload $true
-            $iniContent = Get-IniContent -Path $fileINIPath
         }
         catch {
             return
         }
+    
+        
     }
+
+
+
+
+    $rgName = $iniContent[$region]["REMOTE_STATE_RG"].Trim() 
+    $saName = $iniContent[$region]["REMOTE_STATE_SA"].Trim() 
+    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim()
 
     $rgName = $iniContent[$region]["REMOTE_STATE_RG"].Trim() 
     $saName = $iniContent[$region]["REMOTE_STATE_SA"].Trim() 
     $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim()
 
     # Subscription
-    $sub = $iniContent[$combined]["subscription"].Trim() 
+    $sub = $iniContent[$region]["subscription"].Trim() 
     $repo = $iniContent["Common"]["repo"].Trim()
-
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {

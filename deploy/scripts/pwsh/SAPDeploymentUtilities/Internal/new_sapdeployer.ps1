@@ -86,14 +86,15 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
-    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_deployer"
+    $terraform_module_directory = $repo + "\deploy\terraform\bootstrap\sap_deployer"
+
     if (-not (Test-Path $terraform_module_directory) ) {
         Write-Host -ForegroundColor Red "The repository path: $repo is incorrect!"
         $iniContent["Common"]["repo"] = ""
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
         throw "The repository path: $repo is incorrect!"
         return
 

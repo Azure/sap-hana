@@ -85,7 +85,8 @@ locals {
   offset = try(var.options.resource_offset, 0)
 
   //Allowing to keep the old nic order
-  legacy_nic_order = try(var.options.legacy_nic_order, false)
+  legacy_nic_order = try(var.options.legacy_nic_order, "false") == "true"
+
   // Availability Set 
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
@@ -340,15 +341,15 @@ locals {
   )
 
   // Zones
-  zones         = try(local.anydb.zones, [])
-  db_zone_count = length(local.zones)
-
+  zones            = try(local.anydb.zones, [])
+  db_zone_count    = length(local.zones)
+  
   //Ultra disk requires zonal deployment
   zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
 
   //If we deploy more than one server in zone put them in an availability set
   use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
-
+  
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]

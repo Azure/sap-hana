@@ -50,14 +50,7 @@ while getopts ":e:c:s:t:h:v:r:x" option; do
 done
 
 automation_config_directory=~/.sap_deployment_automation/
-
-if [ ! -n "${environment}" ]; then
-    read -p "Environment name:"  environment
-fi
-
-
 environment_config_information="${automation_config_directory}""${environment}"
-touch "${environment_config_information}"
 
 if [ ! -d "${automation_config_directory}" ]
 then
@@ -91,6 +84,17 @@ else
     else
         tenant_exists=0
     fi
+
+    temp=$(grep "Subscription" "${environment_config_information}")
+    if [ ! -z "${temp}" ]
+    then
+        subscription=$(echo "${temp}" | cut -d= -f2)
+        subscription_exists=1
+    else
+        subscription_exists=0
+    fi
+
+fi
 
     temp=$(grep "Subscription" "${environment_config_information}")
     if [ ! -z "${temp}" ]

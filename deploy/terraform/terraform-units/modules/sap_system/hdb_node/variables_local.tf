@@ -315,10 +315,10 @@ locals {
     false
   )
 
-  // Zones
-  zones         = try(local.hdb.zones, [])
-  db_zone_count = length(local.zones)
-
+    // Zones
+  zones            = try(local.hdb.zones, [])
+  db_zone_count    = length(local.zones)
+  
   //Ultra disk requires zonal deployment
   zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
 

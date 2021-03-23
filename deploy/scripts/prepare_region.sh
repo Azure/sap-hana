@@ -242,8 +242,8 @@ deployer_dirname=$(dirname "${deployer_parameter_file}")
 deployer_file_parametername=$(basename "${deployer_parameter_file}")
 
 # Read environment
-environment=$(cat "${deployer_parameter_file}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${deployer_parameter_file}" | jq .infrastructure.region | tr -d \")
+environment=$(grep "environment" "${deployer_parameter_file}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \" | xargs)
+region=$(grep "region" "${deployer_parameter_file}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
 
 deployer_key=$(echo "${deployer_file_parametername}" | cut -d. -f1)
 library_config_information="${automation_config_directory}""${region}"
@@ -306,17 +306,15 @@ echo $library_config_information
     then
         # Key vault was specified in ~/.sap_deployment_automation in the deployer file
         keyvault_name=$(echo $temp | cut -d= -f2 | xargs)
-        keyvault_param=$(printf " -v %s " "${keyvault_name}")
+        keyvault_param=$(printf " -v %s " $keyvault_name)
     fi    
     
-    env_param=$(printf " -e %s " "${environment}")
-    region_param=$(printf " -r %s " "${region}")
+    env_param=$(printf " -e %s " $environment)
+    region_param=$(printf " -r %s " $region)
     
-    allParams="${env_param}""${keyvault_param}""${region_param}"
+    allParams=${env_param}${keyvault_param}${region_param}
 
-    echo $allParams
-
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams 
     if [ $? -eq 255 ]
         then
         exit $?

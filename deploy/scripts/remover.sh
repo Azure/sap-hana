@@ -74,8 +74,8 @@ parameterfile_name=$(basename "${parameterfile}")
 
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
+region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
 
 key=$(echo "${parameterfile_name}" | cut -d. -f1)
 

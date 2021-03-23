@@ -77,8 +77,8 @@ workload_file_parametername=$(basename "${parameterfile}")
 
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
+region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
 key=$(echo "${workload_file_parametername}" | cut -d. -f1)
 
 if [ ! -f "${workload_file_parametername}" ]
@@ -109,7 +109,7 @@ if [ $answer == 'Y' ]; then
     if [ ! -z $temp ]
     then
         # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-        keyvault_name=$(echo $temp | cut -d= -f2 | tr -d \" | xargs)
+        keyvault_name=$(echo $temp | cut -d= -f2 | xargs)
         keyvault_param=$(printf " -v %s " $keyvault_name)
     fi    
     
@@ -169,7 +169,7 @@ else
     temp=$(grep "tfstate_resource_id" "${library_config_information}")
     if [ ! -z "${temp}" ]
     then
-        tfstate_resource_id=$(echo "${temp}" | cut -d= -f2 | tr -d \" | xargs)
+        tfstate_resource_id=$(echo "${temp}" | cut -d= -f2)
         if [ "${deployment_system}" != sap_deployer ]
         then
             tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"

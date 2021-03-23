@@ -80,8 +80,8 @@ parameterfile_name=$(basename "${parameterfile}")
 
 
 # Read environment
-environment=$(cat "${parameterfile}" | jq .infrastructure.environment | tr -d \")
-region=$(cat "${parameterfile}" | jq .infrastructure.region | tr -d \")
+environment=$(grep "environment" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
+region=$(grep "region" "${parameterfile}" -m1  | cut -d: -f2 | cut -d, -f1 | tr -d \"   | xargs)
 
 key=$(echo "${parameterfile_name}" | cut -d. -f1)
 
@@ -160,13 +160,13 @@ else
     if [ ! -z "${temp}" ]
     then
         # Remote state storage group was specified in ~/.sap_deployment_automation library config
-        REMOTE_STATE_SA=$(echo "${temp}" | cut -d= -f2 | tr -d \" | xargs)
+        REMOTE_STATE_SA=$(echo "${temp}" | cut -d= -f2)
     fi
     
     temp=$(grep "tfstate_resource_id" "${library_config_information}")
     if [ ! -z "${temp}" ]
     then
-        tfstate_resource_id=$(echo "${temp}" | cut -d= -f2 | tr -d \" | xargs)
+        tfstate_resource_id=$(echo "${temp}" | cut -d= -f2)
         if [ "${deployment_system}" != sap_deployer ]
         then
             tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
@@ -189,7 +189,6 @@ else
                 rm post_deployment.sh
             fi
             
-            deployer_tfstate_key_exists=true
         fi
     fi
     
@@ -278,12 +277,7 @@ terraform {
 }
 EOF
 
-echo ${ARM_SUBSCRIPTION_ID}" 
-echo ${REMOTE_STATE_RG}" 
-echo ${REMOTE_STATE_SA}" 
-    
-
-if [ ! -d ./.terraform/ ];
+if [ ! -d ./.terraform/ ]; 
 then
     terraform init -upgrade=true -force-copy \
     --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
@@ -296,8 +290,7 @@ else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
     if [ ! -z "${temp}" ]
     then
-        terraform init -upgrade=true -force-copy \
-        --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
+        terraform init -upgrade=true -force-copy --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
@@ -315,13 +308,11 @@ else
         answer=${ans^^}
         if [ $answer == 'Y' ]; then
             ok_to_proceed=true
-            
         else
             exit 1
         fi
         terraform init -upgrade=true $terraform_module_directory
         check_output=1
-        
     fi
     
 fi

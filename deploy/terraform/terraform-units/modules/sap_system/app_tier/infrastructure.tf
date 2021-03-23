@@ -10,7 +10,6 @@ resource "azurerm_subnet" "subnet_sap_app" {
 }
 
 resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
-  provider       = azurerm.main
   count          = !local.sub_app_exists && length(var.route_table_id) > 0 ? 1 : 0
   subnet_id      = azurerm_subnet.subnet_sap_app[0].id
   route_table_id = var.route_table_id
@@ -69,16 +68,15 @@ resource "azurerm_lb" "scs" {
     iterator = pub
     for_each = local.fpips
     content {
-      name      = pub.value.name
-      subnet_id = pub.value.subnet_id
-      private_ip_address = pub.value.private_ip_address
-      private_ip_address_allocation = pub.value.private_ip_address_allocation
+      name      = pub.name
+      subnet_id = pub.subnet_id
+      private_ip_address = pub.private_ip_address
+      private_ip_address_allocation = pub.private_ip_address_allocation
     }
   }
 }
 
 resource "azurerm_lb_backend_address_pool" "scs" {
-  provider        = azurerm.main
   count           = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
   name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb_bepool)
   loadbalancer_id = azurerm_lb.scs[0].id
@@ -131,8 +129,11 @@ resource "azurerm_lb_rule" "ers" {
 
 # Create the SCS Availability Set
 resource "azurerm_availability_set" "scs" {
-  count                        = local.enable_deployment && local.use_scs_avset ? max(length(local.scs_zones), 1) : 0
-  name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.scs_avset_names[count.index])
+  count = local.enable_deployment && local.use_scs_avset ? max(length(local.scs_zones), 1) : 0
+  name = local.scs_zonal_deployment ? (
+    format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.scs_zones[count.index], var.naming.separator, local.resource_suffixes.scs_avset)) : (
+    format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_avset)
+  )
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
@@ -147,9 +148,8 @@ resource "azurerm_availability_set" "scs" {
 
 # Create the Application Availability Set
 resource "azurerm_availability_set" "app" {
-  provider                     = azurerm.main
   count                        = local.enable_deployment && local.use_app_avset ? max(length(local.app_zones), 1) : 0
-  name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.app_avset_names[count.index])
+  name                         = local.app_zonal_deployment ? format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.app_zones[count.index], var.naming.separator, local.resource_suffixes.app_avset) : format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_avset)
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
@@ -219,8 +219,11 @@ resource "azurerm_network_interface_backend_address_pool_association" "web" {
 
 # Create the Web dispatcher Availability Set
 resource "azurerm_availability_set" "web" {
-  count                        = local.enable_deployment && local.use_web_avset ? max(length(local.web_zones), 1) : 0
-  name                         = format("%s%s%s", local.prefix, var.naming.separator, var.naming.web_avset_names[count.index])
+  count = local.enable_deployment && local.use_web_avset ? max(length(local.web_zones), 1) : 0
+  name = local.web_zonal_deployment ? (
+    format("%s%sz%s%s%s", local.prefix, var.naming.separator, local.web_zones[count.index], var.naming.separator, local.resource_suffixes.web_avset)) : (
+    format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_avset)
+  )
   location                     = var.resource_group[0].location
   resource_group_name          = var.resource_group[0].name
   platform_update_domain_count = 20
@@ -245,8 +248,7 @@ resource "random_integer" "app_priority" {
 
 # Create a Azure Firewall Network Rule for Azure Management API
 resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
-  provider            = azurerm.deployer
-  count               = local.firewall_exists && !local.sub_app_exists? 1 : 0
+  count               = local.firewall_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
@@ -264,7 +266,6 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
 //ASG
 
 resource "azurerm_application_security_group" "app" {
-  provider            = azurerm.main
   count               = local.enable_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_asg)
   resource_group_name = var.resource_group[0].name
@@ -272,7 +273,6 @@ resource "azurerm_application_security_group" "app" {
 }
 
 resource "azurerm_application_security_group" "web" {
-  provider            = azurerm.main
   count               = local.webdispatcher_count > 0 ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_asg)
   resource_group_name = var.resource_group[0].name

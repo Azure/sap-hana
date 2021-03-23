@@ -139,8 +139,7 @@ resource "random_integer" "db_priority" {
 
 # Create a Azure Firewall Network Rule for Azure Management API
 resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
-  provider            = azurerm.deployer
-  count               = local.firewall_exists && !local.sub_db_exists ? 1 : 0
+  count               = local.firewall_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_db)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
@@ -158,7 +157,6 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
 //ASG
 
 resource "azurerm_application_security_group" "db" {
-  provider            = azurerm.main
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_asg)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location

@@ -66,6 +66,7 @@ Licensed under the MIT license.
         $deployer_tfstate_key = Read-Host ("Please provide the deployer state file name for the " + $region + " region")
         $Category1 = @{"Deployer" = $deployer_tfstate_key }
         $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
     else {
         $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()
@@ -81,9 +82,35 @@ Licensed under the MIT license.
         $changed = $true
     }
 
-    if ($changed) {
-        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+    $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
+    if ("Y" -eq $ans) {
+        $vault = ""
+        if ($null -ne $iniContent[$region] ) {
+            $vault = $iniContent[$region]["Vault"]
+        }
+
+        if (($null -eq $vault ) -or ("" -eq $vault)) {
+            $vault = Read-Host -Prompt "Please enter the vault name"
+            $iniContent[$region]["Vault"] = $vault 
+            Out-IniFile -InputObject $iniContent -FilePath $filePath
+    
+        }
+        try {
+            Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Workload $true
+        }
+        catch {
+            return
+        }
+    
+        
     }
+
+
+
+
+    $rgName = $iniContent[$region]["REMOTE_STATE_RG"].Trim() 
+    $saName = $iniContent[$region]["REMOTE_STATE_SA"].Trim() 
+    $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim()
 
     $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
     if ("Y" -eq $ans) {
@@ -109,9 +136,8 @@ Licensed under the MIT license.
     $tfstate_resource_id = $iniContent[$region]["tfstate_resource_id"].Trim()
 
     # Subscription
-    $sub = $iniContent[$combined]["subscription"].Trim() 
+    $sub = $iniContent[$region]["subscription"].Trim() 
     $repo = $iniContent["Common"]["repo"].Trim()
-
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {

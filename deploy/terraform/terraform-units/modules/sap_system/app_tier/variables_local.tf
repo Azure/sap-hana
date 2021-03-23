@@ -482,14 +482,12 @@ locals {
     {
       name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_clst_feip)
       subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-      private_ip_address            = local.use_DHCP ? (null) : (try(local.scs_lb_ips[0], cidrhost(local.sub_app_prefix, 0 + local.ip_offsets.scs_lb + 2 )))
       private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
 
     },
     {
       name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_fs_feip)
       subnet_id                     = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-      private_ip_address            = local.use_DHCP ? (null) : (try(local.scs_lb_ips[0], cidrhost(local.sub_app_prefix, 0 + local.ip_offsets.scs_lb + 3 )))
       private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
 
     }
@@ -512,5 +510,5 @@ locals {
     },
   ]
 
-  fpips = (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? flatten(concat(local.std_ips, local.winha_ips)) : flatten(local.std_ips)
+  fpips = (scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? merge(local.std_ips, local.winha_ips) : std_ips
 }

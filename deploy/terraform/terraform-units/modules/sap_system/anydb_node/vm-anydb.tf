@@ -28,7 +28,6 @@ resource "azurerm_network_interface" "anydb_db" {
 }
 
 resource "azurerm_network_interface_application_security_group_association" "db" {
-  provider                      = azurerm.main
   count                         = local.enable_deployment ? local.db_server_count : 0
   network_interface_id          = azurerm_network_interface.anydb_db[count.index].id
   application_security_group_id = var.db_asg_id

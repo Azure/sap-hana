@@ -74,6 +74,7 @@ Licensed under the MIT license.
         $sub = Read-Host -Prompt "Please enter the subscription"
         $iniContent[$region]["subscription"] = $sub
         $changed = $true
+      
     }
 
     if ($null -eq $repo -or "" -eq $repo) {
@@ -104,12 +105,11 @@ Licensed under the MIT license.
                 $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
             }
         }
-        else {
-            if ($PSCmdlet.ShouldProcess($Parameterfile, $DeployerFolderRelativePath)) {
-                $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
-                if ("Y" -ne $ans) {
-                    return
-                }
+        else
+        {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                return
             }
         }
     }

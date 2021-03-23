@@ -94,21 +94,21 @@ Licensed under the MIT license.
         
         $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id }
         $iniContent += @{$region = $Category1 }
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
 
     }
 
     if ($null -eq $iniContent[$combined]) {
         $Category1 = @{"Landscape" = $landscapeKey; "Subscription" = "" }
         $iniContent += @{$combined = $Category1 }
-        Out-IniFile -InputObject $iniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
     }
 
     
     if ("sap_deployer" -eq $Type) {
         $iniContent[$region]["Deployer"] = $key.Trim()
-        Out-IniFile -InputObject $iniContent -Path $filePath
-        $iniContent = Get-IniContent -Path $filePath
+        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        $iniContent = Get-IniContent $filePath
     }
     else {
         $deployer_tfstate_key = $iniContent[$region]["Deployer"].Trim()    
@@ -137,15 +137,6 @@ Licensed under the MIT license.
     
     $repo = $iniContent["Common"]["repo"].Trim() 
 
-    if ($null -eq $landscape_tfstate_key -or "" -eq $landscape_tfstate_key) {
-        $landscape_tfstate_key = Read-Host -Prompt "Please enter the subscription for the deployment"
-        if ($Type -eq "sap_system") {
-            $iniContent[$combined]["Landscape"] = $landscape_tfstate_key.Trim()
-        }
-    
-        $changed = $true
-    }
-
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription for the deployment"
         if ($Type -eq "sap_system" -or $Type -eq "sap_landscape") {
@@ -154,6 +145,7 @@ Licensed under the MIT license.
         else {
             $iniContent[$region]["subscription"] = $sub.Trim()  
         }
+    
         $changed = $true
     }
 
