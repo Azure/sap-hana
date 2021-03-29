@@ -17,7 +17,7 @@ resource "azurerm_network_security_group" "db" {
     )
   )
   location = local.nsg_asg_with_vnet ? (
-    local.vnet_sap_resource_group_name) : (
+    local.vnet_sap_resource_group_location) : (
     local.rg_exists ? (
       data.azurerm_resource_group.resource_group[0].location) : (
       azurerm_resource_group.resource_group[0].location
@@ -54,7 +54,7 @@ resource "azurerm_network_security_group" "admin" {
     )
   )
   location = local.nsg_asg_with_vnet ? (
-    local.vnet_sap_resource_group_name) : (
+    local.vnet_sap_resource_group_location) : (
     local.rg_exists ? (
       data.azurerm_resource_group.resource_group[0].location) : (
       azurerm_resource_group.resource_group[0].location

@@ -218,7 +218,7 @@ locals {
   vnet_sap_name                    = split("/", local.vnet_sap_arm_id)[8]
   vnet_sap_resource_group_name     = split("/", local.vnet_sap_arm_id)[4]
   vnet_sap                         = data.azurerm_virtual_network.vnet_sap
-  vnet_sap_resource_group_location = try(local.vnet_sap.location, "")
+  vnet_sap_resource_group_location = try(local.vnet_sap.location, local.region)
   vnet_sap_addr                    = local.vnet_sap.address_space
   var_vnet_sap                     = try(local.var_infra.vnets.sap, {})
 
