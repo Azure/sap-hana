@@ -158,7 +158,8 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
 //ASG
 
 resource "azurerm_application_security_group" "db" {
-  name = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_asg)
+  provider = azurerm.main
+  name     = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_asg)
   resource_group_name = local.nsg_asg_with_vnet ? (
     local.vnet_sap_resource_group_name) : (
     (local.rg_exists ? (
