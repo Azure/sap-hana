@@ -379,7 +379,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = datadisk.type
+        type                      = "sap"
       }
     ]
   ])
@@ -415,7 +415,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = datadisk.type
+        type                      = "sap"
       }
     ]
   ])
@@ -451,7 +451,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
-        type                      = datadisk.type
+        type                      = "sap"
       }
     ]
   ])
@@ -473,17 +473,17 @@ locals {
 
   app_disks_ansible = flatten([for vm in local.app_virtualmachine_names : [
     for idx, datadisk in local.app_data_disk_per_dbnode :
-    format("host: %s, LUN: %d, type: %s, size:%d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+    format("host: %s, LUN: %d, type: %s", vm, idx, "sap")
   ]])
 
   scs_disks_ansible = flatten([for vm in local.scs_virtualmachine_names : [
     for idx, datadisk in local.scs_data_disk_per_dbnode :
-    format("host: %s, LUN: %d, type: %s, size:%d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+    format("host: %s, LUN: %d, type: %s", vm, idx, "sap")
   ]])
 
   web_disks_ansible = flatten([for vm in local.web_virtualmachine_names : [
     for idx, datadisk in local.web_data_disk_per_dbnode :
-    format("host: %s, LUN: %d, type: %s, size: %d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+    format("host: %s, LUN: %d, type: %s", vm, idx, "sap")
   ]])
 
 
