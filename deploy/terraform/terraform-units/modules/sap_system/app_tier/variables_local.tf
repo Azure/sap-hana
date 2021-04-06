@@ -360,6 +360,7 @@ locals {
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
         }
       ]
       if storage_type.name != "os"
@@ -378,6 +379,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
+        type                      = datadisk.type
       }
     ]
   ])
@@ -394,6 +396,7 @@ locals {
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
         }
       ]
       if storage_type.name != "os"
@@ -412,6 +415,7 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
+        type                      = datadisk.type
       }
     ]
   ])
@@ -428,6 +432,7 @@ locals {
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
         }
       ]
       if storage_type.name != "os"
@@ -446,10 +451,10 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
+        type                      = datadisk.type
       }
     ]
   ])
-
 
   full_appserver_names = flatten([for vm in local.app_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
@@ -462,6 +467,25 @@ locals {
   full_webserver_names = flatten([for vm in local.web_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
   )
+
+  //Disks for Ansible
+  // host: xxx, LUN: #, type: sapusr, size: #
+
+  app_disks_ansible = flatten([for vm in local.app_virtualmachine_names : [
+    for idx, datadisk in local.app_data_disk_per_dbnode :
+    format("host: %s, LUN: %d, type: %s, size:%d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+  ]])
+
+  scs_disks_ansible = flatten([for vm in local.scs_virtualmachine_names : [
+    for idx, datadisk in local.scs_data_disk_per_dbnode :
+    format("host: %s, LUN: %d, type: %s, size:%d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+  ]])
+
+  web_disks_ansible = flatten([for vm in local.web_virtualmachine_names : [
+    for idx, datadisk in local.web_data_disk_per_dbnode :
+    format("host: %s, LUN: %d, type: %s, size: %d", vm, idx, datadisk.type, datadisk.disk_size_gb)
+  ]])
+
 
   // Zones
   app_zones            = try(var.application.app_zones, [])
@@ -508,7 +532,7 @@ locals {
     },
     {
       name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_ers_feip)
-      subnet_id                     = local.enable_deployment ? (local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id) :""
+      subnet_id                     = local.enable_deployment ? (local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id) : ""
       private_ip_address            = local.use_DHCP ? (null) : (try(local.scs_lb_ips[1], cidrhost(local.sub_app_prefix, 1 + local.ip_offsets.scs_lb)))
       private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
     },

@@ -97,6 +97,10 @@ variable "sid_kv_user_id" {
   description = "Defines the names for the resources"
 }
 
+variable "disks" {
+  description = "List of disks"
+}
+
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")

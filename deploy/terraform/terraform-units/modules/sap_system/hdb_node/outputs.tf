@@ -48,3 +48,8 @@ output "dns_info_loadbalancers" {
 output "hanadb_vm_ids" {
   value = local.enable_deployment ? azurerm_linux_virtual_machine.vm_dbnode[*].id : []
 }
+
+
+output "dbtier_disks" {
+  value = local.enable_deployment ? local.db_disks_ansible : []
+}

@@ -171,4 +171,6 @@ module "output_files" {
   naming                    = module.sap_namegenerator.naming
   app_tier_os_types         = module.app_tier.app_tier_os_types
   sid_kv_user_id            = module.common_infrastructure.sid_kv_user_id
+  disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks))) 
+
 }

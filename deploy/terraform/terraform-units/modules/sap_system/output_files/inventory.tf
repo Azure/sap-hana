@@ -157,6 +157,7 @@ resource "local_file" "sap-parameters_yml" {
     uname_secret = local.uname_secret,
     pwd_secret   = local.pwd_secret,
     key_secret   = local.key_secret
+    disks        = var.disks
     }
   )
   filename             = "${path.cwd}/ansible_config_files/sap-parameters.yaml"

@@ -283,6 +283,8 @@ locals {
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          mount_point               = storage_type.mount_point
+          type                      = storage_type.name
         }
       ]
       if storage_type.name != "os"
@@ -302,9 +304,19 @@ locals {
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
         lun                       = idx
+        mount_point               = datadisk.mount_point
+        type                      = datadisk.type
       }
     ]
   ])
+
+//Disks for Ansible
+  // host: xxx, LUN: #, type: sapusr, size: #
+
+  db_disks_ansible = flatten([for vm in local.computer_names : [
+    for idx, datadisk in local.data_disk_per_dbnode :
+    format("host: %s, LUN: %d, type: %s, size: %d, mount: %s", vm, idx, datadisk.type, datadisk.disk_size_gb, datadisk.mount_point)
+  ]])
 
   enable_ultradisk = try(
     compact(

@@ -8,3 +8,8 @@ pwd_secret:                    ${pwd_secret}
 key_secret:                    ${key_secret}
 bom_base_name:                 
 sapbits_location_base_path:    
+
+disks:
+%{~ for disk in disks }
+  - ${disk} 
+%{~ endfor }

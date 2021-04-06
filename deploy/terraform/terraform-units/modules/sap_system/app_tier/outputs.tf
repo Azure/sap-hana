@@ -144,3 +144,7 @@ output "web_vm_ids" {
 output "app_tier_os_types" {
   value = zipmap(["app", "scs", "web"], [local.app_ostype, local.scs_ostype, local.web_ostype])
 }
+
+output "apptier_disks" {
+  value = local.enable_deployment ? compact(concat(local.app_disks_ansible, local.scs_disks_ansible, local.web_disks_ansible)) : []
+}
