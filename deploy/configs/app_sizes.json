@@ -40,7 +40,7 @@
         },
         {
           "count": 1,
-          "name": "data",
+          "name": "sap",
           "disk_type": "Premium_LRS",
           "size_gb": 512,
           "caching": "None",
@@ -90,7 +90,7 @@
         },
         {
           "count": 1,
-          "name": "data",
+          "name": "sap",
           "disk_type": "Premium_LRS",
           "size_gb": 512,
           "caching": "None",
@@ -140,7 +140,7 @@
         },
         {
           "count": 1,
-          "name": "data",
+          "name": "sap",
           "disk_type": "Premium_LRS",
           "size_gb": 512,
           "caching": "None",
