@@ -151,7 +151,7 @@ else
         ARM_SUBSCRIPTION_ID=$(echo "${temp}" | cut -d= -f2 | tr -d \" | xargs)
     fi
     
-    STATE_SUBSCRIPTION=ARM_SUBSCRIPTION_ID
+    STATE_SUBSCRIPTION=${ARM_SUBSCRIPTION_ID}
     
     temp=$(grep -m1 "tfstate_resource_id" "${system_config_information}")
     if [ ! -z "${temp}" ]
