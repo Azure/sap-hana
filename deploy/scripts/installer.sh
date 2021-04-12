@@ -209,7 +209,7 @@ if [ ! -n "${ARM_SUBSCRIPTION_ID}" ]; then
 fi
 
 # Checking for valid az session
-
+az account show > stdout.az 2>&1
 temp=$(grep "az login" stdout.az)
 if [ -n "${temp}" ]; then
     echo ""
