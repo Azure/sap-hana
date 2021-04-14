@@ -274,7 +274,7 @@ locals {
   data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
       for storage_type in local.db_sizing : [
-        for disk_count in range(storage_type.count) : {
+        for idx, disk_count in range(storage_type.count) : {
           suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
@@ -284,15 +284,41 @@ locals {
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
           type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
         }
+        if ! try(storage_type.growth, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
 
+
+  growth_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type = storage_type.disk_type,
+          disk_size_gb         = storage_type.size_gb,
+          //The following two lines are for Ultradisks only
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+        }
+        
+      ]
+      if try(storage_type.growth, false)
+    ]
+  ) : []
+
+  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.growth_data_disk_per_dbnode)
+
   data_disk_list = flatten([
     for vm_counter, hdb_vm in local.hdb_vms : [
-      for idx, datadisk in local.data_disk_per_dbnode : {
+      for idx, datadisk in local.all_data_disk_per_dbnode : {
         vm_index                  = vm_counter
         name                      = format("%s-%s", hdb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter
@@ -302,7 +328,7 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
+        lun                       = datadisk.lun
         type                      = datadisk.type
       }
     ]
