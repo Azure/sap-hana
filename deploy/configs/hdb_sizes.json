@@ -5,22 +5,26 @@
             {
                 "name": "data",
                 "count": 1,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
                 "count": 1,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
                 "count": 1,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
                 "count": 1,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -49,7 +53,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -58,7 +63,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -67,7 +73,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -76,7 +83,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -85,7 +93,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -109,7 +118,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -118,7 +128,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -127,7 +138,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -136,7 +148,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -145,7 +158,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -169,7 +183,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -178,7 +193,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -187,7 +203,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -196,7 +213,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -205,7 +223,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -229,7 +248,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -238,7 +258,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -247,7 +268,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -256,7 +278,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -265,7 +288,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -289,7 +313,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -298,7 +323,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -307,7 +333,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -316,7 +343,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -325,7 +353,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -349,7 +378,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -358,7 +388,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -367,7 +398,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -376,7 +408,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -385,7 +418,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -409,7 +443,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -418,7 +453,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -427,7 +463,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -436,7 +473,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -445,7 +483,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -469,7 +508,8 @@
                 "size_gb": 64,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -478,7 +518,8 @@
                 "size_gb": 128,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -487,7 +528,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -496,7 +538,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -505,7 +548,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -529,7 +573,8 @@
                 "size_gb": 64,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -538,7 +583,8 @@
                 "size_gb": 128,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -547,7 +593,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -556,7 +603,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -565,7 +613,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -589,7 +638,8 @@
                 "size_gb": 128,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -598,7 +648,8 @@
                 "size_gb": 128,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -607,7 +658,8 @@
                 "size_gb": 512,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -616,7 +668,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -625,7 +678,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -649,7 +703,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -658,7 +713,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -667,7 +723,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -676,7 +733,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -685,7 +743,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -709,7 +768,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -718,7 +778,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -727,7 +788,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -736,7 +798,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -745,7 +808,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -769,7 +833,8 @@
                 "size_gb": 512,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -778,7 +843,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -787,7 +853,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -796,7 +863,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -805,7 +873,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -829,7 +898,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -838,7 +908,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -847,7 +918,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -856,7 +928,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -865,7 +938,8 @@
                 "size_gb": 2048,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -889,7 +963,8 @@
                 "size_gb": 1024,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -898,7 +973,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -907,7 +983,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -916,7 +993,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -925,7 +1003,8 @@
                 "size_gb": 2048,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -949,7 +1028,8 @@
                 "size_gb": 2048,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -958,7 +1038,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -967,7 +1048,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -976,7 +1058,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -985,7 +1068,8 @@
                 "size_gb": 2048,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -1009,7 +1093,8 @@
                 "size_gb": 2048,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -1018,7 +1103,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -1027,7 +1113,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -1036,7 +1123,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -1045,7 +1133,8 @@
                 "size_gb": 4096,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     },
@@ -1069,7 +1158,8 @@
                 "size_gb": 4096,
                 "caching": "None",
                 "write_accelerator": false,
-                "mount_point": "/hana/data"
+                "mount_point": "/hana/data",
+                "lun_start": 0
             },
             {
                 "name": "log",
@@ -1078,7 +1168,8 @@
                 "size_gb": 255,
                 "caching": "None",
                 "write_accelerator": true,
-                "mount_point": "/hana/log"
+                "mount_point": "/hana/log",
+                "lun_start": 9
             },
             {
                 "name": "shared",
@@ -1087,7 +1178,8 @@
                 "size_gb": 1024,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/shared"
+                "mount_point": "/hana/shared",
+                "lun_start": 13
             },
             {
                 "name": "sap",
@@ -1096,7 +1188,8 @@
                 "size_gb": 64,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/usr/sap"
+                "mount_point": "/usr/sap",
+                "lun_start": 14
             },
             {
                 "name": "backup",
@@ -1105,7 +1198,8 @@
                 "size_gb": 4096,
                 "caching": "ReadOnly",
                 "write_accelerator": false,
-                "mount_point": "/hana/backup"
+                "mount_point": "/hana/backup",
+                "lun_start": 15
             }
         ]
     }
