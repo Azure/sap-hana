@@ -314,7 +314,7 @@ locals {
     ]
   ) : []
 
-  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.growth_data_disk_per_dbnode)
+  all_data_disk_per_dbnode = concat(local.data_disk_per_dbnode, local.growth_disk_per_dbnode)
 
   data_disk_list = flatten([
     for vm_counter, hdb_vm in local.hdb_vms : [
