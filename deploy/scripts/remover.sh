@@ -197,7 +197,7 @@ if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
 fi
 
 # Checking for valid az session
-
+az account show > stdout.az 2>&1
 temp=$(grep "az login" stdout.az)
 if [ -n "${temp}" ]; then
     echo ""
@@ -270,7 +270,17 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
  
-terraform -chdir="${terraform_module_directory}" destroy -var-file="${var_file}" $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter 
+if [ $deployment_system == sap_deployer ]
+then
+    terraform -chdir="${terraform_module_directory}" destroy -var-file="${var_file}" \
+                $landscape_tfstate_key_parameter \
+                $deployer_tfstate_key_parameter
+else
+    terraform -chdir="${terraform_module_directory}" destroy -var-file="${var_file}" \
+                $tfstate_parameter \
+                $landscape_tfstate_key_parameter \
+                $deployer_tfstate_key_parameter
+fi
 
 if [ $deployment_system == sap_deployer ]
 then
