@@ -14,7 +14,7 @@
 # Example of complete run execution:
 #
 #         ansible-playbook                                                                \
-#           --inventory   X00-hosts.yml                                                   \
+#           --inventory   X00-hosts.yaml                                                  \
 #           --user        azureadm                                                        \
 #           --private-key sshkey                                                          \
 #           --extra-vars="@sap-parameters.yaml"                                           \
@@ -77,7 +77,7 @@ do
 #       2) Convert file extension to yaml.
 #       3) Find more secure way to handle the ssh private key so it is not exposed.
         ansible-playbook                                                                                                \
-          --inventory   X00_hosts.yml                                                     \
+          --inventory   X00_hosts.yaml                                                    \
           --user        azureadm                                                          \
           --private-key sshkey                                                            \
           --extra-vars="@sap-parameters.yaml"                                             \
