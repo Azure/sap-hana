@@ -1,0 +1,277 @@
+---
+# Assumptions
+#   target_media_location exists on disk
+#
+# Inputs:
+#   target_media_location             Default     /usr/sap/install
+#   inventory_dir
+#   bom_name
+#   sapbits_location_base_path
+#   sapbits_bom_files
+#   sapbits_sas_token
+#
+# Locals:
+#   _bom
+#   item
+#   result
+#
+# BOM Fields:
+#   download
+#   archive
+#   permissions
+#   
+
+
+
+# Steps:
+#   01) Register BOM
+#   02) Create static download directories
+#   03) Create dynamic extract directories
+#   04) Download media from bom
+#   05) Extract files - SAPCAR
+#   06) Extract files - UNRAR
+#   07) Extract files - UNZIP
+#   08) Purge BOM file from Ansible Controller
+
+
+
+#   01) Register BOM
+- name:         "Register BOM: {{ bom_name }}"
+  include_vars:
+    file:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+    name:       _bom
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      "Archive: {{ item.archive }}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+
+#   02) Create static download directories
+- name:     "BOM: Create SAP download directories"
+  file:
+    path:   "{{ item.path }}"
+    state:  directory
+    mode:   0755
+  loop:
+    - { path: '/usr/sap/install/downloads' }
+    - { path: '/usr/sap/install/download_basket' }
+
+
+
+#   03) Create dynamic extract directories
+- name: "BOM: Create BOM directories"
+  file:
+    path:   "{{ target_media_location }}/{{ item.extractDir }}"
+    state:  directory
+    mode:   0755
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     not (    (item.extractDir is undefined)
+                  or (item.extractDir == '') )
+
+
+
+
+# Download Files
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      
+#       - "URL : {{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/archives/{{ item.archive }}{% if sapbits_sas_token is not undefined %}{{ sapbits_sas_token }}{% endif %}"
+#       - "DEST: {{ target_media_location }}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+#       - "MODE: {% if item.permissions is undefined %}0644{% else %}{{ item.permissions }}{% endif %}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+
+#   04) Download media from bom
+# Loop throough BOM media files and download to correct location
+- name: "BOM: Download Files"
+  get_url:
+    url:    "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/archives/{{ item.archive }}{% if sapbits_sas_token is not undefined %}{{ sapbits_sas_token }}{% endif %}"
+    dest:   "{{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+    mode:   "{% if item.permissions is undefined %}0644{% else %}{{ item.permissions }}{% endif %}"
+
+  register: result
+  until:    result is succeeded
+  retries:  10
+  delay:    6
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     item.download is undefined or
+            item.download
+
+
+
+#   05) Extract files - SAPCAR
+- name:         "BOM: Extract File, SAPCAR"
+  command:      "{{ target_media_location }}/downloads/SAPCAR -manifest SIGNATURE.SMF -xf {{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+  args:
+    chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
+    creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
+  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:       
+    - item.extract is not undefined
+    - item.extract
+    - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="SAR") ) or
+      ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="SAR") )
+
+
+
+#   06) Extract files - UNRAR
+- name:         "BOM: Extract File, UNRAR"
+  command:      unrar x "{{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+  args:
+    chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
+    creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
+  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:       
+    - item.extract is not undefined
+    - item.extract
+    - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="RAR") ) or
+      ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="RAR") )
+
+
+
+#   07) Extract files - UNZIP
+- name:         "BOM: Extract File, UNZIP"
+  unarchive:
+    src:        "{{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
+    dest:       "{{ target_media_location }}/{{ item.extractDir }}"
+    remote_src: yes
+    creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
+  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:       
+    - item.extract is not undefined
+    - item.extract
+    - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="ZIP") ) or
+      ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="ZIP") )
+
+
+
+#   08) Purge BOM file from Ansible Controller
+- name:         "Ensure {{ bom_name }} is absent"
+  file:
+    path:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
+    state:      absent
+  delegate_to:  localhost
+
+# -------------------------------------+---------------------------------------8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# - name:         "Ensure {{ target_media_location }} exists"
+#   file:
+#     path:       "{{ target_media_location }}"
+#     state:      directory
+#   check_mode:   "{{ test_mode is defined and test_mode }}"
+
+# - name:               "Ensure current property is iterated"
+#   include_tasks:      download_media.yaml
+#   vars:
+#     default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+#     bom_media:        "{{ media_iterator.media }}"
+#     source_location:  "{{ media_iterator.uri_location }}"
+#     file_name:        "{{ media_iterator.property_name }}"
+#   loop:
+#     - uri_location:   archives
+#       property_name:  archive
+#       media:          "{{ bom.materials.media | flatten(levels=1) }}"
+#     # - uri_location:   "boms/{{ bom_base_name }}/stackfiles"
+#     #   property_name:  file
+#     #   media:          "{{ bom.materials.stackfiles | flatten(levels=1) }}"
+#     # - uri_location:   "boms/{{ bom_base_name }}/templates"
+#     #   property_name:  file
+#     #   media:          "{{ bom.materials.templates if (bom.materials.templates | type_debug == 'list') else [] | flatten(levels=1) }}"
+#   loop_control:
+#     loop_var:         media_iterator
+
+# - name:               "Ensure {{ bom_base_name }} dependencies are followed"
+#   when:               bom_dependencies | length != 0
+#   include_tasks:      "{{ iterator }}"
+#   vars:
+#     bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+#     bom_media:        "{{ bom.materials.media }}"
+#     bom_base_name:    "{{ item.name }}"
+#   loop:               "{{ bom_dependencies | flatten(levels=1) }}"
+
+
+
+
+#------------------<DEBUGGING>-------------------
+# - name:           Ensure target folders exist
+#   debug:  
+#     msg:          "{{ download_location }}"
+#   loop:           "{{
+#                       bom_media |
+#                       flatten(levels=1) |
+#                       selectattr('override_target_location', 'defined') |
+#                       map(attribute='override_target_location') |
+#                       list |
+#                       union([default_location]) |
+#                       unique }}"
+#   loop_control:
+#     loop_var:     download_location
+#------------------</DEBUGGING>------------------
+
+# - name: "Ensure media property is iterated"
+#   block:
+#     - name: Ensure target folders exist
+#       file:
+#         path: "{{ download_location }}"
+#         state: directory
+#       loop: "{{
+#         bom_media |
+#         flatten(levels=1) |
+#         selectattr('override_target_location', 'defined') |
+#         map(attribute='override_target_location') |
+#         list |
+#         union([default_location]) |
+#         unique }}"
+#       loop_control:
+#         loop_var: download_location
+#       check_mode: "{{ test_mode is defined and test_mode }}"
+
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:          "{{ download_iterator }}"
+#   loop:           "{{ bom_media | flatten(levels=1) }}"
+#   loop_control:
+#     loop_var:     download_iterator
+#------------------</DEBUGGING>------------------
+
+
+    # - name: Ensure media are downloaded
+    #   vars:
+    #     archive_location:           "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/{{ source_location }}"
+    #     default_file_name:          "{{ download_iterator[file_name] }}"
+    #     file_source:                "{{ archive_location }}/{{ default_file_name }}"
+    #     file_dest_target_location:  "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
+    #     file_dest_target_name:      "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, default_file_name) }}"
+    #     file_dest:                  "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
+    #   uri:
+    #     url:                        "{{ file_source }}{{ sapbits_sas_token }}"
+    #     dest:                       "{{ file_dest }}"
+    #     creates:                    "{{ file_dest }}"
+    #   loop:                         "{{ bom_media | flatten(levels=1) }}"
+    #   loop_control:
+    #     loop_var:                   download_iterator
+    #   check_mode:                   "{{ test_mode is defined and test_mode }}"
