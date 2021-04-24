@@ -111,12 +111,12 @@
     pvs_backup_str: "{{ pvs_backup | default([]) | join(',') }}"
     cacheable: yes
 
-- name: Create the consolidated variable
+- name: Create the consolidated list
   set_fact:
     LVM_data: "{{ [ \
-    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',    'lv':'lv_backup',  'size': '100%FREE',  'opts': '',            'fstype': 'xfs', 'dev': '/dev/vg_backup/lv_backup' }, \
-    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',      'lv':'lv_data',    'size': '100%FREE',  'opts': '-i 3 -I 128', 'fstype': 'xfs', 'dev': '/dev/vg_data/lv_data' }, \
-    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}'        'lv':'lv_log',     'size': '100%FREE',  'opts': '-i 3 -I 32',  'fstype': 'xfs', 'dev': '/dev/vg_log/lv_log' } \
+    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',  'lv':'lv_backup', 'size': '100%FREE', 'opt' : '',             'fstype': 'xfs', 'dev': '/dev/vg_backup/lv_backup'}, \
+    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',    'lv':'lv_data',   'size': '100%FREE', 'opt' : '-i 3 -I 128',  'fstype': 'xfs', 'dev': '/dev/vg_data/lv_data'}, \
+    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}',     'lv':'lv_log',    'size': '100%FREE', 'opt' : '-i 3 -I 32',   'fstype': 'xfs', 'dev': '/dev/vg_log/lv_log'} \
     ] }}"
 
 - debug:
@@ -137,6 +137,7 @@
   lvg:
     vg:     "{{ 'vg_' ~ item.type }}"
     pvs:    "{{ '/dev/disk/azure/scsi1/lun' ~ item.LUN }}"
+    state:  present
 
   loop: "{{ disks }}"
   when: 
@@ -159,11 +160,15 @@
   when:
     - item.pvs | bool
 
-- name: Volume Group creation (single disks)
-  lvg:
+- name: Logical Volume creation (single disks)
+  lvol:
+    lv:     "{{ 'lv_' ~ item.type }}"
     vg:     "{{ 'vg_' ~ item.type }}"
-    lv:     "{{ 'vg_' ~ item.type }}"
-    size:   '100%FREE'
+    size:     '100%FREE'
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
 
   loop: "{{ disks }}"
   when: 
@@ -173,15 +178,15 @@
     - item.host == inventory_hostname
 
 - name: "Filesystem creation"
-  lvol:
+  filesystem:
     dev:       "{{ item.dev }}"
     fstype:    "{{ item.fstype }}"
   loop: "{{ LVM_data }}"
   when:
-    - item.pvs | bool
+    - item.dev | bool
 
 - name: Filesystem creation (single disks)
-  lvg:
+  filesystem:
     dev:     "{{ '/dev/vg_' ~ item.type  ~ '/lv_' ~ item.type }}"
     fstype:  'xfs'
 
