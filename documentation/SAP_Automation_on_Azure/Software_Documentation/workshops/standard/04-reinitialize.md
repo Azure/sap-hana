@@ -125,7 +125,7 @@
 1. Change to Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/NP-EUS2-SAP_LIBRARY
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/NP-EUS2-SAP_LIBRARY
     ```
     <br/>
 
@@ -151,7 +151,8 @@
    It should be inserted as the first line following the opening `{`
     ```
     {
-        "tfstate_resource_id": "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>",
+        "tfstate_resource_id"                   : "<RESOURCE_ID_FOR_TFSTATE_STORAGE_ACCOUNT>",
+        "deployer_tfstate_key"                  : "<DEPLOYER_STATE_FILE_KEY_NAME>",
         "infrastructure": {
             ...
     }

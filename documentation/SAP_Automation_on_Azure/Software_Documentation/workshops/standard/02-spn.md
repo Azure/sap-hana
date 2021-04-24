@@ -43,7 +43,7 @@ This allows for mapping of an environment to a subscription, along with credenti
     From a privilaged account, create an SPN.<br/>
     The Subscription ID that you are deploying into is reqired.
     ```
-    az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="Deployment Account-NP"
+    az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" --name="Deployment-Account-NP"
     ```
     <br/><br/>
 
@@ -55,7 +55,7 @@ This allows for mapping of an environment to a subscription, along with credenti
     ```
     {
       "appId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-      "displayName": "Deployment Account-NP",
+      "displayName": "Deployment-Account-NP",
       "name": "http://Deployment-Account-NP",
       "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx""

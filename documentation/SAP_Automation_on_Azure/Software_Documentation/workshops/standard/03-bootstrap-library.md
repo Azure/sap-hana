@@ -77,7 +77,7 @@
 2. Create Working Directory.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY/NP-EUS2-SAP_LIBRARY; cd $_
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/NP-EUS2-SAP_LIBRARY; cd $_
     ```
     <br/>
 
