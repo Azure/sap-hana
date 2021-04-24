@@ -1,10 +1,7 @@
 {
   "infrastructure": {
     "region"                : "westus2",
-    "environment"           : "MGMT",
-    "resource_group"        : {
-      "name"                : "MGMT-WUS2-SAP_LIBRARY"
-    }
+    "environment"           : "MGMT"
   },
   "deployer": {
     "environment"           : "MGMT",

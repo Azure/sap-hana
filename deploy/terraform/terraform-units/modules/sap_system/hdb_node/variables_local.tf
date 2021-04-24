@@ -1,3 +1,4 @@
+
 variable "anchor_vm" {
   description = "Deployed anchor VM"
 }
@@ -76,10 +77,10 @@ locals {
   resource_suffixes    = var.naming.resource_suffixes
 
   // Imports database sizing information
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0  ? format("%s/%s",path.cwd, var.custom_disk_sizes_filename) : format("%s%s",path.module,"/../../../../../configs/hdb_sizes.json")))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
-  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+  faults = jsondecode(file(format("%s%s",path.module,"/../../../../../configs/max_fault_domain_count.json")))
 
   region = try(var.infrastructure.region, "")
   sid    = upper(var.sap_sid)
@@ -196,28 +197,15 @@ locals {
     { db_version = local.hdb_version },
     { os = local.hdb_os },
     { size = local.hdb_size },
-    { filesystem = local.hdb_fs },
     { high_availability = local.hdb_ha },
-    { authentication = local.hdb_auth },
+    { auth_type = local.sid_auth_type },
+    { dbnodes = local.dbnodes },
+    { loadbalancer = local.loadbalancer },
     { instance = {
       sid             = local.hdb_sid,
       instance_number = local.hdb_nr
       }
-    },
-    { credentials = {
-      db_systemdb_password   = "obsolete"
-      os_sidadm_password     = "obsolete"
-      os_sapadm_password     = "obsolete"
-      xsa_admin_password     = "obsolete"
-      cockpit_admin_password = "obsolete"
-      ha_cluster_password    = "obsolete"
-      }
-    },
-    { components = local.components },
-    { xsa = local.xsa },
-    { shine = local.shine },
-    { dbnodes = local.dbnodes },
-    { loadbalancer = local.loadbalancer }
+    }
   )
 
   // Numerically indexed Hash of HANA DB nodes to be created
@@ -231,8 +219,9 @@ locals {
       storage_nic_ip = dbnode.storage_nic_ip,
       size           = local.hdb_size,
       os             = local.hdb_os,
-      authentication = local.hdb_auth
+      auth_type      = local.sid_auth_type,
       sid            = local.hdb_sid
+
     }
   ]
 
@@ -268,6 +257,8 @@ locals {
       port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
     }
   ])
+
+
 
   db_sizing = local.enable_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), local.hdb_size).storage : lookup(local.sizes, local.hdb_size).storage : []
 

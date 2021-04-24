@@ -47,6 +47,13 @@ Licensed under the MIT license.
         #Deployer state file
         [Parameter(Mandatory = $false)][string]$Deployerstatefile,
         [Parameter(Mandatory = $false)][string]$Deployerenvironment,
+        [Parameter(Mandatory = $true)][string]$Subscription,
+        #SPN App ID
+        [Parameter(Mandatory = $true)][string]$Client_id,
+        #SPN App secret
+        [Parameter(Mandatory = $true)][string]$Client_secret,
+        #Tenant
+        [Parameter(Mandatory = $true)][string]$Tenant_id,
         [Parameter(Mandatory = $false)][Switch]$Force 
     )
 
@@ -198,12 +205,19 @@ Licensed under the MIT license.
     if ($null -ne $vault -and "" -ne $vault) {
         if ($null -eq (Get-AzKeyVaultSecret -VaultName $vault -Name ($Environment + "-client-id") )) {
             $bAsk = $true
+            if(($null -ne $Client_id) -and ($null -ne $Client_secret) -and ($null -ne $Tenant_id)) 
+            {
+                Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Client_id $Client_id -Client_secret $Client_secret -Tenant_id $Tenant_id
+                $iniContent = Get-IniContent -Path $fileINIPath
+                $iniContent = Get-IniContent -Path $fileINIPath
+        
+                $step = 2
+                $iniContent[$combined]["step"] = $step
+                Out-IniFile -InputObject $iniContent -Path $fileINIPath
+                $bAsk = $false
+            }
         }
-        else {
-            $bAsk = $false
-        }
-    }
-    if ($bAsk) {
+    }    if ($bAsk) {
         $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
         if ("Y" -eq $ans) {
             $vault = $iniContent[$combined]["Vault"]

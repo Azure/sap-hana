@@ -13,7 +13,7 @@ Function Set-SAPSPNSecrets {
      .PARAMETER Environment
         This is the name of the environment.
 
-    .PARAMETER VAultNAme
+    .PARAMETER VaultName
         This is the name of the keyvault
 
     .PARAMETER Client_id
@@ -22,8 +22,8 @@ Function Set-SAPSPNSecrets {
     .PARAMETER Client_secret
         This is the SAP Application password
 
-    .PARAMETER Tenant
-        This is the Tenant ID for the SPN
+    .PARAMETER Tenant_id
+        This is the Tenant_id ID for the SPN
         
 
     .EXAMPLE 
@@ -32,7 +32,7 @@ Function Set-SAPSPNSecrets {
     #
     # Import the module
     Import-Module "SAPDeploymentUtilities.psd1"
-    Set-SAPSPNSecrets -Environment PROD -VaultName <vaultname> -Client_id <appId> -Client_secret <clientsecret> -Tenant <TenantID> 
+    Set-SAPSPNSecrets -Environment PROD -VaultName <vaultname> -Client_id <appId> -Client_secret <clientsecret> -Tenant_id <Tenant_idID> 
 
     
 .LINK
@@ -57,11 +57,11 @@ Licensed under the MIT license.
         #Keyvault name
         [Parameter(Mandatory = $true)][string]$VaultName,
         # #SPN App ID
-        [Parameter(Mandatory = $true)][string]$Client_id = "",
+        [Parameter(Mandatory = $true)][string]$Client_id,
         #SPN App secret
         [Parameter(Mandatory = $true)][string]$Client_secret,
-        #Tenant
-        [Parameter(Mandatory = $true)][string]$Tenant = "",
+        #Tenant_id
+        [Parameter(Mandatory = $true)][string]$Tenant_id,
         #Workload
         [Parameter(Mandatory = $false )][Switch]$Workload
 
@@ -77,24 +77,29 @@ Licensed under the MIT license.
 
     $combined = $Environment + $region
 
-    if($Workload) {
-        Write-Host ("Setting SPN for workload" + "("+ $combined +")")
-    }
-    else {
-        $combined = $region
-        Write-Host ("Setting SPN for deployer" + "("+ $combined +")")
-    }
-
     if ($null -eq $iniContent[$combined]) {
         $Category1 = @{"subscription" = "" }
         $iniContent += @{$combined = $Category1 }
     }
-    
+
+    if($Workload) {
+        Write-Host ("Setting SPN for workload" + "("+ $combined +")")
+        $sub = $iniContent[$combined]["subscription"]
+    }
+    else {
+        $sub = $iniContent[$combined]["kvsubscription"]
+        Write-Host ("Setting SPN for deployer" + "("+ $combined +")")
+    }
+
     # Subscription
-    $sub = $iniContent[$combined]["subscription"]
     if ($null -eq $sub -or "" -eq $sub) {
         $sub = Read-Host -Prompt "Please enter the subscription for the SPN"
-        $iniContent[$combined]["subscription"] = $sub
+        if($Workload) {
+            $iniContent[$combined]["subscription"] = $sub
+        }
+        else {
+            $iniContent[$combined]["kvsubscription"] = $sub
+        }
     }
 
     $ctx= Get-AzContext
@@ -136,18 +141,18 @@ Licensed under the MIT license.
         $iniContent[$combined]["Client_id"] = $Client_id
     }
 
-    # Read Tenant
-    $t = $iniContent[$combined]["Tenant"]
+    # Read Tenant_id
+    $t = $iniContent[$combined]["Tenant_id"]
 
-    if ("" -eq $Tenant) {
+    if ("" -eq $Tenant_id) {
         if ($t -eq "" -or $null -eq $t) {
-            $t = Read-Host -Prompt 'Tenant:'
-            $iniContent[$combined]["Tenant"] = $t 
+            $t = Read-Host -Prompt 'Tenant_id:'
+            $iniContent[$combined]["Tenant_id"] = $t 
         }
     }
     else {
-        $t = $Tenant
-        $iniContent[$combined]["Tenant"] = $Tenant
+        $t = $Tenant_id
+        $iniContent[$combined]["Tenant_id"] = $Tenant_id
     }
 
     if ("" -eq $Client_secret) {

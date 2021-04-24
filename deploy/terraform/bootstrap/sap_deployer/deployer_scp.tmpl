@@ -46,13 +46,13 @@ printf "%s\n" "Start uploading deployer json"
 
 %{~ for index, deployer in deployers }
 %{~ if deployer.authentication.type == "key"  }
-scp -i $${temp_file} -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/$${workspace}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
+scp -i $${temp_file} -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/${deployer-rgs}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{~ endif }
 %{~ endfor }
 
 %{~ for index, deployer in deployers }
 %{~ if deployer.authentication.type == "password"  }
-scp -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/$${workspace}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
+scp -o StrictHostKeyChecking=no -o ConnectTimeout=$${ssh_timeout_s} $${local_file_dir}/${deployer-rgs}.json ${deployer.authentication.username}@${deployer-ips[index]}:$${remote_dir}
 %{~ endif }
 %{~ endfor }
 

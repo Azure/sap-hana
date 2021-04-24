@@ -129,8 +129,8 @@ locals {
   enable_hdb_deployment = (length(local.hdb_list) > 0) ? true : false
 
   default_filepath = local.enable_hdb_deployment ? (
-    "${path.module}/../../../../../configs/hdb_sizes.json") : (
-    "${path.module}/../../../../../configs/anydb_sizes.json"
+    format("%s%s",path.module,"/../../../../../configs/hdb_sizes.json")) : (
+    format("%s%s",path.module,"/../../../../../configs/anydb_sizes.json")
   )
 
 
@@ -149,8 +149,8 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes     = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
-  custom_sizing         = length(var.custom_disk_sizes_filename) > 0
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0  ? format("%s/%s",path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
   db_sizing = local.enable_sid_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), var.databases[0].size).storage : lookup(local.sizes, var.databases[0].size).storage : []
 

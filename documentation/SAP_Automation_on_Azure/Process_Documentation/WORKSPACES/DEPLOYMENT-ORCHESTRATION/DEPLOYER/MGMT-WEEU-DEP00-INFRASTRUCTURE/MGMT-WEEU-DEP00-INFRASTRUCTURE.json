@@ -12,9 +12,6 @@
           "prefix"               : "10.10.20.0/26"
         }
       }
-    },
-    "resource_group": {
-      "name"                    : "WEEU-MGMT-DEP00-INFRASTRUCTURE"
     }
   },
   "options": {

@@ -1,10 +1,7 @@
 {
   "infrastructure": {
     "region"                : "westeurope",
-    "environment"           : "MGMT",
-    "resource_group": {
-      "name"                : "MGMT-WEEU-SAP_LIBRARY"
-    }
+    "environment"           : "MGMT"
   },
   "deployer": {
     "environment"           : "MGMT",

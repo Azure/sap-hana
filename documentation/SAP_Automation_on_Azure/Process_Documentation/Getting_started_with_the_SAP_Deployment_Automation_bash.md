@@ -133,7 +133,7 @@ A sample output is listed below
 
 ## **Preparing the region** ##
 
-For deploying the supporting infrastructure for the Azure region(Deployer, Library) use the prepare_region.sh script
+For deploying the supporting infrastructure for the Azure region(Deployer, Library) use the prepare_region.sh script. Navigate to the root folder of your repository containing your parameter files (DEPLOYMENT-ORCHESTRATION). 
 
 ```bash
 ${DEPLOYMENT_REPO_PATH}deploy/scripts/prepare_region.sh

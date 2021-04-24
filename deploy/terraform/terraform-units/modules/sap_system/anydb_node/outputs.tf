@@ -1,7 +1,7 @@
 output "anydb_vms" {
   value = (upper(local.anydb_ostype) == "LINUX") ? [
-    azurerm_linux_virtual_machine.dbserver, azurerm_linux_virtual_machine.observer] : [
-    azurerm_windows_virtual_machine.dbserver, azurerm_windows_virtual_machine.observer
+    azurerm_linux_virtual_machine.dbserver[*].id, azurerm_linux_virtual_machine.observer[*].id] : [
+    azurerm_windows_virtual_machine.dbserver[*].id, azurerm_windows_virtual_machine.observer[*].id
   ]
 }
 
@@ -51,7 +51,6 @@ output "dns_info_vms" {
   ) : null
 
 }
-
 
 output "dns_info_loadbalancers" {
   value = local.enable_deployment ? (

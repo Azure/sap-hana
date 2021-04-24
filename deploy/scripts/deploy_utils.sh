@@ -26,7 +26,9 @@ function save_config_vars() {
 }
 
 function load_config_vars() {
-    local var_file="${1}" var_name var_value
+    local var_file="${1}" 
+    local var_name="${2}" 
+    local var_value
     
     for var_name
     do
@@ -35,7 +37,7 @@ function load_config_vars() {
             var_value="$(grep -m1 "^${var_name}=" "${var_file}" | cut -d'=' -f2 | tr -d '"')"
         fi
         
-        [ -z "${var_value}" ] && continue
+        [[ -z "${var_value}" ]] && continue #switch to compound command `[[` instead of `[`
         
         typeset -g "${var_name}"  # declare the specified variable as global
         

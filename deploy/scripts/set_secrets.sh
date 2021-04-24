@@ -16,7 +16,7 @@ function showhelp {
     echo "#      -v vault name                                                                    #"
     echo "#      -c SPN app id                                                                    #"
     echo "#      -s SPN password                                                                  #"
-    echo "#      -t tenant of                                                                     #"
+    echo "#      -t tenant id of SPN                                                              #"
     echo "#      -h Show help                                                                     #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"

@@ -3,7 +3,7 @@
     "region"                : "eastus2",
     "environment"           : "MGMT",
     "resource_group": {
-      "name"                : "MGMT-EUS2-SAP_LIBRARY"
+      "arm_id"              : "<azureresourceid>"
     }
   },
   "deployer": {

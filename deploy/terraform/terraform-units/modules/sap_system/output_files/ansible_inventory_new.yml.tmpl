@@ -3,48 +3,56 @@ ${sid}_DB:
   hosts:
 %{~ for idx,ips_dbnode in ips_dbnodes }
     ${dbnodes[idx].name}:
-      ansible_host:  ${ips_dbnode}
-      ansible_connection: ${dbconnection} 
+      ansible_host        : ${ips_dbnode}
+      ansible_connection  : ${dbconnection} 
+      connection_type     : ${dbconnectiontype} 
 %{~ endfor }
   vars:
-    tier: ${platform}
+    tier                  : ${platform}
 
 ${sid}_SCS:
   hosts:
 %{~ for idx,ip_scs in ips_scs }
     ${scsservers[idx]}:
-      ansible_host: ${ip_scs}
-      ansible_connection: ${scsconnection} 
+      ansible_host        : ${ip_scs}
+      ansible_connection  : ${scsconnection} 
+      connection_type     : ${scsconnectiontype} 
 %{~ endfor }
   vars:
-    tier: SCS
+    tier                  : SCS
 
 ${sid}_PAS:
   hosts:
 %{~ for idx,ip_pas in ips_pas }
     ${passervers[idx]}:
-      ansible_host: ${ip_pas}
-      ansible_connection: ${scsconnection} 
+      ansible_host        : ${ip_pas}
+      ansible_connection  : ${scsconnection} 
+      connection_type     : ${scsconnectiontype} 
+
 %{~ endfor }
   vars:
-    tier: PAS
+    tier                  : PAS
 
 ${sid}_APP:
   hosts:
 %{~ for idx,ip_app in ips_app }
     ${appservers[idx]}:
-      ansible_host: ${ip_app}
-      ansible_connection: ${appconnection} 
+      ansible_host        : ${ip_app}
+      ansible_connection  : ${appconnection} 
+      connection_type     : ${appconnectiontype} 
+
 %{~ endfor }
   vars:
-    tier: APP
+    tier                  : APP
 
 ${sid}_WEB:
   hosts:
 %{~ for idx,ip_web in ips_web }
     ${webservers[idx]}:
-      ansible_host: ${ip_web}
-      ansible_connection: ${webconnection} 
+      ansible_host        : ${ip_web}
+      ansible_connection  : ${webconnection} 
+      connection_type     : ${webconnectiontype} 
+
 %{~ endfor }
   vars:
-    tier: WEB
+    tier                  : WEB

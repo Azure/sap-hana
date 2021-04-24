@@ -125,6 +125,8 @@ then
     exit -1
 fi
 
+
+
 if [ $force == 1 ]
 then
     if [ -d ./.terraform/ ]; then
@@ -193,7 +195,15 @@ root_dirname=$(pwd)
 init "${automation_config_directory}" "${generic_config_information}" "${system_config_information}"
 
 var_file="${param_dirname}"/"${parameterfile}" 
- 
+
+extra_vars=""
+
+if [ -f terraform.tfvars ]; then
+    extra_vars=" -var-file=${param_dirname}/terraform.tfvars "
+fi
+
+
+
 if [ "${deployment_system}" == sap_deployer ]
 then
     deployer_tfstate_key=${key}.terraform.tfstate
@@ -442,7 +452,7 @@ else
             exit 1
         fi
 
-        terraform -chdir="${terraform_module_directory}"  init -upgrade=true -reconfigure -var-file="${var_file}" \
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure  \
         --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
@@ -455,6 +465,7 @@ fi
 
 if [ 1 == $check_output ]
 then
+    terraform -chdir=$terraform_module_directory refresh -no-color -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
 
     outputs=$(terraform -chdir="${terraform_module_directory}" output )
     if echo "${outputs}" | grep "No outputs"; then
@@ -494,6 +505,7 @@ then
             if [ $answer == 'Y' ]; then
                 ok_to_proceed=true
             else
+                unset TF_DATA_DIR
                 exit 1
             fi
         else
@@ -523,8 +535,8 @@ then
     rm plan_output.log
 fi
 
-terraform -chdir="${terraform_module_directory}" plan -no-color -var-file="${var_file}" $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter 2>error.log 1>plan_output.log 
-
+terraform -chdir=$terraform_module_directory plan -no-color -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars} 2>error.log 1>plan_output.log 
+cat error.log
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
@@ -541,6 +553,7 @@ then
     then
         rm plan_output.log
     fi
+    unset TF_DATA_DIR
     exit -1
 fi
 
@@ -566,6 +579,7 @@ then
                 landscape_tfstate_key
             fi
         fi
+        unset TF_DATA_DIR
         exit 0
     fi
     if ! grep "0 to change, 0 to destroy" plan_output.log ; then
@@ -586,6 +600,7 @@ then
         if [ $answer == 'Y' ]; then
             ok_to_proceed=true
         else
+            unset TF_DATA_DIR
             exit -1
         fi
     else
@@ -612,7 +627,8 @@ if [ $ok_to_proceed ]; then
     echo "#########################################################################################"
     echo ""
     
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter 
+    terraform -chdir=${terraform_module_directory} apply ${approve} -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
+    
 fi
 
 if [ "${deployment_system}" == sap_landscape ]

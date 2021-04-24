@@ -62,37 +62,45 @@ function missing {
     echo "#   Usage: prepare_region.sh                                                            #"
     echo "#      -d deployer parameter file                                                       #"
     echo "#      -l library parameter file                                                        #"
+    echo "#      -s subscription (optional)                                                       #"
+    echo "#      -c SPN app id (optional)                                                         #"
+    echo "#      -p SPN password (optional)                                                       #"
+    echo "#      -t tenant id of SPN (optional)                                                   #"
     echo "#      -h Show help                                                                     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     
 }
 
-interactive=false
+interactive=0
 force=0
+subscription=""
+client_id=""
+spn_secret=""
+tenant_id=""
 
-while getopts ":d:l:e:h:f" option; do
+while getopts ":d:l:s:c:p:t:h:f:i" option; do
     case "${option}" in
         d) deployer_parameter_file=${OPTARG};;
         l) library_parameter_file=${OPTARG};;
-        f) force=1
-        ;;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
+        f) force=1 ;;
+        i) interactive=1 ;;
+        s) subscription=${OPTARG};;
+        c) client_id=${OPTARG};;
+        p) spn_secret=${OPTARG};;
+        t) tenant_id=${OPTARG};;
+        h) showhelp exit 3 ;;
+        ?) echo "Invalid option: -${OPTARG}." exit 2 ;;
     esac
 done
 
-if [ -z $deployer_parameter_file ]; then
+if [ -z "$deployer_parameter_file" ]; then
     missing_value='deployer parameter file'
     missing
     exit -1
 fi
 
-if [ -z $library_parameter_file ]; then
+if [ -z "$library_parameter_file" ]; then
     missing_value='library parameter file'
     missing
     exit -1
@@ -169,9 +177,9 @@ root_dirname=$(pwd)
 
 if [ $force == 1 ]
 then
-    if [ -f $deployer_config_information ]
+    if [ -f "${deployer_config_information}" ]
     then
-        rm $deployer_config_information
+        rm "${deployer_config_information}"
     fi
 fi
 
@@ -289,7 +297,24 @@ then
     then
         exit $?
     fi
-    
+
+    save_config_var "step" "${deployer_config_information}"
+
+    if [ ! -z $subscription ]
+    then
+        save_config_var "subscription" "${deployer_config_information}"
+    fi
+
+    if [ ! -z $client_id ]
+    then
+        save_config_var "client_id" "${deployer_config_information}"
+    fi
+
+    if [ ! -z $tenant_id ]
+    then
+        save_config_var "tenant_id" "${deployer_config_information}"
+    fi
+
     step=1
     save_config_var "step" "${deployer_config_information}"
 else
@@ -306,27 +331,47 @@ unset TF_DATA_DIR
 
 if [ 1 == $step ]
 then
-    read -p "Do you want to specify the SPN Details Y/N?"  ans
-    answer=${ans^^}
-    if [ $answer == 'Y' ]; then
-        load_config_vars ${deployer_config_information} "keyvault"
-        if [ ! -z $keyvault ]
-        then
-            # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-            keyvault_param=$(printf " -v %s " "${keyvault}")
-        fi
-        
-        env_param=$(printf " -e %s " "${environment}")
-        region_param=$(printf " -r %s " "${region}")
-        
-        allParams="${env_param}""${keyvault_param}""${region_param}"
-        
-        "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-        if [ $? -eq 255 ]
-        then
-            exit $?
-        fi
+    load_config_vars "${deployer_config_information}" "keyvault"
+    if [ ! -z $keyvault ]
+    then
+        # Key vault was specified in ~/.sap_deployment_automation in the deployer file
+        keyvault_param=$(printf " -v %s " "${keyvault}")
     fi
+    
+    env_param=$(printf " -e %s " "${environment}")
+    region_param=$(printf " -r %s " "${region}")
+
+    secretname="${environment}"-client-id
+    az keyvault secret show --name $secretname --vault $keyvault 2>error.log > kv.log
+    if [ -f error.log ]
+    then
+        if [ grep "ERROR:" error.log ]
+        then
+            if [ ! -z $spn_secret ]
+            then
+                secret_param=$(printf " -s %s " "${spn_secret}")
+                allParams="${env_param}""${keyvault_param}""${region_param}""${secret_param}"
+                
+                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+                if [ $? -eq 255 ]
+                then
+                    exit $?
+                fi
+            else
+                read -p -r "Do you want to specify the SPN Details Y/N?"  ans
+                answer=${ans^^}
+                if [ $answer == 'Y' ]; then
+                    
+                    allParams="${env_param}""${keyvault_param}""${region_param}"
+                    
+                    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+                    if [ $? -eq 255 ]
+                    then
+                        exit $?
+                    fi
+                fi
+            fi
+        fi
     
     if [ -f post_deployment.sh ]; then
         "./post_deployment.sh"

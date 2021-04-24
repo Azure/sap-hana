@@ -61,15 +61,18 @@ output "storage_subnet" {
 }
 
 output "sid_password" {
+  sensitive = true
   value = local.sid_auth_password
 }
 
 output "sid_username" {
+  sensitive = true
   value = local.sid_auth_username
 }
 
 //Output the SDU specific SSH key
 output "sdu_public_key" {
+  sensitive = true
   value = local.sid_public_key
 }
 

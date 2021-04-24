@@ -1,5 +1,6 @@
 output "hdb_vms" {
-  value = azurerm_linux_virtual_machine.vm_dbnode
+  sensitive = false
+  value     = azurerm_linux_virtual_machine.vm_dbnode[*].id
 }
 
 output "nics_dbnodes_admin" {
@@ -15,11 +16,13 @@ output "loadbalancers" {
 }
 
 output "hdb_sid" {
-  value = local.hana_database.instance.sid
+  sensitive = false
+  value     = local.hdb_sid
 }
 
 output "hana_database_info" {
-  value = try(local.enable_deployment ? local.hana_database : map(false), {})
+  sensitive = false
+  value     = try(local.enable_deployment ? local.hana_database : map(false), {})
 }
 
 // Output for DNS

@@ -35,13 +35,21 @@ Licensed under the MIT license.
     [cmdletbinding(SupportsShouldProcess)]
     param(
         #Parameter file
-        [Parameter(Mandatory = $true)][string]$Parameterfile
+        [Parameter(Mandatory = $true)][string]$Parameterfile,
+        [Parameter(Mandatory = $false)][Switch]$Silent
+
     )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Bootstrap the deployer"
 
     $curDir = Get-Location 
+
+    $autoApprove=""
+    
+    if($Silent) {
+        $autoApprove=" --auto-approve "
+    }
 
     $fInfo = Get-ItemProperty -Path $Parameterfile
     if (!$fInfo.Exists ) {
@@ -74,7 +82,7 @@ Licensed under the MIT license.
     $combined = $Environment + $region
 
     if ($null -ne $iniContent[$combined] ) {
-        $sub = $iniContent[$combined]["subscription"] 
+        $sub = $iniContent[$combined]["kvsubscription"] 
     }
     else {
         $Category1 = @{"subscription" = "" }
@@ -84,16 +92,27 @@ Licensed under the MIT license.
     
     # Subscription & repo path
 
-    $sub = $iniContent[$combined]["subscription"] 
+    $sub = $iniContent[$combined]["kvsubscription"] 
     $repo = $iniContent["Common"]["repo"]
 
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {
-        $sub = Read-Host -Prompt "Please enter the subscription"
+        if ($null -ne $env:ARM_SUBSCRIPTION_ID) {
+            $sub = $env:ARM_SUBSCRIPTION_ID
+        }
+        else {
+            $sub = Read-Host -Prompt "Please enter the subscription"    
+        }
+        
         $iniContent[$combined]["subscription"] = $sub
         $changed = $true
     }
+
+    $Cmd = "az account set --sub $sub"
+    Add-Content -Path "deployment.log" -Value $Cmd
+
+    & ([ScriptBlock]::Create($Cmd)) 
 
     if ($null -eq $repo -or "" -eq $repo) {
         $repo = Read-Host -Prompt "Please enter the path to the repository"
@@ -187,7 +206,7 @@ Licensed under the MIT license.
     if ($PSCmdlet.ShouldProcess($Parameterfile)) {
         Write-Host -ForegroundColor green "Running apply"
 
-        $Command = " apply -var-file " + $ParamFullFile 
+        $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile 
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         Add-Content -Path "deployment.log" -Value $Cmd
         & ([ScriptBlock]::Create($Cmd)) 

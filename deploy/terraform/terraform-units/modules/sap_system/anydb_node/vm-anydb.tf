@@ -104,7 +104,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
 
   dynamic "os_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
+    for_each = flatten([for storage_type in lookup(try(local.sizes.db, local.sizes), local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
       name                   = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
       caching                = disk.value.caching
@@ -182,7 +182,7 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
 
   dynamic "os_disk" {
     iterator = disk
-    for_each = flatten([for storage_type in lookup(local.sizes, local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
+    for_each = flatten([for storage_type in lookup(try(local.sizes.db, local.sizes), local.anydb_size).storage : [for disk_count in range(storage_type.count) : { name = storage_type.name, id = disk_count, disk_type = storage_type.disk_type, size_gb = storage_type.size_gb, caching = storage_type.caching }] if storage_type.name == "os"])
     content {
       name                   = format("%s%s", local.anydb_vms[count.index].name, local.resource_suffixes.osdisk)
       caching                = disk.value.caching

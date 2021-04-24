@@ -1,12 +1,12 @@
-# /*----------------------------------------------------------------------------8
+# /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |         Role for ensuring the Repositories are configured correctly         |
+# |         Role for ensuring the Repositories are configured correctly        |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 # -------------------------------------+---------------------------------------8
 #
-# <Comment Header> 
+# <Comment Header>
 #
 # -------------------------------------+---------------------------------------8
 # TODO: 20210127 Review
@@ -31,19 +31,24 @@
 #
 # TODO: 20210127 - This only takes into account pay-as-you-go deployments.
 #                  Need to support BYOL with SUSE Manager Registrations.
-#                  Is there a betterway to do this other than using 'command' or 'shell'
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
 #----------------------------------------
 
-- name:     Ensure zypper repo is configured on HANA VMs for SLES
+- name:     Ensure zypper repo is configured on SLE VMs
   block:
-    - name:     Check zypper repo on HANA VMs
+    # If there are no repos configured zypper lr will fail with rc == 6
+    - name:     Check that zypper repos are registered
       command:    zypper lr
+      args:
+        warn: false  # quieten warning about using zypper directly
 
   when:     ansible_os_family|upper == 'SUSE'
 
   rescue:
-    # Attempt to configure the repo by re-register SLE
-    - name:     Ensure to re-register SLE instance against the Public Cloud Update Infrastructure servers
+    # Attempt to configure the repos by re-registering instance
+    - name:     Attempt to re-register SLE instance with Public Cloud \
+                Update Infrastructure
       shell:      |
                   rm /etc/SUSEConnect
                   rm -f /etc/zypp/{repos,services,credentials}.d/*
@@ -51,20 +56,26 @@
                   sed -i '/^# Added by SMT reg/,+1d' /etc/hosts
                   export PYTHONWARNINGS="ignore:Unverified HTTPS request"
                   /usr/sbin/registercloudguest --force-new
+      args:
+        warn: false  # quieten warning about using rm directly
 
-      register:     reg_result
+      register:    reg_result
       # registercloudguest rc == 1 when successful
       failed_when: reg_result.rc > 1
 
-    - name: Check if zypper repo is configured on HANA VMs post re-register SLE instance
+    - name: Verify that zypper repos are configured after re-registering \
+            SLE instance
       command: zypper lr
+      args:
+        warn: false  # quieten warning about using zypper directly
 
 #----------------------------------------
 # END
 #
 # TODO: 20210127 - This only takes into account pay-as-you-go deployments.
 #                  Need to support BYOL with SUSE Manager Registrations.
-#                  Is there a betterway to do this other than using 'command' or 'shell'
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
 #----------------------------------------
 
 
@@ -75,13 +86,16 @@
 #
 # TODO: 20210127 - This only takes into account pay-as-you-go deployments.
 #                  Need to support BYOL with RHEL satellite Registrations.
-#                  Is there a betterway to do this other than using 'command' or 'shell'
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
 #----------------------------------------
 
-- name:     Ensure zypper repo is configured on HANA VMs for RedHat
+- name:     Ensure yum repos are configured on Redhat VMs
   block:
-    - name:     Check yum repo on HANA VMs
+    - name:     Check that yum repos are registered
       command:    yum repolist
+      args:
+        warn: false  # quieten warning about using yum directly
 
   when:     ansible_os_family == 'RedHat'
 
@@ -90,7 +104,8 @@
 #
 # TODO: 20210127 - This only takes into account pay-as-you-go deployments.
 #                  Need to support BYOL with RHEL satellite Registrations.
-#                  Is there a betterway to do this other than using 'command' or 'shell'
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
 #----------------------------------------
 
 
