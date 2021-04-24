@@ -113,10 +113,10 @@
 
 - name: Create the consolidated variable
   set_fact:
-    LVM_data: "{{ [
-    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',    'lv':'lv_backup',  'size': '100%FREE',  'opts': '',            fstype: 'xfs', dev: '/dev/vg_backup/lv_backup' },
-    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',      'lv':'lv_data',    'size': '100%FREE',  'opts': '-i 3 -I 128', fstype: 'xfs', dev: '/dev/vg_data/lv_data' }, },
-    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}'        'lv':'lv_log',     'size': '100%FREE',  'opts': '-i 3 -I 32',  fstype: 'xfs', dev: '/dev/vg_log/lv_log' }, },
+    LVM_data: "{{ [ \
+    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',    'lv':'lv_backup',  'size': '100%FREE',  'opts': '',            'fstype': 'xfs', 'dev': '/dev/vg_backup/lv_backup' }, \
+    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',      'lv':'lv_data',    'size': '100%FREE',  'opts': '-i 3 -I 128', 'fstype': 'xfs', 'dev': '/dev/vg_data/lv_data' }, \
+    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}'        'lv':'lv_log',     'size': '100%FREE',  'opts': '-i 3 -I 32',  'fstype': 'xfs', 'dev': '/dev/vg_log/lv_log' } \
     ] }}"
 
 - debug:
