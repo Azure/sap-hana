@@ -18,10 +18,10 @@
     # - { tier: 'pas',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
     # - { tier: 'app',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
     # - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
-    - { tier: 'hdb',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
-    - { tier: 'pas',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
-    - { tier: 'app',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
-    - { tier: 'web',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'hdb',          type: 'nfs',  src: 'x01dhdb00l0f02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'pas',          type: 'nfs',  src: 'x01dhdb00l0f02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'app',          type: 'nfs',  src: 'x01dhdb00l0f02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'web',          type: 'nfs',  src: 'x01dhdb00l0f02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
   when:         item.tier == "all" or
                 item.tier == tier
 
