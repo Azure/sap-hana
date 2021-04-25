@@ -1,15 +1,8 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                            Package Installation                             |
+# |               Task: 1.4       - Package Installation for OS                |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
----
-# -------------------------------------+---------------------------------------8
-#
-# Task: 1.4       - Package Installation for OS
-#
-# TODO: split between OS and sap playbooks
-
 
 - name:             1.4 - Import package list
   include_vars:     os-packages.yaml
@@ -18,18 +11,8 @@
   package:
     name:           "{{ item }}" 
     state:          present
-  loop:             "{{ packages[ansible_os_family|lower] }}"
+  loop:             "{{ packages[ansible_os_family|lower + ansible_distribution_major_version] }}"
 
-# -------------------------------------+---------------------------------------8
-
-
-
-# - name:             "1.4 - Installing OS packages: {{ ansible_os_family|upper }}-{{ ansible_distribution_major_version }}"
-#   include_tasks:    1.4.yaml
-#   when:             ansible_os_family|upper == "REDHAT" or
-#                     ansible_os_family|upper == "SUSE"
-
-...
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
-# +------------------------------------4--------------------------------------*/
+# +------------------------------------4---------------------------------------*/
