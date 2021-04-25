@@ -50,9 +50,6 @@
 #
 # Build the list of tasks to be executed in order here. 
 #
-# - name: "Simple connection test for troubleshooting"
-#   ping:
-#
 # -------------------------------------+---------------------------------------8
 
   - set_fact:
