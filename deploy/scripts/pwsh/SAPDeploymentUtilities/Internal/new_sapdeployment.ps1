@@ -86,10 +86,10 @@ Licensed under the MIT license.
         Remove-Item "terraform.tfstate.backup" -ErrorAction SilentlyContinue
     }
 
-    $autoApprove=""
+    $autoApprove = ""
     
-    if($Silent) {
-        $autoApprove=" --auto-approve "
+    if ($Silent) {
+        $autoApprove = " --auto-approve "
     }
 
 
@@ -208,7 +208,7 @@ Licensed under the MIT license.
     }
 
     if ($null -ne $sub -and "" -ne $sub) {
-        if( $sub -ne $env:ARM_SUBSCRIPTION_ID) {
+        if ( $sub -ne $env:ARM_SUBSCRIPTION_ID) {
             Select-AzSubscription -SubscriptionId $sub
         }
         
@@ -488,8 +488,8 @@ Licensed under the MIT license.
     if ($PSCmdlet.ShouldProcess($Parameterfile , $Type)) {
 
         Write-Host -ForegroundColor green "Running apply"
-        $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile 
-        $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile  + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars
+        
+        $Command = " apply " + $autoApprove + " -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter + $extra_vars
 
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"
         Add-Content -Path "deployment.log" -Value $Cmd

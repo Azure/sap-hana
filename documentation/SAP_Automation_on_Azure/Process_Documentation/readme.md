@@ -150,7 +150,7 @@ The deployment configuration file defines the region and the environment name an
    }
    ```
 
-A sample deployment environment configuration is specified in [Deployment Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
+A sample deployment environment configuration is specified in [Deployment Environment](WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
 
 For more details on the deployer see [Deployer](../Software_Documentation/product_documentation-deployer.md)
 
@@ -184,7 +184,7 @@ The SAP Library configuration file defines the region and the environment name .
    }
 ```
 
-A sample deployment for the SAP library configuration is specified in [Library Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
+A sample deployment for the SAP library configuration is specified in [Library Environment](WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
 
 For more details on the SAP Library see [SAP Library](../Software_Documentation/product_documentation-sap_library.md)
 For more details on the configuration of the SAP Library see [SAP Library Configuration](../Software_Documentation/configuration-sap_library.md)
@@ -256,7 +256,7 @@ The Workload Zone configuration file defines the region and the environment name
     }
 ```
 
-A sample workload zone configuration is specified in [Workload Zone Environment](WORKSPACES/DEPLOYMENT-ORCHESTRATION/LANDSCAPE/DEV-WEEU-SAP00-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
+A sample workload zone configuration is specified in [Workload Zone Environment](WORKSPACES/LANDSCAPE/DEV-WEEU-SAP00-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
 
 The deployment will create a Virtual network and a storage account for boot diagnostics and a storage account which can be used as the witness disk for Windows High Availability Architectures and two key vaults. The deployment will populate the keyvault with the default credentials for the Virtual Machines.
 
@@ -269,7 +269,7 @@ For more details on the configuration of the SAP Library see [Workload Zone Conf
 
 The SAP System is the actual SAP Application, it contains all the Azure artifacts required to host the SAP Application.
 
-A sample SAP System configuration is specified in [SAP System](WORKSPACES/DEPLOYMENT-ORCHESTRATION/SYSTEM/DEV-WEEU-SAP00-X00/DEV-WEEU-SAP01-X00.json)
+A sample SAP System configuration is specified in [SAP System](WORKSPACES/SYSTEM/DEV-WEEU-SAP00-X00/DEV-WEEU-SAP01-X00.json)
 
 The deployment will create a SAP system that has an Hana database server, 2 application servers, 1 central services server and a web dispatcher and two key vaults (which can be ignored for now).
 

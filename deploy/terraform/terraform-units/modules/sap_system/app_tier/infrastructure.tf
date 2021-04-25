@@ -298,10 +298,10 @@ resource "random_integer" "app_priority" {
   }
 }
 
-# Create a Azure Firewall Network Rule for Azure Management API
+# Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
 resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
   provider            = azurerm.deployer
-  count               = local.firewall_exists && !local.sub_app_exists ? 1 : 0
+  count               = local.firewall_exists && local.sub_app_defined && !local.sub_app_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname
@@ -312,6 +312,13 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
     source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
     destination_ports     = ["*"]
     destination_addresses = [local.firewall_service_tags]
+    protocols             = ["Any"]
+  }
+  rule {
+    name                  = "ToInternet"
+    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = ["*"]
     protocols             = ["Any"]
   }
 }

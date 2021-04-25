@@ -4,7 +4,6 @@
     "enable_deployment"             : true,
     "ers_instance_number"           : "02",
     "os": {
-      "os_type"                     : "Linux",
       "offer"                       : "sles-sap-12-sp5",
       "publisher"                   : "SUSE",
       "sku"                         : "gen2",
@@ -13,7 +12,7 @@
     "scs_high_availability"         : true,
     "scs_server_count"              : 1,
     "scs_instance_number"           : "01",
-    "sid"                           : "X02",
+    "sid"                           : "X00",
     "webdispatcher_count"           : 1,
     "dual_nics"                     : false,
     "use_DHCP"                      : true
@@ -35,10 +34,10 @@
   ],
   "infrastructure": {
     "environment"                   : "DEV",
-    "region"                        : "northeurope",
+    "region"                        : "westeurope",
     "vnets": {
       "sap": {
-        "name"                      : "SAP02"
+        "name"                      : "SAP01"
       }
     }
   },

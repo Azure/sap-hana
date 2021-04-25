@@ -261,9 +261,9 @@ locals {
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   anydb_ip_offsets = {
     anydb_lb       = 4
-    anydb_admin_vm = 10
-    anydb_db_vm    = 10
-    observer_db_vm = 4 + 1
+    anydb_admin_vm = 4
+    anydb_db_vm    = 5 + 1
+    observer_db_vm = 5 
   }
 
   // Ports used for specific DB Versions
@@ -358,7 +358,7 @@ locals {
 
   db_disks_ansible = flatten([for idx, vm in local.anydb_vms : [
     for idx, datadisk in local.anydb_disks :
-    format("{ host: '%s', LUN: %d, type: '%s' }", vm.name, datadisk.lun, datadisk.type)
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm.computername, datadisk.lun, datadisk.type)
   ]])
 
   enable_ultradisk = try(

@@ -54,7 +54,8 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $true)][string]$Client_secret,
         #Tenant
         [Parameter(Mandatory = $true)][string]$Tenant_id,
-        [Parameter(Mandatory = $false)][Switch]$Force 
+        [Parameter(Mandatory = $false)][Switch]$Force,
+        [Parameter(Mandatory = $false)][Switch]$Silent  
     )
 
     if ($true -eq $Force) {
@@ -101,8 +102,9 @@ Licensed under the MIT license.
         $iniContent.Remove($combined)
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
         $iniContent = Get-IniContent -Path $fileINIPath
+    
     }
-
+    
     $changed = $false
 
     if ($null -eq $iniContent["Common"]) {
@@ -183,7 +185,14 @@ Licensed under the MIT license.
         }
         $iniContent[$combined]["Landscape"] = $landscape_tfstate_key
         $changed = $true
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        $iniContent = Get-IniContent -Path $fileINIPath
+    
+    }
 
+    if ($null -ne $Subscription) {
+        $iniContent[$combined]["subscription"] = $Subscription
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
     # Subscription
@@ -205,10 +214,8 @@ Licensed under the MIT license.
     if ($null -ne $vault -and "" -ne $vault) {
         if ($null -eq (Get-AzKeyVaultSecret -VaultName $vault -Name ($Environment + "-client-id") )) {
             $bAsk = $true
-            if(($null -ne $Client_id) -and ($null -ne $Client_secret) -and ($null -ne $Tenant_id)) 
-            {
-                Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Client_id $Client_id -Client_secret $Client_secret -Tenant_id $Tenant_id
-                $iniContent = Get-IniContent -Path $fileINIPath
+            if (($null -ne $Client_id) -and ($null -ne $Client_secret) -and ($null -ne $Tenant_id)) {
+                Set-SAPSPNSecrets -Region $region -Environment $Environment -VaultName $vault -Client_id $Client_id -Client_secret $Client_secret -Tenant_id $Tenant_id -Workload
                 $iniContent = Get-IniContent -Path $fileINIPath
         
                 $step = 2
@@ -217,7 +224,11 @@ Licensed under the MIT license.
                 $bAsk = $false
             }
         }
-    }    if ($bAsk) {
+        else {
+            $bAsk = $false
+        }
+    }    
+    if ($bAsk) {
         $ans = Read-Host -Prompt "Do you want to enter the Workload SPN secrets Y/N?"
         if ("Y" -eq $ans) {
             $vault = $iniContent[$combined]["Vault"]
@@ -384,7 +395,13 @@ Licensed under the MIT license.
 
     if ($PSCmdlet.ShouldProcess($Parameterfile)) {
         Write-Host -ForegroundColor green "Running apply"
-        $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        if ($Silent) {
+            $Command = " apply --auto-approve -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        }
+        else {
+            $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        }
+        
         Add-Content -Path "deployment.log" -Value $Cmd
 
         $Cmd = "terraform -chdir=$terraform_module_directory $Command"

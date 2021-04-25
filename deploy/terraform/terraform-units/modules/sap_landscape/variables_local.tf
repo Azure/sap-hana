@@ -41,6 +41,15 @@ locals {
   vnet_mgmt_id     = try(local.deployer_tfstate.vnet_mgmt_id, try(local.deployer_tfstate.vnet_mgmt.id, ""))
   firewall_ip      = try(var.deployer_tfstate.firewall_ip, "")
 
+    // Firewall
+  firewall_id     = try(var.deployer_tfstate.firewall_id, "")
+  firewall_exists = length(local.firewall_id) > 0
+  firewall_name   = local.firewall_exists ? try(split("/", local.firewall_id)[8], "") : ""
+  firewall_rgname = local.firewall_exists ? try(split("/", local.firewall_id)[4], "") : ""
+
+  firewall_service_tags = format("AzureCloud.%s", local.region)
+
+
   // Resource group
   var_rg    = try(local.var_infra.resource_group, {})
   rg_arm_id = try(local.var_rg.arm_id, "")

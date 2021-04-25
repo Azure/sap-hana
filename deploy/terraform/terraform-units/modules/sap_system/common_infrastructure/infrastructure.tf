@@ -130,7 +130,7 @@ resource "random_integer" "db_priority" {
 # Create a Azure Firewall Network Rule for Azure Management API
 resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
   provider            = azurerm.deployer
-  count               = local.firewall_exists && !local.sub_db_exists ? 1 : 0
+  count               = local.firewall_exists && local.sub_db_defined && !local.sub_db_exists ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_db)
   azure_firewall_name = local.firewall_name
   resource_group_name = local.firewall_rgname

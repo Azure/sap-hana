@@ -1,6 +1,18 @@
 #!/bin/bash
 
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
 
 function showhelp {
     echo ""
@@ -53,10 +65,10 @@ function missing {
     echo "#########################################################################################"
 }
 
-show_help=false
+
 force=0
 
-while getopts ":p:t:i:d:h:f" option; do
+while getopts "p:t:ihf" option; do
     case "${option}" in
         p) parameterfile=${OPTARG};;
         t) deployment_system=${OPTARG};;
@@ -89,7 +101,7 @@ if [ "${param_dirname}" != '.' ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#   Please run this command from the folder containing the parameter file               #"
+    echo -e "#  $boldred Please run this command from the folder containing the parameter file $resetformatting              #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit 3
@@ -97,11 +109,11 @@ fi
 
 if [ ! -f "${parameterfile}" ]
 then
-    printf -v val %-40.40s "$parameterfile"
+    printf -v val %-35.35s "$parameterfile"
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#               Parameter file does not exist: ${val} #"
+    echo -e "#                 $boldred  Parameter file does not exist: ${val} $resetformatting #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit
@@ -536,14 +548,13 @@ then
 fi
 
 terraform -chdir=$terraform_module_directory plan -no-color -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars} 2>error.log 1>plan_output.log 
-cat error.log
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Errors during the plan phase                                #"
+    echo -e "#                            $boldreduscore Errors during the plan phase $resetformatting                             #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -586,7 +597,7 @@ then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo "#                               !!! Risk for Data loss !!!                              #"
+        echo -e "#                              $boldreduscore !!! Risk for Data loss !!!  $resetformatting                             #"
         echo "#                                                                                       #"
         echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
         echo "#                                                                                       #"
@@ -627,8 +638,24 @@ if [ $ok_to_proceed ]; then
     echo "#########################################################################################"
     echo ""
     
-    terraform -chdir=${terraform_module_directory} apply ${approve} -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
-    
+    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${extra_vars}" 2>error.log
+ 
+    str1=$(grep "Error: " error.log)
+    if [ -n "${str1}" ]
+    then
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                               #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+        cat error.log
+        rm error.log
+        unset TF_DATA_DIR
+        exit -1
+    fi
+        
 fi
 
 if [ "${deployment_system}" == sap_landscape ]

@@ -1,6 +1,20 @@
 #!/bin/bash
 
-. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+#error codes include those from /usr/include/sysexits.h
+
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
 
 ################################################################################################
 #                                                                                              #
@@ -72,27 +86,32 @@ function missing {
     
 }
 
-interactive=0
 force=0
-subscription=""
-client_id=""
-spn_secret=""
-tenant_id=""
 
-while getopts ":d:l:s:c:p:t:h:f:i" option; do
+while getopts "d:l:s:c:p:t:ifh" option; do
     case "${option}" in
         d) deployer_parameter_file=${OPTARG};;
         l) library_parameter_file=${OPTARG};;
-        f) force=1 ;;
-        i) interactive=1 ;;
         s) subscription=${OPTARG};;
         c) client_id=${OPTARG};;
         p) spn_secret=${OPTARG};;
         t) tenant_id=${OPTARG};;
-        h) showhelp exit 3 ;;
-        ?) echo "Invalid option: -${OPTARG}." exit 2 ;;
+        i) approve="--auto-approve" ;;
+        f) force=1 ;;
+        h)
+            showhelp
+            exit 3
+        ;;
+        ?)
+            echo "Invalid option: -${OPTARG}."
+            exit 2
+        ;;
     esac
 done
+
+if [ ! -z "$approve" ]; then
+    approveparam=" -i"
+fi
 
 if [ -z "$deployer_parameter_file" ]; then
     missing_value='deployer parameter file'
@@ -112,7 +131,7 @@ if [ ! -n "$tf" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Please install Terraform                                    #"
+    echo -e "#                          $boldreduscore  Please install Terraform $resetformatting                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -125,7 +144,7 @@ if [ ! -n "${az}" ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo "#                           Please install the Azure CLI                                #"
+    echo -e "#                          $boldreduscore Please install the Azure CLI $resetformatting                               #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -185,6 +204,24 @@ fi
 
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
 
+if [ ! -z "${subscription}" ]
+then
+    kvsubscription="${subscription}"
+    save_config_var "kvsubscription" "${deployer_config_information}"
+    export ARM_SUBSCRIPTION_ID=$subscription
+fi
+
+
+if [ ! -n "$ARM_SUBSCRIPTION_ID" ]
+then
+    if [ ! -z "${subscription}" ]
+    then
+        save_config_var "subscription" "${deployer_config_information}"
+        export ARM_SUBSCRIPTION_ID=$subscription
+    fi
+    
+fi
+
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo ""
     echo ""
@@ -230,8 +267,6 @@ fi
 deployer_dirname=$(dirname "${deployer_parameter_file}")
 deployer_file_parametername=$(basename "${deployer_parameter_file}")
 
-deployer_key=$(echo "${deployer_file_parametername}" | cut -d. -f1)
-
 library_dirname=$(dirname "${library_parameter_file}")
 library_file_parametername=$(basename "${library_parameter_file}")
 
@@ -275,7 +310,7 @@ then
     echo "#########################################################################################"
     echo ""
     
-    cd "${deployer_dirname}"
+    cd "${deployer_dirname}" || exit
     
     if [ $force == 1 ]
     then
@@ -292,29 +327,31 @@ then
         fi
     fi
     
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh -p $deployer_file_parametername -i true
+    allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
+                
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh $allParams
     if [ $? -eq 255 ]
     then
         exit $?
     fi
-
+    
     save_config_var "step" "${deployer_config_information}"
-
-    if [ ! -z $subscription ]
+    
+    if [ ! -z "$subscription" ]
     then
         save_config_var "subscription" "${deployer_config_information}"
     fi
-
-    if [ ! -z $client_id ]
+    
+    if [ ! -z "$client_id" ]
     then
         save_config_var "client_id" "${deployer_config_information}"
     fi
-
-    if [ ! -z $tenant_id ]
+    
+    if [ ! -z "$tenant_id" ]
     then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
-
+    
     step=1
     save_config_var "step" "${deployer_config_information}"
 else
@@ -332,7 +369,7 @@ unset TF_DATA_DIR
 if [ 1 == $step ]
 then
     load_config_vars "${deployer_config_information}" "keyvault"
-    if [ ! -z $keyvault ]
+    if [ ! -z "$keyvault" ]
     then
         # Key vault was specified in ~/.sap_deployment_automation in the deployer file
         keyvault_param=$(printf " -v %s " "${keyvault}")
@@ -340,14 +377,16 @@ then
     
     env_param=$(printf " -e %s " "${environment}")
     region_param=$(printf " -r %s " "${region}")
-
+    
     secretname="${environment}"-client-id
-    az keyvault secret show --name $secretname --vault $keyvault 2>error.log > kv.log
+    az keyvault secret show --name "$secretname" --vault "$keyvault" 2>error.log > kv.log
     if [ -f error.log ]
     then
-        if [ grep "ERROR:" error.log ]
+        temp=$(grep "ERROR:" error.log)
+        
+        if [ -n "${temp}" ];
         then
-            if [ ! -z $spn_secret ]
+            if [ ! -z "$spn_secret" ]
             then
                 secret_param=$(printf " -s %s " "${spn_secret}")
                 allParams="${env_param}""${keyvault_param}""${region_param}""${secret_param}"
@@ -358,9 +397,9 @@ then
                     exit $?
                 fi
             else
-                read -p -r "Do you want to specify the SPN Details Y/N?"  ans
+                read -p  "Do you want to specify the SPN Details Y/N?"  ans
                 answer=${ans^^}
-                if [ $answer == 'Y' ]; then
+                if [ "$answer" == 'Y' ]; then
                     
                     allParams="${env_param}""${keyvault_param}""${region_param}"
                     
@@ -372,20 +411,19 @@ then
                 fi
             fi
         fi
-    
-    if [ -f post_deployment.sh ]; then
-        "./post_deployment.sh"
+        
+        if [ -f post_deployment.sh ]; then
+            "./post_deployment.sh"
+        fi
+        cd "${curdir}" || exit
+        step=2
+        save_config_var "step" "${deployer_config_information}"
     fi
-    cd "${curdir}"
-    step=2
-    save_config_var "step" "${deployer_config_information}"
 fi
-
 unset TF_DATA_DIR
 
 if [ 2 == $step ]
 then
-    
     
     echo ""
     echo "#########################################################################################"
@@ -399,7 +437,7 @@ then
     export TF_DATA_DIR="${relative_path}/.terraform"
     relative_path="${root_dirname}"/"${deployer_dirname}"
     
-    cd "${library_dirname}"
+    cd "${library_dirname}" || exit
     if [ $force == 1 ]
     then
         if [ -d ./.terraform/ ]; then
@@ -414,12 +452,14 @@ then
             rm terraform.tfstate.backup
         fi
     fi
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh -p "${library_file_parametername}" -i true -d "${relative_path}"
+    allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
+    
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh $allParams
     if [ $? -eq 255 ]
     then
         exit $?
     fi
-    cd "${curdir}"
+    cd "${curdir}" || exit
     step=3
     save_config_var "step" "${deployer_config_information}"
 else
@@ -445,19 +485,21 @@ then
     echo "#########################################################################################"
     echo ""
     
-    cd "${deployer_dirname}"
+    cd "${deployer_dirname}" || exit
     
     # Remove the script file
     if [ -f post_deployment.sh ]
     then
         rm post_deployment.sh
     fi
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh -p $deployer_file_parametername -i true -t sap_deployer
+    allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
+    
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
     if [ $? -eq 255 ]
     then
         exit $?
     fi
-    cd "${curdir}"
+    cd "${curdir}" || exit
     step=4
     save_config_var "step" "${deployer_config_information}"
 fi
@@ -476,14 +518,18 @@ then
     echo "#########################################################################################"
     echo ""
     
-    cd "${library_dirname}"
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh -p $library_file_parametername  -i true -t sap_library
+    cd "${library_dirname}" || exit
+    allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
+
+    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
     if [ $? -eq 255 ]
     then
         exit $?
     fi
-    cd "${curdir}"
-    step=5
+    cd "${curdir}" || exit
+    step=3
     save_config_var "step" "${deployer_config_information}"
 fi
 unset TF_DATA_DIR
+
+exit 0

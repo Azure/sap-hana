@@ -33,7 +33,7 @@ function showhelp {
 }
 
 
-while getopts ":e:c:s:t:h:v:r:x" option; do
+while getopts "e:c:s:t:h:v:r:x:w" option; do
     case "${option}" in
         e) environment=${OPTARG};;
         c) client_id=${OPTARG};;
@@ -43,6 +43,8 @@ while getopts ":e:c:s:t:h:v:r:x" option; do
         v) keyvault=${OPTARG};;
         h) showhelp
             exit 0
+        ;;
+        w) workload=1
         ;;
         ?) echo "Invalid option: -${OPTARG}."
             exit 0
@@ -73,8 +75,15 @@ then
     mkdir "${automation_config_directory}"
 else
     touch "${environment_config_information}"
-    load_config_vars "${environment_config_information}" "subscription"
    
+fi
+
+load_config_vars "${environment_config_information}" "subscription"
+
+if [ "$workload" != 1 ] ;
+then
+    load_config_vars "${environment_config_information}" "kvsubscription"
+    subscription=${kvsubscription}
 fi
 
 if [ ! -n "$keyvault" ]; then

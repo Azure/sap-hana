@@ -71,7 +71,7 @@ function missing {
 }
 
 #process inputs - may need to check the option i for auto approve as it is not used
-while getopts ":p:t:i:d:h" option; do
+while getopts "p:t:ih" option; do
     case "${option}" in
     p) parameterfile=${OPTARG} ;;
     t) deployment_system=${OPTARG} ;;

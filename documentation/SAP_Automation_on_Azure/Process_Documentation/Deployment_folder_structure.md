@@ -10,7 +10,7 @@ The root folder “WORKSPACES” contains the following folders.
 
 |Folder Name|Contains|Notes|
 | :- | :- | :- |
-|DEPLOYMENT-ORCHESTRATION|Configuration and template files|This is the root folder for all the systems that are managed from the deployment environment|
+||Configuration and template files|This is the root folder for all the systems that are managed from the deployment environment|
 |CONFIGURATION|Configuration files, for example custom disk sizing|Storing the custom configuration files in a shared folder simplifies referring to them|
 |DEPLOYER|Contains the configuration files for all Deployer deployments managed by the deployment environment|Each subfolder should be named according to the naming standard “Environment-region-Virtual Network”. The structure of the json parameter files are defined here [Deployer configuration](../Software_Documentation/configuration-deployer.md#Parameter-file-construction)|
 |LIBRARY|Contains the configuration files for all Library deployments managed by the deployment environment|Each subfolder should be named according to the naming standard “Environment-region”. The structure of the json parameter files are defined here [Library configuration](../Software_Documentation/configuration-sap_library.md#Parameter-file-construction)|

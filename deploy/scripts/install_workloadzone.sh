@@ -53,13 +53,18 @@ function missing {
 show_help=false
 force=0
 
-while getopts ":p:t:d:h:f:e:i" option; do
+while getopts ":p:t:d:h:f:e:i:s:c:p" option; do
     case "${option}" in
         p) parameterfile=${OPTARG};;
         i) approve="--auto-approve";;
         f) force=1 ;;
         d) deployer_tfstate_key=${OPTARG};;
         e) deployer_environment=${OPTARG};;
+        s) subscription=${OPTARG};;
+        c) client_id=${OPTARG};;
+        p) spn_secret=${OPTARG};;
+        t) tenant_id=${OPTARG};;
+
         h) showhelp
             exit 3
         ;;
@@ -168,6 +173,23 @@ param_dirname=$(pwd)
 export TF_DATA_DIR="${param_dirname}/.terraform"
 var_file="${param_dirname}"/"${parameterfile}"
 
+if [ ! -z "$subscription" ]
+then
+    save_config_var "subscription" "${workload_config_information}"
+fi
+
+if [ ! -z "$client_id" ]
+then
+    save_config_var "client_id" "${workload_config_information}"
+fi
+
+if [ ! -z "$tenant_id" ]
+then
+    save_config_var "tenant_id" "${workload_config_information}"
+fi
+
+
+
 load_config_vars "${workload_config_information}" "REMOTE_STATE_SA"
 load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
 load_config_vars "${workload_config_information}" "tfstate_resource_id"
@@ -250,27 +272,41 @@ then
     az keyvault secret show --name $secretname --vault $keyvault 2>error.log > kv.log
     if [ -f error.log ]
     then
-        if [ grep "ERROR:" error.log ]
+        temp=$(grep "ERROR:" error.log)
+        
+        if [ -n "${temp}" ];
         then
-            read -p "Do you want to specify the Workload SPN Details Y/N?"  ans
-            answer=${ans^^}
-            if [ $answer == 'Y' ]; then
-                load_config_vars ${workload_config_information} "keyvault"
-                if [ ! -z $keyvault ]
-                then
-                    # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-                    keyvault_param=$(printf " -v %s " "${keyvault}")
-                fi
+            if [ ! -z "$spn_secret" ]
+            then
+                secret_param=$(printf " -s %s " "${spn_secret}")
+                allParams="${env_param}""${keyvault_param}""${region_param}""${secret_param}"
                 
-                env_param=$(printf " -e %s " "${environment}")
-                region_param=$(printf " -r %s " "${region}")
-                
-                allParams="${env_param}""${keyvault_param}""${region_param}"
-                
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
                 if [ $? -eq 255 ]
                 then
                     exit $?
+                fi
+            else
+                read -p "Do you want to specify the Workload SPN Details Y/N?"  ans
+                answer=${ans^^}
+                if [ $answer == 'Y' ]; then
+                    load_config_vars ${workload_config_information} "keyvault"
+                    if [ ! -z $keyvault ]
+                    then
+                        # Key vault was specified in ~/.sap_deployment_automation in the deployer file
+                        keyvault_param=$(printf " -v %s " "${keyvault}")
+                    fi
+                    
+                    env_param=$(printf " -e %s " "${environment}")
+                    region_param=$(printf " -r %s " "${region}")
+                    
+                    allParams="${env_param}""${keyvault_param}""${region_param}"
+                    
+                    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
+                    if [ $? -eq 255 ]
+                    then
+                        exit $?
+                    fi
                 fi
             fi
         fi

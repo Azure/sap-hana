@@ -129,8 +129,8 @@ locals {
   enable_hdb_deployment = (length(local.hdb_list) > 0) ? true : false
 
   default_filepath = local.enable_hdb_deployment ? (
-    format("%s%s",path.module,"/../../../../../configs/hdb_sizes.json")) : (
-    format("%s%s",path.module,"/../../../../../configs/anydb_sizes.json")
+    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")) : (
+    format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")
   )
 
 
@@ -149,7 +149,7 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0  ? format("%s/%s",path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
   db_sizing = local.enable_sid_deployment ? local.custom_sizing ? lookup(try(local.sizes.db, local.sizes), var.databases[0].size).storage : lookup(local.sizes, var.databases[0].size).storage : []
@@ -250,9 +250,10 @@ locals {
   sub_admin_nsg_name   = local.sub_admin_nsg_exists ? try(split("/", local.sub_admin_nsg_arm_id)[8], "") : try(local.var_sub_admin_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg))
 
   //DB subnet
-  var_sub_db    = try(local.var_vnet_sap.subnet_db, {})
-  sub_db_arm_id = try(local.var_sub_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
-  sub_db_exists = length(trimspace(try(local.var_sub_db.prefix, ""))) > 0 ? false : length(local.sub_db_arm_id) > 0 ? true : false
+  sub_db_defined = try(var.infrastructure.vnets.sap.subnet_db, null) == null ? false : true
+  var_sub_db     = try(local.var_vnet_sap.subnet_db, {})
+  sub_db_arm_id  = try(local.var_sub_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
+  sub_db_exists  = length(trimspace(try(local.var_sub_db.prefix, ""))) > 0 ? false : length(local.sub_db_arm_id) > 0 ? true : false
 
   sub_db_name   = local.sub_db_exists ? try(split("/", local.sub_db_arm_id)[10], "") : try(local.var_sub_db.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet))
   sub_db_prefix = local.sub_db_exists ? data.azurerm_subnet.db[0].address_prefixes[0] : try(local.var_sub_db.prefix, "")

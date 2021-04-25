@@ -138,3 +138,82 @@ resource "azurerm_subnet_network_security_group_association" "web" {
   network_security_group_id = azurerm_network_security_group.web[0].id
 }
 
+########################################################################################################
+#
+# Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
+#
+########################################################################################################
+
+resource "random_integer" "app_priority" {
+  min = 3000
+  max = 3999
+  keepers = {
+    # Generate a new ID only when a new resource group is defined
+    resource_group = local.firewall_rgname
+  }
+}
+resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
+  provider            = azurerm.deployer
+  count               = local.firewall_exists && local.sub_app_defined && !local.sub_app_existing ? 1 : 0
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_app)
+  azure_firewall_name = local.firewall_name
+  resource_group_name = local.firewall_rgname
+  priority            = random_integer.app_priority.result
+  action              = "Allow"
+  rule {
+    name                  = "Azure-Cloud"
+    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = [local.firewall_service_tags]
+    protocols             = ["Any"]
+  }
+  rule {
+    name                  = "ToInternet"
+    source_addresses      = local.sub_web_defined ? [local.sub_app_prefix, local.sub_web_prefix] : [local.sub_app_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = ["*"]
+    protocols             = ["Any"]
+  }
+}
+
+########################################################################################################
+#
+# Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
+#
+########################################################################################################
+
+
+resource "random_integer" "db_priority" {
+  min = 2000
+  max = 2999
+  keepers = {
+    # Generate a new ID only when a new resource group is defined
+    resource_group = local.firewall_rgname
+  }
+}
+
+
+# Create a Azure Firewall Network Rule for Azure Management API
+resource "azurerm_firewall_network_rule_collection" "firewall-azure-db" {
+  provider            = azurerm.deployer
+  count               = local.firewall_exists && local.sub_db_defined && !local.sub_db_nsg_exists ? 1 : 0
+  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_db)
+  azure_firewall_name = local.firewall_name
+  resource_group_name = local.firewall_rgname
+  priority            = random_integer.db_priority.result
+  action              = "Allow"
+  rule {
+    name                  = "Azure-Cloud"
+    source_addresses      = [local.sub_admin_prefix, local.sub_db_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = [local.firewall_service_tags]
+    protocols             = ["Any"]
+  }
+  rule {
+    name                  = "ToInternet"
+    source_addresses      = [local.sub_admin_prefix, local.sub_db_prefix]
+    destination_ports     = ["*"]
+    destination_addresses = ["*"]
+    protocols             = ["Any"]
+  }
+}

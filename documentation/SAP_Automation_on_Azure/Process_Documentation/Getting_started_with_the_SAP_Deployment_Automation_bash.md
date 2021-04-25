@@ -35,11 +35,11 @@ git checkout beta
     cd ~/Azure_SAP_Automated_Deployment
     cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES/ -r
 
-    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYMENT-ORCHESTRATION
+    cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
     ```
 
-Navigate to the ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYMENT-ORCHESTRATION folder.
+Navigate to the ~/Azure_SAP_Automated_Deployment/WORKSPACES folder.
 
 **Note! The deployment will need the Service Principal details (application id, secret and tenant ID)**
 

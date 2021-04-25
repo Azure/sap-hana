@@ -139,19 +139,13 @@ Licensed under the MIT license.
 
     $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
     
-    try {
-        if ($null -ne $iniContent[$region] ) {
-            $iniContent[$region]["Deployer"] = $key
-        }
-        else {
-            $Category1 = @{"Deployer" = $key }
-            $iniContent += @{$region = $Category1 }
-            Out-IniFile -InputObject $iniContent -Path $fileINIPath                    
-        }
-                
+    if ($null -ne $iniContent[$region] ) {
+        $iniContent[$region]["Deployer"] = $key
     }
-    catch {
-        
+    else {
+        $Category1 = @{"Deployer" = $key }
+        $iniContent += @{$region = $Category1 }
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath                    
     }
 
     if ($true -eq $Force) {
@@ -395,6 +389,11 @@ Licensed under the MIT license.
 
         Set-Location -Path $curDir
     }
+
+    # Reset the state to after bootstrap, this allows for re-running if the templates have changed
+    $step = 3
+    $iniContent[$combined]["step"] = $step
+    Out-IniFile -InputObject $iniContent -Path $fileINIPath
 
     $Env:TF_DATA_DIR = $null
     return

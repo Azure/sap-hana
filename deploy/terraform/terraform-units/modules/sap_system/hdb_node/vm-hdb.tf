@@ -149,7 +149,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
       publisher = local.hdb_vms[count.index].os.publisher
       offer     = local.hdb_vms[count.index].os.offer
       sku       = local.hdb_vms[count.index].os.sku
-      version   = "latest"
+      version   = local.hdb_vms[count.index].os.version
     }
   }
 
