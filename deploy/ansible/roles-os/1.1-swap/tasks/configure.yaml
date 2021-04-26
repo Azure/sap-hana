@@ -5,11 +5,12 @@
     path:       "/mnt/resource"
     state:      directory
     mode:       "0755"
+  register:     resourcedircheck
 
 - name:         "validate /mnt/resource directory exists"
   stat:
     path:       "/mnt/resource"
-  register:   swapfsdata
+  register:     swapfsdata
 
 - name:         "Ensure Resource disk is formatted if it is not formatted"
   lineinfile:
@@ -17,7 +18,8 @@
     dest:       /etc/waagent.conf
     regexp:     'ResourceDisk.Format='
     line:       'ResourceDisk.Format=y'
-  when: swapfsdata.stat.exists and swapfsdata.stat.isdir
+  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
+  register:     waagentformat
 
 - name:         "Ensure swap is enabled"
   lineinfile:
@@ -25,7 +27,8 @@
     dest:       /etc/waagent.conf
     regexp:     'ResourceDisk.EnableSwap='
     line:       'ResourceDisk.EnableSwap=y'
-  when: swapfsdata.stat.exists and swapfsdata.stat.isdir
+  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
+  register:     waagentswapenable
 
 - name:         "Ensure swapfile size"
   lineinfile:
@@ -33,11 +36,17 @@
     dest:       /etc/waagent.conf
     regexp:     'ResourceDisk.SwapSizeMB='
     line:       'ResourceDisk.SwapSizeMB={{ item.swap_size_mb | default(2052) }}'
-  when: swapfsdata.stat.exists and swapfsdata.stat.isdir
+  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
+  register:     waagentswapsize
 
 - name:         "Ensure waagent is restarted"
   service:
     name:       waagent
     state:      restarted
+  when:         ( resourcedircheck.changed == true or
+                  waagentformat.changed == true or
+                  waagentswapenable.changed == true or
+                  waagentswapsize.changed == true
+                )
 
 ...
