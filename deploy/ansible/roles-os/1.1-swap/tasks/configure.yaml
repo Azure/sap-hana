@@ -43,10 +43,11 @@
   service:
     name:       waagent
     state:      restarted
-  when:         ( resourcedircheck.changed == true or
-                  waagentformat.changed == true or
-                  waagentswapenable.changed == true or
-                  waagentswapsize.changed == true
+  when:         ( 
+                      resourcedircheck.changed == true
+                  or  waagentformat.changed == true
+                  or  waagentswapenable.changed == true
+                  or  waagentswapsize.changed == true
                 )
 
 ...
