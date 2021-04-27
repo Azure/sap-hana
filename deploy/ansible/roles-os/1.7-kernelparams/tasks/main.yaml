@@ -1,0 +1,64 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role to set kernel parameters for general hardening             |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Description:  Download the specified BOM file to the ansible controller.
+#               Download any dependent BOM files to the ansible controller.
+#               Create Download directories, both static and dynamic.
+#               Download all media from BOMs to the SCS
+#
+#
+# Objects:
+#   External:
+#             sapbits_location_base_path      - URL of Blob Storage
+#             sapbits_bom_files               - path to the root of the sap file store
+#             bom_base_name                   - Name of BOM
+#             sapbits_sas_token               - SAS Token
+#             inventory_dir                   - Path to the inventory location on the ansible controller
+#
+#   Internal:
+#             result                          - objet to store the results of a task execution
+#
+#   Created:
+#             bom                             - object containing the specified BOM
+#
+# -------------------------------------+---------------------------------------8
+# Reviews:
+#
+# 04/22/2021  Morgan Deegan       Reviewed - Complete
+#
+# -------------------------------------+---------------------------------------8
+---
+
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.30    - Prometheus
+#
+# -------------------------------------+---------------------------------------8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header> 
+#
+# -------------------------------------+---------------------------------------8
+
+#----------------------------------------
+# BEGIN
+#----------------------------------------
+- name: Ensure variables are available
+  include_vars:
+    file: "../../../vars/sap-disks.yaml"
+
+- include_tasks: configure.yaml
+  loop: "{{ sap_swap }}"
+  when: (item.tier != "HLI") and (item.tier == "all" or item.tier == tier)
+#----------------------------------------
+# END
+#----------------------------------------
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/
