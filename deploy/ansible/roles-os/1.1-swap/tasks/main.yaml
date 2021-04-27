@@ -15,21 +15,14 @@
 #       2) waagent config should not run on Baremetal
 #          -Update: I have assumed that the tier for Baremetal is going to be named "HLI"
 
-- name: Ensure variables are available
+- name:           Ensure variables are available
   include_vars:
-    file: "../../../vars/sap-disks.yaml"
+    file:         "../../../vars/sap-disks.yaml"
 
-- include_tasks: configure.yaml
-  loop: "{{ sap_swap }}"
-  when: 
-        (
-          item.tier != "HLI"
-        ) 
-        and 
-        (
-          item.tier == "all" 
-          or 
-          item.tier == tier
-        )
+- include_tasks:  configure.yaml
+  loop:           "{{ sap_swap }}"
+  when:
+                  - item.tier != "HLI"
+                  - item.tier in ["all", tier]
 
 ...
