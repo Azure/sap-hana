@@ -22,6 +22,7 @@
 - include_tasks:  configure.yaml
   loop:           "{{ sap_swap }}"
   when:
+                  - ansible_os_family != "Windows"
                   - item.tier != "HLI"
                   - item.tier in ["all", tier]
 
