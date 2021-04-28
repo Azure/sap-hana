@@ -5,9 +5,9 @@
 ---
 
 #------------------<DEBUGGING>-------------------
-# - debug:  
-#     msg:      "URL: {{ item }}"
-#   loop:       "{{ bom|flatten(levels=1) }}"
+- debug:  
+    msg:      "Product: {{ item }}"
+  loop:       "{{ bom.product_ids.scs|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 # *====================================4=======================================8
 
@@ -53,7 +53,7 @@
 # - name:               "SAP SCS Install"
 #   shell: |
 #                       export TMPDIR=/usr/sap/install
-#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ SAP_BOM }}-{{ ansible_hostname }}.params \
+#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-{{ ansible_hostname }}.params \
 #                                 SAPINST_EXECUTE_PRODUCT_ID={{ sapbom.ProductIdSCS }}                                                \
 #                                 SAPINST_SKIP_DIALOGS=true                                                                           \
 #                                 SAPINST_START_GUISERVER=false
