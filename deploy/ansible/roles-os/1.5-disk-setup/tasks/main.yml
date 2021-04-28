@@ -107,10 +107,7 @@
     ] }}"
 
 - debug:
-    # var: LVM_data
-    msg:
-      - "pvs: {{ item.pvs }}"
-  loop: "{{ LVM_data }}"
+    var: LVM_data
 
 - name: Volume Group creation (multiple disks)
   lvg:
@@ -121,7 +118,8 @@
 
   loop: "{{ LVM_data }}"
   when:
-    - item.pvs | bool
+    # - item.pvs | bool
+    - item.pvs != ""
 
 - name: Volume Group creation (single disks)
   lvg:
