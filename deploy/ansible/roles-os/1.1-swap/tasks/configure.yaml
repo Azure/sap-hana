@@ -5,7 +5,8 @@
     path:       "/mnt/resource"
     state:      directory
     mode:       "0755"
-  register:     resourcedircheck
+  notify:
+    - "Ensure waagent is restarted"
 
 - name:         "validate /mnt/resource directory exists"
   stat:
@@ -19,7 +20,8 @@
     regexp:     'ResourceDisk.Format='
     line:       'ResourceDisk.Format=y'
   when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
-  register:     waagentformat
+  notify:
+    - "Ensure waagent is restarted"
 
 - name:         "Ensure swap is enabled"
   lineinfile:
@@ -28,7 +30,8 @@
     regexp:     'ResourceDisk.EnableSwap='
     line:       'ResourceDisk.EnableSwap=y'
   when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
-  register:     waagentswapenable
+  notify:
+    - "Ensure waagent is restarted"
 
 - name:         "Ensure swapfile size"
   lineinfile:
@@ -37,17 +40,7 @@
     regexp:     'ResourceDisk.SwapSizeMB='
     line:       'ResourceDisk.SwapSizeMB={{ item.swap_size_mb | default(2052) }}'
   when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
-  register:     waagentswapsize
-
-- name:         "Ensure waagent is restarted"
-  service:
-    name:       waagent
-    state:      restarted
-  when:         ( 
-                      resourcedircheck is changed
-                  or  waagentformat is changed
-                  or  waagentswapenable is changed
-                  or  waagentswapsize is changed
-                )
+  notify:
+    - "Ensure waagent is restarted"
 
 ...
