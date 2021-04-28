@@ -170,7 +170,7 @@
     fstype:    "{{ item.fstype }}"
   loop: "{{ LVM_data }}"
   when:
-    - item.dev != ""
+    - item.pvs != ""
 
 - name: Filesystem creation (single disks)
   filesystem:
