@@ -19,9 +19,17 @@
 
 
   tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
 
-  # - name: Test Connection                                     # Simple connection test for troubleshooting
-  #   ping:
+  - set_fact:
+      tier:     scs
+
+  - include_role:
+      name:     roles-sap/scs-install
 
 
 ...
