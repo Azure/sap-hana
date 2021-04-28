@@ -37,7 +37,7 @@
 #   SAP SCS: deploy SCS Parameter file install template
 - name:               "SAP SCS: deploy SCS Parameter file install template"
   template:
-    src:              "{{ sap_inifile }}"
+    src:              "{{ inventory_dir }}/{{ sap_inifile }}"
     dest:             /usr/sap/install/downloads/{{ bom_base_name }}-{{ ansible_hostname }}.params
     mode:             0644
     force:            yes
