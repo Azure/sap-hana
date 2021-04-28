@@ -67,7 +67,7 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n prepare_region -o p:d:e:s:c:p:t:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:s:c:p:t:ifh --longoptions parameter_file:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then

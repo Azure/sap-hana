@@ -68,7 +68,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n validate -o p:t:hif --longoptions type:,parameterfile:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n installer -o p:t:hif --longoptions type:,parameterfile:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then

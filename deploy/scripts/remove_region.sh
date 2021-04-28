@@ -90,13 +90,11 @@ function missing {
     echo "#                                                                                       #"
     echo "#   Missing : ${val}                                  #"
     echo "#                                                                                       #"
-    echo "#   Usage: prepare_region.sh                                                            #"
+    echo "#   Usage: remove_region.sh                                                            #"
     echo "#      -d deployer parameter file                                                       #"
     echo "#      -l library parameter file                                                        #"
-    echo "#      -s subscription (optional)                                                       #"
-    echo "#      -c SPN app id (optional)                                                         #"
-    echo "#      -p SPN password (optional)                                                       #"
-    echo "#      -t tenant id of SPN (optional)                                                   #"
+    echo "#      -s subscription                                                                  #"
+    echo "#      -b storage account name (terrafrom state file)                                   #"
     echo "#      -h Show help                                                                     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
@@ -105,7 +103,7 @@ function missing {
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n prepare_region  -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n remove_region -o d:l:s:b:r:h --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,resource_group:, storage_account:,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
@@ -118,12 +116,8 @@ do
   case "$1" in
     -d | --deployer_parameter_file)            deployer_parameter_file="$2"     ; shift 2 ;;
     -l | --library_parameter_file)             library_parameter_file="$2"      ; shift 2 ;;
-    -s | --subscription)                       subscription="$2"                ; shift 2 ;;
-    -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
-    -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
-    -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
-    -f | --force)                              force=1                          ; shift ;;
-    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -b | --storage_account)                    storage_account="$2"             ; shift 2 ;;
+    -r | --resource_group)                     resource_group="$2"              ; shift 2 ;;
     -h | --help)                               showhelp 
                                                exit 3                           ; shift ;;
     --) shift; break ;;
@@ -176,6 +170,7 @@ fi
 # Helper variables
 environment=$(jq .infrastructure.environment "${deployer_parameter_file}" | tr -d \")
 region=$(jq .infrastructure.region "${deployer_parameter_file}" | tr -d \")
+key=$(echo "${deployer_parameter_file}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
 then
@@ -207,6 +202,10 @@ automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
 deployer_config_information="${automation_config_directory}""${environment}""${region}"
 
+if [ -z "$deployer_config_information" ]; then
+    rm $deployer_config_information
+fi
+
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
@@ -216,26 +215,10 @@ export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
 root_dirname=$(pwd)
 
-if [ $force == 1 ]
-then
-    if [ -f "${deployer_config_information}" ]
-    then
-        rm "${deployer_config_information}"
-    fi
-fi
-
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
 
 if [ ! -z "${subscription}" ]
 then
-    kvsubscription="${subscription}"
-    save_config_var "kvsubscription" "${deployer_config_information}"
-    export ARM_SUBSCRIPTION_ID=$subscription
-fi
-
-if [ ! -z "${subscription}" ]
-then
-    save_config_var "subscription" "${deployer_config_information}"
     export ARM_SUBSCRIPTION_ID=$subscription
 fi
 
@@ -254,12 +237,6 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     exit 65 #data format error
 fi
 
-templen=$(echo "${ARM_SUBSCRIPTION_ID}" | wc -c)
-# Subscription length is 37
-if [ 37 != $templen ]
-then
-    arm_config_stored=0
-fi
 
 if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo ""
@@ -273,12 +250,6 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     exit 65 #data format error
-else
-    if [ "{$arm_config_stored}" != 0 ]
-    then
-        echo "Storing the configuration"
-        save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
-    fi
 fi
 
 deployer_dirname=$(dirname "${deployer_parameter_file}")
@@ -318,230 +289,73 @@ else
 
 fi
 
-step=0
-load_config_vars "${deployer_config_information}" "step"
-
 curdir=$(pwd)
 
-if [ 0 == $step ]
-then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Bootstrapping the deployer                                  #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    
-    cd "${deployer_dirname}" || exit
-    
-    if [ $force == 1 ]
-    then
-        if [ -d ./.terraform/ ]; then
-            rm .terraform -r
-        fi
-        
-        if [ -f terraform.tfstate ]; then
-            rm terraform.tfstate
-        fi
-        
-        if [ -f terraform.tfstate.backup ]; then
-            rm terraform.tfstate.backup
-        fi
-    fi
-    
-    allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
-                
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh $allParams
-    if [ $? -eq 255 ]
-    then
-        exit $?
-    fi
-    
-    step=1
-    save_config_var "step" "${deployer_config_information}"
-    
-    if [ ! -z "$subscription" ]
-    then
-        save_config_var "subscription" "${deployer_config_information}"
-        kvsubscription=$subscription
-        save_config_var "kvsubscription" "${deployer_config_information}"
-    fi
-    
-    if [ ! -z "$client_id" ]
-    then
-        save_config_var "client_id" "${deployer_config_information}"
-    fi
-    
-    if [ ! -z "$tenant_id" ]
-    then
-        save_config_var "tenant_id" "${deployer_config_information}"
-    fi
-    
-else
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Deployer is bootstrapped                                    #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-fi
 
-unset TF_DATA_DIR
+# Deployer
 
-if [ 1 == $step ]
-then
-    load_config_vars "${deployer_config_information}" "keyvault"
-    
-    secretname="${environment}"-client-id
-    az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
-    if [ -s error.log ]
-    then
-        if [ ! -z "$spn_secret" ]
-        then
-            allParams=$(printf " -e %s -r %s -v %s -s %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
+cd "${deployer_dirname}" || exit
 
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-            if [ $? -eq 255 ]
-            then
-                exit $?
-            fi
-        else
-            read -p  "Do you want to specify the SPN Details Y/N?"  ans
-            answer=${ans^^}
-            if [ "$answer" == 'Y' ]; then
-                
-                allParams="${env_param}""${keyvault_param}""${region_param}"
-                
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-                if [ $? -eq 255 ]
-                then
-                    exit $?
-                fi
-            fi
-        fi
-        
-        if [ -f post_deployment.sh ]; then
-            "./post_deployment.sh"
-        fi
-        cd "${curdir}" || exit
-        step=2
-        save_config_var "step" "${deployer_config_information}"
-    fi
-fi
-unset TF_DATA_DIR
+param_dirname=$(pwd)
 
-if [ 2 == $step ]
-then
-    
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Bootstrapping the library                                   #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    
-    relative_path="${root_dirname}"/"${library_dirname}"
-    export TF_DATA_DIR="${relative_path}/.terraform"
-    relative_path="${root_dirname}"/"${deployer_dirname}"
-    
-    cd "${library_dirname}" || exit
-    if [ $force == 1 ]
-    then
-        if [ -d ./.terraform/ ]; then
-            rm .terraform -r
-        fi
-        
-        if [ -f terraform.tfstate ]; then
-            rm terraform.tfstate
-        fi
-        
-        if [ -f terraform.tfstate.backup ]; then
-            rm terraform.tfstate.backup
-        fi
-    fi
-    allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
-    
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh $allParams
-    if [ $? -eq 255 ]
-    then
-        exit $?
-    fi
-    cd "${curdir}" || exit
-    step=3
-    save_config_var "step" "${deployer_config_information}"
-else
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                            Library is bootstrapped                                    #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    step=3
-    save_config_var "step" "${deployer_config_information}"
-    
-fi
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_deployer/
+export TF_DATA_DIR="${param_dirname}/.terraform"
 
-unset TF_DATA_DIR
+#Reinitialize
 
-if [ 3 == $step ]
-then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Migrating the deployer state                                #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    
-    cd "${deployer_dirname}" || exit
-    
-    # Remove the script file
-    if [ -f post_deployment.sh ]
-    then
-        rm post_deployment.sh
-    fi
-    allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
-    
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
-    if [ $? -eq 255 ]
-    then
-        exit $?
-    fi
-    cd "${curdir}" || exit
-    step=4
-    save_config_var "step" "${deployer_config_information}"
-fi
+terraform -chdir="${terraform_module_directory}" init -upgrade=true \
+--backend-config "subscription_id=${subscription}" \
+--backend-config "resource_group_name=${resource_group}" \
+--backend-config "storage_account_name=${storage_Account}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
 
-unset TF_DATA_DIR
 
-if [ 4 == $step ]
-then
-    
-    echo ""
-    
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Migrating the library state                                 #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    
-    cd "${library_dirname}" || exit
-    allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
+#Initialize the statefile and copy to local
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_deployer/
+terraform -chdir="${terraform_module_directory}" init force-copy -backend-config "path=${param_dirname}/terraform.tfstate"
 
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
-    if [ $? -eq 255 ]
-    then
-        exit $?
-    fi
-    cd "${curdir}" || exit
-    step=3
-    save_config_var "step" "${deployer_config_information}"
-fi
+cd "${curdir}" || exit
+
+key=$(echo "${library_parameter_file}" | cut -d. -f1)
+cd "${library_dirname}" || exit
+param_dirname=$(pwd)
+
+#Library
+
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_library/
+export TF_DATA_DIR="${param_dirname}/.terraform"
+
+#Reinitialize
+
+terraform -chdir="${terraform_module_directory}" init -upgrade=true \
+--backend-config "subscription_id=${subscription}" \
+--backend-config "resource_group_name=${resource_group}" \
+--backend-config "storage_account_name=${storage_Account}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
+
+
+#Initialize the statefile and copy to local
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_library/
+terraform -chdir="${terraform_module_directory}" init force-copy -backend-config "path=${param_dirname}/terraform.tfstate"
+
+terraform -chdir="${terraform_module_directory}" destroy 
+
+cd "${curdir}" || exit
+
+cd "${deployer_dirname}" || exit
+
+param_dirname=$(pwd)
+
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_deployer/
+export TF_DATA_DIR="${param_dirname}/.terraform"
+
+terraform -chdir="${terraform_module_directory}" destroy 
+
+cd "${curdir}" || exit
+
+
 unset TF_DATA_DIR
 
 exit 0

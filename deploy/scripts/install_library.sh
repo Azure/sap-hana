@@ -47,7 +47,7 @@ function showhelp {
 }
 
 #process inputs - may need to check the option i for auto approve as it is not used
-INPUT_ARGUMENTS=$(getopt -n validate -o p:d:ih --longoptions parameterfile:,deployer_statefile_foldername:,auto-approve,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_library -o p:d:ih --longoptions parameterfile:,deployer_statefile_foldername:,auto-approve,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
