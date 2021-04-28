@@ -8,11 +8,6 @@
     file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
     name:           bom
 
-#------------------<DEBUGGING>-------------------
-# - debug:  
-#     msg:      "Product: {{ bom.product_ids.scs }}"
-#   loop:       "{{ bom.product_ids|flatten(levels=1) }}"
-#------------------</DEBUGGING>------------------
 # *====================================4=======================================8
 
 - name:  
@@ -47,6 +42,19 @@
     force:            yes
 # *====================================4=======================================8
 
+
+#------------------<DEBUGGING>-------------------
+- name:       Parameters
+  debug:  
+    msg:
+      - "Product              : {{ bom.product_ids.scs }}"
+      - "SAP SID              : {{ sap_sid }}"
+      - "Instance Number - SCS: {{ scs_instance_number }}"
+      - "Master Password      : {{ password_master }}"
+      - "sapadm UID           : {{ sapadm_uid }}"
+      - "sapsys GID           : {{ sapsys_gid }}"
+      - "<sid>adm UID         : {{ sidadm_uid }}"
+#------------------</DEBUGGING>------------------
 
 
 # # *====================================4=======================================8
