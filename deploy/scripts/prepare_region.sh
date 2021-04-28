@@ -233,15 +233,10 @@ then
     export ARM_SUBSCRIPTION_ID=$subscription
 fi
 
-
-if [ ! -n "$ARM_SUBSCRIPTION_ID" ]
+if [ ! -z "${subscription}" ]
 then
-    if [ ! -z "${subscription}" ]
-    then
-        save_config_var "subscription" "${deployer_config_information}"
-        export ARM_SUBSCRIPTION_ID=$subscription
-    fi
-    
+    save_config_var "subscription" "${deployer_config_information}"
+    export ARM_SUBSCRIPTION_ID=$subscription
 fi
 
 if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
@@ -315,6 +310,12 @@ else
     then
         rm stdout.az
     fi
+
+    if [ ! -z "${subscription}" ]
+    then
+        az account set --sub "${subscription}"
+    fi
+
 fi
 
 step=0
