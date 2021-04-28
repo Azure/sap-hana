@@ -1,4 +1,12 @@
 ---
+
+# TODO: Fix Hardcoded NFS Server Name
+
+- debug:
+    msg:
+      - "{{ item }}"
+  loop: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
+
 # Mount Filesystems
 - name:     "Mount Filesystems"
   mount:
@@ -20,8 +28,8 @@
     - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_log',                                                path: '/hana/log' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_backup/lv_hana_backup',                                          path: '/hana/backup' }
     - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
-    # - { tier: 'pas',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
-    # - { tier: 'app',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    # - { tier: 'pas',          type: 'nfs',  src: 'x01scs00lf02:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    # - { tier: 'app',          type: 'nfs',  src: 'x01scs00lf02:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
     - { tier: 'hdb',          type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
     - { tier: 'dbload',       type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
     - { tier: 'app',          type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion

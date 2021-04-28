@@ -35,8 +35,37 @@
 # - include_tasks: lvm_mount.yml
 #   when: path_status_flag is defined
 
-- name: Example from an Ansible Playbook
-  ansible.builtin.ping:
+
+# Expectations:
+#
+#   Volume Groups: (pvs are only examples)
+#     - { tier: 'all',      vg: 'vg_sap',         pvs: '/dev/disk/azure/scsi1/lun0' }
+#     - { tier: 'hdb',      vg: 'vg_hana_data',   pvs: '/dev/disk/azure/scsi1/lun1,/dev/disk/azure/scsi1/lun2,/dev/disk/azure/scsi1/lun3' }
+#     - { tier: 'hdb',      vg: 'vg_hana_log',    pvs: '/dev/disk/azure/scsi1/lun4,/dev/disk/azure/scsi1/lun5,/dev/disk/azure/scsi1/lun6' }
+#     - { tier: 'hdb',      vg: 'vg_hana_backup', pvs: '/dev/disk/azure/scsi1/lun7' }
+#
+#   Logical Volumes:
+#    - { tier: 'all',         lv: 'lv_usrsap',        vg: 'vg_sap',         size: '64g',       opts: '' }
+#    - { tier: 'preparation', lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: '' }
+#    - { tier: 'preparation', lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: '' }
+#    - { tier: 'hdb',         lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: '' }
+#    - { tier: 'hdb',         lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i 3 -I 128' }
+#    - { tier: 'hdb',         lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i 3 -I 32' }
+#    - { tier: 'hdb',         lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: '' }
+#    - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: '' }
+#
+#   Filesystems:
+#    - { tier: 'all',         fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsap' }
+#    - { tier: 'preparation', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+#    - { tier: 'preparation', fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_sap/lv_hana_shared' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_data/lv_hana_data' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
+#    - { tier: 'web',         fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+
+
+
 
 - debug:
     msg: System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}
