@@ -1,0 +1,18 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.4       - Package Installation for OS                |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+- name:             1.4 - Import package list
+  include_vars:     os-packages.yaml
+
+- name:             "1.4 - Install OS packages: {{ ansible_os_family|upper }}-{{ ansible_distribution_major_version }}"
+  package:
+    name:           "{{ item }}" 
+    state:          present
+  loop:             "{{ packages[ansible_os_family|lower + ansible_distribution_major_version] }}"
+
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4---------------------------------------*/

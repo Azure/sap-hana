@@ -1,0 +1,30 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for SAP PAS Install                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+
+- hosts:          "{{ sap_sid|upper }}_PAS"
+
+  name:           SAP Installation - PAS
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+
+  # - name: Test Connection                                     # Simple connection test for troubleshooting
+  #   ping:
+
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

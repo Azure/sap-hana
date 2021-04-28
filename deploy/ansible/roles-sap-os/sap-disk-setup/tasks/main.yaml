@@ -1,0 +1,58 @@
+---
+
+- name:       "Ensure variables are included"
+  include_vars:
+    file:         "../../../vars/sap-disks.yaml"
+
+
+
+- name: "LVM: Volume Group creation"
+  lvg:
+    vg:     "{{ item.vg }}"
+    pvs:    "{{ item.pvs }}"
+    pesize: 4M
+    state:  present
+  loop:     "{{ sap_volume_groups }}"
+  when:     item.tier == "all" or
+            item.tier == tier
+
+
+
+- name: "LVM: Logical Volume creation"
+  lvol:
+    lv:       "{{ item.lv }}"
+    vg:       "{{ item.vg }}"
+    size:     "{{ item.size }}"
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
+  loop:       "{{ sap_logical_volumes }}"
+  when:       item.tier == "all" or
+              item.tier == tier
+
+
+
+- name: "LVM: Filesystem creation"
+  filesystem:
+    dev:       "{{ item.dev }}"
+    fstype:    "{{ item.fstype }}"
+  loop:        "{{ sap_filesystems }}"
+  when:        item.tier == "all" or
+               item.tier == tier
+
+
+
+# TODO: Move this to a role that just does mounts
+- name: "Ensure Filesystem(s) are mounted"
+  mount:
+    src:    "{{ item.dev }}"
+    path:   "{{ item.mount_path }}"
+    fstype: "{{ item.fstype }}"
+    opts:   defaults
+    state:  mounted
+  loop:     "{{ sap_filesystems }}"
+  when:     item.tier == "all" or
+            item.tier == tier
+
+...

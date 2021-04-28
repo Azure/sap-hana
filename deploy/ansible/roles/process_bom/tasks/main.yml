@@ -1,0 +1,7 @@
+---
+
+- import_tasks: pre_checks.yaml
+
+- include_tasks: "{{ iterator }}"
+  vars:
+    iterator: "./iterate_bom.yaml"

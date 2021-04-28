@@ -1,0 +1,39 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                 Playbook for SAP Application Server Install                 |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+
+- hosts:          "{{ sap_sid|upper }}_APP"
+
+  name:           SAP Installation - APP
+  serial:         1
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+
+    #   (Role)  SAP: LVM
+
+    #   (Role)  SAP: mounts
+
+    #   (Role)  SAP: packages
+
+    #   (Role)  SAP: Users and Groups
+
+    #   (Role)  SAP: Permissions
+
+    #   (Role)  SAP APP: Install
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

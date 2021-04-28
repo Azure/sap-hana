@@ -1,0 +1,28 @@
+---
+# Mount Filesystems
+- name:     "Mount Filesystems"
+  mount:
+    src:    "{{ item.src }}"
+    path:   "{{ item.path }}"
+    fstype: "{{ item.type }}"
+    opts:   defaults
+    state:  mounted
+  loop:
+    # - { tier: 'all',          type: 'xfs',  src: '/dev/vg_sap/lv_usrsap',                                                       path: '/usr/sap' }
+    # - { tier: 'scs-prepare',  type: 'xfs',  src: '/dev/vg_sap/lv_usrsapinstall',                                                path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    # - { tier: 'scs-prepare',  type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
+    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_sap/lv_hana_shared',                                                  path: '/hana/shared' }
+    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_hana_data',                                              path: '/hana/data' }
+    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                                                path: '/hana/log' }
+    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_backup/lv_hana_backup',                                          path: '/hana/backup' }
+    # - { tier: 'pas',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    # - { tier: 'app',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    # - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
+    - { tier: 'hdb',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'pas',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'app',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'web',          type: 'nfs',  src: '10.1.1.42:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+  when:         item.tier == "all" or
+                item.tier == tier
+
+...

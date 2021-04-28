@@ -1,0 +1,78 @@
+# *=====================================4=======================================8
+# Document Artifact:  N/A
+#
+# Summary:
+#
+#
+# Change History:
+#
+#   Date        Name              Description
+#   ----------  ----------------  ----------------------------------------------
+#   2020        Centiq            Sprint 8: SAP Install Framework
+#   2020/12/22  Morgan Deegan     Simplify and Update inline documentation
+#
+#
+# Facts:
+
+---
+
+# *=====================================4=======================================8
+#
+#                              Create User Groups
+#
+# *=====================================4=======================================8
+#
+# Document Artifact:  N/A
+#
+# Create User Groups for SAP:
+#   sapsys - once defined, typically remains constant across all systems. Used
+#   for file access in shared directories between SID's.
+#
+#   sapinst - typically only used durring install, and removed after. Potentially
+#   can be depracated. 
+# 
+- name:       "SAP: Create SAP Groups"
+  group:
+    name:         "{{ item.group }}"
+    gid:          "{{ item.gid }}"
+    state:        present
+  loop:
+    - { group: 'sapsys',    gid: '{{ sapsys_gid }}'  }
+    - { group: 'sapinst',   gid: '{{ sapinst_gid }}' }
+
+
+# *=====================================4=======================================8
+#
+#                                 Create Users
+#
+# *=====================================4=======================================8
+#
+# Document Artifact:  N/A
+#
+# Create User for SAP:
+#   sapadm - once defined, typically remains constant across all systems. Used
+#   for file access in shared directories between SID's.
+#
+#   <sid>adm - SAP admin user for SID. 
+#
+#   webadm - SAP admin user for web dispatcher. same as <sid>adm. 
+# 
+- name:       "SAP: Create SAP Users"
+  user:
+    name:         "{{ item.user }}"
+    comment:      "{{ item.comment }}"
+    uid:          "{{ item.uid }}"
+    group:        "{{ item.group }}"
+    append:       no
+    shell:        /bin/csh
+    create_home:  yes
+    home:         "{{ item.home }}"
+  loop:
+    - { tier: 'all',         user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
+    - { tier: 'SCS',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { tier: 'PAS',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { tier: 'APP',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    # TODO: add user for WebDisp Functionality
+    # - { tier: 'WEB',         user: 'webadm',                   uid: '32002',            group: 'sapsys', home: '/home/webadm',                 comment: 'SAP WebDisp Admin' }
+  when:     item.tier == "all" or
+            item.tier == tier

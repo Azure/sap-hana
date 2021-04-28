@@ -1,5 +1,8 @@
 ---
 
+# TODO: Validate Relivancy for this Task
+
+
 - name: Create mapping between IP and hostname for HANA VMs
   run_once: true
   set_fact:
@@ -15,10 +18,18 @@
     regexp: '^DHCLIENT_SET_HOSTNAME='
     line: DHCLIENT_SET_HOSTNAME="no"
 
+# TODO: 20200126 Sort out; Variable not defined
+# TEST VARIABLES
+# - debug:
+#     var: ansible_hostname
+# - debug:
+#     var: hanadbnodes_dict[inventory_hostname]
+
 - name: Ensure the correct hostnames are set on HANA VMs
   hostname:
     name: "{{ hanadbnodes_dict[inventory_hostname] }}"
   when: ansible_hostname != hanadbnodes_dict[inventory_hostname]
+# END TODO 20200126
 
 # To prevent situation where setting hostname does not work 100%
 - name: Check if the correct hostnames are set on HANA VMs

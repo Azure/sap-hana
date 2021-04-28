@@ -1,0 +1,186 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                         OS Base Disk Configuration                          |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.5     - os-disk-setup
+#
+# -------------------------------------+---------------------------------------8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+
+#----------------------------------------
+# BEGIN
+#----------------------------------------
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+# # Prepare disks and mount points
+
+# # TODO: Refactor
+# # Check if installation paths are ready. If paths are unready, path_status_flag will be set. Then subsequent tasks will be executed.
+# - import_tasks: installation_path_prechecks.yml
+
+# - include_tasks: lvm_mount.yml
+#   when: path_status_flag is defined
+
+- name: Example from an Ansible Playbook
+  ansible.builtin.ping:
+
+- debug:
+    msg: System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}
+
+  # Get all the unique disk types from sap-parameters
+# Translate this to JINJA later
+
+- name: Get the unique disk types
+  set_fact:
+    disktypes: "{{ (disktypes|default([]) +  [ item.type ])|unique }}"
+    cacheable: yes
+  loop: "{{ disks }}"
+  when: item.host == inventory_hostname
+
+- name: Prepare the disk list
+  set_fact:
+    alldisks: "{{ alldisks|default([]) +  [ { 'type': item.type, 'vg' : 'vg_' ~ item.type, 'pvs' :  '/dev/disk/azure/scsi1/lun' ~ item.LUN } ] }}"
+    cacheable: yes
+  loop: "{{ disks }}"
+  when: item.host == inventory_hostname
+
+- name: Store the data pvs valuas into a list
+  set_fact:
+    pvs_data: "{{ (pvs_data|default([]) +  [ '/dev/disk/azure/scsi1/lun' ~ item.LUN ]) | list}}"
+    cacheable: yes
+  loop: "{{ disks }}"
+  when: item.type == 'data' and item.host == inventory_hostname
+
+- name: Convert the data pvs list to a string
+  set_fact:
+    pvs_data_str: "{{ pvs_data | default([]) | join(',') }}"
+    cacheable: yes
+
+# Log volume
+
+- name: Store the log pvs valuas into a list
+  set_fact:
+    pvs_log: "{{ (pvs_log|default([]) +  [ '/dev/disk/azure/scsi1/lun' ~ item.LUN ]) | list}}"
+    cacheable: yes
+  loop: "{{ disks }}"
+  when: item.type == 'log' and item.host == inventory_hostname
+
+- name: Convert the log pvs list to a string
+  set_fact:
+    pvs_log_str: "{{ pvs_log | default([]) | join(',') }}"
+    cacheable: yes
+
+# Backup volume
+
+- name: Store the backup pvs valuas into a list
+  set_fact:
+    pvs_backup: "{{ (pvs_backup|default([]) +  [ '/dev/disk/azure/scsi1/lun' ~ item.LUN ]) | list}}"
+    cacheable: yes
+  loop: "{{ disks }}"
+  when: item.type == 'backup' and item.host == inventory_hostname
+
+- name: Convert the backup pvs list to a string
+  set_fact:
+    pvs_backup_str: "{{ pvs_backup | default([]) | join(',') }}"
+    cacheable: yes
+
+- name: Create the consolidated list
+  set_fact:
+    LVM_data: "{{ [ 
+    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',  'lv':'lv_backup', 'size': '100%FREE', 'opt' : '',             'fstype': 'xfs', 'dev': '/dev/vg_backup/lv_backup'}, 
+    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',    'lv':'lv_data',   'size': '100%FREE', 'opt' : '-i 3 -I 256',  'fstype': 'xfs', 'dev': '/dev/vg_data/lv_data'}, 
+    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}',     'lv':'lv_log',    'size': '100%FREE', 'opt' : '-i 3 -I 64',   'fstype': 'xfs', 'dev': '/dev/vg_log/lv_log'} 
+    ] }}"
+
+- debug:
+    var: LVM_data
+
+- name: Volume Group creation (multiple disks)
+  lvg:
+    vg:     "{{ item.vg }}"
+    pvs:    "{{ item.pvs }}"
+    pesize: 4M
+    state:  present
+
+  loop: "{{ LVM_data }}"
+  when:
+    - item.pvs | bool
+
+- name: Volume Group creation (single disks)
+  lvg:
+    vg:     "{{ 'vg_' ~ item.type }}"
+    pvs:    "{{ '/dev/disk/azure/scsi1/lun' ~ item.LUN }}"
+    state:  present
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+
+
+- name: "Logical Volume creation"
+  lvol:
+    lv:       "{{ item.lv }}"
+    vg:       "{{ item.vg }}"
+    size:     "{{ item.size }}"
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
+  loop: "{{ LVM_data }}"
+  when:
+    - item.pvs | bool
+
+- name: Logical Volume creation (single disks)
+  lvol:
+    lv:     "{{ 'lv_' ~ item.type }}"
+    vg:     "{{ 'vg_' ~ item.type }}"
+    size:     '100%FREE'
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+
+- name: "Filesystem creation"
+  filesystem:
+    dev:       "{{ item.dev }}"
+    fstype:    "{{ item.fstype }}"
+  loop: "{{ LVM_data }}"
+  when:
+    - item.dev | bool
+
+- name: Filesystem creation (single disks)
+  filesystem:
+    dev:     "{{ '/dev/vg_' ~ item.type  ~ '/lv_' ~ item.type }}"
+    fstype:  'xfs'
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+

@@ -1,0 +1,9 @@
+---
+
+- name: Ensure variables are available
+  include_vars:
+    file: "../../../vars/sap-disks.yaml"
+
+- include_tasks: configure.yml
+  loop: "{{ sap_swap }}"
+  when: item.tier == "all" or item.tier == tier

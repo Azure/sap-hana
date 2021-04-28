@@ -1,0 +1,90 @@
+---
+
+- name: "Exports: Create SAP Directories"
+  file:
+    path:   "{{ item.path }}"
+    state:  directory
+    mode:   0755
+  loop:
+    - { tier: 'preparation', path: '/usr/sap/trans' }
+    - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}' }
+  when:     item.tier == "all" or
+            item.tier == tier
+
+
+- name: "Exports: NFS Server Config"
+  lineinfile:
+    path:   "{{ item.path }}"
+    regexp: "{{ item.regexp }}"
+    line:   "{{ item.line }}"
+    owner:  root
+    group:  root
+    mode:   0644
+  loop:
+    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/sapmnt/{{ sap_sid|upper }}', line: '/sapmnt/{{ sap_sid|upper }} *(rw,sync,no_wdelay,no_root_squash)' }
+    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/trans',             line: '/usr/sap/trans *(rw,sync,no_wdelay,no_root_squash)' }
+    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',           line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)' }
+    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS4_SUPPORT=\"yes\"',       line: 'NFS4_SUPPORT=\"yes\"' }
+  when:     item.tier == "all" or
+            item.tier == tier
+
+
+- name: "Exports: Enable NFS Service"
+  service:
+    name:    nfsserver
+    state:   reloaded
+    enabled: yes
+
+
+
+
+
+# - name: Ensure the NFS utils package is installed
+#   package:
+#     name: nfs-utils
+#     state: present
+
+# - name: Ensure NFS Server is running
+#   systemd:
+#     name: nfsserver
+#     state: started
+#     enabled: yes
+
+# - name: Ensure expected base directories are present
+#   file:
+#     path: "{{ item.path }}"
+#     state: directory
+#     owner: "{{ item.owner | default(omit) }}"
+#     group: "{{ item.group | default(omit) }}"
+#     mode: +r
+#   loop: "{{ nfs_exports }}"
+
+# - name: Ensure exports file exists
+#   lineinfile:
+#     dest: /etc/exports
+#     create: yes
+#     line: "{{ item.path }}    {{ item.export_settings }}"
+#     regexp: '^{{ item.path }}\s+'
+#     owner: root
+#     group: root
+#     mode: 0644
+#     state: present
+#   loop: "{{ nfs_exports }}"
+
+# - name: Ensure nfsserver is running
+#   systemd:
+#     state: started
+#     name: nfsserver
+#     daemon_reload: yes
+
+# - name: Ensure file systems are exported
+#   command: exportfs -a
+
+
+# nfs_exports:
+# - { path: "{{ target_media_location }}",          export_settings: "*(rw,no_root_squash,sync,no_subtree_check)" }
+# - { path: "/tmp/app_template",                    export_settings: "*(rw,no_root_squash,sync,no_subtree_check)" }
+# - { path: "/sapmnt/{{ sap_sid | upper}}",         export_settings: "*(rw,no_root_squash,sync,no_subtree_check)",  owner: "{{ sap_sid | lower }}adm",  group: "{{ sapsys_gid }}" }
+# - { path: "/usr/sap/{{ sap_sid | upper }}/SYS",   export_settings: "*(rw,no_root_squash,sync,no_subtree_check)",  owner: "{{ sap_sid | lower }}adm",  group: "{{ sapsys_gid }}" }
+# - { path: "/sapmnt/{{ sap_sid | upper}}/global",  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)",  owner: "{{ sap_sid | lower }}adm",  group: "{{ sapsys_gid }}" }
+# - { path: "/sapmnt/{{ sap_sid | upper}}/profile", export_settings: "*(rw,no_root_squash,sync,no_subtree_check)",  owner: "{{ sap_sid | lower }}adm",  group: "{{ sapsys_gid }}" }

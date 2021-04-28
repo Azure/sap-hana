@@ -1,0 +1,7 @@
+---
+
+- name: Ensure ({{ dependencies }}) exist
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ dependencies }}"

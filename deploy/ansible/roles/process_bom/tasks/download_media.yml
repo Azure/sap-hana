@@ -1,0 +1,36 @@
+---
+
+- name: "Ensure media property is iterated"
+  block:
+    - name: Ensure target folders exist
+      file:
+        path: "{{ download_location }}"
+        state: directory
+      loop: "{{
+        bom_media |
+        flatten(levels=1) |
+        selectattr('override_target_location', 'defined') |
+        map(attribute='override_target_location') |
+        list |
+        union([default_location]) |
+        unique }}"
+      loop_control:
+        loop_var: download_location
+      check_mode: "{{ test_mode is defined and test_mode }}"
+
+    - name: Ensure media are downloaded
+      vars:
+        archive_location: "{{ sapbits_location_base_path }}/{{ source_location }}"
+        default_file_name: "{{ download_iterator[file_name] }}"
+        file_source: "{{ archive_location }}/{{ default_file_name }}"
+        file_dest_target_location: "{{ download_iterator.override_target_location is defined | ternary(download_iterator.override_target_location, default_location) | regex_replace('/$', '') }}"
+        file_dest_target_name: "{{ download_iterator.override_target_filename is defined | ternary(download_iterator.override_target_filename, default_file_name) }}"
+        file_dest: "{{ file_dest_target_location }}/{{ file_dest_target_name }}"
+      uri:
+        url: "{{ file_source }}{{ sapbits_sas_token }}"
+        dest: "{{ file_dest }}"
+        creates: "{{ file_dest }}"
+      loop: "{{ bom_media | flatten(levels=1) }}"
+      loop_control:
+        loop_var: download_iterator
+      check_mode: "{{ test_mode is defined and test_mode }}"
