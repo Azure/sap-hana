@@ -50,6 +50,8 @@
       - "Product              : {{ bom.product_ids.scs }}"
       - "SAP SID              : {{ sap_sid }}"
       - "Instance Number - SCS: {{ scs_instance_number }}"
+      - "Virtual Hostname     : {{ ansible_hostname }}"
+      - "FQDN                 : {{ sap_fqdn }}"
       - "Master Password      : {{ password_master }}"
       - "sapadm UID           : {{ sapadm_uid }}"
       - "sapsys GID           : {{ sapsys_gid }}"
