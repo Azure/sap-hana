@@ -3,6 +3,10 @@
 #   SAP SCS: Install
 
 ---
+- name:             "Register BOM: {{ bom_base_name }}"
+  include_vars:
+    file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
+    name:           bom
 
 #------------------<DEBUGGING>-------------------
 - debug:  
