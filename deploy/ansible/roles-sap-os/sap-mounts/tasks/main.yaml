@@ -3,9 +3,9 @@
 # TODO: Fix Hardcoded NFS Server Name
 
 - debug:
-    msg:
-      - "{{ item }}"
-  loop: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
+    msg:  "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
+  #     - "{{ item }}"
+  # loop: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
 
 # Mount Filesystems
 - name:     "Mount Filesystems"
