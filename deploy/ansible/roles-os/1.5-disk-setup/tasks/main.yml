@@ -110,6 +110,7 @@
     # var: LVM_data
     msg:
       - "pvs: {{ item.pvs }}"
+  loop: "{{ LVM_data }}"
 
 - name: Volume Group creation (multiple disks)
   lvg:
