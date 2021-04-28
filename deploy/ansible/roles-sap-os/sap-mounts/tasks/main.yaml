@@ -1,12 +1,5 @@
 ---
 
-# TODO: Fix Hardcoded NFS Server Name
-
-# - debug:
-#     msg:  "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
-#   #     - "{{ item }}"
-#   # loop: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') }}"
-
 # Mount Filesystems
 - name:     "Mount Filesystems"
   mount:
@@ -16,6 +9,7 @@
     opts:   defaults
     state:  mounted
   vars:
+    # Get all the hostnames in <SID>_SCS group and return only the first hostname
     nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
   loop:
     # - { tier: 'all',          type: 'xfs',  src: '/dev/vg_sap/lv_usrsap',                                                       path: '/usr/sap' }
@@ -23,7 +17,7 @@
     # - { tier: 'prepare',      type: 'xfs',  src: '/dev/vg_sap/lv_usrsapinstall',                                                path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
     # - { tier: 'prepare',      type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_sap/lv_hana_shared',                                                  path: '/hana/shared' }
-    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_sap/lv_shared',                                                  path: '/hana/shared' }
+    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_shared/lv_shared',                                                  path: '/hana/shared' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_hana_data',                                              path: '/hana/data' }
     - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_data',                                              path: '/hana/data' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                                                path: '/hana/log' }
