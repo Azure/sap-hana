@@ -358,11 +358,14 @@ Licensed under the MIT license.
         if ("azurerm" -eq $jsonData.backend.type) {
             $Command = " init -upgrade=true -force-copy -backend-config ""subscription_id=$sub"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$key"""
 
-            $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
-            if ("Y" -ne $ans) {
-                $Env:TF_DATA_DIR = $null
+            if ($false -eq $Silent) {
 
-                return
+                $ans = Read-Host -Prompt "The system has already been deployed and the statefile is in Azure, do you want to redeploy Y/N?"
+                if ("Y" -ne $ans) {
+                    $Env:TF_DATA_DIR = $null
+
+                    return
+                }
             }
         }
     } 

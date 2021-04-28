@@ -27,10 +27,10 @@ Once the pre-requisites are met, proceed with the next steps.
     git checkout beta
    ```
 
-4. Copy the sample parameter `folder WORKSPACES` from
-   `sap-hana\documentation\SAP_Automation_on_Azure\Process_Documentation` to the `Azure_SAP_Automated_Deployment` folder.
+4. Copy the content from the
+   `sap-hana\documentation\SAP_Automation_on_Azure\Process_Documentation\WORKSPACES` to the `Azure_SAP_Automated_Deployment\WORKSPACES` folder.
 
-5. Navigate to the `Azure_SAP_Automated_Deployment\WORKSPACES\DEPLOYMENT-ORCHESTRATION` folder.
+5. Navigate to the `Azure_SAP_Automated_Deployment\WORKSPACES` folder.
 
 Kindly note, that triggering the deployment will need the Service Principal details (application id, secret and tenant ID)
 

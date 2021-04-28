@@ -33,7 +33,7 @@
 
 export           ANSIBLE_HOST_KEY_CHECKING=False
 
-./get-sshkey.sh
+bash ${DEPLOYMENT_REPO_PATH}deploy/ansible/get-sshkey.sh
 
 PS3='Please select playbook: '
 options=(                           \

@@ -9,7 +9,6 @@ function showhelp {
     echo "#   This file contains the logic to deploy the different systems                        #"
     echo "#   The script experts the following exports:                                           #"
     echo "#                                                                                       #"
-    echo "#     ARM_SUBSCRIPTION_ID to specify which subscription to deploy to                    #"
     echo "#     DEPLOYMENT_REPO_PATH the path to the folder containing the cloned sap-hana        #"
     echo "#                                                                                       #"
     echo "#   The script will persist the parameters needed between the executions in the         #"
@@ -18,18 +17,34 @@ function showhelp {
     echo "#                                                                                       #"
     echo "#   Usage: install_workloadzone.sh                                                      #"
     echo "#    -p parameter file                                                                  #"
-    echo "#    -f will remove .terraform and local state files before deployment                  #"
+    echo "#                                                                                       #"
+    echo "#   Optional parameters                                                                 #"
     echo "#    -d Deployer terraform state file name                                              #"
-    echo "#    -e Deployer environment, typically MGMT                                            #"
-    echo "#    -i interactive true/false setting the value to false will not prompt before apply  #"
+    echo "#    -e Deployer environment, i.e. MGMT                                                 #"
+    echo "#    -b target subscription                                                             #"
+    echo "#    -c Service Principal Application ID                                                #"
+    echo "#    -s Password of the Service Principal                                               #"
+    echo "#    -t tenant of the Service Principal                                                 #"
+    echo "#    -f Clean up the local Terraform files. Use with caution                            #"
+    echo "#    -i Silent install                                                                  #"
     echo "#    -h Show help                                                                       #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
     echo "#   [REPO-ROOT]deploy/scripts/install_workloadzone.sh \                                 #"
     echo "#      -p PROD-WEEU-SAP01-INFRASTRUCTURE.json \                                         #"
-    echo "#      -i true                                                                          #"
+    echo "#      -i                                                                               #"
     echo "#                                                                                       #"
+    echo "#   Example:                                                                            #"
+    echo "#                                                                                       #"
+    echo "#   [REPO-ROOT]deploy/scripts/install_workloadzone.sh \                                 #"
+    echo "#      -p PROD-WEEU-SAP01-INFRASTRUCTURE.json \                                         #"
+    echo "#      -e MGMT                                                                          #"
+    echo "#      -b xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                          #"
+    echo "#      -c yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                          #"
+    echo "#      -s ************************                                                      #"  
+    echo "#      -t zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz                                          #"
+    echo "#      -i                                                                               #"
     echo "#########################################################################################"
 }
 
@@ -53,18 +68,17 @@ function missing {
 show_help=false
 force=0
 
-while getopts ":p:t:d:h:f:e:i:s:c:p" option; do
+while getopts "p:d:e:b:c:s:t:ifh" option; do
     case "${option}" in
         p) parameterfile=${OPTARG};;
-        i) approve="--auto-approve";;
-        f) force=1 ;;
         d) deployer_tfstate_key=${OPTARG};;
         e) deployer_environment=${OPTARG};;
-        s) subscription=${OPTARG};;
+        b) subscription=${OPTARG};;
         c) client_id=${OPTARG};;
-        p) spn_secret=${OPTARG};;
+        s) spn_secret=${OPTARG};;
         t) tenant_id=${OPTARG};;
-
+        i) approve="--auto-approve";;
+        f) force=1 ;;
         h) showhelp
             exit 3
         ;;
@@ -188,13 +202,12 @@ then
     save_config_var "tenant_id" "${workload_config_information}"
 fi
 
-
-
 load_config_vars "${workload_config_information}" "REMOTE_STATE_SA"
 load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
 load_config_vars "${workload_config_information}" "tfstate_resource_id"
 load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
-load_config_vars "${workload_config_information}" "ARM_SUBSCRIPTION_ID"
+load_config_vars "${workload_config_information}" "keyvault"
+load_config_vars "${workload_config_information}" "deployer_tfstate_key"
 
 # Checking for valid az session
 az account show > stdout.az 2>&1
@@ -230,12 +243,10 @@ if [ -z "${REMOTE_STATE_SA}" ]
 then
     # Ask for deployer environment name and try to read the deployer state file and resource group details from the configuration file
     
-    if [ -z $deployer_environment ]
+    if [ -z "$deployer_environment" ]
     then
         read -p "Deployer environment name: " deployer_environment
     fi
-
-    echo "REMOTE_STATE_SA" $REMOTE_STATE_SA
     
     deployer_config_information="${automation_config_directory}""${deployer_environment}""${region}"
     load_config_vars "${deployer_config_information}" "keyvault"
@@ -244,6 +255,15 @@ then
     load_config_vars "${deployer_config_information}" "tfstate_resource_id"
     load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
     STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+
+    save_config_vars "${workload_config_information}" \
+    REMOTE_STATE_RG \
+    REMOTE_STATE_SA \
+    tfstate_resource_id \
+    STATE_SUBSCRIPTION \
+    keyvault \
+    deployer_tfstate_key
     
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
@@ -253,60 +273,45 @@ then
             account_set=1
         fi
         
-        save_config_vars "${workload_config_information}" \
-        REMOTE_STATE_RG \
-        REMOTE_STATE_SA \
-        tfstate_resource_id \
-        STATE_SUBSCRIPTION \
-        keyvault \
-        deployer_tfstate_key
 
     fi
 fi
 
-if [ ! -z $keyvault ]
+if [ -n $keyvault ]
 then
     secretname="${environment}"-client-id
-    echo $keyvault
-    echo $secretname
-    az keyvault secret show --name $secretname --vault $keyvault 2>error.log > kv.log
-    if [ -f error.log ]
+    az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
+    if [ -s error.log ]
     then
-        temp=$(grep "ERROR:" error.log)
-        
-        if [ -n "${temp}" ];
+        if [ ! -z "$spn_secret" ]
         then
-            if [ ! -z "$spn_secret" ]
+            allParams=$(printf " -e %s -r %s -v %s -s %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
+                
+            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
+            if [ $? -eq 255 ]
             then
-                secret_param=$(printf " -s %s " "${spn_secret}")
-                allParams="${env_param}""${keyvault_param}""${region_param}""${secret_param}"
+                exit $?
+            fi
+        else
+            read -p "Do you want to specify the Workload SPN Details Y/N?"  ans
+            answer=${ans^^}
+            if [ $answer == 'Y' ]; then
+                load_config_vars ${workload_config_information} "keyvault"
+                if [ ! -z $keyvault ]
+                then
+                    # Key vault was specified in ~/.sap_deployment_automation in the deployer file
+                    keyvault_param=$(printf " -v %s " "${keyvault}")
+                fi
+                
+                env_param=$(printf " -e %s " "${environment}")
+                region_param=$(printf " -r %s " "${region}")
+                
+                allParams="${env_param}""${keyvault_param}""${region_param}"
                 
                 "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
                 if [ $? -eq 255 ]
                 then
                     exit $?
-                fi
-            else
-                read -p "Do you want to specify the Workload SPN Details Y/N?"  ans
-                answer=${ans^^}
-                if [ $answer == 'Y' ]; then
-                    load_config_vars ${workload_config_information} "keyvault"
-                    if [ ! -z $keyvault ]
-                    then
-                        # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-                        keyvault_param=$(printf " -v %s " "${keyvault}")
-                    fi
-                    
-                    env_param=$(printf " -e %s " "${environment}")
-                    region_param=$(printf " -r %s " "${region}")
-                    
-                    allParams="${env_param}""${keyvault_param}""${region_param}"
-                    
-                    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
-                    if [ $? -eq 255 ]
-                    then
-                        exit $?
-                    fi
                 fi
             fi
         fi
@@ -358,31 +363,27 @@ if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     exit -1
 fi
 
-if [ ! -n "${ARM_SUBSCRIPTION_ID}" ]; then
-    read -p "Please provide the subscription id for the workload:" ARM_SUBSCRIPTION_ID
-    save_config_vars "${workload_config_information}" ARM_SUBSCRIPTION_ID
-fi
-
 if [ ! -n "${REMOTE_STATE_SA}" ]; then
     read -p "Terraform state storage account name:"  REMOTE_STATE_SA
     REMOTE_STATE_RG=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].resourceGroup  | tr -d \" | xargs)
     tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
     STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+
     if [ ! -z "${STATE_SUBSCRIPTION}" ]
     then
-        if [ $account_set==0 ]
-        then
-            $(az account set --sub "${STATE_SUBSCRIPTION}")
-            account_set=1
-        fi
         
         save_config_vars "${workload_config_information}" REMOTE_STATE_RG \
         REMOTE_STATE_SA \
         tfstate_resource_id \
         STATE_SUBSCRIPTION
+        if [ $account_set==0 ]
+        then
+            $(az account set --sub "${STATE_SUBSCRIPTION}")
+            account_set=1
+        fi
     fi
     
-    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
     
 fi
 
@@ -410,6 +411,10 @@ fi
 if [ ! -z "${tfstate_resource_id}" ]
 then
     tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+else
+    tfstate_resource_id=$(az resource list --name ${REMOTE_STATE_SA} | jq .[0].id  | tr -d \" | xargs)
+    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+
 fi
 
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/

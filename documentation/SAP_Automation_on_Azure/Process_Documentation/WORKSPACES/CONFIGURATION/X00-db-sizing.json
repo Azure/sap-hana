@@ -1,0 +1,138 @@
+{
+  "app": {
+    "New": {
+      "compute": {
+        "vm_size": "Standard_D2s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [
+        {
+          "count": 1,
+          "name": "os",
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "None",
+          "write_accelerator": false
+        },
+        {
+          "count": 1,
+          "name": "data",
+          "disk_type": "Premium_LRS",
+          "size_gb": 256,
+          "caching": "None",
+          "write_accelerator": false
+        }
+      ]
+    }
+  },
+  "scs": {
+    "New": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [
+        {
+          "count": 1,
+          "name": "os",
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "None",
+          "write_accelerator": false
+        },
+        {
+          "count": 1,
+          "name": "data",
+          "disk_type": "Premium_LRS",
+          "size_gb": 256,
+          "caching": "None",
+          "write_accelerator": false
+        }
+      ]
+    }
+  },
+  "web": {
+    "New": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [
+        {
+          "count": 1,
+          "name": "os",
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "None",
+          "write_accelerator": false
+        },
+        {
+          "count": 1,
+          "name": "data",
+          "disk_type": "Premium_LRS",
+          "size_gb": 256,
+          "caching": "None",
+          "write_accelerator": false
+        }
+      ]
+    }
+  },
+  "db": {
+    "Demo": {
+      "compute": {
+        "vm_size": "Standard_D4s_v3",
+        "accelerated_networking": false
+      },
+      "storage": [
+        {
+          "count": 1,
+          "name": "os",
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "None",
+          "write_accelerator": false
+        },
+        {
+          "name": "data",
+          "count": 3,
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "None",
+          "write_accelerator": false,
+          "mount_point": "/hana/data",
+          "lun_start": 0
+        },
+        {
+          "name": "log",
+          "count": 1,
+          "disk_type": "Premium_LRS",
+          "size_gb": 128,
+          "caching": "None",
+          "write_accelerator": false,
+          "mount_point": "/hana/log",
+          "lun_start": 9
+        },
+        {
+          "name": "shared",
+          "count": 1,
+          "disk_type": "Premium_LRS",
+          "size_gb": 128,
+          "caching": "ReadOnly",
+          "write_accelerator": false,
+          "mount_point": "/hana/shared",
+          "lun_start": 13
+        },
+        {
+          "name": "sap",
+          "count": 1,
+          "disk_type": "Premium_LRS",
+          "size_gb": 64,
+          "caching": "ReadOnly",
+          "write_accelerator": false,
+          "mount_point": "/usr/sap",
+          "lun_start": 14
+        }
+      ]
+    }
+  }
+}

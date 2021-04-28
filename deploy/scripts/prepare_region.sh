@@ -54,14 +54,31 @@ function showhelp {
     echo "#   Usage: prepare_region.sh                                                            #"
     echo "#    -d deployer parameter file                                                         #"
     echo "#    -l library parameter file                                                          #"
+    echo "#                                                                                       #"
+    echo "#   Optional parameters                                                                 #"
+    echo "#    -s subscription                                                                    #"
+    echo "#    -c Service Principal Application ID                                                #"
+    echo "#    -p Password of the Service Principal                                               #"
+    echo "#    -t tenant of the Service Principal                                                 #"
+    echo "#    -f Clean up the local Terraform files. Use with caution                            #"
+    echo "#    -i Silent install                                                                  #"
     echo "#    -h Show help                                                                       #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
-    echo "#   [REPO-ROOT]deploy/scripts/install_environment.sh \                                  #"
+    echo "#   DEPLOYMENT_REPO_PATH/scripts/install_environment.sh \                               #"
     echo "#      -d DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/PROD-WEEU-DEP00-INFRASTRUCTURE.json \ #"
     echo "#      -l LIBRARY/PROD-WEEU-SAP_LIBRARY/PROD-WEEU-SAP_LIBRARY.json \                    #"
     echo "#                                                                                       #"
+    echo "#   Example:                                                                            #"
+    echo "#                                                                                       #"
+    echo "#   DEPLOYMENT_REPO_PATH/scripts/install_environment.sh \                               #"
+    echo "#      -d DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/PROD-WEEU-DEP00-INFRASTRUCTURE.json \ #"
+    echo "#      -l LIBRARY/PROD-WEEU-SAP_LIBRARY/PROD-WEEU-SAP_LIBRARY.json \                    #"
+    echo "#      -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                          #"
+    echo "#      -c yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                          #"
+    echo "#      -p ************************                                                      #"  
+    echo "#      -t zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz                                          #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -335,11 +352,14 @@ then
         exit $?
     fi
     
+    step=1
     save_config_var "step" "${deployer_config_information}"
     
     if [ ! -z "$subscription" ]
     then
         save_config_var "subscription" "${deployer_config_information}"
+        kvsubscription=$subscription
+        save_config_var "kvsubscription" "${deployer_config_information}"
     fi
     
     if [ ! -z "$client_id" ]
@@ -352,8 +372,6 @@ then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
     
-    step=1
-    save_config_var "step" "${deployer_config_information}"
 else
     echo ""
     echo "#########################################################################################"
@@ -369,45 +387,31 @@ unset TF_DATA_DIR
 if [ 1 == $step ]
 then
     load_config_vars "${deployer_config_information}" "keyvault"
-    if [ ! -z "$keyvault" ]
-    then
-        # Key vault was specified in ~/.sap_deployment_automation in the deployer file
-        keyvault_param=$(printf " -v %s " "${keyvault}")
-    fi
-    
-    env_param=$(printf " -e %s " "${environment}")
-    region_param=$(printf " -r %s " "${region}")
     
     secretname="${environment}"-client-id
-    az keyvault secret show --name "$secretname" --vault "$keyvault" 2>error.log > kv.log
-    if [ -f error.log ]
+    az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
+    if [ -s error.log ]
     then
-        temp=$(grep "ERROR:" error.log)
-        
-        if [ -n "${temp}" ];
+        if [ ! -z "$spn_secret" ]
         then
-            if [ ! -z "$spn_secret" ]
+            allParams=$(printf " -e %s -r %s -v %s -s %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
+
+            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+            if [ $? -eq 255 ]
             then
-                secret_param=$(printf " -s %s " "${spn_secret}")
-                allParams="${env_param}""${keyvault_param}""${region_param}""${secret_param}"
+                exit $?
+            fi
+        else
+            read -p  "Do you want to specify the SPN Details Y/N?"  ans
+            answer=${ans^^}
+            if [ "$answer" == 'Y' ]; then
+                
+                allParams="${env_param}""${keyvault_param}""${region_param}"
                 
                 "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
                 if [ $? -eq 255 ]
                 then
                     exit $?
-                fi
-            else
-                read -p  "Do you want to specify the SPN Details Y/N?"  ans
-                answer=${ans^^}
-                if [ "$answer" == 'Y' ]; then
-                    
-                    allParams="${env_param}""${keyvault_param}""${region_param}"
-                    
-                    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
-                    if [ $? -eq 255 ]
-                    then
-                        exit $?
-                    fi
                 fi
             fi
         fi
@@ -470,6 +474,8 @@ else
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
+    step=3
+    save_config_var "step" "${deployer_config_information}"
     
 fi
 

@@ -28,19 +28,6 @@
 
 # # Prepare disks and mount points
 
-# # TODO: Unnecessary, values can be found in hostvars; refactor
-# - name: Create device list
-#   shell: ls -l /dev/disk/azure/scsi1/* | awk '{split($0,disks," "); system("readlink -f " disks[9])}'
-#   register: device_list
-
-# # TODO: Find a different way
-# - name: Create dictionary with disk name and devices list
-#   set_fact:
-#     start: "{{ start|int+item.count }}"
-#     disk_dict: "{{ disk_dict | combine({ item.name: {'count': item.count, 'mount_point': item.mount_point, 'devices': device_list.stdout_lines[start|int:start|int+item.count]} }) }}"
-#   loop: "{{ hdb_sizes[hana_database.size].storage }}"
-#   when: item.name != 'os'
-
 # # TODO: Refactor
 # # Check if installation paths are ready. If paths are unready, path_status_flag will be set. Then subsequent tasks will be executed.
 # - import_tasks: installation_path_prechecks.yml
@@ -97,31 +84,103 @@
     pvs_log_str: "{{ pvs_log | default([]) | join(',') }}"
     cacheable: yes
 
-# SAP volume
+# Backup volume
 
-- name: Store the sap pvs valuas into a list
+- name: Store the backup pvs valuas into a list
   set_fact:
-    pvs_sap: "{{ (pvs_sap|default([]) +  [ '/dev/disk/azure/scsi1/lun' ~ item.LUN ]) | list}}"
+    pvs_backup: "{{ (pvs_backup|default([]) +  [ '/dev/disk/azure/scsi1/lun' ~ item.LUN ]) | list}}"
     cacheable: yes
   loop: "{{ disks }}"
-  when: item.type == 'sap' and item.host == inventory_hostname
+  when: item.type == 'backup' and item.host == inventory_hostname
 
-- name: Convert the sap pvs list to a string
+- name: Convert the backup pvs list to a string
   set_fact:
-    pvs_sap_str: "{{ pvs_sap | default([]) | join(',') }}"
+    pvs_backup_str: "{{ pvs_backup | default([]) | join(',') }}"
     cacheable: yes
 
-- name: Create the consolidated variable
+- name: Create the consolidated list
   set_fact:
-    LVM_data: "{{ [{ 'vg':'vg_sap', 'pvs': '{{ pvs_sap_str }}' },{ 'vg':'vg_data', 'pvs': '{{ pvs_data_str }}' },{ 'vg':'vg_log', 'pvs': '{{ pvs_log_str }}' }] }}"
+    LVM_data: "{{ [ 
+    { 'vg':'vg_backup',   'pvs': '{{ pvs_backup_str }}',  'lv':'lv_backup', 'size': '100%FREE', 'opt' : '',             'fstype': 'xfs', 'dev': '/dev/vg_backup/lv_backup'}, 
+    { 'vg':'vg_data',     'pvs': '{{ pvs_data_str }}',    'lv':'lv_data',   'size': '100%FREE', 'opt' : '-i 3 -I 256',  'fstype': 'xfs', 'dev': '/dev/vg_data/lv_data'}, 
+    { 'vg':'vg_log',      'pvs': '{{ pvs_log_str }}',     'lv':'lv_log',    'size': '100%FREE', 'opt' : '-i 3 -I 64',   'fstype': 'xfs', 'dev': '/dev/vg_log/lv_log'} 
+    ] }}"
 
 - debug:
     var: LVM_data
 
-- lvg:
+- name: Volume Group creation (multiple disks)
+  lvg:
     vg:     "{{ item.vg }}"
     pvs:    "{{ item.pvs }}"
+    pesize: 4M
+    state:  present
 
   loop: "{{ LVM_data }}"
   when:
     - item.pvs | bool
+
+- name: Volume Group creation (single disks)
+  lvg:
+    vg:     "{{ 'vg_' ~ item.type }}"
+    pvs:    "{{ '/dev/disk/azure/scsi1/lun' ~ item.LUN }}"
+    state:  present
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+
+
+- name: "Logical Volume creation"
+  lvol:
+    lv:       "{{ item.lv }}"
+    vg:       "{{ item.vg }}"
+    size:     "{{ item.size }}"
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
+  loop: "{{ LVM_data }}"
+  when:
+    - item.pvs | bool
+
+- name: Logical Volume creation (single disks)
+  lvol:
+    lv:     "{{ 'lv_' ~ item.type }}"
+    vg:     "{{ 'vg_' ~ item.type }}"
+    size:     '100%FREE'
+    active:   yes
+    state:    present
+    shrink:   no
+    resizefs: no
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+
+- name: "Filesystem creation"
+  filesystem:
+    dev:       "{{ item.dev }}"
+    fstype:    "{{ item.fstype }}"
+  loop: "{{ LVM_data }}"
+  when:
+    - item.dev | bool
+
+- name: Filesystem creation (single disks)
+  filesystem:
+    dev:     "{{ '/dev/vg_' ~ item.type  ~ '/lv_' ~ item.type }}"
+    fstype:  'xfs'
+
+  loop: "{{ disks }}"
+  when: 
+    - item.type != 'log'
+    - item.type != 'data'
+    - item.type != 'backup'
+    - item.host == inventory_hostname
+

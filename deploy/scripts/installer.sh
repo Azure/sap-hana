@@ -215,7 +215,6 @@ if [ -f terraform.tfvars ]; then
 fi
 
 
-
 if [ "${deployment_system}" == sap_deployer ]
 then
     deployer_tfstate_key=${key}.terraform.tfstate
@@ -264,11 +263,6 @@ if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     exit -1
 fi
 
-if [ ! -n "${ARM_SUBSCRIPTION_ID}" ]; then
-    option="ARM_SUBSCRIPTION_ID"
-    missing
-    exit -1
-fi
 
 # Checking for valid az session
 az account show > stdout.az 2>&1
@@ -456,12 +450,17 @@ else
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
-        read -p "Do you want to redeploy Y/N?"  ans
-        answer=${ans^^}
-        if [ $answer == 'Y' ]; then
-            ok_to_proceed=true
+        if [ ! -n "${approve}" ] 
+        then
+            read -p "Do you want to redeploy Y/N?"  ans
+            answer=${ans^^}
+            if [ $answer == 'Y' ]; then
+                ok_to_proceed=true
+            else
+                exit 1
+            fi
         else
-            exit 1
+            ok_to_proceed=true
         fi
 
         terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure  \
@@ -547,7 +546,16 @@ then
     rm plan_output.log
 fi
 
-terraform -chdir=$terraform_module_directory plan -no-color -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars} 2>error.log 1>plan_output.log 
+
+echo "${tfstate_parameter}"
+echo "${landscape_tfstate_key_parameter}"
+echo "${deployer_tfstate_key_parameter}"
+echo "${extra_vars}"
+
+allParams=$(printf " -var-file=%s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}")
+echo $allParams
+
+terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
@@ -637,8 +645,11 @@ if [ $ok_to_proceed ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
+
+    allParams=$(printf " -var-file=%s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}")
+
     
-    terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${extra_vars}" 2>error.log
+    terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
  
     str1=$(grep "Error: " error.log)
     if [ -n "${str1}" ]
@@ -646,7 +657,7 @@ if [ $ok_to_proceed ]; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                               #"
+        echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                              #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""

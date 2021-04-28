@@ -260,7 +260,7 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  apply "${approve}" -var-file="${var_file}" 2>error.log
+terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" 2>error.log
 str1=$(grep "Error: " error.log)
 if [ -n "${str1}" ]
 then
