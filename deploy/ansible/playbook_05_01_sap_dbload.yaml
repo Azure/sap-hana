@@ -29,7 +29,7 @@
 # -------------------------------------+---------------------------------------8
 
   - set_fact:
-      tier:     pas                                                             # Acttions for HANA DB Servers
+      tier:     dbload                                                             # Acttions for HANA DB Servers
 
 # -------------------------------------+---------------------------------------8
 # Role: sap-mounts
