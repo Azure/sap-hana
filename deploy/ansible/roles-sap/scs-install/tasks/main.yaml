@@ -18,9 +18,11 @@
 #S41909SPS03_v1-scs-inifile-param.j2
 - name:             "Download BOM Template: {{ bom_base_name }}"
   get_url:
-    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ bom_base_name }}-scs-inifile-param.j2{{ sapbits_sas_token }}"
+    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ sap_inifile }}{{ sapbits_sas_token }}"
     dest:           "{{ inventory_dir }}/{{ bom_base_name }}-scs-inifile-param.j2"
     mode:           0644
+  vars:
+    sap_inifile:    "{{ bom_base_name }}-scs-inifile-param.j2"
   register:         result
   until:            result is succeeded
   retries:          10
