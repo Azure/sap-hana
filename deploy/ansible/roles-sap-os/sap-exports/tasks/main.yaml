@@ -6,6 +6,7 @@
     state:  directory
     mode:   0755
   loop:
+    - { tier: 'preparation', path: '/usr/sap/install' }
     - { tier: 'preparation', path: '/usr/sap/trans' }
     - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}' }
   when:     item.tier == "all" or
@@ -22,9 +23,10 @@
     mode:   0644
   loop:
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/sapmnt/{{ sap_sid|upper }}', line: '/sapmnt/{{ sap_sid|upper }} *(rw,sync,no_wdelay,no_root_squash)' }
-    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/trans',             line: '/usr/sap/trans *(rw,sync,no_wdelay,no_root_squash)' }
-    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',           line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)' }
-    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS4_SUPPORT=\"yes\"',       line: 'NFS4_SUPPORT=\"yes\"' }
+    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/trans',              line: '/usr/sap/trans *(rw,sync,no_wdelay,no_root_squash)' }
+    - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',            line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)' }
+    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=\"yes\"', line: 'NFS3_SERVER_SUPPORT="no"' }
+    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS4_SUPPORT=\"yes\"',        line: 'NFS4_SUPPORT="yes"' }
   when:     item.tier == "all" or
             item.tier == tier
 
