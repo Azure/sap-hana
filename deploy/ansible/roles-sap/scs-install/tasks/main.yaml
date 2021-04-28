@@ -10,8 +10,8 @@
 
 #------------------<DEBUGGING>-------------------
 - debug:  
-    msg:      "Product: {{ item }}"
-  loop:       "{{ bom.product_ids|flatten(levels=1) }}"
+    msg:      "Product: {{ bom.product_ids.scs }}"
+  # loop:       "{{ bom.product_ids|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 # *====================================4=======================================8
 
