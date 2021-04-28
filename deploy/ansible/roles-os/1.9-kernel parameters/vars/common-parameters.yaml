@@ -1,0 +1,15 @@
+accounts:
+  - { type: 'legacy', name: 'shutdown',             state: 'disabled' }
+  - { type: 'legacy', name: 'halt',                 state: 'disabled' }
+  - { type: 'legacy', name: 'reboot',               state: 'disabled' }
+  - { type: 'unused', name: 'games',                state: 'disabled' }
+  - { type: 'unused', name: 'news',                 state: 'disabled' }
+  - { type: 'unused', name: 'gopher',               state: 'disabled' }
+  - { type: 'unused', name: 'lp',                   state: 'disabled' }
+
+kernel-parameters:
+  - { type: 'unused', name: 'lp',                     state: 'absent' }
+
+shell: |
+  
+  

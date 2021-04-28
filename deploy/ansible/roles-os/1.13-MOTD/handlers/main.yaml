@@ -1,0 +1,8 @@
+handlers:
+  - name:               restart sshd service
+    service:
+      name:             sshd
+      state:            restarted
+    become:             true
+
+...
