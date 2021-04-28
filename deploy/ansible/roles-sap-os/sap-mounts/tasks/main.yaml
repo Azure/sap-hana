@@ -19,7 +19,13 @@
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                                                path: '/hana/log' }
     - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_log',                                                path: '/hana/log' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_backup/lv_hana_backup',                                          path: '/hana/backup' }
-    # - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
+    - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
+    # - { tier: 'pas',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    # - { tier: 'app',          type: 'nfs',  src: '{{ sap_sid|lower }}scs00.us.sap.contoso.com:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
+    - { tier: 'hdb',          type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'dbload',       type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'app',          type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'web',          type: 'nfs4',  src: 'x01scs00lf02:/usr/sap/install',                 path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
   when:         item.tier == "all" or
                 item.tier == tier
 

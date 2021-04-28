@@ -24,6 +24,9 @@
     #   (Role)  SAP: LVM
 
     #   (Role)  SAP: mounts
+  - include_role:
+      name:     roles-sap-os/sap-mounts
+
 
     #   (Role)  SAP: packages
 
