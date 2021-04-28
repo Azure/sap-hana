@@ -107,7 +107,9 @@
     ] }}"
 
 - debug:
-    var: LVM_data
+    # var: LVM_data
+    msg:
+      - "pvs: {{ item.pvs }}"
 
 - name: Volume Group creation (multiple disks)
   lvg:

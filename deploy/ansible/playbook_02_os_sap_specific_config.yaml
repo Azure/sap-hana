@@ -39,8 +39,8 @@
       name:     roles-sap-os/2.1-sap-packages                   # TODO: Review and Refactoring Needed
 
 
-  - include_role:
-      name:     roles-sap-os/sap-disk-setup                     # TODO: Centiq copy (rework done)
+  # - include_role:
+  #     name:     roles-sap-os/sap-disk-setup                     # TODO: Centiq copy (rework done)
 
 
 # - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
