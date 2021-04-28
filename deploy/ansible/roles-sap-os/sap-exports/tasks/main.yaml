@@ -34,7 +34,7 @@
 - name: "Exports: Enable NFS Service"
   service:
     name:    nfsserver
-    state:   reloaded
+    state:   restarted
     enabled: yes
 
 
