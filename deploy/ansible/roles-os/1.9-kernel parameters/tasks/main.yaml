@@ -30,35 +30,73 @@
 #
 # -------------------------------------+---------------------------------------8
 ---
-
 # -------------------------------------+---------------------------------------8
 #
 # Task: 1.30    - Prometheus
 #
 # -------------------------------------+---------------------------------------8
 
-
 # -------------------------------------+---------------------------------------8
 #
-# <Comment Header> 
+# <Comment Header>
 #
 # -------------------------------------+---------------------------------------8
+- name: Ensure parameters are available
+  include_vars: parameters.yaml
 
 #----------------------------------------
 # BEGIN
 #----------------------------------------
-- name: Ensure variables are available
-  include_vars:
-    file: "../../../vars/sap-disks.yaml"
 
-- include_tasks: configure.yaml
-  loop: "{{ sap_swap }}"
-  when: (item.tier != "HLI") and (item.tier == "all" or item.tier == tier)
+- name: Gather list of parameters which need to be applied
+  set_fact:
+    all_settings: '{{ (parameters["common"] + (parameters[distro_id]|default([]))) | unique }}'
+
+#print only when -vv, otherwise you will have terminal nausea
+- debug:
+    var: all_settings
+    verbosity: 2
+
+- debug:
+    msg: " {{ all_settings | type_debug }} "
+    verbosity: 2
+
+#- name: Count our fruit
+#  ansible.builtin.debug:
+#    msg: "{{ item }} with index {{ my_idx }}"
+#  loop: "{{ all_settings }}"
+#  loop_control:
+#    index_var: my_idx
+
+- name: Set relevant kernel parameters
+  become: true
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: "{{item.state}}"
+    sysctl_set: yes
+    reload: yes
+    ignoreerrors: yes
+  loop: "{{all_settings}}"
+
+#all_settings: '{{ distro_exists|bool | ternary(parameters["common"]|combine(parameters[distro_id]), parameters["common"] ) }}'
+#- name: Ensure variables are available
+#  include_vars: parameters.yaml
+
+#- name: combine list of parameters
+#  set_fact:
+#          all_settings="{{ parameters["common"]|union(parameters[distro_id]) }}"
+#- debug:
+#        var: all_settings
+
+# - include_tasks: common-hardening-all.yaml
+#   loop: "{{ sap_swap }}"
+#   when: (item.tier != "HLI") and (item.tier == "all" or item.tier == tier)
 #----------------------------------------
 # END
 #----------------------------------------
 
-...
+---
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
 # +------------------------------------4--------------------------------------*/
