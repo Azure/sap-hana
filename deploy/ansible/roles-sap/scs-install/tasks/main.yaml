@@ -1,0 +1,187 @@
+---
+
+
+#   SAP: Register BOM
+#   SAP SCS: deploy SCS Parameter file install template
+#   SAP SCS: Install
+
+---
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      "URL: {{ item }}"
+#   loop:       "{{ bom|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+# *====================================4=======================================8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Download specified BOM Template File
+#S41909SPS03_v1-scs-inifile-param.j2
+- name:             "Download BOM Template: {{ bom_base_name }}"
+  get_url:
+    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ bom_base_name }}-scs-inifile-param.j2{{ sapbits_sas_token }}"
+    dest:           "{{ inventory_dir }}/{{ bom_base_name }}-scs-inifile-param.j2"
+    mode:           0644
+  register:         result
+  until:            result is succeeded
+  retries:          10
+  delay:            6
+  delegate_to:      localhost                                                     # Causes action to occur on the Ansible Controller
+  become:           no
+
+
+
+
+
+# *====================================4=======================================8
+#   SAP SCS: deploy SCS Parameter file install template
+# - name:               "SAP SCS: deploy SCS Parameter file install template"
+#   template:
+#     src:              ../../BOM_FILES/parameter_files/{{ SAP_BOM }}.j2
+#     dest:             /usr/sap/install/downloads/{{ SAP_BOM }}-{{ ansible_hostname }}.params
+#     mode:             0644
+#     force:            yes
+# *====================================4=======================================8
+
+
+# # *====================================4=======================================8
+# #   SAP SCS: Install
+# # 2230669 - System Provisioning Using a Parameter Input File
+#             # SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:BW4HANA10SR1.CORE.HDB.ABAP \
+#             # SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:NW750.HDB.ABAP \
+# - name:               "SAP SCS Install"
+#   shell: |
+#                       export TMPDIR=/usr/sap/install
+#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ SAP_BOM }}-{{ ansible_hostname }}.params \
+#                                 SAPINST_EXECUTE_PRODUCT_ID={{ sapbom.ProductIdSCS }}                                                \
+#                                 SAPINST_SKIP_DIALOGS=true                                                                           \
+#                                 SAPINST_START_GUISERVER=false
+#   args:
+#     chdir:            /usr/sap/install/EX_SWPM
+#   # Skip when TRUE (test mode)
+#   # when: not test_new_bom
+# # *====================================4=======================================8
+
+
+
+
+
+
+# - name: "Ensure {{ bom_base_name }} data is available"
+#   include_vars:
+#     file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yaml"
+#     name: bom
+
+# - name: Determine Stack XML file name
+#   set_fact:
+#     stack_xml_file: "{{ stack_xml_entry.override_target_filename is defined | ternary(stack_xml_entry.override_target_filename, stack_xml_entry.file) }}"
+#   vars:
+#     stack_xml_entry: "{{
+#       bom.materials.stackfiles |
+#       flatten(levels=1) |
+#       selectattr('file', 'match', '^MP_Stack.*\\.xml$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Determine inifile name
+#   set_fact:
+#     inifile: "{{ inifile_entry.override_target_filename is defined | ternary(inifile_entry.override_target_filename, inifile_entry.file) }}"
+#   vars:
+#     inifile_entry: "{{
+#       bom.materials.templates |
+#       flatten(levels=1) |
+#       selectattr('file', 'match', '.*\\.inifile.params$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Determine SAPCAR executable file name
+#   set_fact:
+#     sapcar_executable: "{{ sapcar_entry.override_target_filename is defined | ternary(sapcar_entry.override_target_filename, sapcar_entry.archive) }}"
+#   vars:
+#     sapcar_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SAPCAR.*\\.EXE$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Determine SWPM archive name
+#   set_fact:
+#     swpm_archive: "{{ swpm_entry.override_target_filename is defined | ternary(swpm_entry.override_target_filename, swpm_entry.archive) }}"
+#   vars:
+#     swpm_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SWPM.*\\.SAR$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Determine product id
+#   set_fact:
+#     product_id: "{{ bom.product_ids.scs }}"
+
+# - name: Ensure SAPCAR is executable
+#   file:
+#     path: "{{ download_basket_dir }}/{{ sapcar_executable }}"
+#     mode: "0755"
+
+# - name: Ensure SWPM directory is present
+#   file:
+#     path: "{{ target_media_location }}/SWPM"
+#     state: directory
+
+# - name: Ensure SWPM is unarchived
+#   command: >
+#     {{ download_basket_dir }}/{{ sapcar_executable }} -xf {{ download_basket_dir }}/{{ swpm_archive }} -R {{ target_media_location }}/SWPM/
+#   args:
+#     creates: "{{ target_media_location }}/SWPM/SIGNATURE.SMF"
+
+# - name: Ensure the template is available on the controller
+#   fetch:
+#     dest: /tmp/
+#     src: "{{ target_media_location }}/config/{{ inifile }}"
+#     flat: yes
+
+# - name: Ensure inifile is prepared from template
+#   template:
+#     dest: "{{ target_media_location }}/config/scs.inifile.params"
+#     src: "/tmp/{{ inifile }}"
+
+# - name: "Ensure /usr/sap permissions are correct"
+#   file:
+#      path: "/usr/sap"
+#      state: directory
+#      mode: "0777"
+#      group: "sapsys"
+
+# - name: "Ensure /sapmnt permissions are correct"
+#   file:
+#      path: "/sapmnt"
+#      state: directory
+#      mode: "0777"
+
+# - name: Ensure a temporary directory for executing the installation exists
+#   file:
+#     path: "/tmp/{{ bom_base_name }}"
+#     state: directory
+#     owner: root
+#     group: sapinst
+#     mode: "0777"
+
+# - name: Ensure SCS is present and running
+#   shell: >
+#     {{ target_media_location }}/SWPM/sapinst
+#     SAPINST_XML_FILE="{{ target_media_location }}/config/{{ stack_xml_file }}"
+#     SAPINST_USE_HOSTNAME="{{ scs_hostname }}"
+#     SAPINST_INPUT_PARAMETERS_URL={{ target_media_location }}/config/scs.inifile.params
+#     SAPINST_EXECUTE_PRODUCT_ID="{{ product_id }}"
+#     SAPINST_START_GUI=false
+#     SAPINST_START_GUISERVER=false
+#   args:
+#     chdir: "/tmp/{{ bom_base_name }}"
