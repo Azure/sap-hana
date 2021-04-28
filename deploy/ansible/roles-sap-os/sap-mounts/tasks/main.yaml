@@ -16,7 +16,7 @@
     opts:   defaults
     state:  mounted
   vars:
-    nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS').1 }}"
+    nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
   loop:
     # - { tier: 'all',          type: 'xfs',  src: '/dev/vg_sap/lv_usrsap',                                                       path: '/usr/sap' }
     - { tier: 'all',          type: 'xfs',  src: '/dev/vg_sap/lv_sap',                                                       path: '/usr/sap' }
