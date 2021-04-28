@@ -62,7 +62,7 @@
                                 SAPINST_SKIP_DIALOGS=true                                                                                 \
                                 SAPINST_START_GUISERVER=false
   args:
-    chdir:            /usr/sap/install/EX_SWPM
+    chdir:            /usr/sap/install/SWPM
 #   # Skip when TRUE (test mode)
 #   # when: not test_new_bom
 # # *====================================4=======================================8
