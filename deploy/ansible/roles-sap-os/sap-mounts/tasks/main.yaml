@@ -19,9 +19,9 @@
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_sap/lv_hana_shared',                                                  path: '/hana/shared' }
     - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_shared/lv_shared',                                                  path: '/hana/shared' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_hana_data',                                              path: '/hana/data' }
-    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_data',                                              path: '/hana/data' }
+    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_data/lv_data',                                              path: '/hana/data' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                                                path: '/hana/log' }
-    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_log',                                                path: '/hana/log' }
+    - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_log/lv_log',                                                path: '/hana/log' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_backup/lv_hana_backup',                                          path: '/hana/backup' }
     - { tier: 'web',          type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                                                       path: '/sapmnt' }
     # - { tier: 'pas',          type: 'nfs',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',      path: '/sapmnt/{{ sap_sid|upper }}' }
