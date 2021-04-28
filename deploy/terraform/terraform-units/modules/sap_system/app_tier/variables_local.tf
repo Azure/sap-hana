@@ -228,7 +228,7 @@ locals {
   scs_size = try(var.application.scs_sku, local.app_size)
   web_size = try(var.application.web_sku, local.app_size)
 
-  vm_sizing = length(local.app_size) > 0 ? "New" : "Default"
+  vm_sizing = try(var.application.vm_sizing, length(local.app_size) > 0 ? "New" : "Default")
 
   use_DHCP = try(var.application.use_DHCP, false)
 
@@ -402,9 +402,8 @@ locals {
           type                      = storage_type.name
           lun                       = try(storage_type.lun_start, 0) + idx
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -424,9 +423,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
@@ -464,9 +462,8 @@ locals {
           type                      = storage_type.name
           lun                       = try(storage_type.lun_start, 0) + idx
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -485,9 +482,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
@@ -527,9 +523,8 @@ locals {
           lun                       = try(storage_type.lun_start, 0) + idx
 
         }
-        if !try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && !try(storage_type.append, false)
     ]
   ) : []
 
@@ -548,9 +543,8 @@ locals {
           type                      = storage_type.name
           lun                       = storage_type.lun_start + idx
         }
-        if try(storage_type.append, false)
       ]
-      if storage_type.name != "os"
+      if storage_type.name != "os" && try(storage_type.append, false)
     ]
   ) : []
 
