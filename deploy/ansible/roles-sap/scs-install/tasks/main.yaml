@@ -32,17 +32,16 @@
 
 
 
-
-
 # *====================================4=======================================8
 #   SAP SCS: deploy SCS Parameter file install template
-# - name:               "SAP SCS: deploy SCS Parameter file install template"
-#   template:
-#     src:              ../../BOM_FILES/parameter_files/{{ SAP_BOM }}.j2
-#     dest:             /usr/sap/install/downloads/{{ SAP_BOM }}-{{ ansible_hostname }}.params
-#     mode:             0644
-#     force:            yes
+- name:               "SAP SCS: deploy SCS Parameter file install template"
+  template:
+    src:              "{{ sap_inifile }}"
+    dest:             /usr/sap/install/downloads/{{ bom_base_name }}-{{ ansible_hostname }}.params
+    mode:             0644
+    force:            yes
 # *====================================4=======================================8
+
 
 
 # # *====================================4=======================================8
