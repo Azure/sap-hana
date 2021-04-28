@@ -11,7 +11,7 @@
 #------------------<DEBUGGING>-------------------
 - debug:  
     msg:      "Product: {{ item }}"
-  loop:       "{{ bom.product_ids.scs|flatten(levels=1) }}"
+  loop:       "{{ bom.product_ids|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 # *====================================4=======================================8
 
