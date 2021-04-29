@@ -13,7 +13,7 @@
 - name:  
   set_fact:
     sap_inifile:                  "{{ bom_base_name }}-scs-inifile-param.j2"
-    sap_virtual_hostname:         "{{ ansible_hostname }}"                                  # SAP Install
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"     # SAP Install
 
 # -------------------------------------+---------------------------------------8
 #
@@ -38,7 +38,7 @@
 - name:               "SAP SCS: deploy SCS Parameter file install template"
   template:
     src:              "{{ inventory_dir }}/{{ sap_inifile }}"
-    dest:             /usr/sap/install/downloads/{{ bom_base_name }}-{{ ansible_hostname }}.params
+    dest:             /usr/sap/install/downloads/{{ bom_base_name }}-scs-{{ ansible_hostname }}.params
     mode:             0644
     force:            yes
 # *====================================4=======================================8
@@ -67,9 +67,9 @@
 - name:               "SAP SCS Install"
   shell: |
                       export TMPDIR=/usr/sap/install
-                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-{{ ansible_hostname }}.params \
-                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.scs }}                                                      \
-                                SAPINST_SKIP_DIALOGS=true                                                                                 \
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-scs-{{ ansible_hostname }}.params \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.scs }}                                                          \
+                                SAPINST_SKIP_DIALOGS=true                                                                                     \
                                 SAPINST_START_GUISERVER=false
   args:
     chdir:            /usr/sap/install/SWPM
