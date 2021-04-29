@@ -25,7 +25,7 @@
 #
 # Description:  Download specified BOM Template File
 #S41909SPS03_v1-scs-inifile-param.j2
-- name:             "Download BOM Template: {{ bom_base_name }}"
+- name:             "Download BOM Template: {{ sap_inifile }}"
   get_url:
     url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ sap_inifile }}{{ sapbits_sas_token }}"
     dest:           "{{ inventory_dir }}/{{ bom_base_name }}-scs-inifile-param.j2"
@@ -40,8 +40,8 @@
 
 
 # *====================================4=======================================8
-#   SAP SCS: deploy SCS Parameter file install template
-- name:               "SAP SCS: deploy SCS Parameter file install template"
+#   SAP DBLOAD: deploy DBLOAD Parameter file install template
+- name:               "SAP DBLOAD: deploy DBLOAD Parameter file install template"
   template:
     src:              "{{ inventory_dir }}/{{ sap_inifile }}"
     dest:             /usr/sap/install/downloads/{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params
