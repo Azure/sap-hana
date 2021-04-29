@@ -21,16 +21,9 @@
 
 
   tasks:
-
-  # - set_fact:
-  #     tier:     all                                                             # Acttions for ALL Servers
-
 # -------------------------------------+---------------------------------------8
 #
 # Build the list of tasks to be executed in order here. 
-#
-# - name: "Simple connection test for troubleshooting"
-#   ping:
 #
 # -------------------------------------+---------------------------------------8
 
