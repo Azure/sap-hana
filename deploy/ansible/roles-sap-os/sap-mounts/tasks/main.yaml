@@ -22,7 +22,8 @@
     - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_data/lv_data',                          path: '/hana/data' }
     # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                   path: '/hana/log' }
     - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_log/lv_log',                            path: '/hana/log' }
-    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_backup/lv_hana_backup',             path: '/hana/backup' }
+    # - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',             path: '/hana/backup' }
+    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_backup/lv_backup',                      path: '/hana/backup' }
     - { tier: 'web',          type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt' }
     - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
     - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
