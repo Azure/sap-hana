@@ -45,8 +45,8 @@
 # Description: 
 #              
 #
-  # - include_role:
-  #     name:     roles-sap/5.1-dbload
+  - include_role:
+      name:     roles-sap/5.1-dbload
 
 
 ...
