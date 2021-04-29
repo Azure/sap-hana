@@ -3,36 +3,30 @@
 # |            Role to set kernel parameters for general hardening             |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
-# Description:  Download the specified BOM file to the ansible controller.
-#               Download any dependent BOM files to the ansible controller.
-#               Create Download directories, both static and dynamic.
-#               Download all media from BOMs to the SCS
-#
-#
+# Description:  A set of common parameters recommeneded from CIS, RH and SUSE -
+#               are applied to the host along with some distro specific params.
+#               
 # Objects:
 #   External:
-#             sapbits_location_base_path      - URL of Blob Storage
-#             sapbits_bom_files               - path to the root of the sap file store
-#             bom_base_name                   - Name of BOM
-#             sapbits_sas_token               - SAS Token
-#             inventory_dir                   - Path to the inventory location on the ansible controller
+#             parameters.yaml                  - parameter file 
 #
 #   Internal:
-#             result                          - objet to store the results of a task execution
+#             getparamlistforapply             - object to store the params 
+#                                                applicable for a host
 #
 #   Created:
-#             bom                             - object containing the specified BOM
+#             
 #
 # -------------------------------------+---------------------------------------8
 # Reviews:
 #
-# 04/22/2021  Morgan Deegan       Reviewed - Complete
+# 
 #
 # -------------------------------------+---------------------------------------8
 ---
 # -------------------------------------+---------------------------------------8
 #
-# Task: 1.30    - Prometheus
+#   Task: 1.9                                  - kernel parameters
 #
 # -------------------------------------+---------------------------------------8
 
@@ -41,62 +35,47 @@
 # <Comment Header>
 #
 # -------------------------------------+---------------------------------------8
-- name: Ensure parameters are available
-  include_vars: parameters.yaml
+- name:                                        Ensure parameters are available
+  include_vars:                                parameters.yaml
 
-#----------------------------------------
+# ----------------------------------------
 # BEGIN
-#----------------------------------------
+# ----------------------------------------
 
-- name: Gather list of parameters which need to be applied
+- name:                                        Gather list of parameters which need to be applied
   set_fact:
-    all_settings: '{{ (parameters["common"] + (parameters[distro_id]|default([]))) | unique }}'
+    getparamlistforapply:                      '{{ 
+                                                  (
+                                                    parameters["common"] 
+                                                    + 
+                                                    (
+                                                      parameters[distro_id]|default([])
+                                                    )
+                                                  ) | unique 
+                                                }}'
 
-#print only when -vv, otherwise you will have terminal nausea
-- debug:
-    var: all_settings
-    verbosity: 2
+# print only when -vv, otherwise you will have terminal nausea
+- name:                                        "Display parameters which will be applied"
+  ansible.builtin.debug:
+    var:                                       getparamlistforapply
+    verbosity:                                 2
 
-- debug:
-    msg: " {{ all_settings | type_debug }} "
-    verbosity: 2
-
-#- name: Count our fruit
-#  ansible.builtin.debug:
-#    msg: "{{ item }} with index {{ my_idx }}"
-#  loop: "{{ all_settings }}"
-#  loop_control:
-#    index_var: my_idx
-
-- name: Set relevant kernel parameters
-  become: true
+- name:                                        Set relevant kernel parameters
+  become:                                      true
   sysctl:
-    name: "{{ item.name }}"
-    value: "{{ item.value }}"
-    state: "{{item.state}}"
-    sysctl_set: yes
-    reload: yes
-    ignoreerrors: yes
-  loop: "{{all_settings}}"
+    name:                                      "{{ item.name }}"
+    value:                                     "{{ item.value }}"
+    state:                                     "{{item.state}}"
+    sysctl_set:                                yes
+    reload:                                    yes
+    ignoreerrors:                              yes
+  loop:                                        "{{ getparamlistforapply }}"
 
-#all_settings: '{{ distro_exists|bool | ternary(parameters["common"]|combine(parameters[distro_id]), parameters["common"] ) }}'
-#- name: Ensure variables are available
-#  include_vars: parameters.yaml
-
-#- name: combine list of parameters
-#  set_fact:
-#          all_settings="{{ parameters["common"]|union(parameters[distro_id]) }}"
-#- debug:
-#        var: all_settings
-
-# - include_tasks: common-hardening-all.yaml
-#   loop: "{{ sap_swap }}"
-#   when: (item.tier != "HLI") and (item.tier == "all" or item.tier == tier)
-#----------------------------------------
+# ----------------------------------------
 # END
-#----------------------------------------
+# ----------------------------------------
 
----
+...
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
 # +------------------------------------4--------------------------------------*/

@@ -51,7 +51,6 @@ parameters:
 
     suse15:
       - { name: 'net.core.bpf_jit_harden',                       value: '2',  state: 'present' }
-      - { name: 'dev.tty.ldisc_autoload',                        value: '0',  state: 'present' }
       - { name: 'fs.protected_fifos',                            value: '2',  state: 'present' }
       - { name: 'fs.protected_regular',                          value: '2',  state: 'present' }
       - { name: 'kernel.suid_dumpable',                          value: '0',  state: 'present' }
@@ -60,7 +59,6 @@ parameters:
       - { name: 'fs.protected_symlinks',                         value: '1',  state: 'present' }
 
     suse12:
-      - { name: 'dev.tty.ldisc_autoload',                        value: '0',  state: 'present' }
       - { name: 'fs.protected_fifos',                            value: '2',  state: 'present' }
       - { name: 'fs.protected_regular',                          value: '2',  state: 'present' }
       - { name: 'kernel.suid_dumpable',                          value: '0',  state: 'present' }
