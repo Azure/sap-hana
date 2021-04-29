@@ -12,7 +12,8 @@
 
 - name:  
   set_fact:
-    sap_inifile:    "{{ bom_base_name }}-scs-inifile-param.j2"
+    sap_inifile:                  "{{ bom_base_name }}-scs-inifile-param.j2"
+    sap_virtual_hostname:         "{{ ansible_hostname }}"                                  # SAP Install
 
 # -------------------------------------+---------------------------------------8
 #
@@ -50,7 +51,7 @@
       - "Product              : {{ bom.product_ids.scs }}"
       - "SAP SID              : {{ sap_sid }}"
       - "Instance Number - SCS: {{ scs_instance_number }}"
-      - "Virtual Hostname     : {{ ansible_hostname }}"
+      - "Virtual Hostname     : {{ sap_virtual_hostname }}"
       - "FQDN                 : {{ sap_fqdn }}"
       - "Master Password      : {{ password_master }}"
       - "sapadm UID           : {{ sapadm_uid }}"
