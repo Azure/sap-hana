@@ -56,7 +56,6 @@
     state:  directory
     mode:   0755
   loop:
-    - { path: '/usr/sap/install/CD_DBEXPORT' }
     - { path: '/usr/sap/install/downloads' }
     - { path: '/usr/sap/install/download_basket' }
 
