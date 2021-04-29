@@ -31,7 +31,7 @@
 # -------------------------------------+---------------------------------------8
 
   - set_fact:
-      tier:     hdb                                                             # Acttions for HANA DB Servers
+      tier:     hdb                                                             # Actions for HANA DB Servers
 
 # -------------------------------------+---------------------------------------8
 # Role: sap-mounts

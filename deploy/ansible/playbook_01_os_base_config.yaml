@@ -30,7 +30,7 @@
   tasks:
 
   # - set_fact:
-  #     tier:     all                                                             # Acttions for ALL Servers
+  #     tier:     all                                                             # Actions for ALL Servers
 
 # -------------------------------------+---------------------------------------8
 #
