@@ -65,7 +65,7 @@
   sysctl:
     name:                                      "{{ item.name }}"
     value:                                     "{{ item.value }}"
-    state:                                     "{{item.state}}"
+    state:                                     "{{ item.state }}"
     sysctl_set:                                yes
     reload:                                    yes
     ignoreerrors:                              yes
