@@ -28,7 +28,7 @@
 - name:             "Download BOM Template: {{ sap_inifile }}"
   get_url:
     url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ sap_inifile }}{{ sapbits_sas_token }}"
-    dest:           "{{ inventory_dir }}/{{ bom_base_name }}-scs-inifile-param.j2"
+    dest:           "{{ inventory_dir }}/{{ sap_inifile }}"
     mode:           0644
   register:         result
   until:            result is succeeded
