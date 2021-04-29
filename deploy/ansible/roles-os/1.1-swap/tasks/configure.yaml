@@ -1,45 +1,32 @@
 ---
 
-- name:         "Ensure /mnt/resource directory exists"
+- name:                           "Ensure /mnt/resource directory exists"
   file:
-    path:       "/mnt/resource"
-    state:      directory
-    mode:       "0755"
+    path:                         "/mnt/resource"
+    state:                        directory
+    mode:                         "0755"
   notify:
     - "Ensure waagent is restarted"
 
-- name:         "validate /mnt/resource directory exists"
+- name:                           "validate /mnt/resource directory exists"
   stat:
-    path:       "/mnt/resource"
-  register:     swapfsdata
+    path:                         "/mnt/resource"
+  register:                       swapfsdata
 
-- name:         "Ensure Resource disk is formatted if it is not formatted"
+- name:                           "Ensure waagent file is configured with proper parameters"
   lineinfile:
-    state:      present
-    dest:       /etc/waagent.conf
-    regexp:     'ResourceDisk.Format='
-    line:       'ResourceDisk.Format=y'
-  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
-  notify:
-    - "Ensure waagent is restarted"
-
-- name:         "Ensure swap is enabled"
-  lineinfile:
-    state:      present
-    dest:       /etc/waagent.conf
-    regexp:     'ResourceDisk.EnableSwap='
-    line:       'ResourceDisk.EnableSwap=y'
-  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
-  notify:
-    - "Ensure waagent is restarted"
-
-- name:         "Ensure swapfile size"
-  lineinfile:
-    state:      present
-    dest:       /etc/waagent.conf
-    regexp:     'ResourceDisk.SwapSizeMB='
-    line:       'ResourceDisk.SwapSizeMB={{ item.swap_size_mb | default(2052) }}'
-  when:         swapfsdata.stat.exists and swapfsdata.stat.isdir
+    dest:                         /etc/waagent.conf  
+    state:                        "{{ waagentconf.state }}"
+    regexp:                       "{{ waagentconf.regexp }}"
+    line:                         "{{ waagentconf.line }}"
+  loop:
+    - { state: 'present', regexp: 'ResourceDisk.Format=',     line: 'ResourceDisk.Format=y' }
+    - { state: 'present', regexp: 'ResourceDisk.EnableSwap=', line: 'ResourceDisk.EnableSwap=y' }
+    - { state: 'present', regexp: 'ResourceDisk.SwapSizeMB=', line: 'ResourceDisk.SwapSizeMB={{ item.swap_size_mb | default(2052) }}' }
+  loop_control:
+    loop_var:                     waagentconf
+  when:                           swapfsdata.stat.exists and swapfsdata.stat.isdir
+  register:                       swapfilemodified
   notify:
     - "Ensure waagent is restarted"
 
