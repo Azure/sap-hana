@@ -48,3 +48,38 @@ parameters:
 
     suse15:
       - { name: 'net.core.bpf_jit_harden',                     value: '2',  state: 'present' }
+      - { name: 'dev.tty.ldisc_autoload', value: '0' }
+      - { name: 'fs.protected_fifos', value: '2' }
+      - { name: 'fs.protected_hardlinks', value: '1' }
+      - { name: 'fs.protected_regular', value: '2' }
+      - { name: 'fs.protected_symlinks', value: '1' }
+      - { name: 'fs.suid_dumpable', value: '0' }
+      - { name: 'kernel.suid_dumpable', value: '0' }
+      - { name: 'kernel.unprivileged_bpf_disabled', value: '1' }
+    suse12:
+      - { name: 'dev.tty.ldisc_autoload', value: '0' }
+      - { name: 'fs.protected_fifos', value: '2' }
+      - { name: 'fs.protected_hardlinks', value: '1' }
+      - { name: 'fs.protected_regular', value: '2' }
+      - { name: 'fs.protected_symlinks', value: '1' }
+      - { name: 'fs.suid_dumpable', value: '0' }
+      - { name: 'kernel.suid_dumpable', value: '0' }
+      - { name: 'kernel.unprivileged_bpf_disabled', value: '1' }
+
+    redhat7:
+      - { name: 'fs.suid_dumpable', value: '0' }
+      - { name: 'fs.protected_hardlinks', value: '1' }
+      - { name: 'fs.protected_symlinks', value: '1' }
+      - { name: 'kernel.yama.ptrace_scope', value: '1' }
+      - { name: 'net.core.bpf_jit_harden', value: '2' }
+    
+    redhat8:
+      - { name: 'fs.suid_dumpable', value: '0' }
+      - { name: 'fs.protected_hardlinks', value: '1' }
+      - { name: 'fs.protected_symlinks', value: '1' }
+      - { name: 'kernel.yama.ptrace_scope', value: '1' }
+      - { name: 'net.core.bpf_jit_harden', value: '2' }
+      - { name: 'fs.protected_fifos', value: '2' }
+      - { name: 'fs.protected_regular', value: '2' }
+
+...
