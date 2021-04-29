@@ -1,0 +1,145 @@
+---
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role for ensuring the entries are added in the host file        |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.12     - hosts file setup
+#
+# -------------------------------------+---------------------------------------8
+
+
+
+
+# TODO:
+#       1) Process the ansible config file and add correct entries in the host file 
+
+
+
+
+#----------------------------------------
+# BEGIN CODE
+#----------------------------------------
+---
+- debug:
+    msg:
+      - "sap_hostname = {{ sap_hostname }}"
+      - "sap_fqdn = {{ sap_fqdn }}"
+      - "sap_ip = {{ sap_ip }}"
+
+- name: Get all hostname aliases of {{ sap_ip }}
+  shell: |
+    awk '( $1 == "{{ sap_ip }}" ) {
+      for (i=2; i<=NF; ++i) {
+        if (( $i != "{{ sap_hostname }}" ) && ( $i != "{{ sap_hostname }}.{{ sap_fqdn }}" )) { printf " "$i }
+      }
+    }' /etc/hosts
+  register: sap_hostname_aliases
+  changed_when: false
+
+- name: Print hostname aliases
+  debug:
+    var=sap_hostname_aliases
+
+- name: Check if ipv4 address, FQDN, and hostname are in /etc/hosts
+  block:
+    - name: Perform the /etc/hosts completeness check
+      command: bash -lc "awk 'BEGIN{a=0}/{{ sap_ip }}/&&/{{ sap_hostname }}.{{ sap_fqdn }}/&&/{{ sap_hostname }}/{a++}END{print a}' /etc/hosts"
+      register: command_result
+      changed_when: false
+    - debug:
+        var: command_result.stdout_lines, command_result.stderr_lines
+    - debug:
+        msg:
+          - "Expected:"
+          - "{{ sap_ip }} {{ sap_hostname }}.{{ sap_fqdn }} {{ sap_hostname }}"
+      when:
+        - command_result.stdout != "1"
+
+    - fail:
+        msg:
+          - "Server's ip4 address, FQDN, or hostname are not in /etc/hosts!"
+          - "Expected:"
+          - "{{ sap_ip }} {{ sap_hostname }}.{{ sap_fqdn }} {{ sap_hostname }}"
+      when:
+        - command_result.stdout != "1"
+      ignore_errors: "{{ ansible_check_mode }}"
+
+  when:
+    - not sap_preconfigure_modify_etc_hosts | bool
+
+- debug:
+    msg:
+      - "System {{ sap_hostname }}, {{ sap_hostname }}.{{ sap_fqdn }} has ipv4 address {{ sap_ip }}."
+
+# We allow more than one line containing sap_ip:
+- name: Check for duplicate entries of {{ sap_ip }} in /etc/hosts
+  shell: |
+    n=$(grep "^{{ sap_ip }}\s" /etc/hosts | wc -l)
+    if [ $n -gt 1 ]; then
+      echo "Duplicate IP entry in /etc/hosts!"
+      exit 1
+    else
+      exit 0
+    fi
+  register: shell_result
+  changed_when: false
+  ignore_errors: yes
+  when: not ansible_check_mode
+
+- name: Verify that variable sap_fqdn is set
+  assert:
+    that:
+      not( (sap_fqdn is undefined) or (sap_fqdn is none) or (sap_fqdn | trim == '') )
+    msg: "Variable 'sap_fqdn' is undefined or empty. Please define it in defaults/main.yml or via --extra-vars!"
+
+- debug:
+    msg:
+      - "More than one line containing {{ sap_ip }}. File /etc/hosts will not be modified."
+  when:
+    - not ansible_check_mode
+    - shell_result.stdout == 'Duplicate IP entry in /etc/hosts!'
+    - sap_preconfigure_modify_etc_hosts | bool
+
+- name: Ensure that the entry in /etc/hosts is correct
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^{{ sap_ip }}\s'
+    line: "{{ sap_ip }} {{ sap_hostname }}.{{ sap_fqdn }} {{ sap_hostname }}{{sap_hostname_aliases.stdout }}"
+    backup: yes
+  when:
+    - not ansible_check_mode
+    - sap_fqdn != ''
+    - shell_result.stdout != 'Duplicate IP entry in /etc/hosts!'
+    - sap_preconfigure_modify_etc_hosts | bool
+
+- name: Check for duplicate or missing entries of hostname and fqdn in /etc/hosts
+  shell: |
+    n=$(grep -w "{{ line_item }}" /etc/hosts | wc -l)
+    if [ $n -eq 1 ]; then
+      exit 0
+    else
+      exit 1
+    fi
+  with_items:
+    - '{{ sap_hostname }}.{{ sap_fqdn }}'
+    - '{{ sap_hostname }}'
+  changed_when: false
+  loop_control:
+    loop_var: line_item
+  when: not ansible_check_mode
+
+- name: Check hostname -s and hostname -f settings
+  shell: test "$(hostname -s)" = "$(hostname)" -a "$(hostname -f)" = "$(hostname).$(hostname -d)"
+  changed_when: false
+
+...
+
+#----------------------------------------
+# END CODE
+#----------------------------------------
+
+...

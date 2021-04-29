@@ -37,7 +37,8 @@ sapsys_gid:                   2000
 scs_hostname:                 ""
 scs_instance_number:          "00"
 sidadm_uid:                   2000
-sap_hostname: '{{ ansible_hostname }}'
+sap_hostname:                 '{{ ansible_hostname }}'
+sap_ip:                       '{{ ansible_default_ipv4.address }}
 
 orchestration_ansible_user:   azureadm
 
