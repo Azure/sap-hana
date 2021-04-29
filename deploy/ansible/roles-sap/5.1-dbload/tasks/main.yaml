@@ -13,6 +13,7 @@
 - name:  
   set_fact:
     sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
+#   scsVirtualHostname
     sap_virtual_hostname:         "{{ ansible_hostname }}"                         # SAP Install
     sap_db_hostname:              "{{ ansible_hostname }}"                         # SAP Install
     sap_cd_package_hdbclient:     /usr/sap/install/CD_HDBCLIENT
@@ -67,21 +68,21 @@
 #------------------</DEBUGGING>------------------
 
 
-# # *====================================4=======================================8
-# #   SAP DBLOAD: Install
-# # 2230669 - System Provisioning Using a Parameter Input File
-# #
-# - name:               "SAP DBLOAD Install"
-#   shell: |
-#                       export TMPDIR=/usr/sap/install
-#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params \
-#                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.dbl }}                                                      \
-#                                 SAPINST_SKIP_DIALOGS=true                                                                                 \
-#                                 SAPINST_START_GUISERVER=false
-#   args:
-#     chdir:            /usr/sap/install/SWPM
-#   # Skip when TRUE (test mode)
-#   # when: not test_new_bom
-# # *====================================4=======================================8
+# *====================================4=======================================8
+#   SAP DBLOAD: Install
+# 2230669 - System Provisioning Using a Parameter Input File
+#
+- name:               "SAP DBLOAD Install"
+  shell: |
+                      export TMPDIR=/usr/sap/install
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.dbl }}                                                      \
+                                SAPINST_SKIP_DIALOGS=true                                                                                 \
+                                SAPINST_START_GUISERVER=false
+  args:
+    chdir:            /usr/sap/install/SWPM
+  # Skip when TRUE (test mode)
+  # when: not test_new_bom
+# *====================================4=======================================8
 
 
