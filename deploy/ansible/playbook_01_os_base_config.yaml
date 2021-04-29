@@ -41,6 +41,10 @@
 #
 # -------------------------------------+---------------------------------------8
 
+  # Specify the active tier for this playbook run
+  - set_fact:
+      tier:     os
+
   - include_role:
       name:     roles-os/1.1-swap
 

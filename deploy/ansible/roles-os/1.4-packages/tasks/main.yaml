@@ -1,4 +1,5 @@
-# /*----------------------------------------------------------------------------8
+---
+# /*---------------------------------------------------------------------------8
 # |                                                                            |
 # |               Task: 1.4       - Package Installation for OS                |
 # |                                                                            |
@@ -7,11 +8,36 @@
 - name:             1.4 - Import package list
   include_vars:     os-packages.yaml
 
-- name:             "1.4 - Install OS packages: {{ ansible_os_family|upper }}-{{ ansible_distribution_major_version }}"
+# Analyse the package list for this distribution selecting only those
+# packages assigned to the active tier or 'all'.
+- name:             Determine packages appropriate for tier
+  set_fact:
+    packages_for_tier: "{{ packages[distro_id] |
+                           selectattr('tier', 'in', ['all', tier]) |
+                           list }}"
+
+# Print list of matching packages if verbosity it 1 or greater
+- debug:
+    var: packages_for_tier
+    verbosity: 1
+
+# Extract the list of package names whose state match the specified value and
+# pass them as the argument to the name parameter; this is the recommended
+# approach as it only calls the underlying distro specific package manager
+# once per state value.
+# TODO: Do we want to remap 'present' to 'latest' to install latest version
+# for packages that may not be up-to-date?
+- name:             "1.4 - Update OS packages: {{ distro_name }}"
   package:
-    name:           "{{ item }}" 
-    state:          present
-  loop:             "{{ packages[ansible_os_family|lower + ansible_distribution_major_version] }}"
+    name:           "{{ packages_for_tier |
+                        selectattr('state', 'equalto', item.state) |
+                        map(attribute='package') |
+                        list }}"
+    state:          "{{ item.state }}"
+  loop:
+    - { state: 'present' }  # First install required packages
+    - { state: 'absent' }   # Then remove packages that we don't want
+
 
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |

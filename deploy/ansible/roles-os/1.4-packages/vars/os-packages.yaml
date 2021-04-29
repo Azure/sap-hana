@@ -1,81 +1,95 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.4       - Package lists per OS                       |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# For each supported 'distro_id' we want a list of dictionary entries that
+# specify the associated tier (or 'all' to always match), the package name,
+# and whether we want the package to be installed (present) or removed
+# (absent). See the definition of 'distro_id' to determine what to use when
+# creating an entry for a new distribution.
 packages:
     redhat7:
-      - "@base"
-      - gtk2
-      - libicu
-      - xulrunner
-      - sudo
-      - tcsh
-      - libssh2
-      - expect
-      - cairo
-      - graphviz
-      - iptraf-ng
-      - krb5-workstation
-      - krb5-libs
-      - libpng12
-      - nfs-utils
-      - lm_sensors
-      - rsyslog
-      - openssl
-      - PackageKit-gtk3-module
-      - libcanberra-gtk2
-      - libtool-ltdl
-      - xorg-x11-xauth 
-      - numactl
-      - xfsprogs
-      - net-tools
-      - bind-utils
-      - chrony
-      - gdisk
-      - sg3_utils
-      - lvm2
-      - numad
-      - cifs-utils
+      - { tier: 'os', package: '@base',                  state: 'present' }
+      - { tier: 'os', package: 'gtk2',                   state: 'present' }
+      - { tier: 'os', package: 'libicu',                 state: 'present' }
+      - { tier: 'os', package: 'xulrunner',              state: 'present' }
+      - { tier: 'os', package: 'sudo',                   state: 'present' }
+      - { tier: 'os', package: 'tcsh',                   state: 'present' }
+      - { tier: 'os', package: 'libssh2',                state: 'present' }
+      - { tier: 'os', package: 'expect',                 state: 'present' }
+      - { tier: 'os', package: 'cairo',                  state: 'present' }
+      - { tier: 'os', package: 'graphviz',               state: 'present' }
+      - { tier: 'os', package: 'iptraf-ng',              state: 'present' }
+      - { tier: 'os', package: 'krb5-workstation',       state: 'present' }
+      - { tier: 'os', package: 'krb5-libs',              state: 'present' }
+      - { tier: 'os', package: 'libpng12',               state: 'present' }
+      - { tier: 'os', package: 'nfs-utils',              state: 'present' }
+      - { tier: 'os', package: 'lm_sensors',             state: 'present' }
+      - { tier: 'os', package: 'rsyslog',                state: 'present' }
+      - { tier: 'os', package: 'openssl',                state: 'present' }
+      - { tier: 'os', package: 'PackageKit-gtk3-module', state: 'present' }
+      - { tier: 'os', package: 'libcanberra-gtk2',       state: 'present' }
+      - { tier: 'os', package: 'libtool-ltdl',           state: 'present' }
+      - { tier: 'os', package: 'xorg-x11-xauth',         state: 'present' }
+      - { tier: 'os', package: 'numactl',                state: 'present' }
+      - { tier: 'os', package: 'xfsprogs',               state: 'present' }
+      - { tier: 'os', package: 'net-tools',              state: 'present' }
+      - { tier: 'os', package: 'bind-utils',             state: 'present' }
+      - { tier: 'os', package: 'chrony',                 state: 'present' }
+      - { tier: 'os', package: 'gdisk',                  state: 'present' }
+      - { tier: 'os', package: 'sg3_utils',              state: 'present' }
+      - { tier: 'os', package: 'lvm2',                   state: 'present' }
+      - { tier: 'os', package: 'numad',                  state: 'present' }
+      - { tier: 'os', package: 'cifs-utils',             state: 'present' }
 
     redhat8:
-      - "@base"
-      - gtk2
-      - libicu
-      - sudo
-      - tcsh
-      - libssh2
-      - expect
-      - cairo
-      - graphviz
-      - iptraf-ng
-      - krb5-workstation
-      - krb5-libs
-      - libpng12
-      - nfs-utils
-      - lm_sensors
-      - rsyslog
-      - openssl
-      - PackageKit-gtk3-module
-      - libcanberra-gtk2
-      - libtool-ltdl
-      - xorg-x11-xauth 
-      - numactl
-      - xfsprogs
-      - net-tools
-      - bind-utils
-      - chrony
-      - gdisk
-      - sg3_utils
-      - lvm2
-      - numad
-      - cifs-utils      
+      - { tier: 'os', package: '@base',                  state: 'present' }
+      - { tier: 'os', package: 'gtk2',                   state: 'present' }
+      - { tier: 'os', package: 'libicu',                 state: 'present' }
+      - { tier: 'os', package: 'sudo',                   state: 'present' }
+      - { tier: 'os', package: 'tcsh',                   state: 'present' }
+      - { tier: 'os', package: 'libssh2',                state: 'present' }
+      - { tier: 'os', package: 'expect',                 state: 'present' }
+      - { tier: 'os', package: 'cairo',                  state: 'present' }
+      - { tier: 'os', package: 'graphviz',               state: 'present' }
+      - { tier: 'os', package: 'iptraf-ng',              state: 'present' }
+      - { tier: 'os', package: 'krb5-workstation',       state: 'present' }
+      - { tier: 'os', package: 'krb5-libs',              state: 'present' }
+      - { tier: 'os', package: 'libpng12',               state: 'present' }
+      - { tier: 'os', package: 'nfs-utils',              state: 'present' }
+      - { tier: 'os', package: 'lm_sensors',             state: 'present' }
+      - { tier: 'os', package: 'rsyslog',                state: 'present' }
+      - { tier: 'os', package: 'openssl',                state: 'present' }
+      - { tier: 'os', package: 'PackageKit-gtk3-module', state: 'present' }
+      - { tier: 'os', package: 'libcanberra-gtk2',       state: 'present' }
+      - { tier: 'os', package: 'libtool-ltdl',           state: 'present' }
+      - { tier: 'os', package: 'xorg-x11-xauth',         state: 'present' }
+      - { tier: 'os', package: 'numactl',                state: 'present' }
+      - { tier: 'os', package: 'xfsprogs',               state: 'present' }
+      - { tier: 'os', package: 'net-tools',              state: 'present' }
+      - { tier: 'os', package: 'bind-utils',             state: 'present' }
+      - { tier: 'os', package: 'chrony',                 state: 'present' }
+      - { tier: 'os', package: 'gdisk',                  state: 'present' }
+      - { tier: 'os', package: 'sg3_utils',              state: 'present' }
+      - { tier: 'os', package: 'lvm2',                   state: 'present' }
+      - { tier: 'os', package: 'numad',                  state: 'present' }
+      - { tier: 'os', package: 'cifs-utils',             state: 'present' }
 
-    suse12: 
-      - libyui-qt-pkg7
-      - glibc
-      - systemd
-      - tuned
-      - numad
+    suse12:
+      - { tier: 'os', package: 'libyui-qt-pkg7', state: 'present' }
+      - { tier: 'os', package: 'glibc',          state: 'present' }
+      - { tier: 'os', package: 'systemd',        state: 'present' }
+      - { tier: 'os', package: 'tuned',          state: 'present' }
+      - { tier: 'os', package: 'numad',          state: 'present' }
+      - { tier: 'os', package: 'ntp',            state: 'absent' }
 
-    suse15: 
-      - libyui-qt-pkg11
-      - glibc
-      - systemd
-      - tuned
-      - numad     
+    suse15:
+      - { tier: 'os', package: 'libyui-qt-pkg11', state: 'present' }
+      - { tier: 'os', package: 'glibc',           state: 'present' }
+      - { tier: 'os', package: 'systemd',         state: 'present' }
+      - { tier: 'os', package: 'tuned',           state: 'present' }
+      - { tier: 'os', package: 'numad',           state: 'present' }
+      - { tier: 'os', package: 'ntp',             state: 'absent' }

@@ -76,11 +76,12 @@ do
 #       1) Make SID in inventory file name a parameter.
 #       2) Convert file extension to yaml.
 #       3) Find more secure way to handle the ssh private key so it is not exposed.
-        ansible-playbook                                                                                                \
+        ansible-playbook                                                                  \
           --inventory   X00_hosts.yaml                                                    \
           --user        azureadm                                                          \
           --private-key sshkey                                                            \
           --extra-vars="@sap-parameters.yaml"                                             \
+	  "${@}"                                                                          \
           ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/${playbook}
           break
 done
