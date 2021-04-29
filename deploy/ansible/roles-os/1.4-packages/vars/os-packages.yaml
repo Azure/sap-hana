@@ -79,6 +79,7 @@ packages:
       - { tier: 'os', package: 'cifs-utils',             state: 'present' }
 
     suse12:
+      - { tier: 'os', package: 'chrony',         state: 'present' }
       - { tier: 'os', package: 'libyui-qt-pkg7', state: 'present' }
       - { tier: 'os', package: 'glibc',          state: 'present' }
       - { tier: 'os', package: 'systemd',        state: 'present' }
@@ -87,6 +88,7 @@ packages:
       - { tier: 'os', package: 'ntp',            state: 'absent' }
 
     suse15:
+      - { tier: 'os', package: 'chrony',          state: 'present' }
       - { tier: 'os', package: 'libyui-qt-pkg11', state: 'present' }
       - { tier: 'os', package: 'glibc',           state: 'present' }
       - { tier: 'os', package: 'systemd',         state: 'present' }

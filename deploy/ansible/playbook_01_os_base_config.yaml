@@ -61,6 +61,9 @@
       name:     roles-os/1.4-packages
 
   - include_role:
+      name:     roles-os/1.7-chrony
+
+  - include_role:
       name:     roles-os/1.20-prometheus
     when:   prometheus
             and             ansible_os_family|upper == "SUSE"

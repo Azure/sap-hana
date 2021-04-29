@@ -10,6 +10,9 @@
 #           --extra-vars="@sap-parameters.yaml"                                                                           \
 #           ~/Azure_SAP_Automated_Deployment/centiq-sap-hana/deploy/ansible/${playbook}
 
+# OS Config Settings variables
+chrony_pool:                  ""
+chrony_servers:               []
 
 # BoM Processing variables
 sapbits_location_base_path:   ""                                                        # REQUIRED
