@@ -16,8 +16,8 @@
 #   scsVirtualHostname
     sap_virtual_hostname:         x00scs00lee4                                     # SAP Install
     sap_db_hostname:              x00dhdb00l0ee4                                   # SAP Install
-    sap_cd_package_hdbclient:     /usr/sap/install/CD_HDBCLIENT
-    sap_cd_package_cd1:           /usr/sap/install/CD_DBEXPORT
+    sap_cd_package_hdbclient:     
+    sap_cd_package_cd1:           
     sap_cd_package_cd2:           
     sap_cd_package_cd3:           
     sap_cd_package_cd4:           
