@@ -60,11 +60,10 @@
 #------------------</DEBUGGING>------------------
 
 
-# # *====================================4=======================================8
-# #   SAP SCS: Install
-# # 2230669 - System Provisioning Using a Parameter Input File
-#             # SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:BW4HANA10SR1.CORE.HDB.ABAP \
-#             # SAPINST_EXECUTE_PRODUCT_ID=NW_ABAP_ASCS:NW750.HDB.ABAP \
+# *====================================4=======================================8
+#   SAP SCS: Install
+# 2230669 - System Provisioning Using a Parameter Input File
+#
 - name:               "SAP SCS Install"
   shell: |
                       export TMPDIR=/usr/sap/install
@@ -74,9 +73,9 @@
                                 SAPINST_START_GUISERVER=false
   args:
     chdir:            /usr/sap/install/SWPM
-#   # Skip when TRUE (test mode)
-#   # when: not test_new_bom
-# # *====================================4=======================================8
+  # Skip when TRUE (test mode)
+  # when: not test_new_bom
+# *====================================4=======================================8
 
 
 

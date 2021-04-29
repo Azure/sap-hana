@@ -1,6 +1,6 @@
-# /*----------------------------------------------------------------------------8
+# /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                       Playbook for SAP SCS Install                          |
+# |                       Playbook for SAP SCS Install                         |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -15,7 +15,7 @@
   become_user:    root
   gather_facts:   true
   vars_files:
-    - vars/ansible-input-api.yaml                               # API Input template with defaults
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
 
 
   tasks:
@@ -29,10 +29,10 @@
       tier:     scs
 
   - include_role:
-      name:     roles-sap/scs-install
+      name:     roles-sap/5.0.0-scs-install
 
 
 ...
-# /*----------------------------------------------------------------------------8
-# |                                    END                                      |
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
 # +------------------------------------4--------------------------------------*/
