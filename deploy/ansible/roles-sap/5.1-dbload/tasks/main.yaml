@@ -14,8 +14,8 @@
   set_fact:
     sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
 #   scsVirtualHostname
-    sap_virtual_hostname:         "{{ ansible_hostname }}"                         # SAP Install
-    sap_db_hostname:              "{{ ansible_hostname }}"                         # SAP Install
+    sap_virtual_hostname:         x00scs00lee4                                     # SAP Install
+    sap_db_hostname:              x00dhdb00l0ee4                                   # SAP Install
     sap_cd_package_hdbclient:     /usr/sap/install/CD_HDBCLIENT
     sap_cd_package_cd1:           /usr/sap/install/CD_DBEXPORT
     sap_cd_package_cd2:           
