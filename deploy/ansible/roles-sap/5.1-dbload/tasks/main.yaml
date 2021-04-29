@@ -9,13 +9,14 @@
     name:           bom
 
 # *====================================4=======================================8
+    # Get all the hostnames in <SID>_SCS group and return only the first hostname
+    nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
 
 - name:  
   set_fact:
     sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
-#   scsVirtualHostname
-    sap_virtual_hostname:         x00scs00lee4                                     # SAP Install
-    sap_db_hostname:              x00dhdb00l0ee4                                   # SAP Install
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
     sap_cd_package_hdbclient:     
     sap_cd_package_cd1:           
     sap_cd_package_cd2:           
@@ -76,8 +77,8 @@
   shell: |
                       export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params \
-                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.dbl }}                                                      \
-                                SAPINST_SKIP_DIALOGS=true                                                                                 \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.dbl }}                                                             \
+                                SAPINST_SKIP_DIALOGS=true                                                                                        \
                                 SAPINST_START_GUISERVER=false
   args:
     chdir:            /usr/sap/install/SWPM
