@@ -20,17 +20,7 @@
 
 - name:  
   set_fact:
-    sap_cd_package_hdbclient:     
-    sap_cd_package_cd1:           
-    sap_cd_package_cd2:           
-    sap_cd_package_cd3:           
-    sap_cd_package_cd4:           
-    sap_cd_package_cd5:           
     sap_inifile:                  "{{ bom_base_name }}-pas-inifile-param.j2"
-    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
-    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-    sap_ciVirtualHostname:        x01app00lab3
 
 # -------------------------------------+---------------------------------------8
 #
@@ -64,6 +54,16 @@
     sap_ciBtcWPNumber:            8
     sap_installSAPHostAgent:      "false"
     sap_ciInstanceNumber:         '00'
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
+    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
+    sap_ciVirtualHostname:        x01app00lab3
+    sap_cd_package_hdbclient:     
+    sap_cd_package_cd1:           
+    sap_cd_package_cd2:           
+    sap_cd_package_cd3:           
+    sap_cd_package_cd4:           
+    sap_cd_package_cd5:           
 
 # *====================================4=======================================8
 
