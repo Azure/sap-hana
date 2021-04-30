@@ -30,7 +30,6 @@
     sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
     sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
     sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-    sap_ciInstanceNumber:         00
     sap_ciVirtualHostname:        x01app00lab3
 
 # -------------------------------------+---------------------------------------8
@@ -64,6 +63,7 @@
     sap_ciDialogWPNumber:         12
     sap_ciBtcWPNumber:            8
     sap_installSAPHostAgent:      "false"
+    sap_ciInstanceNumber:         '00'
 
 # *====================================4=======================================8
 
