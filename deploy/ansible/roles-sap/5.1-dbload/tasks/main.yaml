@@ -12,15 +12,16 @@
 
 - name:  
   set_fact:
-    sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
-    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
     sap_cd_package_hdbclient:     
     sap_cd_package_cd1:           
     sap_cd_package_cd2:           
     sap_cd_package_cd3:           
     sap_cd_package_cd4:           
     sap_cd_package_cd5:           
+    sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
+    sap_profile_dir:              /sapmnt/{{ sap_sid|upper }}/profile
 
 # -------------------------------------+---------------------------------------8
 #
