@@ -32,9 +32,6 @@
     sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
     sap_ciInstanceNumber:         00
     sap_ciVirtualHostname:        x01app00lab3
-    sap_installSAPHostAgent:      false
-    # sap_ciDialogWPNumber:         12
-    # sap_ciBtcWPNumber:            8
 
 # -------------------------------------+---------------------------------------8
 #
@@ -66,6 +63,7 @@
   vars:
     sap_ciDialogWPNumber:         12
     sap_ciBtcWPNumber:            8
+    sap_installSAPHostAgent:      "false"
 
 # *====================================4=======================================8
 
