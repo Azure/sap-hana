@@ -9,8 +9,6 @@
     name:           bom
 
 # *====================================4=======================================8
-    # Get all the hostnames in <SID>_SCS group and return only the first hostname
-    nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
 
 - name:  
   set_fact:
