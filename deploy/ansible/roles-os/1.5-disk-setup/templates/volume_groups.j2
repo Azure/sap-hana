@@ -28,8 +28,8 @@
             {% set disk_count.value = loop.index %}
             {% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
         {% endfor %}
-        {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count } %}
-        {% set _ = vgs.append(disk_count) %}
+        {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count.value } %}
+        {% set _ = vgs.append(vg) %}
     {% endfor %}
 
     {{ vgs }}
