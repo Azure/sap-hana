@@ -20,21 +20,13 @@
 ]
 #}
 [
+    {% set vgs = dict() %}
     {% for type in disktypes %}
-        {% set disk_count = 0 %}
-        {% set pvslist = [] %}
-        {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-            {% set disk_count = disk_count + 1 %}
-            {% set dummy = pvslist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
-            {% set dummy = type.update({'host': disk.host }) %}
-            {% set dummy = type.update({'vg': 'vg_' ~ type.type }) %}
-            {% set dummy = type.update({'disk_count': disk_count }) %}
-            {% set dummy = type.update({'pvs': pvslist | join(',') }) %}
-        {% endfor %}
+        {% set record = vgs.update({'vg': 'vg_' ~ type.type }) %}
     {% endfor %}
 
-    {% for disktype in disktypes %}
-        {{ disktype }},
+    {% for vg in vgs %}
+        {{ vg }},
     {% endfor %}
 
 ]
