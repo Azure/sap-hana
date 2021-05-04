@@ -22,11 +22,13 @@
 [
     {% set vgs = [] %}
     {% for type in disktypes %}
+        {% set disk_count = 0 %}
         {% set pvlist = [] %}
         {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
+            {% set disk_count = disk_count + 1 %}
             {% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
         {% endfor %}
-        {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(',') } %}
+        {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count } %}
         {% set _ = vgs.append(vg) %}
     {% endfor %}
 
