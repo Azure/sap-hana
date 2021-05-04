@@ -27,7 +27,7 @@
             {% set disk_count = disk_count + 1 %}
             {% set dummy = pvslist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
             {% set dummy = disktype.update({'host': disk.host }) %}
-            {% set dummy = disktype.update({'vg': 'vg_' ~ disktype.type }) %}
+            {% set dummy = disktype.update({'vg': 'vg_' ~ type.type }) %}
             {% set dummy = disktype.update({'disk_count': disk_count }) %}
             {% set dummy = disktype.update({'pvs': pvslist | join(',') }) %}
         {% endfor %}
