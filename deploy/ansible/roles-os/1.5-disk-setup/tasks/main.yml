@@ -96,11 +96,11 @@
 
 - debug:
     var:
-    #  - disks
-    #  - disktypes
+    #  disks
+    #  disktypes
       volume_groups
-    #  - logical_volumes
-    #  - file_systems
+    #  logical_volumes
+    #  file_systems
 
 
 # - name:                           "Volume Group creation"
