@@ -94,11 +94,11 @@
 #   set_fact:
 #     file_systems:                 "{{ lookup ('template', 'file_systems.j2') }}"
 
--debug:
-   var:
+- debug:
+    var:
     #  - disks
     #  - disktypes
-     - volume_groups
+      - volume_groups
     #  - logical_volumes
     #  - file_systems
 
