@@ -22,7 +22,7 @@
 [
     {% set vgs = dict() %}
     {% for type in disktypes %}
-        {% set record = vgs.update({'vg': 'vg_' ~ type.type }) %}
+        {% set record = vgs.append({'vg': 'vg_' ~ type.type }) %}
     {% endfor %}
 
     {{ vgs }}
