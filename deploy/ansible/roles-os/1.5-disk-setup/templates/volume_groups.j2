@@ -25,7 +25,6 @@
         {% set disk_count = 0 %}
         {% set pvlist = [] %}
         {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-            {% disk_count++ %}
             {% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
         {% endfor %}
         {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': loop.index } %}
