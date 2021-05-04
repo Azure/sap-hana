@@ -109,7 +109,7 @@
     pvs:                          "{{ item.pvs }}"
     pesize:                       4M
     state:                        present
-  loop:                           "{{ volume_groups }}"
+  loop:                           "{{ volume_groups|flatten(levels=1) }}"
 #   when:
 #                                   - item.host is defined
 #                                   - item.host == inventory_hostname
