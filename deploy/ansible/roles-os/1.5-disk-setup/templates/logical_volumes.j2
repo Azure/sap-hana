@@ -93,7 +93,7 @@
 {% for vg in volume_groups %}
 {% if node_tier ==  HANA %}
 {% set lv = { 'lv': 'lv_backup' } %}
-{% fi %}
+{% endif %}
 {% set lv = { 'vg': vg.vg } %}
 {% set _ = lvs.append(lv) %}
 {% endfor %}
