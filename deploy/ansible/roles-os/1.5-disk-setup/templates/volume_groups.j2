@@ -23,7 +23,7 @@
     {% for type in disktypes %}
         {% set disk_count = 0 %}
         {% set pvslist = [] %}
-        {% for disk in disks if disk.host == inventory_hostname and disk.type == type %}
+        {% for disk in disks if disks.host == inventory_hostname and disks.type == type %}
             {% set disk_count = disk_count + 1 %}
             {% set dummy = pvslist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
             {% set dummy = disktype.update({'host': disk.host }) %}
