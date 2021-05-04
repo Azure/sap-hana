@@ -84,9 +84,9 @@
 
 
 
-# - name:                           "Define Logical Volumes"
-#   set_fact:
-#     logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
+- name:                           "Define Logical Volumes"
+  set_fact:
+    logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
 
 
 
