@@ -98,8 +98,8 @@
     var:
     #  disks
     #  disktypes
-      volume_groups
-    #  logical_volumes
+    #  volume_groups
+      logical_volumes
     #  file_systems
 
 
@@ -110,9 +110,8 @@
     pesize:                       4M
     state:                        present
   loop:                           "{{ volume_groups }}"
-#   when:
-#                                   - item.host is defined
-#                                   - item.host == inventory_hostname
+
+
 
 # - name:                           "Logical Volume creation"
 #   lvol:

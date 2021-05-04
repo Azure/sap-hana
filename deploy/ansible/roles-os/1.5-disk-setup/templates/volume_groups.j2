@@ -1,33 +1,13 @@
-{#
-[
-    {% for disk in disks if disk.host == inventory_hostname %}
-        {% set disk_count = 0 %}
-        {% set pvslist = [] %}
-        {% for disktype in disktypes if disk.type == disktype.type %}
-            {% set disk_count = disk_count + 1 %}
-            {% set dummy = pvslist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
-            {% set dummy = disktype.update({'host': disk.host }) %}
-            {% set dummy = disktype.update({'vg': 'vg_' ~ disktype.type }) %}
-            {% set dummy = disktype.update({'disk_count': disk_count }) %}
-            {% set dummy = disktype.update({'pvs': pvslist | join(',') }) %}
-        {% endfor %}
-    {% endfor %}
-
-    {% for disktype in disktypes %}
-        {{ disktype }},
-    {% endfor %}
-
-]
-#}
 {% set vgs = [] %}
 {% for type in disktypes %}
-{% set disk_count = namespace(value=0) %}
+{# {% set disk_count = namespace(value=0) %} #}
 {% set pvlist = [] %}
 {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-{% set disk_count.value = loop.index %}
+{# {% set disk_count.value = loop.index %} #}
 {% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
 {% endfor %}
-{% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count.value } %}
+{# {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count.value } %} #}
+{% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(',') } %}
 {% set _ = vgs.append(vg) %}
 {% endfor %}
 {{ vgs }}
