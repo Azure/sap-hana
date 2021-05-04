@@ -20,7 +20,7 @@
 ]
 #}
 [
-    {% set vgs = {} %}
+    {% set vgs = [] %}
     {% for type in disktypes %}
 {#        {% set pvlist = [] %}
         {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
@@ -28,7 +28,8 @@
         {% endfor %}
         {% set record = vgs.update({'pvs': pvlist|join(',') }) %}
 #}
-        {% set record = vgs.update({'vg': 'vg_' ~ type.type }) %}
+        {% set vg = { 'vg': 'vg_', 'pvs': '/dev/disk1,/dev/disk2' } %}
+        {% set _ = vgs.append(vg) %}
     {% endfor %}
 
     {{ vgs }}
