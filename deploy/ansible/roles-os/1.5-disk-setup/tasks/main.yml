@@ -98,7 +98,7 @@
     var:
     #  - disks
     #  - disktypes
-      - volume_groups
+      volume_groups
     #  - logical_volumes
     #  - file_systems
 
