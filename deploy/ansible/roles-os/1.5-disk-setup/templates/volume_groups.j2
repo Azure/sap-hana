@@ -30,6 +30,4 @@
 {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count.value } %}
 {% set _ = vgs.append(vg) %}
 {% endfor %}
-{% for vg in vgs %}
-{{ vg }}
-{% endfor %}
+{{ vgs }}
