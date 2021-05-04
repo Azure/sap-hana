@@ -28,7 +28,7 @@
         {% endfor %}
         {% set record = vgs.update({'pvs': pvlist|join(',') }) %}
 #}
-        {% set vg = { 'vg': 'vg_', 'pvs': '/dev/disk1,/dev/disk2' } %}
+        {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': '/dev/disk1,/dev/disk2' } %}
         {% set _ = vgs.append(vg) %}
     {% endfor %}
 
