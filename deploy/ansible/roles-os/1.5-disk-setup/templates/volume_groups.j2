@@ -19,7 +19,6 @@
 
 ]
 #}
-[
     {% set vgs = [] %}
     {% for type in disktypes %}
         {% set disk_count = namespace(value=0) %}
@@ -34,4 +33,3 @@
 
     {{ vgs }}
 
-]
