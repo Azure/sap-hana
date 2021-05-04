@@ -102,8 +102,6 @@
     #  logical_volumes
     #  file_systems
 
-- debug:
-    msg: "{{ volume_groups }}"
 
 # - name:                           "Volume Group creation"
 #   lvg:

@@ -31,5 +31,6 @@
         {% set _ = vgs.append(vg) %}
     {% endfor %}
 
-    {{ vgs }}
-
+    {% for vg in vgs %}
+        {{ vg }}
+    {% endfor %}
