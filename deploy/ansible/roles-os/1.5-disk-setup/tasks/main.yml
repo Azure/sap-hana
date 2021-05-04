@@ -103,7 +103,7 @@
     #  file_systems
 
 - debug:
-    msg: "{{ volume_groups|flatten(levels=1) }}"
+    msg: "{{ volume_groups }}"
 
 # - name:                           "Volume Group creation"
 #   lvg:
