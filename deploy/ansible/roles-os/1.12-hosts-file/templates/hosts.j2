@@ -1,0 +1,47 @@
+{#
+
+TODO:
+  Be able to handle multiple interfaces. (eth0, eth1, etc...)
+  
+#}
+
+# {{ sap_sid|upper }}
+{#
+
+Loop through all the hosts that are referenced by the Playbook.
+If we do not sort it, then the order can change randomly.
+
+#}
+
+{%  for host in play_hosts|sort %}
+{#
+
+Ensure the specified host has gathered facts about eth0.
+
+#}
+{%    if 'ansible_eth0' in hostvars[host] %}
+{{ '%-15s' | format(hostvars[host]['ansible_eth0']['ipv4']['address']) }}    {{ '%15s' | format(host) }}     {{ '%15s' | format(host) }}.{{ sap_fqdn }}
+{#
+
+Check for Secondary IP Addresses.
+Currently only structured to support 4 Secondaries.
+Currently only first Secondary is defined.
+
+#}
+{%      if 'ipv4_secondaries' in hostvars[host]['ansible_eth0'] %}
+{%        for ipv4Secondary in hostvars[host]['ansible_eth0']['ipv4_secondaries'] %}
+{%          if loop.index == 1 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    {{ '%15s' | format('sap-' + host) }}     {{ '%15s' | format('sap-' + host) }}.{{ sap_fqdn }}
+{%          elif loop.index == 2 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Third IP
+{%          elif loop.index == 3 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Fourth IP
+{%          elif loop.index == 4 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Fifth IP
+{%          else %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Unknown {{ loop.index }}
+{%          endif %}
+{%        endfor %}
+{%      endif %}
+{%    endif %}
+{%  endfor %}

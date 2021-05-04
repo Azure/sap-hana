@@ -56,15 +56,16 @@
 
 #---------------------------
 # BEGIN NEW CODE 
+# Not Needed - comment out all the lines 
 #---------------------------
 # The intention of the following is to ensure that the short hostname is set 
 - name: current Values
   debug:
-     msg: "sap_hostname: {{ sap_hostname }}"
+     msg: "sap_hostname: {{ inventory_hostname }}"
 
 - name: ensure short system hostname is set
   hostname:
-    name: '{{ sap_hostname }}'
+    name: '{{ inventory_hostname }}'
 
 #---------------------------
 # END NEW CODE 
