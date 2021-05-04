@@ -72,52 +72,70 @@
                                     }}"
     cacheable:                    yes
   loop:                           "{{ disks }}"
+  when:
+                                  - item.host is defined
+                                  - item.host == inventory_hostname
+
+
 
 - name:                           "Define volume groups"
   set_fact:
     volume_groups:                "{{ lookup ('template', 'volume_groups.j2') }}"
 
-- name:                           "Define Logical Volumes"
-  set_fact:
-    logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
 
-- name:                           "Define Filesystems"
-  set_fact:
-    file_systems:                 "{{ lookup ('template', 'file_systems.j2') }}"
 
-- name:                           "Volume Group creation"
-  lvg:
-    vg:                           "{{ item.vg }}"
-    pvs:                          "{{ item.pvs }}"
-    pesize:                       4M
-    state:                        present
-  loop:                           "{{ volume_groups }}"
-  when:
-                                  - item.host is defined
-                                  - item.host == inventory_hostname
+# - name:                           "Define Logical Volumes"
+#   set_fact:
+#     logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
 
-- name:                           "Logical Volume creation"
-  lvol:
-    lv:                           "{{ item.lv }}"
-    vg:                           "{{ item.vg }}"
-    size:                         "{{ item.size }}"
-    opts:                         "{{ item.opts }}"
-    active:                       yes
-    state:                        present
-    shrink:                       no
-    resizefs:                     no
-  loop:                           "{{ logical_volumes }}"
-  when:
-                                  - item.host is defined
-                                  - item.host == inventory_hostname
 
-- name:                           "Filesystem creation"
-  filesystem:
-    dev:                          "{{ item.dev }}"
-    fstype:                       "{{ item.fstype }}"
-  loop:                           "{{ file_systems }}"
-  when:
-                                  - item.host is defined
-                                  - item.host == inventory_hostname
+
+# - name:                           "Define Filesystems"
+#   set_fact:
+#     file_systems:                 "{{ lookup ('template', 'file_systems.j2') }}"
+
+-debug:
+   var:
+    #  - disks
+    #  - disktypes
+     - volume_groups
+    #  - logical_volumes
+    #  - file_systems
+
+
+# - name:                           "Volume Group creation"
+#   lvg:
+#     vg:                           "{{ item.vg }}"
+#     pvs:                          "{{ item.pvs }}"
+#     pesize:                       4M
+#     state:                        present
+#   loop:                           "{{ volume_groups }}"
+#   when:
+#                                   - item.host is defined
+#                                   - item.host == inventory_hostname
+
+# - name:                           "Logical Volume creation"
+#   lvol:
+#     lv:                           "{{ item.lv }}"
+#     vg:                           "{{ item.vg }}"
+#     size:                         "{{ item.size }}"
+#     opts:                         "{{ item.opts }}"
+#     active:                       yes
+#     state:                        present
+#     shrink:                       no
+#     resizefs:                     no
+#   loop:                           "{{ logical_volumes }}"
+#   when:
+#                                   - item.host is defined
+#                                   - item.host == inventory_hostname
+
+# - name:                           "Filesystem creation"
+#   filesystem:
+#     dev:                          "{{ item.dev }}"
+#     fstype:                       "{{ item.fstype }}"
+#   loop:                           "{{ file_systems }}"
+#   when:
+#                                   - item.host is defined
+#                                   - item.host == inventory_hostname
 
 ...
