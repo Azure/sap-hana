@@ -69,11 +69,11 @@
         {% endfor %}
 ]
 #}
-
-
-
-
 {#
+
+
+
+
 {% set lvs = [] %}
 {% for vg in volume_groups.vg %}
 {% set disk_count = namespace(value=0) %}
@@ -86,16 +86,12 @@
 {% set _ = vgs.append(vg) %}
 {% endfor %}
 {{ lvs }}
+
+
 #}
-
-
-
 {% set lvs = [] %}
 {% for vg in volume_groups %}
 {% set lv = { 'vg': vg.vg } %}
 {% set _ = lvs.append(lv) %}
 {% endfor %}
 {{ lvs }}
-
-
-
