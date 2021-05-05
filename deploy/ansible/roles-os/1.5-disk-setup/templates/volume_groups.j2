@@ -1,13 +1,20 @@
 {% set vgs = [] %}
 {% for type in disktypes %}
-{# {% set disk_count = namespace(value=0) %} #}
 {% set pvlist = [] %}
 {% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-{# {% set disk_count.value = loop.index %} #}
 {% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
 {% endfor %}
-{# {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'disk_count': disk_count.value } %} #}
+{% if   type.type == 'sap' %}
+{% set vg = { 'vg': 'vg_sap', 'pvs': pvlist|join(',') } %}
+{% elif type.type == 'data' %}
+{% set vg = { 'vg': 'vg_hana_data', 'pvs': pvlist|join(',') } %}
+{% elif type.type == 'log' %}
+{% set vg = { 'vg': 'vg_hana_log', 'pvs': pvlist|join(',') } %}
+{% elif type.type == 'backup' %}
+{% set vg = { 'vg': 'vg_hana_backup', 'pvs': pvlist|join(',') } %}
+{% else %}
 {% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(',') } %}
+{% endif %}
 {% set _ = vgs.append(vg) %}
 {% endfor %}
 {{ vgs }}
