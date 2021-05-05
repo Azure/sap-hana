@@ -26,6 +26,8 @@
 # Build the list of tasks to be executed in order here. 
 #
 # -------------------------------------+---------------------------------------8
+  - set_fact:
+      tier:     sapos
 
   - include_role:
       name:     roles-sap-os/hosts_file_test
