@@ -142,8 +142,8 @@
   when:                           item.tier == "all" or
                                   item.tier == node_tier
   vars:
-    count_hana_data:        "{{ ((volume_groups|selectattr("vg", "search", "vg_hana_data")|list|first).pvs|default("NOT_FOUND")).count(",")+1 }}"
-    count_hana_log:         "{{ ((volume_groups|selectattr("vg", "search", "vg_hana_log")|list|first).pvs|default("NOT_FOUND")).count(",")+1 }}"
+    count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
+    count_hana_log:         "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_log') |list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
 
 
 
