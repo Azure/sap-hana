@@ -137,7 +137,7 @@
 
 
 - debug:
-    msg:  "PV Count = {{ volume_groups | selectattr('vg', 'vg_hana_data') }}"
+    msg:  "PV Count = {{ volume_groups | selectattr('vg', 'vg_hana_data') | map(attribute='pvs') | list }}"
 
 
 
