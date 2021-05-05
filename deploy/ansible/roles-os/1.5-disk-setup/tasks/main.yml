@@ -88,28 +88,6 @@
     verbosity:                    2
 
 
-- name:                           "Define Logical Volumes"
-  set_fact:
-    logical_volumes:              "{{ lookup ('template', 'logical_volumes.j2') }}"
-
-
-- name:                           "print logical volume details"
-  debug:
-    var:                          logical_volumes
-    verbosity:                    2
-
-
-- name:                           "Define Filesystems"
-  set_fact:
-    file_systems:                 "{{ lookup ('template', 'file_systems.j2') }}"
-
-
-- name:                           "print logical volume details"
-  debug:
-    var:                          file_systems
-    verbosity:                    2
-
-
 - name:                           "Volume Group creation"
   lvg:
     vg:                           "{{ item.vg }}"
@@ -146,18 +124,6 @@
     count_hana_log:         "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_log') |list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
 
 
-
-# - name:                           "Logical Volume creation"
-#   lvol:
-#     lv:                           "{{ item.lv }}"
-#     vg:                           "{{ item.vg }}"
-#     size:                         "{{ item.size }}"
-#     opts:                         "{{ item.opts }}"
-#     active:                       yes
-#     state:                        present
-#     shrink:                       no
-#     resizefs:                     no
-#   loop:                           "{{ logical_volumes }}"
 
 # - name:                           "Filesystem creation"
 #   filesystem:

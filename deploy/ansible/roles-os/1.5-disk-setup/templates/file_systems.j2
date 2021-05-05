@@ -1,6 +1,0 @@
-{% set fs = [] %}
-{% for lv in logical_volumes %}
-{% set fsystem = {'tier' : lv.tier, 'fstype' : 'xfs', 'dev' : '/dev/' ~ lv.vg ~'/' ~lv.lv } %}
-{% set _ = fs.append(fsystem) %}
-{% endfor %}
-{{ fs }}
