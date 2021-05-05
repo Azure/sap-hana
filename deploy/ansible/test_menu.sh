@@ -87,7 +87,12 @@ do
             --extra-vars="@sap-parameters.yaml"                                                              \
             "${@}"                                                                                           \
             ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_01_os_base_config.yaml         \
-            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_02_os_sap_specific_config.yaml
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_02_os_sap_specific_config.yaml \
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_03_bom_processing.yaml         \
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_04_00_00_hana_db_install.yaml  \
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_00_00_sap_scs_install.yaml  \
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_01_sap_dbload.yaml          \
+            ~/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/playbook_05_02_sap_pas_install.yaml
             break
         else
           ansible-playbook                                                                  \
