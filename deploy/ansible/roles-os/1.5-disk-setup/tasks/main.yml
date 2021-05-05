@@ -128,7 +128,7 @@
     - { tier: 'SCS',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: ''            }
     - { tier: 'SCS',         lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: ''            }
     - { tier: 'HANA',        lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: ''            }
-    # - { tier: 'HANA',        lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i 3 -I 128' }
+    - { tier: 'HANA',        lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i {{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs).count(',')+1 }} -I 128' }
     # - { tier: 'HANA',        lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i 3 -I 32'  }
     - { tier: 'HANA',        lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: ''            }
     - { tier: 'WEB',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: ''            }
@@ -137,7 +137,9 @@
 
 
 - debug:
-    msg:  "PV Count = {{ volume_groups | selectattr('vg', 'vg_hana_data') | map(attribute='pvs') | list }}"
+#    msg:  "PV Count = {{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs).count(',')+1 }}"
+    msg:  "PV Count = {{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs).count(',')+1 }}"
+  when:   node_tier == 'HANA'
 
 
 
