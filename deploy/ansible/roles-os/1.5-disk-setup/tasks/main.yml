@@ -1,6 +1,6 @@
-# /*----------------------------------------------------------------------------8
+# /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                         OS Base Disk Configuration                          |
+# |                         OS Base Disk Configuration                         |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -63,6 +63,8 @@
 
 # Get all the unique disk types from sap-parameters
 
+# -------------------------------------+---------------------------------------8
+#
 - name:                           Get the unique disk types
   set_fact:
     disktypes:                    "{{ 
@@ -76,13 +78,15 @@
                                   - item.host is defined
                                   - item.host == inventory_hostname
 
-
 - name:                           "print unique disks"
   debug:
     var:                          disktypes
     verbosity:                    2
 
 
+
+# -------------------------------------+---------------------------------------8
+#
 - name:                           "Define volume groups"
   set_fact:
     volume_groups:                "{{ lookup ('template', 'volume_groups.j2') }}"
@@ -92,6 +96,10 @@
     var:                          volume_groups
     verbosity:                    2
 
+
+
+# -------------------------------------+---------------------------------------8
+#
 - name:                           "Volume Group creation"
   lvg:
     vg:                           "{{ item.vg }}"
@@ -100,6 +108,10 @@
     state:                        present
   loop:                           "{{ volume_groups }}"
 
+
+
+# -------------------------------------+---------------------------------------8
+#
 - name:                           "Logical Volume creation"
   lvol:
     lv:                           "{{ item.lv }}"
@@ -125,6 +137,12 @@
     count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
     count_hana_log:         "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_log') |list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
 
+
+
+# -------------------------------------+---------------------------------------8
+#
+# TODO: make the dev constant a global variable since it is used in multiple places (sap-mounts)
+#
 - name:                           "Filesystem creation"
   filesystem:
     dev:                          "{{ item.dev }}"
@@ -142,3 +160,6 @@
                                   item.tier == node_tier
 
 ...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
