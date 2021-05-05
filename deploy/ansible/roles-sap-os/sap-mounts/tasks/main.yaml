@@ -12,18 +12,13 @@
     # Get all the hostnames in <SID>_SCS group and return only the first hostname
     nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
   loop:
-    # - { tier: 'all',          type: 'xfs',  src: '/dev/vg_sap/lv_usrsap',                          path: '/usr/sap' }
-    - { tier: 'all',          type: 'xfs',   src: '/dev/vg_sap/lv_sap',                            path: '/usr/sap' }
-    # - { tier: 'prepare',      type: 'xfs',  src: '/dev/vg_sap/lv_usrsapinstall',                   path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
-    # - { tier: 'prepare',      type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',                          path: '/sapmnt' }
-    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_sap/lv_hana_shared',                     path: '/hana/shared' }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_shared/lv_shared',                      path: '/hana/shared' }
-    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_data/lv_hana_data',                 path: '/hana/data' }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_data/lv_data',                          path: '/hana/data' }
-    # - { tier: 'hdb',          type: 'xfs',  src: '/dev/vg_hana_log/lv_hana_log',                   path: '/hana/log' }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_log/lv_log',                            path: '/hana/log' }
-    # - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',             path: '/hana/backup' }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_backup/lv_backup',                      path: '/hana/backup' }
+    - { tier: 'all',          type: 'xfs',   src: '/dev/vg_sap/lv_usrsap',                         path: '/usr/sap' }
+    - { tier: 'preparation',  type: 'xfs',   src: '/dev/vg_sap/lv_usrsapinstall',                  path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'preparation',  type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt' }
+    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_sap/lv_hana_shared',                    path: '/hana/shared' }
+    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_data/lv_hana_data',                path: '/hana/data' }
+    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_log/lv_hana_log',                  path: '/hana/log' }
+    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',            path: '/hana/backup' }
     - { tier: 'web',          type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt' }
     - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
     - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
