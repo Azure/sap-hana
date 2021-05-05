@@ -141,9 +141,6 @@
 
 
 
-
-
-
 # - name:                           "Logical Volume creation"
 #   lvol:
 #     lv:                           "{{ item.lv }}"
@@ -158,6 +155,10 @@
 #   when:
 #                                   - item.host is defined
 #                                   - item.host == inventory_hostname
+
+
+
+
 
 # - name:                           "Filesystem creation"
 #   filesystem:
