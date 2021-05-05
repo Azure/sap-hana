@@ -135,20 +135,10 @@
   when:                           item.tier == "all" or
                                   item.tier == node_tier
 
-  # when:
-  #                                 - item.host is defined
-  #                                 - item.host == inventory_hostname
 
+- debug:
+    msg:  "PV Count = {{ volume_groups | selectattr('vg', 'vg_hana_data') }}"
 
-#   Logical Volumes:
-#    - { tier: 'all',         lv: 'lv_usrsap',        vg: 'vg_sap',         size: '64g',       opts: '' }
-#    - { tier: 'preparation', lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: '' }
-#    - { tier: 'preparation', lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: '' }
-#    - { tier: 'hdb',         lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: '' }
-#    - { tier: 'hdb',         lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i 3 -I 128' }
-#    - { tier: 'hdb',         lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i 3 -I 32' }
-#    - { tier: 'hdb',         lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: '' }
-#    - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: '' }
 
 
 
