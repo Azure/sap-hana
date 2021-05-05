@@ -1,101 +1,33 @@
-{#
-[
-        {% for disktype in disktypes %}
-          {% set disk_count = 0 %}
-          {% for disk in disks if disk.type == disktype.type %}
-            {% set disk_count =  disk_count  + 1 %}
-
-            {% if disk.type == 'data' %}
-              {% set opts = '-i ' ~ loop.index ~' -I 256' %}
-              {% set size = '100%FREE' %}
-              {% set tier = 'hdb' %}
-            {% elif disk.type == 'log' %}
-              {% set opts = '-i ' ~ loop.index ~' -I 64' %}
-              {% set size = '100%FREE' %}
-              {% set tier = 'hdb' %}
-            {% elif disk.type == 'shared' %}
-              {% set opts = '' %}
-              {% set size = '100%FREE' %}
-              {% set tier = 'hdb' %}
-            {% elif disk.type == 'backup' %}
-              {% if loop.index > 1 %}
-                {% set opts = '-i ' ~ loop.index ~' -I 256' %}
-              {% set size = '100%FREE' %}
-                {% set tier = 'hdb' %}
-              {% else %} 
-                {% set size = '100%FREE' %}
-                {% set opts = '' %}
-              {% endif %} 
-              {% set tier = 'hdb' %}
-            {% elif disk.type == 'sap' %}
-              {% set size = '64g' %}
-              {% set opts = '' %}
-            {% elif disk.type == 'web' %}
-              {% set size = '4g' %}
-              {% set opts = '' %}
-            {% else %}
-              {% if loop.index > 1 %}
-                {% set opts = '-i ' ~ loop.index ~' -I 256' %}
-                {% set size = '100%FREE' %}
-                {% set tier = 'hdb' %}
-              {% else %} 
-                {% set opts = '' %}
-                {% set size = '100%FREE' %}
-                {% set tier = 'all' %}
-              {% endif %}
-            {% endif %}
-
-
-            {% set dummy =  disktype.update({'host': disk.host }) %}
-            {% set dummy =  disktype.update({'tier': tier }) %}
-            {% set dummy =  disktype.update({'opts': opts }) %}
-            {% set dummy =  disktype.update({'vg': 'vg_' ~ disktype.type }) %}
-            {% set dummy =  disktype.update({'lv': 'lv_' ~ disktype.type }) %}
-            {% set dummy =  disktype.update({'size': size }) %}
-
-          {% endfor %}
-        {% endfor %}
-
-
-        {% for disktype in disktypes %}
-          {% if disktype.type == 'sap' %}
-            {{ disktype }},
-            {{ { 'tier' : 'preparation',  'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_sapmnt',        'size' : '128g',      'opts' : '' } }},
-            {{ { 'tier' : 'preparation',  'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_usrsapinstall', 'size' : '100%FREE',  'opts' : '' } }},
-            {{ { 'tier' : 'web',          'host' : disktype.host, 'vg' : disktype.vg, 'type' : disktype.type, 'lv': 'lv_sapmnt',        'size' : '1g',        'opts' : '' } }},
-          {% else %}
-            {{ disktype }},
-          {% endif %}
-        {% endfor %}
-]
-#}
-{#
-
-
-
-
 {% set lvs = [] %}
-{% for vg in volume_groups.vg %}
-{% set disk_count = namespace(value=0) %}
-{% set pvlist = [] %}
-{% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-{% set disk_count.value = loop.index %}
-{% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
-{% endfor %}
-{% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(',') } %}
-{% set _ = vgs.append(vg) %}
-{% endfor %}
-{{ lvs }}
-
-
-#}
-{% set lvs = [] %}
-{% for vg in volume_groups %}
-{% if node_tier ==  'HANA' %}
-{% set lv.update = { 'lv': 'lv_backup', 'vg': 'vg_sap' } %}
-{% else %}
-{% set lv = { 'vg': vg.vg } %}
-{% endif %}
+{% set lv = {'tier': 'all',         'lv': 'lv_usrsap',        'vg': 'vg_sap',         'size': '64g',       'opts': ''            } %}
 {% set _ = lvs.append(lv) %}
+{% for vg in volume_groups %}
+{%   set lvname = vg.vg|replace('vg', 'lv', 1) %}
+{%   if node_tier == 'HANA' and vg.vg == 'vg_hana_log' %}
+{%     if vg.diskcount > 1 %}
+{%       set lv = {'tier': node_tier,        'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '-i ' ~ vg.diskcount ~ ' -I 64' } %}
+{%     else %}
+{%       set lv = {'tier': node_tier,        'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '' } %}
+{%     endif %}
+{%   elif node_tier == 'HANA' and (vg.vg == 'vg_hana_data' or vg.vg == 'vg_hana_backup') %}
+{%     if vg.diskcount > 1 %}
+{%       set lv = {'tier': node_tier,        'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '-i ' ~ vg.diskcount ~ ' -I 256' } %}
+{%     else %}
+{%       set lv = {'tier': node_tier,        'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '' } %}
+{%     endif %}
+{%   elif node_tier == 'SCS' and vg.vg == 'vg_sap' %}
+{%     set lv = {'tier': node_tier,       'lv': 'lv_sapmnt',      'vg': 'vg_sap',    'size': '128g','opts': '' } %}
+{%     set _ = lvs.append(lv) %}
+{%     set lv = {'tier': node_tier,       'lv': 'lv_usrsapinstall',     'vg': 'vg_sap',    'size': '100%FREE',  'opts': '' } %}
+{%   elif node_tier == 'WEB' and vg.vg == 'vg_sap' %}
+{%     set lv = {'tier': node_tier,       'lv': 'lv_sapmnt',      'vg': 'vg_sap',    'size': '1g',  'opts': '' } %}
+{%   else %}
+{%     if vg.diskcount > 1 %}
+{%       set lv = {'tier': node_tier,     'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '-i ' ~ vg.diskcount ~ ' -I 256' } %}
+{%     else %}
+{%       set lv = {'tier': node_tier,     'lv': lvname,      'vg': vg.vg,    'size': '100%FREE',  'opts': '' } %}
+{%     endif %}
+{%   endif %}
+{%   set _ = lvs.append(lv) %}
 {% endfor %}
 {{ lvs }}

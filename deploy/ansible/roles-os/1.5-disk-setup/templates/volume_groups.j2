@@ -1,20 +1,22 @@
 {% set vgs = [] %}
 {% for type in disktypes %}
-{% set pvlist = [] %}
-{% for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
-{% set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
-{% endfor %}
-{% if   type.type == 'sap' %}
-{% set vg = { 'vg': 'vg_sap', 'pvs': pvlist|join(',') } %}
-{% elif type.type == 'data' %}
-{% set vg = { 'vg': 'vg_hana_data', 'pvs': pvlist|join(',') } %}
-{% elif type.type == 'log' %}
-{% set vg = { 'vg': 'vg_hana_log', 'pvs': pvlist|join(',') } %}
-{% elif type.type == 'backup' %}
-{% set vg = { 'vg': 'vg_hana_backup', 'pvs': pvlist|join(',') } %}
-{% else %}
-{% set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(',') } %}
-{% endif %}
-{% set _ = vgs.append(vg) %}
+{%   set pvlist = [] %}
+{%   set disk_count = namespace(value=0) %}
+{%   for disk in disks if (disk.host == inventory_hostname) and (disk.type == type.type) %}
+{%       set disk_count.value = loop.index %}
+{%       set record = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
+{%   endfor %}
+{%   if   type.type == 'sap' %}
+{%     set vg = { 'vg': 'vg_sap', 'pvs': pvlist|join(','), 'diskcount': disk_count.value } %}
+{%   elif type.type == 'data' %}
+{%     set vg = { 'vg': 'vg_hana_data', 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
+{%   elif type.type == 'log' %}
+{%     set vg = { 'vg': 'vg_hana_log', 'pvs': pvlist|join(',') , 'diskcount': disk_count.value  } %}
+{%   elif type.type == 'backup' %}
+{%     set vg = { 'vg': 'vg_hana_backup', 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
+{%   else %}
+{%     set vg = { 'vg': 'vg_' ~ type.type, 'pvs': pvlist|join(','), 'diskcount': disk_count.value  } %}
+{%   endif %}
+{%   set _ = vgs.append(vg) %}
 {% endfor %}
 {{ vgs }}
