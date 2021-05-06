@@ -15,9 +15,9 @@
 #       2) waagent config should not run on Baremetal
 #          -Update: I have assumed that the tier for Baremetal is going to be named "HLI"
 
-- name:                           Ensure variables are available
-  include_vars:
-    file:                         "../../../vars/sap-disks.yaml"
+# - name:                           Ensure variables are available
+#   include_vars:
+#     file:                         "../../../vars/sap-disks.yaml"
 
 - include_tasks:                  configure.yaml
   loop:                           "{{ sap_swap }}"

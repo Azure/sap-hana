@@ -54,4 +54,12 @@ download_templates:           false
 prometheus:                   false                                                      # Install Prometheus Monitoring Agent
 
 
+sap_swap:
+  - { tier: 'scs',  swap_size_mb: '4096' }
+  - { tier: 'pas',  swap_size_mb: '20480' }
+  - { tier: 'app',  swap_size_mb: '20480' }
+  - { tier: 'web',  swap_size_mb: '4096' }
+  - { tier: 'hana', swap_size_mb: '2048' }
+
+
 ...
