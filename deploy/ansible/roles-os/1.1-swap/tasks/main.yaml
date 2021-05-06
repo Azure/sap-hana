@@ -55,7 +55,7 @@
 - debug:
     var:
       # count_hana_data:        "{{ ((sap_swap|selectattr('tier', 'search', node_tier)|list|first).swap_size_mb|default('2048')) }}"
-      sap_swap
+      sap_swap|selectattr('tier', 'search', node_tier)
 
 
 ...
