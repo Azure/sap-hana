@@ -54,10 +54,7 @@
     # count_hana_data:        "{{ ((sap_swap|selectattr('tier', 'search', node_tier)|list|first).pvs|default('NOT_FOUND')).split(',')|count }}"
       # count_hana_data:        "{{ ((sap_swap|selectattr('tier', 'search', node_tier)|list|first).swap_size_mb|default('2048')) }}"
 - debug:
-    var:  node_tier
-
-- debug:
-    var:  sap_swap|selectattr('tier', 'search', node_tier)|list
+    var:  (sap_swap|selectattr('tier', 'search', node_tier)|list).swap_size_mb
 
 
 ...
