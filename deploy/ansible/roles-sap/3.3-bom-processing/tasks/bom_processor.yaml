@@ -275,3 +275,47 @@
     #   loop_control:
     #     loop_var:                   download_iterator
     #   check_mode:                   "{{ test_mode is defined and test_mode }}"
+
+
+
+# - name: Determine SWPM archive name
+#   set_fact:
+#     swpm_archive: "{{ swpm_entry.override_target_filename is defined | ternary(swpm_entry.override_target_filename, swpm_entry.archive) }}"
+#   vars:
+#     swpm_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SWPM.*\\.SAR$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Ensure SAPCAR is executable
+#   file:
+#     path: "{{ download_basket_dir }}/{{ sapcar_executable }}"
+#     mode: "0755"
+
+
+# - name: Ensure SWPM directory is present
+#   file:
+#     path: "{{ target_media_location }}/SWPM"
+#     state: directory
+
+
+# - name: Ensure SWPM is unarchived
+#   command: >
+#     {{ download_basket_dir }}/{{ sapcar_executable }} -xf {{ download_basket_dir }}/{{ swpm_archive }} -R {{ target_media_location }}/SWPM/
+#   args:
+#     creates: "{{ target_media_location }}/SWPM/SIGNATURE.SMF"
+
+# - name: Determine SAPCAR executable file name
+#   set_fact:
+#     sapcar_executable: "{{ sapcar_entry.override_target_filename is defined | ternary(sapcar_entry.override_target_filename, sapcar_entry.archive) }}"
+#   vars:
+#     sapcar_entry: "{{
+#       bom.materials.media |
+#       flatten(levels=1) |
+#       selectattr('archive', 'match', '^SAPCAR.*\\.EXE$') |
+#       list |
+#       first
+#       }}"
