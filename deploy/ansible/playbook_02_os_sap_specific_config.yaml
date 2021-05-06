@@ -30,7 +30,7 @@
       tier:     sapos
 
   - include_role:
-      name:     roles-sap-os/hosts_file_test
+      name:     roles-sap-os/2.4-hosts-file
 
   - include_role:
       name:     roles-sap-os/sap-mounts
