@@ -9,19 +9,19 @@ sap_volume_groups:
 
 sap_logical_volumes:
   - { tier: 'all', lv: 'lv_usrsap',        vg: 'vg_sap', size: '64g',      opts: '' }
-  - { tier: 'SCS', lv: 'lv_sapmnt',        vg: 'vg_sap', size: '128g',     opts: '' }
-  - { tier: 'SCS', lv: 'lv_usrsapinstall', vg: 'vg_sap', size: '100%FREE', opts: '' }
-  - { tier: 'WEB', lv: 'lv_sapmnt',        vg: 'vg_sap', size: '1g',       opts: '' }
+  - { tier: 'scs', lv: 'lv_sapmnt',        vg: 'vg_sap', size: '128g',     opts: '' }
+  - { tier: 'scs', lv: 'lv_usrsapinstall', vg: 'vg_sap', size: '100%FREE', opts: '' }
+  - { tier: 'web', lv: 'lv_sapmnt',        vg: 'vg_sap', size: '1g',       opts: '' }
 
 sap_filesystems:
   - { tier: 'all', fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsap',        mount_path: '/usr/sap' }
-  - { tier: 'SCS', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt',        mount_path: '/sapmnt' }
-  - { tier: 'SCS', fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall', mount_path: '/usr/sap/install' }
-  - { tier: 'WEB', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt',        mount_path: '/sapmnt' }
+  - { tier: 'scs', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt',        mount_path: '/sapmnt' }
+  - { tier: 'scs', fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall', mount_path: '/usr/sap/install' }
+  - { tier: 'web', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt',        mount_path: '/sapmnt' }
 
 sap_swap:
-  - { tier: 'SCS',  swap_size_mb: '20480' }
-  - { tier: 'PAS',  swap_size_mb: '20480' }
-  - { tier: 'APP',  swap_size_mb: '20480' }
-  - { tier: 'WEB',  swap_size_mb: '20480' }
-  - { tier: 'HANA', swap_size_mb: '2048' }
+  - { tier: 'scs',  swap_size_mb: '20480' }
+  - { tier: 'pas',  swap_size_mb: '20480' }
+  - { tier: 'app',  swap_size_mb: '20480' }
+  - { tier: 'web',  swap_size_mb: '20480' }
+  - { tier: 'hana', swap_size_mb: '2048' }

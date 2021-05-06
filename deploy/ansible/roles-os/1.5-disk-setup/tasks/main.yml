@@ -124,13 +124,13 @@
     resizefs:                     no
   loop:
     - { tier: 'all',         lv: 'lv_usrsap',        vg: 'vg_sap',         size: '64g',       opts: ''                                }
-    - { tier: 'SCS',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: ''                                }
-    - { tier: 'SCS',         lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
-    - { tier: 'HANA',        lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
-    - { tier: 'HANA',        lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i {{ count_hana_data }} -I 256' }
-    - { tier: 'HANA',        lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i {{ count_hana_log  }}  -I 64' }
-    - { tier: 'HANA',        lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: ''                                }
-    - { tier: 'WEB',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: ''                                }
+    - { tier: 'scs',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: ''                                }
+    - { tier: 'scs',         lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
+    - { tier: 'hana',        lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: ''                                }
+    - { tier: 'hana',        lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i {{ count_hana_data }} -I 256' }
+    - { tier: 'hana',        lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i {{ count_hana_log  }}  -I 64' }
+    - { tier: 'hana',        lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: ''                                }
+    - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: ''                                }
   when:                           item.tier == "all" or
                                   item.tier == node_tier
   vars:
@@ -162,13 +162,13 @@
     fstype:                       "{{ item.fstype }}"
   loop:                           
    - { tier: 'all',          fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsap' }
-   - { tier: 'SCS',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
-   - { tier: 'SCS',          fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall' }
-   - { tier: 'HANA',         fstype: 'xfs', dev: '/dev/vg_sap/lv_hana_shared' }
-   - { tier: 'HANA',         fstype: 'xfs', dev: '/dev/vg_hana_data/lv_hana_data' }
-   - { tier: 'HANA',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
-   - { tier: 'HANA',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
-   - { tier: 'WEB',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+   - { tier: 'scs',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+   - { tier: 'scs',          fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall' }
+   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_sap/lv_hana_shared' }
+   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_data/lv_hana_data' }
+   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
+   - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
+   - { tier: 'web',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
   when:                           item.tier == "all" or
                                   item.tier == node_tier
 
