@@ -1,8 +1,8 @@
----
+# ---
 
-- name:                           "Ensure waagent is restarted"
-  service:
-    name:                         waagent
-    state:                        restarted
+# - name:                           "Ensure waagent is restarted"
+#   service:
+#     name:                         waagent
+#     state:                        restarted
 
-...
+# ...
