@@ -19,11 +19,42 @@
 #   include_vars:
 #     file:                         "../../../vars/sap-disks.yaml"
 
-- include_tasks:                  configure.yaml
-  loop:                           "{{ sap_swap }}"
-  when:
-                                  - ansible_os_family != "Windows"
-                                  - item.tier != "HLI"
-                                  - item.tier in ["all", tier]
+
+- name:                           "Ensure /mnt/resource directory exists"
+  file:
+    path:                         "/mnt/resource"
+    state:                        directory
+    mode:                         "0755"
+  notify:
+    - "Ensure waagent is restarted"
+
+- name:                           "validate /mnt/resource directory exists"
+  stat:
+    path:                         "/mnt/resource"
+  register:                       swapfsdata
+
+- name:                           "Ensure waagent file is configured with proper parameters"
+  lineinfile:
+    dest:                         /etc/waagent.conf  
+    state:                        "{{ waagentconf.state }}"
+    regexp:                       "{{ waagentconf.regexp }}"
+    line:                         "{{ waagentconf.line }}"
+  loop:
+    - { state: 'present', regexp: 'ResourceDisk.Format=',     line: 'ResourceDisk.Format=y' }
+    - { state: 'present', regexp: 'ResourceDisk.EnableSwap=', line: 'ResourceDisk.EnableSwap=y' }
+    - { state: 'present', regexp: 'ResourceDisk.SwapSizeMB=', line: 'ResourceDisk.SwapSizeMB={{ item.swap_size_mb | default(2052) }}' }
+  loop_control:
+    loop_var:                     waagentconf
+  when:                           swapfsdata.stat.exists and swapfsdata.stat.isdir
+  register:                       swapfilemodified
+  notify:
+    - "Ensure waagent is restarted"
+
+
+    # count_hana_data:        "{{ ((sap_swap|selectattr('tier', 'search', node_tier)|list|first).pvs|default('NOT_FOUND')).split(',')|count }}"
+- debug:
+    vars:
+      count_hana_data:        "{{ ((sap_swap|selectattr('tier', 'search', node_tier)|list|first).swap_size_mb|default('2048')) }}"
+
 
 ...
