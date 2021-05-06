@@ -145,7 +145,7 @@
   #                             ).count(',')+1                                          # Get number of commas and increment by 1.
   #                         }}"
   @
-    count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default(-1)).count(',')+1}}"
+    count_hana_data:        "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_data')|list|first).pvs|default(-1|int)).count(',')+1}}"
     count_hana_log:         "{{ ((volume_groups|selectattr('vg', 'search', 'vg_hana_log') |list|first).pvs|default('NOT_FOUND')).count(',')+1 }}"
 
 
