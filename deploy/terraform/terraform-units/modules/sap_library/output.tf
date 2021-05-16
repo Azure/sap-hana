@@ -57,3 +57,7 @@ output "remote_state_container_name" {
 output "tfstate_resource_id" {
   value = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0].id : azurerm_storage_account.storage_tfstate[0].id
 }
+
+output "storagecontainer_ansible" {
+  value = local.sa_ansible_container_name
+}

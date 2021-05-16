@@ -1,5 +1,6 @@
 output "hdb_vms" {
-  value = azurerm_linux_virtual_machine.vm_dbnode
+  sensitive = false
+  value     = azurerm_linux_virtual_machine.vm_dbnode[*].id
 }
 
 output "nics_dbnodes_admin" {
@@ -15,11 +16,13 @@ output "loadbalancers" {
 }
 
 output "hdb_sid" {
-  value = local.hana_database.instance.sid
+  sensitive = false
+  value     = local.hdb_sid
 }
 
 output "hana_database_info" {
-  value = try(local.enable_deployment ? local.hana_database : map(false), {})
+  sensitive = false
+  value     = try(local.enable_deployment ? local.hana_database : map(false), {})
 }
 
 // Output for DNS
@@ -33,7 +36,7 @@ output "dns_info_vms" {
       concat(
         slice(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, 0, local.db_server_count),
         slice(azurerm_network_interface.nics_dbnodes_db[*].private_ip_address, 0, local.db_server_count)
-      )    )) : (
+    ))) : (
     null
   )
 }
@@ -47,4 +50,9 @@ output "dns_info_loadbalancers" {
 
 output "hanadb_vm_ids" {
   value = local.enable_deployment ? azurerm_linux_virtual_machine.vm_dbnode[*].id : []
+}
+
+
+output "dbtier_disks" {
+  value = local.enable_deployment ? local.db_disks_ansible : []
 }

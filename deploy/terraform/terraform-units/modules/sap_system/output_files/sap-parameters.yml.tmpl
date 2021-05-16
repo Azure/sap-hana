@@ -1,0 +1,16 @@
+---
+
+bom_base_name:                 
+sapbits_location_base_path:    
+
+# TERRAFORM CREATED
+sap_sid:                       ${sid}
+kv_uri:                        ${kv_uri}
+secret_prefix:                 ${secret_prefix}
+
+disks: 
+%{~ for disk in disks }
+  - ${disk} 
+%{~ endfor }
+
+...

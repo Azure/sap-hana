@@ -1,0 +1,14 @@
+{
+  "infrastructure": {
+    "region"                : "eastus2",
+    "environment"           : "MGMT",
+    "resource_group": {
+      "arm_id"              : "<azureresourceid>"
+    }
+  },
+  "deployer": {
+    "environment"           : "MGMT",
+    "region"                : "eastus2",
+    "vnet"                  : "DEP01"
+  }
+}

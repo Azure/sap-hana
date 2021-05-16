@@ -1,93 +1,64 @@
-### <img src="documentation/SAP_Automation_on_Azure/assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
-<br/>
+# ![SAP Deployment Automation Framework](/documentation/SAP_Automation_on_Azure/assets/images/UnicornSAPBlack64x64.png) **SAP Deployment Automation Framework** #
 
-# Welcome <!-- omit in toc -->
+Welcome to the [**SAP on Azure Deployment Automation Framework**](documentation/SAP_Automation_on_Azure/table_of_contents.md) repository.
 
-Master Branch's status: [![Build Status](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_apis/build/status/Azure.sap-hana?branchName=master&api-version=5.1-preview.1)](https://dev.azure.com/azuresaphana/Azure-SAP-HANA/_build/latest?definitionId=6&branchName=master)
+This repository contains the tooling designed to enable automated deployment for SAP on Azure. The automation framework leverages [Terraform](https://www.terraform.io/) for the infrastructure deployment and [Ansible](https://www.ansible.com/) for operating system and application configuration. It allows for deployment of the infrastructure for SAP landscapes based on SAP HANA and NetWeaver with AnyDB using all SAP supported operating system versions. All SAP tiers – SBX, DEV, QA, PROD can be deployed in a chosen region.
 
-<br/><br/>
+The deployment framework is based on Microsoft best practices and principles for SAP on Azure. These principles are outlined in a comprehensive documentation which should be followed to ensure supportability by using certified virtual machines and storage solutions, stability, reliability and performance. [Get started with SAP on Azure VMs - Azure Virtual Machines | Microsoft Docs](https://docs.microsoft.com/azure/virtual-machines/workloads/sap/get-started)
 
-## Abstract <!-- omit in toc -->
+The principles of the SAP Automation frameworks adhers to the principles of the Microsoft cloud adoption framework. [Microsoft Cloud Adoption Framework for Azure - Cloud Adoption Framework | Microsoft Docs](https://docs.microsoft.com/azure/cloud-adoption-framework/)
 
----
-<br/>
+## Glossary ##
 
-Welcome to the **SAP on Azure Deployment Automation Framework** repository.
-This repository contains code that will support the automated deployments of SAP platforms in the Azure Cloud.
-<br/>
-
-Please follow the linke below to the documentation:
-<br/><br/>
-
-
-<center>
-
-[<img src="documentation/SAP_Automation_on_Azure/assets/images/documentation-clipart.png" width="256px">](documentation/SAP_Automation_on_Azure/table_of_contents.md)
-
-## [SAP Deployment Automation Framework Documentation](documentation/SAP_Automation_on_Azure/table_of_contents.md) <!-- omit in toc -->
-
-</center>
-
-
-<br/><br/><br/>
-
-
-# Table of contents <!-- omit in toc -->
-
-- [Contributions](#contributions)
-- [Data Collection](#data-collection)
-- [How to Turn off Data Collection](#how-to-turn-off-data-collection)
-- [License & Copyright](#license--copyright)
-- [Contact](#contact)
-
-<br/><br/>
-
----
-
-## Contributions
-
-If you want to contribute to our project, be sure to review the [contributing guidelines](/CONTRIBUTING.md).
-
-We use [GitHub issues](https://github.com/Azure/sap-hana/issues/) for feature requests and bugs.
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+|Term           | Description|
+| :-            | :-         |
+|System         |An SAP system is an instance of an SAP application that has the resources the application needs to run, like virtual machines (VMs), disks, load balancers, proximity placement groups, availability sets, subnets, and network security groups. The application is identified by a unique 3 letter identifier SID.|
+|Landscape      |A landscape is a collection of systems in different environments in an SAP application. The example diagram shows three SAP landscapes: SAP ERP Central Component (ECC), SAP customer relationship management (CRM), and SAP Business Warehouse (BW).|
+|Workload Zone  |A workload zone is also called a deployment environment, and partitions the SAP application into environments like non-prod and prod or can further segment a landscape into tiers like development, quality assurance, and production. A deployment environment provides shared resources like virtual networks and key vaults to all the systems in the Workload Zone.  
 
 <br>
 
-## Data Collection
+The following diagram illustrates the dependencies between SAP systems, workload zones, and landscapes. In the illustration below the customer has three landscapes: SAP ERP Central Component (ECC), SAP customer relationship management (CRM), and SAP Business Warehouse (BW). Each landscape has four workload zones: sandbox, development, quality assurance, and production. Each workload zone may contain one or more systems.
 
-The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft's privacy statement. Our privacy statement is located at https://go.microsoft.com/fwlink/?LinkID=824704. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
+![SAP Deployment Automation Framework - Process](/documentation/images/SAP_estate.png)
+
+## SAP Deployment Automation Framework - Process ##
+
+The highlevel process for deployment is illustrated in the diagram below.
+
+![SAP Deployment Automation Framework - Process](/documentation/images/SAP-Automation_Process.png)
+
+### **Deployment environment** ###
+
+The first deployment activity is to prepare the deployment environment. This environment will contain a an Azure virtual machine that can be used to run Terraform and Ansible. The environment will also contain a keyvault for storing credential information. For more information see [Deployer documentation](/documentation/SAP_Automation_on_Azure/Software_Documentation/product_documentation-deployer.md) and [Deployer configuration](/documentation/SAP_Automation_on_Azure/Software_Documentation/configuration-deployer.md)
+
+![SAP Deployment Automation Framework - Deployer](/documentation/images/Deployer.png)
+
+### **SAP Library** ###
+
+The SAP library will provide persistent storage for the Terraform state files as well as storage for the SAP Installation media. For more information see [SAP Library documentation](/documentation/SAP_Automation_on_Azure/Software_Documentation/product_documentation-sap_library.md) and [SAP Library configuration](/documentation/SAP_Automation_on_Azure/Software_Documentation/configuration-sap_library.md)
+
+![SAP Deployment Automation Framework - Library](/documentation/images/Library.png)
+
+### **Workload zone** ###
+
+The workload zone will support the partitioning of an SAP landscape into different tiers (Dev, QA, Prod, etc). The workload zone will contain an Azure Virtual Network and Azure Keyvaults for managing the virtual machine credentials for the systems deployed into the workload. For more information see [SAP Workload Zone documentation](/documentation/SAP_Automation_on_Azure/Software_Documentation/product_documentation-sapworkloadzone.md) and [SAP Workload Zone configuration](/documentation/SAP_Automation_on_Azure/Software_Documentation/configuration-sap_workloadzone.md)
+
+![SAP Deployment Automation Framework - Workload zone](/documentation/images/Workload_zone.png)
+
+### **System** ###
+
+The SAP System is the actual SAP Application, it contains all the Azure artifacts required to host the SAP Application.
+
+For more information see [SAP System documentation](/documentation/SAP_Automation_on_Azure/Software_Documentation/product_documentation-sap_deployment_unit.md) and [SAP System configuration](/documentation/SAP_Automation_on_Azure/Software_Documentation/configuration--sap_deployment_unit.md)
+
+![SAP Deployment Automation Framework - Workload zone](/documentation/images/system.png)
+
+### Getting started with the SAP Deployment Automation Framework ###
+
+For detailed guidance on how to start using the Deployment Automation Framework see: [Getting started with the SAP Deployment Automation framework](/documentation/SAP_Automation_on_Azure/Process_Documentation/readme.md)
+
+### Contributing to the repository ###
 
 
-## How to Turn off Data Collection
-
-To turn off data collection, please remove or comment out below IMDS.tf files:
-- Data collection for deployer [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_deployer/IMDS.tf)
-- Data collection for sap_library [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_library/IMDS.tf)
-- Data collection for sap_landscape [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_landscape/IMDS.tf)
-- Data collection for sap_system [here](https://github.com/Azure/sap-hana/blob/master/deploy/terraform/terraform-units/modules/sap_system/common_infrastructure/IMDS.tf)
-
-
-## License & Copyright
-
-Copyright © 2018-2020 Microsoft Azure.
-
-Licensed under the [MIT License](LICENSE).
-
-<br>
-
-## Contact
-
-We look forward to your feedback and welcome any contributions!
-
-Please feel free to reach out to our team at ![image](documentation/SAP_Automation_on_Azure/assets/images/contact.png).
+For information about how to collaborate in the repository please see the [contributing guidelines](contributions.md)

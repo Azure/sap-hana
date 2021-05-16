@@ -1,6 +1,7 @@
 
 # Create observer VM
 resource "azurerm_network_interface" "observer" {
+  provider                      = azurerm.main
   count                         = local.deploy_observer ? length(local.zones) : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.nic)
   resource_group_name           = var.resource_group[0].name
@@ -23,12 +24,26 @@ resource "azurerm_network_interface" "observer" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
-  depends_on          = [var.anchor_vm]
-  count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
-  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
-  computer_name       = local.observer_computer_names[count.index]
-  resource_group_name = var.resource_group[0].name
-  location            = var.resource_group[0].location
+  provider                        = azurerm.main
+  depends_on                      = [var.anchor_vm]
+  count                           = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
+  resource_group_name             = var.resource_group[0].name
+  location                        = var.resource_group[0].location
+  name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  computer_name                   = local.observer_computer_names[count.index]
+
+  admin_username                  = var.sid_username
+  admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -45,9 +60,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   network_interface_ids = [
     azurerm_network_interface.observer[count.index].id
   ]
-  size                            = local.observer_size
-  admin_username                  = var.sid_username
-  disable_password_authentication = true
+  size = local.observer_size
 
   os_disk {
     name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)
@@ -68,11 +81,6 @@ resource "azurerm_linux_virtual_machine" "observer" {
     }
   }
 
-  admin_ssh_key {
-    username   = var.sid_username
-    public_key = var.sdu_public_key
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -82,6 +90,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
 
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "observer" {
+  provider            = azurerm.main
   count               = local.deploy_observer && upper(local.anydb_ostype) == "WINDOWS" ? length(local.zones) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.observer_computer_names[count.index]

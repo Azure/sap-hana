@@ -1,0 +1,68 @@
+{
+  "application": {
+    "application_server_count": 0,
+    "enable_deployment": true,
+    "ers_instance_number": "02",
+    "os": {
+      "offer": "windowsserver",
+      "publisher": "MicrosoftWindowsServer",
+      "sku": "2016-Datacenter-smalldisk",
+      "version": "latest"
+    },
+    "scs_os": {
+      "offer": "windowsserver",
+      "publisher": "MicrosoftWindowsServer",
+      "sku": "2016-Datacenter-smalldisk",
+      "version": "latest"
+    },
+    "scs_high_availability": false,
+    "scs_server_count": 1,
+    "scs_instance_number": "01",
+    "sid": "WIN",
+    "webdispatcher_count": 0,
+    "dual_nics": false,
+    "use_DHCP": true,
+    "app_zones": [
+      "2",
+      "1",
+      "3"
+    ],
+    "scs_zones": [
+      "2"
+    ],
+    "web_zones": [
+      "2"
+    ]
+  },
+  "databases": [
+    {
+      "high_availability": false,
+      "os": {
+        "publisher": "MicrosoftSQLServer",
+        "offer": "SQL2017-WS2016",
+        "sku": "Standard",
+        "version": "latest"
+      },
+      "platform": "SQLSERVER",
+      "size": "1024",
+      "dual_nics": false,
+      "use_DHCP": true,
+      "authentication": {
+        "type": "password"
+      },
+      "dbnodes": [
+        {}
+      ]
+    }
+  ],
+  "infrastructure": {
+    "environment": "DEV",
+    "region": "westeurope",
+    "vnets": {
+      "sap": {
+        "name": "SAP01"
+        
+      }
+    }
+  }
+}

@@ -103,7 +103,13 @@ steps:
         fi
       fi
       sap_vnet_address_space="10.${idx}.0.0/16"
+      subnet_admin_prefix="10.${idx}.0.0/25"
+      subnet_app_prefix="10.${idx}.1.0/25"
+      subnet_db_prefix="10.${idx}.2.0/25"
+      subnet_web_prefix="10.${idx}.3.0/25"
       subnet_iscsi_prefix="10.${idx}.${idx}.64/27"
+
+      echo "${subnet_admin_prefix}"
 
       saplandscape_rg="${saplandscape_prefix}-WEEU-SAP0-INFRASTRUCTURE"
       
@@ -144,6 +150,10 @@ steps:
       | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
       | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq --arg sap_vnet_address_space "${sap_vnet_address_space}" .infrastructure.vnets.sap.address_space\ =\ \$sap_vnet_address_space \
+      | jq --arg subnet_admin_prefix "${subnet_admin_prefix}" .infrastructure.vnets.sap.subnet_admin.prefix\ =\ \$subnet_admin_prefix \
+      | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
+      | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
+      | jq --arg subnet_web_prefix "${subnet_web_prefix}" .infrastructure.vnets.sap.subnet_web.prefix\ =\ \$subnet_web_prefix \
       | jq --arg subnet_iscsi_prefix "${subnet_iscsi_prefix}" .infrastructure.vnets.sap.subnet_iscsi.prefix\ =\ \$subnet_iscsi_prefix \
       > ${input}
 

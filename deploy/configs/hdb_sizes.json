@@ -1,1052 +1,1209 @@
 {
-    "LargeInstance": {
-        "compute": {},
-        "storage": [
-            {
-                "name": "data",
-                "count": 1,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 1,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "mount_point": "/hana/logbackups"
-            }
-        ]
-    },
-    "Default": {
-        "compute": {
-            "vm_size": "Standard_D8s_v3",
-            "swap_size_gb": 2
+    "db": {
+        "LargeInstance": {
+            "compute": {},
+            "storage": [
+                {
+                    "name": "data",
+                    "count": 1,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 1,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "mount_point": "/hana/logbackups"
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "Default": {
+            "compute": {
+                "vm_size": "Standard_D8s_v3",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "S": {
-        "compute": {
-            "vm_size": "Standard_M32ls",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "Demo": {
+            "compute": {
+                "vm_size": "Standard_D8s_v3",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M": {
-        "compute": {
-            "vm_size": "Standard_M64ls",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "S": {
+            "compute": {
+                "vm_size": "Standard_M32ls",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "L": {
-        "compute": {
-            "vm_size": "Standard_M64s",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "M": {
+            "compute": {
+                "vm_size": "Standard_M64ls",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 2,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "XL": {
-        "compute": {
-            "vm_size": "Standard_M128s",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "L": {
+            "compute": {
+                "vm_size": "Standard_M64s",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 2,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "XXL": {
-        "compute": {
-            "vm_size": "Standard_M128ms",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 2,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "XL": {
+            "compute": {
+                "vm_size": "Standard_M128s",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 5,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 4,
-                "disk_type": "StandardSSD_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M32ts": {
-        "compute": {
-            "vm_size": "Standard_M32ts",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 2,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "XXL": {
+            "compute": {
+                "vm_size": "Standard_M128ms",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M32ls": {
-        "compute": {
-            "vm_size": "Standard_M32ls",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 5,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 4,
+                    "disk_type": "StandardSSD_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "M32ts": {
+            "compute": {
+                "vm_size": "Standard_M32ts",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M64ls": {
-        "compute": {
-            "vm_size": "Standard_M64ls",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "M32ls": {
+            "compute": {
+                "vm_size": "Standard_M32ls",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M64s": {
-        "compute": {
-            "vm_size": "Standard_M64s",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M64ls": {
+            "compute": {
+                "vm_size": "Standard_M64ls",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M64ms": {
-        "compute": {
-            "vm_size": "Standard_M64ms",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadWrite"
+        "M64s": {
+            "compute": {
+                "vm_size": "Standard_M64s",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M128s": {
-        "compute": {
-            "vm_size": "Standard_M128s",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M64ms": {
+            "compute": {
+                "vm_size": "Standard_M64ms",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 512,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 2,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M128ms": {
-        "compute": {
-            "vm_size": "Standard_M128ms",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M128s": {
+            "compute": {
+                "vm_size": "Standard_M128s",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 2048,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M208s_v2": {
-        "compute": {
-            "vm_size": "Standard_M208s_v2",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 512,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M128ms": {
+            "compute": {
+                "vm_size": "Standard_M128ms",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 2048,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M208ms_v2": {
-        "compute": {
-            "vm_size": "Standard_M208ms_v2",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 2048,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M208s_v2": {
+            "compute": {
+                "vm_size": "Standard_M208s_v2",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 2048,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 2048,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M416s_v2": {
-        "compute": {
-            "vm_size": "Standard_M416s_v2",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 2048,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M208ms_v2": {
+            "compute": {
+                "vm_size": "Standard_M208ms_v2",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 2048,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
-            },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 4096,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
-    },
-    "M416ms_v2": {
-        "compute": {
-            "vm_size": "Standard_M416ms_v2",
-            "swap_size_gb": 2
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 2048,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 2048,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
         },
-        "storage": [
-            {
-                "name": "os",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 128,
-                "caching": "ReadWrite"
+        "M416s_v2": {
+            "compute": {
+                "vm_size": "Standard_M416s_v2",
+                "swap_size_gb": 2
             },
-            {
-                "name": "data",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 4096,
-                "caching": "None",
-                "write_accelerator": false,
-                "mount_point": "/hana/data"
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 2048,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 4096,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
+        },
+        "M416ms_v2": {
+            "compute": {
+                "vm_size": "Standard_M416ms_v2",
+                "swap_size_gb": 2
             },
-            {
-                "name": "log",
-                "count": 3,
-                "disk_type": "Premium_LRS",
-                "size_gb": 255,
-                "caching": "None",
-                "write_accelerator": true,
-                "mount_point": "/hana/log"
-            },
-            {
-                "name": "shared",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 1024,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/shared"
-            },
-            {
-                "name": "sap",
-                "count": 1,
-                "disk_type": "Premium_LRS",
-                "size_gb": 64,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/usr/sap"
-            },
-            {
-                "name": "backup",
-                "count": 4,
-                "disk_type": "Premium_LRS",
-                "size_gb": 4096,
-                "caching": "ReadOnly",
-                "write_accelerator": false,
-                "mount_point": "/hana/backup"
-            }
-        ]
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 4096,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 0
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 255,
+                    "caching": "None",
+                    "write_accelerator": true,
+                    "mount_point": "/hana/log",
+                    "lun_start": 9
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 1024,
+                    "use_lvm": true,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 13
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 14
+                },
+                {
+                    "name": "backup",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 4096,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 15
+                }
+            ]
+        }
     }
 }

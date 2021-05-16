@@ -56,3 +56,8 @@ output "sid" {
 output "automation_version" {
   value = local.version_label
 }
+
+output "disks" {
+  value = compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)) 
+
+}

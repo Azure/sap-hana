@@ -15,20 +15,32 @@
     },
     "storage_account_sapbits": {
         "arm_id": "",
+        "account_tier": "Standard",
+        "account_replication_type": "LRS",
+        "account_kind": "StorageV2",
         "file_share": {
-            "is_existing": true
+            "enable_deployment": true,
+            "is_existing": false,
+            "name": "sapbits"
         },
         "sapbits_blob_container": {
-            "is_existing": true
+            "enable_deployment": true,
+            "is_existing": false,
+            "name": "sapbits"
         }
     },
     "storage_account_tfstate": {
         "arm_id": "",
+        "account_tier": "Standard",
+        "account_replication_type": "LRS",
+        "account_kind": "StorageV2",
         "tfstate_blob_container": {
-            "is_existing": true
+            "is_existing": false,
+            "name": "tfstate"
         },
         "ansible_blob_container": {
-            "is_existing": true
+            "is_existing": false,
+            "name": "ansible"
         }
     }
 }

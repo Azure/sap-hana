@@ -1,0 +1,15 @@
+{
+  "infrastructure": {
+    "region"                : "westus2",
+    "environment"           : "MGMT"
+  },
+  "deployer": {
+    "environment"           : "MGMT",
+    "region"                : "westus2",
+    "vnet"                  : "DEP02",
+    "use"                   : false
+  },
+  "key_vault": {
+    "kv_spn_id"             : "<azureresourceid>"
+  }
+}

@@ -6,8 +6,8 @@ Description:
   Define 0..n Deployer(s).
 */
 
-data azurerm_subscription "primary" {}
-data azurerm_client_config "current" {}
+data "azurerm_subscription" "primary" {}
+data "azurerm_client_config" "current" {}
 
 // Public IP addresse and nic for Deployer
 resource "azurerm_public_ip" "deployer" {
@@ -16,6 +16,7 @@ resource "azurerm_public_ip" "deployer" {
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "deployer" {
@@ -27,8 +28,8 @@ resource "azurerm_network_interface" "deployer" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = local.sub_mgmt_deployed.id
-    private_ip_address            = local.deployers[count.index].private_ip_address
-    private_ip_address_allocation = "static"
+    private_ip_address            = local.deployers[count.index].use_DHCP ? "" : local.deployers[count.index].private_ip_address
+    private_ip_address_allocation = local.deployers[count.index].use_DHCP ? "Dynamic" : "Static"
     public_ip_address_id          = local.enable_deployer_public_ip ? azurerm_public_ip.deployer[count.index].id : ""
   }
 }
@@ -40,8 +41,9 @@ resource "azurerm_user_assigned_identity" "deployer" {
   name                = format("%s%s", local.prefix, local.resource_suffixes.msi)
 }
 
-// Add role to be able to deploy resources
+# // Add role to be able to deploy resources
 resource "azurerm_role_assignment" "sub_contributor" {
+  count                = var.assign_subscription_permissions ? 1 : 0
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
@@ -127,10 +129,10 @@ resource "null_resource" "prepare-deployer" {
   provisioner "remote-exec" {
     inline = local.deployers[count.index].os.source_image_id != "" ? [] : [
       // Prepare folder structure
-      "mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${azurerm_resource_group.deployer[0].name}",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM",
-      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE",
+      "mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/${local.rg_name}",
+      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY",
+      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM",
+      "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE",
       "mkdir $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER",
       // Clones project repository
       "git clone https://github.com/Azure/sap-hana.git $HOME/Azure_SAP_Automated_Deployment/sap-hana",
@@ -146,28 +148,38 @@ resource "null_resource" "prepare-deployer" {
       "sudo sh -c \"echo export PATH=$PATH:/opt/terraform/bin > /etc/profile.d/deploy_server.sh\"",
       // Set env for MSI
       "sudo sh -c \"echo export ARM_USE_MSI=true >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo export ARM_MSI_ENDPOINT=\"http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01\" >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo export ARM_CLIENT_ID=${azurerm_user_assigned_identity.deployer.client_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_SUBSCRIPTION_ID=${data.azurerm_subscription.primary.subscription_id} >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo export ARM_TENANT_ID=${data.azurerm_subscription.primary.tenant_id} >> /etc/profile.d/deploy_server.sh\"",
+      "sudo sh -c \"echo export DEPLOYMENT_REPO_PATH=$HOME/Azure_SAP_Automated_Deployment/sap-hana/ >> /etc/profile.d/deploy_server.sh\"",
       "sudo sh -c \"echo az login --identity --output none >> /etc/profile.d/deploy_server.sh\"",
       // Set env for ansible
       "sudo sh -c \"echo export ANSIBLE_HOST_KEY_CHECKING=False >> /etc/profile.d/deploy_server.sh\"",
       // Install az cli
       "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
-      // Install Git
       "sudo apt update",
-      "sudo apt-get install git=1:2.17.1-1ubuntu0.7",
       // install jq
-      "sudo apt -y install jq=1.5+dfsg-2",
-      // Install pip3
+      "sudo apt -y install jq",
+      "sudo pip3 pip install setuptools-rust",
+      // Install pip
       "sudo apt -y install python3-pip",
+      "sudo pip3 install --upgrade pip",
+      "sudo pip3 pip install msal",
       // Installs Ansible
-      "sudo -H pip3 install \"ansible>=2.8,<2.9\"",
+      "sudo pip3 install \"ansible>=2.9,<2.10\"",
+      "sudo pip3 install ansible[azure]",
+      "sudo wget -nv -q https://raw.githubusercontent.com/ansible-collections/azure/dev/requirements-azure.txt",
+      "sudo pip3 install -r requirements-azure.txt",
+      "sudo ansible-galaxy collection install azure.azcollection --force",
       // Install pywinrm
-      "sudo -H pip3 install \"pywinrm>=0.3.0\"",
+      "sudo pip3 install \"pywinrm>=0.3.0\"",     
       // Install yamllint
-      "sudo -H pip3 install \"yamllint==1.25.0\"",
+      "sudo pip3 install yamllint",
       // Install ansible-lint
-      "sudo -H pip3 install \"ansible-lint==4.3.7\""
+      "sudo pip3 install ansible-lint \"ansible>=2.9,<2.10\"",
+      "sudo pip3 install argcomplete",
+      "sudo activate-global-python-argcomplete"
     ]
   }
 }

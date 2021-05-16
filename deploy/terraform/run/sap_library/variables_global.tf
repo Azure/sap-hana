@@ -58,4 +58,52 @@ variable "deployer" {
 variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
+
+  validation {
+    condition = (
+      contains(keys(var.key_vault), "kv_spn_id") ? (
+        length(split("/", var.key_vault.kv_spn_id)) == 9) : (
+        true
+      )
+    )
+    error_message = "If specified, the kv_spn_id needs to be a correctly formed Azure resource ID."
+  }
+
+  validation {
+    condition = (
+      contains(keys(var.key_vault), "kv_user_id") ? (
+        length(split("/", var.key_vault.kv_user_id)) == 9) : (
+        true
+      )
+    )
+    error_message = "If specified, the kv_user_id needs to be a correctly formed Azure resource ID."
+  }
+
+  validation {
+    condition = (
+      contains(keys(var.key_vault), "kv_prvt_id") ? (
+        length(split("/", var.key_vault.kv_prvt_id)) == 9) : (
+        true
+      )
+    )
+    error_message = "If specified, the kv_prvt_id needs to be a correctly formed Azure resource ID."
+  }
+
+
 }
+
+variable "deployer_tfstate_key" {
+  description = "The key of deployer's remote tfstate file"
+  default     = ""
+}
+
+variable "deployment" {
+  description = "The type of deployment"
+  default = "update"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+  default = ""
+}
+

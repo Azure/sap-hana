@@ -32,43 +32,87 @@ function New-SAPDeployer {
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT license.
 #>
-    [cmdletbinding()]
+    [cmdletbinding(SupportsShouldProcess)]
     param(
         #Parameter file
-        [Parameter(Mandatory = $true)][string]$Parameterfile
+        [Parameter(Mandatory = $true)][string]$Parameterfile,
+        [Parameter(Mandatory = $false)][Switch]$Silent
+
     )
 
     Write-Host -ForegroundColor green ""
     Write-Host -ForegroundColor green "Bootstrap the deployer"
 
+    $curDir = Get-Location 
+
+    $autoApprove=""
+    
+    if($Silent) {
+        $autoApprove=" --auto-approve "
+    }
+
+    $fInfo = Get-ItemProperty -Path $Parameterfile
+    if (!$fInfo.Exists ) {
+        Write-Error ("File " + $Parameterfile + " does not exist")
+        return
+    }
+
+    $CachePath = (Join-Path -Path $Env:APPDATA -ChildPath "terraform.d\plugin-cache")
+    if ( -not (Test-Path -Path $CachePath)) {
+        New-Item -Path $CachePath -ItemType Directory
+    }
+    $env:TF_PLUGIN_CACHE_DIR = $CachePath
+    
+    $ParamFullFile = (Get-ItemProperty -Path $Parameterfile -Name Fullname).Fullname
+
+    Add-Content -Path "deployment.log" -Value "Bootstrap the deployer"
+    Add-Content -Path "deployment.log" -Value (Get-Date -Format "yyyy-MM-dd HH:mm")
+
     $mydocuments = [environment]::getfolderpath("mydocuments")
-    $filePath = $mydocuments + "\sap_deployment_automation.ini"
-    $iniContent = Get-IniContent $filePath
+    $fileINIPath = $mydocuments + "\sap_deployment_automation.ini"
+    $iniContent = Get-IniContent -Path $fileINIPath
 
-    [IO.FileInfo] $fInfo = $Parameterfile
-    $region = ($fInfo.Name -split "-")[1]
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
 
-    if ($null -ne $iniContent[$region] ) {
-        $sub = $iniContent[$region]["subscription"] 
+    Write-Host "Region:"$region
+    Write-Host "Environment:"$Environment
+
+    $combined = $Environment + $region
+
+    if ($null -ne $iniContent[$combined] ) {
+        $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"] 
     }
     else {
         $Category1 = @{"subscription" = "" }
-        $iniContent += @{$region = $Category1 }
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
-                
+        $iniContent += @{$combined = $Category1 }
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
-    # Subscription
+    
+    # Subscription & repo path
 
-    $sub = $iniContent[$region]["subscription"] 
-
+    $sub = $iniContent[$combined]["STATE_SUBSCRIPTION"] 
     $repo = $iniContent["Common"]["repo"]
+
     $changed = $false
 
     if ($null -eq $sub -or "" -eq $sub) {
-        $sub = Read-Host -Prompt "Please enter the subscription"
-        $iniContent[$region]["subscription"] = $sub
+        if ($null -ne $env:ARM_SUBSCRIPTION_ID) {
+            $sub = $env:ARM_SUBSCRIPTION_ID
+        }
+        else {
+            $sub = Read-Host -Prompt "Please enter the subscription"    
+        }
+        
+        $iniContent[$combined]["subscription"] = $sub
         $changed = $true
     }
+
+    $Cmd = "az account set --sub $sub"
+    Add-Content -Path "deployment.log" -Value $Cmd
+
+    & ([ScriptBlock]::Create($Cmd)) 
 
     if ($null -eq $repo -or "" -eq $repo) {
         $repo = Read-Host -Prompt "Please enter the path to the repository"
@@ -77,24 +121,25 @@ Licensed under the MIT license.
     }
 
     if ($changed) {
-         Out-IniFile -InputObject $iniContent -FilePath $filePath
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-    $terraform_module_directory = $repo + "\deploy\terraform\bootstrap\sap_deployer"
-
-    if (-not (Test-Path $terraform_module_directory) )
-    {
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\bootstrap\sap_deployer"
+    if (-not (Test-Path $terraform_module_directory) ) {
         Write-Host -ForegroundColor Red "The repository path: $repo is incorrect!"
-        $iniContent["Common"]["repo"] =""
-        Out-IniFile -InputObject $iniContent -FilePath $filePath
+        $iniContent["Common"]["repo"] = ""
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
         throw "The repository path: $repo is incorrect!"
         return
 
     }
 
+    $Env:TF_DATA_DIR = (Join-Path -Path $curDir -ChildPath ".terraform")
+
     Write-Host -ForegroundColor green "Initializing Terraform"
 
-    $Command = " init -upgrade=true " + $terraform_module_directory
+    $statefile = (Join-Path -Path $curDir -ChildPath "terraform.tfstate")
+    $Command = " init -upgrade=true  -backend-config ""path=$statefile"""
     if (Test-Path ".terraform" -PathType Container) {
         $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
 
@@ -102,27 +147,39 @@ Licensed under the MIT license.
             Write-Host -ForegroundColor green "State file already migrated to Azure!"
             $ans = Read-Host -Prompt "State is already migrated to Azure. Do you want to re-initialize the deployer Y/N?"
             if ("Y" -ne $ans) {
+                $Env:TF_DATA_DIR = $null
                 return
             }
             else {
-                $Command = " init -upgrade=true -reconfigure " + $terraform_module_directory
+                $Command = " init -upgrade=true -reconfigure "
+            }
+        }
+        else {
+            $ans = Read-Host -Prompt "The system has already been deployed, do you want to redeploy Y/N?"
+            if ("Y" -ne $ans) {
+                $Env:TF_DATA_DIR = $null
+                return
             }
         }
     }
 
-    $Cmd = "terraform $Command"
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
     & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
         throw "Error executing command: $Cmd"
     }
 
     Write-Host -ForegroundColor green "Running plan"
-    $Command = " plan -var-file " + $Parameterfile + " " + $terraform_module_directory
-
-    $Cmd = "terraform $Command"
+    $Command = " plan -var-file " + $ParamFullFile 
+    
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
     $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
     
     if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
         throw "Error executing command: $Cmd"
     }
 
@@ -132,6 +189,7 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor Green "Infrastructure is up to date"
         Write-Host ""
+        $Env:TF_DATA_DIR = $null
         return;
     }
 
@@ -139,40 +197,38 @@ Licensed under the MIT license.
         Write-Host ""
         Write-Host -ForegroundColor Green "Infrastructure is up to date"
         Write-Host ""
+        $Env:TF_DATA_DIR = $null
         return;
     }
 
     Write-Host $planResults
     
-    Write-Host -ForegroundColor green "Running apply"
+    if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+        Write-Host -ForegroundColor green "Running apply"
 
-    $Command = " apply -var-file " + $Parameterfile + " " + $terraform_module_directory
-    $Cmd = "terraform $Command"
-    & ([ScriptBlock]::Create($Cmd)) 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Error executing command: $Cmd"
+        $Command = " apply " +$autoApprove +" -var-file " + $ParamFullFile 
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        Add-Content -Path "deployment.log" -Value $Cmd
+        & ([ScriptBlock]::Create($Cmd)) 
+        if ($LASTEXITCODE -ne 0) {
+            $Env:TF_DATA_DIR = $null
+            throw "Error executing command: $Cmd"
+        }
+
+        $Command = " output deployer_kv_user_name"
+
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        $kvName = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+        Write-Host ("SPN Keyvault: " + $kvName)
+
+        $iniContent[$combined]["Vault"] = $kvName.Replace("""", "")
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+
+        if ($LASTEXITCODE -ne 0) {
+            $Env:TF_DATA_DIR = $null
+            throw "Error executing command: $Cmd"
+        }
     }
 
-    New-Item -Path . -Name "backend.tf" -ItemType "file" -Value "terraform {`n  backend ""local"" {}`n}" -Force
-
-    $Command = " output deployer_kv_user_name"
-
-    $Cmd = "terraform $Command"
-    $kvName = & ([ScriptBlock]::Create($Cmd)) | Out-String 
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "Error executing command: $Cmd"
-    }
-
-    Write-Host $kvName.Replace("""", "")
-    $iniContent[$region]["Vault"] = $kvName.Replace("""", "")
-    Out-IniFile -InputObject $iniContent -FilePath $filePath
-
-    if (Test-Path ".\backend.tf" -PathType Leaf) {
-        Remove-Item -Path ".\backend.tf" -Force 
-    }
-
-
+    $Env:TF_DATA_DIR = $null
 }
-
-

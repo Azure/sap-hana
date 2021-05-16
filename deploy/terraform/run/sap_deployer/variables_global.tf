@@ -60,4 +60,43 @@ variable "authentication" {
 variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
+  validation {
+    condition = (
+      contains(keys(var.key_vault),"kv_spn_id") ? (
+        length(split("/",var.key_vault.kv_spn_id)) == 9) : (
+        true
+      )
+    )
+    error_message = "If specified, the kv_spn_id needs to be a correctly formed Azure resource ID."
+  }
+}
+
+variable "firewall_deployment" {
+  description = "Boolean flag indicating if an Azure Firewall should be deployed"
+  default     = false
+}
+
+variable "firewall_rule_subnets" {
+  description = "List of subnets that are part of the firewall rule"
+  default     = []
+}
+
+variable "firewall_allowed_ipaddresses" {
+  description = "List of allowed IP addresses to be part of the firewall rule"
+  default     = []
+}
+
+variable "assign_subscription_permissions" {
+  description = "Assign permissions on the subscription"
+  default = true
+}
+
+variable "deployment" {
+  description = "The type of deployment"
+  default = "update"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+  default = ""
 }

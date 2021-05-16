@@ -62,14 +62,12 @@ variable "key_vault" {
   default     = {}
 }
 
+variable "deployer_tfstate_key" {
+  description = "The key of deployer's remote tfstate file"
+  default=""
+}
+
 variable "deployer_statefile_foldername" {
   description = "Folder name of folder containing the terraform state file"
   default = ""
-#   validation {
-#    condition = (
-#       length(trimspace(try(var.deployer_statefile_foldername, ""))) != 0 ? false : true
-#     )
-#     error_message = "If deployer_state_foldername is specified it must point to an existing folder containing the deployer state file."
-# }
 }
-

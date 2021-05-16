@@ -1,4 +1,4 @@
-output naming {
+output "naming" {
   value = {
     prefix = {
       DEPLOYER = local.deployer_name
@@ -9,7 +9,11 @@ output naming {
     storageaccount_names = {
       DEPLOYER = local.deployer_storageaccount_name
       SDU      = local.sdu_storageaccount_name
-      VNET     = local.landscape_storageaccount_name
+      VNET = {
+        landscape_storageaccount_name = local.landscape_storageaccount_name
+        witness_storageaccount_name   = local.witness_storageaccount_name
+      }
+
       LIBRARY = {
         library_storageaccount_name        = local.library_storageaccount_name
         terraformstate_storageaccount_name = local.terraformstate_storageaccount_name
@@ -57,6 +61,13 @@ output naming {
       WEB_SECONDARY_DNSNAME    = local.web_secondary_dnsnames
       WEB_VMNAME               = local.web_server_vm_names
     }
+
+    ppg_names = local.ppg_names
+    
+    app_avset_names = local.app_avset_names
+    scs_avset_names = local.scs_avset_names
+    web_avset_names = local.web_avset_names
+    db_avset_names  = local.db_avset_names
 
     resource_suffixes = var.resource_suffixes
 

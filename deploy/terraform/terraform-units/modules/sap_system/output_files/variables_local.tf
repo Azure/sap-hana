@@ -23,6 +23,7 @@ variable "hdb_sid" {
 }
 
 variable "hana_database_info" {
+  sensitive   = false
   description = "Updated hana database json"
 }
 
@@ -69,6 +70,7 @@ variable "anydb_loadbalancers" {
 }
 
 variable "any_database_info" {
+  sensitive   = false
   description = "Updated anydb database json"
 }
 
@@ -81,7 +83,37 @@ variable "landscape_tfstate" {
   description = "Landscape remote tfstate file"
 }
 
+variable "tfstate_resource_id" {
+  description = "Resource ID for tf state file"
+}
+
+variable "app_tier_os_types" {
+  description = "Defines the app tier os types"
+}
+
+variable "naming" {
+  description = "Defines the names for the resources"
+}
+
+variable "sid_kv_user_id" {
+  description = "Defines the names for the resources"
+}
+
+variable "disks" {
+  description = "List of disks"
+}
+
+variable "use_local_credentials" {
+  description = "SDU has unique credentials"
+}
+
 locals {
+
+  tfstate_resource_id          = try(var.tfstate_resource_id, "")
+  tfstate_storage_account_name = split("/", local.tfstate_resource_id)[8]
+  ansible_container_name       = try(var.naming.resource_suffixes.ansible, "ansible")
+
+  kv_name = split("/", var.sid_kv_user_id)[8]
 
   landscape_tfstate = var.landscape_tfstate
   ips_iscsi         = var.iscsi_private_ip
@@ -102,20 +134,21 @@ locals {
   hdb_vms = flatten([
     for database in local.databases : flatten([
       [
+
         for dbnode in database.dbnodes : {
-          role           = dbnode.role,
-          platform       = database.platform,
-          authentication = database.authentication,
-          name           = dbnode.computername
+          role      = dbnode.role,
+          platform  = database.platform,
+          name      = dbnode.computername,
+          auth_type = try(database.auth_type, "key")
         }
         if try(database.platform, "NONE") == "HANA"
       ],
       [
         for dbnode in database.dbnodes : {
-          role           = dbnode.role,
-          platform       = database.platform,
-          authentication = database.authentication,
-          name           = dbnode.computername
+          role      = dbnode.role,
+          platform  = database.platform,
+          name      = dbnode.computername,
+          auth_type = try(database.auth_type, "key")
         }
         if try(database.platform, "NONE") == "HANA" && database.high_availability
       ]
@@ -140,20 +173,22 @@ locals {
   anydb_vms = flatten([
     for adatabase in local.anydatabases : flatten([
       [
+
         for dbnode in adatabase.dbnodes : {
-          role           = dbnode.role,
-          platform       = upper(adatabase.platform),
-          authentication = adatabase.authentication,
-          name           = dbnode.name
+          role      = dbnode.role,
+          platform  = upper(adatabase.platform),
+          name      = dbnode.computername,
+          auth_type = try(adatabase.auth_type, "key")
+
         }
         if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(adatabase.platform, "NONE")))
       ],
       [
         for dbnode in adatabase.dbnodes : {
-          role           = dbnode.role,
-          platform       = upper(adatabase.platform),
-          authentication = adatabase.authentication,
-          name           = dbnode.name
+          role      = dbnode.role,
+          platform  = upper(adatabase.platform),
+          name      = dbnode.computername,
+          auth_type = try(adatabase.auth_type, "key")
         }
         if adatabase.high_availability && contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(adatabase.platform, "NONE")))
       ]
@@ -161,55 +196,5 @@ locals {
     if adatabase != {}
   ])
 
-  // Downloader for Ansible use
-  sap_user     = try(var.software.downloader.credentials.sap_user, "sap_smp_user")
-  sap_password = try(var.software.downloader.credentials.sap_password, "sap_smp_password")
-
-  hdb_versions = [
-    for scenario in try(var.software.downloader.scenarios, []) : scenario.product_version
-    if scenario.scenario_type == "DB"
-  ]
-  hdb_version = try(local.hdb_versions[0], "2.0")
-
-  downloader = merge({
-    credentials = {
-      sap_user     = local.sap_user,
-      sap_password = local.sap_password
-    }
-    },
-    {
-      scenarios = [
-        {
-          scenario_type   = "DB",
-          product_name    = "HANA",
-          product_version = local.hdb_version,
-          os_type         = "LINUX_X64",
-          os_version      = "SLES12.3",
-          components = [
-            "PLATFORM"
-          ]
-        },
-        {
-          scenario_type = "RTI",
-          product_name  = "RTI",
-          os_type       = "LINUX_X64"
-        },
-        {
-          scenario_type = "BASTION",
-          os_type       = "NT_X64"
-        },
-        {
-          scenario_type = "BASTION",
-          os_type       = "LINUX_X64"
-        }
-      ],
-      debug = {
-        enabled = false,
-        cert    = "charles.pem",
-        proxies = {
-          http  = "http://127.0.0.1:8888",
-          https = "https://127.0.0.1:8888"
-        }
-      }
-  })
+  secret_prefix = var.use_local_credentials ? var.naming.prefix.SDU : var.naming.prefix.VNET
 }

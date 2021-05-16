@@ -1,4 +1,19 @@
 #!/bin/bash
+
+#colors for terminal
+boldreduscore="\e[1;4;31m"
+boldred="\e[1;31m"
+cyan="\e[1;36m"
+resetformatting="\e[0m"
+
+#External helper functions
+#. "$(dirname "${BASH_SOURCE[0]}")/deploy_utils.sh"
+full_script_path="$(realpath "${BASH_SOURCE[0]}")"
+script_directory="$(dirname "${full_script_path}")"
+
+#call stack has full scriptname when using source 
+source "${script_directory}/deploy_utils.sh"
+
 function showhelp {
     echo ""
     echo "#########################################################################################"
@@ -15,15 +30,26 @@ function showhelp {
     echo "#                                                                                       #"
     echo "#                                                                                       #"
     echo "#   Usage: installer.sh                                                                 #"
-    echo "#    -p parameter file                                                                  #"
-    echo "#    -i interactive true/false setting the value to false will not prompt before apply  #"
-    echo "#    -h Show help                                                                       #"
+    echo "#    -p or --parameterfile                parameter file                                #"
+    echo "#    -t or --type                         type of system to remove                      #"
+    echo "#                                         valid options:                                #"
+    echo "#                                           sap_deployer                                #"
+    echo "#                                           sap_library                                 #"
+    echo "#                                           sap_landscape                               #"
+    echo "#                                           sap_system                                  #"
+    echo "#                                                                                       #"
+    echo "#   Optional parameters                                                                 #"
+    echo "#                                                                                       #"
+    echo "#    -o or --storageaccountname           Storage account name for state file           #"
+    echo "#    -i or --auto-approve                 Silent install                                #"
+    echo "#    -h or --help                         Show help                                     #"
     echo "#                                                                                       #"
     echo "#   Example:                                                                            #"
     echo "#                                                                                       #"
-    echo "#   [REPO-ROOT]deploy/scripts/install_deployer.sh \                                     #"
-    echo "#      -p PROD-WEEU-DEP00-INFRASTRUCTURE.json \                                         #"
-    echo "#      -i true                                                                          #"
+    echo "#   [REPO-ROOT]deploy/scripts/installer.sh \                                            #"
+    echo "#      --parameterfile DEV-WEEU-SAP01-X00 \                                             #"
+    echo "#      --type sap_system                                                                #"
+    echo "#      --auto-approve                                                                   #"  
     echo "#                                                                                       #"
     echo "#########################################################################################"
 }
@@ -45,21 +71,31 @@ function missing {
     echo "#########################################################################################"
 }
 
-show_help=false
 
-while getopts ":p:t:i:d:h" option; do
-    case "${option}" in
-        p) parameterfile=${OPTARG};;
-        t) deployment_system=${OPTARG};;
-        i) approve="--auto-approve";;
-        h) showhelp
-            exit 3
-        ;;
-        ?) echo "Invalid option: -${OPTARG}."
-            exit 2
-        ;;
-    esac
+force=0
+
+INPUT_ARGUMENTS=$(getopt -n installer -o p:t:o:hif --longoptions type:,parameterfile:,storageaccountname:,auto-approve,force,help -- "$@")
+VALID_ARGUMENTS=$?
+
+if [ "$VALID_ARGUMENTS" != "0" ]; then
+  showhelp
+fi
+
+eval set -- "$INPUT_ARGUMENTS"
+while :
+do
+  case "$1" in
+    -t | --type)                               deployment_system="$2"           ; shift 2 ;;
+    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
+    -o | --storageaccountname)                 REMOTE_STATE_SA="$2"             ; shift 2 ;;
+    -f | --force)                              force=1                          ; shift ;;
+    -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
+    -h | --help)                               showhelp 
+                                               exit 3                           ; shift ;;
+    --) shift; break ;;
+  esac
 done
+
 
 tfstate_resource_id=""
 tfstate_parameter=""
@@ -72,141 +108,268 @@ landscape_tfstate_key_parameter=""
 landscape_tfstate_key_exists=false
 
 parameterfile_name=$(basename "${parameterfile}")
+param_dirname=$(dirname "${parameterfile}")
 
-
-# Read environment
-readarray -d '-' -t environment<<<"${parameterfile_name}"
-readarray -d '-' -t -s 1 region<<<"${parameterfile_name}"
-
-key=$(echo "${parameterfile_name}" | cut -d. -f1)
+if [ "${param_dirname}" != '.' ]; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#  $boldred Please run this command from the folder containing the parameter file $resetformatting              #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    exit 3
+fi
 
 if [ ! -f "${parameterfile}" ]
 then
-    printf -v val %-40.40s "$parameterfile"
+    printf -v val %-35.35s "$parameterfile"
     echo ""
     echo "#########################################################################################"
-    echo "#                                                                                       #" 
-    echo "#               Parameter file does not exist: ${val} #"
-    echo "#                                                                                       #" 
+    echo "#                                                                                       #"
+    echo -e "#                 $boldred  Parameter file does not exist: ${val} $resetformatting #"
+    echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit
+    exit 2 #No such file or directory
 fi
+
+if [ ! -n "${deployment_system}" ]
+then
+    printf -v val %-40.40s "$deployment_system"
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#   Incorrect system deployment type specified: ${val}#"
+    echo "#                                                                                       #"
+    echo "#     Valid options are:                                                                #"
+    echo "#       sap_deployer                                                                    #"
+    echo "#       sap_library                                                                     #"
+    echo "#       sap_landscape                                                                   #"
+    echo "#       sap_system                                                                      #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 64 #script usage wrong
+fi
+
+
+
+if [ $force == 1 ]
+then
+    if [ -d ./.terraform/ ]; then
+        rm .terraform -r
+    fi
+
+    if [ -f terraform.tfstate ]; then
+        rm terraform.tfstate
+    fi
+
+    if [ -f terraform.tfstate.backup ]; then
+        rm terraform.tfstate.backup
+    fi
+fi
+
+
+# Read environment
+environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+
+if [ ! -n "${environment}" ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                                                                                       #"
+    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 65 #data format error
+fi
+
+if [ ! -n "${region}" ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Incorrect parameter file.                                   #"
+    echo "#                                                                                       #"
+    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 65 #data format error
+fi
+
+key=$(echo "${parameterfile_name}" | cut -d. -f1)
 
 #Persisting the parameters across executions
 
 automation_config_directory=~/.sap_deployment_automation/
 generic_config_information="${automation_config_directory}"config
-library_config_information="${automation_config_directory}""${region}"
+system_config_information="${automation_config_directory}""${environment}""${region}"
 
-if [ ! -d ${automation_config_directory} ]
+deployer_tfstate_key_parameter=''
+landscape_tfstate_key_parameter=''
+
+
+#Plugins
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
-    # No configuration directory exists
-    mkdir $automation_config_directory
-    if [ -n "${DEPLOYMENT_REPO_PATH}" ]; then
-        # Store repo path in ~/.sap_deployment_automation/config
-        echo "DEPLOYMENT_REPO_PATH=${DEPLOYMENT_REPO_PATH}" >> "${generic_config_information}"
-        config_stored=1
-    fi
-    if [ -n "$ARM_SUBSCRIPTION_ID" ]; then
-        # Store ARM Subscription info in ~/.sap_deployment_automation
-        echo "ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}" >> "${library_config_information}"
-        arm_config_stored=1
-    fi
-else
-    temp=$(grep "DEPLOYMENT_REPO_PATH" "${generic_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Repo path was specified in ~/.sap_deployment_automation/config
-        DEPLOYMENT_REPO_PATH=$(echo "${temp}" | cut -d= -f2)
-
-        config_stored=1
-    else
-        config_stored=0
-    fi
-
-    temp=$(grep "REMOTE_STATE_RG" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Remote state storage group was specified in ~/.sap_deployment_automation library config
-        REMOTE_STATE_RG=$(echo "${temp}" | cut -d= -f2)
-    fi
-
-    temp=$(grep "REMOTE_STATE_SA" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Remmote state storage group was specified in ~/.sap_deployment_automation library config
-        REMOTE_STATE_SA=$(echo "${temp}" | cut -d= -f2)
-    fi
-
-    temp=$(grep "tfstate_resource_id" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        echo "tfstate_resource_id specified"
-        tfstate_resource_id=$(echo "${temp}" | cut -d= -f2)
-        if [ "${deployment_system}" != sap_deployer ]
-        then
-            tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
-        fi
-    fi
-
-    temp=$(grep "deployer_tfstate_key" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Deployer state was specified in ~/.sap_deployment_automation library config
-        deployer_tfstate_key=$(echo "${temp}" | cut -d= -f2)
-        
-        if [ "${deployment_system}" != sap_deployer ]
-        then
-            deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
-        else
-            rm post_deployment.sh
-        fi
-
-        deployer_tfstate_key_exists=true
-
-    fi
-
-    temp=$(grep "landscape_tfstate_key" "${library_config_information}")
-    if [ ! -z "${temp}" ]
-    then
-        # Landscape state was specified in ~/.sap_deployment_automation library config
-        landscape_tfstate_key=$(echo "${temp}" | cut -d= -f2)
-
-        if [ $deployment_system == sap_system ]
-        then
-            landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
-        fi
-        landscape_tfstate_key_exists=true
-    fi
+    mkdir "$HOME/.terraform.d/plugin-cache"
 fi
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
+param_dirname=$(pwd)
+
+init "${automation_config_directory}" "${generic_config_information}" "${system_config_information}"
+
+var_file="${param_dirname}"/"${parameterfile}" 
+
+extra_vars=""
+
+if [ -f terraform.tfvars ]; then
+    extra_vars=" -var-file=${param_dirname}/terraform.tfvars "
+fi
+
+if [ "${deployment_system}" == sap_deployer ]
+then
+    deployer_tfstate_key=${key}.terraform.tfstate
+fi
+
+if [ -z "$REMOTE_STATE_SA" ]; 
+then
+    load_config_vars "${system_config_information}" "REMOTE_STATE_SA"
+fi
+
+load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+load_config_vars "${system_config_information}" "tfstate_resource_id"
+load_config_vars "${system_config_information}" "deployer_tfstate_key"
+load_config_vars "${system_config_information}" "landscape_tfstate_key"
+load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+
+echo "Terraform storage " "${REMOTE_STATE_SA}"
 
 if [ ! -n "${DEPLOYMENT_REPO_PATH}" ]; then
     option="DEPLOYMENT_REPO_PATH"
     missing
-    exit -1
+    exit 1
 fi
 
-if [ ! -n "${ARM_SUBSCRIPTION_ID}" ]; then
-    option="ARM_SUBSCRIPTION_ID"
-    missing
-    exit -1
+# Checking for valid az session
+az account show > stdout.az 2>&1
+temp=$(grep "az login" stdout.az)
+if [ -n "${temp}" ]; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                           Please login using az login                                 #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    if [ -f stdout.az ]
+    then
+        rm stdout.az
+    fi
+    exit 1
+else
+    if [ -f stdout.az ]
+    then
+        rm stdout.az
+    fi
+    
 fi
 
-if [ ! -n "${REMOTE_STATE_RG}" ]; then
-    option="REMOTE_STATE_RG"
-    missing
-    exit -1
+account_set=0
+
+if [ ! -z "${STATE_SUBSCRIPTION}" ]
+then
+    $(az account set --sub "${STATE_SUBSCRIPTION}")
+    account_set=1
 fi
 
 if [ ! -n "${REMOTE_STATE_SA}" ]; then
-    option="REMOTE_STATE_SA"
-    missing
-    exit -1
+    read -p "Terraform state storage account name:"  REMOTE_STATE_SA
+
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+    load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${system_config_information}" "tfstate_resource_id"
+
+    if [ ! -z "${STATE_SUBSCRIPTION}" ]
+    then
+        if [ $account_set==0 ] 
+        then
+            $(az account set --sub "${STATE_SUBSCRIPTION}")
+            account_set=1
+        fi
+    fi
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
 
-echo $terraform_module_directory
+if [ -z "${REMOTE_STATE_SA}" ]; then
+    option="REMOTE_STATE_SA"
+    missing
+    exit 1
+fi
+
+if [ -z "${REMOTE_STATE_RG}" ]; then
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+    load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${system_config_information}" "tfstate_resource_id"
+
+    if [ ! -z "${STATE_SUBSCRIPTION}" ]
+    then
+        if [ $account_set==0 ] 
+        then
+            $(az account set --sub "${STATE_SUBSCRIPTION}")
+            account_set=1
+        fi
+        
+    fi
+    
+fi
+
+if [ "${deployment_system}" != sap_deployer ]
+then
+    if [ ! -n "${tfstate_resource_id}" ]; then
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+        load_config_vars "${system_config_information}" "STATE_SUBSCRIPTION"
+        load_config_vars "${system_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${system_config_information}" "tfstate_resource_id"
+        
+    fi
+    tfstate_parameter=" -var tfstate_resource_id=${tfstate_resource_id}"
+
+    if [ -z "${deployer_tfstate_key}" ]; then
+        deployer_tfstate_key_parameter=" "
+    else
+        deployer_tfstate_key_parameter=" -var deployer_tfstate_key=${deployer_tfstate_key}"
+    fi
+
+else
+    tfstate_parameter=" "
+
+    save_config_vars "${system_config_information}" deployer_tfstate_key
+fi
+
+if [ "${deployment_system}" == sap_system ]
+then
+    if [ -n "${landscape_tfstate_key}" ]; then
+        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
+        landscape_tfstate_key_exists=true
+    else
+        read -p "Workload terraform statefile name :" landscape_tfstate_key
+        landscape_tfstate_key_parameter=" -var landscape_tfstate_key=${landscape_tfstate_key}"
+        save_config_var "landscape_tfstate_key" "${system_config_information}"
+        landscape_tfstate_key_exists=true
+    fi
+else
+    landscape_tfstate_key_parameter=""
+
+fi
+
+
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+export TF_DATA_DIR="${param_dirname}/.terraform"
 
 if [ ! -d "${terraform_module_directory}" ]
 then
@@ -223,67 +386,83 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 1
 fi
 
 ok_to_proceed=false
 new_deployment=false
 
-if [ -f backend.tf ]
-then
-    rm backend.tf
-fi
-
-# Checking for valid az session
-az account show > stdout.az 2>&1
-temp=$(grep "az login" stdout.az)
-if [ -n "${temp}" ]; then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                           Please login using az login                                 #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
-    rm stdout.az
-    exit -1
-else
-    rm stdout.az
-fi
-
 check_output=0
 
-if [ ! -d ./.terraform/ ]; 
+if [ $account_set==0 ] 
 then
-    terraform init -upgrade=true -force-copy --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
+    $(az account set --sub "${STATE_SUBSCRIPTION}")
+    account_set=1
+fi
+
+# This is used to tell Terraform if this is a new deployment or an update
+deployment_parameter=""
+# This is used to tell Terraform the version information from the state file
+version_parameter=""
+if [ ! -d ./.terraform/ ];
+then
+    terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
+    --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
     --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
     --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
     --backend-config "container_name=tfstate" \
-    --backend-config "key=${key}.terraform.tfstate" \
-    $terraform_module_directory
+    --backend-config "key=${key}.terraform.tfstate"
+
+    deployment_parameter=" -var deployment=new "
+
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
-    echo $temp
-    cat .terraform/terraform.tfstate
     if [ ! -z "${temp}" ]
     then
-        echo "${REMOTE_STATE_SA}"
-        terraform init -upgrade=true -force-copy --backend-config "subscription_id=${ARM_SUBSCRIPTION_ID}" \
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
+        --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
         --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
         --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
         --backend-config "container_name=tfstate" \
-        --backend-config "key=${key}.terraform.tfstate" \
-        $terraform_module_directory
-    else
-        terraform init -upgrade=true
-        check_output=1
-    fi
+        --backend-config "key=${key}.terraform.tfstate"
 
+    else
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo "#             The system has already been deployed and the statefile is in Azure        #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+        if [ ! -n ${approve} ] 
+        then
+            read -p "Do you want to redeploy Y/N?"  ans
+            answer=${ans^^}
+            if [ $answer == 'Y' ]; then
+                ok_to_proceed=true
+            else
+                exit 1
+            fi
+        else
+            ok_to_proceed=true
+        fi
+
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure  \
+        --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
+        --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
+        --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
+        --backend-config "container_name=tfstate" \
+        --backend-config "key=${key}.terraform.tfstate"
+        check_output=1
+        
+    fi
 fi
 
 if [ 1 == $check_output ]
 then
-    outputs=$(terraform output)
+    terraform -chdir=$terraform_module_directory refresh -var-file=${var_file} ${tfstate_parameter} ${landscape_tfstate_key_parameter} ${deployer_tfstate_key_parameter} ${extra_vars}
+
+    outputs=$(terraform -chdir="${terraform_module_directory}" output )
     if echo "${outputs}" | grep "No outputs"; then
         ok_to_proceed=true
         new_deployment=true
@@ -292,6 +471,9 @@ then
         echo "#                                   New deployment                                      #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
+        
+        deployment_parameter=" -var deployment=new "
+
     else
         echo ""
         echo "#########################################################################################"
@@ -301,7 +483,10 @@ then
         echo "#########################################################################################"
         echo ""
 
-        deployed_using_version=$(terraform output automation_version)
+        deployment_parameter=" "
+
+        deployed_using_version=$(terraform -chdir="${terraform_module_directory}" output automation_version | tr -d \")
+
         if [ ! -n "${deployed_using_version}" ]; then
             echo ""
             echo "#########################################################################################"
@@ -313,16 +498,18 @@ then
             echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
-
+            
             read -p "Do you want to continue Y/N?"  ans
             answer=${ans^^}
             if [ $answer == 'Y' ]; then
                 ok_to_proceed=true
             else
+                unset TF_DATA_DIR
                 exit 1
             fi
         else
-
+            version_parameter=" -var terraform_template_version=${deployed_using_version} "
+                    
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
@@ -343,10 +530,40 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform plan -var-file=${parameterfile} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter $terraform_module_directory > plan_output.log
+if [ -f plan_output.log ]
+then
+    rm plan_output.log
+fi
 
-if ! $new_deployment; then
-    if grep "No changes" plan_output.log ; then
+allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
+echo $allParams
+
+terraform -chdir="$terraform_module_directory" plan -no-color $allParams  
+str1=$(grep "Error: " error.log)
+if [ -n "${str1}" ]
+then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                            $boldreduscore Errors during the plan phase $resetformatting                             #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    cat error.log
+    rm error.log
+    if [ -f plan_output.log ]
+    then
+        rm plan_output.log
+    fi
+    unset TF_DATA_DIR
+    exit 1
+fi
+
+if [ ! $new_deployment ]
+then
+    str1=$(grep "0 to add, 0 to change, 0 to destroy" plan_output.log)
+    str2=$(grep "No changes" plan_output.log)
+    if [ -n "${str1}" ] || [ -n "${str2}" ]; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
@@ -355,45 +572,38 @@ if ! $new_deployment; then
         echo "#########################################################################################"
         echo ""
         rm plan_output.log
-
-        if [ $deployment_system == sap_deployer ]
-        then
-            if [ $deployer_tfstate_key_exists == false ]
-            then
-                echo "Saving the deployer state file name"
-                echo "deployer_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
-                deployer_tfstate_key_exists=true
-            fi
-        fi
-        if [ $deployment_system == sap_landscape ]
+        
+        if [ "${deployment_system}" == sap_landscape ]
         then
             if [ $landscape_tfstate_key_exists == false ]
             then
-                echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
-                landscape_tfstate_key_exists=true
+                save_config_vars "${system_config_information}" \
+                landscape_tfstate_key
             fi
         fi
+        unset TF_DATA_DIR
         exit 0
     fi
     if ! grep "0 to change, 0 to destroy" plan_output.log ; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo "#                               !!! Risk for Data loss !!!                              #"
+        echo -e "#                              $boldreduscore !!! Risk for Data loss !!!  $resetformatting                             #"
         echo "#                                                                                       #"
         echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
         read -n 1 -r -s -p $'Press enter to continue...\n'
-
+        
         cat plan_output.log
         read -p "Do you want to continue with the deployment Y/N?"  ans
         answer=${ans^^}
         if [ $answer == 'Y' ]; then
             ok_to_proceed=true
         else
-            exit -1
+            unset TF_DATA_DIR
+            exit 1
         fi
     else
         ok_to_proceed=true
@@ -401,9 +611,16 @@ if ! $new_deployment; then
 fi
 
 if [ $ok_to_proceed ]; then
-
-    rm plan_output.log
-
+    
+    if [ -f error.log ]
+    then
+        rm error.log
+    fi
+    if [ -f plan_output.log ]
+    then
+        rm plan_output.log
+    fi
+    
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -412,24 +629,42 @@ if [ $ok_to_proceed ]; then
     echo "#########################################################################################"
     echo ""
 
-    terraform apply ${approve} -var-file=${parameterfile} $tfstate_parameter $landscape_tfstate_key_parameter $deployer_tfstate_key_parameter $terraform_module_directory
-fi
-
-if [ $deployment_system == sap_deployer ]
-then
-echo $deployer_tfstate_key_exists
-    if [ $deployer_tfstate_key_exists == false ]
+    allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
+    
+    terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
+ 
+    str1=$(grep "Error: " error.log)
+    if [ -n "${str1}" ]
     then
-        echo "deployer_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo -e "#                          $boldreduscore Errors during the apply phase $resetformatting                              #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+        cat error.log
+        rm error.log
+        unset TF_DATA_DIR
+        exit 1
     fi
+        
 fi
 
-if [ $deployment_system == sap_landscape ]
+if [ "${deployment_system}" == sap_landscape ]
 then
-    if [ $landscape_tfstate_key_exists == false ]
-    then
-        echo "landscape_tfstate_key=${key}.terraform.tfstate" >> $library_config_information
-    fi
+    save_config_vars "${system_config_information}" \
+    landscape_tfstate_key
 fi
 
+if [ "${deployment_system}" == sap_library ]
+then
+
+    REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
+
+    get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+    
+fi
+
+unset TF_DATA_DIR
 exit 0

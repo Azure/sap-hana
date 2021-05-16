@@ -5,18 +5,21 @@
 
 // retrieve public key from sap landscape's Key vault
 data "azurerm_key_vault_secret" "sid_pk" {
+  provider     = azurerm.main
   count        = local.use_local_credentials ? 0 : 1
   name         = var.landscape_tfstate.sid_public_key_secret_name
   key_vault_id = local.user_key_vault_id
 }
 
 data "azurerm_key_vault_secret" "sid_username" {
+  provider     = azurerm.main
   count        = local.use_local_credentials ? 0 : 1
   name         = try(var.landscape_tfstate.sid_username_secret_name, trimprefix(format("%s-sid-username", var.naming.prefix.VNET), "-"))
   key_vault_id = local.user_key_vault_id
 }
 
 data "azurerm_key_vault_secret" "sid_password" {
+  provider     = azurerm.main
   count        = local.use_local_credentials ? 0 : 1
   name         = try(var.landscape_tfstate.sid_password_secret_name, trimprefix(format("%s-sid-password", var.naming.prefix.VNET), "-"))
   key_vault_id = local.user_key_vault_id
@@ -25,12 +28,12 @@ data "azurerm_key_vault_secret" "sid_password" {
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
-  count                      = local.enable_sid_deployment  && !local.prvt_kv_override ? 1 : 0
+  provider                   = azurerm.main
+  count                      = local.enable_sid_deployment && !local.prvt_kv_override ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
-  soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
   sku_name                   = "standard"
@@ -41,6 +44,12 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
 
     secret_permissions = [
       "get",
+    ]
+  }
+
+  lifecycle {
+    ignore_changes = [
+      soft_delete_enabled
     ]
   }
 
@@ -48,6 +57,7 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
 
 // Import an existing private Key Vault
 data "azurerm_key_vault" "sid_kv_prvt" {
+  provider            = azurerm.main
   count               = (local.enable_sid_deployment && local.prvt_kv_override) ? 1 : 0
   name                = local.prvt_kv_name
   resource_group_name = local.prvt_kv_rg_name
@@ -55,12 +65,12 @@ data "azurerm_key_vault" "sid_kv_prvt" {
 
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
+  provider                   = azurerm.main
   count                      = local.enable_sid_deployment && !local.user_kv_override ? 1 : 0
   name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
-  soft_delete_enabled        = true
   soft_delete_retention_days = 7
   purge_protection_enabled   = true
   sku_name                   = "standard"
@@ -70,17 +80,28 @@ resource "azurerm_key_vault" "sid_kv_user" {
     object_id = local.service_principal.object_id
 
     secret_permissions = [
-      "delete",
-      "get",
-      "list",
-      "set",
+      "Delete",
+      "Get",
+      "List",
+      "Set",
+      "Restore",
+      "Recover",
+      "Purge"
     ]
 
   }
+
+  lifecycle {
+    ignore_changes = [
+      soft_delete_enabled
+    ]
+  }
+
 }
 
 // Import an existing user Key Vault
 data "azurerm_key_vault" "sid_kv_user" {
+  provider            = azurerm.main
   count               = (local.enable_sid_deployment && local.user_kv_override) ? 1 : 0
   name                = local.user_kv_name
   resource_group_name = local.user_kv_rg_name
@@ -115,6 +136,7 @@ resource "random_password" "password" {
 
 // Store the logon username in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_username" {
+  provider     = azurerm.main
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-username", local.prefix)
   value        = local.sid_auth_username
@@ -123,6 +145,7 @@ resource "azurerm_key_vault_secret" "auth_username" {
 
 // Store the password in KV when authentication type is password
 resource "azurerm_key_vault_secret" "auth_password" {
+  provider     = azurerm.main
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-password", local.prefix)
   value        = var.authentication.password
@@ -142,6 +165,7 @@ resource "tls_private_key" "sdu" {
 
 // By default the SSH keys are stored in landscape key vault. By defining the authenticationb block the SDU keyvault
 resource "azurerm_key_vault_secret" "sdu_private_key" {
+  provider     = azurerm.main
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-sshkey", local.prefix)
   value        = local.sid_private_key
@@ -149,6 +173,7 @@ resource "azurerm_key_vault_secret" "sdu_private_key" {
 }
 
 resource "azurerm_key_vault_secret" "sdu_public_key" {
+  provider     = azurerm.main
   count        = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name         = format("%s-sshkey-pub", local.prefix)
   value        = local.sid_public_key

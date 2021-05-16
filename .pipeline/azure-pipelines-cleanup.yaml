@@ -11,21 +11,6 @@ variables:
   - group: azure-config-variables
   - group: azure-sap-hana-pipeline-secrets
 jobs:
-- job: scheduled_RG_Cleanup
-  pool:
-    vmImage: "ubuntu-18.04"
-  steps:
-  - script: |
-      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-      groups=$(az group list --tag Delete=True --query [].name --output tsv)
-      for rg in $groups
-      do
-        if $(az group exists -n $rg); then
-          echo ${rg}
-          az group delete -n $rg --no-wait -y
-        fi
-      done
-    displayName: 'Clean up resource group'
 - job: scheduled_Peering_Cleanup
   pool:
     vmImage: "ubuntu-18.04"
@@ -61,7 +46,7 @@ jobs:
       az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n rdp --source-address-prefixes ${prefix_list} --output none
       az network nsg rule update -g ${rg_name} --nsg-name ${nsg_name} -n winrm --source-address-prefixes ${prefix_list} --output none
 
-      echo "=== Assgin ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
+      echo "=== Assign ${nsg_name} to deployer ${subnet_name} to avoid NRMS ==="
       az network vnet subnet update -g ${rg_name} -n ${subnet_name} --vnet-name ${vnet_name} --network-security-group ${nsg_name} --output none
     displayName: 'Clean up NSG'
 - job: scheduled_Subnet_Cleanup
@@ -79,4 +64,19 @@ jobs:
         az network vnet subnet delete --resource-group ${sap_landscape_rg} --vnet-name ${sap_vnet} --name ${subnet} || :
       done
     displayName: 'Clean up subnet'
+- job: scheduled_RG_Cleanup
+  pool:
+    vmImage: "ubuntu-18.04"
+  steps:
+  - script: |
+      az login --service-principal --user $(hana-pipeline-spn-id) --password  $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
+      groups=$(az group list --tag Delete=True --query [].name --output tsv)
+      for rg in $groups
+      do
+        if $(az group exists -n $rg); then
+          echo ${rg}
+          az group delete -n $rg --no-wait -y
+        fi
+      done
+    displayName: 'Clean up resource group'
 

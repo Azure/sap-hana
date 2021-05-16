@@ -22,12 +22,12 @@ stages:
     steps:
       - script: |
           az login --service-principal --user $(hana-pipeline-spn-id) --password $(hana-pipeline-spn-pw) --tenant $(landscape-tenant) --output none
-          sapsystem_rg="SLES-WEEU-SAP-PRD"
+          sapsystem_rg="SLES-WEEU-SAP01-PRD"
           echo "=== Mark and try to delete rg $sapsystem_rg ==="
           az group update --resource-group $sapsystem_rg --set tags.Delete=True
           az group delete -n $sapsystem_rg -y
 
-          sapsystem_rg="RHEL-WEEU-SAP-PRD"
+          sapsystem_rg="RHEL-WEEU-SAP01-PRD"
           echo "=== Mark and try to delete rg $sapsystem_rg ==="
           az group update --resource-group $sapsystem_rg --set tags.Delete=True
           az group delete -n $sapsystem_rg -y
@@ -173,6 +173,7 @@ stages:
   - job: runAnsibleSLES
     timeoutInMinutes: 120
     dependsOn: createSAPSystemSLES
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     steps:
       - template: templates/util/prepare-agent.yml
       - template: templates/util/collect-deployer-info.yml

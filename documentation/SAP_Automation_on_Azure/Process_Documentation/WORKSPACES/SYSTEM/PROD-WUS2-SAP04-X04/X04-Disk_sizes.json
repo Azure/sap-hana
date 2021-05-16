@@ -1,0 +1,70 @@
+{
+    "db": {
+        "X04": {
+            "compute": {
+                "vm_size": "Standard_E32ds_v4",
+                "accelerated_networking": false
+            },
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "None",
+                    "write_accelerator": false
+                },
+                {
+                    "name": "sap",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 320,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/usr/sap",
+                    "lun_start": 0
+                },
+                {
+                    "name": "data",
+                    "count": 4,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 96,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/data",
+                    "lun_start": 10
+                },
+                {
+                    "name": "log",
+                    "count": 3,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 64,
+                    "caching": "None",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/log",
+                    "lun_start": 20
+                },
+                {
+                    "name": "backup",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 320,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/backup",
+                    "lun_start": 2
+                },
+                {
+                    "name": "shared",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 320,
+                    "caching": "ReadOnly",
+                    "write_accelerator": false,
+                    "mount_point": "/hana/shared",
+                    "lun_start": 3
+                }
+            ]
+        }
+    }
+}

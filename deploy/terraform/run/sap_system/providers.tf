@@ -22,7 +22,8 @@ provider "azurerm" {
 
 provider "azurerm" {
   features {}
-  alias = "deployer"
+  alias           = "deployer"
+  subscription_id = length(local.deployer_subscription_id) > 0 ? local.deployer_subscription_id : null
 }
 
 provider "azuread" {
@@ -32,35 +33,28 @@ provider "azuread" {
 }
 
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.14"
   required_providers {
     external = {
-      source  = "hashicorp/external"
-      version = "~> 2.0.0"
+      source = "hashicorp/external"
     }
     local = {
-      source  = "hashicorp/local"
-      version = "~> 2.0.0"
+      source = "hashicorp/local"
     }
     random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0.0"
+      source = "hashicorp/random"
     }
     null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0.0"
+      source = "hashicorp/null"
     }
     tls = {
-      source  = "hashicorp/tls"
-      version = "~> 3.0.0"
+      source = "hashicorp/tls"
     }
     azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 1.0.0"
+      source = "hashicorp/azuread"
     }
     azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 2.35.0"
+      source = "hashicorp/azurerm"
     }
   }
 }

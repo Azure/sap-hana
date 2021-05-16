@@ -1,5 +1,6 @@
 # Create Application NICs
 resource "azurerm_network_interface" "app" {
+  provider                      = azurerm.main
   count                         = local.enable_deployment ? local.application_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.nic)
   location                      = var.resource_group[0].location
@@ -20,11 +21,20 @@ resource "azurerm_network_interface" "app" {
       )
     )
     private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+
   }
+}
+
+resource "azurerm_network_interface_application_security_group_association" "app" {
+  provider                      = azurerm.main
+  count                         = local.enable_deployment ? local.application_server_count : 0
+  network_interface_id          = azurerm_network_interface.app[count.index].id
+  application_security_group_id = azurerm_application_security_group.app[0].id
 }
 
 # Create Application NICs
 resource "azurerm_network_interface" "app_admin" {
+  provider                      = azurerm.main
   count                         = local.enable_deployment && local.apptier_dual_nics ? local.application_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.admin_nic)
   location                      = var.resource_group[0].location
@@ -48,36 +58,44 @@ resource "azurerm_network_interface" "app_admin" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "app" {
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  provider            = azurerm.main
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.app_ostype) == "LINUX" ? local.application_server_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.app_computer_names[count.index]
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    null) : (
-    local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
-      azurerm_availability_set.app[0].id
-    )
-  )
-
   proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
-  zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
-  null)
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_app_avset ? azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id : null
+
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
-    [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
+    local.legacy_nic_order ? (
+      [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
+      [azurerm_network_interface.app[count.index].id, azurerm_network_interface.app_admin[count.index].id]
+    )
+    ) : (
     [azurerm_network_interface.app[count.index].id]
   )
 
-  size                            = local.app_sizing.compute.vm_size
+  size                            = length(local.app_size) > 0 ? local.app_size : local.app_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  disable_password_authentication = ! local.enable_auth_password
   admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
 
   dynamic "os_disk" {
     iterator = disk
@@ -118,14 +136,6 @@ resource "azurerm_linux_virtual_machine" "app" {
     }
   }
 
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -136,32 +146,31 @@ resource "azurerm_linux_virtual_machine" "app" {
 
 # Create the Windows Application VM(s)
 resource "azurerm_windows_virtual_machine" "app" {
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  provider            = azurerm.main
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.app_ostype) == "WINDOWS" ? local.application_server_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.app_computer_names[count.index]
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    null) : (
-    local.app_zone_count > 1 ? (
-      azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id) : (
-      azurerm_availability_set.app[0].id
-    )
-  )
   proximity_placement_group_id = local.app_zonal_deployment ? var.ppg[count.index % max(local.app_zone_count, 1)].id : var.ppg[0].id
-  zone = local.app_zonal_deployment && (local.application_server_count == local.app_zone_count) ? (
-    local.app_zones[count.index % max(local.app_zone_count, 1)]) : (
-  null)
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_app_avset ? azurerm_availability_set.app[count.index % max(local.app_zone_count, 1)].id : null
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
-    [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
+    local.legacy_nic_order ? (
+      [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
+      [azurerm_network_interface.app[count.index].id, azurerm_network_interface.app_admin[count.index].id]
+    )
+    ) : (
     [azurerm_network_interface.app[count.index].id]
   )
 
-  size           = local.app_sizing.compute.vm_size
+  size           = length(local.app_size) > 0 ? local.app_size : local.app_sizing.compute.vm_size
   admin_username = var.sid_username
   admin_password = var.sid_password
 
@@ -214,6 +223,7 @@ resource "azurerm_windows_virtual_machine" "app" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "app" {
+  provider               = azurerm.main
   count                  = local.enable_deployment ? length(local.app_data_disks) : 0
   name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[local.app_data_disks[count.index].vm_index], local.app_data_disks[count.index].suffix)
   location               = var.resource_group[0].location
@@ -233,6 +243,7 @@ resource "azurerm_managed_disk" "app" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "app" {
+  provider                  = azurerm.main
   count                     = local.enable_deployment ? length(local.app_data_disks) : 0
   managed_disk_id           = azurerm_managed_disk.app[count.index].id
   virtual_machine_id        = upper(local.app_ostype) == "LINUX" ? azurerm_linux_virtual_machine.app[local.app_data_disks[count.index].vm_index].id : azurerm_windows_virtual_machine.app[local.app_data_disks[count.index].vm_index].id

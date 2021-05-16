@@ -99,7 +99,7 @@ resource "azurerm_virtual_machine" "windows_bastion" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = file("${path.module}/files/FirstLogonCommands.xml")
+      content      = file("path.module/files/FirstLogonCommands.xml")
     }
   }
 

@@ -1,0 +1,30 @@
+{
+    "authentication": {
+        "username"                      : "azureadm"
+    },
+    "infrastructure": {
+        "environment"                   : "DEV",
+        "region"                        : "northeurope",
+        "vnets": {
+            "sap": {
+                "name"                  : "SAP02",
+                "address_space"         : "10.111.0.0/24",
+                "subnet_admin": {
+                  "prefix"              : "10.111.0.0/27"
+                },
+                "subnet_app": {
+                  "prefix"              : "10.111.0.32/27"
+                },
+                "subnet_db": {
+                  "prefix"              : "10.111.0.64/27"
+                },
+                "subnet_web": {
+                  "prefix"              : "10.111.0.96/27"
+                }
+            }
+        }
+    },
+    "key_vault": {
+      "kv_spn_id"                       : "<azureresourceid>"
+    }
+}

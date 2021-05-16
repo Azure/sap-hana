@@ -1,3 +1,4 @@
+# ![SAP Deployment Automation Framework](../assets/images/UnicornSAPBlack64x64.png)**SAP Deployment Automation Framework** #
 
 # Deployment scripts
 
@@ -274,18 +275,18 @@ Helper cmdlet to set the SPN secrets in Azure keyvault.
 Usage:
 
 ```Powershell
-Set-SAPSPNSecrets -Environment <> -VaultName <vaultname> -Client_id <appId> -Client_secret <clientsecret> -Tenant <TenantID> 
+Set-SAPSPNSecrets -Environment <> -VaultName <vaultname> -SPN_id <appId> -SPN_password <clientsecret> -Tenant <TenantID> 
 
 Parameters:
 -Environment environment name
 -VaultName vault name
--Client_id SPN app id
--Client_secret SPN password
+-SPN_id SPN app id
+-SPN_password SPN password
 -Tenant tenant id of the SPN
 ```
 
 Example:
 
 ```Powershell
-Set-SAPSPNSecrets -Environment PROD -VaultName prodweeuusrabc -Client_id 11111111-1111-1111-1111-111111111111 -Client_secret SECRETPassword -Tenant 222222222-2222-2222-2222-222222222222
+Set-SAPSPNSecrets -Environment PROD -VaultName prodweeuusrabc -SPN_id 11111111-1111-1111-1111-111111111111 -SPN_password SECRETPassword -Tenant 222222222-2222-2222-2222-222222222222
 ```

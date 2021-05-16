@@ -9,3 +9,7 @@ variable "key_vault" {
 variable "diagnostics_storage_account" {
   description = "Storage account information for diagnostics account"
 }
+
+variable "witness_storage_account" {
+  description = "Storage account information for diagnostics account"
+}

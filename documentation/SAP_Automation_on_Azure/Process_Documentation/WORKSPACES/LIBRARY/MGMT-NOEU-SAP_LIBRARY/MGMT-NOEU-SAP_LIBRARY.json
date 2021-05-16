@@ -1,0 +1,15 @@
+{
+  "infrastructure": {
+    "region"                : "northeurope",
+    "environment"           : "MGMT"
+  },
+  "deployer": {
+    "environment"           : "MGMT",
+    "region"                : "northeurope",
+    "vnet"                  : "DEP00",
+    "use"                   : false
+  },
+  "key_vault": {
+    "kv_spn_id"             : "<azureresourceid>"
+  }
+}

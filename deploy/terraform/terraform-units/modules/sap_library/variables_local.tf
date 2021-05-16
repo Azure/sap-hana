@@ -72,6 +72,10 @@ locals {
   sa_tfstate_container_exists = try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false)
   sa_tfstate_container_name   = try(var.storage_account_tfstate.tfstate_blob_container.name, local.resource_suffixes.tfstate)
 
+  //Ansible
+  sa_ansible_container_exists = try(var.storage_account_tfstate.ansible_blob_container.is_existing, false)
+  sa_ansible_container_name   = try(var.storage_account_tfstate.ansible_blob_container.name, local.resource_suffixes.ansible)
+
   // deployer
   deployer      = try(var.deployer, {})
   deployer_vnet = try(local.deployer.vnet, "")
@@ -84,7 +88,8 @@ locals {
 
   // deployer terraform.tfstate
   deployer_tfstate          = var.deployer_tfstate
-  deployer_msi_principal_id = local.deployer_tfstate.outputs.deployer_uai.principal_id
+  deployer_defined          = length(var.deployer_tfstate) > 0
+  deployer_msi_principal_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_uai.principal_id, local.deployer_tfstate.deployer_uai) : ""
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")

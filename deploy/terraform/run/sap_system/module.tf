@@ -3,21 +3,6 @@
   Setup common infrastructure
 */
 
-module "common_infrastructure" {
-  source                     = "../../terraform-units/modules/sap_system/common_infrastructure"
-  is_single_node_hana        = "true"
-  application                = var.application
-  databases                  = var.databases
-  infrastructure             = var.infrastructure
-  options                    = local.options
-  key_vault                  = var.key_vault
-  naming                     = module.sap_namegenerator.naming
-  service_principal          = local.service_principal
-  deployer_tfstate           = data.terraform_remote_state.deployer.outputs
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  custom_disk_sizes_filename = var.db_disk_sizes_filename
-  authentication             = var.authentication
-}
 
 module "sap_namegenerator" {
   source           = "../../terraform-units/modules/sap_namegenerator"
@@ -25,7 +10,7 @@ module "sap_namegenerator" {
   location         = var.infrastructure.region
   codename         = lower(try(var.infrastructure.codename, ""))
   random_id        = module.common_infrastructure.random_id
-  sap_vnet_name    = local.vnet_sap_name_part
+  sap_vnet_name    = local.vnet_logical_name
   sap_sid          = local.sap_sid
   db_sid           = local.db_sid
   app_ostype       = local.app_ostype
@@ -42,12 +27,38 @@ module "sap_namegenerator" {
   resource_offset  = try(var.options.resource_offset, 0)
 }
 
-// Create HANA database nodes
-module "hdb_node" {
-  source                     = "../../terraform-units/modules/sap_system/hdb_node"
+module "common_infrastructure" {
+  source = "../../terraform-units/modules/sap_system/common_infrastructure"
+  providers = {
+    azurerm.main     = azurerm
+    azurerm.deployer = azurerm.deployer
+  }
+  is_single_node_hana        = "true"
+  application                = var.application
   databases                  = var.databases
   infrastructure             = var.infrastructure
-  options                    = local.options
+  options                    = var.options
+  key_vault                  = var.key_vault
+  naming                     = module.sap_namegenerator.naming
+  service_principal          = local.service_principal
+  deployer_tfstate           = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  custom_disk_sizes_filename = var.db_disk_sizes_filename
+  authentication             = var.authentication
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
+}
+
+// Create HANA database nodes
+module "hdb_node" {
+  source = "../../terraform-units/modules/sap_system/hdb_node"
+  providers = {
+    azurerm.main     = azurerm
+    azurerm.deployer = azurerm.deployer
+  }
+  databases                  = var.databases
+  infrastructure             = var.infrastructure
+  options                    = var.options
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
@@ -63,14 +74,21 @@ module "hdb_node" {
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
+  db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 }
 
 // Create Application Tier nodes
 module "app_tier" {
-  source                     = "../../terraform-units/modules/sap_system/app_tier"
+  source = "../../terraform-units/modules/sap_system/app_tier"
+  providers = {
+    azurerm.main     = azurerm
+    azurerm.deployer = azurerm.deployer
+  }
   application                = var.application
   infrastructure             = var.infrastructure
-  options                    = local.options
+  options                    = var.options
   resource_group             = module.common_infrastructure.resource_group
   vnet_sap                   = module.common_infrastructure.vnet_sap
   storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
@@ -79,18 +97,27 @@ module "app_tier" {
   naming                     = module.sap_namegenerator.naming
   admin_subnet               = module.common_infrastructure.admin_subnet
   custom_disk_sizes_filename = var.app_disk_sizes_filename
-  anydb_vms                  = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
-  hdb_vms                    = module.hdb_node.hdb_vms
+  anydb_vm_ids               = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
+  hdb_vm_ids                 = module.hdb_node.hdb_vms
   sid_password               = module.common_infrastructure.sid_password
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
+  route_table_id             = module.common_infrastructure.route_table_id
+  firewall_id                = module.common_infrastructure.firewall_id
   sap_sid                    = local.sap_sid
+  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
 
 }
 
 // Create anydb database nodes
 module "anydb_node" {
-  source                     = "../../terraform-units/modules/sap_system/anydb_node"
+  source = "../../terraform-units/modules/sap_system/anydb_node"
+  providers = {
+    azurerm.main     = azurerm
+    azurerm.deployer = azurerm.deployer
+  }
   databases                  = var.databases
   infrastructure             = var.infrastructure
   options                    = var.options
@@ -108,15 +135,23 @@ module "anydb_node" {
   sid_username               = module.common_infrastructure.sid_username
   sdu_public_key             = module.common_infrastructure.sdu_public_key
   sap_sid                    = local.sap_sid
+  db_asg_id                  = module.common_infrastructure.db_asg_id
+  terraform_template_version = var.terraform_template_version
+  deployment                 = var.deployment
+
 }
 
 // Generate output files
 module "output_files" {
-  source                    = "../../terraform-units/modules/sap_system/output_files"
+  source = "../../terraform-units/modules/sap_system/output_files"
+  providers = {
+    azurerm.main     = azurerm
+    azurerm.deployer = azurerm.deployer
+  }
   application               = module.app_tier.application
   databases                 = var.databases
   infrastructure            = var.infrastructure
-  options                   = local.options
+  options                   = var.options
   software                  = var.software
   ssh-timeout               = var.ssh-timeout
   authentication            = var.authentication
@@ -139,4 +174,11 @@ module "output_files" {
   anydb_loadbalancers       = module.anydb_node.anydb_loadbalancers
   random_id                 = module.common_infrastructure.random_id
   landscape_tfstate         = data.terraform_remote_state.landscape.outputs
+  tfstate_resource_id       = var.tfstate_resource_id
+  naming                    = module.sap_namegenerator.naming
+  app_tier_os_types         = module.app_tier.app_tier_os_types
+  sid_kv_user_id            = module.common_infrastructure.sid_kv_user_id
+  disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)))
+  use_local_credentials     = module.common_infrastructure.use_local_credentials
+
 }

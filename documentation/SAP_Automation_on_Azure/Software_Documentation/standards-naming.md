@@ -1,8 +1,7 @@
-### <img src="../../../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
 
-<br/><br/>
+# ![SAP Deployment Automation Framework](../assets/images/UnicornSAPBlack64x64.png)**SAP Deployment Automation Framework** #
 
-# Naming Conventions for SAP Automation Framework <!-- omit in toc -->
+## Naming Conventions for SAP Automation Framework <!-- omit in toc --> ##
 
 Table of Contents
 - [1 Naming Standards](#1-naming-standards)
@@ -26,7 +25,7 @@ Table of Contents
 
 <br/><br/>
 
-# 1 Naming Standards
+## 1 Naming Standards##
 <br/>
 
 ## 1.1 Terraform

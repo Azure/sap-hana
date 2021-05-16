@@ -18,7 +18,7 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-variable naming {
+variable "naming" {
   description = "Defines the names for the resources"
 }
 
@@ -55,12 +55,27 @@ variable "sap_sid" {
   description = "The SID of the application"
 }
 
+variable "db_asg_id" {
+  description = "Database Application Security Group"
+}
+
+variable "deployment" {
+  description = "The type of deployment"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+}
+
+
 locals {
   // Imports database sizing information
 
-  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/anydb_sizes.json"))
 
-  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+
+  faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
   computer_names       = var.naming.virtualmachine_names.ANYDB_COMPUTERNAME
   virtualmachine_names = var.naming.virtualmachine_names.ANYDB_VMNAME
@@ -80,11 +95,8 @@ locals {
   //Allowing changing the base for indexing, default is zero-based indexing, if customers want the first disk to start with 1 they would change this
   offset = try(var.options.resource_offset, 0)
 
-  // Zones
-  zones            = try(local.anydb.zones, [])
-  zonal_deployment = length(local.zones) > 0 ? true : false
-  db_zone_count    = length(local.zones)
-
+  //Allowing to keep the old nic order
+  legacy_nic_order = try(var.options.legacy_nic_order, false)
   // Availability Set 
   availabilityset_arm_ids = try(local.anydb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
@@ -118,12 +130,17 @@ locals {
   // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
 
-  anydb_ostype = try(local.anydb.os.os_type, "Linux")
+  anydb_ostype = upper(local.anydb_platform) == "SQLSERVER" ? "WINDOWS" : try(local.anydb.os.os_type, "LINUX")
   anydb_oscode = upper(local.anydb_ostype) == "LINUX" ? "l" : "w"
   anydb_size   = try(local.anydb.size, "Default")
-  anydb_sku    = try(lookup(local.sizes, local.anydb_size).compute.vm_size, "Standard_E4s_v3")
-  anydb_fs     = try(local.anydb.filesystem, "xfs")
-  anydb_ha     = try(local.anydb.high_availability, false)
+
+  db_sizing = local.enable_deployment ? lookup(local.sizes.db, local.anydb_size).storage : []
+  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.anydb_size).compute : {}
+
+  anydb_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
+
+  anydb_fs = try(local.anydb.filesystem, "xfs")
+  anydb_ha = try(local.anydb.high_availability, false)
 
   db_sid       = lower(substr(local.anydb_platform, 0, 3))
   loadbalancer = try(local.anydb.loadbalancer, {})
@@ -203,13 +220,8 @@ locals {
     { db_version = local.anydb_version },
     { size = local.anydb_size },
     { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
-    { filesystem = local.anydb_fs },
     { high_availability = local.anydb_ha },
-    { authentication = local.authentication },
-    { credentials = {
-      db_systemdb_password = "obsolete"
-      }
-    },
+    { auth_type = local.sid_auth_type },
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
   )
@@ -247,15 +259,15 @@ locals {
 
   anydb_vms = [
     for idx, dbnode in local.dbnodes : {
-      platform       = local.anydb_platform,
-      name           = dbnode.name
-      computername   = dbnode.computername
-      db_nic_ip      = dbnode.db_nic_ip
-      admin_nic_ip   = dbnode.admin_nic_ip
-      size           = local.anydb_sku
-      os             = local.anydb_ostype,
-      authentication = local.authentication
-      sid            = var.sap_sid
+      platform     = local.anydb_platform,
+      name         = dbnode.name
+      computername = dbnode.computername
+      db_nic_ip    = dbnode.db_nic_ip
+      admin_nic_ip = dbnode.admin_nic_ip
+      size         = local.anydb_sku
+      os           = local.anydb_ostype,
+      auth_type    = local.sid_auth_type,
+      sid          = var.sap_sid
     }
   ]
 
@@ -263,9 +275,9 @@ locals {
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   anydb_ip_offsets = {
     anydb_lb       = 4
-    anydb_admin_vm = 10
-    anydb_db_vm    = 10
-    observer_db_vm = 4 + 1
+    anydb_admin_vm = 4
+    anydb_db_vm    = 5 + 1
+    observer_db_vm = 5
   }
 
   // Ports used for specific DB Versions
@@ -293,29 +305,75 @@ locals {
     }
   ])
 
-  db_sizing = local.enable_deployment ? lookup(local.sizes, local.anydb_size).storage : []
+  // OS disk to be created for DB nodes
+  // disk_iops_read_write only apply for ultra
+  os_disk = flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = try(storage_type.write_accelerator, false)
+        }
+        if !try(storage_type.append, false)
+      ]
+      if storage_type.name == "os"
+    ]
+  )
+
+
+
+  // List of data disks to be created for  DB nodes
+  // disk_iops_read_write only apply for ultra
 
   data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
     [
       for storage_type in local.db_sizing : [
-        for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
-          storage_account_type = storage_type.disk_type,
-          disk_size_gb         = storage_type.size_gb,
-          //The following two lines are for Ultradisks only
+        for idx, disk_count in range(storage_type.count) : {
+          suffix                    = format("%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
           disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
         }
+        if !try(storage_type.append, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
 
+  append_data_disk_per_dbnode = (length(local.anydb_vms) > 0) ? flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          suffix                    = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+        }
+        if try(storage_type.append, false)
+      ]
+      if storage_type.name != "os"
+    ]
+  ) : []
+
+  all_data_disk_per_dbnode = distinct(concat(local.data_disk_per_dbnode, local.append_data_disk_per_dbnode))
+
   anydb_disks = flatten([
     for vm_counter, anydb_vm in local.anydb_vms : [
-      for idx, datadisk in local.data_disk_per_dbnode : {
+      for datadisk in local.all_data_disk_per_dbnode : {
         name                      = format("%s-%s", anydb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter
         caching                   = datadisk.caching
@@ -324,10 +382,19 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
+        lun                       = datadisk.lun
+        type                      = datadisk.type
       }
     ]
   ])
+
+  //Disks for Ansible
+  // host: xxx, LUN: #, type: sapusr, size: #
+
+  db_disks_ansible = distinct(flatten([for idx, vm in local.anydb_vms : [
+    for idx, datadisk in local.anydb_disks :
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm.computername, datadisk.lun, datadisk.type)
+  ]]))
 
   enable_ultradisk = try(
     compact(
@@ -337,6 +404,17 @@ locals {
     )[0],
     false
   )
+
+  // Zones
+  zones         = try(local.anydb.zones, [])
+  db_zone_count = length(local.zones)
+
+  //Ultra disk requires zonal deployment
+  zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
+
+  //If we deploy more than one server in zone put them in an availability set
+  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
+
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]

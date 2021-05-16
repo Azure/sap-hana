@@ -56,6 +56,7 @@ output "saplibrary_environment" {
 }
 
 output "saplibrary_subscription_id" {
+  sensitive = true
   value = local.spn.subscription_id
 }
 

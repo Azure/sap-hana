@@ -1,0 +1,58 @@
+# SAPSID: ${sid}
+${sid}_DB:
+  hosts:
+%{~ for idx,ips_dbnode in ips_dbnodes }
+    ${dbnodes[idx].name}:
+      ansible_host        : ${ips_dbnode}
+      ansible_connection  : ${dbconnection} 
+      connection_type     : ${dbconnectiontype} 
+%{~ endfor }
+  vars:
+    node_tier             : ${platform}
+
+${sid}_SCS:
+  hosts:
+%{~ for idx,ip_scs in ips_scs }
+    ${scsservers[idx]}:
+      ansible_host        : ${ip_scs}
+      ansible_connection  : ${scsconnection} 
+      connection_type     : ${scsconnectiontype} 
+%{~ endfor }
+  vars:
+    node_tier             : scs
+
+${sid}_PAS:
+  hosts:
+%{~ for idx,ip_pas in ips_pas }
+    ${passervers[idx]}:
+      ansible_host        : ${ip_pas}
+      ansible_connection  : ${scsconnection} 
+      connection_type     : ${scsconnectiontype} 
+
+%{~ endfor }
+  vars:
+    node_tier             : pas
+
+${sid}_APP:
+  hosts:
+%{~ for idx,ip_app in ips_app }
+    ${appservers[idx]}:
+      ansible_host        : ${ip_app}
+      ansible_connection  : ${appconnection} 
+      connection_type     : ${appconnectiontype} 
+
+%{~ endfor }
+  vars:
+    node_tier             : app
+
+${sid}_WEB:
+  hosts:
+%{~ for idx,ip_web in ips_web }
+    ${webservers[idx]}:
+      ansible_host        : ${ip_web}
+      ansible_connection  : ${webconnection} 
+      connection_type     : ${webconnectiontype} 
+
+%{~ endfor }
+  vars:
+    node_tier             : web

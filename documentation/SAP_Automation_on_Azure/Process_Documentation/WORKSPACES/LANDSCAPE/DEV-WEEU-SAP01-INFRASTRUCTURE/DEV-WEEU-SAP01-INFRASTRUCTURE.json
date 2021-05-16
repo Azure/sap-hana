@@ -1,0 +1,27 @@
+{
+    "authentication": {
+        "username"                      : "azureadm"
+    },
+    "infrastructure": {
+        "environment"                   : "DEV",
+        "region"                        : "westeurope",
+        "vnets": {
+            "sap": {
+                "name"                  : "SAP01",
+                "address_space"         : "10.110.0.0/24",
+                "subnet_admin": {
+                  "prefix"              : "10.110.0.0/27"
+                },
+                "subnet_app": {
+                  "prefix"              : "10.110.0.32/27"
+                },
+                "subnet_db": {
+                  "prefix"              : "10.110.0.64/27"
+                },
+                "subnet_web": {
+                  "prefix"              : "10.110.0.96/27"
+                }
+            }
+        }
+    }
+}

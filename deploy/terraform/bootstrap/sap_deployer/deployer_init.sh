@@ -36,9 +36,9 @@ function init()
 
     # Prepare folder structure
     mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LOCAL/$deployer_rg_name
-    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LIBRARY
-    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM
-    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE
+    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY
+    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM
+    mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE
     mkdir -p $HOME/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER
 
     # Clones project repository

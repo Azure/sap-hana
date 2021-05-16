@@ -1,3 +1,4 @@
+
 variable "anchor_vm" {
   description = "Deployed anchor VM"
 }
@@ -18,7 +19,7 @@ variable "ppg" {
   description = "Details of the proximity placement group"
 }
 
-variable naming {
+variable "naming" {
   description = "Defines the names for the resources"
 }
 
@@ -60,6 +61,20 @@ variable "sap_sid" {
   description = "The SID of the application"
 }
 
+
+variable "db_asg_id" {
+  description = "Database Application Security Group"
+}
+
+variable "deployment" {
+  description = "The type of deployment"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+}
+
+
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
@@ -68,13 +83,16 @@ locals {
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
-}
-
-locals {
   // Imports database sizing information
-  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : "${path.module}/../../../../../configs/hdb_sizes.json"))
+  file_name = length(var.custom_disk_sizes_filename) > 0 ? (
+    format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
+    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  )
 
-  faults = jsondecode(file("${path.module}/../../../../../configs/max_fault_domain_count.json"))
+  sizes         = jsondecode(file(local.file_name))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+
+  faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
   region = try(var.infrastructure.region, "")
   sid    = upper(var.sap_sid)
@@ -101,11 +119,6 @@ locals {
   dbnode_per_site       = length(try(local.hdb.dbnodes, [{}]))
   enable_storage_subnet = local.use_ANF && local.dbnode_per_site > 1
 
-  // Zones
-  zones            = try(local.hdb.zones, [])
-  zonal_deployment = length(local.zones) > 0 ? true : false
-  db_zone_count    = length(local.zones)
-
   // Availability Set 
   availabilityset_arm_ids = try(local.hdb.avset_arm_ids, [])
   availabilitysets_exist  = length(local.availabilityset_arm_ids) > 0 ? true : false
@@ -125,16 +138,24 @@ locals {
   hdb_platform = try(local.hdb.platform, "NONE")
   hdb_version  = try(local.hdb.db_version, "2.00.043")
   // If custom image is used, we do not overwrite os reference with default value
-  hdb_custom_image = try(local.hdb.os.source_image_id, "") != "" ? true : false
+  hdb_custom_image = length(try(local.hdb.os.source_image_id, "")) > 0
   hdb_os = {
     "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
     "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "suse")
     "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
     "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
+    "version"         = try(local.hdb.os.version, local.hdb_custom_image ? "" : "latest")
   }
+
   hdb_size = try(local.hdb.size, "Default")
-  hdb_fs   = try(local.hdb.filesystem, "xfs")
-  hdb_ha   = try(local.hdb.high_availability, false)
+
+  db_sizing = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).storage : []
+  db_size   = local.enable_deployment ? lookup(local.sizes.db, local.hdb_size).compute : {}
+
+  hdb_vm_sku = try(local.db_size.vm_size, "Standard_E4s_v3")
+
+  hdb_fs = try(local.hdb.filesystem, "xfs")
+  hdb_ha = try(local.hdb.high_availability, false)
 
   sid_auth_type        = try(local.hdb.authentication.type, "key")
   enable_auth_password = local.enable_deployment && local.sid_auth_type == "password"
@@ -195,29 +216,16 @@ locals {
     { platform = local.hdb_platform },
     { db_version = local.hdb_version },
     { os = local.hdb_os },
-    { size = local.hdb_size },
-    { filesystem = local.hdb_fs },
+    { size = local.hdb_vm_sku },
     { high_availability = local.hdb_ha },
-    { authentication = local.hdb_auth },
+    { auth_type = local.sid_auth_type },
+    { dbnodes = local.dbnodes },
+    { loadbalancer = local.loadbalancer },
     { instance = {
       sid             = local.hdb_sid,
       instance_number = local.hdb_nr
       }
-    },
-    { credentials = {
-      db_systemdb_password   = "obsolete"
-      os_sidadm_password     = "obsolete"
-      os_sapadm_password     = "obsolete"
-      xsa_admin_password     = "obsolete"
-      cockpit_admin_password = "obsolete"
-      ha_cluster_password    = "obsolete"
-      }
-    },
-    { components = local.components },
-    { xsa = local.xsa },
-    { shine = local.shine },
-    { dbnodes = local.dbnodes },
-    { loadbalancer = local.loadbalancer }
+    }
   )
 
   // Numerically indexed Hash of HANA DB nodes to be created
@@ -229,10 +237,11 @@ locals {
       admin_nic_ip   = dbnode.admin_nic_ip,
       db_nic_ip      = dbnode.db_nic_ip,
       storage_nic_ip = dbnode.storage_nic_ip,
-      size           = local.hdb_size,
+      size           = local.hdb_vm_sku,
       os             = local.hdb_os,
-      authentication = local.hdb_auth
+      auth_type      = local.sid_auth_type,
       sid            = local.hdb_sid
+
     }
   ]
 
@@ -240,9 +249,9 @@ locals {
   // Note: First 4 IP addresses in a subnet are reserved by Azure
   hdb_ip_offsets = {
     hdb_lb         = 4
-    hdb_admin_vm   = 10
-    hdb_db_vm      = 10
-    hdb_storage_vm = 10
+    hdb_admin_vm   = 4
+    hdb_db_vm      = 5
+    hdb_storage_vm = 4
   }
 
   // Ports used for specific HANA Versions
@@ -269,14 +278,54 @@ locals {
     }
   ])
 
-  db_sizing = local.enable_deployment ? lookup(local.sizes, local.hdb_size).storage : []
 
   // List of data disks to be created for HANA DB nodes
+  // disk_iops_read_write only apply for ultra
   data_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
     [
       for storage_type in local.db_sizing : [
-        for disk_count in range(storage_type.count) : {
-          suffix               = format("%s%02d", storage_type.name, disk_count + local.offset)
+        for idx, disk_count in range(storage_type.count) : {
+          suffix                    = format("%s%02d", storage_type.name, disk_count + local.offset)
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
+        }
+        if !try(storage_type.append, false)
+      ]
+      if storage_type.name != "os"
+    ]
+  ) : []
+
+  // OS disk to be created for HANA DB nodes
+  // disk_iops_read_write only apply for ultra
+  os_disk = flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          storage_account_type      = storage_type.disk_type,
+          disk_size_gb              = storage_type.size_gb,
+          disk_iops_read_write      = try(storage_type.disk-iops-read-write, null)
+          disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
+          caching                   = storage_type.caching,
+          write_accelerator_enabled = try(storage_type.write_accelerator, false)
+        }
+        if !try(storage_type.append, false)
+      ]
+      if storage_type.name == "os"
+    ]
+  )
+
+
+  append_disk_per_dbnode = (length(local.hdb_vms) > 0) && local.enable_deployment ? flatten(
+    [
+      for storage_type in local.db_sizing : [
+        for idx, disk_count in range(storage_type.count) : {
+          suffix               = format("%s%02d", storage_type.name, storage_type.lun_start + disk_count + local.offset)
           storage_account_type = storage_type.disk_type,
           disk_size_gb         = storage_type.size_gb,
           //The following two lines are for Ultradisks only
@@ -284,16 +333,20 @@ locals {
           disk_mbps_read_write      = try(storage_type.disk-mbps-read-write, null)
           caching                   = storage_type.caching,
           write_accelerator_enabled = storage_type.write_accelerator
+          type                      = storage_type.name
+          lun                       = storage_type.lun_start + idx
         }
+        if try(storage_type.append, false)
       ]
       if storage_type.name != "os"
     ]
   ) : []
 
+  all_data_disk_per_dbnode = distinct(concat(local.data_disk_per_dbnode, local.append_disk_per_dbnode))
+
   data_disk_list = flatten([
     for vm_counter, hdb_vm in local.hdb_vms : [
-      for idx, datadisk in local.data_disk_per_dbnode : {
-        vm_index                  = vm_counter
+      for datadisk in local.all_data_disk_per_dbnode : {
         name                      = format("%s-%s", hdb_vm.name, datadisk.suffix)
         vm_index                  = vm_counter
         caching                   = datadisk.caching
@@ -302,10 +355,19 @@ locals {
         write_accelerator_enabled = datadisk.write_accelerator_enabled
         disk_iops_read_write      = datadisk.disk_iops_read_write
         disk_mbps_read_write      = datadisk.disk_mbps_read_write
-        lun                       = idx
+        lun                       = datadisk.lun
+        type                      = datadisk.type
       }
     ]
   ])
+
+  //Disks for Ansible
+  // host: xxx, LUN: #, type: sapusr, size: #
+
+  db_disks_ansible = distinct(flatten([for idx, vm in local.hdb_vms : [
+    for idx, datadisk in local.data_disk_list :
+    format("{ host: '%s', LUN: %d, type: '%s' }", vm.computername, datadisk.lun, datadisk.type)
+  ]]))
 
   enable_ultradisk = try(
     compact(
@@ -315,4 +377,15 @@ locals {
     )[0],
     false
   )
+
+  // Zones
+  zones         = try(local.hdb.zones, [])
+  db_zone_count = length(local.zones)
+
+  //Ultra disk requires zonal deployment
+  zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
+
+  //If we deploy more than one server in zone put them in an availability set
+  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
+
 }

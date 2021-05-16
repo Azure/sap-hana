@@ -1,5 +1,6 @@
 # Create Web dispatcher NICs
 resource "azurerm_network_interface" "web" {
+  provider                      = azurerm.main
   count                         = local.enable_deployment ? local.webdispatcher_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.nic)
   location                      = var.resource_group[0].location
@@ -20,8 +21,16 @@ resource "azurerm_network_interface" "web" {
   }
 }
 
+resource "azurerm_network_interface_application_security_group_association" "web" {
+  count                         = local.enable_deployment ? local.webdispatcher_count : 0
+  network_interface_id          = azurerm_network_interface.web[count.index].id
+  application_security_group_id = azurerm_application_security_group.web[0].id
+}
+
+
 # Create Application NICs
 resource "azurerm_network_interface" "web_admin" {
+  provider                      = azurerm.main
   count                         = local.enable_deployment && local.apptier_dual_nics ? local.webdispatcher_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.admin_nic)
   location                      = var.resource_group[0].location
@@ -43,35 +52,44 @@ resource "azurerm_network_interface" "web_admin" {
 
 # Create the Linux Web dispatcher VM(s)
 resource "azurerm_linux_virtual_machine" "web" {
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  provider            = azurerm.main
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "LINUX" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.webdispatcher_count == local.web_zone_count ? null : (
-    local.web_zone_count > 1 ? (
-      azurerm_availability_set.web[count.index % max(local.web_zone_count, 1)].id) : (
-      azurerm_availability_set.web[0].id
-    )
-  )
   proximity_placement_group_id = local.web_zonal_deployment ? var.ppg[count.index % max(local.web_zone_count, 1)].id : var.ppg[0].id
-  zone = local.web_zonal_deployment ? (
-    local.webdispatcher_count == local.web_zone_count ? local.web_zones[count.index % max(local.web_zone_count, 1)] : null) : (
-    null
-  )
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_web_avset ? azurerm_availability_set.web[count.index % max(local.web_zone_count, 1)].id : null
+
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_web_avset ? null : local.web_zones[count.index % max(local.web_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
-    [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
+    local.legacy_nic_order ? (
+      [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
+      [azurerm_network_interface.web[count.index].id, azurerm_network_interface.web_admin[count.index].id]
+    )
+    ) : (
     [azurerm_network_interface.web[count.index].id]
   )
 
-  size                            = local.web_sizing.compute.vm_size
+  size                            = length(local.web_size) > 0 ? local.web_size : local.web_sizing.compute.vm_size
   admin_username                  = var.sid_username
-  disable_password_authentication = ! local.enable_auth_password
   admin_password                  = local.enable_auth_key ? null : var.sid_password
+  disable_password_authentication = !local.enable_auth_password
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
 
   dynamic "os_disk" {
     iterator = disk
@@ -112,14 +130,6 @@ resource "azurerm_linux_virtual_machine" "web" {
     }
   }
 
-  dynamic "admin_ssh_key" {
-    for_each = range(local.enable_auth_password ? 0 : 1)
-    content {
-      username   = var.sid_username
-      public_key = var.sdu_public_key
-    }
-  }
-
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
@@ -129,28 +139,28 @@ resource "azurerm_linux_virtual_machine" "web" {
 
 # Create the Windows Web dispatcher VM(s)
 resource "azurerm_windows_virtual_machine" "web" {
-  depends_on          = [var.anydb_vms, var.hdb_vms]
+  provider            = azurerm.main
+  depends_on          = [var.anydb_vm_ids, var.hdb_vm_ids]
   count               = local.enable_deployment ? (upper(local.web_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0
   name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.vm)
   computer_name       = local.web_computer_names[count.index]
   location            = var.resource_group[0].location
   resource_group_name = var.resource_group[0].name
 
-  //If more than one servers are deployed into a zone put them in an availability set and not a zone
-  availability_set_id = local.webdispatcher_count == local.web_zone_count ? null : (
-    local.web_zone_count > 1 ? (
-      azurerm_availability_set.web[count.index % max(local.web_zone_count, 1)].id) : (
-      azurerm_availability_set.web[0].id
-    )
-  )
   proximity_placement_group_id = local.web_zonal_deployment ? var.ppg[count.index % max(local.web_zone_count, 1)].id : var.ppg[0].id
-  zone = local.web_zonal_deployment ? (
-    local.webdispatcher_count == local.web_zone_count ? local.web_zones[count.index % max(local.web_zone_count, 1)] : null) : (
-    null
-  )
+
+  //If more than one servers are deployed into a single zone put them in an availability set and not a zone
+  availability_set_id = local.use_web_avset ? azurerm_availability_set.web[count.index % max(local.web_zone_count, 1)].id : null
+
+  //If length of zones > 1 distribute servers evenly across zones
+  zone = local.use_web_avset ? null : local.web_zones[count.index % max(local.web_zone_count, 1)]
 
   network_interface_ids = local.apptier_dual_nics ? (
-    [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
+    local.legacy_nic_order ? (
+      [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
+      [azurerm_network_interface.web[count.index].id, azurerm_network_interface.web_admin[count.index].id]
+    )
+    ) : (
     [azurerm_network_interface.web[count.index].id]
   )
 
@@ -206,6 +216,7 @@ resource "azurerm_windows_virtual_machine" "web" {
 
 # Creates managed data disk
 resource "azurerm_managed_disk" "web" {
+  provider               = azurerm.main
   count                  = local.enable_deployment ? length(local.web_data_disks) : 0
   name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[local.web_data_disks[count.index].vm_index], local.web_data_disks[count.index].suffix)
   location               = var.resource_group[0].location
@@ -225,6 +236,7 @@ resource "azurerm_managed_disk" "web" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "web" {
+  provider        = azurerm.main
   count           = local.enable_deployment ? length(local.web_data_disks) : 0
   managed_disk_id = azurerm_managed_disk.web[count.index].id
   virtual_machine_id = upper(local.web_ostype) == "LINUX" ? (

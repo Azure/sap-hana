@@ -1,0 +1,47 @@
+{
+  "application": {
+    "application_server_count"      : 2,
+    "enable_deployment"             : true,
+    "ers_instance_number"           : "02",
+    "os": {
+      "publisher"                   : "SUSE",
+      "offer"                       : "sles-sap-12-sp5",
+      "sku"                         : "gen2",
+      "version"                     : "latest"
+    },
+    "scs_high_availability"         : true,
+    "scs_server_count"              : 1,
+    "scs_instance_number"           : "01",
+    "sid"                           : "X00",
+    "webdispatcher_count"           : 1,
+    "dual_nics"                     : false,
+    "use_DHCP"                      : true
+  },
+  "databases": [
+    {
+      "high_availability"           : false,
+      "os": {
+        "publisher"                 : "SUSE",
+        "offer"                     : "sles-sap-12-sp5",
+        "sku"                       : "gen2",
+        "version"                   : "latest"
+      },
+      "platform"                    : "HANA",
+      "size"                        : "Default",
+      "use_DHCP"                    : true,
+      "dbnodes"                     : [ {} ]
+    }
+  ],
+  "infrastructure": {
+    "environment"                   : "DEV",
+    "region"                        : "westeurope",
+    "vnets": {
+      "sap": {
+        "name"                      : "SAP01"
+      }
+    }
+  },
+  "options": {
+    "resource_offset"               : 1
+  }
+}

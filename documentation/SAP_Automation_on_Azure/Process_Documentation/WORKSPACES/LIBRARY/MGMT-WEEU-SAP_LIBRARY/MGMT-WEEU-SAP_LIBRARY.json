@@ -1,0 +1,11 @@
+{
+  "infrastructure": {
+    "region"                : "westeurope",
+    "environment"           : "MGMT"
+  },
+  "deployer": {
+    "environment"           : "MGMT",
+    "region"                : "westeurope",
+    "vnet"                  : "DEP00"
+  }
+}

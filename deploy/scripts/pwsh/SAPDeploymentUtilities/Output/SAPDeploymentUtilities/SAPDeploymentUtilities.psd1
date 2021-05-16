@@ -51,9 +51,9 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules   = @(@{ModuleName = 'Az.Accounts'; ModuleVersion = '2.2.5'; },
-        @{ModuleName = 'Az.KeyVault'; ModuleVersion = '2.1.0'; }
-    )
+    # RequiredModules   = @(@{ModuleName = 'Az.Accounts'; ModuleVersion = '2.2.5'; },
+    #     @{ModuleName = 'Az.KeyVault'; ModuleVersion = '2.1.0'; }
+    # )
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -71,7 +71,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @('Set-SAPSPNSecrets', 'New-SAPSystem', 'New-SAPDeployer', 'New-SAPAutomationRegion', 'New-SAPLibrary', 'New-SAPWorkloadZone')
+    FunctionsToExport = @('Set-SAPSPNSecrets', 'New-SAPSystem', 'New-SAPDeployer', 'New-SAPAutomationRegion', 'New-SAPLibrary', 'New-SAPWorkloadZone', 'Remove-SAPSystem','Read-SAPDeploymentTemplate','Remove-SAPAutomationRegion')
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = '*'

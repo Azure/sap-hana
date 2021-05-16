@@ -28,7 +28,7 @@ Thanks for taking the time to contribute!
 This document summarizes the deployment principles which govern our project.
 <br/><br/>
 
-## Building "in the Open"
+## Building "in the Open" ##
 - Our users appreciate the transparency of our project; in this context, building "in the open" means that anyone can:
   - see the individual pull requests this solution is comprised of;
   - understand particular changes by going back and forth between pull requests;
@@ -37,7 +37,7 @@ This document summarizes the deployment principles which govern our project.
 <br/><br/><br/>
 
 
-## Fully Maintained
+## Fully Maintained ##
 - Rather than providing a loose collection of scripts that are never updated, we fully maintain our project.
 - We strive to provide a high-quality solution by:
   - continuously deploying it using an internal runner to ensure performance and stability;
@@ -45,19 +45,19 @@ This document summarizes the deployment principles which govern our project.
 <br/><br/><br/>
 
 
-## Execution-focused
+## Execution-focused ##
 - We don't just work on some grand plan that may or never be completely executed;
   - It is encouraged to make changes to gradually improve old codebase to meet standards. However, we are not planning a refactor.
   - we start building out the solution and iterate towards a grand plan.
 <br/><br/><br/>
 
 
-## Coding Guidelines
+## Coding Guidelines ##
 This repository integrates with [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/), which invokes build checks on the submitted pull requests aginst defined branch(eg. master). :exclamation: All pull requests are required to pass the Azure pipelines test before it can be merged.
 <br/><br/><br/>
 
 
-### PR Basics
+### PR Basics ###
 This section captures fundamentals on how new features should be developed and fixes made to the codebase.
 
 1. **Close on design before sending PRs**
@@ -70,7 +70,7 @@ This section captures fundamentals on how new features should be developed and f
 <br/><br/><br/>
 
 
-#### PR guidelines
+#### PR guidelines ####
 1. Required information in PR ([example](https://github.com/Azure/sap-hana/pull/480)):
     	- Always link to the issue that is is trying to resolve with tag **Closes**.
 	- Describe the **Problem** that it tries to resolve.
@@ -83,27 +83,28 @@ This section captures fundamentals on how new features should be developed and f
 <br/><br/><br/>
 
 
-#### Terraform guidelines
+#### Terraform guidelines ####
 1. Use `//` for single line comment and `/* */` for block comment.
 2. Try to handle complex logic in `variables_local.tf` which comes in every module.
 3. Use underscore `_` instead of hyphen `-`. The only place hyphen is used is for resource naming convention. 
 <br/><br/><br/>
 
 
-### PR reviews guidelines
+### PR reviews guidelines ###
 We need to ensure quality along with agility. We need to move to everyone agreeing on the base requirement and then relying on systems in place to catch and mitigate issues.
 1. Focus on the [PR Basics](#pr-basics). PRs have to adhere to Basics with no exceptions.
-1. In additional to Basics, PR reviews need to focus on the quality of a PR. eg. catching potential issues/bugs, semantic problems, nitpicks, etc...
-1. Keep PRs in an open published state for at least one working day, which would allow everyone in other regions to review.
-1. For hotfixes, keep PRs open for at least 4 business hrs.
-1. The maintainer is [here](https://github.com/Azure/sap-hana/blob/master/CODEOWNERS).
+2. In additional to Basics, PR reviews need to focus on the quality of a PR. eg. catching potential issues/bugs, semantic problems, nitpicks, etc...
+3.  Keep PRs in an open published state for at least one working day, which would allow everyone in other regions to review.
+4. For hotfixes, keep PRs open for at least 4 business hrs.
+5. The maintainer is [here](https://github.com/Azure/sap-hana/blob/master/CODEOWNERS).
+<br/><br/><br/>
 
-### Release strategy
+### Release strategy ###
 1. All new features should be added to feature branch (eg. `feature/remote-tfstate2`)
-1. All features should stay in beta branch until stable before get into master (eg. `beta/v2.3`)
-1. Only merge beta branches into master.
-1. Create releases of current master before and after merge into master.
-1. Releases naming convention: x.x.x-x (eg. `2.3.1-1`)
+2. All features should stay in beta branch until stable before get into master (eg. `beta/v2.3`)
+3. Only merge beta branches into master.
+4. Create releases of current master before and after merge into master.
+5. Releases naming convention: x.x.x-x (eg. `2.3.1-1`)
    - major version number
    - sub version number
    - maintainance version number

@@ -1,116 +1,115 @@
 
-variable environment {
+variable "environment" {
   description = "Environment type (Prod, Test, Sand, QA)"
 }
 
-variable library_environment {
+variable "library_environment" {
   description = "SAP Library environment type (Prod, Test, Sand, QA)"
   default     = ""
 }
 
-
-variable deployer_environment {
+variable "deployer_environment" {
   description = "Deployer environment type (Prod, Test, Sand, QA)"
   default     = ""
 }
 
-variable landscape_environment {
+variable "landscape_environment" {
   description = "Landscape environment type (Prod, Test, Sand, QA)"
   default     = ""
 }
 
-variable location {
+variable "location" {
   description = "Azure region"
 }
 
-variable codename {
+variable "codename" {
   description = "Code name of application (optional)"
   default     = ""
 }
 
-variable management_vnet_name {
+variable "management_vnet_name" {
   description = "Name of Management vnet"
   default     = ""
 }
 
-variable sap_vnet_name {
+variable "sap_vnet_name" {
   description = "Name of SAP vnet"
   default     = ""
 }
 
-variable sap_sid {
+variable "sap_sid" {
   description = "SAP SID"
   default     = ""
 }
 
-variable db_sid {
+variable "db_sid" {
   description = "Database SID"
   default     = ""
 }
 
-variable random_id {
+variable "random_id" {
   type        = string
   description = "Random hex string"
 }
 
-variable db_ostype {
+variable "db_ostype" {
   description = "Database operating system"
   default     = "LINUX"
 }
 
-variable app_ostype {
+variable "app_ostype" {
   description = "Application Server operating system"
   default     = "LINUX"
 }
 
-variable db_platform {
+variable "db_platform" {
   description = "AnyDB platform type (Oracle, DB2, SQLServer, ASE)"
   default     = "LINUX"
 }
 
-variable anchor_ostype {
+variable "anchor_ostype" {
   description = "Anchor Server operating system"
   default     = "LINUX"
 }
 
-variable app_server_count {
+variable "app_server_count" {
   type    = number
   default = 1
 }
 
-variable scs_server_count {
+variable "scs_server_count" {
   type    = number
   default = 1
 }
 
-variable web_server_count {
+variable "web_server_count" {
   type    = number
   default = 1
 }
 
 
-variable db_server_count {
+variable "db_server_count" {
   type    = number
   default = 1
 }
 
-variable iscsi_server_count {
+variable "iscsi_server_count" {
   type    = number
   default = 1
 }
 
-variable deployer_vm_count {
+variable "deployer_vm_count" {
   type    = number
   default = 1
 }
 
-variable resource_offset {
+variable "resource_offset" {
   type    = number
   default = 0
 }
 
 //Todo: Add to documentation
-variable sapautomation_name_limits {
+variable "sapautomation_name_limits" {
   description = "Name length for automation resources"
   default = {
     environment_variable_length = 5
@@ -121,7 +120,7 @@ variable sapautomation_name_limits {
 }
 
 //Todo: Add to documentation
-variable azlimits {
+variable "azlimits" {
   description = "Name length for resources"
   default = {
     asr         = 50
@@ -149,7 +148,7 @@ variable azlimits {
   }
 }
 
-variable region_mapping {
+variable "region_mapping" {
   type        = map(string)
   description = "Region Mapping: Full = Single CHAR, 4-CHAR"
   # 42 Regions 
@@ -200,7 +199,7 @@ variable region_mapping {
 }
 
 //Todo: Add to documentation
-variable resource_suffixes {
+variable "resource_suffixes" {
   type        = map(string)
   description = "Extension of resource name"
 
@@ -208,7 +207,9 @@ variable resource_suffixes {
     "admin_nic"           = "-admin-nic"
     "admin_subnet"        = "admin-subnet"
     "admin_subnet_nsg"    = "adminSubnet-nsg"
+    "ansible"             = "ansible"
     "app_alb"             = "app-alb"
+    "app_asg"             = "app-asg"
     "app_avset"           = "app-avset"
     "app_subnet"          = "app-subnet"
     "app_subnet_nsg"      = "appSubnet-nsg"
@@ -217,6 +218,7 @@ variable resource_suffixes {
     "db_alb_feip"         = "dbAlb-feip"
     "db_alb_hp"           = "dbAlb-hp"
     "db_alb_rule"         = "dbAlb-rule_"
+    "db_asg"              = "db-asg"
     "db_avset"            = "db-avset"
     "db_nic"              = "-db-nic"
     "db_subnet"           = "db-subnet"
@@ -225,6 +227,8 @@ variable resource_suffixes {
     "deployer_state"      = "_DEPLOYER.terraform.tfstate"
     "deployer_subnet"     = "_deployment-subnet"
     "deployer_subnet_nsg" = "_deployment-nsg"
+    "firewall_rule_db"    = "firewall-rule-db"
+    "firewall_rule_app"   = "firewall-rule-app"
     "iscsi_subnet"        = "iscsi-subnet"
     "iscsi_subnet_nsg"    = "iscsiSubnet-nsg"
     "library_rg"          = "-SAP_LIBRARY"
@@ -235,6 +239,7 @@ variable resource_suffixes {
     "osdisk"              = "-OsDisk"
     "pip"                 = "-pip"
     "ppg"                 = "-ppg"
+    "routetable"          = "route-table"
     "sapbits"             = "sapbits"
     "storage_nic"         = "-storage-nic"
     "storage_subnet"      = "_storage-subnet"
@@ -245,9 +250,15 @@ variable resource_suffixes {
     "scs_alb_hp"          = "scsAlb-hp"
     "scs_alb_rule"        = "scsAlb-rule_"
     "scs_avset"           = "scs-avset"
+    "scs_clst_feip"       = "scsClst-feip"
+    "scs_clst_rule"       = "scsClst-rule"
+    "scs_clst_hp"         = "scsClst-hp"
     "scs_ers_feip"        = "scsErs-feip"
     "scs_ers_hp"          = "scsErs-hp"
-    "scs_ers_rule"        = "scsErs-rule_"
+    "scs_ers_rule"        = "scsErs-rule"
+    "scs_fs_feip"         = "scsFs-feip"
+    "scs_fs_hp"           = "scsFs-hp"
+    "scs_fs_rule"         = "scsFs-rule"
     "scs_scs_rule"        = "scsScs-rule_"
     "sdu_rg"              = ""
     "tfstate"             = "tfstate"
@@ -259,48 +270,49 @@ variable resource_suffixes {
     "web_alb_feip"        = "webAlb-feip"
     "web_alb_hp"          = "webAlb-hp"
     "web_alb_inrule"      = "webAlb-inRule"
+    "web_asg"             = "web-asg"
     "web_avset"           = "web-avset"
     "web_subnet"          = "web-subnet"
     "web_subnet_nsg"      = "webSubnet-nsg"
+    "witness"             = "-witness"
 
   }
 }
 
-variable app_zones {
+variable "app_zones" {
   type        = list(string)
   description = "List of availability zones for application tier"
   default     = []
 }
 
-variable scs_zones {
+variable "scs_zones" {
   type        = list(string)
   description = "List of availability zones for scs tier"
   default     = []
 }
 
-variable web_zones {
+variable "web_zones" {
   type        = list(string)
   description = "List of availability zones for web tier"
   default     = []
 }
 
-variable db_zones {
+variable "db_zones" {
   type        = list(string)
   description = "List of availability zones for db tier"
   default     = []
 }
 
-variable custom_prefix {
+variable "custom_prefix" {
   type        = string
   description = "Custom prefix"
   default     = ""
 }
 
-variable deployer_location {
+variable "deployer_location" {
   description = "Deployer Azure region"
   default     = ""
 }
-
 
 locals {
 
@@ -335,4 +347,3 @@ locals {
   separator = "_"
 
 }
-

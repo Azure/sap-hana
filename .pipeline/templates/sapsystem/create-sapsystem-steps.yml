@@ -121,10 +121,6 @@ steps:
         fi
       fi
 
-      subnet_admin_prefix="10.${sap_vnet_prefix_idx}.${idx}.0/27"
-      subnet_db_prefix="10.${sap_vnet_prefix_idx}.${idx}.32/27"
-      subnet_app_prefix="10.${sap_vnet_prefix_idx}.${idx}.96/27"
-
       sapsystem_rg="${sapsystem_prefix}-WEEU-SAP-PRD"
       sapland_rg="UNIT-WEEU-SAP0-INFRASTRUCTURE"
 
@@ -176,20 +172,11 @@ steps:
       | jq --arg tfstate_resource_id "${tfstate_resource_id}" .tfstate_resource_id\ =\ \$tfstate_resource_id \
       | jq --arg deployer_tfstate_key "${deployer_tfstate_key}" .deployer_tfstate_key\ =\ \$deployer_tfstate_key \
       | jq --arg landscape_tfstate_key "${landscape_tfstate_key}" .landscape_tfstate_key\ =\ \$landscape_tfstate_key \
-      | jq --arg subnet_admin_prefix "${subnet_admin_prefix}" .infrastructure.vnets.sap.subnet_admin.prefix\ =\ \$subnet_admin_prefix \
-      | jq --arg subnet_db_prefix "${subnet_db_prefix}" .infrastructure.vnets.sap.subnet_db.prefix\ =\ \$subnet_db_prefix \
-      | jq --arg subnet_app_prefix "${subnet_app_prefix}" .infrastructure.vnets.sap.subnet_app.prefix\ =\ \$subnet_app_prefix \
       | jq --arg db "${db}" .databases[].platform\ =\ \$db \
       | jq --arg ha "${ha}" .databases[].high_availability\ =\ \$ha \
       | jq --arg osImage_offer "${osImage_offer}" .databases[].os.offer\ =\ \$osImage_offer \
       | jq --arg osImage_publisher "${osImage_publisher}" .databases[].os.publisher\ =\ \$osImage_publisher \
       | jq --arg osImage_sku "${osImage_sku}" .databases[].os.sku\ =\ \$osImage_sku \
-      | jq --arg db_systemdb_password "$(hana-pipeline-db-pwd)" .databases[].credentials.db_systemdb_password\ =\ \$db_systemdb_password \
-      | jq --arg os_sidadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sidadm_password\ =\ \$os_sidadm_password \
-      | jq --arg os_sapadm_password "$(hana-pipeline-os-pwd)" .databases[].credentials.os_sapadm_password\ =\ \$os_sapadm_password \
-      | jq --arg xsa_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.xsa_admin_password\ =\ \$xsa_admin_password \
-      | jq --arg cockpit_admin_password "$(hana-pipeline-db-pwd)" .databases[].credentials.cockpit_admin_password\ =\ \$cockpit_admin_password \
-      | jq --arg ha_cluster_password "$(hana-pipeline-os-pwd)" .databases[].credentials.ha_cluster_password\ =\ \$ha_cluster_password \
       > ${input}
 
       cat ${input}
@@ -204,6 +191,8 @@ steps:
         --backend-config "container_name=tfstate" \
         --backend-config "key=${sap_system_key}" \
         ${repo_dir}/deploy/terraform/run/sap_system/
+      
+      terraform refresh -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       terraform apply -auto-approve -var-file=${input} ${repo_dir}/deploy/terraform/run/sap_system/
       '
     displayName: "Deploy new sap system: Branch ${{parameters.branch_name}}"

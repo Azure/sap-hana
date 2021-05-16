@@ -10,6 +10,10 @@ output "landscape_key_vault_private_arm_id" {
   value = try(module.sap_landscape.kv_prvt, "")
 }
 
+output "landscape_key_vault_spn_arm_id" {
+  value = local.spn_key_vault_arm_id
+}
+
 output "sid_public_key_secret_name" {
   value = try(module.sap_landscape.sid_public_key_secret_name, "")
 }
@@ -45,6 +49,54 @@ output "dns_info_iscsi" {
   value = module.sap_landscape.dns_info_vms
 }
 
+output "route_table_id" {
+  value = module.sap_landscape.route_table_id
+}
+
 output "automation_version" {
   value = local.version_label
+}
+
+//Witness
+output "witness_storage_account" {
+
+  value = module.sap_landscape.witness_storage_account
+}
+
+output "witness_storage_account_key" {
+  sensitive = true
+  value     = module.sap_landscape.witness_storage_account_key
+}
+
+output "admin_subnet_id" {
+  value = module.sap_landscape.admin_subnet_id
+}
+
+output "app_subnet_id" {
+  value = module.sap_landscape.app_subnet_id
+}
+
+output "db_subnet_id" {
+  value = module.sap_landscape.db_subnet_id
+}
+
+output "web_subnet_id" {
+  value = module.sap_landscape.admin_subnet_id
+}
+
+
+output "admin_nsg_id" {
+  value = module.sap_landscape.admin_nsg_id
+}
+
+output "app_nsg_id" {
+  value = module.sap_landscape.app_nsg_id
+}
+
+output "db_nsg_id" {
+  value = module.sap_landscape.db_nsg_id
+}
+
+output "web_nsg_id" {
+  value = module.sap_landscape.admin_nsg_id
 }

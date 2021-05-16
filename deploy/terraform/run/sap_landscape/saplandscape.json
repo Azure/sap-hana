@@ -8,6 +8,18 @@
             "sap": {
                 "name": "SAP01",
                 "address_space": "10.1.0.0/16",
+                "subnet_admin": {
+                    "prefix": "10.1.0.0/25"
+                },
+                "subnet_app": {
+                    "prefix": "10.1.1.0/24"
+                },
+                "subnet_db": {
+                    "prefix": "10.1.2.0/24"
+                },
+                "subnet_web": {
+                    "prefix": "10.1.3.0/24"
+                },
                 "subnet_iscsi": {
                     "name": "global-WEEU-sap01_iscsi-subnet",
                     "prefix": "10.1.0.0/24"

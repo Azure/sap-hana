@@ -27,7 +27,7 @@ variable "deployer_user" {
 }
 */
 
-variable naming {
+variable "naming" {
   description = "Defines the names for the resources"
 }
 
@@ -36,6 +36,15 @@ variable "custom_disk_sizes_filename" {
   description = "Disk size json file"
   default     = ""
 }
+
+variable "deployment" {
+  description = "The type of deployment"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+}
+
 
 locals {
   // Resources naming
@@ -64,11 +73,34 @@ locals {
   zones            = distinct(concat(local.db_zones, local.app_zones, local.scs_zones, local.web_zones))
   zonal_deployment = length(local.zones) > 0 ? true : false
 
+  //Flag to control if nsg is creates in virtual network resource group
+  nsg_asg_with_vnet = try(var.options.nsg_asg_with_vnet, false)
+
   // Retrieve information about Deployer from tfstate file
   deployer_tfstate = var.deployer_tfstate
 
   storageaccount_name    = try(var.landscape_tfstate.storageaccount_name, "")
   storageaccount_rg_name = try(var.landscape_tfstate.storageaccount_rg_name, "")
+  // Retrieve information about Sap Landscape from tfstate file
+  landscape_tfstate = var.landscape_tfstate
+
+  iscsi_private_ip = try(local.landscape_tfstate.iscsi_private_ip, [])
+
+  // Firewall routing logic
+  // If the environment deployment created a route table use it to populate a route
+
+  route_table_id   = try(var.landscape_tfstate.route_table_id, "")
+  route_table_name = try(split("/", var.landscape_tfstate.route_table_id)[8], "")
+
+  firewall_ip = try(var.deployer_tfstate.firewall_ip, "")
+
+  // Firewall
+  firewall_id     = try(var.deployer_tfstate.firewall_id, "")
+  firewall_exists = length(local.firewall_id) > 0
+  firewall_name   = local.firewall_exists ? try(split("/", local.firewall_id)[8], "") : ""
+  firewall_rgname = local.firewall_exists ? try(split("/", local.firewall_id)[4], "") : ""
+
+  firewall_service_tags = format("AzureCloud.%s", local.region)
 
   //Filter the list of databases to only HANA platform entries
   databases = [
@@ -105,7 +137,11 @@ locals {
 
   enable_hdb_deployment = (length(local.hdb_list) > 0) ? true : false
 
-  default_filepath = local.enable_hdb_deployment ? "${path.module}/../../../../../configs/hdb_sizes.json" : "${path.module}/../../../../../configs/anydb_sizes.json"
+  default_filepath = local.enable_hdb_deployment ? (
+    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")) : (
+    format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")
+  )
+
 
   //Enable xDB deployment 
   xdb_list = [
@@ -122,9 +158,11 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes     = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? var.custom_disk_sizes_filename : local.default_filepath))
-  db_sizing = local.enable_db_deployment ? lookup(local.sizes, var.databases[0].size).storage : []
+  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
+  db_sizing = local.enable_sid_deployment ? lookup(local.sizes.db, var.databases[0].size).storage : []
+  
   enable_ultradisk = try(
     compact(
       [
@@ -148,7 +186,7 @@ locals {
   anchor_authentication       = try(local.anchor.authentication, local.db_auth)
   anchor_auth_type            = try(local.anchor.authentication.type, "key")
   enable_anchor_auth_password = local.deploy_anchor && local.anchor_auth_type == "password"
-  enable_anchor_auth_key      = ! local.enable_anchor_auth_password
+  enable_anchor_auth_key      = !local.enable_anchor_auth_password
 
   //If the db uses ultra disks ensure that the anchore sets the ultradisk flag but only for the zones that will contain db servers
   enable_anchor_ultra = [
@@ -191,44 +229,53 @@ locals {
   */
 
   //SAP vnet
-  vnet_sap_arm_id              = try(var.landscape_tfstate.vnet_sap_arm_id, "")
-  vnet_sap_name                = split("/", local.vnet_sap_arm_id)[8]
-  vnet_sap_resource_group_name = split("/", local.vnet_sap_arm_id)[4]
-  vnet_sap                     = data.azurerm_virtual_network.vnet_sap
-  vnet_sap_addr                = local.vnet_sap.address_space
-  var_vnet_sap                 = try(local.var_infra.vnets.sap, {})
+  vnet_sap_arm_id                  = try(var.landscape_tfstate.vnet_sap_arm_id, "")
+  vnet_sap_name                    = split("/", local.vnet_sap_arm_id)[8]
+  vnet_sap_resource_group_name     = split("/", local.vnet_sap_arm_id)[4]
+  vnet_sap                         = data.azurerm_virtual_network.vnet_sap
+  vnet_sap_resource_group_location = try(local.vnet_sap.location, local.region)
+  vnet_sap_addr                    = local.vnet_sap.address_space
+  var_vnet_sap                     = try(local.var_infra.vnets.sap, {})
 
   //Admin subnet
   enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
   var_sub_admin       = try(local.var_vnet_sap.subnet_admin, {})
-  sub_admin_arm_id    = try(local.var_sub_admin.arm_id, "")
-  sub_admin_exists    = length(local.sub_admin_arm_id) > 0
+  sub_admin_arm_id    = try(local.var_sub_admin.arm_id, try(var.landscape_tfstate.admin_subnet_id, ""))
+  sub_admin_exists    = length(trimspace(try(local.var_sub_admin.prefix, ""))) > 0 ? false : length(local.sub_admin_arm_id) > 0
 
-  sub_admin_name   = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
-  sub_admin_prefix = local.sub_admin_exists ? "" : try(local.var_sub_admin.prefix, "")
+  sub_admin_name = local.sub_admin_exists ? try(split("/", local.sub_admin_arm_id)[10], "") : try(local.var_sub_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
+  sub_admin_prefix = local.enable_admin_subnet ? (
+    local.sub_admin_exists ? (
+      data.azurerm_subnet.admin[0].address_prefixes[0]) : (
+      try(local.var_sub_admin.prefix, "")
+    )) : (
+    ""
+  )
 
   //Admin NSG
   var_sub_admin_nsg    = try(local.var_sub_admin.nsg, {})
-  sub_admin_nsg_arm_id = try(local.var_sub_admin_nsg.arm_id, "")
-  sub_admin_nsg_exists = length(local.sub_admin_nsg_arm_id) > 0 ? true : false
+  sub_admin_nsg_arm_id = try(var.landscape_tfstate.admin_nsg_id, try(local.var_sub_admin_nsg.arm_id, ""))
+  sub_admin_nsg_exists = local.sub_admin_exists ? length(local.sub_admin_nsg_arm_id) > 0 : false
   sub_admin_nsg_name   = local.sub_admin_nsg_exists ? try(split("/", local.sub_admin_nsg_arm_id)[8], "") : try(local.var_sub_admin_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg))
 
   //DB subnet
-  var_sub_db    = try(local.var_vnet_sap.subnet_db, {})
-  sub_db_arm_id = try(local.var_sub_db.arm_id, "")
-  sub_db_exists = length(local.sub_db_arm_id) > 0 ? true : false
+  sub_db_defined = try(var.infrastructure.vnets.sap.subnet_db, null) == null ? false : true
+  var_sub_db     = try(local.var_vnet_sap.subnet_db, {})
+  sub_db_arm_id  = try(local.var_sub_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
+  sub_db_exists  = length(trimspace(try(local.var_sub_db.prefix, ""))) > 0 ? false : length(local.sub_db_arm_id) > 0 ? true : false
+
   sub_db_name   = local.sub_db_exists ? try(split("/", local.sub_db_arm_id)[10], "") : try(local.var_sub_db.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet))
-  sub_db_prefix = local.sub_db_exists ? "" : try(local.var_sub_db.prefix, "")
+  sub_db_prefix = local.sub_db_exists ? data.azurerm_subnet.db[0].address_prefixes[0] : try(local.var_sub_db.prefix, "")
 
   //DB NSG
   var_sub_db_nsg    = try(local.var_sub_db.nsg, {})
-  sub_db_nsg_arm_id = try(local.var_sub_db_nsg.arm_id, "")
-  sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0 ? true : false
+  sub_db_nsg_arm_id = try(local.var_sub_db_nsg.arm_id, try(var.landscape_tfstate.db_nsg_id, ""))
+  sub_db_nsg_exists = local.sub_db_exists ? length(local.sub_db_nsg_arm_id) > 0 : false
   sub_db_nsg_name   = local.sub_db_nsg_exists ? try(split("/", local.sub_db_nsg_arm_id)[8], "") : try(local.var_sub_db_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet_nsg))
 
   //APP subnet
   var_sub_app    = try(local.var_vnet_sap.subnet_app, {})
-  sub_app_arm_id = try(local.var_sub_app.arm_id, "")
+  sub_app_arm_id = try(var.landscape_tfstate.app_subnet_id, try(local.var_sub_app.arm_id, ""))
   sub_app_exists = length(local.sub_app_arm_id) > 0 ? true : false
   sub_app_name   = local.sub_app_exists ? "" : try(local.var_sub_app.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet))
   sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "")
@@ -254,8 +301,8 @@ locals {
   sub_storage_nsg_name   = local.sub_storage_nsg_exists ? try(split("/", local.sub_storage_nsg_arm_id)[8], "") : try(local.sub_storage_nsg.name, format("%s%s", local.prefix, local.resource_suffixes.storage_subnet_nsg))
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of using the landscape key vault
-  user_key_vault_id = try(var.key_vault.kv_user_id, var.landscape_tfstate.landscape_key_vault_user_arm_id)
-  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, var.landscape_tfstate.landscape_key_vault_private_arm_id)
+  user_key_vault_id = try(var.key_vault.kv_user_id, local.landscape_tfstate.landscape_key_vault_user_arm_id)
+  prvt_key_vault_id = try(var.key_vault.kv_prvt_id, local.landscape_tfstate.landscape_key_vault_private_arm_id)
 
   //Override 
   user_kv_override = length(try(var.key_vault.kv_user_id, "")) > 0
@@ -277,14 +324,16 @@ locals {
     try(var.authentication.username, ""),
     try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
   )
-  
-  sid_auth_password = coalesce(
-    try(var.authentication.password, ""),
-    try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
-  )
 
-  sid_public_key    = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
-  sid_private_key   = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
+  sid_auth_password = coalesce(
+      try(var.authentication.password, ""),
+      try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
+    )
+    
+  sid_public_key  = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
+  sid_private_key = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
+
+  password_required = try(var.databases[0].authentication.type, "key") == "password" || try(var.application.authentication.type, "key") == "password"
 
   //---- Update infrastructure with defaults ----//
   infrastructure = {

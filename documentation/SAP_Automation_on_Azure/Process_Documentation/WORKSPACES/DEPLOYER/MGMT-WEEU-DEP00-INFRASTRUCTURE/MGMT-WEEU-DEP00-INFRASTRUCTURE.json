@@ -1,0 +1,21 @@
+{
+  "infrastructure": {
+    "region"                     : "westeurope",
+    "environment"                : "MGMT",
+    "vnets": {
+      "management": {
+        "address_space"          : "10.10.20.0/25",
+        "subnet_mgmt": {
+          "prefix"               : "10.10.20.64/28"
+        },
+        "subnet_fw": {
+          "prefix"               : "10.10.20.0/26"
+        }
+      }
+    }
+  },
+  "options": {
+    "enable_deployer_public_ip" : true
+  },
+  "firewall_deployment"         : true
+}

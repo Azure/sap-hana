@@ -1,4 +1,5 @@
 {
+  "db": {
     "Default": {
       "compute": {
         "vm_size": "Standard_E4s_v3",
@@ -19,7 +20,8 @@
           "size_gb": 256,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -28,7 +30,8 @@
           "size_gb": 128,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 9
         }
       ]
     },
@@ -52,7 +55,8 @@
           "size_gb": 256,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -61,7 +65,8 @@
           "size_gb": 128,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 9
         }
       ]
     },
@@ -85,7 +90,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -94,7 +100,8 @@
           "size_gb": 256,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 9
         }
       ]
     },
@@ -113,12 +120,13 @@
         },
         {
           "name": "data",
-          "count": 2,
+          "count": 4,
           "disk_type": "Premium_LRS",
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -127,7 +135,8 @@
           "size_gb": 256,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 9
         }
       ]
     },
@@ -151,7 +160,8 @@
           "size_gb": 1024,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -160,7 +170,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 9
         }
       ]
     },
@@ -184,7 +195,8 @@
           "size_gb": 1024,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -193,7 +205,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -217,7 +230,8 @@
           "size_gb": 2048,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -226,7 +240,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -250,7 +265,8 @@
           "size_gb": 4096,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -259,7 +275,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -283,7 +300,8 @@
           "size_gb": 4096,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -292,7 +310,8 @@
           "size_gb": 512,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -316,7 +335,8 @@
           "size_gb": 4096,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -325,7 +345,8 @@
           "size_gb": 2048,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -349,7 +370,8 @@
           "size_gb": 4096,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -358,7 +380,8 @@
           "size_gb": 2048,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     },
@@ -382,7 +405,8 @@
           "size_gb": 4096,
           "caching": "None",
           "write_accelerator": false,
-          "mount_point": "/data"
+          "mount_point": "/data",
+          "lun_start": 0
         },
         {
           "name": "log",
@@ -391,9 +415,10 @@
           "size_gb": 2048,
           "caching": "None",
           "write_accelerator": true,
-          "mount_point": "/log"
+          "mount_point": "/log",
+          "lun_start": 17
         }
       ]
     }
   }
-  
+}

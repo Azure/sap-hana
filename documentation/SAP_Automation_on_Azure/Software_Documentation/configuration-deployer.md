@@ -1,34 +1,21 @@
-<!-- TODO: 
-Remove files and maintain here in documentation
-deploy/terraform/bootstrap/sap_deployer/deployer_full.json
-deploy/terraform/bootstrap/sap_deployer/deployer.json
-deploy/terraform/run/sap_deployer/deployer_full.json
-deploy/terraform/run/sap_deployer/deployer.json
--->
-### <img src="../assets/images/UnicornSAPBlack256x256.png" width="64px"> SAP Deployment Automation Framework <!-- omit in toc -->
-<br/><br/>
 
-# Configuration - Deployer with Public IP <!-- omit in toc -->
+# ![SAP Deployment Automation Framework](../assets/images/UnicornSAPBlack64x64.png)**SAP Deployment Automation Framework** #
 
-<br/>
+## Configuration <!-- omit in toc --> ##
 
-## Table of Contents <!-- omit in toc -->
-<br/>
+This document describes how the deployment infrastructure is configured.
+### Table of Contents <!-- omit in toc --> ###
 
-- [Parameter file construction](#parameter-file-construction)
-- [Examples](#examples)
-  - [Minimal (Default) input parameter JSON](#minimal-default-input-parameter-json)
-  - [Complete input parameter JSON](#complete-input-parameter-json)
+- [Parameter file construction](##parameter-file-construction)
+- [Examples](##examples)
+  - [Minimal (Default) input parameter JSON](##minimal-default-input-parameter-json)
+  - [Complete input parameter JSON](##complete-input-parameter-json)
 
+## Parameter file construction ##
 
-<br/><br/><br/><br/>
+The configuration of the deployement infrastructure is achieved using a json formatted parameter file. The key section is the **infrastructure** section which is used to define the Azure region, the Virtual Network information (either a new Virtual Network or an existing). The **key_vault** section is used to specify the Azure Resource Identifiers for existing key vaults if the customer wants to use existing vaults.
 
----
-<br/>
-
-# Parameter file construction
-
-JSON structure
+### JSON structure ###
 
 ```
 {                                                                                 <-- JSON opening tag
@@ -39,16 +26,21 @@ JSON structure
     "vnets": {
       "management": {
         "arm_id"                      : "",                                       <-- Optional Identifier
-        "name"                        : "DEP00",                                  <-- Required Parameter if arm_id is not specified
-        "address_space"               : "10.0.0.0/27",                            <-- Required Parameter if arm_id is not specified
+        "name"                        : "DEP00",                                  <-- Required Parameter
+        "address_space"               : "10.0.0.0/25",                            <-- Required Parameter if arm_id is not specified
         "subnet_mgmt": {
-          "arm_id"                    : ""                                        <-- Optional Identifier
-          "name"                      : "deployment_subnet"                       <-- Optional Identifier
+          "arm_id"                    : "",                                       <-- Optional Identifier
+          "name"                      : "deployment_subnet",                      <-- Optional Identifier
           "prefix"                    : "10.0.0.16/28"                            <-- Required Parameter
+        }
+        "subnet_fw": {
+          "arm_id"                    : "",                                       <-- Optional Identifier
+          "prefix"                    : "10.0.0.32/26"                            <-- Required Parameter
         }
       }
     },
    "resource_group": {
+      "name"                          : ""                                        <-- Optional Identifier
       "arm_id"                        : ""                                        <-- Optional Identifier
     }
 
@@ -56,62 +48,65 @@ JSON structure
   "key_vault": {
     "kv_user_id"                      : "",                                       <-- Optional
     "kv_prvt_id"                      : "",                                       <-- Optional
+    "kv_spn_id"                       : "",                                       <-- Optional
     "kv_sshkey_prvt"                  : "",                                       <-- Optional
     "kv_sshkey_pub"                   : "",                                       <-- Optional
     "kv_username"                     : "",                                       <-- Optional
     "kv_pwd"                          : ""                                        <-- Optional
   },
-  "sshkey": {
+  "authentication": {
     "path_to_public_key"              : "sshkey.pub",                             <-- Optional
     "path_to_private_key"             : "sshkey"                                  <-- Optional
   },
+
   "options": {
-    "enable_secure_transfer"          : true,                                     <-- Optional, Default: true
     "enable_deployer_public_ip"       : false                                     <-- Optional, Default: false
-  }
+  },
+  "firewall_deployment"               : true                                      <-- Optional, Default: false
 }                                                                                 <-- JSON Closing tag
 ```
 
-| Object Path                                   | Parameter                     | Type          | Default  | Description |
+The complete set of configuratiuon options is listed in the table below.
+
+| Node                                   | Value                     | Type          | Default  | Description |
 | :-------------------------------------------- | :---------------------------- | ------------- | :------- | :---------- |
-| infrastructure                                | `environment`                 | **required**  | -        | The Environment is a 5 Character designator used for partitioning. An example of partitioning would be, PROD / NP /QA /DEV (Production, Non-Production, Quality Assurance, Development). Environments may also be tied to a unique SPN or Subscription |
-| <p>                                           | `region`                      | **required**  | -        | This specifies the Azure Region in which to deploy |
-|<P>|||
+| infrastructure.                             | `environment`                 | **required**  | -------- | The Environment is a 5 Character designator used for identifying the workload zone. An example of partitioning would be, PROD / NP (Production and Non-Production). Environments may also be tied to a unique SPN or Subscription. |
+| infrastructure.                             | `region`                      | **required**  |          | This specifies the Azure Region in which to deploy. |
+| infrastructure.resource_group.              | `arm_id`                      | optional      |          | If specified the Azure Resource ID of Resource Group to use for the deployment |
+| infrastructure.resource_group.              | `name`                        | optional      |          | If specified the name of the resource group to be created |
+| |  |
 | infrastructure.vnets.management               | `arm_id`                      | **required**      | -        | If provided, The Azure Resource Identifier of the VNet to use
-| | **or** | 
-| infrastructure.vnets.management               | `name`                      | **required**  | -        | The name of the VNet| infrastructure.vnets.management               | `name`                        | **required**  | -        | This assigns a 7 Character designator for the Deployer VNET. Recommended value: DEP00 |
-| <p>                                           | `address_space`               | **required**  | -        | CIDR of the VNET Address Space. We recommend a /27 CIDR (32 IP's).<br/>This allows space for 2x /28 CIDR (16 IP's). |
+| | **or** |
+| infrastructure.vnets.management               | `name`                      | **required**  | -        | The logical identifier of the VNet| infrastructure.vnets.management               | `name`                        | **required**  | -        | This assigns a 7 Character designator for the Deployer VNET. Recommended value: DEP00 |
+| <p>                                           | `address_space`               | **required**  | -        | CIDR of the VNET Address Space. We recommend a /27 CIDR (32 IP's).<br/>This allows space for 2x /28 CIDR (16 IP's). <br/> If you want to include the Azure Firewall use a /25 CIDR as Azure Firewall requires a /26 range |
 ||<p>| 
 | infrastructure.vnets.management.subnet_mgmt               | `arm_id`                      | **required**      | -        | If provided, The Azure Resource Identifier of the subnet to use
 | | **or** | 
 | infrastructure.vnets.management.subnet_mgmt               | `name`                      | **required**  | -        | The name of the subnet| infrastructure.vnets.management               | `name`                        | **required**  | -        | This assigns a 7 Character designator for the Deployer VNET. Recommended value: deployment-subnet |
 |infrastructure.vnets.management.subnet_mgmt   | `prefix`                      | **required**  | -        | CIDR of the Deployer Subnet. We recommend a /28 CIDR (16 IP's). |
+| | <br/> | 
+| infrastructure.vnets.management.subnet_fw               | `arm_id`                      | **required**      | -        | If provided, The Azure Resource Identifier of the subnet to use for the Azure Firewall
+| | **or** | 
+|infrastructure.vnets.management.subnet_fw   | `prefix`                      | **required**  | -        | CIDR of the Deployer Subnet. We recommend a /26 CIDR. |
+| | <br/> | 
+| key_vault.                     | `kv_user_id`                                | optional      |          |If provided, the Key Vault resource ID of the user Key Vault to be used.  |
+| key_vault.                     | `kv_prvt_id`                                | optional      |          |If provided, the Key Vault resource ID of the private Key Vault to be used. |
+| key_vault.                     | `kv_spn_id`                                | optional      |          |If provided, the Key Vault resource ID of the private Key Vault containing the SPN details. |
+| key_vault.                                    | `kv_sshkey_prvt`              | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
+| key_vault.                                    | `kv_sshkey_pub`               | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
+| key_vault.                                    | `kv_username`                 | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
+| key_vault.                                    | `kv_pwd`                      | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
 ||<p>| 
-infrastructure.resource_group               | `arm_id`                      | optional      | -        | If provided, the Azure Resource Identifier for the resource group to use for the deployment 
+| authentication                                        | `path_to_public_key`          | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
+| authentication                                           | `path_to_private_key`         | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
 ||<p>| 
-| key_vault                                     | `kv_user_id`                  | optional      | -        | This provides a way to override the user keyvault to use. If specified no key vault will be created by the deployment<br/>- Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `kv_prvt_id`                  | optional      | -        | This provides a way to override the private keyvault to use. If specified no key vault will be created by the deployment<br/>- Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `kv_spn_id`                   | optional      | -        | - This provides a way to provide the override for the keyvault that will contain the Service Principal Secrets <br/>Not required in a standard deployment.<br/>|
-| <p>                                           | `kv_sshkey_prvt`              | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `kv_sshkey_pub`               | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `kv_username`                 | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `kv_pwd`                      | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| sshkey                                        | `path_to_public_key`          | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| <p>                                           | `path_to_private_key`         | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
-| options                                       | `enable_secure_transfer`      | optional      | true     | - Not required in a standard deployment.<br/> <!-- TODO: --> |
-| <p>                                           | `enable_deployer_public_ip`   | optional      | false    | Controls whether the deployer VM will have a public IP address or not.- Not required in a standard deployment.<br/> <!-- TODO: --> |
+| options                                           | `enable_deployer_public_ip`   | optional      | false    | Controls whether the deployer VM will have a public IP address or not.- Not required in a standard deployment.|
+|<p>| 
+| firewall_deployment                                           | `true/false`   | optional      | false    | Controls whether the deployment will include an Azure Firewall|
 
+## Examples ##
 
-<br/><br/><br/><br/>
-
----
-
-<br/><br/>
-
-# Examples
-<br/>
-
-## Minimal (Default) input parameter JSON
+### Minimal (Default) input parameter JSON
 
 ```json
 {
@@ -131,37 +126,44 @@ infrastructure.resource_group               | `arm_id`                      | op
 }
 ```
 
-<br/><br/><br/>
-
-## Complete input parameter JSON
+### Complete input parameter JSON ###
 
 ```json
-{
-  "infrastructure": {
-    "environment"                     : "NP",
-    "region"                          : "eastus2",
-    "vnets": {
-      "management": {
-        "name"                        : "NP-EUS2-DEP00-vnet",
-        "address_space"               : "10.0.0.0/27",
-        "subnet_mgmt": {
-          "prefix"                    : "10.0.0.16/28"
+  {
+    "infrastructure": {
+      "environment"                     : "NP",
+      "region"                          : "eastus2",
+      "vnets": {
+        "management": {
+          "name"                        : "DEP00",
+          "address_space"               : "10.0.0.0/25",
+          "subnet_mgmt": {
+            "prefix"                    : "10.0.0.16/28"
+          },
+          "subnet_fw": {
+            "prefix"                    : "10.0.0.32/26"
+          }
         }
       }
-    }
-  },
-  "key_vault": {
-    "kv_user_id"                      : "",
-    "kv_prvt_id"                      : "",
-    "kv_spn_id"                       : "",
-    "kv_sshkey_prvt"                  : "",
-    "kv_sshkey_pub"                   : "",
-    "kv_username"                     : "",
-    "kv_pwd"                          : ""
-  },
+    },
+    "key_vault": {
+      "kv_user_id"                      : "",
+      "kv_prvt_id"                      : "",
+      "kv_spn_id"                       : "",
+      "kv_sshkey_prvt"                  : "",
+      "kv_sshkey_pub"                   : "",
+      "kv_username"                     : "",
+      "kv_pwd"                          : ""
+    },
+  "authentication": {
+      "username"                        : "azureadm",
+      "password"                        : "",
+      "path_to_public_key"              : "sshkey.pub",
+      "path_to_private_key"             : "sshkey"
+    },
   "options": {
-    "enable_secure_transfer"          : true,
-    "enable_deployer_public_ip"       : false
+      "enable_deployer_public_ip"       : false
+    },
+  "firewall_deployment"                 : true
   }
-}
 ```

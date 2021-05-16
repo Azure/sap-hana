@@ -26,10 +26,8 @@
     "key_vault": {
         "kv_user_id": "",
         "kv_prvt_id": "",
-        "kv_sid_sshkey_prvt" : "",
-        "kv_sid_sshkey_pub" : "",
-        "kv_sid_username" : "",
-        "kv_sid_pwd" : "",
+        "kv_sid_sshkey_prvt": "",
+        "kv_sid_sshkey_pub": "",
         "kv_iscsi_username": "",
         "kv_iscsi_pwd": "",
         "kv_spn_id": ""
@@ -42,6 +40,9 @@
     },
     "options": {},
     "diagnostics_storage_account": {
+        "arm_id": ""
+    },
+    "witness_storage_account": {
         "arm_id": ""
     }
 }

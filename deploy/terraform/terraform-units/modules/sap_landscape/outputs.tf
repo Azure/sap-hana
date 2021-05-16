@@ -30,11 +30,11 @@ output "kv_prvt" {
 }
 
 output "sid_public_key_secret_name" {
-  value = local.sid_pk_name 
+  value = local.sid_pk_name
 }
 
 output "sid_private_key_secret_name" {
-  value = local.sid_ppk_name 
+  value = local.sid_ppk_name
 }
 
 
@@ -78,3 +78,79 @@ output "storage_bootdiag_endpoint" {
 output "dns_info_vms" {
   value = local.iscsi_count > 0 ? zipmap(local.full_iscsiserver_names, azurerm_network_interface.iscsi[*].private_ip_address) : null
 }
+
+output "route_table_id" {
+  value = local.vnet_sap_exists ? "" : azurerm_route_table.rt[0].id
+}
+
+//Witness Info
+output "witness_storage_account" {
+  value = length(var.witness_storage_account.arm_id) > 0 ? (
+    split("/", var.witness_storage_account.arm_id)[8]) : (
+    local.witness_storageaccount_name
+  )
+}
+
+output "witness_storage_account_key" {
+  sensitive = true
+  value = length(var.witness_storage_account.arm_id) > 0 ? (
+    data.azurerm_storage_account.witness_storage[0].primary_access_key) : (
+    azurerm_storage_account.witness_storage[0].primary_access_key
+  )
+}
+
+output "admin_subnet_id" {
+  value = local.sub_admin_defined ? (
+    local.sub_admin_existing ? local.sub_admin_id : azurerm_subnet.admin[0].id) : (
+    ""
+  )
+}
+
+output "app_subnet_id" {
+  value = local.sub_app_defined ? (
+    local.sub_app_existing ? local.sub_app_id : azurerm_subnet.app[0].id) : (
+    ""
+  )
+}
+
+output "db_subnet_id" {
+  value = local.sub_db_defined ? (
+    local.sub_db_existing ? local.sub_db_id : azurerm_subnet.db[0].id) : (
+    ""
+  )
+}
+
+output "web_subnet_id" {
+  value = local.sub_web_defined ? (
+    local.sub_web_existing ? local.sub_web_id : azurerm_subnet.web[0].id) : (
+    ""
+  )
+}
+
+output "admin_nsg_id" {
+  value = local.sub_admin_defined ? (
+    local.sub_admin_nsg_exists ? local.sub_admin_nsg_arm_id : azurerm_network_security_group.admin[0].id) : (
+    ""
+  )
+}
+
+output "app_nsg_id" {
+  value = local.sub_app_defined ? (
+    local.sub_app_nsg_exists ? local.sub_app_nsg_arm_id : azurerm_network_security_group.app[0].id) : (
+    ""
+  )
+}
+
+output "db_nsg_id" {
+  value = local.sub_db_defined ? (
+    local.sub_db_nsg_exists ? local.sub_db_nsg_arm_id : azurerm_network_security_group.db[0].id) : (
+    ""
+  )
+}
+output "web_nsg_id" {
+  value = local.sub_web_defined ? (
+    local.sub_web_nsg_exists ? local.sub_web_nsg_arm_id : azurerm_network_security_group.web[0].id) : (
+    ""
+  )
+}
+

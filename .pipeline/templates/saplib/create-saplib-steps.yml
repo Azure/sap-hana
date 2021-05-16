@@ -29,6 +29,7 @@ steps:
 
       echo "=== Store SPN in deployer KV ==="
       deployer_kv_name=$(az keyvault list --resource-group ${deployer_rg} | jq -r '.[] | select(.name | contains("user")).name')
+      echo $deployer_kv_name
       az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-id --value $(hana-pipeline-spn-id) --output none
       az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-client-secret --value $(hana-pipeline-spn-pw) --output none
       az keyvault secret set --vault-name ${deployer_kv_name} --name ${saplib_prefix}-subscription-id --value $(landscape-subscription) --output none

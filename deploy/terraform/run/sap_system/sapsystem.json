@@ -11,16 +11,8 @@
     },
     "vnets": {
       "sap": {
-        "name": "SAP01",
-        "subnet_admin": {
-          "prefix": "10.1.1.0/24"
-        },
-        "subnet_db": {
-          "prefix": "10.1.2.0/24"
-        },
-        "subnet_app": {
-          "prefix": "10.1.4.0/24"
-        }
+        "name": "SAP01"
+
       }
     }
   },
@@ -37,7 +29,8 @@
       },
       "authentication": {
         "type": "key"
-      }
+      },
+      "use_DHCP": true
     }
   ],
   "application": {
@@ -50,10 +43,9 @@
     "webdispatcher_count": 1,
     "authentication": {
       "type": "key"
-    }
+    },
+    "use_DHCP": true
   },
   "options": {
-    "enable_secure_transfer": true,
-    "enable_prometheus": true
   }
 }

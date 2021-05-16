@@ -25,3 +25,12 @@ set-sp.sh
 
 # ignore any clustering auth scripts
 set-clustering-auth*.sh
+
+#  Local .vscode directories
+
+**/.vscode/*
+.vscode/
+deploy/scripts/pwsh/SAPDeploymentUtilities/Output/stats.json
+
+
+**/.terraform.lock.hcl
