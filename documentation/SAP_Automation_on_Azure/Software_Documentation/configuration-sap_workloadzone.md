@@ -74,7 +74,7 @@ JSON structure
         },
         "subnet_web": {
           "name"                      : "",                                       <-- Optional
-          "arm_id"                    : "",                                     <-- Optional
+          "arm_id"                    : "",                                       <-- Optional
           "prefix"                    : "10.1.3.0/25",                            <-- Optional
           "nsg": {
             "name"                    : "",                                       <-- Optional
@@ -110,7 +110,13 @@ JSON structure
     "path_to_private_key"             : "sshkey"                                  <-- Optional
   }
 
-  "options": {},                                                                   <-- Optional
+  "options": {},                                                                  <-- Optional
+  "diagnostics_storage_account": {
+        "arm_id"                      : ""                                        <-- Optional
+    },
+  "witness_storage_account": {
+        "arm_id"                      : ""                                        <-- Optional
+    },  
   "tfstate_resource_id"               : "",                                       <-- Required Parameter
   "deployer_tfstate_key"              : "",                                       <-- Required Parameter
 }                                                                                 <-- JSON Closing tag
@@ -166,8 +172,9 @@ Node                                          | attribute               | Type  
 | authentication.                              | `path_to_public_key`    | optional      |          | If specified the path to the SSH public key file. If not specified, Terraform will create  and store it in keyvault |
 | authentication.                              | `path_to_private_key`   | optional      |          | If specified the path to the SSH private key file. If not specified, Terraform will create  and store it in keyvault |
 | | <br/> |
+| `diagnostics_storage_account`                 |`arm_id`                 | optional      | -        | This is the Azure Resource ID for the Storage Account to contain the boot diagnostics for the virtual machines. |
+| `witness_storage_account`                     |`arm_id`                | optional      | -        | This is the Azure Resource ID for the Storage Account that can be used as the witness storage account. |
 | `tfstate_resource_id`                         |`Remote State`                 | **required**  | -        | This is the Azure Resource ID for the Storage Account in which the Statefiles are stored. Typically this is deployed by the SAP Library execution unit. |
-| `deployer_tfstate_key`                        | `Remote State`                  | **required**  | -        | This is the deployer state file name, used for finding the correct state file.  <br/>**Case-sensitive**  |
 | `deployer_tfstate_key`                        | `Remote State`                  | **required**  | -        | This is the deployer state file name, used for finding the correct state file.  <br/>**Case-sensitive**  |
 
 ---
@@ -270,12 +277,18 @@ Node                                          | attribute               | Type  
     "kv_iscsi_sshkey_pub"             : "",
     "kv_iscsi_pwd"                    : ""
   },
-"authentication": {
-    "username"                        : "azureadm",
-    "password"                        : "",
-    "path_to_public_key"              : "sshkey.pub",
-    "path_to_private_key"             : "sshkey"
-  },
+  "authentication": {
+     "username"                       : "azureadm",
+     "password"                       : "",
+     "path_to_public_key"             : "sshkey.pub",
+     "path_to_private_key"            : "sshkey"
+    },
+  "diagnostics_storage_account": {
+     "arm_id"                         : ""
+    },
+  "witness_storage_account": {
+     "arm_id"                         : ""
+    },
   "options": {},
   "tfstate_resource_id"               : "",
   "deployer_tfstate_key"              : ""
