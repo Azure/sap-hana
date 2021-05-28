@@ -152,25 +152,21 @@ fi
 
 
 
-if [ $force == 1 ]
-then
-    if [ -d ./.terraform/ ]; then
-        rm .terraform -r
-    fi
-
-    if [ -f terraform.tfstate ]; then
-        rm terraform.tfstate
-    fi
-
-    if [ -f terraform.tfstate.backup ]; then
-        rm terraform.tfstate.backup
-    fi
+if [ $force == 1 ]; then
+    rm -Rf .terraform terraform.tfstate*
 fi
 
+ext=$(echo ${parameterfile} | cut -d. -f2)
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
+    load_config_vars "${param_dirname}"/"${parameterfile}" "environment"
+    load_config_vars "${param_dirname}"/"${parameterfile}" "location"
+    region=$(echo ${location} | xargs)
+fi
 
 if [ ! -n "${environment}" ]
 then
@@ -368,7 +364,7 @@ else
 fi
 
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 if [ ! -d "${terraform_module_directory}" ]

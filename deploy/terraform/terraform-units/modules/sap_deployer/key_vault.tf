@@ -2,14 +2,14 @@
 data "azurerm_client_config" "deployer" {}
 
 data "azuread_service_principal" "deployer" {
-  count = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
+  count          = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
   application_id = data.azurerm_client_config.deployer.client_id
 }
 
 
 resource "azurerm_key_vault" "kv_prvt" {
   count                      = (local.enable_deployers && !local.prvt_kv_exist) ? 1 : 0
-  name                       = local.prvt_kv_name
+  name                       = local.keyvault_names.private_access
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location                   = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
@@ -28,8 +28,8 @@ resource "azurerm_key_vault" "kv_prvt" {
 // Import an existing private Key Vault
 data "azurerm_key_vault" "kv_prvt" {
   count               = (local.enable_deployers && local.prvt_kv_exist) ? 1 : 0
-  name                = local.prvt_kv_name
-  resource_group_name = local.prvt_kv_rg_name
+  name                = split("/", local.prvt_key_vault_id)[8]
+  resource_group_name = split("/", local.prvt_key_vault_id)[4]
 }
 
 resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
@@ -48,7 +48,7 @@ resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
 // Create user KV with access policy
 resource "azurerm_key_vault" "kv_user" {
   count                      = (local.enable_deployers && !local.user_kv_exist) ? 1 : 0
-  name                       = local.user_kv_name
+  name                       = local.keyvault_names.user_access
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location                   = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
   tenant_id                  = data.azurerm_client_config.deployer.tenant_id
@@ -67,12 +67,19 @@ resource "azurerm_key_vault" "kv_user" {
 // Import an existing user Key Vault
 data "azurerm_key_vault" "kv_user" {
   count               = (local.enable_deployers && local.user_kv_exist) ? 1 : 0
-  name                = local.user_kv_name
-  resource_group_name = local.user_kv_rg_name
+  name                = split("/", local.user_key_vault_id)[8]
+  resource_group_name = split("/", local.user_key_vault_id)[4]
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
-  count        = (local.enable_deployers && !local.user_kv_exist) ? 1 : 0
+  count = (local.enable_deployers && !local.user_kv_exist) ? (
+    data.azurerm_client_config.deployer.object_id == "" ? (
+      0) : (
+      1
+    )) : (
+    0
+  )
+
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
@@ -108,6 +115,10 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
     "Restore",
     "Purge"
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 // Comment out code with users.object_id for the time being.
@@ -146,7 +157,10 @@ resource "tls_private_key" "deployer" {
 */
 // If user brings an existing KV, the secrets will be stored in the exsiting KV; if not, the secrets will be stored in a newly generated KV
 resource "azurerm_key_vault_secret" "ppk" {
-  depends_on   = [azurerm_key_vault_access_policy.kv_user_pre_deployer[0]]
+  depends_on = [
+    azurerm_key_vault_access_policy.kv_user_pre_deployer[0],
+    azurerm_key_vault_access_policy.kv_user_msi[0]
+  ]
   count        = (local.enable_deployers && local.enable_key && !local.key_exist) ? 1 : 0
   name         = local.ppk_secret_name
   value        = local.private_key
@@ -154,7 +168,10 @@ resource "azurerm_key_vault_secret" "ppk" {
 }
 
 resource "azurerm_key_vault_secret" "pk" {
-  depends_on   = [azurerm_key_vault_access_policy.kv_user_pre_deployer[0]]
+  depends_on = [
+    azurerm_key_vault_access_policy.kv_user_pre_deployer[0],
+    azurerm_key_vault_access_policy.kv_user_msi[0]
+  ]
   count        = (local.enable_deployers && local.enable_key && !local.key_exist) ? 1 : 0
   name         = local.pk_secret_name
   value        = local.public_key
@@ -162,7 +179,10 @@ resource "azurerm_key_vault_secret" "pk" {
 }
 
 resource "azurerm_key_vault_secret" "username" {
-  depends_on   = [azurerm_key_vault_access_policy.kv_user_pre_deployer[0]]
+  depends_on = [
+    azurerm_key_vault_access_policy.kv_user_pre_deployer[0],
+    azurerm_key_vault_access_policy.kv_user_msi[0]
+  ]
   count        = (local.enable_deployers && !local.username_exist) ? 1 : 0
   name         = local.username_secret_name
   value        = local.username
@@ -175,7 +195,7 @@ resource "random_password" "deployer" {
     local.enable_deployers
     && local.enable_password
     && !local.pwd_exist
-    && local.input_pwd == null
+    && try(var.authentication.password, "") == ""
   ) ? 1 : 0
 
   length           = 32
@@ -187,7 +207,10 @@ resource "random_password" "deployer" {
 }
 
 resource "azurerm_key_vault_secret" "pwd" {
-  depends_on   = [azurerm_key_vault_access_policy.kv_user_pre_deployer[0]]
+  depends_on = [
+    azurerm_key_vault_access_policy.kv_user_pre_deployer[0],
+    azurerm_key_vault_access_policy.kv_user_msi[0]
+  ]
   count        = (local.enable_deployers && local.enable_password && !local.pwd_exist) ? 1 : 0
   name         = local.pwd_secret_name
   value        = local.password
