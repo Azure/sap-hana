@@ -1,38 +1,75 @@
 {
     "infrastructure": {
-        "region": "westeurope",
-        "environment": "np",
+        "environment"                   : "np",
+        "codename"                      : "",
+        "region"                        : "westeurope",
         "vnets": {
             "management": {
-                "name": "NP-WEEU-DEP00-vnet",
-                "address_space": "10.0.0.0/26",
+                "name"                  : "NP-WEEU-DEP00-vnet",
+                "arm_id"                : "",
+                "address_space"         : "10.0.0.0/26",
                 "subnet_mgmt": {
-                    "prefix": "10.0.0.16/28"
+                    "name"              : "NP-WEEU-DEP00_deployment-subnet",
+                    "arm_id"            : "",
+                    "prefix"            : "10.0.0.16/28",
+                    "nsg": {
+                        "name"          : "NP-WEEU-DEP00_deployment-nsg",
+                        "arm_id"        : "",
+                        "allowed_ips" : [
+                            "0.0.0.0/0"
+                        ]
+                    }
+                },
+                "subnet_fw": {
+                    "name"              : "",
+                    "arm_id"            : "",
+                    "prefix"            : "10.0.0.16/24"
                 }
             }
         }
     },
-    "options": {
-        "enable_secure_transfer": true,
-        "enable_deployer_public_ip": false
-    },
-    "key_vault": {
-        "kv_user_id": "",
-        "kv_prvt_id": "",
-        "kv_sshkey_prvt": "",
-        "kv_sshkey_pub": "",
-        "kv_username": "",
-        "kv_pwd": ""
-    },
     "deployers": [
         {
-            "size": "Standard_D4ds_v4",
-            "disk_type": "Premium_LRS",
-            "use_DHCP": false
+            "size"                      : "Standard_D4ds_v4",
+            "disk_type"                 : "Premium_LRS",
+            "use_DHCP"                  : false,
+            "os": {
+                "source_image_id"       : "",
+                "publisher"             : "Canonical",
+                "offer"                 : "UbuntuServer",
+                "sku"                   : "18.04-LTS",
+                "version"               : "latest"
+              },
+            "authentication": {
+                "type"                  : "key"
+              },
+            "private_ip_address"        : "10.0.0.20",
+            "users" : [
+                "object_id"
+            ]
+            
         }
     ],
-    "firewall_deployment": false,
-    "firewall_rule_subnets": [],
-    "firewall_allowed_ipaddresses": [],
-    "assign_subscription_permissions": true
+    "options": {
+        "enable_deployer_public_ip"     : false
+    },
+    "authentication": {
+        "username": "azureadm",
+        "password": "SecretPassword",
+        "path_to_public_key": "sshkey.pub",
+        "path_to_private_key": "sshkey"
+    },
+
+    "key_vault": {
+        "kv_user_id"                    : "",
+        "kv_prvt_id"                    : "",
+        "kv_sshkey_prvt"                : "",
+        "kv_sshkey_pub"                 : "",
+        "kv_username"                   : "",
+        "kv_pwd"                        : ""
+    },
+    "firewall_deployment"               : false,
+    "firewall_rule_subnets"             : [],
+    "firewall_allowed_ipaddresses"      : [],
+    "assign_subscription_permissions"   : true
 }
