@@ -94,12 +94,27 @@ if [ $param_dirname != '.' ]; then
     exit 3
 fi
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+ext=$(echo ${parameterfile} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+    use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+else
+    
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_environment"
+    environment=$(echo ${library_environment} | xargs)
+    load_config_vars "${param_dirname}"/"${parameterfile}" "library_location"
+    region=$(echo ${library_location} | xargs)
+
+    load_config_vars "${param_dirname}"/"${parameterfile}" "deployer_use"
+    use_deployer=$deployer_use
+fi
+
 key=$(echo "${parameterfile}" | cut -d. -f1)
 
-use_deployer=$(jq --raw-output .deployer.use "${parameterfile}")
+
 if [ "${use_deployer}" == "null" ]; then
     use_deployer=false
 fi

@@ -5,7 +5,7 @@ Description:
 */
 
 // Input arguments 
-variable naming {
+variable "naming" {
   description = "naming convention"
 }
 
@@ -28,14 +28,19 @@ locals {
 
   // Region
   region = try(local.var_infra.region, "")
-  prefix = try(local.var_infra.resource_group.name, var.naming.prefix.LIBRARY)
+  prefix = length(local.var_infra.resource_group.name) > 0 ? local.var_infra.resource_group.name : trimspace(var.naming.prefix.LIBRARY)
 
   // Resource group
-  var_rg    = try(local.var_infra.resource_group, {})
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
   rg_exists = length(local.rg_arm_id) > 0
 
-  rg_name = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.library_rg))
+  rg_name = local.rg_exists ? (
+    try(split("/", local.rg_arm_id)[4], "")) : (
+    length(local.var_infra.resource_group.name) > 0 ? (
+      local.var_infra.resource_group.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.library_rg)
+    )
+  )
 
   // Storage account for sapbits
   sa_sapbits_arm_id = try(var.storage_account_sapbits.arm_id, "")
