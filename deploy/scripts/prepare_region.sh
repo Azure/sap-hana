@@ -13,7 +13,7 @@ resetformatting="\e[0m"
 full_script_path="$(realpath "${BASH_SOURCE[0]}")"
 script_directory="$(dirname "${full_script_path}")"
 
-#call stack has full scriptname when using source 
+#call stack has full scriptname when using source
 source "${script_directory}/deploy_utils.sh"
 
 ################################################################################################
@@ -77,9 +77,9 @@ function showhelp {
     echo "#      --library_parameter_file LIBRARY/PROD-WEEU-SAP_LIBRARY/PROD-WEEU-SAP_LIBRARY.json \                      #"
     echo "#      --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \                                                    #"
     echo "#      --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \                                                          #"
-    echo "#      --spn_secret ************************ \                                                                  #"  
+    echo "#      --spn_secret ************************ \                                                                  #"
     echo "#      --tenant_id zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz \                                                       #"
-    echo "#      --auto-approve                                                                                           #"  
+    echo "#      --auto-approve                                                                                           #"
     echo "#                                                                                                               #"
     echo "#################################################################################################################"
 }
@@ -105,16 +105,16 @@ function missing {
     echo "#      -h or --help                          Help                                       #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    
+
 }
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n prepare_region  -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n prepare_region -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
-  showhelp
+    showhelp
 fi
 
 eval set -- "$INPUT_ARGUMENTS"
@@ -134,6 +134,8 @@ do
     --) shift; break ;;
   esac
 done
+
+root_dirname=$(pwd)
 
 
 if [ ! -z "$approve" ]; then
@@ -165,7 +167,7 @@ if [ ! -n "$tf" ]; then
     exit -1
 fi
 
-az --version > stdout.az 2>&1
+az --version >stdout.az 2>&1
 az=$(grep "azure-cli" stdout.az)
 if [ ! -n "${az}" ]; then
     echo ""
@@ -178,12 +180,20 @@ if [ ! -n "${az}" ]; then
     exit -1
 fi
 
-# Helper variables
-environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
-region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
+ext=$(echo ${deployer_parameter_file} | cut -d. -f2)
 
-if [ ! -n "${environment}" ]
-then
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
+    region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
+else
+    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "environment"
+    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "location"
+    region=$(echo ${location} | xargs)
+fi
+
+
+if [ ! -n "${environment}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                           Incorrect parameter file.                                   #"
@@ -195,8 +205,7 @@ then
     exit 64 #script usage wrong
 fi
 
-if [ ! -n "${region}" ]
-then
+if [ ! -n "${region}" ]; then
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                           Incorrect parameter file.                                   #"
@@ -213,26 +222,20 @@ generic_config_information="${automation_config_directory}"config
 deployer_config_information="${automation_config_directory}""${environment}""${region}"
 
 #Plugins
-if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
-then
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]; then
     mkdir "$HOME/.terraform.d/plugin-cache"
 fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
-root_dirname=$(pwd)
-
-if [ $force == 1 ]
-then
-    if [ -f "${deployer_config_information}" ]
-    then
+if [ $force == 1 ]; then
+    if [ -f "${deployer_config_information}" ]; then
         rm "${deployer_config_information}"
     fi
 fi
 
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
 
-if [ ! -z "${subscription}" ]
-then
+if [ ! -z "${subscription}" ]; then
     ARM_SUBSCRIPTION_ID="${subscription}"
     save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
     save_config_var "subscription" "${deployer_config_information}"
@@ -256,8 +259,7 @@ fi
 
 templen=$(echo "${ARM_SUBSCRIPTION_ID}" | wc -c)
 # Subscription length is 37
-if [ 37 != $templen ]
-then
+if [ 37 != $templen ]; then
     arm_config_stored=0
 fi
 
@@ -274,8 +276,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#########################################################################################"
     exit 65                                                                                           #data format error
 else
-    if [ "${arm_config_stored}" != 0 ]
-    then
+    if [ "${arm_config_stored}" != 0 ]; then
         echo "Storing the configuration"
         save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
     fi
@@ -300,19 +301,16 @@ if [ -n "${temp}" ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    if [ -f stdout.az ]
-    then
+    if [ -f stdout.az ]; then
         rm stdout.az
     fi
     exit 67                                                                                             #addressee unknown
 else
-    if [ -f stdout.az ]
-    then
+    if [ -f stdout.az ]; then
         rm stdout.az
     fi
 
-    if [ ! -z "${subscription}" ]
-    then
+    if [ ! -z "${subscription}" ]; then
         echo "Setting the subscription"
         az account set --sub "${subscription}"
         export ARM_SUBSCRIPTION_ID="${subscription}"
@@ -324,8 +322,7 @@ step=0
 load_config_vars "${deployer_config_information}" "step"
 
 curdir=$(pwd)
-if [ 0 == $step ]
-then
+if [ 0 == $step ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -333,65 +330,37 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    
+
     cd "${deployer_dirname}" || exit
-    
-    if [ $force == 1 ]
-    then
-        # This is a a bit verbose
 
-        # if [ -d ./.terraform/ ]; then
-        #     rm .terraform -r
-        # fi
-        
-        # if [ -f terraform.tfstate ]; then
-        #     rm terraform.tfstate
-        # fi
-        
-        # if [ -f terraform.tfstate.backup ]; then
-        #     rm terraform.tfstate.backup
-        # fi
-        
-        
-        
-        # Another way to do it
-        
-        # [ -d .terraform ]               && rm -Rf .terraform
-        # [ -f terraform.tfstate ]        && rm     terraform.tfstate
-        # [ -f terraform.tfstate.backup ] && rm     terraform.tfstate.backup
-
-        # This is the simplest
+    if [ $force == 1 ]; then
         rm -Rf .terraform terraform.tfstate*
     fi
-    
+
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
-                
+
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
-    if (( $? > 0 ))
-    then
+    if (($? > 0)); then
         exit $?
     fi
-    
+
     step=1
     save_config_var "step" "${deployer_config_information}"
-    
-    if [ ! -z "$subscription" ]
-    then
+
+    if [ ! -z "$subscription" ]; then
         save_config_var "subscription" "${deployer_config_information}"
         kvsubscription=$subscription
         save_config_var "kvsubscription" "${deployer_config_information}"
     fi
-    
-    if [ ! -z "$client_id" ]
-    then
+
+    if [ ! -z "$client_id" ]; then
         save_config_var "client_id" "${deployer_config_information}"
     fi
-    
-    if [ ! -z "$tenant_id" ]
-    then
+
+    if [ ! -z "$tenant_id" ]; then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
-    
+
 else
     echo ""
     echo "#########################################################################################"
@@ -404,41 +373,36 @@ fi
 
 unset TF_DATA_DIR
 
-if [ 1 == $step ]
-then
+if [ 1 == $step ]; then
     load_config_vars "${deployer_config_information}" "keyvault"
     echo "Using the keyvault: " $keyvault
     secretname="${environment}"-client-id
     az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
-    if [ -s error.log ]
-    then
-        if [ ! -z "$spn_secret" ]
-        then
-            allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
-            
+    if [ -s error.log ]; then
+        if [ ! -z "$spn_secret" ]; then
+            allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}")
+
             "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
-            if (( $? > 0 ))
-            then
+            if (($? > 0)); then
                 exit $?
             fi
         else
-            read -p  "Do you want to specify the SPN Details Y/N?"  ans
+            read -p "Do you want to specify the SPN Details Y/N?" ans
             answer=${ans^^}
             if [ "$answer" == 'Y' ]; then
-                
+
                 allParams="${env_param}""${keyvault_param}""${region_param}"
-                
+
                 "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
-                if (( $? > 0 ))
-                then
+                if (($? > 0)); then
                     exit $?
                 fi
             fi
         fi
-        
+
         if [ -f post_deployment.sh ]; then
             ./post_deployment.sh
-            if (( $? > 0 )); then
+            if (($? > 0)); then
                 exit $?
             fi
         fi
@@ -449,9 +413,8 @@ then
 fi
 unset TF_DATA_DIR
 cd $root_dirname
-if [ 2 == $step ]
-then
-    
+if [ 2 == $step ]; then
+
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -459,31 +422,21 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    
+
     relative_path="${root_dirname}"/"${library_dirname}"
     export TF_DATA_DIR="${relative_path}/.terraform"
     relative_path="${root_dirname}"/"${deployer_dirname}"
-    
+
     cd "${library_dirname}" || exit
-    if [ $force == 1 ]
-    then
-        if [ -d ./.terraform/ ]; then
-            rm .terraform -r
-        fi
-        
-        if [ -f terraform.tfstate ]; then
-            rm terraform.tfstate
-        fi
-        
-        if [ -f terraform.tfstate.backup ]; then
-            rm terraform.tfstate.backup
-        fi
+
+    if [ $force == 1 ]; then
+        rm -Rf .terraform terraform.tfstate*
     fi
+
     allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
-    
+
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_library.sh $allParams
-    if (( $? > 0 ))
-    then
+    if (($? > 0)); then
         exit $?
     fi
     cd "${curdir}" || exit
@@ -499,14 +452,13 @@ else
     echo ""
     step=3
     save_config_var "step" "${deployer_config_information}"
-    
+
 fi
 
 unset TF_DATA_DIR
 cd $root_dirname
 
-if [ 3 == $step ]
-then
+if [ 3 == $step ]; then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
@@ -514,19 +466,17 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    
+
     cd "${deployer_dirname}" || exit
-    
+
     # Remove the script file
-    if [ -f post_deployment.sh ]
-    then
+    if [ -f post_deployment.sh ]; then
         rm post_deployment.sh
     fi
     allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
-    
+
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
-    if (( $? > 0 ))
-    then
+    if (($? > 0)); then
         exit $?
     fi
     cd "${curdir}" || exit
@@ -537,24 +487,22 @@ fi
 unset TF_DATA_DIR
 cd $root_dirname
 
-if [ 4 == $step ]
-then
-    
+if [ 4 == $step ]; then
+
     echo ""
-    
+
     echo "#########################################################################################"
     echo "#                                                                                       #"
     echo "#                           Migrating the library state                                 #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    
+
     cd "${library_dirname}" || exit
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
 
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
-    if (( $? > 0 ))
-    then
+    if (($? > 0)); then
         exit $?
     fi
     cd "${curdir}" || exit
