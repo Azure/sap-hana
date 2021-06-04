@@ -115,15 +115,36 @@ output "dns_info_loadbalancers" {
       compact([
         local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",
         local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "ers") : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? format("%s%s%s", local.prefix, var.naming.separator, "clst") : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? format("%s%s%s", local.prefix, var.naming.separator, "fs") : "",
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            format("%s%s%s", local.prefix, var.naming.separator, "clst")) : (
+            ""
+          )) : (
+          ""
+        ),
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            format("%s%s%s", local.prefix, var.naming.separator, "fs")) : (
+            ""
+          )) : (
+          ""
+        ),
         local.webdispatcher_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) : ""
       ]),
       compact([
         local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[0] : "",
         local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[1] : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[2] : "",
-        local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[3] : "",
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
+            azurerm_lb.scs[0].private_ip_addresses[2]) : (
+            ""
+          )) : (
+          ""
+        ),
+        local.scs_server_count > 0 ? (
+          local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[3] : "") : (
+          ""
+        ),
         local.webdispatcher_count > 0 ? azurerm_lb.web[0].private_ip_address : ""
       ])
     )
