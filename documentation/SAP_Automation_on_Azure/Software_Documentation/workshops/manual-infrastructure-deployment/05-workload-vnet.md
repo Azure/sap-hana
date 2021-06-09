@@ -111,7 +111,8 @@
     2. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=DEMO-EUS2-SAP00-INFRASTRUCTURE.json                   \
+       terraform plan                                                                  \
+                       --var-file=DEMO-EUS2-SAP00-INFRASTRUCTURE.json                  \
                        ../../../sap-hana/deploy/terraform/run/sap_landscape/
        ```
 

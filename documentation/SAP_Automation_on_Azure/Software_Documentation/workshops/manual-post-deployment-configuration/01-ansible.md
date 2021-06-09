@@ -184,6 +184,3 @@ Future Steps will include:
         ```
 
        <br/><br/><br/><br/>
-
-
-# Next: [Bootstrap - SPN](02-spn.md) <!-- omit in toc -->

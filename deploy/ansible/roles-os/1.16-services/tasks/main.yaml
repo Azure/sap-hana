@@ -1,0 +1,67 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.16       - Services for OS                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+- name:             1.16 -  Enable/Disable and Stop/Start Required Services
+  include_vars:     os-services.yaml
+
+# Analyse the service list for this distribution selecting only those
+# services assigned to the active tier or 'all'.
+- name:             Determine services appropriate for tier
+  set_fact:
+    services_to_process: "{{ services[distro_id] |
+                           selectattr('tier', 'in', ['all', tier]) |
+                           selectattr('node_tier', 'in', ['all', node_tier]) |
+                           list }}"
+
+# Print list of matching services if verbosity is 1 or greater
+- debug:
+    var: services_to_process
+    verbosity: 1
+
+# Extract the list of service names whose state match the specified value and
+# pass them as the argument to the name parameter; this is the recommended
+# approach as it only calls the underlying distro specific service manager
+# once per state value.
+- name:             "1.16 - Start Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    state:          started
+  loop:             "{{ services_to_process |
+                      selectattr('state', 'equalto', 'started') |
+                      map(attribute='service') |
+                      list }}"
+
+- name:             "1.16 - Enable Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    enabled:         yes
+  loop:             "{{ services_to_process |
+                      selectattr('state', 'equalto', 'enabled') |
+                      map(attribute='service') |
+                      list }}"
+
+- name:             "1.16 - Disable Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    enabled:         no
+  loop:           "{{ services_to_process |
+                      selectattr('state', 'equalto', 'disabled') |
+                      map(attribute='service') |
+                      list }}"
+
+- name:             "1.16 - Stop Services : {{ distro_name }}"
+  service:
+    name:           "{{ item }}"
+    state:          stopped
+  loop:           "{{ services_to_process |
+                      selectattr('state', 'equalto', 'stopped') |
+                      map(attribute='service') |
+                      list }}"
+
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4---------------------------------------*/

@@ -254,7 +254,7 @@ locals {
 
   //Admin NSG
   var_sub_admin_nsg    = try(local.var_sub_admin.nsg, {})
-  sub_admin_nsg_arm_id = try(var.landscape_tfstate.admin_nsg_id, try(local.var_sub_admin_nsg.arm_id, ""))
+  sub_admin_nsg_arm_id = try(local.var_sub_admin_nsg.arm_id, try(var.landscape_tfstate.admin_nsg_id, ""))
   sub_admin_nsg_exists = local.sub_admin_exists ? length(local.sub_admin_nsg_arm_id) > 0 : false
   sub_admin_nsg_name   = local.sub_admin_nsg_exists ? try(split("/", local.sub_admin_nsg_arm_id)[8], "") : try(local.var_sub_admin_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg))
 
@@ -275,14 +275,14 @@ locals {
 
   //APP subnet
   var_sub_app    = try(local.var_vnet_sap.subnet_app, {})
-  sub_app_arm_id = try(var.landscape_tfstate.app_subnet_id, try(local.var_sub_app.arm_id, ""))
+  sub_app_arm_id = try(local.var_sub_app.arm_id, try(var.landscape_tfstate.app_subnet_id, ""))
   sub_app_exists = length(local.sub_app_arm_id) > 0 ? true : false
   sub_app_name   = local.sub_app_exists ? "" : try(local.var_sub_app.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet))
   sub_app_prefix = local.sub_app_exists ? "" : try(local.var_sub_app.prefix, "")
 
   //APP NSG
   var_sub_app_nsg    = try(local.var_sub_app.nsg, {})
-  sub_app_nsg_arm_id = try(local.var_sub_app_nsg.arm_id, "")
+  sub_app_nsg_arm_id = try(local.var_sub_app_nsg.arm_id, try(var.landscape_tfstate.app_nsg_id, ""))
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0 ? true : false
   sub_app_nsg_name   = local.sub_app_nsg_exists ? try(split("/", local.sub_app_nsg_arm_id)[8], "") : try(local.var_sub_app_nsg.name, format("%s%s%s", var.naming.separator, local.prefix, local.resource_suffixes.app_subnet_nsg))
 

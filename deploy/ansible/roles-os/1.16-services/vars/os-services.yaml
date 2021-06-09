@@ -1,0 +1,40 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.16       - Services lists per OS & based on SAP node |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# For each supported 'distro_id' we want a list of dictionary entries that
+# specify the associated tier (or 'all' to always match), the service name,
+# and whether we want the service to be enabled and started or disabled 
+# and stopped. See the definition of 'distro_id' to determine what to use when
+# creating an entry for a new distribution.
+# In this list one can specify the custom list of services to be enabled,disabled
+# OR started, stopped 
+
+#Example - Add a line specifying the service, SAP node teir & state 
+# redhat8:
+#      - { tier: 'os', service: 'auditd',       node_tier: 'all',     state: 'started' }
+
+services:
+    redhat7:
+#      - { tier: 'os', service: '',  node_tier: 'all',    state: 'started' }
+     
+    
+ 
+    redhat8:
+      - { tier: 'os', service: 'auditd',       node_tier: 'all',     state: 'started' }
+      - { tier: 'os', service: 'multipathd',   node_tier: 'all',     state: 'stopped' }
+      - { tier: 'os', service: 'sbd',          node_tier: 'all',     state: 'enabled' }
+      - { tier: 'os', service: 'oddjobd',      node_tier: 'all',     state: 'disabled' }
+   
+    suse12:
+#      - { tier: 'os', service: '',  node_tier: 'all',     state: 'started' }
+      
+ 
+
+    suse15:
+#      - { tier: 'os', service: '',  node_tier: 'all',     state: 'started' }
+      
+

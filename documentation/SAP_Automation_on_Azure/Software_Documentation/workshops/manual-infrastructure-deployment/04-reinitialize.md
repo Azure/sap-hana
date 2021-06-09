@@ -100,7 +100,8 @@
     3. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                    \
+       terraform plan                                                                  \
+                       --var-file=DEMO-EUS2-DEP00-INFRASTRUCTURE.json                  \
                        ../../../sap-hana/deploy/terraform/run/sap_deployer/
        ```
 
@@ -161,7 +162,7 @@
 4. Terraform
     1. Initialization
        ```bash
-       terraform init  --backend-config backend                                        \
+       terraform init  --backend-config backend                                          \
                        ../../../sap-hana/deploy/terraform/run/sap_library/
        ```
        
@@ -177,14 +178,15 @@
     3. Plan
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform plan  --var-file=DEMO-EUS2-SAP_LIBRARY.json                             \
+       terraform plan                                                                    \
+                       --var-file=DEMO-EUS2-SAP_LIBRARY.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_library/
        ```
 
     4. Apply
        <br/>*`Observe Naming Convention`*<br/>
        ```bash
-       terraform apply --auto-approve                                                  \
+       terraform apply --auto-approve                                                    \
                        --var-file=DEMO-EUS2-SAP_LIBRARY.json                             \
                        ../../../sap-hana/deploy/terraform/run/sap_library/
        ```

@@ -13,12 +13,7 @@
 <br/><br/>
 
 ## Steps
-1. [Bootstrap - Deployer](01-bootstrap-deployer.md)
-2. [Bootstrap - SPN](02-spn.md)
-3. [Bootstrap - SAP Library](03-bootstrap-library.md)
-4. [Bootstrap - Reinitialize](04-reinitialize.md)
-5. [Deploy SAP Workload VNET](05-workload-vnet.md)
-6. [Deploy SDU](06-sdu.md)
+1. [Executing Ansible](01-ansible.md)
 
 <br/>
 
@@ -48,4 +43,4 @@ Future Steps will include:
 <br/><br/><br/><br/>
 
 
-# Next: [Bootstrapping the Deployer](01-bootstrap-deployer.md) <!-- omit in toc -->
+# Next: [Executing Ansible](01-ansible.md) <!-- omit in toc -->

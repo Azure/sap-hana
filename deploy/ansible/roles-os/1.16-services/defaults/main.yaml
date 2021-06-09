@@ -1,0 +1,6 @@
+---
+# TODO: Maybe move these to a group_vars/all/distro file so that they
+# can be shared by all playbooks/tasks automatically, and extend with
+# standardised versions of all similar patterns used in the playbooks.
+distro_name:    "{{ ansible_os_family|upper }}-{{ ansible_distribution_major_version }}"
+distro_id:      "{{ ansible_os_family|lower ~ ansible_distribution_major_version }}"

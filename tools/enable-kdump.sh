@@ -41,15 +41,16 @@ do
     ExitIfFailed $? "Unable to scan lun"
 done
 
+LUN_ID=2
 # sg_scan -i command will give mapping for the devices
 # output look like
-# /dev/sg32: scsi17 channel=0 id=3 lun=3
+# /dev/sg32: scsi17 channel=0 id=$LUN_ID lun=$LUN_ID
 #    NETAPP    LUN C-Mode        9600 [rmb=0 cmdq=1 pqual=0 pdev=0x0]
-# where lun=3 is the lun id
-# so in order to fetch the dedicated kdump lun which is attached to lun_id=3
+# where lun=$LUN_ID is the lun id
+# so in order to fetch the dedicated kdump lun which is attached to lun_id=$LUN_ID
 # we need to parse the SAN id and then map that id to device id in os
 # in above example SAN id is /dev/sg32
-san_disk=$(sg_scan -i | grep lun=3 | awk 'FNR==1'| egrep -o "^[ ]{0,}\/dev\/[a-z0-9]*")
+san_disk=$(sg_scan -i | grep lun=$LUN_ID | awk 'FNR==1'| egrep -o "^[ ]{0,}\/dev\/[a-z0-9]*")
 if [[ "$san_disk" == "" ]]; then
     ExitIfLunNotFound
 fi

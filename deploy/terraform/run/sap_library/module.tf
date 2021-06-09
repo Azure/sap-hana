@@ -21,6 +21,7 @@ module sap_namegenerator {
   deployer_environment = try(var.deployer.environment, var.infrastructure.environment)
   management_vnet_name = var.deployer.vnet
   location             = var.infrastructure.region
+  codename             = try(var.infrastructure.codename,"")
   deployer_location    = try(var.deployer.region, var.infrastructure.region)
   random_id            = module.sap_library.random_id
 }

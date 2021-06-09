@@ -107,7 +107,7 @@
     pesize:                       4M
     state:                        present
   loop:                           "{{ volume_groups }}"
-
+  when:                           tier == 'sapos'
 
 
 # -------------------------------------+---------------------------------------8
@@ -131,8 +131,7 @@
     - { tier: 'hana',        lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i {{ count_hana_log  }}  -I 64' }
     - { tier: 'hana',        lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: ''                                }
     - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: ''                                }
-  when:                           item.tier == "all" or
-                                  item.tier == node_tier
+  when:                           ( item.tier == "all" or item.tier == node_tier) and tier == 'sapos'
   vars:
   # count_hana_data:        "{{ (                                                       # Integer; Number of disk devices.
   #                               (
@@ -169,8 +168,7 @@
    - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
    - { tier: 'hana',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
    - { tier: 'web',          fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
-  when:                           item.tier == "all" or
-                                  item.tier == node_tier
+  when:                           (item.tier == "all" or item.tier == node_tier) and tier == 'sapos'
 
 ...
 # /*---------------------------------------------------------------------------8

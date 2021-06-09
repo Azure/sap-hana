@@ -29,7 +29,7 @@ locals {
 
   // Resource group and location
   region = try(var.infrastructure.region, "")
-  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.DEPLOYER)
+  prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.DEPLOYER))
 
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
   rg_exists = length(local.rg_arm_id) > 0 ? true : false

@@ -1,0 +1,51 @@
+---
+
+# Targets the first node in the all nodes list, but we don't actually
+# run any commands on the node; we just need to reference a node that
+# is specified by the inventory file for the inventory_dir reference
+# to be a valid fact.
+- hosts: all[0]
+  gather_facts: false
+  tags:
+  - always
+  tasks:
+  - name: Load the SAP parameters
+    include_vars: "{{ inventory_dir }}/sap-parameters.yaml"
+
+  - name: Construct SSH key secret name
+    set_fact:
+      secret_name: "{{ secret_prefix }}-sid-sshkey"
+
+  - name: Retrieve SSH Key secret details (locally)
+    command: >-
+      az keyvault secret show
+        --vault-name {{ kv_uri }}
+        --name {{ secret_name }}
+    changed_when: false
+    delegate_to: localhost
+    register: keyvault_secret_show
+    no_log: true
+
+  - name: Extract SSH Key content from secret details
+    set_fact:
+      sshkey_content: >-
+        {{ (keyvault_secret_show.stdout | from_json).value }}
+    no_log: true
+
+  - name: Determine SSH key file name
+    set_fact:
+      sshkey_file: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY_FILE') | default('sshkey', True) }}"
+
+  - name: Determine SSH key file path
+    set_fact:
+      sshkey_path: >-
+        {{ sshkey_file is abs |
+           ternary(sshkey_file,
+                   (inventory_dir, sshkey_file) | join('/')) }}
+
+  - name: Write out SSH Key content as sshkey file (locally)
+    copy:
+      dest: "{{ sshkey_path }}"
+      content: "{{ sshkey_content }}"
+      mode: "0600"
+    delegate_to: localhost
