@@ -4,25 +4,25 @@
 # run any commands on the node; we just need to reference a node that
 # is specified by the inventory file for the inventory_dir reference
 # to be a valid fact.
-- hosts: all[0]
+- hosts: localhost
   gather_facts: false
   tags:
   - always
   tasks:
   - name: Load the SAP parameters
-    include_vars: "{{ inventory_dir }}/sap-parameters.yaml"
+    include_vars: "{{ _invDir }}/sap-parameters.yaml"
 
   - name: Construct SSH key secret name
     set_fact:
       secret_name: "{{ secret_prefix }}-sid-sshkey"
 
-  - name: Retrieve SSH Key secret details (locally)
+  - name: Retrieve SSH Key secret details
     command: >-
       az keyvault secret show
         --vault-name {{ kv_uri }}
         --name {{ secret_name }}
     changed_when: false
-    delegate_to: localhost
+    # delegate_to: localhost
     register: keyvault_secret_show
     no_log: true
 
@@ -41,11 +41,11 @@
       sshkey_path: >-
         {{ sshkey_file is abs |
            ternary(sshkey_file,
-                   (inventory_dir, sshkey_file) | join('/')) }}
+                   (_invDir, sshkey_file) | join('/')) }}
 
-  - name: Write out SSH Key content as sshkey file (locally)
+  - name: Write out SSH Key content as sshkey file
     copy:
       dest: "{{ sshkey_path }}"
       content: "{{ sshkey_content }}"
       mode: "0600"
-    delegate_to: localhost
+    # delegate_to: localhost
