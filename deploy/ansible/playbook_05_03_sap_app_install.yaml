@@ -1,6 +1,6 @@
-# /*----------------------------------------------------------------------------8
+# /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                 Playbook for SAP Application Server Install                 |
+# |                 Playbook for SAP Application Server Install                |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -16,7 +16,7 @@
   become_user:    root
   gather_facts:   true
   vars_files:
-    - vars/ansible-input-api.yaml                               # API Input template with defaults
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
 
 
   tasks:
@@ -26,7 +26,7 @@
 #
 # -------------------------------------+---------------------------------------8
   - set_fact:
-      tier:     app                                                          # SAP Install phase: APP - Application Server
+      tier:     app                                                             # SAP Install phase: APP - Application Server
 
     #   (Role)  SAP: LVM
 
@@ -44,6 +44,6 @@
     #   (Role)  SAP APP: Install
 
 ...
-# /*----------------------------------------------------------------------------8
-# |                                    END                                      |
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
 # +------------------------------------4--------------------------------------*/
