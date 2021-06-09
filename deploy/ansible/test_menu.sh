@@ -127,6 +127,7 @@ all_playbooks=(
 playbook_options=(
         --inventory-file="${sap_sid}_hosts.yaml"
         --private-key=${ANSIBLE_PRIVATE_KEY_FILE}
+        --extra-vars="_workspace_directory=`pwd`"
         --extra-vars="@${sap_params_file}"
         "${@}"
 )
@@ -134,7 +135,7 @@ playbook_options=(
 # List of playbooks to run through
 playbooks=(
   # Retrieve the SSH key first before running remaining playbooks
-  ${cmd_dir}/get-sshkey.yaml
+  ${cmd_dir}/pb_get-sshkey.yaml
 )
 
 select opt in "${options[@]}";
