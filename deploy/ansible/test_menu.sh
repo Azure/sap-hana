@@ -127,7 +127,7 @@ all_playbooks=(
 playbook_options=(
         --inventory-file="${sap_sid}_hosts.yaml"
         --private-key=${ANSIBLE_PRIVATE_KEY_FILE}
-        --extra-vars="_invDir=`pwd`"
+        --extra-vars="_workspace_directory=`pwd`"
         --extra-vars="@${sap_params_file}"
         "${@}"
 )
