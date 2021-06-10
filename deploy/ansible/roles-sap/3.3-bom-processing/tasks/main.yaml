@@ -41,9 +41,10 @@
 # -------------------------------------+---------------------------------------8
 
 
-# - name: Check for Microsoft Supplied BOM
-#   local_action: stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
-#   register: microsoft_supplied_bom
+- name:             Check for Microsoft Supplied BOM
+  local_action:     stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+  register:         microsoft_supplied_bom
+  
 #         "microsoft_supplied_bom   : {
 #                                       'changed': False,
 #                                       'stat': {
@@ -101,19 +102,13 @@
   include_vars:
     file:           BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yamlx
     name:           bom
-  register: microsoft_supplied_bom
+  when:             microsoft_supplied_bom.stat.exists == true
 
-        # "microsoft_supplied_bom   : {
-        #                               'ansible_included_var_files': ['/home/azureadm/Azure_SAP_Automated_Deployment/sap-hana/deploy/ansible/BOM-catalog/S41909SPS03_v0001ms/S41909SPS03_v0001ms.yaml'],
-        #                               'ansible_facts': {},
-        #                               'failed': False,
-        #                               'changed': False
-        #                             }"
 
 
 - debug:  
     msg:
-      - "microsoft_supplied_bom   : {{ microsoft_supplied_bom }}"
+      - "bom   : {{ bom }}"
 
 
 # - name: block bom
