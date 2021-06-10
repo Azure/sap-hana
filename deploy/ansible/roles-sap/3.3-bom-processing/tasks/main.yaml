@@ -41,32 +41,26 @@
 # -------------------------------------+---------------------------------------8
 
 
-- name:             Check for Microsoft Supplied BOM
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
+#               If not, download from storage account location.
+#
+- name:             Check for Microsoft Supplied BOM ({{ bom_base_name }})
   local_action:     stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yamlx
   register:         microsoft_supplied_bom
 
-- name:             "Register BOM: {{ bom_base_name }}"
+
+- name:             Register Microsoft Supplied BOM {{ bom_base_name }}
   include_vars:
     file:           "{{ microsoft_supplied_bom.stat.path }}"
     name:           bom
   when:             microsoft_supplied_bom.stat.exists == true
 
-
-
-
-
-
-
-
-# -------------------------------------+---------------------------------------8
-#
-# Description:  Download specified BOM and Register as an object.
-#
-
-
-- name:             BOM from Storage Account
+# Microsoft supplied BOM not found
+- name:             Retrieve BOM ({{ bom_base_name }}) from Storage Account
   block:
-    - name:             "Download Main BOM: {{ bom_base_name }}"
+    - name:             Download BOM ({{ bom_base_name }}) from Storage Account
       get_url:
         url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
         dest:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
@@ -75,30 +69,14 @@
       until:            result is succeeded
       retries:          10
       delay:            6
-      delegate_to:      localhost                                                     # Causes action to occur on the Ansible Controller
+      delegate_to:      localhost                                               # Causes action to occur on the Ansible Controller
       become:           no
 
-
-    - name:             "Register BOM: {{ bom_base_name }}"
+    - name:             Register downloaded BOM {{ bom_base_name }}
       include_vars:
         file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
         name:           bom
-    #------------------<DEBUGGING>-------------------
-    # - debug:  
-    #     msg:      "{{ item.archive }}"
-    #   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
-    #
-    # - debug:  
-    #     msg:      "{{ item.name }}"
-    #   loop:       "{{ bom.materials.dependencies|flatten(levels=1) }}"
-    #------------------</DEBUGGING>------------------
-
   when:             microsoft_supplied_bom.stat.exists != true
-
-- debug:
-    msg:
-      - "bom: {{ bom }}"
-
 # -------------------------------------+---------------------------------------8
 
 
