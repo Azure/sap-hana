@@ -98,6 +98,8 @@ options=(
         "Pacemaker HANA Setup"
 
         # Special menu entries
+        "BOM Validator"
+        "BOM Downloader"
         "Install SAP (1-7)"
         "Post SAP Install (8-12)"
         "All Playbooks"
@@ -121,6 +123,8 @@ all_playbooks=(
         ${cmd_dir}/playbook_06_00_00_pacemaker.yaml
         ${cmd_dir}/playbook_06_00_01_pacemaker_scs.yaml
         ${cmd_dir}/playbook_06_00_03_pacemaker_hana.yaml
+        ${cmd_dir}/playbook_bom_validator.yaml
+        ${cmd_dir}/playbook_bom_downloader.yaml
 )
 
 # Set of options that will be passed to the ansible-playbook command

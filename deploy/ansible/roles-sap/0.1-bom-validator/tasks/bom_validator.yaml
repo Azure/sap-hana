@@ -1,0 +1,109 @@
+---
+# Assumptions
+#   target_media_location exists on disk
+#
+# Inputs:
+#   target_media_location             Default     /usr/sap/install
+#   download_directory
+#   bom_name
+#   sapbits_location_base_path
+#   sapbits_bom_files
+#   sapbits_sas_token
+#   sapbits_access_key
+#   S_user
+#   S_password:                   
+#   download_directory:               Default /mnt/downloads
+#
+# Locals:
+#   _bom
+#   item
+#   result
+#
+# BOM Fields:
+#   download
+#   archive
+#   permissions
+#   
+
+#TODO:  
+# Read the pertinent fields from keyvault
+
+# Steps:
+#   01) Register BOM
+#   02) Download media
+#   03) Upload media
+
+#   01) Register BOM
+- name:         "Register BOM: {{ bom_name }}"
+  include_vars:
+    file:       "{{ download_directory }}/bom/{{ bom_name }}.yaml"
+    name:       _bom
+
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      "Archive: {{ item.archive }} Url: {{ item.url }} Dest: {{ download_directory }}/{{ item.archive }}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+# Files to download
+#------------------<DEBUGGING>-------------------
+# - debug:  
+#     msg:      
+#       - "URL : {{ item.url }}"
+#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#------------------</DEBUGGING>------------------
+
+
+
+#   02) Validate media from SAP
+#   Loop through BOM media URLs
+- name: "BOM: Check/Download Files"
+  get_url:
+    url:              "{{ item.url }}"
+    dest:             "{{ download_directory }}/files/{{ item.archive }}"
+    tmp_dest:         "{{ download_directory }}/tmp"
+    url_username:     "{{ S_user }}"
+    url_password:     "{{ S_password }}"
+    force_basic_auth: yes
+    http_agent:       'SAP Software Download'
+  
+  register: result
+  until:    result is succeeded
+  retries:  2
+  delay:    1
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     item.url is defined
+
+#   03) Upload files to Azure
+#   Loop through BOM media files  
+- name: "BOM: Upload files"
+  command: >-
+    az storage blob upload 
+      --account-name {{ sapbits_location_base_path.rpartition('//')[2].split('.')[0]}} 
+      --account-key {{ sapbits_access_key }} 
+      --container-name {{ sapbits_location_base_path.rpartition('//')[2].split('/')[1]}}/{{ sapbits_bom_files }}/archives 
+      --name {{ item.archive }}  
+      --file {{ download_directory }}/files/{{ item.archive }} 
+      --if-none-match "*" 
+      --no-progress
+  delegate_to: localhost
+  register: azresult
+  ignore_errors: true
+  failed_when:  azresult.rc != 0 and azresult.stderr.find("BlobAlreadyExists") == -1
+  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  when:     item.archive is defined
+
+#------------------<DEBUGGING>-------------------
+# - name: "List error codes"
+#   debug:
+#     var: azresult
+#------------------</DEBUGGING>-------------------
+
+# -------------------------------------+---------------------------------------8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
+
