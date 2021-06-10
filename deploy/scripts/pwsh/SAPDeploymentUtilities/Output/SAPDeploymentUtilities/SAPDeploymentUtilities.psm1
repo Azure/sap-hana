@@ -1842,7 +1842,6 @@ Licensed under the MIT license.
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-
     $bAsk = $true
     if ($null -ne $vault -and "" -ne $vault) {
         if ($null -eq (Get-AzKeyVaultSecret -VaultName $vaultname -Name ($Environment + "-client-id") )) {
@@ -1915,8 +1914,6 @@ Licensed under the MIT license.
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
 
-    $sub = $tfstate_resource_id.Split("/")[2]
-    
     $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
     $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
 

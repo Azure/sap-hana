@@ -135,7 +135,7 @@ resource "random_password" "iscsi_password" {
     local.enable_landscape_kv
     && local.enable_iscsi_auth_password
     && !local.iscsi_pwd_exist
-  && try(local.var_iscsi.authentication.password, null) == null) ? 1 : 0
+  && try(var.authentication.password, null) == null) ? 1 : 0
 
   length           = 32
   min_upper        = 2

@@ -31,17 +31,15 @@ locals {
 }
 
 locals {
-  var_infra = try(var.infrastructure, {})
 
   // Region and metadata
-  region = try(local.var_infra.region, "")
-  prefix = try(var.infrastructure.resource_group.name, var.naming.prefix.VNET)
+  region = var.infrastructure.region
+  prefix = length(var.infrastructure.resource_group.name) > 0 ? var.infrastructure.resource_group.name : trimspace(var.naming.prefix.VNET)
 
-  deployer_tfstate = var.deployer_tfstate
-  vnet_mgmt_id     = try(local.deployer_tfstate.vnet_mgmt_id, try(local.deployer_tfstate.vnet_mgmt.id, ""))
-  firewall_ip      = try(var.deployer_tfstate.firewall_ip, "")
+  vnet_mgmt_id = try(var.deployer_tfstate.vnet_mgmt_id, try(var.deployer_tfstate.vnet_mgmt.id, ""))
+  firewall_ip  = try(var.deployer_tfstate.firewall_ip, "")
 
-    // Firewall
+  // Firewall
   firewall_id     = try(var.deployer_tfstate.firewall_id, "")
   firewall_exists = length(local.firewall_id) > 0
   firewall_name   = local.firewall_exists ? try(split("/", local.firewall_id)[8], "") : ""
@@ -51,30 +49,27 @@ locals {
 
 
   // Resource group
-  var_rg    = try(local.var_infra.resource_group, {})
-  rg_arm_id = try(local.var_rg.arm_id, "")
-  rg_exists = length(local.rg_arm_id) > 0 ? true : false
-  rg_name   = local.rg_exists ? try(split("/", local.rg_arm_id)[4], "") : try(local.var_rg.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
+  rg_exists = length(var.infrastructure.resource_group.arm_id) > 0 ? true : false
+  rg_name   = local.rg_exists ? try(split("/", var.infrastructure.resource_group.arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
 
   // iSCSI
-  var_iscsi    = try(local.var_infra.iscsi, {})
-  iscsi_count  = try(local.var_iscsi.iscsi_count, 0)
+  iscsi_count  = try(var.infrastructure.iscsi.iscsi_count, 0)
   enable_iscsi = local.iscsi_count > 0
-  iscsi_size   = try(local.var_iscsi.size, "Standard_D2s_v3")
+  iscsi_size   = try(var.infrastructure.iscsi.size, "Standard_D2s_v3")
 
-  use_DHCP = try(local.var_iscsi.use_DHCP, false)
+  use_DHCP = try(var.infrastructure.iscsi.use_DHCP, false)
 
-  iscsi_os = try(local.var_iscsi.os,
+  iscsi_os = try(var.infrastructure.iscsi.os,
     {
-      "publisher" = try(local.var_iscsi.os.publisher, "SUSE")
-      "offer"     = try(local.var_iscsi.os.offer, "sles-sap-12-sp5")
-      "sku"       = try(local.var_iscsi.os.sku, "gen1")
-      "version"   = try(local.var_iscsi.os.version, "latest")
+      "publisher" = try(var.infrastructure.iscsi.os.publisher, "SUSE")
+      "offer"     = try(var.infrastructure.iscsi.os.offer, "sles-sap-12-sp5")
+      "sku"       = try(var.infrastructure.iscsi.os.sku, "gen1")
+      "version"   = try(var.infrastructure.iscsi.os.version, "latest")
   })
 
-  iscsi_auth_type     = local.enable_iscsi ? try(local.var_iscsi.authentication.type, "key") : ""
-  iscsi_auth_username = local.enable_iscsi ? (local.iscsi_username_exist ? data.azurerm_key_vault_secret.iscsi_username[0].value : try(local.var_iscsi.authentication.username, "azureadm")) : ""
-  iscsi_nic_ips       = local.sub_iscsi_exists ? try(local.var_iscsi.iscsi_nic_ips, []) : []
+  iscsi_auth_type     = local.enable_iscsi ? try(var.infrastructure.iscsi.authentication.type, "key") : ""
+  iscsi_auth_username = local.enable_iscsi ? (local.iscsi_username_exist ? data.azurerm_key_vault_secret.iscsi_username[0].value : try(var.authentication.username, "azureadm")) : ""
+  iscsi_nic_ips       = local.sub_iscsi_exists ? try(var.infrastructure.iscsi.iscsi_nic_ips, []) : []
 
   // By default, ssh key for iSCSI uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
   enable_iscsi_auth_key = local.enable_iscsi && local.iscsi_auth_type == "key"
@@ -83,9 +78,9 @@ locals {
 
   // By default, authentication type of iSCSI target is ssh key pair but using username/password is a potential usecase.
   enable_iscsi_auth_password = local.enable_iscsi && local.iscsi_auth_type == "password"
-  iscsi_auth_password        = local.enable_iscsi_auth_password ? (local.iscsi_pwd_exist ? data.azurerm_key_vault_secret.iscsi_password[0].value : try(local.var_iscsi.authentication.password, random_password.iscsi_password[0].result)) : null
+  iscsi_auth_password        = local.enable_iscsi_auth_password ? (local.iscsi_pwd_exist ? data.azurerm_key_vault_secret.iscsi_password[0].value : try(var.infrastructure.iscsi.authentication.password, random_password.iscsi_password[0].result)) : null
 
-  iscsi = merge(local.var_iscsi, {
+  iscsi = merge(var.infrastructure.iscsi, {
     iscsi_count = local.iscsi_count,
     size        = local.iscsi_size,
     os          = local.iscsi_os,
@@ -97,11 +92,10 @@ locals {
   })
 
   // SAP vnet
-  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
-  vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
+  vnet_sap_arm_id = try(var.infrastructure.vnets.sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : format("%s%s", local.vnet_prefix, local.resource_suffixes.vnet)
-  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
+  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(var.infrastructure.vnets.sap.address_space, "")
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
 
@@ -109,7 +103,7 @@ locals {
   sid_private_key = local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.sid[0].private_key_pem)
 
   // iSCSI subnet
-  var_sub_iscsi    = try(local.var_vnet_sap.subnet_iscsi, null)
+  var_sub_iscsi    = try(var.infrastructure.vnets.sap.subnet_iscsi, null)
   enable_sub_iscsi = local.var_sub_iscsi != null
   sub_iscsi_arm_id = try(local.var_sub_iscsi.arm_id, "")
   sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0
@@ -127,43 +121,6 @@ locals {
     try(split("/", local.sub_iscsi_nsg_arm_id)[8], "")) : (
     try(local.var_sub_iscsi_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet_nsg))
   )
-
-  // Update infrastructure with defaults
-  infrastructure = {
-    resource_group = {
-      is_existing = local.rg_exists,
-      name        = local.rg_name,
-      arm_id      = local.rg_arm_id
-    }
-    iscsi = { iscsi_count = local.iscsi_count,
-      size = local.iscsi_size,
-      os   = local.iscsi_os,
-      authentication = {
-        type     = local.iscsi_auth_type
-        username = local.iscsi_auth_username
-      }
-    },
-    vnets = {
-      sap = {
-        is_existing   = local.vnet_sap_exists,
-        arm_id        = local.vnet_sap_arm_id,
-        name          = local.vnet_sap_name,
-        address_space = local.vnet_sap_addr,
-
-        subnet_iscsi = {
-          is_existing = local.sub_iscsi_exists,
-          arm_id      = local.sub_iscsi_arm_id,
-          name        = local.sub_iscsi_name,
-          prefix      = local.sub_iscsi_prefix,
-          nsg = {
-            is_existing = local.sub_iscsi_nsg_exists,
-            arm_id      = local.sub_iscsi_nsg_arm_id,
-            name        = local.sub_iscsi_nsg_name
-          }
-        }
-      }
-    }
-  }
 
   // Current service principal
   service_principal = try(var.service_principal, {})
@@ -189,7 +146,6 @@ locals {
   input_sid_username = try(var.authentication.username, "azureadm")
   input_sid_password = length(try(var.authentication.password, "")) > 0 ? var.authentication.password : random_password.created_password.result
 
-
   input_iscsi_public_key_secret_name  = try(var.key_vault.kv_iscsi_sshkey_pub, "")
   input_iscsi_private_key_secret_name = try(var.key_vault.kv_iscsi_sshkey_prvt, "")
   input_iscsi_password_secret_name    = try(var.key_vault.kv_iscsi_pwd, "")
@@ -200,7 +156,6 @@ locals {
 
   sid_ppk_name = local.sid_key_exist ? local.input_sid_private_key_secret_name : format("%s-sid-sshkey", local.prefix)
   sid_pk_name  = local.sid_key_exist ? local.input_sid_public_key_secret_name : format("%s-sid-sshkey-pub", local.prefix)
-
 
   input_sid_username_secret_name = try(var.key_vault.kv_sid_username, "")
   input_sid_password_secret_name = try(var.key_vault.kv_sid_pwd, "")
@@ -223,8 +178,10 @@ locals {
 
   // In brownfield scenarios the subnets are often defined in the workload
   // If subnet information is specified in the parameter file use it
+  // As either of the arm_id or the prefix need to be specified to create a subnet the lack of both indicate that the subnet is to be created in the SDU
 
-  sub_admin_defined  = try(var.infrastructure.vnets.sap.subnet_admin, null) == null ? false : true
+
+  sub_admin_defined  = (length(var.infrastructure.vnets.sap.subnet_admin.arm_id) + length(var.infrastructure.vnets.sap.subnet_admin.prefix)) > 0
   sub_admin_id       = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "") : ""
   sub_admin_existing = length(local.sub_admin_id) > 0
   sub_admin_name = local.sub_admin_existing ? (
@@ -233,7 +190,7 @@ locals {
   )
   sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
 
-  sub_db_defined  = try(var.infrastructure.vnets.sap.subnet_db, null) == null ? false : true
+  sub_db_defined  = (length(var.infrastructure.vnets.sap.subnet_db.arm_id) + length(var.infrastructure.vnets.sap.subnet_db.prefix)) > 0
   sub_db_id       = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.arm_id, "") : ""
   sub_db_existing = length(local.sub_db_id) > 0
   sub_db_name = local.sub_db_existing ? (
@@ -242,7 +199,7 @@ locals {
   )
   sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
 
-  sub_app_defined  = try(var.infrastructure.vnets.sap.subnet_app, null) == null ? false : true
+  sub_app_defined  = (length(var.infrastructure.vnets.sap.subnet_app.arm_id) + length(var.infrastructure.vnets.sap.subnet_app.prefix)) > 0
   sub_app_id       = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.arm_id, "") : ""
   sub_app_existing = length(local.sub_app_id) > 0
   sub_app_name = local.sub_app_existing ? (
@@ -251,7 +208,7 @@ locals {
   )
   sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
 
-  sub_web_defined  = try(var.infrastructure.vnets.sap.subnet_web, null) == null ? false : true
+  sub_web_defined  = (length(var.infrastructure.vnets.sap.subnet_web.arm_id) + length(var.infrastructure.vnets.sap.subnet_web.prefix)) > 0
   sub_web_id       = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.arm_id, "") : ""
   sub_web_existing = length(local.sub_web_id) > 0
   sub_web_name = local.sub_web_existing ? (
