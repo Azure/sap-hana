@@ -12,25 +12,25 @@
                 "subnet_admin": {
                     "arm_id"            : "<azureresourceid>",
                     "nsg": {
-                        "arm_id"        : "<azureresourceid>",
+                        "arm_id"        : "<azureresourceid>"
                     }
                 },
                 "subnet_app": {
                     "arm_id"            : "<azureresourceid>",
                     "nsg": {
-                        "arm_id"        : "<azureresourceid>",
+                        "arm_id"        : "<azureresourceid>"
                     }
                 },
                 "subnet_db": {
                     "arm_id"            : "<azureresourceid>",
                     "nsg": {
-                        "arm_id"        : "<azureresourceid>",
+                        "arm_id"        : "<azureresourceid>"
                     }
                 },
                 "subnet_web": {
                     "arm_id"            : "<azureresourceid>",
                     "nsg": {
-                        "arm_id"        : "<azureresourceid>",
+                        "arm_id"        : "<azureresourceid>"
                     }
                 }
             }
