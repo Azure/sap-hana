@@ -91,50 +91,34 @@
 #                 dependencies:
 #                   - name:      HANA_2_00_055_v1
 #
-- name:             Download dependant BOMs when not Microsoft supplied
-  block:
-    - name:             Check for Microsoft Supplied BOM ({{ item.name }})
-      local_action:     stat path=BOM-catalog/{{ item.name }}/{{ item.name }}.yaml
-      register:         microsoft_supplied_bom
-
-
-    - name:             Download BOM ({{ item.name }}) from Storage Account
-      get_url:
-        url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ item.name }}/{{ item.name }}.yaml{{ sapbits_sas_token }}"
-        dest:           "{{ inventory_dir }}/{{ item.name }}.yaml"
-        mode:           0644
-      register:         result
-      until:            result is succeeded
-      retries:          10
-      delay:            6
-      delegate_to:      localhost                                                     # Causes action to happen  on the Ansible Controller
-      become:           no
-      when:             microsoft_supplied_bom.stat.exists != true
-
+- name:             Download dependent BOMs when not Microsoft supplied
+  include_tasks:    "dependent_bom.yaml"
+  vars:
+    bom_name:       "{{ bom_dependency.name }}"
   loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
+  loop_control:
+    loop_var:       bom_dependency
   when:
     - bom.materials.dependencies is defined
     - bom.materials.dependencies|length>0
 
 
 
-
-
-- name:             "Download Dependent BOM(s)"
-  get_url:
-    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ item.name }}/{{ item.name }}.yaml{{ sapbits_sas_token }}"
-    dest:           "{{ inventory_dir }}/{{ item.name }}.yaml"
-    mode:           0644
-  register:         result
-  until:            result is succeeded
-  retries:          10
-  delay:            6
-  delegate_to:      localhost                                                     # Causes action to happen  on the Ansible Controller
-  become:           no
-  loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
-  when:             
-    - bom.materials.dependencies is defined
-    - bom.materials.dependencies|length>0
+# - name:             "Download Dependent BOM(s)"
+#   get_url:
+#     url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ item.name }}/{{ item.name }}.yaml{{ sapbits_sas_token }}"
+#     dest:           "{{ inventory_dir }}/{{ item.name }}.yaml"
+#     mode:           0644
+#   register:         result
+#   until:            result is succeeded
+#   retries:          10
+#   delay:            6
+#   delegate_to:      localhost                                                     # Causes action to happen  on the Ansible Controller
+#   become:           no
+#   loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
+#   when:             
+#     - bom.materials.dependencies is defined
+#     - bom.materials.dependencies|length>0
 # -------------------------------------+---------------------------------------8
 
 
