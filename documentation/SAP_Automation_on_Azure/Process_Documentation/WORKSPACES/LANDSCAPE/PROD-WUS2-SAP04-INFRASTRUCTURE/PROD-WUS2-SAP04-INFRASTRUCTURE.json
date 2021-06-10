@@ -10,21 +10,36 @@
                 "name"                  : "SAP04",
                 "arm_id"                : "<azureresourceid>",
                 "subnet_admin": {
-                    "arm_id"            : "<azureresourceid>"
+                    "arm_id"            : "<azureresourceid>",
+                    "nsg": {
+                        "arm_id"        : "<azureresourceid>"
+                    }
                 },
                 "subnet_app": {
-                    "arm_id"            : "<azureresourceid>"
+                    "arm_id"            : "<azureresourceid>",
+                    "nsg": {
+                        "arm_id"        : "<azureresourceid>"
+                    }
                 },
                 "subnet_db": {
-                    "arm_id"            : "<azureresourceid>"
+                    "arm_id"            : "<azureresourceid>",
+                    "nsg": {
+                        "arm_id"        : "<azureresourceid>"
+                    }
                 },
                 "subnet_web": {
-                    "arm_id"            : "<azureresourceid>"
+                    "arm_id"            : "<azureresourceid>",
+                    "nsg": {
+                        "arm_id"        : "<azureresourceid>"
+                    }
                 }
             }
         },
         "key_vault": {
-            "kv_prvt_id"                : "<azureresourceid>"
+            "kv_user_id"                : "<azureresourceid>",
+            "kv_prvt_id"                : "<azureresourceid>",
+            "kv_spn_id"                 : "<azureresourceid>"
+            
         }
     }
 }
