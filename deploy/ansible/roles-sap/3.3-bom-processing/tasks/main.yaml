@@ -100,15 +100,14 @@
 
 - name:             "Register BOM: {{ bom_base_name }}"
   include_vars:
-    file:           BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+    # file:           BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+    file:           "{{ microsoft_supplied_bom.stat.path }}"
     name:           bom
   when:             microsoft_supplied_bom.stat.exists == true
 
-
-
-- debug:  
+- debug:
     msg:
-      - "bom   : {{ bom }}"
+      - "bom: {{ bom }}"
 
 
 # - name: block bom
