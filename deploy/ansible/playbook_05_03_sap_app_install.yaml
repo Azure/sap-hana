@@ -42,6 +42,8 @@
     #   (Role)  SAP: Permissions
 
     #   (Role)  SAP APP: Install
+  - include_role:
+      name:     roles-sap/5.3-app-install
 
 ...
 # /*---------------------------------------------------------------------------8
