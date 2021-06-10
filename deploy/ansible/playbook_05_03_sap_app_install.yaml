@@ -5,12 +5,10 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
-
 - hosts:          "{{ sap_sid|upper }}_APP"
 
   name:           SAP Installation - APP
-  serial:         1
+  serial:         1                                                             # Cause App Servers to install sequentially
   remote_user:    "{{ orchestration_ansible_user }}"                
   become:         yes
   become_user:    root
@@ -28,20 +26,9 @@
   - set_fact:
       tier:     app                                                             # SAP Install phase: APP - Application Server
 
-    #   (Role)  SAP: LVM
-
-    #   (Role)  SAP: mounts
   - include_role:
       name:     roles-sap-os/sap-mounts
 
-
-    #   (Role)  SAP: packages
-
-    #   (Role)  SAP: Users and Groups
-
-    #   (Role)  SAP: Permissions
-
-    #   (Role)  SAP APP: Install
   - include_role:
       name:     roles-sap/5.3-app-install
 
