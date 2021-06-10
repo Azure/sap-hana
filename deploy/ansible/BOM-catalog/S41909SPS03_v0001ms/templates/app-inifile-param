@@ -1,0 +1,174 @@
+###########################################################################################################################################################################################################
+#                                                                                                                                                                                                         #
+# Installation service 'SAP S/4HANA Server 1909 > SAP HANA Database > Installation > Additional SAP System Instances > Additional Application Server Instance', product id 'NW_DI:S4HANA1909.CORE.HDB.PD' #
+#                                                                                                                                                                                                         #
+###########################################################################################################################################################################################################
+# IMPORTANT DO NOT DELETE!!! SAPInstDes25Hash=$5b/dpzXsN/5D$ptbkXFnVi+zx4+cODA6mK6+GN/erM3z19WEqi2iVEATVDboCOwcF3QhVmUxcB549G1To3YgsiNJrT6iKN1zFtd/L0YByZKhG
+
+# Password for the Diagnostics Agent specific <dasid>adm user. Provided value may be encoded.
+# DiagnosticsAgent.dasidAdmPassword = 
+
+# Windows domain in which the Diagnostics Agent users must be created. This is an optional property (Windows only).
+# DiagnosticsAgent.domain = 
+
+# Windows only: Password for the Diagnostics Agent specific 'SAPService<DASID>' user.
+# DiagnosticsAgent.sapServiceDASIDPassword = 
+
+# Specify whether Software Provisioning Manager is to drop the schema if it exists.
+# HDB_Schema_Check_Dialogs.dropSchema = false
+
+# The name of the database schema.
+HDB_Schema_Check_Dialogs.schemaName = SAPHANADB
+
+# The password of the database schema.
+HDB_Schema_Check_Dialogs.schemaPassword = des25(ZPn3ThDtgsxDUCZB82Y0BhERsaA=)
+
+# Specify whether Software Provisioning Manager is to validate the schema name. The schema name must only contain numbers and capital letters. It  must not start with '_' . It cannot be 'SYS' or 'SYSTEM'.
+# HDB_Schema_Check_Dialogs.validateSchemaName = true
+
+# Database hostnames that will be set directly in hdbuserstore without resolving them in HANA. Comma separated. Example (host1,host2)
+# HDB_Userstore.doNotResolveHostnames = 
+
+# Alternative port for SystemDB to be used in hdbuserstore
+# HDB_Userstore.systemDBPort = 
+
+# Use ABAP secure store instead of HANA userstore. Default: false for HANA user store.
+# HDB_Userstore.useABAPSSFS = false
+
+# If set to 'true', an 'ms_acl_info' file is created. It manages the hosts from which the Message Server accepts connections.
+# MessageServer.configureAclInfo = false
+
+# The  instance number of the application server. Leave empty for default.
+NW_AS.instanceNumber = 00
+
+# Skip unpacking any archive, for example SAPEXE.SAR. Do not set it to 'true' if the database client archives or the SAP kernel must be unpacked, for example if you want to add an application server on a another operating system.
+# NW_AS.skipUnpacking = false
+
+# Start the application server at the end of the installation. Default is 'true'.
+# NW_AS.start = true
+
+# You can specify a virtual host name for the application server instance. Leave empty if you want to use the default physical host name. The virtual host name must already be bound to a local network interface.
+NW_DI_Instance.virtualHostname = x01app01ld09
+
+# Specify whether the all operating system users are to be removed from group 'sapinst' after the execution of Software Provisioning Manager has completed.
+NW_Delete_Sapinst_Users.removeUsers = true
+
+# Master password
+NW_GetMasterPassword.masterPwd = des25(FQsPzMvEHau/LujYZ0q5vv8rV4M=)
+
+# Skip checking if creating a HANA user store is needed. Default value is 'true'. If set to 'false', a valid HANA userstore must exists.
+# NW_HDB_DBClient.checkCreateUserstore = true
+
+# Install the SAP HANA database client in a central or local directory. Possible values are: 'SAPCPE', 'LOCAL'
+# NW_HDB_DBClient.clientPathStrategy = LOCAL
+
+# Path to sapsrv.pse file. Depends on NW_HDB_getDBInfo.validateCertificate.
+# NW_HDB_Encryption.certificateLocation = 
+
+# The hostname in certificate. Depends on NW_HDB_getDBInfo.validateCertificate.
+# NW_HDB_Encryption.hostnameInCertificate = 
+
+# Validate SSL/TLS certificate, depends on NW_HDB_getDBInfo.usingSSL. Default value: false.
+# NW_HDB_Encryption.validateCertificate = false
+
+# The DB admin user for SAP HANA tenant database. Default value: SYSTEM
+# NW_HDB_getDBInfo.dbadmin = SYSTEM
+
+# The instance number of the SAP HANA database server
+NW_HDB_getDBInfo.instanceNumber = 00
+
+# The SQL port for SAP HANA tenant database
+# NW_HDB_getDBInfo.tenantPort = 
+
+# DEPRECATED, DO NOT USE!
+# NW_SAPCrypto.SAPCryptoFile = 
+
+# SAP INTERNAL USE ONLY
+# NW_System.installSAPHostAgent = true
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.dbaToolsSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.igsExeSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.igsHelperSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeDbSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapJvmSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.xs2Sar = 
+
+# SAP offers the option to skip setting of security profile parameters (NOT recommended) only for compatibility reasons. Set to true and the file with recommended security settings will not be taken into consideration. See SAP Note 2714839 for security recommendations.
+# NW_adaptProfile.skipSecurityProfileSettings = false
+
+# SAP INTERNAL USE ONLY
+# NW_adaptProfile.templateFiles = 
+
+# ABAP message server port for connecting to the message server, leave empty for default
+NW_checkMsgServer.abapMSPort = 3600
+
+# The FQDN of the system
+# NW_getFQDN.FQDN = 
+
+# SAP INTERNAL USE ONLY
+# NW_getFQDN.resolve = true
+
+# Specify whether you want to set FQDN for the system.
+# NW_getFQDN.setFQDN = true
+
+# The load type chosen by the user. Valid values are: 'SAP', 'STD', 'OBR', 'HCP', 'MDA', 'HBR', 'SBR'
+NW_getLoadType.loadType = SAP
+
+# ABAP system is Unicode (true|false), only needed if it cannot be determined from the system.
+# NW_getUnicode.isUnicode = 
+
+# Provide  'profile' directory of SAP Netweaver-based system.
+NW_readProfileDir.profileDir = /sapmnt/X01/profile
+
+# Windows only: The drive to use
+# NW_readProfileDir.sapdrive = 
+
+# The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
+archives.downloadBasket = /usr/sap/install/download_basket
+
+# DBACOCKPIT user is to be created. Default value is 'true'.
+# hdb.create.dbacockpit.user = true
+
+# Windows only: The domain of the SAP Host Agent user
+# hostAgent.domain = 
+
+# Password for the 'sapadm' user of the SAP Host Agent
+# hostAgent.sapAdmPassword = 
+
+# Windows only: The domain of all users of this SAP system. Leave empty for default.
+# nwUsers.sapDomain = 
+
+# Windows only: The password of the 'SAPServiceSID' user
+# nwUsers.sapServiceSIDPassword = 
+
+# UNIX only: The user ID of the 'sapadm' user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sapadmUID = 2100
+
+# UNIX only: The group id of the 'sapsys' group, leave empty for default. The ID is ignored if the group already exists.
+nwUsers.sapsysGID = 2000
+
+# UNIX only: The user id of the <sapsid>adm user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sidAdmUID = 2000
+
+# The password of the '<sapsid>adm' user
+nwUsers.sidadmPassword = des25(fG7v2MxOmClFZar132erKnWRhWw=)
+
+# ABAP schema password
+# storageBasedCopy.abapSchemaPassword = 
+
+# Sets the SAP<SAPSID>DB schema password using a  parameter file.
+# storageBasedCopy.javaSchemaPassword = 
