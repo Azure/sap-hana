@@ -45,6 +45,9 @@
   local_action: stat path=../../../BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
   register: microsoft_supplied_bom
 
+- debug:  
+    msg:
+      - "microsoft_supplied_bom   : {{ microsoft_supplied_bom }}"
 
 
 
