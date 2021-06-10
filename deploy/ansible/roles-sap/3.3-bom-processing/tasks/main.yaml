@@ -42,12 +42,72 @@
 
 
 - name: Check for Microsoft Supplied BOM
-  local_action: stat path=../../../BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+  local_action: stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
   register: microsoft_supplied_bom
+#         "microsoft_supplied_bom   : {
+#                                       'changed': False,
+#                                       'stat': {
+#                                                 'exists': True,
+#                                                 'path': 'BOM-catalog/S41909SPS03_v0001ms/S41909SPS03_v0001ms.yaml',
+#                                                 'mode': '0664',
+#                                                 'isdir': False,
+#                                                 'ischr': False,
+#                                                 'isblk': False,
+#                                                 'isreg': True,
+#                                                 'isfifo': False,
+#                                                 'islnk': False,
+#                                                 'issock': False,
+#                                                 'uid': 1000,
+#                                                 'gid': 1000,
+#                                                 'size': 24383,
+#                                                 'inode': 779125,
+#                                                 'dev': 2065,
+#                                                 'nlink': 1,
+#                                                 'atime': 1623343633.0156872,
+#                                                 'mtime': 1623343633.0116873,
+#                                                 'ctime': 1623343633.0116873,
+#                                                 'wusr': True,
+#                                                 'rusr': True,
+#                                                 'xusr': False,
+#                                                 'wgrp': True,
+#                                                 'rgrp': True,
+#                                                 'xgrp': False,
+#                                                 'woth': False,
+#                                                 'roth': True,
+#                                                 'xoth': False,
+#                                                 'isuid': False,
+#                                                 'isgid': False,
+#                                                 'blocks': 48,
+#                                                 'block_size': 4096,
+#                                                 'device_type': 0,
+#                                                 'readable': True,
+#                                                 'writeable': True,
+#                                                 'executable': False,
+#                                                 'pw_name': 'azureadm',
+#                                                 'gr_name': 'azureadm',
+#                                                 'checksum': 'e836cb27d4d87dcf6eefe0dc0e96db52e26f800a',
+#                                                 'mimetype': 'text/plain',
+#                                                 'charset': 'us-ascii',
+#                                                 'version': '735814480',
+#                                                 'attributes': ['extents'],
+#                                                 'attr_flags': 'e'
+#                                       },
+#                                       'failed': False
+#                                     }"
 
-- debug:  
-    msg:
-      - "microsoft_supplied_bom   : {{ microsoft_supplied_bom }}"
+# - debug:  
+#     msg:
+#       - "microsoft_supplied_bom   : {{ microsoft_supplied_bom }}"
+
+
+- name:             "Register BOM: {{ bom_base_name }}"
+  include_vars:
+    file:           BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+    name:           bom
+
+
+
+
 
 
 
