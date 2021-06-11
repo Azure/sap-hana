@@ -21,7 +21,7 @@
 #             result                          - objet to store the results of a task execution
 #
 #   Created:
-#             bom                             - object containing the specified BOM
+#             bom_base                        - object containing the specified BOM
 #
 # -------------------------------------+---------------------------------------8
 # Reviews:
@@ -78,30 +78,6 @@
         file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
         name:           bom_base
   when:             microsoft_supplied_bom.stat.exists != true
-# -------------------------------------+---------------------------------------8
-
-
-
-# -------------------------------------+---------------------------------------8
-#
-# Description:  Check the Main BOM for dependencies under materials
-#                 (bom.materials.dependencies).
-#               Download dependent BOM files when not Microsoft supplied.
-#
-# Example:      materials:
-#                 dependencies:
-#                   - name:      HANA_2_00_055_v1
-#
-# - name:             Download dependent BOMs when not Microsoft supplied
-#   include_tasks:    "dependent_bom.yaml"
-#   vars:
-#     bom_name:       "{{ bom_dependency.name }}"
-#   loop:             "{{ bom_base.materials.dependencies | flatten(levels=1) }}"
-#   loop_control:
-#     loop_var:       bom_dependency
-#   when:
-#     - bom_base.materials.dependencies is defined
-#     - bom_base.materials.dependencies|length>0
 # -------------------------------------+---------------------------------------8
 
 
