@@ -1,5 +1,12 @@
----
+# Inputs:
+#   bom_name              - Nmae of BOM (ex: S41909SPS03_v0001ms)
+#
+#
+# Outputs:
+#   bom                   - object
+#
 
+---
 # -------------------------------------+---------------------------------------8
 #
 # Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
@@ -17,9 +24,11 @@
     name:           bom
   when:             microsoft_supplied_bom.stat.exists == true
 
+
 # If Microsoft supplied BOM not found
 - name:             Retrieve BOM ({{ bom_name }}) from Storage Account
   block:
+
     - name:             Download BOM ({{ bom_name }}) from Storage Account
       get_url:
         url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_name }}/{{ bom_name }}.yaml{{ sapbits_sas_token }}"
@@ -36,6 +45,7 @@
       include_vars:
         file:           "{{ inventory_dir }}/{{ bom_name }}.yaml"
         name:           bom
+
   when:             microsoft_supplied_bom.stat.exists != true
 # -------------------------------------+---------------------------------------8
 
