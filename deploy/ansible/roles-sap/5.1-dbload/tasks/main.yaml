@@ -19,7 +19,7 @@
 
 - include_role:
     name:     roles-sap/3.3.1-bom-register
-    public:   yes
+    public:   true
 
 
 - debug:

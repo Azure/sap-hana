@@ -38,3 +38,7 @@
         name:           bom_base
   when:             microsoft_supplied_bom.stat.exists != true
 # -------------------------------------+---------------------------------------8
+
+- debug:
+    msg:
+      - "bom_base:    {{ bom_base }}"
