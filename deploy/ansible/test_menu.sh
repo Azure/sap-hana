@@ -64,7 +64,7 @@ export           ANSIBLE_PYTHON_INTERPRETER=auto_silent
 
 # Ref: https://docs.ansible.com/ansible/2.9/plugins/callback/default.html
 # Don't show skipped tasks
-#export           ANSIBLE_DISPLAY_SKIPPED_HOSTS=no
+export           ANSIBLE_DISPLAY_SKIPPED_HOSTS=no
 
 # Ref: https://docs.ansible.com/ansible/2.9/plugins/callback/profile_tasks.html
 # Commented out defaults below
