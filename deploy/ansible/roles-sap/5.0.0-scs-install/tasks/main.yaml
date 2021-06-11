@@ -135,15 +135,15 @@
 #   SAP SCS: Install
 # 2230669 - System Provisioning Using a Parameter Input File
 #
-# - name:               "SAP SCS Install"
-#   shell: |
-#                       export TMPDIR=/usr/sap/install
-#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
-#                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.scs }}                     \
-#                                 SAPINST_SKIP_DIALOGS=true                                                     \
-#                                 SAPINST_START_GUISERVER=false
-#   args:
-#     chdir:            /usr/sap/install/SWPM
+- name:               "SAP SCS Install"
+  shell: |
+                      export TMPDIR=/usr/sap/install
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.scs }}                     \
+                                SAPINST_SKIP_DIALOGS=true                                                     \
+                                SAPINST_START_GUISERVER=false
+  args:
+    chdir:            /usr/sap/install/SWPM
   # Skip when TRUE (test mode)
   # when: not test_new_bom
 # *====================================4=======================================8
