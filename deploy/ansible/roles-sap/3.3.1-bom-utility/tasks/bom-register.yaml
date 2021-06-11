@@ -14,7 +14,7 @@
 - name:             Register Microsoft Supplied BOM {{ bom_base_name }}
   include_vars:
     file:           "{{ microsoft_supplied_bom.stat.path }}"
-    name:           bom_base
+    name:           bom
   when:             microsoft_supplied_bom.stat.exists == true
 
 # If Microsoft supplied BOM not found
@@ -35,7 +35,7 @@
     - name:             Register downloaded BOM ({{ bom_base_name }})
       include_vars:
         file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-        name:           bom_base
+        name:           bom
   when:             microsoft_supplied_bom.stat.exists != true
 # -------------------------------------+---------------------------------------8
 

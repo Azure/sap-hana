@@ -47,7 +47,7 @@
 
 - name:  
   set_fact:
-    bom:                          "{{ bom_base }}"
+    bom_base:                     "{{ bom }}"
 
 # # -------------------------------------+---------------------------------------8
 # #
@@ -113,12 +113,12 @@
 - include_tasks:    "bom_processor.yaml"
   vars:
     bom_name:       "{{ bom_dependency.name }}"
-  loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
+  loop:             "{{ bom_base.materials.dependencies | flatten(levels=1) }}"
   loop_control:
     loop_var:       bom_dependency
   when:             
-    - bom.materials.dependencies is defined
-    - bom.materials.dependencies|length>0
+    - bom_base.materials.dependencies is defined
+    - bom_base.materials.dependencies|length>0
 # -------------------------------------+---------------------------------------8
 
 ...
