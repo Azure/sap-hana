@@ -43,6 +43,8 @@
 - include_role:
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
+  vars:
+    bom_name:                     "{{ bom_base_name }}"
 
 
 - name:  
