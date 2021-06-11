@@ -17,9 +17,12 @@
     sap_inifile_template:         "{{ bom_base_name }}-pas-inifile-param.j2"
 
 
+# Returns bom object
 - include_role:
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
+  vars:
+    bom_name:                     "{{ bom_base_name }}"
 
 
 - include_role:
@@ -52,7 +55,7 @@
   shell: |
                       export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
-                                SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.pas }}                     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \
                                 SAPINST_START_GUISERVER=false
   args:
