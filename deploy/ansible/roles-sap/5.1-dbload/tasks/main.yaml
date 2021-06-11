@@ -29,22 +29,22 @@
     tasks_from:                   bom-template
 
 
-# *====================================4=======================================8
-#   SAP DBLOAD: Install
-# 2230669 - System Provisioning Using a Parameter Input File
-#
-- name:               "SAP DBLOAD Install"
-  shell: |
-                      export TMPDIR=/usr/sap/install
-                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
-                                SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.dbl }}                     \
-                                SAPINST_SKIP_DIALOGS=true                                                     \
-                                SAPINST_START_GUISERVER=false
-  args:
-    chdir:            /usr/sap/install/SWPM
-  # Skip when TRUE (test mode)
-  # when: not test_new_bom
-# *====================================4=======================================8
+# # *====================================4=======================================8
+# #   SAP DBLOAD: Install
+# # 2230669 - System Provisioning Using a Parameter Input File
+# #
+# - name:               "SAP DBLOAD Install"
+#   shell: |
+#                       export TMPDIR=/usr/sap/install
+#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+#                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.dbl }}                     \
+#                                 SAPINST_SKIP_DIALOGS=true                                                     \
+#                                 SAPINST_START_GUISERVER=false
+#   args:
+#     chdir:            /usr/sap/install/SWPM
+#   # Skip when TRUE (test mode)
+#   # when: not test_new_bom
+# # *====================================4=======================================8
 
 
 
