@@ -33,6 +33,25 @@
 #       sapbits_bom_files
 #       sapbits_sas_token
 #       inventory_dir
+
+
+# Template variables:
+#       sap_cd_package_cd1
+#       sap_cd_package_cd2
+#       sap_cd_package_cd3
+#       sap_cd_package_cd4
+#       sap_cd_package_cd5
+#       sap_cd_package_hdbclient
+#       app_instance_number
+#       sap_appVirtualHostname
+#       sap_ciDialogWPNumber
+#       sap_ciBtcWPNumber
+#       sap_installSAPHostAgent
+#       sap_ciInstanceNumber
+#       sap_scs_hostname
+#       sap_db_hostname
+#       sap_profile_dir
+#       sap_ciVirtualHostname
 #       bom_base.product_ids.scs
 #       sap_sid
 #       scs_instance_number
@@ -43,7 +62,20 @@
 #       sapsys_gid
 #       sidadm_uid
 
-
+#------------------<DEBUGGING>-------------------
+- name:       Parameters
+  debug:  
+    msg:
+      - "SAP SID              : {{ sap_sid }}"
+      - "Instance Number - SCS: {{ scs_instance_number }}"
+      - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
+      - "DB Hostname          : {{ sap_db_hostname }}"
+      - "FQDN                 : {{ sap_fqdn }}"
+      - "Master Password      : {{ password_master }}"
+      - "sapadm UID           : {{ sapadm_uid }}"
+      - "sapsys GID           : {{ sapsys_gid }}"
+      - "<sid>adm UID         : {{ sidadm_uid }}"
+#------------------</DEBUGGING>------------------
 
 
 - name:             Check for Microsoft Supplied BOM ({{ bom_base_name }}) template
@@ -83,72 +115,9 @@
         force:          yes
   when:             microsoft_supplied_bom_template.stat.exists != true
 
-#------------------<DEBUGGING>-------------------
-- name:       Parameters
-  debug:  
-    msg:
-      - "Product              : {{ bom_base.product_ids.scs }}"
-      - "SAP SID              : {{ sap_sid }}"
-      - "Instance Number - SCS: {{ scs_instance_number }}"
-      - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
-      - "FQDN                 : {{ sap_fqdn }}"
-      - "Master Password      : {{ password_master }}"
-      - "sapadm UID           : {{ sapadm_uid }}"
-      - "sapsys GID           : {{ sapsys_gid }}"
-      - "<sid>adm UID         : {{ sidadm_uid }}"
-#------------------</DEBUGGING>------------------
 # -------------------------------------+---------------------------------------8
 
-
-# #------------------<DEBUGGING>-------------------
-# - name:       Parameters
-#   debug:  
-#     msg:
-#       - "Product              : {{ bom.product_ids.scs }}"
-#       - "SAP SID              : {{ sap_sid }}"
-#       - "Instance Number - SCS: {{ scs_instance_number }}"
-#       - "SCS Virtual Hostname : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-#       - "DB Hostname          : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-#       - "FQDN                 : {{ sap_fqdn }}"
-#       - "Master Password      : {{ password_master }}"
-#       - "sapadm UID           : {{ sapadm_uid }}"
-#       - "sapsys GID           : {{ sapsys_gid }}"
-#       - "<sid>adm UID         : {{ sidadm_uid }}"
-# #------------------</DEBUGGING>------------------
-
-#------------------<DEBUGGING>-------------------
-# - name:       Parameters
-#   debug:  
-#     msg:
-#       - "Product              : {{ bom.product_ids.scs }}"
-#       - "SAP SID              : {{ sap_sid }}"
-#       - "Instance Number - SCS: {{ scs_instance_number }}"
-#       - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
-#       - "DB Hostname          : {{ sap_db_hostname }}"
-#       - "FQDN                 : {{ sap_fqdn }}"
-#       - "Master Password      : {{ password_master }}"
-#       - "sapadm UID           : {{ sapadm_uid }}"
-#       - "sapsys GID           : {{ sapsys_gid }}"
-#       - "<sid>adm UID         : {{ sidadm_uid }}"
-#   vars:
-#     app_instance_number:          '00'
-#     sap_appVirtualHostname:       "{{ inventory_hostname }}"
-#     sap_ciDialogWPNumber:         12
-#     sap_ciBtcWPNumber:            8
-#     sap_installSAPHostAgent:      "false"
-#     sap_ciInstanceNumber:         '00'
-#     sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-#     sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-#     sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-#     sap_ciVirtualHostname:        "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_PAS') | first }}"
-#     sap_cd_package_hdbclient:     
-#     sap_cd_package_cd1:           
-#     sap_cd_package_cd2:           
-#     sap_cd_package_cd3:           
-#     sap_cd_package_cd4:           
-#     sap_cd_package_cd5:           
-
-# #------------------</DEBUGGING>------------------
-
-
 ...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

@@ -26,41 +26,40 @@
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-template
   vars:
-    sap_ciDialogWPNumber:         12
-    sap_ciBtcWPNumber:            8
-    sap_installSAPHostAgent:      "false"
-    sap_ciInstanceNumber:         '00'
-    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-    sap_ciVirtualHostname:        "{{ inventory_hostname }}"
-    sap_cd_package_hdbclient:     
-    sap_cd_package_cd1:           
+    sap_cd_package_cd1:            
     sap_cd_package_cd2:           
     sap_cd_package_cd3:           
     sap_cd_package_cd4:           
     sap_cd_package_cd5:           
+    sap_cd_package_hdbclient:     
+    sap_ciInstanceNumber:         '00'
+    app_instance_number:          
+    sap_ciDialogWPNumber:         12
+    sap_ciBtcWPNumber:            8
+    sap_installSAPHostAgent:      "false"
+    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
+    sap_ciVirtualHostname:        "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_PAS') | first }}"
+    sap_appVirtualHostname:       
 
 
-
-# # *====================================4=======================================8
-# #   SAP PAS: Install
-# # 2230669 - System Provisioning Using a Parameter Input File
-# #
-# - name:               "SAP PAS Install"
-#   shell: |
-#                       export TMPDIR=/usr/sap/install
-#                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
-#                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.pas }}                     \
-#                                 SAPINST_SKIP_DIALOGS=true                                                     \
-#                                 SAPINST_START_GUISERVER=false
-#   args:
-#     chdir:            /usr/sap/install/SWPM
-#   # Skip when TRUE (test mode)
-#   # when: not test_new_bom
-# # *====================================4=======================================8
-
-
+# *====================================4=======================================8
+#   SAP PAS: Install
+# 2230669 - System Provisioning Using a Parameter Input File
+#
+- name:               "SAP PAS Install"
+  shell: |
+                      export TMPDIR=/usr/sap/install
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom_base.product_ids.pas }}                     \
+                                SAPINST_SKIP_DIALOGS=true                                                     \
+                                SAPINST_START_GUISERVER=false
+  args:
+    chdir:            /usr/sap/install/SWPM
+  # Skip when TRUE (test mode)
+  # when: not test_new_bom
+# *====================================4=======================================8
 
 ...
 # /*---------------------------------------------------------------------------8
