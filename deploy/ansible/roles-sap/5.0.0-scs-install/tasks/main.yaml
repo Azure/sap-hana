@@ -117,7 +117,7 @@
 - name:       Parameters
   debug:  
     msg:
-      - "Product              : {{ bom.product_ids.scs }}"
+      - "Product              : {{ bom_base.product_ids.scs }}"
       - "SAP SID              : {{ sap_sid }}"
       - "Instance Number - SCS: {{ scs_instance_number }}"
       - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
