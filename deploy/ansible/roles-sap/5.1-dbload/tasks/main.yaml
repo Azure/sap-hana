@@ -11,15 +11,23 @@
     sap_cd_package_cd3:           
     sap_cd_package_cd4:           
     sap_cd_package_cd5:           
-    sap_inifile:                  "{{ bom_base_name }}-dbload-inifile-param.j2"
-    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"       # SAP Install
     sap_profile_dir:              /sapmnt/{{ sap_sid|upper }}/profile
+    sap_inifile:                  "{{ bom_base_name }}-dbload-{{ ansible_hostname }}.params"
+    sap_inifile_template:         "{{ bom_base_name }}-dbload-inifile-param.j2"
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"     # SAP Install
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"     # SAP Install
+
 
 
 - include_role:
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
+
+
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-template
+
 
 
 - debug:
