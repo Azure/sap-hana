@@ -41,4 +41,5 @@
 
 - debug:
     msg:
-      - "bom_base:    {{ bom_base }}"
+      - "bom_base:                 {{ bom_base }}"
+      - "microsoft_supplied_bom:   {{ microsoft_supplied_bom }}"
