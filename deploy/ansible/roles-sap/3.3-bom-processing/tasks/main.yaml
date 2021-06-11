@@ -40,45 +40,53 @@
 - import_tasks:     pre_checks.yaml
 # -------------------------------------+---------------------------------------8
 
-
-# -------------------------------------+---------------------------------------8
-#
-# Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
-#               If not, download from storage account location.
-#
-- name:             Check for Microsoft Supplied BOM ({{ bom_base_name }})
-  local_action:     stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
-  register:         microsoft_supplied_bom
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
 
 
-# If Microsoft supplied BOM found
-- name:             Register Microsoft Supplied BOM {{ bom_base_name }}
-  include_vars:
-    file:           "{{ microsoft_supplied_bom.stat.path }}"
-    name:           bom_base
-  when:             microsoft_supplied_bom.stat.exists == true
+- name:  
+  set_fact:
+    bom:                          "{{ bom_base }}"
 
-# If Microsoft supplied BOM not found
-- name:             Retrieve BOM ({{ bom_base_name }}) from Storage Account
-  block:
-    - name:             Download BOM ({{ bom_base_name }}) from Storage Account
-      get_url:
-        url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
-        dest:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-        mode:           0644
-      register:         result
-      until:            result is succeeded
-      retries:          10
-      delay:            6
-      delegate_to:      localhost                                               # Causes action to occur on the Ansible Controller
-      become:           no
+# # -------------------------------------+---------------------------------------8
+# #
+# # Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
+# #               If not, download from storage account location.
+# #
+# - name:             Check for Microsoft Supplied BOM ({{ bom_base_name }})
+#   local_action:     stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+#   register:         microsoft_supplied_bom
 
-    - name:             Register downloaded BOM ({{ bom_base_name }})
-      include_vars:
-        file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-        name:           bom_base
-  when:             microsoft_supplied_bom.stat.exists != true
-# -------------------------------------+---------------------------------------8
+
+# # If Microsoft supplied BOM found
+# - name:             Register Microsoft Supplied BOM {{ bom_base_name }}
+#   include_vars:
+#     file:           "{{ microsoft_supplied_bom.stat.path }}"
+#     name:           bom_base
+#   when:             microsoft_supplied_bom.stat.exists == true
+
+# # If Microsoft supplied BOM not found
+# - name:             Retrieve BOM ({{ bom_base_name }}) from Storage Account
+#   block:
+#     - name:             Download BOM ({{ bom_base_name }}) from Storage Account
+#       get_url:
+#         url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
+#         dest:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
+#         mode:           0644
+#       register:         result
+#       until:            result is succeeded
+#       retries:          10
+#       delay:            6
+#       delegate_to:      localhost                                               # Causes action to occur on the Ansible Controller
+#       become:           no
+
+#     - name:             Register downloaded BOM ({{ bom_base_name }})
+#       include_vars:
+#         file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
+#         name:           bom_base
+#   when:             microsoft_supplied_bom.stat.exists != true
+# # -------------------------------------+---------------------------------------8
 
 
 
@@ -105,12 +113,12 @@
 - include_tasks:    "bom_processor.yaml"
   vars:
     bom_name:       "{{ bom_dependency.name }}"
-  loop:             "{{ bom_base.materials.dependencies | flatten(levels=1) }}"
+  loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
   loop_control:
     loop_var:       bom_dependency
   when:             
-    - bom_base.materials.dependencies is defined
-    - bom_base.materials.dependencies|length>0
+    - bom.materials.dependencies is defined
+    - bom.materials.dependencies|length>0
 # -------------------------------------+---------------------------------------8
 
 ...
