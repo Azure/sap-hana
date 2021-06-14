@@ -81,13 +81,37 @@ Licensed under the MIT license.
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent -Path $filePath
 
-    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+    $Environment = ""
+    $region = ""
+    $saName = $StorageAccountName
+    $repo = ""
 
-    $Environment = $jsonData.infrastructure.environment
-    $region = $jsonData.infrastructure.region
+    $KeyValuePairs = @{}
+
+    if ($fInfo.Extension -eq ".tfvars") {
+        $paramContent = Get-Content -Path $Parameterfile
+
+        foreach ($param in $paramContent) {
+            if ($param.Contains("=")) {
+                $KeyValuePairs.Add($param.Split("=")[0].ToLower(), $param.Split("=")[1].Replace("""", ""))
+            }
+           
+        }
+        $Environment = $KeyValuePairs["environment"]
+        $region = $KeyValuePairs["location"]
+
+    }
+    else {
+        $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+        $Environment = $jsonData.infrastructure.environment
+        $region = $jsonData.infrastructure.region
+            
+    }
+
     $combined = $Environment + $region
 
-    $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
+    $key = $fInfo.Name.replace($fInfo.Extension, ".terraform.tfstate")
 
     if ($null -eq $iniContent[$combined]) {
         Write-Error "The Terraform state information is not available"

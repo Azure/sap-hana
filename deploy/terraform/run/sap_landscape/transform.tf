@@ -88,7 +88,7 @@ locals {
 
   }
   options = {
-
+    enable_secure_transfer = true
   }
   key_vault = {
     kv_user_id = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")

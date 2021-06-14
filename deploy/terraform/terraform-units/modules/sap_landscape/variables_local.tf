@@ -49,8 +49,14 @@ locals {
 
 
   // Resource group
-  rg_exists = length(var.infrastructure.resource_group.arm_id) > 0 ? true : false
-  rg_name   = local.rg_exists ? try(split("/", var.infrastructure.resource_group.arm_id)[4], "") : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.vnet_rg))
+  rg_exists = length(var.infrastructure.resource_group.arm_id) > 0
+  rg_name = local.rg_exists ? (
+    try(split("/", var.infrastructure.resource_group.arm_id)[4], "")) : (
+    length(var.infrastructure.resource_group.name) > 0 ? (
+      var.infrastructure.resource_group.name) : (
+      format("%s%s", local.prefix, local.resource_suffixes.vnet_rg)
+    )
+  )
 
   // iSCSI
   iscsi_count  = try(var.infrastructure.iscsi.iscsi_count, 0)
@@ -103,23 +109,22 @@ locals {
   sid_private_key = local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.sid[0].private_key_pem)
 
   // iSCSI subnet
-  var_sub_iscsi    = try(var.infrastructure.vnets.sap.subnet_iscsi, null)
-  enable_sub_iscsi = local.var_sub_iscsi != null
-  sub_iscsi_arm_id = try(local.var_sub_iscsi.arm_id, "")
+  enable_sub_iscsi = (length(var.infrastructure.vnets.sap.subnet_iscsi.arm_id) + length(var.infrastructure.vnets.sap.subnet_iscsi.prefix)) > 0
+  sub_iscsi_arm_id = try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")
   sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0
   sub_iscsi_name = local.sub_iscsi_exists ? (
     try(split("/", local.sub_iscsi_arm_id)[10], "")) : (
-    try(local.var_sub_iscsi.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet))
+    length(var.infrastructure.vnets.sap.subnet_iscsi.name) > 0 ? var.infrastructure.vnets.sap.subnet_iscsi.name : format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet)
   )
-  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(local.var_sub_iscsi.prefix, "")
+  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")
 
   // iSCSI NSG
-  var_sub_iscsi_nsg    = try(local.var_sub_iscsi.nsg, {})
-  sub_iscsi_nsg_arm_id = try(local.var_sub_iscsi_nsg.arm_id, "")
+  var_sub_iscsi_nsg    = try(var.infrastructure.vnets.sap.subnet_iscsi.nsg, {})
+  sub_iscsi_nsg_arm_id = try(var.infrastructure.vnets.sap.subnet_iscsi_nsg.arm_id, "")
   sub_iscsi_nsg_exists = length(local.sub_iscsi_nsg_arm_id) > 0
   sub_iscsi_nsg_name = local.sub_iscsi_nsg_exists ? (
     try(split("/", local.sub_iscsi_nsg_arm_id)[8], "")) : (
-    try(local.var_sub_iscsi_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet_nsg))
+    try(var.infrastructure.vnets.sap.subnet_iscsi_nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet_nsg))
   )
 
   // Current service principal
@@ -186,7 +191,10 @@ locals {
   sub_admin_existing = length(local.sub_admin_id) > 0
   sub_admin_name = local.sub_admin_existing ? (
     try(split("/", local.sub_admin_id)[10], "")) : (
-    try(var.infrastructure.vnets.sap.subnet_admin.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet))
+    length(var.infrastructure.vnets.sap.subnet_admin.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_admin.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet)
+    )
   )
   sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
 
@@ -195,7 +203,10 @@ locals {
   sub_db_existing = length(local.sub_db_id) > 0
   sub_db_name = local.sub_db_existing ? (
     try(split("/", local.sub_db_id)[10], "")) : (
-    try(var.infrastructure.vnets.sap.subnet_db.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet))
+    length(var.infrastructure.vnets.sap.subnet_db.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_db.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet)
+    )
   )
   sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
 
@@ -204,7 +215,11 @@ locals {
   sub_app_existing = length(local.sub_app_id) > 0
   sub_app_name = local.sub_app_existing ? (
     try(split("/", local.sub_app_id)[10], "")) : (
-    try(var.infrastructure.vnets.sap.subnet_app.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet))
+    length(var.infrastructure.vnets.sap.subnet_app.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_app.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet)
+    )
+
   )
   sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
 
@@ -213,7 +228,10 @@ locals {
   sub_web_existing = length(local.sub_web_id) > 0
   sub_web_name = local.sub_web_existing ? (
     try(split("/", local.sub_web_id)[10], "")) : (
-    try(var.infrastructure.vnets.sap.subnet_web.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet))
+    length(var.infrastructure.vnets.sap.subnet_web.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_web.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet)
+    )
   )
   sub_web_prefix = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.prefix, "") : ""
 
@@ -221,18 +239,42 @@ locals {
 
   sub_admin_nsg_arm_id = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, "") : ""
   sub_admin_nsg_exists = length(local.sub_admin_nsg_arm_id) > 0
-  sub_admin_nsg_name   = local.sub_admin_nsg_exists ? try(split("/", local.sub_admin_nsg_arm_id)[8], "") : try(var.infrastructure.vnets.sap.subnet_admin.nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg))
+  sub_admin_nsg_name = local.sub_admin_nsg_exists ? (
+    try(split("/", local.sub_admin_nsg_arm_id)[8], "")) : (
+    length(var.infrastructure.vnets.sap.subnet_admin.nsg.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_admin.nsg.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet_nsg)
+    )
+  )
 
   sub_db_nsg_arm_id = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, "") : ""
   sub_db_nsg_exists = length(local.sub_db_nsg_arm_id) > 0
-  sub_db_nsg_name   = local.sub_db_nsg_exists ? try(split("/", local.sub_db_nsg_arm_id)[8], "") : try(var.infrastructure.vnets.sap.subnet_db.nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet_nsg))
+  sub_db_nsg_name = local.sub_db_nsg_exists ? (
+    try(split("/", local.sub_db_nsg_arm_id)[8], "")) : (
+    length(var.infrastructure.vnets.sap.subnet_db.nsg.name) > 0 ? (var.infrastructure.vnets.sap.subnet_db.nsg.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet_nsg)
+    )
+  )
 
   sub_app_nsg_arm_id = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, "") : ""
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0
-  sub_app_nsg_name   = local.sub_app_nsg_exists ? try(split("/", local.sub_app_nsg_arm_id)[8], "") : try(var.infrastructure.vnets.sap.subnet_app.nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet_nsg))
+  sub_app_nsg_name = local.sub_app_nsg_exists ? (
+    try(split("/", local.sub_app_nsg_arm_id)[8], "")) : (
+    length(var.infrastructure.vnets.sap.subnet_app.nsg.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_app.nsg.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet_nsg)
+    )
+  )
 
   sub_web_nsg_arm_id = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, "") : ""
   sub_web_nsg_exists = length(local.sub_web_nsg_arm_id) > 0
-  sub_web_nsg_name   = local.sub_web_nsg_exists ? try(split("/", local.sub_web_nsg_arm_id)[8], "") : try(var.infrastructure.vnets.sap.subnet_web.nsg.name, format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet_nsg))
+
+  sub_web_nsg_name = local.sub_web_nsg_exists ? (
+    try(split("/", local.sub_web_nsg_arm_id)[8], "")) : (
+    length(var.infrastructure.vnets.sap.subnet_web.nsg.name) > 0 ? (
+      var.infrastructure.vnets.sap.subnet_web.nsg.name) : (
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet_nsg)
+    )
+  )
 
 }
