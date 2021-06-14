@@ -19,7 +19,7 @@ locals {
   key_vault = {
     kv_user_id     = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")
     kv_prvt_id     = try(coalesce(var.automation_keyvault_id, try(var.key_vault.kv_prvt_id, "")), "")
-    kv_prvt_id = try(coalesce(var.spn_keyvault_id, try(var.key_vault.kv_spn_id, "")), "")
+    kv_spn_id = try(coalesce(var.spn_keyvault_id, try(var.key_vault.kv_spn_id, "")), "")
   }
   storage_account_sapbits = {
     arm_id                   = try(coalesce(var.library_sapmedia_arm_id, try(var.storage_account_sapbits.arm_id, "")), "")
