@@ -34,37 +34,46 @@
 #   03) Upload media
 
 #   01) Register BOM
-- name:         "Register BOM: {{ bom_name }}"
-  include_vars:
-    file:       "{{ download_directory }}/bom/{{ bom_name }}.yaml"
-    name:       _bom
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
+  vars:
+    inventory_dir:                "{{ download_directory }}"
 
 #------------------<DEBUGGING>-------------------
 # - debug:  
 #     msg:      "Archive: {{ item.archive }} Url: {{ item.url }} Dest: {{ download_directory }}/{{ item.archive }}"
 #   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+#   when:       item.url is defined
+
+- name: "BOM: {{ bom_name }} Files without URLS"
+  debug:  
+    msg:      "Archive: {{ item.archive }} Dest: {{ download_directory }}/{{ item.archive }}"
+  loop:       "{{ bom.materials.media|flatten(levels=1) }}"
+  when:       item.url is not defined
+
 #------------------</DEBUGGING>------------------
 
 
 # Files to download
 #------------------<DEBUGGING>-------------------
-# - debug:  
+# - name: "BOM: {{ bom_name }} Files to download"
+#   debug:  
 #     msg:      
-#       - "URL : {{ item.url }}"
+#       - "URL: {{ item.url }} Destination: {{ download_directory }}/files/{{ item.archive }}"
 #   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
 
 
-
 #   02) Validate media from SAP
 #   Loop through BOM media URLs
-- name: "BOM: Check/Download Files"
+- name: "BOM: {{ bom_name }} Check and Download Files"
   get_url:
     url:              "{{ item.url }}"
     dest:             "{{ download_directory }}/files/{{ item.archive }}"
     tmp_dest:         "{{ download_directory }}/tmp"
-    url_username:     "{{ S_user }}"
-    url_password:     "{{ S_password }}"
+    url_username:     "{{ SUser }}"
+    url_password:     "{{ SPassword }}"
     force_basic_auth: yes
     http_agent:       'SAP Software Download'
   
@@ -72,12 +81,22 @@
   until:    result is succeeded
   retries:  2
   delay:    1
-  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
-  when:     item.url is defined
+  loop:     "{{ bom.materials.media|flatten(levels=1) }}"
+  when:     tier != "uploader"
+
+
+# Files to download
+#------------------<DEBUGGING>-------------------
+- name: "BOM:{{ bom_name }} Upload files"
+  debug:  
+    msg:      
+      - "Account: {{ sapbits_location_base_path.rpartition('//')[2].split('.')[0]}} Key: {{ sapbits_access_key }} Container: {{ sapbits_location_base_path.rpartition('//')[2].split('/')[1]}}/{{ sapbits_bom_files }}/archives"
+#------------------</DEBUGGING>------------------
+
 
 #   03) Upload files to Azure
 #   Loop through BOM media files  
-- name: "BOM: Upload files"
+- name: "BOM:{{ bom_name }} Upload files"
   command: >-
     az storage blob upload 
       --account-name {{ sapbits_location_base_path.rpartition('//')[2].split('.')[0]}} 
@@ -91,8 +110,8 @@
   register: azresult
   ignore_errors: true
   failed_when:  azresult.rc != 0 and azresult.stderr.find("BlobAlreadyExists") == -1
-  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
-  when:     item.archive is defined
+  loop:     "{{ bom.materials.media|flatten(levels=1) }}"
+  when:     item.archive is defined and tier == "uploader"
 
 #------------------<DEBUGGING>-------------------
 # - name: "List error codes"

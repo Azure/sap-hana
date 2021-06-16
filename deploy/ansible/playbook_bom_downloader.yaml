@@ -1,6 +1,6 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                         PLAYBOOK FOR BOM VALIDATION                         |
+# |                         PLAYBOOK FOR BOM DOWNLOADER                        |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
@@ -11,7 +11,7 @@
 
 - hosts:          localhost
 
-  name:           BOM Validator
+  name:           BOM Downloader
   gather_facts:   false
   connection:     local
   become:         yes
@@ -29,7 +29,7 @@
 # -------------------------------------+---------------------------------------8
 
   - set_fact:
-      tier:     downloader
+      tier:     "uploader"
 
   - include_role:
       name:     roles-sap/0.1-bom-validator

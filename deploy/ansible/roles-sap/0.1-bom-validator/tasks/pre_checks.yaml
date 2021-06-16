@@ -18,6 +18,10 @@
 
       - "target_media_location is defined"                                      # Has the variable been defined
       - "target_media_location | trim | length != 0"                            #   and given a value
+
+      - "kv_uri is defined"                                                     # Has the variable been defined
+      - "kv_uri | trim | length != 0"                                           #   and given a value
+
 # -------------------------------------+---------------------------------------8
 
 ...
