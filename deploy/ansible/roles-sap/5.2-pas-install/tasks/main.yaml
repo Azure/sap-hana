@@ -11,78 +11,40 @@
 #
 
 ---
-- name:             "Register BOM: {{ bom_base_name }}"
-  include_vars:
-    file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
-    name:           bom
-
-# *====================================4=======================================8
-
 - name:  
   set_fact:
-    sap_inifile:                  "{{ bom_base_name }}-pas-inifile-param.j2"
-
-# -------------------------------------+---------------------------------------8
-#
-# Description:  Download specified BOM Template File
-#S41909SPS03_v1-scs-inifile-param.j2
-- name:             "Download BOM Template: {{ sap_inifile }}"
-  get_url:
-    url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/templates/{{ sap_inifile }}{{ sapbits_sas_token }}"
-    dest:           "{{ inventory_dir }}/{{ sap_inifile }}"
-    mode:           0644
-  register:         result
-  until:            result is succeeded
-  retries:          10
-  delay:            6
-  delegate_to:      localhost                                                     # Causes action to occur on the Ansible Controller
-  become:           no
+    sap_inifile:                  "{{ bom_base_name }}-pas-{{ ansible_hostname }}.params"
+    sap_inifile_template:         "{{ bom_base_name }}-pas-inifile-param.j2"
 
 
-
-# *====================================4=======================================8
-#   SAP PAS: deploy PAS Parameter file install template
-- name:               "SAP PAS: deploy PAS Parameter file install template"
-  template:
-    src:              "{{ inventory_dir }}/{{ sap_inifile }}"
-    dest:             /usr/sap/install/downloads/{{ bom_base_name }}-pas-{{ ansible_hostname }}.params
-    mode:             0644
-    force:            yes
-  # Template parameter mapping
+# Returns bom object
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
   vars:
-    sap_ciDialogWPNumber:         12
-    sap_ciBtcWPNumber:            8
-    sap_installSAPHostAgent:      "false"
-    sap_ciInstanceNumber:         '00'
-    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
-    sap_ciVirtualHostname:        "{{ inventory_hostname }}"
-    sap_cd_package_hdbclient:     
-    sap_cd_package_cd1:           
+    bom_name:                     "{{ bom_base_name }}"
+
+
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-template
+  vars:
+    sap_cd_package_cd1:            
     sap_cd_package_cd2:           
     sap_cd_package_cd3:           
     sap_cd_package_cd4:           
     sap_cd_package_cd5:           
-
-# *====================================4=======================================8
-
-
-#------------------<DEBUGGING>-------------------
-- name:       Parameters
-  debug:  
-    msg:
-      - "Product              : {{ bom.product_ids.scs }}"
-      - "SAP SID              : {{ sap_sid }}"
-      - "Instance Number - SCS: {{ scs_instance_number }}"
-      - "SCS Virtual Hostname : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
-      - "DB Hostname          : {{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
-      - "FQDN                 : {{ sap_fqdn }}"
-      - "Master Password      : {{ password_master }}"
-      - "sapadm UID           : {{ sapadm_uid }}"
-      - "sapsys GID           : {{ sapsys_gid }}"
-      - "<sid>adm UID         : {{ sidadm_uid }}"
-#------------------</DEBUGGING>------------------
+    sap_cd_package_hdbclient:     
+    sap_ciInstanceNumber:         '00'
+    app_instance_number:          
+    sap_ciDialogWPNumber:         12
+    sap_ciBtcWPNumber:            8
+    sap_installSAPHostAgent:      "false"
+    sap_profile_dir:              /usr/sap/{{ sap_sid|upper }}/SYS/profile
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
+    sap_ciVirtualHostname:        "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_PAS') | first }}"
+    sap_appVirtualHostname:       
 
 
 # *====================================4=======================================8
@@ -92,17 +54,15 @@
 - name:               "SAP PAS Install"
   shell: |
                       export TMPDIR=/usr/sap/install
-                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ bom_base_name }}-pas-{{ ansible_hostname }}.params \
-                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                                                             \
-                                SAPINST_SKIP_DIALOGS=true                                                                                        \
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                          \
+                                SAPINST_SKIP_DIALOGS=true                                                     \
                                 SAPINST_START_GUISERVER=false
   args:
     chdir:            /usr/sap/install/SWPM
   # Skip when TRUE (test mode)
   # when: not test_new_bom
 # *====================================4=======================================8
-
-
 
 ...
 # /*---------------------------------------------------------------------------8

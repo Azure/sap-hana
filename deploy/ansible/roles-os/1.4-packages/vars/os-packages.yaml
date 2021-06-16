@@ -95,3 +95,8 @@ packages:
       - { tier: 'os', package: 'tuned',           state: 'present' }
       - { tier: 'os', package: 'numad',           state: 'present' }
       - { tier: 'os', package: 'ntp',             state: 'absent' }
+
+      # TODO(rtamalin): Ensure SLE 15 SP2 uses /usr/bin/python3 rather
+      # than /usr/bin/python.
+      # Required to enable ansible to use /usr/bin/python on SLE 15 SP2
+      - { tier: 'os', package: 'python2-rpm',             state: 'present' }

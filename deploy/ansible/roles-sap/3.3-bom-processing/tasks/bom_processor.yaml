@@ -11,7 +11,7 @@
 #   sapbits_sas_token
 #
 # Locals:
-#   _bom
+#   bom
 #   item
 #   result
 #
@@ -36,16 +36,9 @@
 
 
 #   01) Register BOM
-- name:         "Register BOM: {{ bom_name }}"
-  include_vars:
-    file:       "{{ inventory_dir }}/{{ bom_name }}.yaml"
-    name:       _bom
-
-#------------------<DEBUGGING>-------------------
-# - debug:  
-#     msg:      "Archive: {{ item.archive }}"
-#   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
-#------------------</DEBUGGING>------------------
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
 
 
 
@@ -67,7 +60,7 @@
     path:   "{{ target_media_location }}/{{ item.extractDir }}"
     state:  directory
     mode:   0755
-  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  loop:     "{{ bom.materials.media|flatten(levels=1) }}"
   when:     not (    (item.extractDir is undefined)
                   or (item.extractDir == '') )
 
@@ -98,7 +91,7 @@
   until:    result is succeeded
   retries:  10
   delay:    6
-  loop:     "{{ _bom.materials.media|flatten(levels=1) }}"
+  loop:     "{{ bom.materials.media|flatten(levels=1) }}"
   when:     item.download is undefined or
             item.download
 
@@ -110,7 +103,7 @@
   args:
     chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
-  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  loop:         "{{ bom.materials.media|flatten(levels=1) }}"
   when:       
     - item.extract is not undefined
     - item.extract
@@ -125,7 +118,7 @@
   args:
     chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
-  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  loop:         "{{ bom.materials.media|flatten(levels=1) }}"
   when:       
     - item.extract is not undefined
     - item.extract
@@ -141,7 +134,7 @@
     dest:       "{{ target_media_location }}/{{ item.extractDir }}"
     remote_src: yes
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
-  loop:         "{{ _bom.materials.media|flatten(levels=1) }}"
+  loop:         "{{ bom.materials.media|flatten(levels=1) }}"
   when:       
     - item.extract is not undefined
     - item.extract

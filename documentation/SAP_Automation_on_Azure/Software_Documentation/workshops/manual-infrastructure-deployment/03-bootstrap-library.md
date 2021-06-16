@@ -54,7 +54,10 @@
 
 <br/>
 
-1. Repository
+1. Log on the the Deployer using your SSH Client and the SSH Keys that you retrieved with the Public IP Address.<br/>
+   (*Note*) If using Putty, the SSH Key will have to be [converted](https://www.simplified.guide/putty/convert-ssh-key-to-ppk) to ppk format.
+
+2. Repository
 
     1. (*Optional*) Checkout Branch
         ```bash
@@ -74,7 +77,7 @@
         ```
         <br/>
 
-2. Create Working Directory and prepare JSON.
+3. Create Working Directory and prepare JSON.
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-EUS2-SAP_LIBRARY; cd $_
