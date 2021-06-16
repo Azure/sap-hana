@@ -1,26 +1,74 @@
 {
-    "tfstate_resource_id": "",
-    "deployer_tfstate_key": "",
+    "tfstate_resource_id"                              : "",
+    "deployer_tfstate_key"                             : "",
     "infrastructure": {
-        "environment": "np",
-        "region": "westeurope",
+        "environment"                                  : "np",
+        "region"                                       : "westeurope",
         "resource_group": {
-            "arm_id": "",
-            "name": "azure-test-saplandscape-rg"
+            "name"                                     : "azure-test-saplandscape-rg",
+            "arm_id"                                   : ""
         },
         "vnets": {
             "sap": {
-                "arm_id": "",
-                "address_space": "10.1.0.0/16",
+                "arm_id"                               : "",
+                "address_space"                        : "10.1.0.0/16",
+                "subnet_admin": {
+                    "name"                             : "",
+                    "prefix"                           : "10.1.0.0/24",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
+                },
+                "subnet_db": {
+                    "name"                             : "",
+                    "prefix"                           : "10.2.0.0/24",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
+                },
+                "subnet_app": {
+                    "name"                             : "",
+                    "prefix"                           : "10.3.0.0/24",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
+                },
+                "subnet_web": {
+                    "name"                             : "",
+                    "prefix"                           : "10.4.0.0/24",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
+                },
+                    
                 "subnet_iscsi": {
-                    "name": "global-WEEU-sap0_iscsi-subnet",
-                    "prefix": "10.1.0.0/24"
+                    "name"                             : "global-WEEU-sap0_iscsi-subnet",
+                    "prefix"                           : "10.1.0.0/24",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
                 }
             }
         },
         "iscsi": {
             "iscsi_count": 3,
-            "use_DHCP": false
+            "use_DHCP": false,
+            "os": {
+                "publisher": "SUSE",
+                "offer": "sles-sap-12-sp5",
+                "version": "latest",
+                "sku": "gen1"
+            }
         }
     },
     "key_vault": {

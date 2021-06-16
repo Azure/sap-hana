@@ -162,9 +162,19 @@ then
 fi
 
 
-# Read environment
-environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
-region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+ext=$(echo ${parameterfile} | cut -d. -f2)
+
+# Helper variables
+if [ "${ext}" == json ]; then
+    environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
+    region=$(jq --raw-output .infrastructure.region "${parameterfile}")
+else
+
+    load_config_vars "${param_dirname}"/"${parameterfile}" "environment"
+    load_config_vars "${param_dirname}"/"${parameterfile}" "location"
+    region=$(echo ${location} | xargs)
+fi
+
 key=$(echo "${workload_file_parametername}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
@@ -173,7 +183,7 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
-    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+    echo "#              The file needs to contain the environment attribute!!                    #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -186,7 +196,7 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
-    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+    echo "#                 The file needs to contain the region attribute!!                      #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
