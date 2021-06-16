@@ -11,7 +11,7 @@ product_ids:
   dbl:    NW_ABAP_DB:S4HANA1909.CORE.HDB.ABAP
   pas:    NW_ABAP_CI:S4HANA1909.CORE.HDB.ABAP
   app:    NW_DI:S4HANA1909.CORE.HDB.PD
-  web:
+  web:    NW_Webdispatcher:NW750.IND.PD
 
 materials:
   dependencies:
