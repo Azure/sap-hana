@@ -35,28 +35,15 @@ locals {
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
 
   // The environment of sap landscape and sap system
-  environment = upper(try(var.infrastructure.environment, ""))
+  environment = upper(local.infrastructure.environment)
 
-  vnet_logical_name = var.infrastructure.vnets.sap.name
-  # Options
-  enable_secure_transfer = try(var.options.enable_secure_transfer, true)
-  enable_prometheus      = try(var.options.enable_prometheus, true)
-
-  # Update options with defaults
-  options = merge(var.options, {
-    enable_secure_transfer = local.enable_secure_transfer,
-    enable_prometheus      = local.enable_prometheus
-  })
-
+  vnet_logical_name = local.infrastructure.vnets.sap.name
+  
   // SAP vnet
-  var_infra       = try(var.infrastructure, {})
+  var_infra       = try(local.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
   vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
-
-  // iSCSI
-  var_iscsi   = try(local.var_infra.iscsi, {})
-  iscsi_count = try(local.var_iscsi.iscsi_count, 0)
 
   // Locate the tfstate storage account
   saplib_subscription_id       = split("/", var.tfstate_resource_id)[2]
@@ -65,7 +52,7 @@ locals {
   tfstate_container_name       = module.sap_namegenerator.naming.resource_suffixes.tfstate
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
-  spn_key_vault_arm_id = try(var.key_vault.kv_spn_id, try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, ""))
+  spn_key_vault_arm_id = try(local.key_vault.kv_spn_id, try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, ""))
 
   deployer_subscription_id = length(local.spn_key_vault_arm_id) > 0 ? split("/", local.spn_key_vault_arm_id)[2] : ""
 
