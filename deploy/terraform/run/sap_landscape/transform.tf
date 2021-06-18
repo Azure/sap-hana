@@ -1,5 +1,11 @@
 
 locals {
+  subnet_admin_defined = (length(var.admin_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix, "")) + length(var.admin_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) > 0
+  subnet_db_defined    = (length(var.db_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix, "")) + length(var.db_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) > 0
+  subnet_app_defined   = (length(var.app_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix, "")) + length(var.app_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) > 0
+  subnet_web_defined   = (length(var.web_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix, "")) + length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
+
+
   infrastructure = {
     environment = coalesce(var.environment, try(var.infrastructure.environment, ""))
     region      = coalesce(var.location, try(var.infrastructure.region, ""))
@@ -13,7 +19,7 @@ locals {
         name          = try(coalesce(var.sap_network_name, try(var.infrastructure.vnets.sap.name, "")), "")
         arm_id        = try(coalesce(var.sap_network_arm_id, try(var.infrastructure.vnets.sap.arm_id, "")), "")
         address_space = try(coalesce(var.sap_network_address_space, try(var.infrastructure.vnets.sap.address_space, "")), "")
-        subnet_admin = {
+        subnet_admin = !local.subnet_admin_defined ? {} : {
           name   = try(coalesce(var.sap_admin_subnet_name, try(var.infrastructure.vnets.sap.subnet_admin.name, "")), "")
           arm_id = try(coalesce(var.sap_admin_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")), "")
           prefix = try(coalesce(var.sap_admin_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_admin.prefix, "")), "")
@@ -22,7 +28,7 @@ locals {
             arm_id = try(coalesce(var.sap_admin_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, "")), "")
           }
         }
-        subnet_db = {
+        subnet_db = !local.subnet_db_defined ? {} : {
           name   = try(coalesce(var.sap_db_subnet_name, try(var.infrastructure.vnets.sap.subnet_db.name, "")), "")
           arm_id = try(coalesce(var.sap_db_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")), "")
           prefix = try(coalesce(var.sap_db_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_db.prefix, "")), "")
@@ -31,7 +37,7 @@ locals {
             arm_id = try(coalesce(var.sap_db_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, "")), "")
           }
         }
-        subnet_app = {
+        subnet_app = !local.subnet_app_defined ? {} : {
           name   = try(coalesce(var.sap_app_subnet_name, try(var.infrastructure.vnets.sap.subnet_app.name, "")), "")
           arm_id = try(coalesce(var.sap_app_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")), "")
           prefix = try(coalesce(var.sap_app_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_app.prefix, "")), "")
@@ -40,7 +46,7 @@ locals {
             arm_id = try(coalesce(var.sap_app_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, "")), "")
           }
         }
-        subnet_web = {
+        subnet_web = !local.subnet_web_defined ? {} : {
           name   = try(coalesce(var.sap_web_subnet_name, try(var.infrastructure.vnets.sap.subnet_web.name, "")), "")
           arm_id = try(coalesce(var.sap_web_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")), "")
           prefix = try(coalesce(var.sap_web_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_web.prefix, "")), "")

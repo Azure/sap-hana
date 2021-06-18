@@ -50,7 +50,7 @@ output "storageaccount_name" {
   value = length(var.diagnostics_storage_account.arm_id) > 0 ? (
     data.azurerm_storage_account.storage_bootdiag[0].name) : (
     azurerm_storage_account.storage_bootdiag[0].name
-    )
+  )
 }
 
 output "storageaccount_rg_name" {
@@ -96,7 +96,7 @@ output "witness_storage_account_key" {
 
 output "admin_subnet_id" {
   value = local.sub_admin_defined ? (
-    local.sub_admin_existing ? local.sub_admin_id : azurerm_subnet.admin[0].id) : (
+    local.sub_admin_exists ? local.sub_admin_id : azurerm_subnet.admin[0].id) : (
     ""
   )
 }
@@ -110,7 +110,7 @@ output "app_subnet_id" {
 
 output "db_subnet_id" {
   value = local.sub_db_defined ? (
-    local.sub_db_existing ? local.sub_db_id : azurerm_subnet.db[0].id) : (
+    local.sub_db_exists ? local.sub_db_id : azurerm_subnet.db[0].id) : (
     ""
   )
 }
