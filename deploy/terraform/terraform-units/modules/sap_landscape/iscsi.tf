@@ -95,10 +95,10 @@ resource "azurerm_linux_virtual_machine" "iscsi" {
   }
 
   source_image_reference {
-    publisher = local.iscsi.os.publisher
-    offer     = local.iscsi.os.offer
-    sku       = local.iscsi.os.sku
-    version   = "latest"
+    publisher = try(var.infrastructure.iscsi.os.publisher, "SUSE")
+    offer     = try(var.infrastructure.iscsi.os.offer, "sles-sap-12-sp5")
+    sku       = try(var.infrastructure.iscsi.os.sku, "gen1")
+    version   = try(var.infrastructure.iscsi.os.version, "latest")
   }
 
   dynamic "admin_ssh_key" {

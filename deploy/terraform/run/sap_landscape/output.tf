@@ -100,3 +100,11 @@ output "db_nsg_id" {
 output "web_nsg_id" {
   value = module.sap_landscape.admin_nsg_id
 }
+
+# output "infrastrucure" {
+#   value = local.infrastructure
+# }
+
+# output "key_vault" {
+#   value = local.key_vault
+# }

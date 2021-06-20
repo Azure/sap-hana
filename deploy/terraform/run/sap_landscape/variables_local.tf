@@ -38,7 +38,7 @@ locals {
   environment = upper(local.infrastructure.environment)
 
   vnet_logical_name = local.infrastructure.vnets.sap.name
-  
+
   // SAP vnet
   var_infra       = try(local.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})

@@ -52,11 +52,18 @@ resource "azurerm_subnet_route_table_association" "app" {
 // Creates web subnet of SAP VNET
 resource "azurerm_subnet" "web" {
   provider             = azurerm.main
-  count                = local.sub_web_defined && !local.sub_web_existing ? 1 : 0
+  count                = local.sub_web_defined && !local.sub_web_exists ? 1 : 0
   name                 = local.sub_web_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
   address_prefixes     = [local.sub_web_prefix]
+}
+
+resource "azurerm_subnet_route_table_association" "web" {
+  provider       = azurerm.main
+  count          = local.sub_web_defined && !local.sub_web_exists && !local.vnet_sap_exists ? 1 : 0
+  subnet_id      = local.sub_web_exists ? local.sub_web_id : azurerm_subnet.web[0].id
+  route_table_id = azurerm_route_table.rt[0].id
 }
 
 
@@ -128,7 +135,7 @@ resource "azurerm_network_security_group" "web" {
 resource "azurerm_subnet_network_security_group_association" "web" {
   provider                  = azurerm.main
   count                     = local.sub_web_defined && !local.sub_web_nsg_exists ? 1 : 0
-  subnet_id                 = local.sub_web_existing ? local.sub_web_id : azurerm_subnet.web[0].id
+  subnet_id                 = local.sub_web_exists ? local.sub_web_id : azurerm_subnet.web[0].id
   network_security_group_id = azurerm_network_security_group.web[0].id
 }
 
