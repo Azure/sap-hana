@@ -66,7 +66,7 @@ variable "management_firewall_subnet_address_prefix" {
   default = ""
 }
 
-variable "deployer_sub_mgmt_nsg_name" {
+variable "management_subnet_nsg_name" {
   default = ""
 }
 

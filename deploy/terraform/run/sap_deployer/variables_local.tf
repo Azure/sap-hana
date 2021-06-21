@@ -8,7 +8,7 @@ locals {
   //There is no default as the name is mandatory unless arm_id is specified
   vnet_mgmt_name = local.vnet_mgmt_exists ? (
     split("/", local.vnet_mgmt_arm_id)[8]) : (
-    length(local.infrastructure.vnets.management.name) > 0 ? (
+    length(try(local.infrastructure.vnets.management.name, "")) > 0 ? (
       local.infrastructure.vnets.management.name) : (
       "DEP00"
     )

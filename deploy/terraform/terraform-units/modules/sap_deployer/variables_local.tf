@@ -30,15 +30,15 @@ locals {
   enable_deployer_public_ip = try(var.options.enable_deployer_public_ip, false)
 
   // Resource group and location
-  region = try(var.infrastructure.region, "")
-  prefix = length(var.infrastructure.resource_group.name) > 0 ? var.infrastructure.resource_group.name : var.naming.prefix.DEPLOYER
+  region = var.infrastructure.region
+  prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.DEPLOYER))
 
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
   rg_exists = length(local.rg_arm_id) > 0 ? true : false
   // If resource ID is specified extract the resourcegroup name from it otherwise read it either from input of create using the naming convention
   rg_name = local.rg_exists ? (
     split("/", local.rg_arm_id)[4]) : (
-    length(var.infrastructure.resource_group.name) > 0 ? (
+    length(try(var.infrastructure.resource_group.name, "")) > 0 ? (
       var.infrastructure.resource_group.name) : (
       format("%s%s", local.prefix, local.resource_suffixes.deployer_rg)
     )
@@ -55,7 +55,7 @@ locals {
   // If resource ID is specified extract the vnet name from it otherwise read it either from input of create using the naming convention
   vnet_mgmt_name = local.vnet_mgmt_exists ? (
     split("/", local.vnet_mgmt_arm_id)[8]) : (
-    length(local.vnet_mgmt.name) > 0 ? (
+    length(try(local.vnet_mgmt.name, "")) > 0 ? (
       local.vnet_mgmt.name) : (
       format("%s%s", local.prefix, local.resource_suffixes.vnet)
     )
@@ -71,7 +71,7 @@ locals {
   // If resource ID is specified extract the subnet name from it otherwise read it either from input of create using the naming convention
   sub_mgmt_name = local.sub_mgmt_exists ? (
     split("/", local.sub_mgmt_arm_id)[10]) : (
-    length(local.sub_mgmt.name) > 0 ? (
+    length(try(local.sub_mgmt.name,"")) > 0 ? (
       local.sub_mgmt.name) : (
       format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet)
   ))
@@ -87,14 +87,14 @@ locals {
   // If resource ID is specified extract the nsg name from it otherwise read it either from input of create using the naming convention
   sub_mgmt_nsg_name = local.sub_mgmt_nsg_exists ? (
     split("/", local.sub_mgmt_nsg_arm_id)[8]) : (
-    length(local.sub_mgmt_nsg.name) > 0 ? (
+    length(try(local.sub_mgmt_nsg.name, "")) > 0 ? (
       local.sub_mgmt_nsg.name) : (
       format("%s%s", local.prefix, local.resource_suffixes.deployer_subnet_nsg)
   ))
 
   sub_mgmt_nsg_allowed_ips = local.sub_mgmt_nsg_exists ? (
     []) : (
-    length(local.sub_mgmt_nsg.allowed_ips) > 0 ? (
+    length(try(local.sub_mgmt_nsg.allowed_ips, [])) > 0 ? (
       local.sub_mgmt_nsg.allowed_ips) : (
       ["0.0.0.0/0"]
     )
