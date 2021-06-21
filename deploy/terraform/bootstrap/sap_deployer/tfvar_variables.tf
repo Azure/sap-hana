@@ -66,7 +66,7 @@ variable "management_firewall_subnet_address_prefix" {
   default = ""
 }
 
-variable "deployer_sub_mgmt_nsg_name" {
+variable "management_subnet_nsg_name" {
   default = ""
 }
 
@@ -89,7 +89,7 @@ variable "vm_size" {
 }
 
 variable "vm_disk_type" {
-  default = "Premium_LRS"
+  default = ""
 }
 
 variable "use_DHCP" {
@@ -103,10 +103,10 @@ This block describes the variables for the deployer OS section block in the json
 variable "vm_image" {
   default = {
     "source_image_id" = ""
-    "publisher"       = "Canonical"
-    "offer"           = "0001-com-ubuntu-server-focal"
-    "sku"             = "20_04-lts"
-    "version"         = "latest"
+    "publisher"       = ""
+    "offer"           = ""
+    "sku"             = ""
+    "version"         = ""
   }
 }
 
@@ -190,6 +190,7 @@ variable "firewall_allowed_ipaddresses" {
   description = "List of allowed IP addresses to be part of the firewall rule"
   default = null
 }
+
 
 variable "deployer_assign_subscription_permissions" {
   default = null

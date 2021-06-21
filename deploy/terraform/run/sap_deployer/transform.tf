@@ -23,7 +23,7 @@ locals {
         publisher       = try(coalesce(var.vm_image.publisher, try(var.deployers[0].os.publisher, "")), "")
         offer           = try(coalesce(var.vm_image.offer, try(var.deployers[0].os.offer, "")), "")
         sku             = try(coalesce(var.vm_image.sku, try(var.deployers[0].os.sku, "")), "")
-        version         = try(coalesce(var.vm_image.version, try(var.deployers[0].sku, "")), "")
+        version         = try(coalesce(var.vm_image.version, try(var.deployers[0].version, "")), "latest")
       }
       private_ip_address = try(coalesce(var.private_ip_address, var.deployers[0].private_ip_address), "")
     }

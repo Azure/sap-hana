@@ -89,7 +89,7 @@ variable "vm_size" {
 }
 
 variable "vm_disk_type" {
-  default = "Premium_LRS"
+  default = ""
 }
 
 variable "use_DHCP" {
@@ -103,10 +103,10 @@ This block describes the variables for the deployer OS section block in the json
 variable "vm_image" {
   default = {
     "source_image_id" = ""
-    "publisher"       = "Canonical"
-    "offer"           = "0001-com-ubuntu-server-focal"
-    "sku"             = "20_04-lts"
-    "version"         = "latest"
+    "publisher"       = ""
+    "offer"           = ""
+    "sku"             = ""
+    "version"         = ""
   }
 }
 
