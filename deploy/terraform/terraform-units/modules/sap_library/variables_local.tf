@@ -28,7 +28,7 @@ locals {
 
   // Region
   region = try(local.var_infra.region, "")
-  prefix = length(local.var_infra.resource_group.name) > 0 ? local.var_infra.resource_group.name : trimspace(var.naming.prefix.LIBRARY)
+  prefix = try(local.var_infra.resource_group.name, trimspace(var.naming.prefix.LIBRARY))
 
   // Resource group
   rg_arm_id = try(var.infrastructure.resource_group.arm_id, "")
@@ -36,7 +36,7 @@ locals {
 
   rg_name = local.rg_exists ? (
     try(split("/", local.rg_arm_id)[4], "")) : (
-    length(local.var_infra.resource_group.name) > 0 ? (
+    length(try(local.var_infra.resource_group.name, "")) > 0 ? (
       local.var_infra.resource_group.name) : (
       format("%s%s", local.prefix, local.resource_suffixes.library_rg)
     )
@@ -61,7 +61,7 @@ locals {
   sa_sapbits_blob_container_enable = try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, true)
   sa_sapbits_blob_container_exists = try(var.storage_account_sapbits.sapbits_blob_container.is_existing, false)
   sa_sapbits_blob_container_name   = try(var.storage_account_sapbits.sapbits_blob_container.name, local.resource_suffixes.sapbits)
-  sa_sapbits_container_access_type = "private"
+  sa_sapbits_container_access_type = "container"
 
   // Storage account for tfstate
   sa_tfstate_arm_id                   = try(var.storage_account_tfstate.arm_id, "")
