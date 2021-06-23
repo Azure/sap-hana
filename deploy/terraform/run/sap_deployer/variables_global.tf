@@ -73,33 +73,12 @@ variable "authentication" {
     path_to_private_key = ""
 
   }
-
-  validation {
-    condition = (
-      length(var.authentication) >= 1
-    )
-    error_message = "Either ssh keys or user credentials must be specified."
-  }
-  validation {
-    condition = (
-      length(trimspace(var.authentication.username)) != 0
-    )
-    error_message = "The default username for the Virtual machines must be specified."
-  }
 }
 
 variable "key_vault" {
   description = "Import existing Azure Key Vaults"
   default     = {}
-  validation {
-    condition = (
-      contains(keys(var.key_vault), "kv_spn_id") ? (
-        length(split("/", var.key_vault.kv_spn_id)) == 9) : (
-        true
-      )
-    )
-    error_message = "If specified, the kv_spn_id needs to be a correctly formed Azure resource ID."
-  }
+
 }
 variable "assign_subscription_permissions" {
   description = "Assign permissions on the subscription"
