@@ -76,6 +76,14 @@ resource "azurerm_resource_group" "deployer" {
   count    = local.enable_deployers && !local.rg_exists ? 1 : 0
   name     = local.rg_name
   location = local.region
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      tags,
+    ]
+  }
 }
 
 data "azurerm_resource_group" "deployer" {
