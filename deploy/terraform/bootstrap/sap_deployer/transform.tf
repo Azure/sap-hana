@@ -68,14 +68,13 @@ locals {
     { "name" = try(coalesce(var.management_subnet_name, try(var.infrastructure.vnets.management.subnet_mgmt.name, "")), "") }), (
     { "arm_id" = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "") }), (
     { "prefix" = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "") }), (
-    { "nsg" = var.infrastructure.vnets.management.subnet_mgmt.nsg }
-    # local.subnet_mgmt_nsg_defined ? ({ "nsg" = {
-    #   "name"        = try(coalesce(var.management_subnet_nsg_name, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")), "")
-    #   "arm_id"      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, "")), "")
-    #   "allowed_ips" = try(concat(var.management_subnet_nsg_allowed_ips, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, "")), [])
+    { "nsg" =  {
+      "name"        = try(coalesce(var.management_subnet_nsg_name, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")), "")
+      "arm_id"      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, "")), "")
+      "allowed_ips" = concat(var.management_subnet_nsg_allowed_ips, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, []))
 
-    #   }
-    # }) : null
+      }
+     } #) : null
     )
   )
 
