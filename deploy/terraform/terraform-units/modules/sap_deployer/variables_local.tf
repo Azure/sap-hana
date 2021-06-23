@@ -96,7 +96,7 @@ locals {
     []) : (
     length(try(local.sub_mgmt_nsg.allowed_ips, [])) > 0 ? (
       local.sub_mgmt_nsg.allowed_ips) : (
-      ["0.0.0.0/0"]
+      local.sub_mgmt_deployed.address_prefixes
     )
   )
   sub_mgmt_nsg_deployed = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0] : azurerm_network_security_group.nsg_mgmt[0]
