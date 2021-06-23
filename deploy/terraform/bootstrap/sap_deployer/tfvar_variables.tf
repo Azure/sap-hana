@@ -93,7 +93,7 @@ variable "vm_disk_type" {
 }
 
 variable "use_DHCP" {
-  default = null
+  default = false
 }
 
 /*
@@ -173,7 +173,7 @@ This block describes the variables for the options section block in the json fil
 */
 
 variable "enable_deployer_public_ip" {
-  default = false
+  default = true
 }
 
 variable "firewall_deployment" {
