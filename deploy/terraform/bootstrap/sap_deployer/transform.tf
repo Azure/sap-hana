@@ -74,7 +74,7 @@ locals {
       "allowed_ips" = concat(var.management_subnet_nsg_allowed_ips, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, []))
 
       }
-     } #) : null
+     } 
     )
   )
 
