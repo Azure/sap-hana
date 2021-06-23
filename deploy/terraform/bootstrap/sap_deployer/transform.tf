@@ -2,7 +2,7 @@
 locals {
 
   subnet_mgmt_defined     = (length(var.management_subnet_address_prefix) + length(try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")) + length(var.management_subnet_arm_id) + length(try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, ""))) > 0
-  subnet_mgmt_nsg_defined = (length(var.management_subnet_nsg_name) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")) + length(var.management_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, ""))) + length(var.management_subnet_nsg_allowed_ips) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips,[]))> 0
+  subnet_mgmt_nsg_defined = (length(var.management_subnet_nsg_name) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")) + length(var.management_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, ""))) + length(var.management_subnet_nsg_allowed_ips) + length(try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, [])) > 0
 
   infrastructure_temp = {
     environment = coalesce(var.environment, try(var.infrastructure.environment, ""))
@@ -64,20 +64,20 @@ locals {
   assign_subscription_permissions = try(var.assign_subscription_permissions, true)
 
 
-  subnet_mgmt = var.infrastructure.vnets.management.subnet_mgmt
-  # merge((
-  #   { "name" = try(coalesce(var.management_subnet_name, try(var.infrastructure.vnets.management.subnet_mgmt.name, "")), "") }), (
-  #   { "arm_id" = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "") }), (
-  #   { "prefix" = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "") }), (
-  #   local.subnet_mgmt_nsg_defined ? ({ "nsg" = {
-  #     "name"        = try(coalesce(var.management_subnet_nsg_name, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")), "")
-  #     "arm_id"      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, "")), "")
-  #     "allowed_ips" = try(concat(var.management_subnet_nsg_allowed_ips, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, "")), [])
+  subnet_mgmt = merge((
+    { "name" = try(coalesce(var.management_subnet_name, try(var.infrastructure.vnets.management.subnet_mgmt.name, "")), "") }), (
+    { "arm_id" = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "") }), (
+    { "prefix" = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "") }), (
+    { "nsg" = var.infrastructure.vnets.management.subnet_mgmt.nsg }
+    # local.subnet_mgmt_nsg_defined ? ({ "nsg" = {
+    #   "name"        = try(coalesce(var.management_subnet_nsg_name, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.name, "")), "")
+    #   "arm_id"      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.arm_id, "")), "")
+    #   "allowed_ips" = try(concat(var.management_subnet_nsg_allowed_ips, try(var.infrastructure.vnets.management.subnet_mgmt.nsg.allowed_ips, "")), [])
 
-  #     }
-  #   }) : null
-  #   )
-  # )
+    #   }
+    # }) : null
+    )
+  )
 
   vnets = {
   }
