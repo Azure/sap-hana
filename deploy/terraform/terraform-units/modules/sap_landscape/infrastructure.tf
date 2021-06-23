@@ -9,6 +9,14 @@ resource "azurerm_resource_group" "resource_group" {
   count    = local.rg_exists ? 0 : 1
   name     = local.rg_name
   location = local.region
+  
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to tags, e.g. because a management agent
+      # updates these based on some ruleset managed elsewhere.
+      tags,
+    ]
+  }
 }
 
 // Imports data of existing resource group
