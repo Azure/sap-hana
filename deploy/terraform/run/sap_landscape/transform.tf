@@ -139,19 +139,19 @@ locals {
 
   iscsi = {
     iscsi_count = max(var.iscsi_count, try(var.infrastructure.iscsi.iscsi_count, 0))
-    use_DHCP    = try(coalesce(var.iscsi_use_DHCP, try(var.infrastructure.iscsi.use_DHCP, false)), "")
-    size        = try(coalesce(var.iscsi_size, try(var.infrastructure.iscsi.size, "Standard_D2s_v3")), "Standard_D2s_v3")
+    use_DHCP    = var.iscsi_use_DHCP || try(var.infrastructure.iscsi.use_DHCP, false)
+    size        = coalesce(var.iscsi_size, try(var.infrastructure.iscsi.size, "Standard_D2s_v3"))
     os = {
       source_image_id = try(coalesce(var.iscsi_vm_image.source_image_id, try(var.infrastructure.iscsi.os.source_image_id, "")), "")
       publisher       = try(coalesce(var.iscsi_vm_image.publisher, try(var.infrastructure.iscsi.os.publisher, "")), "")
       offer           = try(coalesce(var.iscsi_vm_image.offer, try(var.infrastructure.iscsi.os.offer, "")), "")
       sku             = try(coalesce(var.iscsi_vm_image.sku, try(var.infrastructure.iscsi.os.sku, "")), "")
-      version         = try(coalesce(var.iscsi_vm_image.version, try(var.infrastructure.iscsi.sku, "")), "")
+      version         = try(coalesce(var.iscsi_vm_image.version, try(var.infrastructure.iscsi.os.version, "")), "")
     }
 
     authentication = {
-      type     = try(coalesce(var.iscsi_authentication_type, try(var.infrastructure.iscsi.authentication.type, "key")), "key")
-      username = try(coalesce(var.iscsi_authentication_username, try(var.authentication.username, "azureadm")), "azureadm")
+      type     = coalesce(var.iscsi_authentication_type, try(var.infrastructure.iscsi.authentication.type, "key"))
+      username = coalesce(var.iscsi_authentication_username, try(var.authentication.username, "azureadm"))
     }
   }
 
