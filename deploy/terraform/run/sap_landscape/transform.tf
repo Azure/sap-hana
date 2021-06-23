@@ -12,7 +12,7 @@ locals {
   subnet_web_defined     = (length(var.web_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix, "")) + length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
   subnet_web_nsg_defined = (length(var.web_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.name, "")) + length(var.web_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, ""))) > 0
 
-  subnet_iscsi_defined     = (length(var.iscsi_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.iscsi.prefix, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.iscsi.arm_id, ""))) > 0
+  subnet_iscsi_defined     = (length(var.iscsi_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
   subnet_iscsi_nsg_defined = (length(var.iscsi_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, ""))) > 0
 
   resource_group = {
