@@ -163,10 +163,10 @@ locals {
       "use_DHCP"             = try(deployer.use_DHCP, false)
       "os" = {
         "source_image_id" = try(deployer.os.source_image_id, "")
-        "publisher"       = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.publisher, "Canonical") : ""
-        "offer"           = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.offer, "0001-com-ubuntu-server-focal") : ""
-        "sku"             = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.sku, "20_04-lts") : ""
-        "version"         = try(deployer.os.source_image_id, "") == "" ? try(deployer.os.version, "latest") : ""
+        "publisher"       = try(deployer.os.source_image_id, "") == "" ? length(deployer.os.publisher) > 0 ? deployer.os.publisher : "Canonical" : ""
+        "offer"           = try(deployer.os.source_image_id, "") == "" ? length(deployer.os.offer) > 0 ? deployer.os.offer : "0001-com-ubuntu-server-focal" : ""
+        "sku"             = try(deployer.os.source_image_id, "") == "" ? length(deployer.os.sku) > 0 ? deployer.os.sku: "20_04-lts" : ""
+        "version"         = try(deployer.os.source_image_id, "") == "" ? length(deployer.os.version) > 0 ? deployer.os.version : "latest" : ""
       },
       "authentication" = {
         "type"     = try(deployer.authentication.type, "key")
