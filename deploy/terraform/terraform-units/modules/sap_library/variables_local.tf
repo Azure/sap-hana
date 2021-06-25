@@ -61,7 +61,7 @@ locals {
   sa_sapbits_blob_container_enable = try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, true)
   sa_sapbits_blob_container_exists = try(var.storage_account_sapbits.sapbits_blob_container.is_existing, false)
   sa_sapbits_blob_container_name   = try(var.storage_account_sapbits.sapbits_blob_container.name, local.resource_suffixes.sapbits)
-  sa_sapbits_container_access_type = "container"
+  sa_sapbits_container_access_type = "private"
 
   // Storage account for tfstate
   sa_tfstate_arm_id                   = try(var.storage_account_tfstate.arm_id, "")
