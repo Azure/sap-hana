@@ -27,7 +27,8 @@ resource "azurerm_key_vault" "kv_prvt" {
 
   lifecycle {
     ignore_changes = [
-      soft_delete_enabled
+      soft_delete_enabled,
+      access_policy
     ]
   }
 
@@ -72,7 +73,9 @@ resource "azurerm_key_vault" "kv_user" {
 
   lifecycle {
     ignore_changes = [
-      soft_delete_enabled
+      soft_delete_enabled,
+      access_policy
+
     ]
   }
 }
@@ -292,4 +295,11 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
     "Get",
     "List"
   ]
+
+  lifecycle {
+    ignore_changes = [
+      object_id
+
+    ]
+  }
 }
