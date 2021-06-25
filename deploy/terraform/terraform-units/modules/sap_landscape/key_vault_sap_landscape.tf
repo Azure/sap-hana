@@ -27,8 +27,7 @@ resource "azurerm_key_vault" "kv_prvt" {
 
   lifecycle {
     ignore_changes = [
-      soft_delete_enabled,
-      access_policy
+      soft_delete_enabled
     ]
   }
 
@@ -73,11 +72,32 @@ resource "azurerm_key_vault" "kv_user" {
 
   lifecycle {
     ignore_changes = [
-      soft_delete_enabled,
-      access_policy
-
+      soft_delete_enabled
     ]
   }
+}
+
+resource "azurerm_key_vault_access_policy" "kv_user_msi" {
+  provider = azurerm.main
+  count = local.user_kv_exist ? (
+    0) : (
+    length(var.deployer_tfstate) > 0 ? (
+      length(var.deployer_tfstate.deployer_uai) >= 2 ? (
+        1) : (
+        0
+      )) : (
+      0
+    )
+  )
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+
+  tenant_id = var.deployer_tfstate.deployer_uai.tenant_id
+  object_id = var.deployer_tfstate.deployer_uai.principal_id
+
+  secret_permissions = [
+    "Get",
+    "List"
+  ]
 }
 
 // Import an existing user Key Vault
@@ -274,32 +294,3 @@ resource "azurerm_key_vault_secret" "witness_name" {
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
-resource "azurerm_key_vault_access_policy" "kv_user_msi" {
-  provider = azurerm.main
-  count = local.user_kv_exist ? (
-    0) : (
-    length(var.deployer_tfstate) > 0 ? (
-      length(var.deployer_tfstate.deployer_uai) == 2 ? (
-        1) : (
-        0
-      )) : (
-      0
-    )
-  )
-  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
-
-  tenant_id = var.deployer_tfstate.deployer_uai.tenant_id
-  object_id = var.deployer_tfstate.deployer_uai.principal_id
-
-  secret_permissions = [
-    "Get",
-    "List"
-  ]
-
-  lifecycle {
-    ignore_changes = [
-      object_id
-
-    ]
-  }
-}
