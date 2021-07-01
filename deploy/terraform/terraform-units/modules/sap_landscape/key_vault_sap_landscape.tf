@@ -135,7 +135,7 @@ resource "random_password" "iscsi_password" {
     local.enable_landscape_kv
     && local.enable_iscsi_auth_password
     && !local.iscsi_pwd_exist
-  && try(local.var_iscsi.authentication.password, null) == null) ? 1 : 0
+  && try(var.authentication.password, null) == null) ? 1 : 0
 
   length           = 32
   min_upper        = 2
@@ -257,7 +257,7 @@ data "azurerm_key_vault_secret" "sid_password" {
 resource "azurerm_key_vault_secret" "witness_access_key" {
   provider     = azurerm.main
   count        = 1
-  name         = format("%s-%s", local.vnet_prefix, "witness-accesskey")
+  name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.witness_accesskey),"/[^A-Za-z0-9-]/","")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].primary_access_key : azurerm_storage_account.witness_storage[0].primary_access_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
@@ -266,11 +266,10 @@ resource "azurerm_key_vault_secret" "witness_access_key" {
 resource "azurerm_key_vault_secret" "witness_name" {
   provider     = azurerm.main
   count        = 1
-  name         = format("%s-%s", local.vnet_prefix, "witness-name")
+  name         = replace(format("%s%s%s", local.prefix,  var.naming.separator, local.resource_suffixes.witness_name),"/[^A-Za-z0-9-]/","")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].name : azurerm_storage_account.witness_storage[0].name
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
-
 
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
   provider = azurerm.main

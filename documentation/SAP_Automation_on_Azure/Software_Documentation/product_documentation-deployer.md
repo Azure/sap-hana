@@ -8,7 +8,7 @@ The deployment environment provides the following services
 2. Azure Keyvault, this keyvault will containg the Service Principal details and will be used by the Terraform deployments
 3. Azure Firewall, this optional component is used to provide outbound Internet connectivity.
 
-![SAP Deployment Automation Framework - Deployer](../../images/deployer.png)
+![SAP Deployment Automation Framework - Deployer](../../images/Deployer.png)
 
 ## Deployer VM ##
 

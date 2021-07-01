@@ -1900,158 +1900,157 @@ Licensed under the MIT license.
         $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
     }
-}
 
 
-if ($null -eq $tfstate_resource_id -or "" -eq $tfstate_resource_id) {
-    $rID = Get-AzResource -Name $saName 
-    $rgName = $rID.ResourceGroupName
-    $tfstate_resource_id = $rID.ResourceId
-    $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
-    $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
-    Out-IniFile -InputObject $iniContent -Path $fileINIPath
-}
+    if ($null -eq $tfstate_resource_id -or "" -eq $tfstate_resource_id) {
+        $rID = Get-AzResource -Name $saName 
+        $rgName = $rID.ResourceGroupName
+        $tfstate_resource_id = $rID.ResourceId
+        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
+        $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
+        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+    }
 
 
-$terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
-$Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
 
-Write-Host -ForegroundColor green "Initializing Terraform"
+    Write-Host -ForegroundColor green "Initializing Terraform"
 
-$Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
-if (Test-Path ".terraform" -PathType Container) {
-    if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
+    $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
+    if (Test-Path ".terraform" -PathType Container) {
+        if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
 
-        $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
+            $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
 
-        if ("azurerm" -eq $jsonData.backend.type) {
-            $Command = " init -upgrade=true"
+            if ("azurerm" -eq $jsonData.backend.type) {
+                $Command = " init -upgrade=true"
 
-            $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
-            if ("Y" -ne $ans) {
-                $Env:TF_DATA_DIR = $null
-                return
+                $ans = Read-Host -Prompt ".terraform already exists, do you want to continue Y/N?"
+                if ("Y" -ne $ans) {
+                    $Env:TF_DATA_DIR = $null
+                    return
+                }
             }
         }
-    }
-} 
+    } 
 
-$Cmd = "terraform -chdir=$terraform_module_directory $Command"
-Add-Content -Path "deployment.log" -Value $Cmd
-Write-Verbose $Cmd
-
-& ([ScriptBlock]::Create($Cmd)) 
-if ($LASTEXITCODE -ne 0) {
-    $Env:TF_DATA_DIR = $null
-    throw "Error executing command: $Cmd"
-}
-
-$deployer_tfstate_key_parameter = ""
-$tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
-if ($Deployerstatefile.Length -gt 0) {
-    $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $Deployerstatefile
-}
-else {
-    if ($deployer_tfstate_key.Length -gt 0) {
-        $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
-    }
-}
-    
-$Command = " output automation_version"
-
-$Cmd = "terraform -chdir=$terraform_module_directory $Command"
-Add-Content -Path "deployment.log" -Value $Cmd
-Write-Verbose $Cmd
-
-$versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
-
-if ("" -eq $versionLabel) {
-    Write-Host ""
-    Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
-    Write-Host ""
-    Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
-    Write-Host ""
-    Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
-    Write-Host ""
-    if ($PSCmdlet.ShouldProcess($Parameterfile)) {
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -eq $ans) {
-    
-        }
-        else {
-            $Env:TF_DATA_DIR = $null
-            return 
-        }
-    }
-}
-else {
-    Write-Host ""
-    Write-Host -ForegroundColor green "The environment was deployed using the $versionLabel version of the Terrafrom templates"
-    Write-Host ""
-    Write-Host ""
-}
-
-Write-Host -ForegroundColor green "Running plan, please wait"
-$Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-
-$Cmd = "terraform -chdir=$terraform_module_directory $Command"
-Add-Content -Path "deployment.log" -Value $Cmd
-Write-Verbose $Cmd
-        
-$planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
-    
-if ($LASTEXITCODE -ne 0) {
-    $Env:TF_DATA_DIR = $null
-    throw "Error executing command: $Cmd"
-}
-
-$planResultsPlain = $planResults -replace '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', ''
-
-if ( $planResultsPlain.Contains('Infrastructure is up-to-date')) {
-    Write-Host ""
-    Write-Host -ForegroundColor Green "Infrastructure is up to date"
-    Write-Host ""
-    $Env:TF_DATA_DIR = $null
-    return;
-}
-
-Write-Host $planResults
-if (-not $planResultsPlain.Contains('0 to change, 0 to destroy') ) {
-    Write-Host ""
-    Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
-    Write-Host ""
-    Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
-    Write-Host ""
-    if ($PSCmdlet.ShouldProcess($Parameterfile)) {
-        $ans = Read-Host -Prompt "Do you want to continue Y/N?"
-        if ("Y" -ne $ans) {
-            $Env:TF_DATA_DIR = $null
-            return 
-        }
-    }
-}
-
-if ($PSCmdlet.ShouldProcess($Parameterfile)) {
-    Write-Host -ForegroundColor green "Running apply"
-    if ($Silent) {
-        $Command = " apply --auto-approve -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-    }
-    else {
-        $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-    }
-        
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
     Write-Verbose $Cmd
 
-    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
-    & ([ScriptBlock]::Create($Cmd))  
+    & ([ScriptBlock]::Create($Cmd)) 
     if ($LASTEXITCODE -ne 0) {
         $Env:TF_DATA_DIR = $null
         throw "Error executing command: $Cmd"
     }
-}
+
+    $deployer_tfstate_key_parameter = ""
+    $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
+    if ($Deployerstatefile.Length -gt 0) {
+        $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $Deployerstatefile
+    }
+    else {
+        if ($deployer_tfstate_key.Length -gt 0) {
+            $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
+        }
+    }
     
-$Env:TF_DATA_DIR = $null
+    $Command = " output automation_version"
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+
+    $versionLabel = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+
+    if ("" -eq $versionLabel) {
+        Write-Host ""
+        Write-Host -ForegroundColor red "The environment was deployed using an older version of the Terrafrom templates"
+        Write-Host ""
+        Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
+        Write-Host ""
+        Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
+        Write-Host ""
+        if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -eq $ans) {
+    
+            }
+            else {
+                $Env:TF_DATA_DIR = $null
+                return 
+            }
+        }
+    }
+    else {
+        Write-Host ""
+        Write-Host -ForegroundColor green "The environment was deployed using the $versionLabel version of the Terrafrom templates"
+        Write-Host ""
+        Write-Host ""
+    }
+
+    Write-Host -ForegroundColor green "Running plan, please wait"
+    $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+        
+    $planResults = & ([ScriptBlock]::Create($Cmd)) | Out-String 
+    
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+    $planResultsPlain = $planResults -replace '\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]', ''
+
+    if ( $planResultsPlain.Contains('Infrastructure is up-to-date')) {
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Infrastructure is up to date"
+        Write-Host ""
+        $Env:TF_DATA_DIR = $null
+        return;
+    }
+
+    Write-Host $planResults
+    if (-not $planResultsPlain.Contains('0 to change, 0 to destroy') ) {
+        Write-Host ""
+        Write-Host -ForegroundColor red "!!! Risk for Data loss !!!"
+        Write-Host ""
+        Write-Host -ForegroundColor red "Please inspect the output of Terraform plan carefully before proceeding" 
+        Write-Host ""
+        if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+            $ans = Read-Host -Prompt "Do you want to continue Y/N?"
+            if ("Y" -ne $ans) {
+                $Env:TF_DATA_DIR = $null
+                return 
+            }
+        }
+    }
+
+    if ($PSCmdlet.ShouldProcess($Parameterfile)) {
+        Write-Host -ForegroundColor green "Running apply"
+        if ($Silent) {
+            $Command = " apply --auto-approve -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        }
+        else {
+            $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+        }
+        
+        Add-Content -Path "deployment.log" -Value $Cmd
+        Write-Verbose $Cmd
+
+        $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+        & ([ScriptBlock]::Create($Cmd))  
+        if ($LASTEXITCODE -ne 0) {
+            $Env:TF_DATA_DIR = $null
+            throw "Error executing command: $Cmd"
+        }
+    }
+    
+    $Env:TF_DATA_DIR = $null
 }
 function Read-KVNode {
     param(
