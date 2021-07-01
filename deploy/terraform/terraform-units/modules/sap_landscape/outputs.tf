@@ -96,28 +96,28 @@ output "witness_storage_account_key" {
 
 output "admin_subnet_id" {
   value = local.sub_admin_defined ? (
-    local.sub_admin_exists ? local.sub_admin_id : azurerm_subnet.admin[0].id) : (
+    local.sub_admin_existing ? local.sub_admin_id : azurerm_subnet.admin[0].id) : (
     ""
   )
 }
 
 output "app_subnet_id" {
   value = local.sub_app_defined ? (
-    local.sub_app_exists ? local.sub_app_id : azurerm_subnet.app[0].id) : (
+    local.sub_app_existing ? local.sub_app_id : azurerm_subnet.app[0].id) : (
     ""
   )
 }
 
 output "db_subnet_id" {
   value = local.sub_db_defined ? (
-    local.sub_db_exists ? local.sub_db_id : azurerm_subnet.db[0].id) : (
+    local.sub_db_existing ? local.sub_db_id : azurerm_subnet.db[0].id) : (
     ""
   )
 }
 
 output "web_subnet_id" {
   value = local.sub_web_defined ? (
-    local.sub_web_exists ? local.sub_web_id : azurerm_subnet.web[0].id) : (
+    local.sub_web_existing ? local.sub_web_id : azurerm_subnet.web[0].id) : (
     ""
   )
 }

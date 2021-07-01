@@ -42,10 +42,10 @@ variable "witness_storage_account" {
 
 variable "deployment" {
   description = "The type of deployment"
-  default     = "update"
+  default = "update"
 }
 
 variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
-  default     = ""
+  default = ""
 }

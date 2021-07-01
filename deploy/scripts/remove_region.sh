@@ -147,19 +147,8 @@ if [ ! -n "${az}" ]; then
 fi
 
 # Helper variables
-ext=$(echo ${deployer_parameter_file} | cut -d. -f2)
-
-# Helper variables
-if [ "${ext}" == json ]; then
-    environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
-    region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
-else
-
-    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "environment"
-    load_config_vars "${root_dirname}"/"${deployer_parameter_file}" "location"
-    region=$(echo ${location} | xargs)
-fi
-
+environment=$(jq --raw-output .infrastructure.environment "${deployer_parameter_file}")
+region=$(jq --raw-output .infrastructure.region "${deployer_parameter_file}")
 key=$(echo "${deployer_parameter_file}" | cut -d. -f1)
 
 if [ ! -n "${environment}" ]
@@ -293,27 +282,23 @@ relative_path="${curdir}"/"${deployer_dirname}"
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
-temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
-if [ -z "${temp}" ]
-then
-    #Reinitialize
+#Reinitialize
 
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                          Running Terraform init (deployer)                            #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
+echo ""
+echo "#########################################################################################"
+echo "#                                                                                       #"
+echo "#                          Running Terraform init (deployer)                            #"
+echo "#                                                                                       #"
+echo "#########################################################################################"
+echo ""
 
-    terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
-    --backend-config "subscription_id=${subscription}" \
-    --backend-config "resource_group_name=${resource_group}" \
-    --backend-config "storage_account_name=${storage_account}" \
-    --backend-config "container_name=tfstate" \
-    --backend-config "key=${key}.terraform.tfstate"
+terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+--backend-config "subscription_id=${subscription}" \
+--backend-config "resource_group_name=${resource_group}" \
+--backend-config "storage_account_name=${storage_account}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
 
-fi
 
 #Initialize the statefile and copy to local
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_deployer/
@@ -345,26 +330,21 @@ export TF_DATA_DIR="${param_dirname}/.terraform"
 
 key=$(echo "${library_file_parametername}" | cut -d. -f1)
 
-temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
-if [ -z "${temp}" ]
-then
-    echo ""
-    echo "#########################################################################################"
-    echo "#                                                                                       #"
-    echo "#                             Running Terraform init (library)                          #"
-    echo "#                                                                                       #"
-    echo "#########################################################################################"
-    echo ""
+echo ""
+echo "#########################################################################################"
+echo "#                                                                                       #"
+echo "#                             Running Terraform init (library)                          #"
+echo "#                                                                                       #"
+echo "#########################################################################################"
+echo ""
 
 
-    terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
-    --backend-config "subscription_id=${subscription}" \
-    --backend-config "resource_group_name=${resource_group}" \
-    --backend-config "storage_account_name=${storage_account}" \
-    --backend-config "container_name=tfstate" \
-    --backend-config "key=${key}.terraform.tfstate"
-
-fi
+terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+--backend-config "subscription_id=${subscription}" \
+--backend-config "resource_group_name=${resource_group}" \
+--backend-config "storage_account_name=${storage_account}" \
+--backend-config "container_name=tfstate" \
+--backend-config "key=${key}.terraform.tfstate"
 
 echo ""
 echo "#########################################################################################"

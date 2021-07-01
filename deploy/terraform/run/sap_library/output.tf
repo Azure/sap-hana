@@ -61,7 +61,7 @@ output "saplibrary_environment" {
 
 output "saplibrary_subscription_id" {
   sensitive = true
-  value     = local.saplib_subscription_id
+  value = local.saplib_subscription_id
 }
 
 output "tfstate_resource_id" {
