@@ -19,6 +19,16 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "dns_label" {
+  description = "DNS label"
+  default = ""
+}
+
+variable "dns_resource_group_name" {
+  description = "DNS resource group name"
+  default = ""
+}
+
 locals {
   // Resources naming
   storageaccount_name         = var.naming.storageaccount_names.VNET.landscape_storageaccount_name
