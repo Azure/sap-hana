@@ -107,3 +107,8 @@ variable "terraform_template_version" {
   default = ""
 }
 
+resource "azurerm_private_dns_zone" "vnet_mgmt" {
+  count               = length(var.dns_label) > 0 ? 1 : 0
+  name                = var.dns_label
+  resource_group_name = local.rg_name
+}

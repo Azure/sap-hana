@@ -4,3 +4,4 @@ variable "storage_account_tfstate" {}
 variable "software" {}
 variable "deployer" {}
 variable "key_vault" {}
+variable "dns_label" {}
