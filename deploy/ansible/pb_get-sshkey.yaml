@@ -1,0 +1,63 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                   Playbook for retrieving the sshkey                       |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+- hosts: localhost
+  gather_facts: false
+  tags:
+  - always
+
+
+  tasks:
+  - name: Load the SAP parameters
+    include_vars: "{{ _workspace_directory }}/sap-parameters.yaml"
+
+
+  - name: Construct SSH key secret name
+    set_fact:
+      secret_name: "{{ secret_prefix }}-sid-sshkey"
+
+
+  - name: Retrieve SSH Key secret details
+    command: >-
+      az keyvault secret show
+        --vault-name {{ kv_uri }}
+        --name {{ secret_name }}
+    changed_when: false
+    register: keyvault_secret_show
+    no_log: true
+
+
+  - name: Extract SSH Key content from secret details
+    set_fact:
+      sshkey_content: >-
+        {{ (keyvault_secret_show.stdout | from_json).value }}
+    no_log: true
+
+
+  - name: Determine SSH key file name
+    set_fact:
+      sshkey_file: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY_FILE') | default('sshkey', True) }}"
+
+
+  - name: Determine SSH key file path
+    set_fact:
+      sshkey_path: >-
+        {{ sshkey_file is abs |
+           ternary(sshkey_file,
+                   (_workspace_directory, sshkey_file) | join('/')) }}
+
+
+  - name: Write out SSH Key content as sshkey file
+    copy:
+      dest: "{{ sshkey_path }}"
+      content: "{{ sshkey_content }}"
+      mode: "0600"
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                     |
+# +------------------------------------4--------------------------------------*/

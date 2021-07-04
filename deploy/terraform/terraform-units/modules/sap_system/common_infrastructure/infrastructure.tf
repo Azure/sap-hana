@@ -115,35 +115,6 @@ data "azurerm_proximity_placement_group" "ppg" {
   resource_group_name = split("/", local.ppg_arm_ids[count.index])[4]
 }
 
-# FIREWALL
-
-resource "random_integer" "db_priority" {
-  min = 2000
-  max = 2999
-  keepers = {
-    # Generate a new ID only when a new resource group is defined
-    resource_group = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
-  }
-}
-
-
-# Create a Azure Firewall Network Rule for Azure Management API
-resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
-  provider            = azurerm.deployer
-  count               = local.firewall_exists && local.sub_db_defined && !local.sub_db_exists ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.firewall_rule_db)
-  azure_firewall_name = local.firewall_name
-  resource_group_name = local.firewall_rgname
-  priority            = random_integer.db_priority.result
-  action              = "Allow"
-  rule {
-    name                  = "Azure-Cloud"
-    source_addresses      = [local.sub_admin_prefix, local.sub_db_prefix]
-    destination_ports     = ["*"]
-    destination_addresses = [local.firewall_service_tags]
-    protocols             = ["Any"]
-  }
-}
 
 //ASG
 
@@ -159,5 +130,18 @@ resource "azurerm_application_security_group" "db" {
   )
 
   location = local.nsg_asg_with_vnet ? (local.vnet_sap_resource_group_location) : (local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location)
+}
+
+// Define a cloud-init config that disables the automatic expansion
+// of the root partition.
+data "template_cloudinit_config" "config_growpart" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    content_type = "text/cloud-config"
+    content      = "growpart: {'mode': 'auto'}"
+  }
 }
 

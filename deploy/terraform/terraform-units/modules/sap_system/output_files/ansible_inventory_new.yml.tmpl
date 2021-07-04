@@ -4,6 +4,7 @@ ${sid}_DB:
 %{~ for idx,ips_dbnode in ips_dbnodes }
     ${dbnodes[idx].name}:
       ansible_host        : ${ips_dbnode}
+      ansible_user        : ${ansible_user}
       ansible_connection  : ${dbconnection} 
       connection_type     : ${dbconnectiontype} 
 %{~ endfor }
@@ -15,17 +16,32 @@ ${sid}_SCS:
 %{~ for idx,ip_scs in ips_scs }
     ${scsservers[idx]}:
       ansible_host        : ${ip_scs}
+      ansible_user        : ${ansible_user}
       ansible_connection  : ${scsconnection} 
       connection_type     : ${scsconnectiontype} 
 %{~ endfor }
   vars:
     node_tier             : scs
 
+${sid}_ERS:
+  hosts:
+%{~ for idx,ip_ers in ips_ers }
+    ${ersservers[idx]}:
+      ansible_host        : ${ip_ers}
+      ansible_user        : ${ansible_user}
+      ansible_connection  : ${ersconnection} 
+      connection_type     : ${ersconnectiontype} 
+%{~ endfor }
+  vars:
+    node_tier             : ers
+
+
 ${sid}_PAS:
   hosts:
 %{~ for idx,ip_pas in ips_pas }
     ${passervers[idx]}:
       ansible_host        : ${ip_pas}
+      ansible_user        : ${ansible_user}
       ansible_connection  : ${scsconnection} 
       connection_type     : ${scsconnectiontype} 
 
@@ -38,6 +54,7 @@ ${sid}_APP:
 %{~ for idx,ip_app in ips_app }
     ${appservers[idx]}:
       ansible_host        : ${ip_app}
+      ansible_user        : ${ansible_user}
       ansible_connection  : ${appconnection} 
       connection_type     : ${appconnectiontype} 
 
@@ -50,6 +67,7 @@ ${sid}_WEB:
 %{~ for idx,ip_web in ips_web }
     ${webservers[idx]}:
       ansible_host        : ${ip_web}
+      ansible_user        : ${ansible_user}
       ansible_connection  : ${webconnection} 
       connection_type     : ${webconnectiontype} 
 

@@ -183,7 +183,11 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
+<<<<<<< HEAD
     echo "#              The file needs to contain the environment attribute!!                    #"
+=======
+    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -196,7 +200,11 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
+<<<<<<< HEAD
     echo "#                 The file needs to contain the region attribute!!                      #"
+=======
+    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -382,7 +390,7 @@ then
         then
             allParams=$(printf " --workload --environment %s --region %s --vault %s --spn_secret %s --subscription %s" ${environment} ${region} ${keyvault} ${spn_secret} ${subscription})
                 
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams 
+            "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams 
             if [ $? -eq 255 ]
             then
                 exit $?
@@ -403,7 +411,7 @@ then
                 
                 allParams="${env_param}""${keyvault_param}""${region_param}"
                 
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
+                "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams -w
                 if [ $? -eq 255 ]
                 then
                     exit $?
@@ -490,7 +498,7 @@ else
 
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]
 then

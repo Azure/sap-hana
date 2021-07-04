@@ -1,0 +1,116 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |         Role for ensuring the Repositories are configured correctly        |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+# TODO: 20210127 Review
+
+#----------------------------------------
+# BEGIN - OLD CODE
+#----------------------------------------
+
+# - name: Check configurations on HANA VMs
+#   any_errors_fatal: true
+#   block:
+#     - import_tasks: hostname_validation.yml
+#     - import_tasks: repo_validation.yml
+
+#----------------------------------------
+# END - OLD CODE
+#----------------------------------------
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: 20210127 - This only takes into account pay-as-you-go deployments.
+#                  Need to support BYOL with SUSE Manager Registrations.
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
+#----------------------------------------
+
+- name:     Ensure zypper repo is configured on SLE VMs
+  block:
+    # If there are no repos configured zypper lr will fail with rc == 6
+    - name:     Check that zypper repos are registered
+      command:    zypper lr
+      # command/shell actions always report changed even if they are
+      # not making any changes; we know this command action doesn't
+      # change anything so ensure it doesn't report as changed.
+      changed_when: false
+      args:
+        warn: false  # quieten warning about using zypper directly
+
+  when:     ansible_os_family|upper == 'SUSE'
+
+  rescue:
+    # Attempt to configure the repos by re-registering instance
+    - name:     Attempt to re-register SLE instance with Public Cloud \
+                Update Infrastructure
+      shell:      |
+                  rm /etc/SUSEConnect
+                  rm -f /etc/zypp/{repos,services,credentials}.d/*
+                  rm -f /usr/lib/zypp/plugins/services/*
+                  sed -i '/^# Added by SMT reg/,+1d' /etc/hosts
+                  export PYTHONWARNINGS="ignore:Unverified HTTPS request"
+                  /usr/sbin/registercloudguest --force-new
+      args:
+        warn: false  # quieten warning about using rm directly
+
+      register:    reg_result
+      # registercloudguest rc == 1 when successful
+      failed_when: reg_result.rc > 1
+
+    - name: Verify that zypper repos are configured after re-registering \
+            SLE instance
+      command: zypper lr
+      args:
+        warn: false  # quieten warning about using zypper directly
+
+#----------------------------------------
+# END
+#
+# TODO: 20210127 - This only takes into account pay-as-you-go deployments.
+#                  Need to support BYOL with SUSE Manager Registrations.
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
+#----------------------------------------
+
+
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: 20210127 - This only takes into account pay-as-you-go deployments.
+#                  Need to support BYOL with RHEL satellite Registrations.
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
+#----------------------------------------
+
+- name:     Ensure yum repos are configured on Redhat VMs
+  block:
+    - name:     Check that yum repos are registered
+      command:    yum repolist
+      args:
+        warn: false  # quieten warning about using yum directly
+
+  when:     ansible_os_family == 'RedHat'
+
+#----------------------------------------
+# END
+#
+# TODO: 20210127 - This only takes into account pay-as-you-go deployments.
+#                  Need to support BYOL with RHEL satellite Registrations.
+#                  Is there a better way to do this other than using
+#                  'command' or 'shell'?
+#----------------------------------------
+
+
+...

@@ -1,0 +1,21 @@
+
+Name										File	File Size	Release Date	Change Date	Related Info
+										Type
+50152942_1	Presentation - Adobe LiveCycle Designer 11.0			ZIP	 506815 KB	25.01.2021	25.01.2021			
+50152942_2	Presentation - 7.70 Compilation 1 Presentation 1		ZIP	 676078 KB	25.01.2021	25.01.2021			
+50152942_3	Presentation - 7.70 Comp.1 Present.2 SAP GUI for Java 7.50	ZIP	 567896 KB	25.01.2021	25.01.2021			
+50152942_4	Presentation - Server Components 7.70 Compilation		ZIP	 268540 KB	25.01.2021	25.01.2021			
+51053627	NW 7.5 Java based SW Components for Linux PPC LE		ZIP	4614701 KB	28.01.2019	28.01.2019			
+51051394	BW4HANA 100 Add-on Installation					ZIP	     41 KB	10.11.2017	10.11.2017			
+51051275	User Interface Technology 7.51					ZIP	1426858 KB	14.10.2016	14.10.2016			
+51050829_1	NW 7.5 Java based SW Comp.s 1/2					EXE	3906250 KB	29.09.2016	29.09.2016			
+51050829_2	NW 7.5 Java based SW Comp.s 2/2					RAR	 570956 KB	29.09.2016	29.09.2016			
+51050829_3	NW 7.5 Installation Export					ZIP	3605690 KB	29.09.2016	29.09.2016			
+51050829_4	NW 7.5 Language 1/2						EXE	3906250 KB	29.09.2016	29.09.2016			
+51050829_5	NW 7.5 Language 2/2						RAR	1344053 KB	29.09.2016	29.09.2016			
+51050829_6	NW 7.5 Upgrade Export Part I 1/2				EXE	3906250 KB	29.09.2016	29.09.2016			
+51050829_7	NW 7.5 Upgrade Export Part I 2/2				RAR	3035688 KB	29.09.2016	29.09.2016			
+51050829_8	NW 7.5 Upgrade Export Part II 1/2				EXE	3906250 KB	29.09.2016	29.09.2016			
+51050829_9	NW 7.5 Upgrade Export Part II 2/2				RAR	3032560 KB	29.09.2016	29.09.2016			
+51050005	UI for Basis Applications 100					ZIP	  12515 KB	22.10.2015	22.10.2015
+51049641	SAP HANA Platf. Edit. 1.0 SPS09 Rev. 93 - Client		ZIP	1630523 KB	15.10.2015	15.10.2015

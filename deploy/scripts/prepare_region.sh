@@ -105,16 +105,15 @@ function missing {
     echo "#      -h or --help                          Help                                       #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-
 }
 
 force=0
 
-INPUT_ARGUMENTS=$(getopt -n prepare_region -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n prepare_region  -o d:l:s:c:p:t:ifh --longoptions deployer_parameter_file:,library_parameter_file:,subscription:,spn_id:,spn_secret:,tenant_id:,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 
 if [ "$VALID_ARGUMENTS" != "0" ]; then
-    showhelp
+  showhelp
 fi
 
 eval set -- "$INPUT_ARGUMENTS"
@@ -452,7 +451,6 @@ else
     echo ""
     step=3
     save_config_var "step" "${deployer_config_information}"
-
 fi
 
 unset TF_DATA_DIR
@@ -497,7 +495,6 @@ if [ 4 == $step ]; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-
     cd "${library_dirname}" || exit
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
 

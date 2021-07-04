@@ -110,7 +110,7 @@ Substitute your Service Principal values in the script below before running the 
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/install_workloadzone.sh --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json \
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh --parameterfile DEV-WEEU-SAP01-INFRASTRUCTURE.json \
     --deployer_environment MGMT
     --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
     --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \
@@ -140,7 +140,7 @@ For deploying the SAP system navigate to the folder(DEV-WEEU-SAP01-X00) containi
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile DEV-WEEU-SAP01-X00.json --type sap_system --auto-approve
 ```
 
 When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet.
@@ -295,7 +295,7 @@ For deploying the SAP system navigate to the folder(DEV-NOEU-SAP02-X02) containi
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile DEV-NOEU-SAP02-X02.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile DEV-NOEU-SAP02-X02.json --type sap_system --auto-approve
 ```
 
 When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet:
@@ -406,7 +406,7 @@ Substitute you Service Principal values in the script below before running the s
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/install_workloadzone.sh --parameterfile QA-EUS2-SAP03-INFRASTRUCTURE.json \
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/install_workloadzone.sh --parameterfile QA-EUS2-SAP03-INFRASTRUCTURE.json \
     --deployer_environment MGMT
     --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
     --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy \
@@ -438,7 +438,7 @@ For deploying the SAP system navigate to the folder(QA-EUS2-SAP03-X01) containin
 ```bash
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile QA-EUS2-SAP03-X01.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile QA-EUS2-SAP03-X01.json --type sap_system --auto-approve
 ```
 
 When using PowerShell the same can be achieved with the ***New-SAPSystem*** PowerShell cmdlet
@@ -568,7 +568,7 @@ For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X03) contain
 
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X03.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X03.json --type sap_system --auto-approve
 
 ```
 
@@ -613,7 +613,7 @@ For deploying the SAP system navigate to the folder(PROD-WUS2-SAP04-X04) contain
 
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04
 
-    ${DEPLOYMENT_REPO_PATH}deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X04.json --type sap_system --auto-approve
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/installer.sh --parameterfile PROD-WUS2-SAP04-X04.json --type sap_system --auto-approve
 
 ```
 

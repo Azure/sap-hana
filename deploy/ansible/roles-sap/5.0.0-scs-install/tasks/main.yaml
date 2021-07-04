@@ -1,0 +1,116 @@
+#   SAP: Register BOM
+#   SAP SCS: deploy SCS Parameter file install template
+#   SAP SCS: Install
+
+---
+- name:  
+  set_fact:
+    sap_inifile:                  "{{ bom_base_name }}-scs-{{ ansible_hostname }}.params"
+    sap_inifile_template:         "{{ bom_base_name }}-scs-inifile-param.j2"
+
+
+# Returns bom object
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
+  vars:
+    bom_name:                     "{{ bom_base_name }}"
+
+
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-template
+  vars:
+    sap_cd_package_cd1:            
+    sap_cd_package_cd2:           
+    sap_cd_package_cd3:           
+    sap_cd_package_cd4:           
+    sap_cd_package_cd5:           
+    sap_cd_package_hdbclient:     
+    sap_ciInstanceNumber:         
+    app_instance_number:          
+    sap_ciDialogWPNumber:         
+    sap_ciBtcWPNumber:            
+    sap_installSAPHostAgent:      
+    sap_profile_dir:              
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_db_hostname:              
+    sap_ciVirtualHostname:        
+    sap_appVirtualHostname:       
+
+
+# *====================================4=======================================8
+#   SAP SCS: Install
+# 2230669 - System Provisioning Using a Parameter Input File
+#
+- name:               "SAP SCS Install"
+  shell: |
+                      export TMPDIR=/usr/sap/install
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.scs }}                          \
+                                SAPINST_SKIP_DIALOGS=true                                                     \
+                                SAPINST_START_GUISERVER=false
+  args:
+    chdir:            /usr/sap/install/SWPM
+  # Skip when TRUE (test mode)
+  # when: not test_new_bom
+# *====================================4=======================================8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
+
+
+#         OLD CODE BELOW TO REVIEW
+
+
+# - name: Determine Stack XML file name
+#   set_fact:
+#     stack_xml_file: "{{ stack_xml_entry.override_target_filename is defined | ternary(stack_xml_entry.override_target_filename, stack_xml_entry.file) }}"
+#   vars:
+#     stack_xml_entry: "{{
+#       bom.materials.stackfiles |
+#       flatten(levels=1) |
+#       selectattr('file', 'match', '^MP_Stack.*\\.xml$') |
+#       list |
+#       first
+#       }}"
+
+# - name: Determine inifile name
+#   set_fact:
+#     inifile: "{{ inifile_entry.override_target_filename is defined | ternary(inifile_entry.override_target_filename, inifile_entry.file) }}"
+#   vars:
+#     inifile_entry: "{{
+#       bom.materials.templates |
+#       flatten(levels=1) |
+#       selectattr('file', 'match', '.*\\.inifile.params$') |
+#       list |
+#       first
+#       }}"
+
+
+# - name: Ensure the template is available on the controller
+#   fetch:
+#     dest: /tmp/
+#     src: "{{ target_media_location }}/config/{{ inifile }}"
+#     flat: yes
+
+
+# - name: Ensure inifile is prepared from template
+#   template:
+#     dest: "{{ target_media_location }}/config/scs.inifile.params"
+#     src: "/tmp/{{ inifile }}"
+
+
+# - name: Ensure SCS is present and running
+#   shell: >
+#     {{ target_media_location }}/SWPM/sapinst
+#     SAPINST_XML_FILE="{{ target_media_location }}/config/{{ stack_xml_file }}"
+#     SAPINST_USE_HOSTNAME="{{ scs_hostname }}"
+#     SAPINST_INPUT_PARAMETERS_URL={{ target_media_location }}/config/scs.inifile.params
+#     SAPINST_EXECUTE_PRODUCT_ID="{{ product_id }}"
+#     SAPINST_START_GUI=false
+#     SAPINST_START_GUISERVER=false
+#   args:
+#     chdir: "/tmp/{{ bom_base_name }}"

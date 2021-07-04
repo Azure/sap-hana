@@ -1,0 +1,60 @@
+#   SAP: Register BOM
+#   SAP WEB: deploy Web Dispatcher Parameter file install template
+#   SAP WEB: Install
+
+# TODO: Considerations
+#         20G+ swap space
+#         Livecache: None, HANA Internal, MaxDB External
+#         message server acl
+#         certificates
+#         secure storage key
+#
+
+---
+- name:  
+  set_fact:
+    sap_inifile:                  "{{ bom_base_name }}-web-{{ ansible_hostname }}.params"
+    sap_inifile_template:         "{{ bom_base_name }}-web-inifile-param.j2"
+
+# Returns bom object
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
+  vars:
+    bom_name:                     "{{ bom_base_name }}"
+
+
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-template
+  vars:
+    web_instance_number:          '00'
+    sap_ciInstanceNumber:         '00'
+    sap_installSAPHostAgent:      "false"
+    sap_profile_dir:              /sapmnt/{{ sap_sid|upper }}/profile
+    sap_scs_hostname:             "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+    sap_ciVirtualHostname:        "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_PAS') | first }}"
+    sap_db_hostname:              "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_DB')  | first }}"
+    sap_webVirtualHostname:       "{{ inventory_hostname }}"
+
+# *====================================4=======================================8
+#   SAP Web Dispatcher: Install
+# 2230669 - System Provisioning Using a Parameter Input File
+#
+- name:               "SAP Web Dispatcher Install"
+  shell: |
+                      export TMPDIR=/usr/sap/install
+                      ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
+                                SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.web }}                          \
+                                SAPINST_SKIP_DIALOGS=true                                                     \
+                                SAPINST_START_GUISERVER=false
+  args:
+    chdir:            /usr/sap/install/SWPM
+  # Skip when TRUE (test mode)
+  # when: not test_new_bom
+# *====================================4=======================================8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

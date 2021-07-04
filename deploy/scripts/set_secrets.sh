@@ -110,34 +110,34 @@ fi
 if [ -z "$keyvault" ]; then
     load_config_vars "${environment_config_information}" "keyvault"
     if [ ! -n "$keyvault" ]; then
-        read -p "Keyvault name:"  keyvault
+        read -p "Keyvault name: "  keyvault
     fi
 fi
 
 if [ -z "$client_id" ]; then
     load_config_vars "${environment_config_information}" "client_id"
     if [ -z  "$client_id" ]; then
-        read -p "SPN App ID:"  client_id
+        read -p "SPN App ID: "  client_id
     fi
 fi
 
 if [ ! -n "$client_secret" ]; then
-    read -p "SPN App Password:"  client_secret
+    read -p "SPN App Password: "  client_secret
 fi
 
 if [ -z "${tenant_id}" ]; then
     load_config_vars "${environment_config_information}" "tenant_id"
     if [ ! -n "${tenant_id}" ]; then
-        read -p "SPN Tenant ID:"  tenant_id
+        read -p "SPN Tenant ID: "  tenant_id
     fi
 fi
 
 if [ -z "$subscription" ]; then
-    read -p "SPN Subscription:"  subscription
+    read -p "SPN Subscription: "  subscription
 fi
 
 if [ -z "${environment}" ]; then
-    read -p "Environment:"  environment
+    read -p "Environment: "  environment
 fi
 
 if [ -z "${keyvault}" ]; then

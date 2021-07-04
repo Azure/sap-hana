@@ -1,0 +1,33 @@
+{% set vgs = [] %}
+{#
+    Outer Loop: Loop over disk types
+#}
+{% for disktype in disktypes %}
+{%     set pvlist = [] %}
+{#
+    Initialise VG dictionary with VG name derived from disk type
+#}
+{%     set vg = {'vg': 'vg_' ~ (disk_type_to_name_map[disktype] |
+                                default(disktype))} %}
+{#
+    Inner Loop: Loop over list of disks that match the execution host and the disk type
+    Note: '_' used as dummy variable that can be ignored
+#}
+{%     for disk in disks if (disk.host == inventory_hostname) and (disk.type == disktype) %}
+{%         set _ = pvlist.append('/dev/disk/azure/scsi1/lun' ~ disk.LUN) %}
+{%     endfor %}
+{#
+    Add list of pvs and diskcount to VG dictionary
+    Note: '_' used as dummy variable that can be ignored
+#}
+{%     set _ = vg.update({'pvs': pvlist}) %}
+{#
+    Append VG dictionary to list of VGs
+    Note: '_' used as dummy variable that can be ignored
+#}
+{%     set _ = vgs.append(vg) %}
+{% endfor %}
+{#
+    Output List of Dictionaries
+#}
+{{ vgs }}

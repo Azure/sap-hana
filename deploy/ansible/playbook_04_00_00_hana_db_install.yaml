@@ -1,0 +1,92 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for HANA DB Install                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# Steps:
+#   01) NFS: Mount
+#
+
+- hosts:          "{{ sap_sid|upper }}_DB"
+
+  name:           DB Installation - HANA
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+
+  - set_fact:
+      tier:     hdb                                                             # Actions for HANA DB Servers
+    tags:
+      - always
+
+# -------------------------------------+---------------------------------------8
+# Role: sap-mounts
+#
+# Description: Mount Filesystems
+#              Mount NFS Filesystems
+#
+  - include_role:
+      name:     roles-sap-os/sap-mounts
+# -------------------------------------+---------------------------------------8
+
+
+
+  - include_role:
+      name:     roles-db/4.0.0-hdb-install
+      
+
+
+
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: evaluate for inclusion and refactor.
+# SOURCE: sap-playbook
+#----------------------------------------
+
+
+#----------------------------------------
+# BEGIN: Commented Section to enable BOM
+#        Process
+#
+# TODO: evaluate and refactor. DB install, HSR, HA
+#----------------------------------------
+
+# # Hana DB components install
+# - hosts: hanadbnodes
+#   become: true
+#   become_user: root
+#   any_errors_fatal: true
+#   vars_files:
+#     - "vars/ha-packages.yaml"
+#   pre_tasks:
+#     - name: Include SAP HANA DB sizes
+#       include_vars:
+#         file: "{{ configs_path }}/hdb_sizes.json"
+#         name: hdb_sizes
+#   roles:
+#     - role: hdb-server-install
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

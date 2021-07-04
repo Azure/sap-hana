@@ -1,0 +1,38 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                                Admin Users                                 |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# -------------------------------------+---------------------------------------8
+# 'admin_accounts' specifies a list of hashes/dictionaries outlining the
+# settings to be used when creating/managing admin groups
+# -------------------------------------+---------------------------------------8
+
+admin_groups:
+  - name:         example
+    gid:          "2000"
+    state:        present
+    tier:         example
+    enabled:      true
+
+# -------------------------------------+---------------------------------------8
+#
+# 'admin_users' specifies a list of hashes/dictionaries outlining the
+# settings to be used when creating/managing admin user accounts
+#
+# -------------------------------------+---------------------------------------8
+
+admin_users:
+  - name:         example
+    comment:      "Example User"
+    uid:          "2000"
+    group:        example
+    groups:       ["users", "adm"]
+    sudoers_role: "admin_no_password"
+    shell:        /bin/bash
+    password:     "some_password_string"
+    state:        present
+    tier:         example
+    enabled:      true

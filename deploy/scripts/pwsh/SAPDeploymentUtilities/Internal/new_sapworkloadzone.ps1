@@ -54,7 +54,6 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $false)][string]$Subscription,
         [Parameter(Mandatory = $false)][string]$SPN_id,
         [Parameter(Mandatory = $false)][string]$SPN_password,
-
         [Parameter(Mandatory = $false)][string]$Tenant_id,
 
         [Parameter(Mandatory = $false)][Switch]$Force,
@@ -447,11 +446,7 @@ Licensed under the MIT license.
     }
 
     Write-Host -ForegroundColor green "Running plan, please wait"
-<<<<<<< HEAD
-    $Command = " plan  -no-color -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-=======
     $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
->>>>>>> 78b1308e9da59baf600919d10d8b08f6179cd2e2
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
@@ -493,17 +488,10 @@ Licensed under the MIT license.
     if ($PSCmdlet.ShouldProcess($Parameterfile)) {
         Write-Host -ForegroundColor green "Running apply"
         if ($Silent) {
-<<<<<<< HEAD
             $Command = " apply --auto-approve -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
         }
         else {
-            $Command = " apply -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-=======
-            $Command = " apply --auto-approve -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
-        }
-        else {
             $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
->>>>>>> 78b1308e9da59baf600919d10d8b08f6179cd2e2
         }
         
         Add-Content -Path "deployment.log" -Value $Cmd
@@ -515,14 +503,7 @@ Licensed under the MIT license.
             $Env:TF_DATA_DIR = $null
             throw "Error executing command: $Cmd"
         }
-<<<<<<< HEAD
     
     }
-
-=======
-    }
-    
->>>>>>> 78b1308e9da59baf600919d10d8b08f6179cd2e2
     $Env:TF_DATA_DIR = $null
 }
-

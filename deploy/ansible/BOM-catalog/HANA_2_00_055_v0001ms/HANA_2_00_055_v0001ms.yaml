@@ -1,0 +1,75 @@
+---
+name:    'HANA_2_00_055_v0001ms'
+target:  'HANA 2.0'
+version: 1
+
+materials:
+#   templates:
+    # - name:     X
+    #   file:     HANA_2_00_055_v1.params
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name:     X
+    #   file:     HANA_2_00_055_v1.params.xml
+    #   override_target_location: "{{ target_media_location }}/config"
+
+#   stackfiles:
+    # # Download Basket permalinks
+    # - name: Download Basket permalinks
+    #   file: myDownloadBasketFiles.txt
+    #   override_target_location: "{{ target_media_location }}/config"
+
+  media:
+    # SAPCAR 7.22
+    - name:         SAPCAR
+      archive:      SAPCAR_1010-70006178.EXE
+      filename:     SAPCAR
+      permissions:  '0755'
+      url:          https://softwaredownloads.sap.com/file/0020000002208852020
+
+    - name:         HANA Client
+      archive:      IMDB_CLIENT20_007_26-80002082.SAR
+      # extract:      true
+      # extractDir:   CD_HDBCLIENT
+      # creates:      SIGNATURE.SMF
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000381822021
+
+    - name:         HANA Server
+      archive:      IMDB_SERVER20_055_0-80002031.SAR
+      extract:      true
+      extractDir:   CD_HDBSERVER
+      creates:      SIGNATURE.SMF
+      url:          https://softwaredownloads.sap.com/file/0020000000392162021
+
+    - name:         X
+      archive:      IMDB_AFL20_055_0-80001894.SAR
+      extract:      true
+      extractDir:   CD_HDBSERVER/COMPONENTS
+      creates:      COMPONENTS/SAP_HANA_AFL/packages
+      url:          https://softwaredownloads.sap.com/file/0020000000458262021
+
+    - name:         X
+      archive:      IMDB_LCAPPS_2055_0-20010426.SAR
+      extract:      true
+      extractDir:   CD_HDBSERVER/COMPONENTS
+      creates:      COMPONENTS/SAP_HANA_LCAPPS/packages
+      url:          https://softwaredownloads.sap.com/file/0020000000393992021
+
+    - name:         X
+      archive:      VCH190900_2055_0-80004631.SAR
+      extract:      true
+      extractDir:   CD_HDBSERVER/COMPONENTS
+      creates:      COMPONENTS/VCH_AFL_1909/packages
+      url:          https://softwaredownloads.sap.com/file/0020000000393862021
+
+    - name:         X
+      archive:      SAPHOSTAGENT51_51-20009394.SAR
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000363342021
+
+    - name:         X
+      archive:      saphostagentrpm_51-20009394.rpm
+      url:          https://softwaredownloads.sap.com/file/0020000000269152021
+
+...

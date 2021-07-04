@@ -1,0 +1,57 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for SAP DB Load                              |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+
+- hosts:          "{{ sap_sid|upper }}_PAS"
+
+  name:           SAP Installation - DB Load
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - set_fact:
+      tier:     dbload                                                          # SAP Install phase: DBLOAD
+    tags:
+      - always
+
+# -------------------------------------+---------------------------------------8
+# Role: sap-mounts
+#
+# Description: Mount Filesystems
+#              Mount NFS Filesystems
+#
+  - include_role:
+      name:     roles-sap-os/sap-mounts
+# -------------------------------------+---------------------------------------8
+
+
+
+# -------------------------------------+---------------------------------------8
+# Role: 5.1-dbload
+#
+# Description: 
+#              
+#
+  - include_role:
+      name:     roles-sap/5.1-dbload
+
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
+# +------------------------------------4--------------------------------------*/

@@ -1,0 +1,40 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for SAP SCS Install                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+
+- hosts:          "{{ sap_sid|upper }}_SCS"
+
+  name:           SAP Installation - SCS
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+
+  - set_fact:
+      tier:     scs
+    tags:
+      - always
+
+  - include_role:
+      name:     roles-sap/5.0.0-scs-install
+
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
+# +------------------------------------4--------------------------------------*/

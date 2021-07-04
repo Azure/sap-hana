@@ -1,0 +1,21 @@
+---
+# RHEL-3.10 Disable Transparent Hugepages (THP)
+# RHEL-3.12 Configure Processor C-States (not relevant for IBM Power LE (ppc64le))
+# SAP Note 2205917 - SAP HANA DB Recommended OS settings for SLES 12 / SLES for SAP Applications 12
+# TODO: when tier = HANA; put in a block; move to sap specific
+- name:     Task Disable Transparent Hugepages & Configure Processor C-States 1
+  command:    "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+
+- name:     Task Disable Transparent Hugepages & Configure Processor C-States 2
+  lineinfile: 
+     dest:    /etc/default/grub 
+     regexp:  "GRUB_CMDLINE_LINUX=" 
+     line:    "GRUB_CMDLINE_LINUX='crashkernel=auto  @ vconsole.keymap=us @kernel_arguments: transparent_hugepage=never intel_idle.max_cstate=1 processor.max_cstate=1'"
+
+- name:     Task Disable Transparent Hugepages & Configure Processor C-States 3
+  command:    grub2-mkconfig -o /boot/grub2/grub.cfg
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

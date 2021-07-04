@@ -1,0 +1,83 @@
+
+
+LogoSoftware Downloads
+Knowledge Base
+
+
+16
+Morgan Deegan (S0021499789)
+SAP SOLUTION MANAGER 7.2 (INSTALLATIONS AND UPGRADES)/
+INSTALLATION AND UPGRADE
+DOWNLOADS
+INFO
+ECCN INFO
+Message Strip Information
+Items Available to Download (13)
+
+
+Selected Items (4)
+Name
+File Type
+File Size
+Release Date
+Change Date
+Related Info
+
+*** Downloaded These ***
+
+51054655_1
+SAP Solution Manager 7.2 SR2 Installation Export I
+ZIP	8171020 KB	15.02.2021	15.02.2021			
+51054655_2
+SAP Solution Manager 7.2 SR2 Installation Export II
+ZIP	7883288 KB	15.02.2021	15.02.2021			
+51054655_3
+SAP Solution Manager 7.2 SR2 Language
+ZIP	7185462 KB	15.02.2021	15.02.2021			
+51054655_4
+SAP Solution Manager 7.2 SR2 - Java
+ZIP	4677979 KB	15.02.2021	15.02.2021			
+
+
+*** NOT These ***
+
+51052491_3
+SAP Solution Manager 7.2 SR1 Installation Export II 1/2
+EXE	3906250 KB	17.11.2017	17.11.2017			
+51052491_4
+SAP Solution Manager 7.2 SR1 Installation Export II 2/2
+RAR	3522332 KB	17.11.2017	17.11.2017			
+51052491_7
+SAP Solution Manager 7.2 SR1 - Java 1/2
+EXE	3906250 KB	17.11.2017	17.11.2017			
+51052491_8
+SAP Solution Manager 7.2 SR1 - Java 2/2
+RAR	1522923 KB	17.11.2017	17.11.2017			
+51052491_1
+SAP Solution Manager 7.2 SR1 Installation Export I 1/2
+EXE	3906250 KB	16.11.2017	16.11.2017			
+51052491_2
+SAP Solution Manager 7.2 SR1 Installation Export I 2/2
+RAR	3813655 KB	16.11.2017	16.11.2017			
+51052491_5
+SAP Solution Manager 7.2 SR1 Language 1/2
+EXE	3906250 KB	16.11.2017	16.11.2017			
+51052491_6
+SAP Solution Manager 7.2 SR1 Language 2/2
+RAR	2861151 KB	16.11.2017	16.11.2017			
+51052491_9
+SAP Solution Manager 7.2 SR1 - Java Components
+ZIP	908676 KB	16.11.2017	16.11.2017			
+(*) for validation only
+
+Download Basket
+
+Main Menu
+
+Contact Us
+
+Share Your Feedback
+
+About the Launchpad
+
+Status

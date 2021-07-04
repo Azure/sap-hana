@@ -103,6 +103,16 @@ resource "azurerm_linux_virtual_machine" "scs" {
       public_key = var.sdu_public_key
     }
   }
+
+  custom_data = var.cloudinit_growpart_config
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
   dynamic "os_disk" {
     iterator = disk
     for_each = flatten(

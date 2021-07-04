@@ -118,3 +118,7 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
   default     = ""
 }
+
+variable "witness_storage_account" {
+  description = "Storage account information for diagnostics account"
+}

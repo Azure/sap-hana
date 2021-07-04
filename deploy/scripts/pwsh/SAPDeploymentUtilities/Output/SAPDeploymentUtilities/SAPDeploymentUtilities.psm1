@@ -1630,7 +1630,6 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $false)][string]$Subscription,
         [Parameter(Mandatory = $false)][string]$SPN_id,
         [Parameter(Mandatory = $false)][string]$SPN_password,
-
         [Parameter(Mandatory = $false)][string]$Tenant_id,
 
         [Parameter(Mandatory = $false)][Switch]$Force,
@@ -2024,10 +2023,14 @@ Licensed under the MIT license.
 
     Write-Host -ForegroundColor green "Running plan, please wait"
 <<<<<<< HEAD
+<<<<<<< HEAD
     $Command = " plan  -no-color -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
 =======
     $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
 >>>>>>> 78b1308e9da59baf600919d10d8b08f6179cd2e2
+=======
+    $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
@@ -2070,16 +2073,22 @@ Licensed under the MIT license.
         Write-Host -ForegroundColor green "Running apply"
         if ($Silent) {
 <<<<<<< HEAD
+<<<<<<< HEAD
             $Command = " apply --auto-approve -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
         }
         else {
             $Command = " apply -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
 =======
+=======
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
             $Command = " apply --auto-approve -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
         }
         else {
             $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+<<<<<<< HEAD
 >>>>>>> 78b1308e9da59baf600919d10d8b08f6179cd2e2
+=======
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
         }
         
         Add-Content -Path "deployment.log" -Value $Cmd
@@ -2092,6 +2101,7 @@ Licensed under the MIT license.
             throw "Error executing command: $Cmd"
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
     
     }
 
@@ -2102,6 +2112,12 @@ Licensed under the MIT license.
     $Env:TF_DATA_DIR = $null
 }
 
+=======
+    }
+    
+    $Env:TF_DATA_DIR = $null
+}
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
 function Read-KVNode {
     param(
         [Parameter(Mandatory = $true)][String]$source,
@@ -2916,6 +2932,7 @@ Licensed under the MIT license.
     $filePath = $mydocuments + "\sap_deployment_automation.ini"
     $iniContent = Get-IniContent -Path $filePath
 
+<<<<<<< HEAD
     $Environment = ""
     $region = ""
     $saName = $StorageAccountName
@@ -2947,6 +2964,15 @@ Licensed under the MIT license.
     $combined = $Environment + $region
 
     $key = $fInfo.Name.replace($fInfo.Extension, ".terraform.tfstate")
+=======
+    $jsonData = Get-Content -Path $Parameterfile | ConvertFrom-Json
+
+    $Environment = $jsonData.infrastructure.environment
+    $region = $jsonData.infrastructure.region
+    $combined = $Environment + $region
+
+    $key = $fInfo.Name.replace(".json", ".terraform.tfstate")
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
 
     if ($null -eq $iniContent[$combined]) {
         Write-Error "The Terraform state information is not available"

@@ -1,0 +1,34 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for PACEMAKER config of ERS                   |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+#       This is a placeholder 
+#       This should probably be two playbooks:
+#       1) ERS Install and Config
+#       2) PACEMAKER Config of SCS and ERS
+
+- hosts:          scs                                           # TODO: Replace this with new inventory group; Change to correct group
+
+  name:           PACEMAKER - SCS and ERS
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+
+  # - name: Test Connection                                     # Simple connection test for troubleshooting
+  #   ping:
+
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

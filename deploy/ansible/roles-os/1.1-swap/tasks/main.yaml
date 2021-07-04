@@ -1,0 +1,47 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role for ensuring the swap space is configured correctly         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.1     - swap space setup
+#
+# -------------------------------------+---------------------------------------8
+
+
+
+- name:                           "Ensure /mnt/resource directory exists"
+  file:
+    path:                         "/mnt/resource"
+    state:                        directory
+    mode:                         "0755"
+  notify:
+    - Restart waagent
+
+
+- name:                           "Ensure waagent file is configured with proper parameters"
+  lineinfile:
+    dest:                         /etc/waagent.conf  
+    state:                        "{{ item.state }}"
+    regexp:                       "{{ item.regexp }}"
+    line:                         "{{ item.line }}"
+  loop:
+    # Default values on install
+    #     ResourceDisk.Format             = y
+    #     ResourceDisk.Filesystem         = ext4
+    #     ResourceDisk.MountPoint         = /mnt/resource
+    #     ResourceDisk.EnableSwap         = n
+    #     ResourceDisk.SwapSizeMB         = 0
+    #     ResourceDisk.MountOptions       = None
+    - { state: 'present',  regexp: 'ResourceDisk.Format=',      line: 'ResourceDisk.Format=y'                                      }
+    - { state: 'present',  regexp: 'ResourceDisk.EnableSwap=',  line: 'ResourceDisk.EnableSwap=y'                                  }
+    - { state: 'present',  regexp: 'ResourceDisk.SwapSizeMB=',  line: 'ResourceDisk.SwapSizeMB={{ swap_size_mb | default(2052) }}' }
+  vars:
+    swap_size_mb:                 "{{ (sap_swap|selectattr('tier', 'search', node_tier)|list|first).swap_size_mb }}"
+  notify:
+    - Restart waagent
+
+
+...

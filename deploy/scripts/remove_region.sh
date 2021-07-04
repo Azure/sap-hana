@@ -290,7 +290,7 @@ param_dirname=$(pwd)
 
 relative_path="${curdir}"/"${deployer_dirname}"
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
@@ -316,7 +316,7 @@ then
 fi
 
 #Initialize the statefile and copy to local
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_deployer/
 
 echo ""
 echo "#########################################################################################"
@@ -338,7 +338,7 @@ param_dirname=$(pwd)
 
 #Library
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/sap_library/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_library/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 #Reinitialize
@@ -375,7 +375,7 @@ echo "##########################################################################
 echo ""
 
 #Initialize the statefile and copy to local
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_library/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_library/
 terraform -chdir="${terraform_module_directory}" init -force-copy -reconfigure --backend-config "path=${param_dirname}/terraform.tfstate"
 
 extra_vars=""
@@ -406,7 +406,7 @@ cd "${deployer_dirname}" || exit
 
 param_dirname=$(pwd)
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/sap_deployer/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 extra_vars=""

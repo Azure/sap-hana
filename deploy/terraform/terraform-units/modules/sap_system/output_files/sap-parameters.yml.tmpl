@@ -2,11 +2,15 @@
 
 bom_base_name:                 
 sapbits_location_base_path:    
+password_master:               
+sap_fqdn:                      
 
 # TERRAFORM CREATED
 sap_sid:                       ${sid}
 kv_uri:                        ${kv_uri}
 secret_prefix:                 ${secret_prefix}
+scs_high_availability:         ${scs_ha}
+db_high_availability:          ${db_ha}
 
 disks: 
 %{~ for disk in disks }

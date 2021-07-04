@@ -1,0 +1,305 @@
+[General]
+
+# Location of Installation Medium
+component_medium=
+
+# Comma separated list of component directories
+component_dirs=
+
+# Use single master password for all users, created during installation ( Default: n )
+use_master_password=n
+
+# Directory root to search for components
+component_root={{ _rsp_component_root }}
+
+# Skip all SAP Host Agent calls ( Default: n )
+skip_hostagent_calls=n
+
+# Remote Execution ( Default: ssh; Valid values: ssh | saphostagent )
+remote_execution=ssh
+
+# Verify the authenticity of SAP HANA components ( Default: n )
+verify_signature=n
+
+# Components ( Valid values: all | client | es | ets | lcapps | server | smartda | streaming | rdsync | xs | studio | afl | sca | sop | eml | rme | rtl | trp )
+components={{ _rsp_components }}
+
+# Install Execution Mode ( Default: standard; Valid values: standard | optimized )
+install_execution_mode=standard
+
+# Ignore failing prerequisite checks
+ignore=
+
+# Do not Modify '/etc/sudoers' File ( Default: n )
+skip_modify_sudoers=n
+
+[Server]
+
+# Enable usage of persistent memory ( Default: n )
+use_pmem=n
+
+# Enable the installation or upgrade of the SAP Host Agent ( Default: y )
+install_hostagent=y
+
+# Database Isolation ( Default: low; Valid values: low | high )
+db_isolation=low
+
+# Create initial tenant database ( Default: y )
+create_initial_tenant=y
+
+# Non-standard Shared File System
+checkmnt=
+
+# Installation Path ( Default: /hana/shared )
+sapmnt={{ _rsp_sapmnt }}
+
+# Local Host Name ( Default: x00dhdb00l0b3a )
+hostname={{ _rsp_hostname }}
+
+# Install SSH Key ( Default: y )
+install_ssh_key=y
+
+# Root User Name For Remote Hosts ( Default: root )
+root_user=root
+
+# Root User Password For Remote Hosts
+root_password=
+
+# SAP Host Agent User (sapadm) Password
+sapadm_password=
+
+# Directory containing a storage configuration
+storage_cfg=
+
+# Listen Interface ( Valid values: global | internal | local )
+listen_interface=
+
+# Internal Network Address
+internal_network=
+
+# SAP HANA System ID
+sid={{ _rsp_sid }}
+
+# Instance Number
+number={{ _rsp_number }}
+
+# Local Host Worker Group ( Default: default )
+workergroup=default
+
+# System Usage ( Default: custom; Valid values: production | test | development | custom )
+system_usage={{ _rsp_system_usage }}
+
+# Instruct the Local Secure Store (LSS) to trust an unsigned SAP HANA Database ( Default: n )
+lss_trust_unsigned_server=n
+
+# Do you want to enable data and log volume encryption? ( Default: n )
+volume_encryption=n
+
+# Location of Data Volumes ( Default: /hana/data/${sid} )
+datapath=/hana/data/${sid}
+
+# Location of Log Volumes ( Default: /hana/log/${sid} )
+logpath=/hana/log/${sid}
+
+# Location of Persistent Memory Volumes ( Default: /hana/pmem/${sid} )
+pmempath=/hana/pmem/${sid}
+
+# Directory containing custom configurations
+custom_cfg=
+
+# SAP HANA Database secure store ( Default: ssfs; Valid values: ssfs | localsecurestore )
+secure_store=ssfs
+
+# Restrict maximum memory allocation?
+restrict_max_mem=
+
+# Maximum Memory Allocation in MB
+max_mem=
+
+# Certificate Host Names
+certificates_hostmap=
+
+# Master Password
+master_password=
+
+# System Administrator Password
+password=
+
+# System Administrator Home Directory ( Default: /usr/sap/${sid}/home )
+home=/usr/sap/${sid}/home
+
+# System Administrator Login Shell ( Default: /bin/sh )
+shell=/bin/sh
+
+# System Administrator User ID
+userid=
+
+# ID of User Group (sapsys)
+groupid=
+
+# Database User (SYSTEM) Password
+system_user_password=
+
+# Restart system after machine reboot? ( Default: n )
+autostart=n
+
+# Enable HANA repository ( Default: y )
+repository=y
+
+# Inter Service Communication Mode ( Valid values: standard | ssl )
+isc_mode=
+
+[Action]
+
+# Action ( Default: exit; Valid values: install | update | extract_components )
+action=install
+
+[AddHosts]
+
+# Auto Initialize Services ( Default: y )
+auto_initialize_services=y
+
+# Additional Hosts
+addhosts=
+
+# Additional Local Host Roles ( Valid values: extended_storage_worker | extended_storage_standby | ets_worker | ets_standby | streaming | xs_worker | xs_standby )
+add_local_roles=
+
+# Automatically assign XS Advanced Runtime roles to the hosts with database roles (y/n) ( Default: y )
+autoadd_xs_roles=y
+
+# Import initial content of XS Advanced Runtime ( Default: y )
+import_xs_content=y
+
+[Client]
+
+# SAP HANA Database Client Installation Path ( Default: ${sapmnt}/${sid}/hdbclient )
+client_path=/hana/shared/${sid}/hdbclient
+
+[Studio]
+
+# SAP HANA Studio Installation Path ( Default: ${sapmnt}/${sid}/hdbstudio )
+studio_path=/hana/shared/${sid}/hdbstudio
+
+# Enables copying of SAP HANA Studio repository ( Default: y )
+studio_repository=y
+
+# Target path to which SAP HANA Studio repository should be copied
+copy_repository=
+
+# Java Runtime ( Default:  )
+vm=
+
+[Reference_Data]
+
+# Installation Path for Address Directories and Reference Data
+reference_data_path=
+
+[XS_Advanced]
+
+# Install XS Advanced in the default tenant database? (y/n) ( Default: n )
+xs_use_default_tenant=n
+
+# XS Advanced App Working Path
+xs_app_working_path=
+
+# Organization Name For Space "SAP" ( Default: orgname )
+org_name=orgname
+
+# XS Advanced Admin User ( Default: XSA_ADMIN )
+org_manager_user=XSA_ADMIN
+
+# XS Advanced Admin User Password
+org_manager_password=
+
+# Customer Space Name ( Default: PROD )
+prod_space_name=PROD
+
+# Routing Mode ( Default: ports; Valid values: ports | hostnames )
+xs_routing_mode=ports
+
+# XS Advanced Domain Name (see SAP Note 2245631)
+xs_domain_name=
+
+# Run Applications in SAP Space with Separate OS User (y/n) ( Default: y )
+xs_sap_space_isolation=y
+
+# Run Applications in Customer Space with Separate OS User (y/n) ( Default: y )
+xs_customer_space_isolation=y
+
+# XS Advanced SAP Space OS User ID
+xs_sap_space_user_id=
+
+# XS Advanced Customer Space OS User ID
+xs_customer_space_user_id=
+
+# XS Advanced Components
+xs_components=
+
+# Do not start the selected XS Advanced components after installation ( Default: none )
+xs_components_nostart=none
+
+# XS Advanced Components Configurations
+xs_components_cfg=
+
+# XS Advanced Certificate
+xs_cert_pem=
+
+# XS Advanced Certificate Key
+xs_cert_key=
+
+# XS Advanced Trust Certificate
+xs_trust_pem=
+
+[lss]
+
+# Installation Path for Local Secure Store ( Default: /lss/shared )
+lss_inst_path=/lss/shared
+
+# Local Secure Store User Password
+lss_user_password=
+
+# Local Secure Store User ID
+lss_userid=
+
+# Local Secure Store User Group ID
+lss_groupid=
+
+# Local Secure Store User Home Directory ( Default: /usr/sap/${sid}/lss/home )
+lss_user_home=/usr/sap/${sid}/lss/home
+
+# Local Secure Store User Login Shell ( Default: /bin/sh )
+lss_user_shell=/bin/sh
+
+# Local Secure Store Auto Backup Password
+lss_backup_password=
+
+[streaming]
+
+# Streaming Cluster Manager Password
+streaming_cluster_manager_password=
+
+# Location of Streaming logstores and runtime information ( Default: /hana/data_streaming/${sid} )
+basepath_streaming=/hana/data_streaming/${sid}
+
+[es]
+
+# Location of Dynamic Tiering Data Volumes ( Default: /hana/data_es/${sid} )
+es_datapath=/hana/data_es/${sid}
+
+# Location of Dynamic Tiering Log Volumes ( Default: /hana/log_es/${sid} )
+es_logpath=/hana/log_es/${sid}
+
+[ets]
+
+# Location of Data Volumes of the Accelerator for SAP ASE ( Default: /hana/data_ase/${sid} )
+ase_datapath=/hana/data_ase/${sid}
+
+# Location of Log Volumes of the Accelerator for SAP ASE ( Default: /hana/log_ase/${sid} )
+ase_logpath=/hana/log_ase/${sid}
+
+# SAP ASE Administrator User ( Default: sa )
+ase_user=sa
+
+# SAP ASE Administrator Password
+ase_user_password=

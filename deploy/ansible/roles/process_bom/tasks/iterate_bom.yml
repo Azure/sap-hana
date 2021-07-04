@@ -1,0 +1,48 @@
+---
+
+- name: "Ensure {{ bom_base_name }} is used"
+  include_vars:
+    file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yaml"
+    name: bom
+  delegate_to: localhost
+
+- name: "Ensure {{ bom_base_name }} is absent"
+  file:
+    path: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yaml"
+    state: absent
+  delegate_to: localhost
+
+- name: "Ensure {{ target_media_location }} exists"
+  file:
+    path: "{{ target_media_location }}"
+    state: directory
+  check_mode: "{{ test_mode is defined and test_mode }}"
+
+- name: "Ensure current property is iterated"
+  include_tasks: download_media.yaml
+  vars:
+    default_location: "{{ bom.defaults.target_location | regex_replace('/$', '') }}"
+    bom_media: "{{ media_iterator.media }}"
+    source_location: "{{ media_iterator.uri_location }}"
+    file_name: "{{ media_iterator.property_name }}"
+  loop:
+    - uri_location: archives
+      property_name: archive
+      media: "{{ bom.materials.media | flatten(levels=1) }}"
+    - uri_location: "boms/{{ bom_base_name }}/stackfiles"
+      property_name: file
+      media: "{{ bom.materials.stackfiles | flatten(levels=1) }}"
+    - uri_location: "boms/{{ bom_base_name }}/templates"
+      property_name: file
+      media: "{{ bom.materials.templates if (bom.materials.templates | type_debug == 'list') else [] | flatten(levels=1) }}"
+  loop_control:
+    loop_var: media_iterator
+
+- name: "Ensure {{ bom_base_name }} dependencies are followed"
+  when: bom_dependencies | length != 0
+  include_tasks: "{{ iterator }}"
+  vars:
+    bom_dependencies: "{{ bom.materials.dependencies is defined | ternary(bom.materials.dependencies, []) }}"
+    bom_media: "{{ bom.materials.media }}"
+    bom_base_name: "{{ item.name }}"
+  loop: "{{ bom_dependencies | flatten(levels=1) }}"

@@ -1,0 +1,10 @@
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Look up secret when ansible host is general VM
+      vars:
+        url: 'https://MGMTWEEUDEP00user16A.vault.azure.net/'
+        secretname: 'MGMT-client-id'
+      debug: msg="the value {{lookup('azure_keyvault_secret',secretname)}}"
+      delegate_to: localhost

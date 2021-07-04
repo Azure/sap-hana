@@ -1,0 +1,150 @@
+{#
+Outline:
+  1) Loop over all the hosts in the playbook
+  2) For each host, loop over all the network interfaces except 'lo' (localhost)
+  3) Check for ipv4 configuration the interface
+  4) If the interface is eth0
+       True : This is the primary NIC and IP for the host
+       False: This is a Secondary NIC with primary IP for this NIC
+  5) If the NIC has secondary IP adresses assigned loop over them and
+     insert comment for unhandled configuration
+
+Examples:
+  hosts file (should look similar to this):
+      # X01
+      10.1.2.42          x01app00l2e7.sap.contoso.com                      x01app00l2e7         
+      10.1.2.43          x01app01l2e7.sap.contoso.com                      x01app01l2e7         
+      10.1.2.5           x01dhdb00l02e7.sap.contoso.com                    x01dhdb00l02e7       
+      10.1.2.68          x01dhdb00l02e7eth1_0.sap.contoso.com              x01dhdb00l02e7eth1_0 
+      10.1.2.38          x01scs00l2e7.sap.contoso.com                      x01scs00l2e7         
+      10.1.2.26          x01web00l2e7.sap.contoso.com                      x01web00l2e7         
+
+  play_hosts (flat list of host names to loop over):
+      x01app00l2e7
+      x01app01l2e7
+      x01dhdb00l02e7
+      x01scs00l2e7
+      x01web00l2e7
+
+  ansible_interfaces (a sorted list could look like this):
+      eth0
+      eth1
+      eth2
+      eth3
+      lo                       <-- we want to omit this entry
+
+  interface (On a grand run this is what all the servers and their associated NICs might look like):
+      x01app00l2e7
+          eth0
+          eth1
+      x01app01l2e7
+          eth0
+          eth1
+      x01dhdb00l02e7
+          eth0
+          eth1
+          eth2
+          eth3
+      x01scs00l2e7
+          eth0
+      x01web00l2e7
+          eth0
+
+Notes:
+    1) any blank lines, that are not in the comment sections, will be reflected
+       in the hosts file.
+
+0.........1.........2.........3.........4.........5.........6.........7.........8
+
+#}
+# {{ sap_sid|upper }}
+{#
+
+Loop through all the hosts that are referenced by the Playbook.
+If we do not sort it, then the order can change randomly.
+
+#}
+{%  for host in play_hosts|sort %}
+{#
+
+Loop through all the network interfaces that are defined on the host.
+Sort the order so eth0 is first.
+Skip over the 'lo' interface.
+
+#}
+{%    for interface in hostvars[host]['ansible_interfaces']|sort if interface != 'lo' %}
+{#
+
+if ipv4 not found, then that NIC is not configured and is skipped
+
+#}
+{%      if 'ipv4' in hostvars[host]['ansible_' + interface] %}
+{#
+
+Determin if we are handling the Primary NIC (eth0)
+
+#}
+{%        if interface == 'eth0' %}
+{{ '%-19s' | format(hostvars[host]['ansible_' + interface]['ipv4']['address']) }}{{ '%-50s' | format(host + '.' + sap_fqdn) }}{{ '%-21s' | format(host) }}
+{%        else %}
+{{ '%-19s' | format(hostvars[host]['ansible_' + interface]['ipv4']['address']) }}{{ '%-50s' | format(host + interface + '_0.' + sap_fqdn) }}{{ '%-21s' | format(host + interface + '_0') }}
+{%        endif %}
+{%      endif %}
+{#
+
+Check for Secondary IP Addresses.
+
+#}
+{%      if 'ipv4_secondaries' in hostvars[host]['ansible_' + interface] %}
+{#
+
+Process all assigned secondaries
+
+#}
+{%        for ipv4Secondary in hostvars[host]['ansible_' + interface]['ipv4_secondaries'] %}
+{#
+
+We have no processing rules at this time.
+We will leave a tell-tale
+
+#}
+# Unhandled condition; Found a secondary IP: {{ interface }}:{{ loop.index }} - {{ ipv4Secondary['address'] }}
+{%        endfor %}
+{%      endif %}
+{%    endfor %}
+{%  endfor %}
+{#
+
+THIS  WAS OLD CODE FOR PROCESSING SECONDARIES - LEFT AS A REFERENCE FOR POSSIBLE EXPANSION
+
+
+
+
+
+
+
+
+Check for Secondary IP Addresses.
+Currently only structured to support 4 Secondaries.
+Currently only first Secondary is defined.
+
+#}
+{#
+{%      if 'ipv4_secondaries' in hostvars[host]['ansible_eth0'] %}
+{%        for ipv4Secondary in hostvars[host]['ansible_eth0']['ipv4_secondaries'] %}
+{%          if loop.index == 1 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    {{ '%15s' | format('sap-' + host) }}.{{ sap_fqdn }}     {{ '%15s' | format('sap-' + host) }}
+{%          elif loop.index == 2 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Third IP
+{%          elif loop.index == 3 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Fourth IP
+{%          elif loop.index == 4 %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Fifth IP
+{%          else %}
+{{ '%-15s' | format(ipv4Secondary['address']) }}    Unknown {{ loop.index }}
+{%          endif %}
+{%        endfor %}
+{%      endif %}
+{%    endif %}
+{%  endfor %}
+#}

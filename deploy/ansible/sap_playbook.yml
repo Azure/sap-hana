@@ -29,7 +29,7 @@
   become: true
   become_user: root
   vars_files:
-    - "vars/packages.yml"
+    - "vars/packages.yaml"
   pre_tasks:
     - name: Include SAP HANA DB sizes
       include_vars:
@@ -97,7 +97,7 @@
   become_user: root
   any_errors_fatal: true
   vars_files:
-    - "vars/ha-packages.yml"
+    - "vars/ha-packages.yaml"
   pre_tasks:
     - name: Include SAP HANA DB sizes
       include_vars:

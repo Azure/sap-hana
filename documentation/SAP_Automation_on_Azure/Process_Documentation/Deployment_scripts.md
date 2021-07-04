@@ -24,7 +24,7 @@ This script bootstraps the deployer.
 Usage:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/install_deployer.sh
+${DEPLOYMENT_REPO_PATH}/scripts/install_deployer.sh
 
 Parameters:
 
@@ -35,7 +35,7 @@ Parameters:
 Example:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/install_deployer.sh -p DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/PROD-WEEU-DEP00-INFRASTRUCTURE.json
+${DEPLOYMENT_REPO_PATH}/scripts/install_deployer.sh -p DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/PROD-WEEU-DEP00-INFRASTRUCTURE.json
 ```
 
 ## **install_library.sh**
@@ -45,7 +45,7 @@ This script bootstraps the deployer.
 Usage:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/install_library.sh
+${DEPLOYMENT_REPO_PATH}/scripts/install_library.sh
 
 Parameters:
 
@@ -57,7 +57,7 @@ Parameters:
 Example:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/install_library.sh 
+${DEPLOYMENT_REPO_PATH}/scripts/install_library.sh 
 -p LIBRARY/PROD-WEEU-SAP_LIBRARY/PROD-WEEU-SAP_LIBRARY.json
 -d ../../DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/ 
 ```
@@ -76,7 +76,7 @@ Wrapper script that:
 Usage:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/prepare_region.sh
+${DEPLOYMENT_REPO_PATH}/scripts/prepare_region.sh
 
 Parameters:
 -d deployer parameter file
@@ -88,7 +88,7 @@ Parameters:
 Example
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/prepare_region.sh 
+${DEPLOYMENT_REPO_PATH}/scripts/prepare_region.sh 
 -d DEPLOYER/PROD-WEEU-DEP00-INFRASTRUCTURE/PROD-WEEU-DEP00-INFRASTRUCTURE.json \
 -l LIBRARY/PROD-WEEU-SAP_LIBRARY/PROD-WEEU-SAP_LIBRARY.json \
 -e LANDSCAPE/PROD-WEEU-SAP00-INFRASTRUCTURE/PROD-WEEU-SAP00-INFRASTRUCTURE.json
@@ -101,7 +101,7 @@ Deployment helper, the script can be used to deploy the deployer, the library, t
 Usage:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/installer.sh
+${DEPLOYMENT_REPO_PATH}/scripts/installer.sh
 
 Parameters:
 -p parameter file
@@ -112,7 +112,7 @@ Parameters:
 Example:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/installer.sh
+${DEPLOYMENT_REPO_PATH}/scripts/installer.sh
 -p SYSTEM/PROD-WEEU-SAP00-ABC/PROD-WEEU-SAP00-ABC.json \
 -t sap_system
 ```
@@ -124,7 +124,7 @@ Helper script to set the SPN secrets in Azure keyvault.
 Usage:
 
 ```bash
-${DEPLOYMENT_REPO_PATH}scripts/set_secret.sh
+${DEPLOYMENT_REPO_PATH}/scripts/set_secret.sh
 
 Parameters:
 -e environment name

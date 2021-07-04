@@ -1,0 +1,57 @@
+[stack xml data: version=1.0]
+
+[stack]
+
+[APP_SYSTEM]
+XXX     00000
+
+[SPAM_CVERS]
+SAP_GWFND                     740       0025
+SAP_UI                        754       0006
+ST-SER                        720       0021
+
+[PRDVERS]
+01200314690900000235SAP SOLUTION MANAGER          4.0                           sap.com                       SAP SOLUTION MANAGER 7.0                                                -00000000000000
+01200314690900000833SAP SOLUTION MANAGER          4.0 EHP 1                     sap.com                       SAP SOLUTION MANAGER 7.0 EHP 1                                          -00000000000000
+01200314690900002795SAP SOLUTION MANAGER          7.1                           sap.com                       SAP SOLUTION MANAGER 7.1                                                -00000000000000
+01200615320900001194SAP SOLUTION MANAGER          3.1                           sap.com                       SAP SOLUTION MANAGER 3.1                                                -00000000000000
+01200615320900001197SAP SOLUTION MANAGER          2.2                           sap.com                       SAP SOLUTION MANAGER 2.2                                                -00000000000000
+01200615320900001198SAP SOLUTION MANAGER          2.1                           sap.com                       SAP SOLUTION MANAGER 2.1                                                -00000000000000
+01200615320900001255SAP SOLUTION MANAGER          3.2                           sap.com                       SAP SOLUTION MANAGER 3.2                                                -00000000000000
+01200615320900006067SAP SOLUTION MANAGER          7.2                           sap.com                       SAP SOLUTION MANAGER 7.2                                                +00000000000000
+67838200100900006370SAP SOLUTION MANAGER ON HANA  7.1                           sap.com                       SAP SOL. MANAGER 7.1 ON HANA                                            -00000000000000
+
+[SWFEATURE]
+1                   01200615320900006067SAP SOLUTION MANAGER          7.2                           sap.com                       SAP SOLUTION MANAGER 7.2: Solution Manager ABAP Stack                   +00000000000000
+7                   01200615320900006067SAP SOLUTION MANAGER          7.2                           sap.com                       SAP SOLUTION MANAGER 7.2: BI Content                                    +00000000000000
+
+[SWFEATUREINC]
+1                   678382001009000058681                   01200615320900006067SAP NETWEAVER                 7.4                           sap.com                       SAP NETWEAVER 7.4: Application Server ABAP                              +000000000000
+1                   735550001009000000211                   01200615320900006067SAP FIORI FOR SAP SOL. MRG.   1.0                           sap.com                       SAP FIORI FOR SAP SOL MRG 1.0: UI for SAP Solution Manager              +000000000000
+7                   012006153209000060671                   01200615320900006067SAP SOLUTION MANAGER          7.2                           sap.com                       SAP SOLUTION MANAGER 7.2: BI Content                                    +000000000000
+
+[INITIAL_CVERS]
+BBPCRM                        713       0020
+BI_CONT                       757       0027
+CPRXRPM                       610_740   0014
+CTS_PLUG                      200       0024
+IW_FNDGC                      100       0005
+IW_GIL                        100       0007
+MDG_FND                       747       0020
+PI_BASIS                      740       0024
+RTCISM                        100       0001
+SAP_ABA                       740       0024
+SAP_AP                        700       0038
+SAP_BASIS                     740       0024
+SAP_BS_FND                    747       0020
+SAP_BW                        740       0024
+SAP_GWFND                     740       0024
+SAP_UI                        754       0005
+ST                            720       0012
+ST-A/PI                       01U_731   0001
+ST-BCO                        720       0012
+ST-ICC                        200       0002
+ST-PI                         740       0014
+ST-SER                        720       0019
+ST-UI                         100       0011
+WEBCUIF                       747       0020
