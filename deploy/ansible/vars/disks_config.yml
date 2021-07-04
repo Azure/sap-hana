@@ -1,0 +1,133 @@
+---
+
+# Dynamicallu determine list of unique disk types associated with
+# current node.
+disktypes: >-
+  {{ disks | selectattr('host', 'defined') |
+      selectattr('host', 'equalto', inventory_hostname) |
+      map(attribute='type') | sort | unique |
+      list }}
+
+# Dynamically determine list of volume groups associated with
+# the current node.
+volume_groups: "{{ lookup ('template', 'volume_groups.j2') }}"
+
+# Mapping table from disk type to volume group name suffix
+disk_type_to_name_map:
+  data:   '{{ node_tier | lower }}_data'
+  log:    '{{ node_tier | lower }}_log'
+  backup: '{{ node_tier | lower }}_backup'
+
+#
+# Table of possible logical volumes that need to be managed.
+#
+# Each table entry must have the following attributes:
+#
+#   node_tier:
+#       the node tier associated with the entry
+#   lv:
+#       the name of the LV
+#   vg:
+#       the name of the VG hosting the LV
+#   size:
+#       the size of the LV
+#
+# Optionally table entries can contain the following attributes:
+#
+#   stripesize:
+#       the size of the stripe to use; the stripe count will be
+#       dynamically determined from the number of PVs associated
+#       with the VG.
+#
+#   fstype:
+#       the type of file system that the LV should be formatted
+#       as; if not specified then no file system will be created
+#       on the LV.
+#
+#   fsopts:
+#       additional options, if any, that should be passed to the
+#       mkfs command when formatting the file system.
+#
+logical_volumes:
+  - tier:       'sapos'
+    node_tier:  'all'
+    vg:         'vg_sap'
+    lv:         'lv_usrsap'
+    size:       '64g'
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'scs'
+    vg:         'vg_sap'
+    lv:         'lv_sapmnt'
+    size:       '128g'
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'scs'
+    vg:         'vg_sap'
+    lv:         'lv_usrsapinstall'
+    size:       '100%FREE'
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'hana'
+    vg:         'vg_sap'
+    lv:         'lv_hana_shared'
+    size:       '100%FREE'
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'hana'
+    vg:         'vg_hana_data'
+    lv:         'lv_hana_data'
+    size:       '100%FREE'
+    stripesize: 256
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'hana'
+    vg:         'vg_hana_log'
+    lv:         'lv_hana_log'
+    size:       '100%FREE'
+    stripesize: 64
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'hana'
+    vg:         'vg_hana_backup'
+    lv:         'lv_hana_backup'
+    size:       '100%FREE'
+    fstype:     'xfs'
+
+  - tier:       'sapos'
+    node_tier:  'web'
+    vg:         'vg_sap'
+    lv:         'lv_sapmnt'
+    size:       '1g'
+    fstype:     'xfs'
+
+# Define a dynamic expression based upon the 'item' fact that can
+# only be used within a loop, that determines the number of PVs
+# in associated with the associated VG.
+vg_stripecount_from_lv_item: >-
+  {{ ((volume_groups | default([{}]) |
+       selectattr('vg', 'equalto', item.vg) |
+       list | first).pvs | default([])) | count }}
+
+# Define a dynamic expression based upon the 'item' fact that can
+# only be used within a loop, that determines the options string
+# to pass to the lvol action's opts argument. Will evaluate to
+# '-i <num_vg_pvs> -I <stripesize>' only when the LV 'item' has
+# stripesize specified, otherwise it will be an empty string.
+lvol_opts_from_lv_item: >-
+  {{ ('stripesize' in item) |
+     ternary('-i ' ~ vg_stripecount_from_lv_item ~
+             ' -I ' ~ (item.stripesize | default(0)),
+             '') }}
+
+# Define a dynamic expression based upon the 'item' fact that can
+# only be used within a loop, that determines the device path for
+# a LV device.
+dev_path_from_lv_item: >-
+  {{ ['/dev', item.vg, item.lv] | join('/') }}

@@ -1,0 +1,105 @@
+#   SAP: Register BOM
+#   create .params directory
+#   deploy db install template
+#   deploy hdblcm password file
+#
+
+# TODO: Considerations
+#         20G+ swap space
+#         Livecache: None, HANA Internal, MaxDB External
+#         message server acl
+#         certificates
+#         secure storage key
+#
+
+---
+
+- name:  
+  set_fact:
+    dir_params:                   "{{ target_media_location }}/.params"
+
+
+
+#   0x) Create hidden directory for parameter files
+- name:     "Create hidden directory"
+  file:
+    path:   "{{ item.path }}"
+    state:  directory
+    mode:   0755
+  loop:
+    - { state: 'directory', mode: '0755', path: '{{ dir_params }}' }
+
+
+# TODO: Move the template to the BOM Directory
+#   SAP HANA: deploy hdblcm password file
+- name:               "SAP HANA: deploy hdblcm password file"
+  template:
+    src:              HANA_2_00_055_v1_install.rsp.xml.j2
+    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml"
+    mode:             0644
+    force:            yes
+  # Template parameter mapping
+  vars:
+    pwd_os_root:                      "***"                                       # Not used at this time
+    pwd_os_sapadm:                    "{{ password_master }}"
+    pwd_master:                       "{{ password_master }}"
+    pwd_os_sidadm:                    "{{ password_master }}"
+    pwd_hdb_system:                   "{{ password_master }}"
+    pwd_lss_user:                     "***"                                       # Not used at this time
+    pwd_lss_backup:                   "***"                                       # Not used at this time
+    pwd_streaming_cluster_manager:    "***"                                       # Not used at this time
+    pwd_ase_user:                     "***"                                       # Not used at this time
+    pwd_org_manager:                  "***"                                       # Not used at this time
+
+
+
+# TODO: Move the template to the BOM Directory
+# TODO: Analyze file in more detail
+#   SAP HANA: deploy hdblcm install response file
+- name:               "SAP HANA: deploy hdblcm install response file"
+  template:
+    src:              HANA_2_00_055_v1_install.rsp.j2
+    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp"
+    mode:             0644
+    force:            yes
+  # Template parameter mapping
+  vars:
+    _rsp_component_root:              "../COMPONENTS"
+    _rsp_components:                  "all"
+    _rsp_sapmnt:                      "/hana/shared"                              # Default Value
+    _rsp_hostname:                    "{{ inventory_hostname_short }}"            # TODO: needs to be tested with HA and scale out
+    _rsp_sid:                         "{{ hdb_sid|upper }}"
+    _rsp_number:                      "{{ hdb_instance_number }}"
+    _rsp_system_usage:                "custom"
+
+
+
+#   SAP HANA: Install
+- name:               "Execute hdblcm"
+  # shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
+  shell: |
+                      pwd=$(<{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml)
+                      rm {{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml
+                      echo $pwd | \
+                      ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
+  args:
+    chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
+
+
+
+
+
+
+# #   0x) remove hidden directory for parameter files
+# - name:     "remove hidden directory"
+#   file:
+#     path:   "{{ item.path }}"
+#     state:  "{{ item.state }}"
+#     mode:   "{{ item.mode }}"
+#   loop:
+#     - { state: 'absent',    mode: '0755', path: '{{ dir_params }}' }
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

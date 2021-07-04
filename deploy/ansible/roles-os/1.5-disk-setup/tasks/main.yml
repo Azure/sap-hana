@@ -1,0 +1,132 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                         OS Base Disk Configuration                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.5     - os-disk-setup
+#
+# -------------------------------------+---------------------------------------8
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+
+# ----------------------------------------
+# BEGIN
+# ----------------------------------------
+
+# ----------------------------------------
+# END
+# ----------------------------------------
+
+# # Prepare disks and mount points
+
+# # TODO: Refactor
+# # Check if installation paths are ready. If paths are unready, path_status_flag will be set. Then subsequent tasks will be executed.
+# - import_tasks: installation_path_prechecks.yml
+
+# - include_tasks: lvm_mount.yml
+#   when: path_status_flag is defined
+
+# Expectations:
+#
+#   Volume Groups: (pvs are only examples)
+#     - { tier: 'all',      vg: 'vg_sap',         pvs: '/dev/disk/azure/scsi1/lun0' }
+#     - { tier: 'hdb',      vg: 'vg_hana_data',   pvs: '/dev/disk/azure/scsi1/lun1,/dev/disk/azure/scsi1/lun2,/dev/disk/azure/scsi1/lun3' }
+#     - { tier: 'hdb',      vg: 'vg_hana_log',    pvs: '/dev/disk/azure/scsi1/lun4,/dev/disk/azure/scsi1/lun5,/dev/disk/azure/scsi1/lun6' }
+#     - { tier: 'hdb',      vg: 'vg_hana_backup', pvs: '/dev/disk/azure/scsi1/lun7' }
+#
+#   Logical Volumes:
+#    - { tier: 'all',         lv: 'lv_usrsap',        vg: 'vg_sap',         size: '64g',       opts: '' }
+#    - { tier: 'preparation', lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '128g',      opts: '' }
+#    - { tier: 'preparation', lv: 'lv_usrsapinstall', vg: 'vg_sap',         size: '100%FREE',  opts: '' }
+#    - { tier: 'hdb',         lv: 'lv_hana_shared',   vg: 'vg_sap',         size: '100%FREE',  opts: '' }
+#    - { tier: 'hdb',         lv: 'lv_hana_data',     vg: 'vg_hana_data',   size: '100%FREE',  opts: '-i 3 -I 128' }
+#    - { tier: 'hdb',         lv: 'lv_hana_log',      vg: 'vg_hana_log',    size: '100%FREE',  opts: '-i 3 -I 32' }
+#    - { tier: 'hdb',         lv: 'lv_hana_backup',   vg: 'vg_hana_backup', size: '100%FREE',  opts: '' }
+#    - { tier: 'web',         lv: 'lv_sapmnt',        vg: 'vg_sap',         size: '1g',        opts: '' }
+#
+#   Filesystems:
+#    - { tier: 'all',         fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsap' }
+#    - { tier: 'preparation', fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+#    - { tier: 'preparation', fstype: 'xfs', dev: '/dev/vg_sap/lv_usrsapinstall' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_sap/lv_hana_shared' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_data/lv_hana_data' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_log/lv_hana_log' }
+#    - { tier: 'hdb',         fstype: 'xfs', dev: '/dev/vg_hana_backup/lv_hana_backup' }
+#    - { tier: 'web',         fstype: 'xfs', dev: '/dev/vg_sap/lv_sapmnt' }
+
+# Get all the unique disk types from sap-parameters
+
+# -------------------------------------+---------------------------------------8
+#
+- name:                           Load the disk configuration settings
+  include_vars:                   disks_config.yml
+
+- name:                           "print unique disks"
+  debug:
+    var:                          disktypes
+    verbosity:                    2
+
+- name:                           "Print volume group details"
+  debug:
+    var:                          volume_groups
+    verbosity:                    2
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+- name:                           "Volume Group creation"
+  lvg:
+    vg:                           "{{ item.vg }}"
+    pvs:                          "{{ item.pvs }}"
+    pesize:                       4M
+    state:                        present
+  loop:                           "{{ volume_groups }}"
+  when:
+    - tier == "sapos"
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+- name:                           "Logical Volume creation"
+  lvol:
+    lv:                           "{{ item.lv }}"
+    vg:                           "{{ item.vg }}"
+    size:                         "{{ item.size }}"
+    opts:                         "{{ lvol_opts_from_lv_item }}"
+    active:                       yes
+    state:                        present
+    shrink:                       no
+    resizefs:                     no
+  loop: "{{ logical_volumes }}"
+  when:
+    - item.tier in ["all", tier]
+    - item.node_tier in ["all", node_tier]
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+- name:                           "Filesystem creation"
+  filesystem:
+    dev:                          "{{ dev_path_from_lv_item }}"
+    fstype:                       "{{ item.fstype }}"
+    opts:                         "{{ item.fsopts | default('') }}"
+  loop: "{{ logical_volumes }}"
+  when:
+    - item.tier in ["all", tier]
+    - item.node_tier in ["all", node_tier]
+    - item.fstype is defined
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

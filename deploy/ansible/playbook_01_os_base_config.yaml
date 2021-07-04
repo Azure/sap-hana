@@ -1,0 +1,143 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |       Playbook for performing general baseline OS configuration tasks      |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header> 
+#
+# -------------------------------------+---------------------------------------8
+
+- hosts:              "{{ sap_sid|upper }}_DB  :
+                       {{ sap_sid|upper }}_SCS :
+                       {{ sap_sid|upper }}_PAS :
+                       {{ sap_sid|upper }}_APP :
+                       {{ sap_sid|upper }}_WEB"
+
+  name:               OS - Base Configuration
+  remote_user:        "{{ orchestration_ansible_user }}"                
+  become:             yes
+  become_user:        root
+  gather_facts:       true                                                      # Important to collect hostvars information
+  any_errors_fatal:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+
+  # Specify the active tier for this playbook run
+  - set_fact:
+      tier:     os
+    tags:
+      - always
+
+  - block:
+      - include_role:
+          name:     roles-os/1.0-sudoers
+    tags:
+      - 1.0-sudoers
+
+  - block:
+      - include_role:
+          name:     roles-os/1.1-swap
+    tags:
+      - 1.1-swap
+
+  - block:
+      - include_role:
+          name:     roles-os/1.2-hostname
+    tags:
+      - 1.2-hostname
+
+  - block:
+      - include_role:
+          name:     roles-os/1.5-disk-setup
+    tags:
+      - 1.5-disk-setup
+
+  - block:
+      - include_role:
+          name:     roles-os/1.3-repository
+    tags:
+      - 1.3-repository
+
+  - block:
+      - include_role:
+          name:     roles-os/1.4-packages
+    tags:
+      - 1.4-packages
+
+  - block:
+      - include_role:
+          name:     roles-os/1.7-chrony
+    tags:
+      - 1.7-chrony
+
+  - block:
+      - include_role:
+          name:     roles-os/1.11-accounts
+    tags:
+      - 1.11-accounts
+
+  - block:
+      - include_role:
+          name:     roles-os/1.16-services
+    tags:
+      - 1.16-services
+
+  - include_role:
+      name:     roles-os/1.20-prometheus
+    tags:
+      - 1.20-prometheus
+    when:   prometheus
+            and             ansible_os_family|upper == "SUSE"
+            and (     (     ansible_distribution_major_version == '12'
+                        and ansible_distribution_release is search('[3-5]' ) )
+                  or  (     ansible_distribution_major_version == '15' ) )
+
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/
+
+#
+# 0      1         2         3         4         5         6         7         8
+# 345678901234567890123456789012345678901234567890123456789012345678901234567890
+#
+
+
+
+
+#----------------------------------------
+# BEGIN example reference for refactoring
+#
+# TODO: evaluate for inclusion and refactor.
+#        this is how hdb_sizes was registered
+# SOURCE: sap-playbook
+#----------------------------------------
+
+# √  pre_tasks:
+# √    - name: Include SAP HANA DB sizes
+# √      include_vars:
+# √        file: "{{ configs_path }}/hdb_sizes.json"
+# √        name: hdb_sizes
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+# # DEBUG: Example of listing hostvars for a specific server.
+  # - debug:
+  #     var: hostvars['x00scs00l373']

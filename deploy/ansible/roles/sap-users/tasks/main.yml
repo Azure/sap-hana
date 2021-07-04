@@ -1,0 +1,28 @@
+---
+
+- name: Ensure SAP groups are created
+  group:
+    name: "{{ item.group }}"
+    gid: "{{ item.gid }}"
+    state: present
+  loop:
+    - group: "sapsys"
+      gid: "{{ sapsys_gid }}"
+    - group: "sapinst"
+      gid: "{{ sapinst_gid }}"
+
+- name: Ensure SAP users are created
+  user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid }}"
+    group: "{{ item.group }}"
+  loop:
+    - tier: all
+      name: sapadm
+      uid: "{{ sapadm_uid }}"
+      group: "sapsys"
+    - tier: preparation
+      name: "{{ sap_sid | lower }}adm"
+      uid: "{{ sidadm_uid }}"
+      group: "sapsys"
+  when: item.tier == "all" or item.tier == tier

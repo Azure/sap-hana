@@ -1,0 +1,258 @@
+---
+
+name: "SAP_BW4HANA_2_0"
+target: "SAP BW/4HANA 2.0"
+version: "001"
+
+defaults:
+  target_location: "{{ target_media_location }}/download_basket"
+
+product_ids:
+  scs:
+  db:
+  pas:
+  aas:
+  web:
+
+materials:
+  dependencies:
+    - name: "HANA_2_00_052_v001"
+      version: "001"
+
+  media:
+
+    # kernel components
+
+    - name: "Kernel Part II (777)"
+      archive: "SAPEXEDB_200-80004392.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001063182020"
+
+    - name: "Kernel Part I"
+      archive: "SAPEXE_200-80004393.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001063232020"
+
+    - name: "SAP HOST AGENT 7.21 SP49"
+      archive: "SAPHOSTAGENT49_49-20009394.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001725602020"
+
+    - name: "Patch 1 for SOFTWARE UPDATE MANAGER 2.0 SP09"
+      archive: "SUM20SP09_1-80002456.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001781372020"
+
+    - name: "SWPM20SP07"
+      archive: "SWPM20SP07_1-80003424.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001765102020"
+
+    - name: "Installation for SAP IGS integrated in SAP Kernel"
+      archive: "igsexe_12-80003187.sar"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000001632902020"
+
+    - name: "SAP IGS Fonts and Textures"
+      archive: "igshelper_17-10010245.sar"
+      sapurl: "https://softwaredownloads.sap.com/file/0020000000703122018"
+
+    # db export components
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_1.zip"
+      archive: "BW4HANA200_INST_EXPORT_1.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365682019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_2.zip"
+      archive: "BW4HANA200_INST_EXPORT_2.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365682019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_3.zip"
+      archive: "BW4HANA200_INST_EXPORT_3.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365692019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_4.zip"
+      archive: "BW4HANA200_INST_EXPORT_4.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365712019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_5.zip"
+      archive: "BW4HANA200_INST_EXPORT_5.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365742019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_6.zip"
+      archive: "BW4HANA200_INST_EXPORT_6.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365782019"
+
+    - name: "File on DVD - BW4HANA200_INST_EXPORT_7.zip"
+      archive: "BW4HANA200_INST_EXPORT_7.zip"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365802019"
+
+    - name: "File on DVD - BW4HANA200_NW_LANG_DE.SAR"
+      archive: "BW4HANA200_NW_LANG_DE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365892019"
+
+    - name: "File on DVD - BW4HANA200_NW_LANG_EN.SAR"
+      archive: "BW4HANA200_NW_LANG_EN.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000365932019"
+
+    - name: "File on DVD - BW4HANA200_NW_LANG_UK.SAR"
+      archive: "BW4HANA200_NW_LANG_UK.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0030000000366442019"
+
+    # other components
+
+    - name:     SAPCAR
+      version:  7.21
+      archive:  SAPCAR_1324-80000935.EXE
+      override_target_filename: SAPCAR.EXE
+
+    - name: "Attribute Change Package 02 for DW4CORE 200"
+      archive: "DW4CORE200.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000804552020"
+
+    - name: "DW4CORE 200: SP 0001"
+      archive: "K-20001INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000737982019"
+
+    - name: "DW4CORE 200: SP 0002"
+      archive: "K-20002INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001363592019"
+
+    - name: "DW4CORE 200: SP 0003"
+      archive: "K-20003INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001936302019"
+
+    - name: "DW4CORE 200: SP 0004"
+      archive: "K-20004INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000220412020"
+
+    - name: "DW4CORE 200: SP 0005"
+      archive: "K-20005INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000663582020"
+
+    - name: "DW4CORE 200: SP 0006"
+      archive: "K-20006INDW4CORE.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001205952020"
+
+    - name: "UIBAS001 400: SP 0002"
+      archive: "K-40002INUIBAS001.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000660352019"
+
+    - name: "UIBAS001 400: SP 0003"
+      archive: "K-40003INUIBAS001.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001874172019"
+
+    - name: "UIBAS001 400: SP 0004"
+      archive: "K-40004INUIBAS001.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000334752020"
+
+    - name: "ST-PI 740: SP 0010"
+      archive: "K-74010INSTPI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000161692019"
+
+    - name: "ST-PI 740: SP 0011"
+      archive: "K-74011INSTPI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001051532019"
+
+    - name: "ST-PI 740: SP 0012"
+      archive: "K-74012INSTPI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000002162182019"
+
+    - name: "ST-PI 740: SP 0013"
+      archive: "K-74013INSTPI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000660652020"
+
+    - name: "SAP_BASIS 753: SP 0002"
+      archive: "K-75302INSAPBASIS.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000564652019"
+
+    - name: "SAP_GWFND 753: SP 0002"
+      archive: "K-75302INSAPGWFND.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000564702019"
+
+    - name: "SAP_BASIS 753: SP 0003"
+      archive: "K-75303INSAPBASIS.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001869462019"
+
+    - name: "SAP_GWFND 753: SP 0003"
+      archive: "K-75303INSAPGWFND.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001730742019"
+
+    - name: "SAP_UI 753: SP 0003"
+      archive: "K-75303INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000564712019"
+
+    - name: "SAP_BASIS 753: SP 0004"
+      archive: "K-75304INSAPBASIS.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000279722020"
+
+    - name: "SAP_GWFND 753: SP 0004"
+      archive: "K-75304INSAPGWFND.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000279762020"
+
+    - name: "SAP_UI 753: SP 0004"
+      archive: "K-75304INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001014562019"
+
+    - name: "SAP_UI 753: SP 0005"
+      archive: "K-75305INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001730772019"
+
+    - name: "SAP_UI 753: SP 0006"
+      archive: "K-75306INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000279772020"
+
+    - name: "SAP_UI 753: SP 0007"
+      archive: "K-75307INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000834262020"
+
+    - name: "SAP_UI 753: SP 0008"
+      archive: "K-75308INSAPUI.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001474132020"
+
+    - name: "SAP_ABA 75D: SP 0002"
+      archive: "K-75D02INSAPABA.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000564732019"
+
+    - name: "SAP_ABA 75D: SP 0003"
+      archive: "K-75D03INSAPABA.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001730792019"
+
+    - name: "SAP_ABA 75D: SP 0004"
+      archive: "K-75D04INSAPABA.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000279782020"
+
+    - name: "SPAM/SAINT Update - Version 753/0076"
+      archive: "KD75376.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000001619172020"
+
+    - name: "Attribute Change Package 13 for SAP_BASIS 753"
+      archive: "SAP_BASIS753.SAR"
+      sapurl: "https://softwaredownloads.sap.com/file/0010000000804552020"
+
+  templates:
+
+    - name: "SAP_BW4HANA_2_0 ini file"
+      file: "SAP_BW4HANA_2_0.inifile.params"
+      override_target_location: "{{ target_media_location }}/config"
+
+  stackfiles:
+
+    - name: Download Basket JSON Manifest
+      file: downloadbasket.json
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Spreadsheet
+      file: MP_Excel_1001059086_20201023_SWC.xls
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Plan doc
+      file: MP_Plan_1001059086_20201023_.pdf
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack text
+      file: MP_Stack_1001059086_20201023_.txt
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket Stack XML
+      file: MP_Stack_1001059086_20201023_.xml
+      override_target_location: "{{ target_media_location }}/config"
+
+    - name: Download Basket permalinks
+      file: myDownloadBasketFiles.txt
+      override_target_location: "{{ target_media_location }}/config"
+...

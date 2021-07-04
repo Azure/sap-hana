@@ -74,6 +74,10 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
 }
 
+variable "cloudinit_growpart_config" {
+  description = "A cloud-init config that configures automatic growpart expansion of root partition"
+}
+
 
 locals {
   // Resources naming

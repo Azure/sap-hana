@@ -1,0 +1,16 @@
+---
+# /*-----------------------------------4---------------------------------------8
+# |                                                                            |
+# |               Task: 1.11   - Defaults for account creation tasks           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+
+# Default role to use if none specified
+sudoers_role:  admin_no_password
+
+# Default to creating a sudoers file
+sudoers_state: present
+
+# Where to create sudoers files
+sudoers_path:  /etc/sudoers.d

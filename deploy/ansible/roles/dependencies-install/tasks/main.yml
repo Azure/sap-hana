@@ -1,0 +1,5 @@
+---
+
+- name: include OS-specific vars
+  include_vars: "{{ ansible_os_family | lower }}.yml"
+- include_tasks: configure.yml

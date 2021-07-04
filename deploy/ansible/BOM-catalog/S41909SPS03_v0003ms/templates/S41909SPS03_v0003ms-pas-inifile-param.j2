@@ -1,0 +1,77 @@
+#   2482103 - Installation with SWPM in unattended mode using parameter input file fails
+#   2393060 - SAPinst Framework 749 Central Note
+
+########################################################################################################################################################################################################
+#                                                                                                                                                                                                      #
+# Installation service 'SAP S/4HANA Server 1909 > SAP HANA Database > Installation > Application Server ABAP
+#                       > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAP' #
+#                       > Distributed System > Database Instance', product id 'NW_ABAP_DB:S4HANA1909.CORE.HDB.ABAP' #
+#                       > Distributed System > Primary Application Server Instance', product id 'NW_ABAP_CI:S4HANA1909.CORE.HDB.ABAP' #
+#                                                                                                                                                                                                      #
+########################################################################################################################################################################################################
+
+# Location of Export CD
+SAPINST.CD.PACKAGE.HDBCLIENT                                         = {{ sap_cd_package_hdbclient }}
+SAPINST.CD.PACKAGE.CD1                                               = {{ sap_cd_package_cd1 }}
+SAPINST.CD.PACKAGE.CD2                                               = {{ sap_cd_package_cd2 }}
+SAPINST.CD.PACKAGE.CD3                                               = {{ sap_cd_package_cd3 }}
+SAPINST.CD.PACKAGE.CD4                                               = {{ sap_cd_package_cd4 }}
+SAPINST.CD.PACKAGE.CD5                                               = {{ sap_cd_package_cd5 }}
+
+
+archives.downloadBasket                                              = /usr/sap/install/download_basket
+
+nwUsers.sapadmUID                                                    = {{ sapadm_uid }}
+nwUsers.sapsysGID                                                    = {{ sapsys_gid }}
+nwUsers.sidAdmUID                                                    = {{ sidadm_uid }}
+
+NW_Delete_Sapinst_Users.removeUsers                                  = true
+NW_GetMasterPassword.masterPwd                                       = {{ password_master }}
+NW_GetSidNoProfiles.sid                                              = {{ sap_sid|upper }}
+
+NW_SCS_Instance.ascsInstallGateway                                   = true
+NW_SCS_Instance.ascsInstallWebDispatcher                             = false
+NW_SCS_Instance.instanceNumber                                       = {{ scs_instance_number }}
+NW_SCS_Instance.scsVirtualHostname                                   = {{ sap_scs_hostname }}
+
+NW_adaptProfile.skipSecurityProfileSettings                          = true
+NW_getFQDN.FQDN                                                      = {{ sap_fqdn }}
+
+
+HDB_Schema_Check_Dialogs.schemaName                                   = SAPHANADB
+HDB_Schema_Check_Dialogs.schemaPassword                               = {{ password_master }}
+
+NW_HDB_DB.abapSchemaName                                              = SAPHANADB
+NW_HDB_DB.abapSchemaPassword                                          = {{ password_master }}
+NW_HDB_DBClient.clientPathStrategy                                    = SAPCPE
+NW_HDB_getDBInfo.dbhost                                               = {{ sap_db_hostname }}
+NW_HDB_getDBInfo.dbsid                                                = {{ hdb_sid|upper }}
+NW_HDB_getDBInfo.instanceNumber                                       = {{ hdb_instance_number }}
+NW_HDB_getDBInfo.systemDbPassword                                     = {{ password_master }}
+NW_HDB_getDBInfo.systemPassword                                       = {{ password_master }}
+NW_HDB_getDBInfo.systemid                                             = {{ hdb_sid|upper }}
+NW_HDB_getDBInfo.usingSSL                                             = true
+
+NW_Recovery_Install_HDB.extractLocation                               = /usr/sap/{{ hdb_sid|upper }}/{{ hdb_sid|upper }}{{ hdb_instance_number }}/backup/data/DB_HDB
+NW_Recovery_Install_HDB.extractParallelJobs                           = 24
+NW_Recovery_Install_HDB.sidAdmName                                    = {{ hdb_sid|lower }}adm
+NW_Recovery_Install_HDB.sidAdmPassword                                = {{ password_master }}
+
+NW_checkMsgServer.abapMSPort                                          = 36{{ scs_instance_number }}
+NW_getLoadType.loadType                                               = SAP
+NW_readProfileDir.profileDir                                          = {{ sap_profile_dir }}
+
+NW_CI_Instance.ascsVirtualHostname                                    = {{ sap_scs_hostname }}
+NW_CI_Instance.ciInstanceNumber                                       = {{ sap_ciInstanceNumber }}
+NW_CI_Instance.ciMSPort                                               = 36{{ scs_instance_number }}
+NW_CI_Instance.ciVirtualHostname                                      = {{ sap_ciVirtualHostname }}
+NW_CI_Instance.scsVirtualHostname                                     = {{ sap_scs_hostname }}
+
+NW_DDIC_Password.needDDICPasswords                                    = false
+NW_System.installSAPHostAgent                                         = {{ sap_installSAPHostAgent }}
+
+NW_WPConfiguration.ciDialogWPNumber                                   = {{ sap_ciDialogWPNumber}}
+NW_WPConfiguration.ciBtcWPNumber                                      = {{ sap_ciBtcWPNumber }}
+
+storageBasedCopy.hdb.instanceNumber                                   = {{ hdb_instance_number }}
+storageBasedCopy.hdb.systemPassword                                   = {{ password_master }}

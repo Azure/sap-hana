@@ -1,0 +1,38 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                 Playbook for SAP Application Server Install                |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+- hosts:          "{{ sap_sid|upper }}_APP"
+
+  name:           SAP Installation - APP
+  serial:         1                                                             # Cause App Servers to install sequentially
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - set_fact:
+      tier:     app                                                             # SAP Install phase: APP - Application Server
+
+  - include_role:
+      name:     roles-sap-os/sap-mounts
+
+  - include_role:
+      name:     roles-sap/5.3-app-install
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
+# +------------------------------------4--------------------------------------*/

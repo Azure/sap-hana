@@ -1,0 +1,70 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.11    - Enable sudo settings for specific user       |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# -------------------------------------+---------------------------------------8
+#
+# To be able to template sudoers_role specific /etc/sudoers.d/<username>
+# files with variables loaded from a sudoers role specific vars file, if
+# it exists, we need to implement that work flow in this task list which
+# is used by a loop'd include_tasks action in the main.yml.
+#
+# Required variables when including this task list:
+#   * sudoers_user - the user name to create a sudoers.d file file;
+#                    must be specified and must be a valid user name
+#   * sudoers_role - the type of sudoers entry to create; optional
+#                    defaulting to 'admin_no_password'. Specified
+#                    value must match the name of a template file
+#                    in the templates directory, and optionally a
+#                    vars file in the vars directory.
+#
+# -------------------------------------+---------------------------------------8
+
+# Retrieve passwd content into getent_passwd fact
+- name:         Load database of known users
+  getent:
+    database:   passwd
+
+- name:         Ensure that sudoers_user was specified
+  fail:
+    msg: >
+      Please ensure that a 'sudoers_user` is specified, is not an
+      empty value, and matches a known user if creating a sudoers
+      entry.
+  when:
+    -           ((sudoers_user is not defined) or
+                 ((sudoers_user == "") or
+                  ((sudoers_user not in getent_passwd) and
+                   (sudoers_state == "present"))))
+
+- name:         Optionally include any vars settings for specified role
+  include_vars: "{{ found_var_file }}"
+  loop_control:
+    # Can't safely use item here as it is being used by the looping
+    # include_tasks action in main.yml
+    loop_var:   found_var_file
+  with_first_found:
+    -           "sudoers_{{ sudoers_role }}.yml"
+    -           "sudoers_default.yml"
+
+- name:         Create sudoers file for {{ sudoers_user }} with
+                role {{ sudoers_role }} if required
+  template:
+    src:        "sudoers_{{ sudoers_role }}.j2"
+    dest:       "{{ sudoers_path }}/{{ sudoers_user }}"
+    mode:       "0440"
+    owner:      root
+    group:      root
+    validate:   /usr/sbin/visudo -cf %s
+  when:
+    -           sudoers_state == "present"
+
+- name:         Remove sudoers file for {{ sudoers_user }} if required
+  file:
+    path:       "{{ sudoers_path }}/{{ sudoers_user }}"
+    state:      absent
+  when:
+    -           sudoers_state == "absent"

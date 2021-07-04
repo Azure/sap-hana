@@ -1,0 +1,62 @@
+[stack xml data: version=1.0]
+
+[stack]
+
+[APP_SYSTEM]
+XXX     00000
+
+[SPAM_CVERS]
+SAP_ABA                       750       0020
+SAP_BASIS                     750       0020
+SAP_BW                        750       0020
+SAP_GWFND                     750       0020
+SAP_UI                        754       0006
+ST-PI                         740       0014
+
+[PRDVERS]
+01200314690900000192SAP NETWEAVER                 04                            sap.com                       SAP NETWEAVER 04                                                        -00000000000000
+01200314690900000267SAP RECORDS MANAGEMENT        SAP RMGT 3.00                 sap.com                       SAP RMGT 3.00                                                           -00000000000000
+01200314690900000451SAP NETWEAVER AS ABAP         7.1                           sap.com                       SAP NETWEAVER AS ABAP 7.1                                               -00000000000000
+01200314690900000866SAP NETWEAVER                 SAP EHP1 FOR SAP NETWEAVER 7.0sap.com                       SAP EHP1 FOR SAP NETWEAVER 7.0                                          -00000000000000
+01200314690900000868SAP NETWEAVER AS ABAP         7.11                          sap.com                       SAP EHP1 FOR SAP NW ABAP 7.1                                            -00000000000000
+01200314690900001453PORTAL ADD-ON NW 7.01         PORTAL ADD-ON NW 7.01         sap.com                       PORTAL ADD-ON SAP NW 7.0 EHP1                                           -00000000000000
+01200314690900002470SAP NETWEAVER                 SAP EHP3 FOR  7.0             sap.com                       SAP EHP3 FOR SAP NETWEAVER 7.0                                          -00000000000000
+01200314690900002540SAP NETWEAVER                 7.3                           sap.com                       SAP NETWEAVER 7.3                                                       -00000000000000
+01200314690900002648PORTAL ADD-ON NW 7.0          PORTAL ADD-ON NW 7.0          sap.com                       PORTAL ADD-ON SAP NW 7.0                                                -00000000000000
+01200314690900004969SAP_NW_UI_EXTENSIONS_7.03     100                           sap.com                       UI ADD-ON 1.0 FOR NW 7.03                                               -00000000000000
+01200314690900004986SAP_NW_UI_EXTENSIONS_100_700  100_700                       sap.com                       UI ADD-ON 1.0 FOR NW 7.00                                               -00000000000000
+01200314690900004987SAP_NW_UI_EXTENSIONS_100_701  100_701                       sap.com                       UI ADD-ON 1.0 FOR NW 7.01                                               -00000000000000
+01200314690900004988SAP_NW_UI_EXTENSIONS_100_702  100_702                       sap.com                       UI ADD-ON 1.0 FOR NW 7.02                                               -00000000000000
+01200615320900001250SAP NETWEAVER                 7.0 (2004S)                   sap.com                       SAP NETWEAVER 7.0                                                       -00000000000000
+01200615320900001396SAP CONTENT SERVER            6.40                          sap.com                       EXP: SAP CONTENT SERVER 6.40                                            -00000000000000
+01200615320900001418SAP NETWEAVER CE              7.1                           sap.com                       SAP NETWEAVER CE 7.1                                                    -00000000000000
+01200615320900001488SAP NETWEAVER MOBILE          7.1                           sap.com                       SAP NETWEAVER MOBILE 7.1                                                -00000000000000
+01200615320900001495SAP NETWEAVER PI              7.1                           sap.com                       SAP NETWEAVER PI 7.1                                                    -00000000000000
+01200615320900001553ESR FOR SAP NETWEAVER CE      7.1                           sap.com                       ESR FOR SAP NETWEAVER CE 7.1                                            -00000000000000
+01200615320900002084SAP NETWEAVER CE              7.1.1                         sap.com                       SAP EHP1 FOR SAP NW CE 7.1                                              -00000000000000
+01200615320900002548SAP NETWEAVER PI              7.11                          sap.com                       SAP EHP1 FOR SAP NW PI 7.1                                              -00000000000000
+01200615320900002549SAP NETWEAVER MOBILE          7.11                          sap.com                       SAP EHP1 FOR SAP NW MOBILE 7.1                                          -00000000000000
+01200615320900003225SAP NETWEAVER                 SAP EHP2 FOR SAP NETWEAVER 7.0sap.com                       SAP EHP2 FOR SAP NETWEAVER 7.0                                          -00000000000000
+01200615320900003664PORTAL ADD-ON NW 7.02         PORTAL ADD-ON NW 7.02         sap.com                       PORTAL ADD-ON SAP NW 7.0 EHP2                                           -00000000000000
+01200615320900004494SAP NETWEAVER CE              7.20                          sap.com                       SAP NETWEAVER CE 7.2                                                    -00000000000000
+01200615320900005175SAP NETWEAVER                 7.31                          sap.com                       SAP EHP1 FOR SAP NETWEAVER 7.3                                          -00000000000000
+01200615320900005437CONCEPT GATEWAY               2.0                           sap.com                       SAP GATEWAY 2.0                                                         -00000000000000
+67837800100900006827PI_SFTPPGP_ADDON              1.0                           sap.com                       PI SFTP PGP ADDON 1.0                                                   -00000000000000
+67837800100900008134SAP BUSINESS PLANNING AND CONS10.5                          sap.com                       SAP PC 10.1 FOR SAP NW                                                  -00000000000000
+67837800100900008927SAP_NW_ABAP_OOEM              1.0                           sap.com                       SAP NW ABAP 7.4 FOR OOEM 1.0                                            -00000000000000
+67838200100900005821SAP NETWEAVER ABAP FOR SUITE  7.40                          sap.com                       SAP NW AS ABAP 7.4 FOR SUITE                                            -00000000000000
+67838200100900005868SAP NETWEAVER                 7.4                           sap.com                       SAP NETWEAVER 7.4                                                       -00000000000000
+73554900100900000414SAP NETWEAVER                 7.5                           sap.com                       SAP NETWEAVER 7.5                                                       +00000000000000
+73554900100900000457SAP UI ADD-ON                 200                           sap.com                       UI ADD-ON 2.0                                                           -00000000000000
+73555000100900004727PI_CONNECTIVITY_ADDON         2.0                           sap.com                       PI CONNECTIVITY ADDON 2.0                                               -00000000000000
+
+[SWFEATURE]
+1                   73554900100900000414SAP NETWEAVER                 7.5                           sap.com                       SAP NETWEAVER 7.5: Application Server ABAP                              +00000000000000
+
+[INITIAL_CVERS]
+SAP_ABA                       750       0000
+SAP_BASIS                     750       0000
+SAP_BW                        750       0000
+SAP_GWFND                     750       0000
+SAP_UI                        750       0000
+ST-PI                         740       0001

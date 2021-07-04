@@ -1,0 +1,219 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                        OS Chrony Configuration                             |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.7     - os-chrony-setup
+#
+# -------------------------------------+---------------------------------------8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+
+#----------------------------------------
+# BEGIN
+#----------------------------------------
+
+# TODO: This should probably be moved into the 1.4-packages role
+- name:   Collect facts about installed packages
+  package_facts:
+
+- name:   Show installed package details if verbosity level specified
+  debug:
+    var:  ansible_facts.packages
+    verbosity: 2
+
+# The ntp package should have been uninstalled during the execution
+# of the 1.4-packages role.
+- name:   Fail if ntp still installed
+  fail:
+    msg: >
+          The 'ntp' package is still installed. Please ensure that the
+          role-os/1.4-packages role has been successfully run before
+          this role runs.
+  when:
+   # parentheses wrapped to keep ansible parser happy
+   -      ('ntp' in ansible_facts.packages)
+
+- name:    Ensure that required packages are installed
+  package:
+    name:  "{{ item }}"
+    state: present
+  when:
+    -      item not in ansible_facts.packages
+  loop:
+    -      'chrony'
+  register: chrony_package_installed
+
+# -------------------------------------+---------------------------------------8
+#
+# Determine whether we are setting up custom pool/server settings, or
+# using the distribution provided defaults.
+#
+# -------------------------------------+---------------------------------------8
+- name: Initialise facts used to manage chrony settings
+  set_fact:
+    chronyd_restart_required: "{{ chrony_package_installed is changed }}"
+    # Generate list of chrony config entries that may need to be added
+    chrony_conf_entries: >-
+      {%- set _conf_entries =[] -%}
+      {%- if chrony_pool != "" -%}
+      {%-   set _ = _conf_entries.append(dict(type="pool", name=chrony_pool, opts=["iburst"])) -%}
+      {%- else -%}
+      {%-   for s in chrony_servers -%}
+      {%-     set _ = _conf_entries.append(dict(type="server", name=s, opts=["iburst"])) -%}
+      {%-   endfor -%}
+      {%- endif -%}
+      {{- _conf_entries -}}
+
+- name: Show generated list of chrony conf entries
+  debug:
+    var: chrony_conf_entries
+    verbosity: 1
+  when:
+    - (chrony_conf_entries | count) == 0
+
+# -------------------------------------+---------------------------------------8
+#
+# For RHEL, the default config either has servers (RHEL7) or a pool
+# (RHEL8) already enabled, while on SLES, there is a '!' commented
+# example default pool entry, which will need to be uncommented.
+# Similarly if switching back from custom settings to the distro
+# defaults we will need to uncomment the '!' commented entries as
+# well as remove the ansible managed block entru
+#
+# -------------------------------------+---------------------------------------8
+- name: Setup chrony with distribution defaults
+  block:
+    - name:        Remove any ansible managed block
+      blockinfile:
+        path:      /etc/chrony.conf
+        marker:    "# {mark} ANSIBLE MANAGED BLOCK"
+        state:     absent
+      register:    chrony_remove_custom_settings
+
+    - name:        Uncomment any default entries
+      lineinfile:
+        path:      /etc/chrony.conf
+        regexp:    '^! ((pool|server) .*)$'
+        # need to use single quotes here to avoid quoting issues with \1
+        line:      '\1'
+        backrefs:  yes
+        state:     present
+      when:
+        -          ansible_os_family|upper == 'SUSE'
+      register:    chrony_conf_updated
+
+    - set_fact:
+        chronyd_restart_required: >-
+          {{ ((chronyd_restart_required | bool) or
+              (chrony_remove_custom_settings is changed) or
+              (chrony_conf_updated is changed)) }}
+  when:
+    # If no custom pool or servers specified, then use defaults
+    - (chrony_conf_entries | count) == 0
+
+# -------------------------------------+---------------------------------------8
+#
+# If using custom settings we will need to comment out any existing
+# settings the first time around before we add the ansible managed block
+# for the first time.
+# On subsequent runs we will only update the ansible managed block if
+# any of the settings are removed.
+#
+# -------------------------------------+---------------------------------------8
+- name: Setup chrony with override settings
+  block:
+    - name:          Remove existing pool or server entries if
+                     custom settings not yet applied
+      shell: |
+        # Don't do anything if the file has ansible managed marker
+        if grep >/dev/null 2>&1 "ANSIBLE MANAGED BLOCK" /etc/chrony.conf; then
+          exit 0
+        fi
+        # Don't do anything if there are no active pool or server settings
+        if ! grep -E "^(pool|server) .*" /etc/chrony.conf; then
+          exit 0
+        fi
+        # comment out any existing pool or server settings and exit with
+        # 55 if successful, otherwise fail with the error status of sed
+        sed -i -e '/^\(pool\|server\) /s,^,! ,' /etc/chrony.conf && exit 55
+      failed_when:   chrony_remove_existing_settings.rc not in [0, 55]
+      changed_when:  chrony_remove_existing_settings.rc == 55
+      register:      chrony_remove_existing_settings
+
+    - name: Add/Update custom settings block
+      blockinfile:
+        path:        /etc/chrony.conf
+        marker:      "# {mark} ANSIBLE MANAGED BLOCK"
+        insertafter: "^# Please consider joining the pool .*"
+        block: |
+          {% for entry in chrony_conf_entries -%}
+          {{ entry.type }} {{ entry.name }} {{ entry.opts | join(' ') }}
+          {% endfor -%}
+      register:      chrony_conf_updated
+
+    - set_fact:
+        chronyd_restart_required: >-
+          {{ ((chronyd_restart_required | bool) or
+              (chrony_conf_updated is changed) or
+              (chrony_remove_existing_settings is changed)) }}
+  when:
+    # If custom pool or servers specified
+    - (chrony_conf_entries | count) > 0
+
+- name: Do we need to restart chronyd?
+  debug:
+    var: chronyd_restart_required
+    verbosity: 1
+
+# -------------------------------------+---------------------------------------8
+#
+# Now that the /etc/chrony.conf config file has been updated as needed,
+# we need to ensure that the service is enabled, and running, restarting
+# as needed if it was already running and we made config file changes.
+#
+# -------------------------------------+---------------------------------------8
+
+# On SLES systems the service is installed in a disabled state
+- name: Ensure chronyd service is enabled
+  service:
+    name: chronyd
+    enabled: true
+
+# Restart chronyd either if the package was installed or
+# configuration changes were made.
+- name: Restart chronyd service if needed
+  service:
+    name: chronyd
+    state: restarted
+  when:
+    - chronyd_restart_required | bool
+  register: chronyd_restarted
+
+# -------------------------------------+---------------------------------------8
+#
+# Finally just in case we didn't install the package in this task list
+# and didn't change the configuration, and therefore didn't restart the
+# server, but the service may not actually be running, let's ensure it
+# is started/running.
+#
+# -------------------------------------+---------------------------------------8
+- name: Ensure chronyd service is running
+  service:
+    name: chronyd
+    state: started
+  when:
+    - chronyd_restarted is skipped
+
+#----------------------------------------
+# END
+#----------------------------------------

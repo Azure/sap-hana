@@ -1,0 +1,80 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                  Task: 1.9       - parameter lists per OS                  |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Derived and adopted from the os-package rewrite done by rtamalin
+#
+# For each supported 'distro_id' we want a list of dictionary entries that
+# specify the associated parameter name, parameter value and whether we
+# want the parameter to be set (present).
+#
+# The common entries are common across OS distributions and will be combined
+# with those specific to a distribution. After the combine is complete we
+# select unique values before applying. This allows us to have a common
+# parameter reference that satisfies multiple distributions, while at same
+# time allowing us to specify new parameters and override existing one at a
+# OS distribution level.
+#
+# See the definition of 'distro_id' to determine what to use when creating
+# an entry for a new distribution.
+
+parameters:
+    common:
+      - { name: 'fs.suid_dumpable',                              value: '0',  state: 'present' }
+      - { name: 'kernel.core_uses_pid',                          value: '1',  state: 'present' }
+      - { name: 'kernel.ctrl-alt-del',                           value: '0',  state: 'present' }
+      - { name: 'kernel.dmesg_restrict',                         value: '1',  state: 'present' }
+      - { name: 'kernel.kptr_restrict',                          value: '2',  state: 'present' }
+      - { name: 'kernel.perf_event_paranoid',                    value: '3',  state: 'present' }
+      - { name: 'kernel.randomize_va_space',                     value: '2',  state: 'present' }
+      - { name: 'kernel.sysrq',                                  value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.accept_redirects',            value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.accept_source_route',         value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.bootp_relay',                 value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.forwarding',                  value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.log_martians',                value: '1',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.proxy_arp',                   value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.all.send_redirects',              value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.default.accept_redirects',        value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.default.accept_source_route',     value: '0',  state: 'present' }
+      - { name: 'net.ipv4.conf.default.log_martians',            value: '1',  state: 'present' }
+      - { name: 'net.ipv4.icmp_echo_ignore_broadcasts',          value: '1',  state: 'present' }
+      - { name: 'net.ipv4.icmp_ignore_bogus_error_responses',    value: '1',  state: 'present' }
+      - { name: 'net.ipv4.tcp_syncookies',                       value: '1',  state: 'present' }
+      - { name: 'net.ipv4.tcp_timestamps',                       value: '1',  state: 'present' }
+      - { name: 'net.ipv6.conf.all.accept_redirects',            value: '0',  state: 'present' }
+      - { name: 'net.ipv6.conf.all.accept_source_route',         value: '0',  state: 'present' }
+      - { name: 'net.ipv6.conf.default.accept_redirects',        value: '0',  state: 'present' }
+      - { name: 'net.ipv6.conf.default.accept_source_route',     value: '0',  state: 'present' }
+
+    suse15:
+      - { name: 'fs.protected_hardlinks',                        value: '1',  state: 'present' }
+      - { name: 'fs.protected_fifos',                            value: '2',  state: 'present' }
+      - { name: 'fs.protected_regular',                          value: '2',  state: 'present' }
+      - { name: 'fs.protected_symlinks',                         value: '1',  state: 'present' }
+      - { name: 'kernel.suid_dumpable',                          value: '0',  state: 'present' }
+      - { name: 'kernel.unprivileged_bpf_disabled',              value: '1',  state: 'present' }
+      - { name: 'net.core.bpf_jit_harden',                       value: '2',  state: 'present' }
+
+    suse12:
+      - { name: 'fs.protected_hardlinks',                        value: '1',  state: 'present' }
+      - { name: 'fs.protected_fifos',                            value: '2',  state: 'present' }
+      - { name: 'fs.protected_regular',                          value: '2',  state: 'present' }
+      - { name: 'fs.protected_symlinks',                         value: '1',  state: 'present' }
+      - { name: 'kernel.suid_dumpable',                          value: '0',  state: 'present' }
+      - { name: 'kernel.unprivileged_bpf_disabled',              value: '1',  state: 'present' }
+
+    redhat7:
+      - { name: 'kernel.yama.ptrace_scope',                      value: '1',  state: 'present' }
+      - { name: 'net.core.bpf_jit_harden',                       value: '2',  state: 'present' }
+
+    redhat8:
+      - { name: 'fs.protected_fifos',                            value: '2',  state: 'present' }
+      - { name: 'fs.protected_regular',                          value: '2',  state: 'present' }
+      - { name: 'kernel.yama.ptrace_scope',                      value: '1',  state: 'present' }
+      - { name: 'net.core.bpf_jit_harden',                       value: '2',  state: 'present' }
+
+
+...

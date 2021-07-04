@@ -1,0 +1,544 @@
+---
+# Download time:  xx Minutes (Full    - xx GB)
+# Download time:  xx Minutes (Partial - xx GB)
+#                 
+name:    'NW75SPS20_v0001ms'
+target:  'NETWEAVER 7.5 SPS 20'
+version: 0001ms
+
+product_ids:
+  scs:    
+  dbl:    
+  pas:    
+  app:    
+  web:    
+
+materials:
+  dependencies:
+    - name:     HANA_2_00_055_v1
+
+#   templates:
+    # - name:     X
+    #   file:     S41909SPS03_v1.params
+    #   override_target_location: "{{ target_media_location }}/config"
+
+#   stackfiles:
+    # - name: Download Basket JSON Manifest
+    #   file: downloadbasket.json
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Spreadsheet
+    #   file: MP_Excel_2001017452_20201030_SWC.xls
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Plan doc
+    #   file: MP_Plan_2001017452_20201030_.pdf
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Stack text
+    #   file: MP_Stack_2001017452_20201030_.txt
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Stack XML
+    #   file: MP_Stack_2001017452_20201030_.xml
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # # Download Basket permalinks
+    # - name: Download Basket permalinks
+    #   file: myDownloadBasketFiles.txt
+    #   override_target_location: "{{ target_media_location }}/config"
+
+  media:
+  # Format:
+  #   - name:           any value                           (Not Used)
+  #     archive:        filename in library
+  #     filename:       filename when downloaded
+  #     permissions:    octal value quoted
+  #     extract:
+  #     extractDir:
+  #     creates:
+  #     url:            optional download url if known      (Not Used at this time)
+  #
+    # SAPCAR 7.22
+    - name:         SAPCAR
+      archive:      SAPCAR_1010-70006178.EXE
+      filename:     SAPCAR
+      permissions:  '0755'
+      url:          https://softwaredownloads.sap.com/file/0020000002208852020
+
+    # Kernel
+    - name:         "Kernel Part I (753) ; OS: Linux on x86_64 64bit ; DB: Database independe"
+      archive:      SAPEXE_800-80002573.SAR
+      path:         download_basket
+
+    - name:         "Kernel Part II (753) ; OS: Linux on x86_64 64bit ; DB: SAP HANA database"
+      archive:      SAPEXEDB_800-80002572.SAR
+      path:         download_basket
+
+    # SAP Host Agent
+    - name:         "SAP HOST AGENT 7.21 SP51 ; OS: Linux on x86_64 64bit"
+      archive:      SAPHOSTAGENT51_51-20009394.SAR
+      path:         download_basket
+
+    # IGS
+    - name:         "Installation for SAP IGS integrated in SAP Kernel ; OS: Linux on x86_64"
+      archive:      igsexe_13-80003187.sar
+      path:         download_basket
+
+    - name:         "SAP IGS Fonts and Textures"
+      archive:      igshelper_17-10010245.sar
+      path:         download_basket
+
+    # SWPM
+    - name:         "SWPM 1.0 SP31 for NW higher than 7.0x ; OS: Linux on x86_64 64bit"
+      archive:      SWPM10SP31_5-20009701.SAR
+      extract:      true
+      extractDir:   SWPM
+      creates:      SIGNATURE.SMF
+
+    # DB Export
+    - name:         "NW 7.5 Installation Export"
+      archive:      51050829_3.zip
+      path:         download_basket
+
+    # Languages
+    - name:         "NW 7.5 Language 1/2"
+      archive:      51050829_4.zip
+      path:         download_basket
+
+    - name:         "NW 7.5 Language 2/2"
+      archive:      51050829_5.zip
+      path:         download_basket
+
+    # MISC
+    - name:         "Patch 5 for SOFTWARE UPDATE MANAGER 2.0 SP10 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP10_5-80002456.SAR
+      download:     true
+
+    # SPAM
+    - name:         "SPAM/SAINT Update - Version 750/0077"
+      archive:      KD75077.SAR
+      download:     true
+
+    # Support Packs
+    - name:         "ST-PI 740: SP 0002"
+      archive:      K-74002INSTPI.SAR
+      download:     true
+
+    - name:         "ST-PI 740: SP 0003"
+      archive:      K-74003INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0004"
+      archive:      K-74004INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0005"
+      archive:      K-74005INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0006"
+      archive:      K-74006INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0007"
+      archive:      K-74007INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0008"
+      archive:      K-74008INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0009"
+      archive:      K-74009INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0010"
+      archive:      K-74010INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0011"
+      archive:      K-74011INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0012"
+      archive:      K-74012INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0013"
+      archive:      K-74013INSTPI.SAR
+      download:     false
+
+    - name:         "ST-PI 740: SP 0014"
+      archive:      K-74014INSTPI.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0001"
+      archive:      K-75001INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0001"
+      archive:      K-75001INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0001"
+      archive:      K-75001INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0001"
+      archive:      K-75001INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0002"
+      archive:      K-75002INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0002"
+      archive:      K-75002INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0002"
+      archive:      K-75002INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0002"
+      archive:      K-75002INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0003"
+      archive:      K-75003INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0003"
+      archive:      K-75003INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0003"
+      archive:      K-75003INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0003"
+      archive:      K-75003INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0004"
+      archive:      K-75004INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0004"
+      archive:      K-75004INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0004"
+      archive:      K-75004INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0004"
+      archive:      K-75004INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0005"
+      archive:      K-75005INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0005"
+      archive:      K-75005INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0005"
+      archive:      K-75005INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0005"
+      archive:      K-75005INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0006"
+      archive:      K-75006INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0006"
+      archive:      K-75006INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0006"
+      archive:      K-75006INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0006"
+      archive:      K-75006INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0007"
+      archive:      K-75007INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0007"
+      archive:      K-75007INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0007"
+      archive:      K-75007INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0007"
+      archive:      K-75007INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0008"
+      archive:      K-75008INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0008"
+      archive:      K-75008INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0008"
+      archive:      K-75008INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0008"
+      archive:      K-75008INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0009"
+      archive:      K-75009INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0009"
+      archive:      K-75009INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0009"
+      archive:      K-75009INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0009"
+      archive:      K-75009INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0010"
+      archive:      K-75010INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0010"
+      archive:      K-75010INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0010"
+      archive:      K-75010INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0010"
+      archive:      K-75010INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0011"
+      archive:      K-75011INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0011"
+      archive:      K-75011INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0011"
+      archive:      K-75011INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0011"
+      archive:      K-75011INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0012"
+      archive:      K-75012INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0012"
+      archive:      K-75012INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0012"
+      archive:      K-75012INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0012"
+      archive:      K-75012INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0013"
+      archive:      K-75013INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0013"
+      archive:      K-75013INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0013"
+      archive:      K-75013INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0013"
+      archive:      K-75013INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0014"
+      archive:      K-75014INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0014"
+      archive:      K-75014INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0014"
+      archive:      K-75014INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0014"
+      archive:      K-75014INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0015"
+      archive:      K-75015INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0015"
+      archive:      K-75015INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0015"
+      archive:      K-75015INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0015"
+      archive:      K-75015INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0016"
+      archive:      K-75016INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0016"
+      archive:      K-75016INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0016"
+      archive:      K-75016INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0016"
+      archive:      K-75016INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0017"
+      archive:      K-75017INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0017"
+      archive:      K-75017INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0017"
+      archive:      K-75017INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0017"
+      archive:      K-75017INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0018"
+      archive:      K-75018INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0018"
+      archive:      K-75018INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0018"
+      archive:      K-75018INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0018"
+      archive:      K-75018INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0019"
+      archive:      K-75019INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0019"
+      archive:      K-75019INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0019"
+      archive:      K-75019INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0019"
+      archive:      K-75019INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_ABA 750: SP 0020"
+      archive:      K-75020INSAPABA.SAR
+      download:     false
+
+    - name:         "SAP_BASIS 750: SP 0020"
+      archive:      K-75020INSAPBASIS.SAR
+      download:     false
+
+    - name:         "SAP_BW 750: SP 0020"
+      archive:      K-75020INSAPBW.SAR
+      download:     false
+
+    - name:         "SAP_GWFND 750: SP 0020"
+      archive:      K-75020INSAPGWFND.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0001"
+      archive:      K-75401INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0002"
+      archive:      K-75402INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0003"
+      archive:      K-75404INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0004"
+      archive:      K-75404INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0005"
+      archive:      K-75405INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754: SP 0006"
+      archive:      K-75406INSAPUI.SAR
+      download:     false
+
+    - name:         "SAP_UI 754 Update: Meta-Commandfile"
+      archive:      K-754BHINSAPUI.SAR
+      download:     false
+
+    - name:         "Attribute Change Package 06 for SAP_BASIS 750"
+      archive:      SAP_BASIS750.SAR
+      download:     false
+
+    - name:         "Attribute Change Package 07 for SAP_BW 750"
+      archive:      SAP_BW750.SAR
+      download:     false
+
+    - name:         "Attribute Change Package 03 for SAP_GWFND 750"
+      archive:      SAP_GWFND750.SAR
+      download:     false
+
+    - name:         "Attribute Change Package 06 for SAP_UI 754"
+      archive:      SAP_UI754.SAR
+      download:     false
+
+    - name:         "Attribute Change Package 34 for ST-PI 740"
+      archive:      ST-PI740.SAR
+      download:     false
+
+...

@@ -1,0 +1,57 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role for ensuring the hostname is configured correctly           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.2     - hostname setup
+#
+# -------------------------------------+---------------------------------------8
+
+# SUSE bug 1167134
+- name:         "Ensure DHCLIENT_SET_HOSTNAME is set to no for SLES"
+  lineinfile:
+    path:       /etc/sysconfig/network/dhcp
+    regexp:     '^DHCLIENT_SET_HOSTNAME='
+    line:       DHCLIENT_SET_HOSTNAME="no"
+  when:         ansible_os_family|upper == 'SUSE'
+
+
+# TODO:
+#       1) Validate Relevancy for the tasks below.
+#       2) Refactor as needed.
+#       3) This may not have been structured correctly and should be done in the hosts file instead.
+#       4) Azure seems to set the hostname correctly, by default.
+
+
+
+#----------------------------------------
+# BEGIN OLD CODE
+#----------------------------------------
+
+# The intention of the following is to map the hostname to the IP for the Admin NIC
+
+# - name: Create mapping between IP and hostname for HANA VMs
+#   run_once: true
+#   set_fact:
+#     hanadbnodes_dict: "{{ hanadbnodes_dict | combine({item.ip_admin_nic : item.dbname}) }}"
+#   loop: "{{ hana_database.nodes }}"
+
+# - name: Ensure the correct hostnames are set on HANA VMs
+#   hostname:
+#     name: "{{ hanadbnodes_dict[inventory_hostname] }}"
+#   when: ansible_hostname != hanadbnodes_dict[inventory_hostname]
+
+# # To prevent situation where setting hostname does not work 100%
+# - name: Check if the correct hostnames are set on HANA VMs
+#   fail:
+#     msg: "Hostname is not set properly for {{ inventory_hostname }}: should be {{ hanadbnodes_dict[inventory_hostname] }} but seen {{ ansible_hostname }}"
+#   when: ansible_hostname != hanadbnodes_dict[inventory_hostname]
+
+#----------------------------------------
+# END OLD CODE
+#----------------------------------------
+
+...

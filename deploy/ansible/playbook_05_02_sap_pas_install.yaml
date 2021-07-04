@@ -1,0 +1,47 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for SAP PAS Install                          |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+
+- hosts:          "{{ sap_sid|upper }}_PAS"
+
+  name:           SAP Installation - PAS
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - set_fact:
+      tier:     pas                                                             # SAP Install phase: PAS - Primary Application Server
+    tags:
+      - always
+
+
+
+# -------------------------------------+---------------------------------------8
+# Role: 5.1-dbload
+#
+# Description: 
+#              
+#
+  - include_role:
+      name:     roles-sap/5.2-pas-install
+
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                    END                                     |
+# +------------------------------------4--------------------------------------*/

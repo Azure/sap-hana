@@ -1,0 +1,118 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |         Playbook for performing SAP specific OS configuration tasks         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+- hosts:          "{{ sap_sid|upper }}_DB  :
+                   {{ sap_sid|upper }}_SCS :
+                   {{ sap_sid|upper }}_PAS :
+                   {{ sap_sid|upper }}_APP :
+                   {{ sap_sid|upper }}_WEB"
+
+  name:           OS - SAP specific configuration
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - set_fact:
+      tier:     sapos
+    tags:
+      - always
+
+  - include_role:
+      name:     roles-sap-os/2.4-hosts-file
+
+# Uses the same role as the OS plabook but is controlled by the sapos tier setting
+  - block:
+      - include_role:
+          name: roles-os/1.5-disk-setup
+    tags:
+      - 1.5-disk-setup
+
+  - include_role:
+      name:     roles-sap-os/sap-mounts
+
+# - role: dependencies-install                                  # --> roles-sap/sap-packages (playbook_02_os_sap_specific_config)
+  - include_role:
+      name:     roles-sap-os/2.1-sap-packages                   # TODO: Review and Refactoring Needed
+
+
+# - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
+  - include_role:
+      name:     roles-sap-os/sap-users                          # TODO: Centiq copy (rework done)
+
+
+# - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
+  - include_role:
+      name:     roles-sap-os/2.10-sap-notes                     # TODO: 
+
+
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: evaluate for inclusion and refactor.
+# SOURCE: sap-playbook
+#----------------------------------------
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header> 
+#
+# -------------------------------------+---------------------------------------8
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: evaluate and refactor. move to os_base_config and os_sap_config
+#----------------------------------------
+
+
+# # Prepare os, disks and mount points on Hana Database servers
+# # - hosts: hanadbnodes
+# - hosts: X00_DB
+#   become: true
+#   become_user: root
+#   vars_files:
+#     - "vars/packages.yaml"
+#   pre_tasks:
+#     - name: Include SAP HANA DB sizes
+#       include_vars:
+#         file: "{{ configs_path }}/hdb_sizes.json"
+#         name: hdb_sizes
+#   max_fail_percentage: 0
+#   roles:
+#     - role: os-preparation
+#     - role: os-disk-setup
+#     - role: enable-prometheus
+#       when:
+#         - output.options.enable_prometheus == True
+#         - ansible_facts['distribution_file_variety'] == 'SUSE'
+#         - ansible_facts['distribution_version'] is regex("(12\.[3-5]|15\.\d)")
+#         - hana_database.size != "LargeInstance"
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

@@ -108,6 +108,7 @@ module "app_tier" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
 
 }
 
@@ -138,6 +139,7 @@ module "anydb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
 
 }
 
@@ -176,5 +178,8 @@ module "output_files" {
   sid_kv_user_id        = module.common_infrastructure.sid_kv_user_id
   disks                 = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)))
   use_local_credentials = module.common_infrastructure.use_local_credentials
+  scs_ha                = module.app_tier.scs_ha
+  db_ha                 = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
+  ansible_user          = module.common_infrastructure.sid_username
 
 }

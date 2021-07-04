@@ -30,10 +30,10 @@ The SAP Deployment Automation leverages Service Principals to perform the deploy
 
 The other type of credentials used by the automation are the default Virtual Machine accounts - these are the accounts provided during the virtual machine creation time. The table below lists the different credential types used by the SAP Deployment Automation.
 
-Credential                   |  Scope       | Storage            | Identifier                    | Description                    |
-| :--------------------------|  :---------- | :----------------- | :---------------------------- | :----------------------------- |
+| Credential                 | Scope        | Storage            | Identifier                    | Description                    |
+| :------------------------- | :----------- | :----------------- | :---------------------------- | :----------------------------- |
 | Local user                 | Deployer     |                    | Current User                  | Used to bootstrap the deployer |
-| Service Principal          | Environment  | Deployer Key Vault | Environment identifier        |
+| Service Principal          | Environment  | Deployer Key Vault | Environment identifier        |                                |
 | Virtual Machine credential | Environment  | Workload Key Vault | Environment identifier        | Default Virtual Machine user   |  
 
 <br>
@@ -63,7 +63,7 @@ From a privilaged account, create an Service Principal using the following comma
       "displayName": "DEV-Deployment-Account",
       "name": "http://DEV-Deployment-Account",
       "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-      "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx""
+      "tenant": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     }
  ```
 
@@ -140,6 +140,7 @@ The deployment configuration file defines the region and the environment name an
          "environment"                 : "MGMT",
          "vnets": {
                "management": {
+                  "name"               : "DEP00",
                   "address_space"      : "10.10.20.0/25",
                   "subnet_mgmt": {
                      "prefix"          : "10.10.20.64/28"
@@ -239,16 +240,16 @@ The Workload Zone configuration file defines the region and the environment name
                     "name"                  : "SAP01",
                     "address_space"         : "10.110.0.0/24",
                     "subnet_admin": {
-                    "prefix"              : "10.110.0.0/27"
+                    "prefix"                : "10.110.0.0/27"
                     },
                     "subnet_app": {
-                    "prefix"              : "10.110.0.32/27"
+                    "prefix"                : "10.110.0.32/27"
                     },
                     "subnet_db": {
-                    "prefix"              : "10.110.0.64/27"
+                    "prefix"                : "10.110.0.64/27"
                     },
                     "subnet_web": {
-                    "prefix"              : "10.110.0.96/27"
+                    "prefix"                : "10.110.0.96/27"
                     }
                 }
             }
@@ -332,10 +333,11 @@ The links below explain how to deploy using the different deployment environment
 
 ## Changing the naming convention ##
 
-The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming.md](.//Software_Documentation/standards-naming.md)
+The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming](.//Software_Documentation/standards-naming.md)
 
+<!-- TODO: Why is the following link a full URL? Shouldn't it be a relative path like all the others? -->
 [naming conventions for the deployment](https://github.com/Azure/sap-hana/blob/documentation-updates/documentation/SAP_Automation_on_Azure/Process_Documentation/Changing_the_naming_convention.md) should be defined upfront and can be customized according the needs.
 
 ## Changing disk sizing ##
 
- [Using_custom_disk_sizing.md](./Using_custom_disk_sizing.md)
+ [Using_custom_disk_sizing](./Using_custom_disk_sizing.md)

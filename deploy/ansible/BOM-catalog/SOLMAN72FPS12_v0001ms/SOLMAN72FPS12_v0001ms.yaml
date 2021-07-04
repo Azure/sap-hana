@@ -1,0 +1,171 @@
+---
+# Download time:  xx Minutes (Full    - xx GB)
+# Download time:  xx Minutes (Partial - xx GB)
+#                 
+name:    'SOLMAN72FPS12_v0001ms'
+target:  'Solution Manager 7.2 FPS 12'
+version: 0001ms
+
+product_ids:
+  scs:    
+  dbl:    
+  pas:    
+  app:    
+  web:    
+
+materials:
+  dependencies:
+    - name:     HANA_2_00_055_v1
+
+#   templates:
+    # - name:     X
+    #   file:     S41909SPS03_v1.params
+    #   override_target_location: "{{ target_media_location }}/config"
+
+#   stackfiles:
+    # - name: Download Basket JSON Manifest
+    #   file: downloadbasket.json
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Spreadsheet
+    #   file: MP_Excel_2001017452_20201030_SWC.xls
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Plan doc
+    #   file: MP_Plan_2001017452_20201030_.pdf
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Stack text
+    #   file: MP_Stack_2001017452_20201030_.txt
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # - name: Download Basket Stack XML
+    #   file: MP_Stack_2001017452_20201030_.xml
+    #   override_target_location: "{{ target_media_location }}/config"
+
+    # # Download Basket permalinks
+    # - name: Download Basket permalinks
+    #   file: myDownloadBasketFiles.txt
+    #   override_target_location: "{{ target_media_location }}/config"
+
+  media:
+  # Format:
+  #   - name:           any value                           (Not Used)
+  #     archive:        filename in library
+  #     filename:       filename when downloaded
+  #     permissions:    octal value quoted
+  #     extract:
+  #     extractDir:
+  #     creates:
+  #     url:            optional download url if known      (Not Used at this time)
+  #
+    # SAPCAR 7.22
+    - name:         SAPCAR
+      archive:      SAPCAR_1010-70006178.EXE
+      filename:     SAPCAR
+      permissions:  '0755'
+      url:          https://softwaredownloads.sap.com/file/0020000002208852020
+
+    # Kernel
+    - name:         "Kernel Part I (753) ; OS: Linux on x86_64 64bit ; DB: Database independe"
+      archive:      SAPEXE_800-80002573.SAR
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000401022021
+
+    - name:         "Kernel Part II (753) ; OS: Linux on x86_64 64bit ; DB: SAP HANA database"
+      archive:      SAPEXEDB_800-80002572.SAR
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000401532021
+
+    # SAP Host Agent
+    - name:         "SAP HOST AGENT 7.21 SP51 ; OS: Linux on x86_64 64bit"
+      archive:      SAPHOSTAGENT51_51-20009394.SAR
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000363342021
+
+    # IGS
+    - name:         "Installation for SAP IGS integrated in SAP Kernel ; OS: Linux on x86_64"
+      archive:      igsexe_13-80003187.sar
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000534572021
+
+    - name:         "SAP IGS Fonts and Textures"
+      archive:      igshelper_17-10010245.sar
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0020000000703122018
+
+    # SWPM
+    - name:         "SWPM 1.0 SP31 for NW higher than 7.0x ; OS: Linux on x86_64 64bit"
+      archive:      SWPM10SP31_6-20009701.SAR
+      extract:      true
+      extractDir:   SWPM
+      creates:      SIGNATURE.SMF
+      url:          https://softwaredownloads.sap.com/file/0020000000707462021
+
+    # DB Export
+    - name:         "SAP Solution Manager 7.2 SR2 Installation Export I"
+      archive:      51054655_1.zip
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0030000000222342021
+
+    - name:         "SAP Solution Manager 7.2 SR2 Installation Export II"
+      archive:      51054655_2.zip
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0030000000222362021
+
+    # Languages
+    - name:         "SAP Solution Manager 7.2 SR2 Language"
+      archive:      51054655_3.zip
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0030000000222352021
+
+    # Java Components
+    - name:         "SAP Solution Manager 7.2 SR2 - Java"
+      archive:      51054655_4.zip
+      path:         download_basket
+      url:          https://softwaredownloads.sap.com/file/0030000000221892021
+
+    # MISC
+    - name:         "Patch 4 for SOFTWARE UPDATE MANAGER 1.0 SP26 ; OS: Linux on x86_64 64bit"
+      archive:      SUM10SP26_4-20006543.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0020000000748942021
+
+    - name:         "Patch 4 for SUM 1.0 SP26 for HDB ; OS: Linux on x86_64 64bit"
+      archive:      SUM10HDBSP26_4-20006543.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0020000000748982021
+
+    # SPAM
+    - name:         "SPAM/SAINT Update - Version 740/0077"
+      archive:      KD74077.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0010000000216122021
+
+    # Support Packs
+    - name:         "SAP HANA CLIENT Version 2.8 ; OS: Linux on x86_64 64bit"
+      archive:      IMDB_CLIENT20_008_22-80002082.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0020000000788142021
+
+    - name:         "ST-SER 720: SP 0020"
+      archive:      K-72020INSTSER.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0010000001996882020
+
+    - name:         "ST-SER 720: SP 0021"
+      archive:      K-72021INSTSER.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0010000000548132021
+
+    - name:         "SAP_GWFND 740: SP 0025"
+      archive:      K-74025INSAPGWFND.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0010000001928582020
+
+    - name:         "SAP_UI 754: SP 0006"
+      archive:      K-75406INSAPUI.SAR
+      download:     true
+      url:          https://softwaredownloads.sap.com/file/0010000000325802021
+
+...

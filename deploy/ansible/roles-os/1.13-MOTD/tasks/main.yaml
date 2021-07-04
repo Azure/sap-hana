@@ -1,0 +1,96 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |             Role used to set motd, issue and issue.net banners             |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Description:  Create and update content of the relevant files in /etc/
+#               Update sshd_config to display banners
+#               Restart sshd service - via handlers/main.yaml
+#
+#
+# Objects:
+#   External:
+#             files/motd                      - File with message to display
+#
+#   Internal:
+#             result                          - objet to store the results of a task execution
+#
+#   Created:
+#             /etc/motd                       - File with MOTD banner
+#             /etc/issue                      - File with issue banner
+#             /etc/issue.net                  - File with issue.net banner
+#
+# -------------------------------------+---------------------------------------8
+# Reviews:
+#
+# 04/28/2021  <ReviewerName>                  Reviewed - NotStarted
+#
+# -------------------------------------+---------------------------------------8
+---
+
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.13    - MOTD
+#
+# -------------------------------------+---------------------------------------8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Update banners - Overwrite existing ones
+#
+# -------------------------------------+---------------------------------------8
+- name:                 Update motd banners
+  copy:
+    src:                files/motd
+    dest:               /etc/motd
+    owner:              root
+    group:              root
+    mode:               0644
+  become:               yes
+
+- name:                 Update issue banners
+  copy:
+    src:                files/issue
+    dest:               /etc/issue
+    owner:              root
+    group:              root
+    mode:               0644
+  become:               yes
+
+- name:                 Update issue.net banners
+  copy:
+    src:                files/issue
+    dest:               /etc/issue.net
+    owner:              root
+    group:              root
+    mode:               0644
+  become:               yes
+
+# -------------------------------------+---------------------------------------8
+#
+# ssh configuration changes required for this
+# Update printmotd if commented. We do not change it is explicitly set to no
+# Update sshd
+# -------------------------------------+---------------------------------------8
+- name:                 Update PrintMotd when commented 
+  lineinfile:
+    state:              present
+    dest:               /etc/ssh/sshd_config
+    regexp:             '#PrintMotd'
+    line:               'PrintMotd yes'
+  become:               yes
+  notify:
+    - restart sshd service
+
+- name:                 Update default Banner path 
+  lineinfile:
+    state:              present
+    dest:               /etc/ssh/sshd_config
+    regexp:             '#Banner'
+    line:               'Banner /etc/issue.net'
+  become:               yes
+  notify:
+    - restart sshd service
+
+...

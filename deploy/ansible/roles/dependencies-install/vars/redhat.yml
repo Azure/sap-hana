@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - "compat-sap-c++-9"
+  - "libatomic"

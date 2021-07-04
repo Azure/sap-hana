@@ -1,0 +1,129 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                          Role to process the BOM                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Description:  Download the specified BOM file to the ansible controller.
+#               Download any dependent BOM files to the ansible controller.
+#               Create Download directories, both static and dynamic.
+#               Download all media from BOMs to the SCS
+#
+#
+# Objects:
+#   External:
+#             sapbits_location_base_path      - URL of Blob Storage
+#             sapbits_bom_files               - path to the root of the sap file store
+#             bom_base_name                   - Name of BOM
+#             sapbits_sas_token               - SAS Token
+#             inventory_dir                   - Path to the inventory location on the ansible controller
+#
+#   Internal:
+#             result                          - objet to store the results of a task execution
+#
+#   Created:
+#             bom_base                        - object containing the specified BOM
+#
+# -------------------------------------+---------------------------------------8
+# Reviews:
+#
+# 04/22/2021  Morgan Deegan       Reviewed - Complete
+#
+# -------------------------------------+---------------------------------------8
+---
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Validation for Prerequisites 
+#
+- import_tasks:     pre_checks.yaml
+# -------------------------------------+---------------------------------------8
+
+- include_role:
+    name:                         roles-sap/3.3.1-bom-utility
+    tasks_from:                   bom-register
+  vars:
+    bom_name:                     "{{ bom_base_name }}"
+
+
+- name:  
+  set_fact:
+    bom_base:                     "{{ bom }}"
+
+# # -------------------------------------+---------------------------------------8
+# #
+# # Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
+# #               If not, download from storage account location.
+# #
+# - name:             Check for Microsoft Supplied BOM ({{ bom_base_name }})
+#   local_action:     stat path=BOM-catalog/{{ bom_base_name }}/{{ bom_base_name }}.yaml
+#   register:         microsoft_supplied_bom
+
+
+# # If Microsoft supplied BOM found
+# - name:             Register Microsoft Supplied BOM {{ bom_base_name }}
+#   include_vars:
+#     file:           "{{ microsoft_supplied_bom.stat.path }}"
+#     name:           bom_base
+#   when:             microsoft_supplied_bom.stat.exists == true
+
+# # If Microsoft supplied BOM not found
+# - name:             Retrieve BOM ({{ bom_base_name }}) from Storage Account
+#   block:
+#     - name:             Download BOM ({{ bom_base_name }}) from Storage Account
+#       get_url:
+#         url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"
+#         dest:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
+#         mode:           0644
+#       register:         result
+#       until:            result is succeeded
+#       retries:          10
+#       delay:            6
+#       delegate_to:      localhost                                               # Causes action to occur on the Ansible Controller
+#       become:           no
+
+#     - name:             Register downloaded BOM ({{ bom_base_name }})
+#       include_vars:
+#         file:           "{{ inventory_dir }}/{{ bom_base_name }}.yaml"
+#         name:           bom_base
+#   when:             microsoft_supplied_bom.stat.exists != true
+# # -------------------------------------+---------------------------------------8
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Process Main BOM.
+#               Call BOM processor, passing BOM name.
+#
+# TODO:
+#       Enhance so a single task loops over base bom and dependencies
+#
+- include_tasks:    "bom_processor.yaml"
+  vars:
+    bom_name:       "{{ bom_base_name }}"
+# -------------------------------------+---------------------------------------8
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Process BOM dependencies.
+#               Call BOM processor, passing dependent BOM names.
+#
+- include_tasks:    "bom_processor.yaml"
+  vars:
+    bom_name:       "{{ bom_dependency.name }}"
+  loop:             "{{ bom_base.materials.dependencies | flatten(levels=1) }}"
+  loop_control:
+    loop_var:       bom_dependency
+  when:             
+    - bom_base.materials.dependencies is defined
+    - bom_base.materials.dependencies|length>0
+# -------------------------------------+---------------------------------------8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

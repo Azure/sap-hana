@@ -1,0 +1,44 @@
+#   2482103 - Installation with SWPM in unattended mode using parameter input file fails
+#   2393060 - SAPinst Framework 749 Central Note
+
+########################################################################################################################################################################################################
+#                                                                                                                                                                                                      #
+# Installation service 'SAP S/4HANA Server 1909 > SAP HANA Database > Installation > Application Server ABAP                                                                                           #
+#                       > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAP'                                                                                      #
+#                       > Distributed System > Database Instance', product id 'NW_ABAP_DB:S4HANA1909.CORE.HDB.ABAP'                                                                                    #
+#                       > Distributed System > Primary Application Server Instance', product id 'NW_ABAP_CI:S4HANA1909.CORE.HDB.ABAP'                                                                  #
+#                       > Additional SAP System Instances > Additional Application Server Instance', product id 'NW_DI:S4HANA1909.CORE.HDB.PD'                                                         #
+#                       > Generic Options > SAP Web Dispatcher > SAP Web Dispatcher (Unicode)', product id 'NW_Webdispatcher:NW750.IND.PD'                                                             #
+#                                                                                                                                                                                                      #
+########################################################################################################################################################################################################
+
+archives.downloadBasket                                               = /usr/sap/install/download_basket
+
+nwUsers.sapadmUID                                                     = {{ sapadm_uid }}
+nwUsers.sapsysGID                                                     = {{ sapsys_gid }}
+nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
+nwUsers.sidadmPassword                                                = {{ password_master }}
+
+NW_Delete_Sapinst_Users.removeUsers                                   = true
+NW_GetMasterPassword.masterPwd                                        = {{ password_master }}
+
+NW_adaptProfile.skipSecurityProfileSettings                           = true
+NW_getFQDN.FQDN                                                       = {{ sap_fqdn }}
+
+NW_GetSidNoProfiles.sid                                               = {{ sap_sid|upper }}
+NW_webdispatcher_Instance.backEndSID                                  = {{ sap_sid|upper }}
+
+NW_Webdispatcher_Instance.wdInstanceNumber                            = {{ web_instance_number }}
+NW_webdispatcher_Instance.activateICF                                 = false
+
+NW_webdispatcher_Instance.msHTTPPort                                  = 81{{ sap_ciInstanceNumber }}
+NW_webdispatcher_Instance.msHost                                      = {{ sap_scs_hostname }}
+
+NW_webdispatcher_Instance.rfcHost                                     = {{ sap_scs_hostname }}
+NW_webdispatcher_Instance.wdVirtualHostname                           = {{ sap_webVirtualHostname }}
+
+NW_webdispatcher_Instance.scenarioSize                                = 500
+NW_webdispatcher_Instance.wdHTTPPort                                  = 80{{ web_instance_number }}
+NW_webdispatcher_Instance.wdHTTPSPort                                 = 443{{ web_instance_number }}
+
+NW_System.installSAPHostAgent                                         = {{ sap_installSAPHostAgent }}
