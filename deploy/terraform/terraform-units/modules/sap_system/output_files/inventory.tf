@@ -123,45 +123,83 @@ resource "local_file" "ansible_inventory_yml" {
 }
 */
 resource "local_file" "ansible_inventory_new_yml" {
-  content = templatefile(format("%s%s",path.module,"/ansible_inventory_new.yml.tmpl"), {
-    ips_dbnodes       = length(local.hdb_vms) > 0 ? local.ips_dbnodes_admin : local.ips_anydbnodes,
-    dbnodes           = length(local.hdb_vms) > 0 ? local.hdb_vms : local.anydb_vms
-    ips_scs           = local.ips_scs,
-    ips_pas           = length(local.ips_app) > 0 ? slice(local.ips_app, 0, 1) : [],
-    ips_app           = length(local.ips_app) > 1 ? slice(local.ips_app, 1, length(local.ips_app) - 1) : []
-    ips_web           = length(local.ips_web) > 0 ? local.ips_web : [],
-    sid               = var.hdb_sid,
-    passervers        = length(local.ips_app) > 0 ? slice(var.naming.virtualmachine_names.APP_VMNAME, 0, 1) : [],
-    appservers        = length(local.ips_app) > 1 ? slice(var.naming.virtualmachine_names.APP_VMNAME, 1, length(local.ips_app)) : [],
-    scsservers        = length(local.ips_scs) > 0 ? var.naming.virtualmachine_names.SCS_VMNAME : [],
+  content = templatefile(format("%s%s", path.module, "/ansible_inventory_new.yml.tmpl"), {
+    ips_dbnodes = length(local.hdb_vms) > 0 ? local.ips_dbnodes_admin : local.ips_anydbnodes,
+    dbnodes     = length(local.hdb_vms) > 0 ? local.hdb_vms : local.anydb_vms
+    ips_scs = length(local.ips_scs) > 0 ? (
+      length(local.ips_scs) > 1 ? (
+        slice(local.ips_scs, 0, 1)) : (
+        local.ips_scs
+      )) : (
+      []
+    )
+    ips_ers = length(local.ips_scs) > 0 ? (
+      length(local.ips_scs) > 1 ? (
+        slice(local.ips_scs, 1, length(local.ips_scs))) : (
+        []
+      )) : (
+      []
+    )
+
+    ips_pas = length(local.ips_app) > 0 ? slice(local.ips_app, 0, 1) : [],
+    ips_app = length(local.ips_app) > 1 ? slice(local.ips_app, 1, length(local.ips_app)) : []
+    ips_web = length(local.ips_web) > 0 ? local.ips_web : [],
+    sid     = var.hdb_sid,
+    passervers = length(local.ips_app) > 0 ? (
+      slice(var.naming.virtualmachine_names.APP_VMNAME, 0, 1)) : (
+      []
+    ),
+    appservers = length(local.ips_app) > 1 ? (
+      slice(var.naming.virtualmachine_names.APP_VMNAME, 1, length(local.ips_app))) : (
+      []
+    ),
+    scsservers = length(local.ips_scs) > 0 ? (
+      length(local.ips_scs) > 1 ? (
+        slice(var.naming.virtualmachine_names.SCS_VMNAME, 0, 1)) : (
+        var.naming.virtualmachine_names.SCS_VMNAME
+      )) : (
+      []
+    ),
+    ersservers = length(local.ips_scs) > 0 ? (
+      length(local.ips_scs) > 1 ? (
+        slice(var.naming.virtualmachine_names.SCS_VMNAME, 1, length(local.ips_scs))) : (
+        []
+      )) : (
+      []
+    ),
     webservers        = length(local.ips_web) > 0 ? var.naming.virtualmachine_names.WEB_VMNAME : [],
     prefix            = var.naming.prefix.SDU,
     separator         = var.naming.separator,
-    platform          = length(local.hdb_vms) > 0 ? "hana" : lower(try(local.anydb_vms[0].platform,""))
-    dbconnection      = length(local.hdb_vms) > 0 ? "ssh" : upper(try(local.anydb_vms[0].platform,"")) == "SQLSERVER" ? "winrm" : "ssh"
+    platform          = lower(length(local.hdb_vms) > 0 ? "HANA" : local.anydb_vms[0].platform)
+    dbconnection      = length(local.hdb_vms) > 0 ? "ssh" : upper(local.anydb_vms[0].platform) == "SQLSERVER" ? "winrm" : "ssh"
     scsconnection     = upper(var.app_tier_os_types["scs"]) == "LINUX" ? "ssh" : "winrm"
+    ersconnection     = upper(var.app_tier_os_types["scs"]) == "LINUX" ? "ssh" : "winrm"
     appconnection     = upper(var.app_tier_os_types["app"]) == "LINUX" ? "ssh" : "winrm"
     webconnection     = upper(var.app_tier_os_types["web"]) == "LINUX" ? "ssh" : "winrm"
-    appconnectiontype = var.authentication_type
-    webconnectiontype = var.authentication_type
-    scsconnectiontype = var.authentication_type
-    dbconnectiontype  = length(local.hdb_vms) > 0 ? try(local.hdb_vms[0].auth_type, "key") : try(local.anydb_vms[0].auth_type, "key")
+    appconnectiontype = var.application.auth_type
+    webconnectiontype = var.application.auth_type
+    scsconnectiontype = var.application.auth_type
+    ersconnectiontype = var.application.auth_type
+    dbconnectiontype  = length(local.hdb_vms) > 0 ? local.hdb_vms[0].auth_type : local.anydb_vms[0].auth_type
+    ansible_user      = var.ansible_user
     }
   )
-  filename             = format("%s/ansible_config_files/%s_hosts.yaml",path.cwd,var.hdb_sid)
+  filename             = format("%s/%s_hosts.yaml", path.cwd, var.hdb_sid)
   file_permission      = "0660"
   directory_permission = "0770"
 }
 
 resource "local_file" "sap-parameters_yml" {
-  content = templatefile(format("%s/sap-parameters.yml.tmpl",path.module), {
+  content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
     sid           = var.hdb_sid,
     kv_uri        = local.kv_name,
     secret_prefix = local.secret_prefix,
     disks         = var.disks
+    scs_ha        = var.scs_ha
+    db_ha         = var.db_ha
     }
   )
-  filename             = format("%s/ansible_config_files/sap-parameters.yaml",path.cwd)
+  filename             = format("%s/sap-parameters.yaml", path.cwd)
   file_permission      = "0660"
   directory_permission = "0770"
 }
@@ -176,3 +214,41 @@ resource "azurerm_storage_blob" "hosts_yaml" {
   source                 = local_file.ansible_inventory_new_yml.filename
 }
 
+resource "null_resource" "create-parameters-file" {
+  provisioner "local-exec" {
+    command = "ansible localhost --module-name lineinfile --args ${local.argsempty}"
+  }
+  triggers = {
+    val = local.argsempty
+  }
+
+}
+
+
+resource "null_resource" "update-parameters-file" {
+  depends_on = [
+    null_resource.create-parameters-file
+  ]
+  triggers = {
+    val = local.args
+  }
+
+  provisioner "local-exec" {
+    command = "ansible localhost --module-name blockinfile --args ${local.args}"
+  }
+}
+
+locals {
+  sid        = var.hdb_sid
+  kv_uri     = local.kv_name
+  scs_ha     = var.scs_ha
+  db_ha      = var.db_ha
+  diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
+  # scs_high_availability:         ${scs_ha}
+  # db_high_availability:          ${db_ha}
+  parameters = format("sap_sid:               %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+
+  args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
+  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), "---\n...")
+
+}

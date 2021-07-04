@@ -54,7 +54,6 @@ Licensed under the MIT license.
         [Parameter(Mandatory = $false)][string]$Subscription,
         [Parameter(Mandatory = $false)][string]$SPN_id,
         [Parameter(Mandatory = $false)][string]$SPN_password,
-
         [Parameter(Mandatory = $false)][string]$Tenant_id,
 
         [Parameter(Mandatory = $false)][Switch]$Force,

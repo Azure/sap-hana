@@ -110,6 +110,22 @@ variable "authentication_type" {
   
 }
 
+variable "db_ha" {
+  description = "Is the DB deployment highly available"
+  default = false
+}
+
+variable "scs_ha" {
+  description = "Is the SCS deployment highly available"
+  default = false
+}
+
+variable "ansible_user" {
+  description = "The ansible remote user account to use"
+  default = "azureadm"
+}
+
+
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")
