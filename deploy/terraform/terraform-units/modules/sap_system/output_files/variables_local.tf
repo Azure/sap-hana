@@ -112,17 +112,17 @@ variable "authentication_type" {
 
 variable "db_ha" {
   description = "Is the DB deployment highly available"
-  default = false
+  default     = false
 }
 
 variable "scs_ha" {
   description = "Is the SCS deployment highly available"
-  default = false
+  default     = false
 }
 
 variable "ansible_user" {
   description = "The ansible remote user account to use"
-  default = "azureadm"
+  default     = "azureadm"
 }
 
 
@@ -216,4 +216,5 @@ locals {
   ])
 
   secret_prefix = var.use_local_credentials ? var.naming.prefix.SDU : var.naming.prefix.VNET
+  dns_label     = try(var.landscape_tfstate.dns_label, "")
 }
