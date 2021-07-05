@@ -6,7 +6,7 @@ resource "azurerm_resource_group" "resource_group" {
   location = local.region
 }
 
-// Imports data of existing resource group
+// Imports data of exists resource group
 data "azurerm_resource_group" "resource_group" {
   provider = azurerm.main
   count    = local.rg_exists ? 1 : 0
@@ -38,10 +38,10 @@ resource "azurerm_subnet_route_table_association" "admin" {
 }
 
 
-// Imports data of existing SAP admin subnet
+// Imports data of exists SAP admin subnet
 data "azurerm_subnet" "admin" {
   provider             = azurerm.main
-  count                = local.sub_admin_exists && local.enable_admin_subnet ? 1 : 0
+  count                = local.sub_admin_exists ? 1 : 0
   name                 = split("/", local.sub_admin_arm_id)[10]
   resource_group_name  = split("/", local.sub_admin_arm_id)[4]
   virtual_network_name = split("/", local.sub_admin_arm_id)[8]
@@ -64,10 +64,10 @@ resource "azurerm_subnet_route_table_association" "db" {
   route_table_id = local.route_table_id
 }
 
-// Imports data of existing db subnet
+// Imports data of exists db subnet
 data "azurerm_subnet" "db" {
   provider             = azurerm.main
-  count                = local.enable_db_deployment ? (local.sub_db_exists ? 1 : 0) : 0
+  count                = local.sub_db_exists ? 1 : 0
   name                 = split("/", local.sub_db_arm_id)[10]
   resource_group_name  = split("/", local.sub_db_arm_id)[4]
   virtual_network_name = split("/", local.sub_db_arm_id)[8]
@@ -83,13 +83,13 @@ resource "azurerm_subnet" "storage" {
   address_prefixes     = [local.sub_storage_prefix]
 }
 
-// Imports data of existing db subnet
+// Imports data of exists db subnet
 data "azurerm_subnet" "storage" {
   provider             = azurerm.main
   count                = local.enable_db_deployment && local.enable_storage_subnet ? (local.sub_storage_exists ? 1 : 0) : 0
-  name                 = split("/", local.sub_storage_arm_id)[10]
-  resource_group_name  = split("/", local.sub_storage_arm_id)[4]
-  virtual_network_name = split("/", local.sub_storage_arm_id)[8]
+  name                 = split("/", var.infrastructure.vnets.sap.subnet_storage.arm_id)[10]
+  resource_group_name  = split("/", var.infrastructure.vnets.sap.subnet_storage.arm_id)[4]
+  virtual_network_name = split("/", var.infrastructure.vnets.sap.subnet_storage.arm_id)[8]
 }
 
 // Import boot diagnostics storage account from sap_landscape
@@ -111,8 +111,8 @@ resource "azurerm_proximity_placement_group" "ppg" {
 data "azurerm_proximity_placement_group" "ppg" {
   provider            = azurerm.main
   count               = local.ppg_exists ? max(length(local.zones), 1) : 0
-  name                = split("/", local.ppg_arm_ids[count.index])[8]
-  resource_group_name = split("/", local.ppg_arm_ids[count.index])[4]
+  name                = split("/", var.infrastructure.ppg.arm_ids[count.index])[8]
+  resource_group_name = split("/", var.infrastructure.ppg.arm_ids[count.index])[4]
 }
 
 

@@ -10,7 +10,7 @@ resource "azurerm_network_interface" "app" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-    private_ip_address = local.use_DHCP ? (
+    private_ip_address = var.application.use_DHCP ? (
       null) : (
       try(local.app_nic_ips[count.index],
         cidrhost(local.sub_app_exists ?
@@ -20,7 +20,7 @@ resource "azurerm_network_interface" "app" {
         )
       )
     )
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+    private_ip_address_allocation = var.application.use_DHCP ? "Dynamic" : "Static"
 
   }
 }
@@ -35,7 +35,7 @@ resource "azurerm_network_interface_application_security_group_association" "app
 # Create Application NICs
 resource "azurerm_network_interface" "app_admin" {
   provider                      = azurerm.main
-  count                         = local.enable_deployment && local.apptier_dual_nics ? local.application_server_count : 0
+  count                         = local.enable_deployment && var.application.use_DHCP ? local.application_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.admin_nic)
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
@@ -44,7 +44,7 @@ resource "azurerm_network_interface" "app_admin" {
   ip_configuration {
     name      = "IPConfig1"
     subnet_id = var.admin_subnet.id
-    private_ip_address = local.use_DHCP ? (
+    private_ip_address = var.application.use_DHCP ? (
       null) : (
       try(local.app_admin_nic_ips[count.index],
         cidrhost(var.admin_subnet.address_prefixes[0],
@@ -52,7 +52,7 @@ resource "azurerm_network_interface" "app_admin" {
         )
       )
     )
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+    private_ip_address_allocation = var.application.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
@@ -74,8 +74,8 @@ resource "azurerm_linux_virtual_machine" "app" {
   //If length of zones > 1 distribute servers evenly across zones
   zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
-  network_interface_ids = local.apptier_dual_nics ? (
-    local.legacy_nic_order ? (
+  network_interface_ids = var.application.use_DHCP ? (
+    var.options.legacy_nic_order ? (
       [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
       [azurerm_network_interface.app[count.index].id, azurerm_network_interface.app_admin[count.index].id]
     )
@@ -141,8 +141,8 @@ resource "azurerm_linux_virtual_machine" "app" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-  tags = local.app_tags
-
+  tags = try(var.application.app_tags, {})
+ 
 }
 
 # Create the Windows Application VM(s)
@@ -162,8 +162,8 @@ resource "azurerm_windows_virtual_machine" "app" {
   //If length of zones > 1 distribute servers evenly across zones
   zone = local.use_app_avset ? null : local.app_zones[count.index % max(local.app_zone_count, 1)]
 
-  network_interface_ids = local.apptier_dual_nics ? (
-    local.legacy_nic_order ? (
+  network_interface_ids = var.application.use_DHCP ? (
+    var.options.legacy_nic_order ? (
       [azurerm_network_interface.app_admin[count.index].id, azurerm_network_interface.app[count.index].id]) : (
       [azurerm_network_interface.app[count.index].id, azurerm_network_interface.app_admin[count.index].id]
     )
@@ -218,7 +218,7 @@ resource "azurerm_windows_virtual_machine" "app" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-  tags = local.app_tags
+  tags = try(var.application.app_tags, {})
 
 }
 

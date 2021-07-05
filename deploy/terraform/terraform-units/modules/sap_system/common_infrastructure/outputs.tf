@@ -26,16 +26,13 @@ output "ppg" {
   value = local.ppg_exists ? data.azurerm_proximity_placement_group.ppg : azurerm_proximity_placement_group.ppg
 }
 
-output "infrastructure_w_defaults" {
-  value = local.infrastructure
-}
 
 output "admin_subnet" {
-  value = !local.enable_admin_subnet ? null : (local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0])
+  value = local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0]
 }
 
 output "db_subnet" {
-  value = local.enable_db_deployment ? local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] : null
+  value = local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] 
 }
 
 output "sid_kv_user_id" {

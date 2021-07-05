@@ -1939,6 +1939,7 @@ Licensed under the MIT license.
             $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
             Out-IniFile -InputObject $iniContent -Path $fileINIPath
         }
+
     }
 
     Write-Host -ForegroundColor green "Initializing Terraform  New-SAPWorkloadZone"
@@ -2022,7 +2023,7 @@ Licensed under the MIT license.
     }
 
     Write-Host -ForegroundColor green "Running plan, please wait"
-    $Command = " plan  -no-color -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+    $Command = " plan  -no-color -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
     Add-Content -Path "deployment.log" -Value $Cmd
@@ -2067,7 +2068,7 @@ Licensed under the MIT license.
             $Command = " apply --auto-approve -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
         }
         else {
-            $Command = " apply -var-file " + $ParamFullFile + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
+            $Command = " apply -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
         }
         
         Add-Content -Path "deployment.log" -Value $Cmd
@@ -2079,7 +2080,6 @@ Licensed under the MIT license.
             $Env:TF_DATA_DIR = $null
             throw "Error executing command: $Cmd"
         }
-    
     }
     $Env:TF_DATA_DIR = $null
 }

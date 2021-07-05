@@ -16,7 +16,7 @@ resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
   route_table_id = var.route_table_id
 }
 
-# Imports data of existing SAP app subnet
+# Imports data of exists SAP app subnet
 data "azurerm_subnet" "subnet_sap_app" {
   provider             = azurerm.main
   count                = local.enable_deployment ? (local.sub_app_exists ? 1 : 0) : 0
@@ -42,7 +42,7 @@ resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
   route_table_id = var.route_table_id
 }
 
-# Imports data of existing SAP web dispatcher subnet
+# Imports data of exists SAP web dispatcher subnet
 data "azurerm_subnet" "subnet_sap_web" {
   provider             = azurerm.main
   count                = local.enable_deployment ? (local.sub_web_exists ? 1 : 0) : 0
@@ -231,11 +231,11 @@ resource "azurerm_lb" "web" {
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_feip)
     subnet_id = local.sub_web_deployed.id
-    private_ip_address = local.use_DHCP ? (
+    private_ip_address = var.application.use_DHCP ? (
       null) : (
       try(local.web_lb_ips[0], cidrhost(local.sub_web_deployed.address_prefixes[0], local.ip_offsets.web_lb))
     )
-    private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
+    private_ip_address_allocation = var.application.use_DHCP ? "Dynamic" : "Static"
   }
 }
 
