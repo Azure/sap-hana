@@ -65,27 +65,23 @@ locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
   // The environment of sap landscape and sap system
-  environment     = upper(try(var.infrastructure.environment, ""))
+  environment     = upper(local.infrastructure.environment)
   vnet_sap_arm_id = data.terraform_remote_state.landscape.outputs.vnet_sap_arm_id
 
-  vnet_logical_name = var.infrastructure.vnets.sap.name
-
-  // SAP vnet
-  var_infra       = try(var.infrastructure, {})
-  var_vnet_sap    = try(local.var_infra.vnets.sap, {})
-  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
+  vnet_logical_name = local.infrastructure.vnets.sap.name
+  vnet_sap_exists   = length(local.vnet_sap_arm_id) > 0 ? true : false
 
   //SID determination
 
   hana-databases = [
-    for db in var.databases : db
+    for db in local.databases : db
     if try(db.platform, "NONE") == "HANA"
   ]
 
   // Filter the list of databases to only AnyDB platform entries
   // Supported databases: Oracle, DB2, SQLServer, ASE 
   anydb-databases = [
-    for database in var.databases : database
+    for database in local.databases : database
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
   ]
 
@@ -95,22 +91,22 @@ locals {
   anydb_platform = try(local.anydb-databases[0].platform, "NONE")
   anydb_sid      = (length(local.anydb-databases) > 0) ? try(local.anydb-databases[0].instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
   db_sid         = length(local.hana-databases) > 0 ? local.hanadb_sid : local.anydb_sid
-  sap_sid        = upper(try(var.application.sid, local.db_sid))
+  sap_sid        = upper(try(local.application.sid, local.db_sid))
 
-  app_ostype            = try(var.application.os.os_type, "LINUX")
-  db_ostype             = try(var.databases[0].os.os_type, "LINUX")
-  db_server_count       = try(length(var.databases[0].dbnodes), 1)
-  app_server_count      = try(var.application.application_server_count, 0)
-  webdispatcher_count   = try(var.application.webdispatcher_count, 0)
-  scs_high_availability = try(var.application.scs_high_availability, false)
-  scs_server_count      = try(var.application.scs_server_count, 1) * (local.scs_high_availability ? 2 : 1)
+  app_ostype            = try(local.application.os.os_type, "LINUX")
+  db_ostype             = try(local.databases[0].os.os_type, "LINUX")
+  db_server_count       = try(length(local.databases[0].dbnodes), 1)
+  app_server_count      = try(local.application.application_server_count, 0)
+  webdispatcher_count   = try(local.application.webdispatcher_count, 0)
+  scs_high_availability = try(local.application.scs_high_availability, false)
+  scs_server_count      = try(local.application.scs_server_count, 1) * (local.scs_high_availability ? 2 : 1)
 
-  db_zones  = try(var.databases[0].zones, [])
-  app_zones = try(var.application.app_zones, [])
-  scs_zones = try(var.application.scs_zones, [])
-  web_zones = try(var.application.web_zones, [])
+  db_zones  = try(local.databases[0].zones, [])
+  app_zones = try(local.application.app_zones, [])
+  scs_zones = try(local.application.scs_zones, [])
+  web_zones = try(local.application.web_zones, [])
 
-  anchor        = try(var.infrastructure.anchor_vms, {})
+  anchor        = try(local.infrastructure.anchor_vms, {})
   anchor_ostype = upper(try(local.anchor.os.os_type, "LINUX"))
 
   // Locate the tfstate storage account
@@ -122,11 +118,7 @@ locals {
   landscape_tfstate_key        = var.landscape_tfstate_key
 
   // Retrieve the arm_id of deployer's Key Vault from deployer's terraform.tfstate
-  spn_key_vault_arm_id = try(var.key_vault.kv_spn_id,
-    try(data.terraform_remote_state.landscape.outputs.landscape_key_vault_spn_arm_id,
-      try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, "")
-    )
-  )
+  spn_key_vault_arm_id = coalesce(try(local.key_vault.kv_spn_id, ""), try(data.terraform_remote_state.landscape.outputs.landscape_key_vault_spn_arm_id, ""), try(data.terraform_remote_state.deployer[0].outputs.deployer_kv_user_arm_id, ""))
 
   deployer_subscription_id = length(local.spn_key_vault_arm_id) > 0 ? split("/", local.spn_key_vault_arm_id)[2] : ""
 

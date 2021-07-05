@@ -19,8 +19,6 @@ steps:
 
       echo "##vso[task.setvariable variable=username]$(az vm list --resource-group ${rg_name} | jq -r .[].osProfile.adminUsername)"
       vm_name=$(az vm list --resource-group ${rg_name} | jq -r .[].name)
-
-      echo $vm_name
       pip=$(az vm list-ip-addresses -g ${rg_name} -n ${vm_name} | jq -r .[].virtualMachine.network.publicIpAddresses | jq -r .[].ipAddress)
       echo "##vso[task.setvariable variable=publicIP]${pip}"
     displayName: "Fetch deployer information"

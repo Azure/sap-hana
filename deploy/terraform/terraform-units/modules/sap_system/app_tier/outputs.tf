@@ -66,16 +66,10 @@ output "fileshare_lb_ip" {
   value = local.enable_deployment && local.scs_server_count > 0 && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? azurerm_lb.scs[0].frontend_ip_configuration[3].private_ip_address : ""
 }
 
-
-output "application" {
-  sensitive = false
-  value     = local.application
-}
-
 // Output for DNS
 output "dns_info_vms" {
   value = local.enable_deployment ? (
-    local.apptier_dual_nics ? (
+    var.application.use_DHCP ? (
       zipmap(
         compact(concat(
           local.full_appserver_names,

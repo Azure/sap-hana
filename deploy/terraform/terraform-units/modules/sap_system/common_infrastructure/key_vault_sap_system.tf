@@ -29,7 +29,7 @@ data "azurerm_key_vault_secret" "sid_password" {
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
   provider                   = azurerm.main
-  count                      = local.enable_sid_deployment && !local.prvt_kv_override ? 1 : 0
+  count                      = local.enable_sid_deployment && length(local.prvt_key_vault_id) == 0 ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -58,7 +58,7 @@ resource "azurerm_key_vault" "sid_kv_prvt" {
 // Import an existing private Key Vault
 data "azurerm_key_vault" "sid_kv_prvt" {
   provider            = azurerm.main
-  count               = (local.enable_sid_deployment && local.prvt_kv_override) ? 1 : 0
+  count               = (local.enable_sid_deployment && length(local.prvt_key_vault_id) > 0) ? 1 : 0
   name                = local.prvt_kv_name
   resource_group_name = local.prvt_kv_rg_name
 }
@@ -66,7 +66,7 @@ data "azurerm_key_vault" "sid_kv_prvt" {
 // Create user KV with access policy
 resource "azurerm_key_vault" "sid_kv_user" {
   provider                   = azurerm.main
-  count                      = local.enable_sid_deployment && !local.user_kv_override ? 1 : 0
+  count                      = local.enable_sid_deployment && length(local.user_key_vault_id) == 0 ? 1 : 0
   name                       = local.user_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -102,7 +102,7 @@ resource "azurerm_key_vault" "sid_kv_user" {
 // Import an existing user Key Vault
 data "azurerm_key_vault" "sid_kv_user" {
   provider            = azurerm.main
-  count               = (local.enable_sid_deployment && local.user_kv_override) ? 1 : 0
+  count               = (local.enable_sid_deployment && length(local.user_key_vault_id) > 0) ? 1 : 0
   name                = local.user_kv_name
   resource_group_name = local.user_kv_rg_name
 }

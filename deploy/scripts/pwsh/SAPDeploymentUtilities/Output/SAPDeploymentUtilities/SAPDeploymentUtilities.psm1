@@ -1927,12 +1927,15 @@ Licensed under the MIT license.
 
 
     if ($null -eq $tfstate_resource_id -or "" -eq $tfstate_resource_id) {
-        $rID = Get-AzResource -Name $saName 
-        $rgName = $rID.ResourceGroupName
-        $tfstate_resource_id = $rID.ResourceId
-        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
-        $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
-        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        if ($null -ne $saName -and "" -ne $saName) {
+            $rID = Get-AzResource -Name $saName -ResourceType Microsoft.Storage/storageAccounts
+            $rgName = $rID.ResourceGroupName
+            $tfstate_resource_id = $rID.ResourceId
+            $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
+            $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
+            Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        }
+
     }
 
 
