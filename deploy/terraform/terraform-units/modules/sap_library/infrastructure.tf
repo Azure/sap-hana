@@ -22,3 +22,10 @@ data "azurerm_resource_group" "library" {
 }
 
 // TODO: Add management lock when this issue is addressed https://github.com/terraform-providers/terraform-provider-azurerm/issues/5473
+
+
+resource "azurerm_private_dns_zone" "dns" {
+  count               = length(var.dns_label) > 0 ? 1 : 0
+  name                = var.dns_label
+  resource_group_name = local.rg_name
+}

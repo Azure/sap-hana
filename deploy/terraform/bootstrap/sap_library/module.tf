@@ -13,6 +13,8 @@ module "sap_library" {
   service_principal       = local.service_principal
   deployer_tfstate        = try(data.terraform_remote_state.deployer[0].outputs, [])
   naming                  = module.sap_namegenerator.naming
+  dns_label               = var.dns_label
+
 }
 
 module "sap_namegenerator" {
