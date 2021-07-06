@@ -1,7 +1,7 @@
 {
   "infrastructure": {
-    "region"                     : "eastus2",
     "environment"                : "MGMT",
+    "region"                     : "eastus2",
     "vnets": {
       "management": {
         "arm_id"                 : "<azureresourceid>",

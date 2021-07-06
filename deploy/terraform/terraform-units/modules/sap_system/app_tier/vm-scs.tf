@@ -95,6 +95,19 @@ resource "azurerm_linux_virtual_machine" "scs" {
   admin_username                  = var.sid_username
   admin_password                  = local.enable_auth_key ? null : var.sid_password
   disable_password_authentication = !local.enable_auth_password
+<<<<<<< HEAD
+=======
+
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
+
+  custom_data = var.cloudinit_growpart_config
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
   dynamic "admin_ssh_key" {
     for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))

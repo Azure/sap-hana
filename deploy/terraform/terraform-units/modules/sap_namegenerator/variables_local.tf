@@ -275,6 +275,11 @@ variable "resource_suffixes" {
     "web_subnet"          = "web-subnet"
     "web_subnet_nsg"      = "webSubnet-nsg"
     "witness"             = "-witness"
+<<<<<<< HEAD
+=======
+    "witness_accesskey"   = "witness-accesskey"
+    "witness_name"        = "witness-name"
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
   }
 }

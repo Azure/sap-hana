@@ -74,6 +74,7 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
 }
 
+<<<<<<< HEAD
 variable "license_type" {
   description = "Specifies the license type for the OS"
   default = ""
@@ -81,6 +82,13 @@ variable "license_type" {
 
 
 
+=======
+variable "cloudinit_growpart_config" {
+  description = "A cloud-init config that configures automatic growpart expansion of root partition"
+}
+
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 locals {
   // Resources naming
   computer_names       = var.naming.virtualmachine_names.HANA_COMPUTERNAME
@@ -94,10 +102,17 @@ locals {
     format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
     format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
   )
+<<<<<<< HEAD
 
   sizes         = jsondecode(file(local.file_name))
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
+=======
+
+  sizes         = jsondecode(file(local.file_name))
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
   region = try(var.infrastructure.region, "")

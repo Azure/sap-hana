@@ -90,6 +90,10 @@ resource "azurerm_linux_virtual_machine" "web" {
     }
   }
 
+<<<<<<< HEAD
+=======
+  custom_data = var.cloudinit_growpart_config
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
   dynamic "os_disk" {
     iterator = disk

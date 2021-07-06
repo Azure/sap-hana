@@ -61,6 +61,11 @@ resource "azurerm_linux_virtual_machine" "observer" {
     azurerm_network_interface.observer[count.index].id
   ]
   size = local.observer_size
+<<<<<<< HEAD
+=======
+
+  custom_data = var.cloudinit_growpart_config
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
   os_disk {
     name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)

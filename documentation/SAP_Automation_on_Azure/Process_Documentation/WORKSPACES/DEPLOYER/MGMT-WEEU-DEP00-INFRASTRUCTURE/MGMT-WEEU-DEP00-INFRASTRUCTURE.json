@@ -1,7 +1,7 @@
 {
   "infrastructure": {
-    "region"                     : "westeurope",
     "environment"                : "MGMT",
+    "region"                     : "westeurope",
     "vnets": {
       "management": {
         "address_space"          : "10.10.20.0/25",

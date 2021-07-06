@@ -104,10 +104,11 @@ locals {
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
-}
-
-locals {
   rg_library_location           = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
   storagecontainer_sapbits_name = local.sa_sapbits_blob_container_enable ? local.sa_sapbits_blob_container_name : null
   fileshare_sapbits_name        = local.sa_sapbits_file_share_enable ? local.sa_sapbits_file_share_name : null
+
+
+  deployer_kv_user_arm_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_kv_user_arm_id, "") : ""
+  
 }

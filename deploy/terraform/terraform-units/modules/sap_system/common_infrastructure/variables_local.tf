@@ -45,12 +45,15 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
 }
 
+<<<<<<< HEAD
 variable "license_type" {
   description = "Specifies the license type for the OS"
   default = ""
 }
 
 
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 locals {
   // Resources naming
@@ -330,6 +333,7 @@ locals {
     try(var.authentication.username, ""),
     try(data.azurerm_key_vault_secret.sid_username[0].value, "azureadm")
   )
+<<<<<<< HEAD
 
   sid_auth_password = coalesce(
       try(var.authentication.password, ""),
@@ -339,6 +343,17 @@ locals {
   sid_public_key  = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
   sid_private_key = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
 
+=======
+
+  sid_auth_password = coalesce(
+      try(var.authentication.password, ""),
+      try(data.azurerm_key_vault_secret.sid_password[0].value, local.use_local_credentials ? random_password.password[0].result : "")
+    )
+    
+  sid_public_key  = local.use_local_credentials ? try(file(var.authentication.path_to_public_key), tls_private_key.sdu[0].public_key_openssh) : data.azurerm_key_vault_secret.sid_pk[0].value
+  sid_private_key = local.use_local_credentials ? try(file(var.authentication.path_to_private_key), tls_private_key.sdu[0].private_key_pem) : ""
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   password_required = try(var.databases[0].authentication.type, "key") == "password" || try(var.application.authentication.type, "key") == "password"
 
   //---- Update infrastructure with defaults ----//
@@ -387,4 +402,9 @@ locals {
   // Current service principal
   service_principal = try(var.service_principal, {})
 
+}
+
+locals {
+  // 'Cg==` is empty string, base64 encoded.
+  cloudinit_growpart_config = try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
 }

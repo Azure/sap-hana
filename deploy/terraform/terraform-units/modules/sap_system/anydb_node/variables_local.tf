@@ -67,9 +67,14 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
 }
 
+<<<<<<< HEAD
 variable "license_type" {
   description = "Specifies the license type for the OS"
   default = ""
+=======
+variable "cloudinit_growpart_config" {
+  description = "A cloud-init config that configures automatic growpart expansion of root partition"
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 }
 
 

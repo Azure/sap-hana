@@ -1,19 +1,19 @@
 {
   "application": {
-    "application_server_count"      : 2,
     "enable_deployment"             : true,
+    "sid"                           : "X00",
+    "scs_instance_number"           : "01",
     "ers_instance_number"           : "02",
+    "scs_high_availability"         : false,
+    "application_server_count"      : 3,
+    "webdispatcher_count"           : 1,
     "os": {
       "publisher"                   : "SUSE",
       "offer"                       : "sles-sap-12-sp5",
       "sku"                         : "gen2",
       "version"                     : "latest"
     },
-    "scs_high_availability"         : true,
     "scs_server_count"              : 1,
-    "scs_instance_number"           : "01",
-    "sid"                           : "X00",
-    "webdispatcher_count"           : 1,
     "dual_nics"                     : false,
     "use_DHCP"                      : true
   },

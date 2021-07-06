@@ -1,0 +1,118 @@
+---
+
+- name: "Ensure {{ bom_base_name }} data is available"
+  include_vars:
+    file: "{{ inventory_dir }}/{{ bom_base_name }}_bom.yaml"
+    name: bom
+
+- name: Determine Stack XML file name
+  set_fact:
+    stack_xml_file: "{{ stack_xml_entry.override_target_filename is defined | ternary(stack_xml_entry.override_target_filename, stack_xml_entry.file) }}"
+  vars:
+    stack_xml_entry: "{{
+      bom.materials.stackfiles |
+      flatten(levels=1) |
+      selectattr('file', 'match', '^MP_Stack.*\\.xml$') |
+      list |
+      first
+      }}"
+
+- name: Determine inifile name
+  set_fact:
+    inifile: "{{ inifile_entry.override_target_filename is defined | ternary(inifile_entry.override_target_filename, inifile_entry.file) }}"
+  vars:
+    inifile_entry: "{{
+      bom.materials.templates |
+      flatten(levels=1) |
+      selectattr('file', 'match', '.*\\.inifile.params$') |
+      list |
+      first
+      }}"
+
+- name: Determine SAPCAR executable file name
+  set_fact:
+    sapcar_executable: "{{ sapcar_entry.override_target_filename is defined | ternary(sapcar_entry.override_target_filename, sapcar_entry.archive) }}"
+  vars:
+    sapcar_entry: "{{
+      bom.materials.media |
+      flatten(levels=1) |
+      selectattr('archive', 'match', '^SAPCAR.*\\.EXE$') |
+      list |
+      first
+      }}"
+
+- name: Determine SWPM archive name
+  set_fact:
+    swpm_archive: "{{ swpm_entry.override_target_filename is defined | ternary(swpm_entry.override_target_filename, swpm_entry.archive) }}"
+  vars:
+    swpm_entry: "{{
+      bom.materials.media |
+      flatten(levels=1) |
+      selectattr('archive', 'match', '^SWPM.*\\.SAR$') |
+      list |
+      first
+      }}"
+
+- name: Determine product id
+  set_fact:
+    product_id: "{{ bom.product_ids.scs }}"
+
+- name: Ensure SAPCAR is executable
+  file:
+    path: "{{ download_basket_dir }}/{{ sapcar_executable }}"
+    mode: "0755"
+
+- name: Ensure SWPM directory is present
+  file:
+    path: "{{ target_media_location }}/SWPM"
+    state: directory
+
+- name: Ensure SWPM is unarchived
+  command: >
+    {{ download_basket_dir }}/{{ sapcar_executable }} -xf {{ download_basket_dir }}/{{ swpm_archive }} -R {{ target_media_location }}/SWPM/
+  args:
+    creates: "{{ target_media_location }}/SWPM/SIGNATURE.SMF"
+
+- name: Ensure the template is available on the controller
+  fetch:
+    dest: /tmp/
+    src: "{{ target_media_location }}/config/{{ inifile }}"
+    flat: yes
+
+- name: Ensure inifile is prepared from template
+  template:
+    dest: "{{ target_media_location }}/config/scs.inifile.params"
+    src: "/tmp/{{ inifile }}"
+
+- name: "Ensure /usr/sap permissions are correct"
+  file:
+     path: "/usr/sap"
+     state: directory
+     mode: "0777"
+     group: "sapsys"
+
+- name: "Ensure /sapmnt permissions are correct"
+  file:
+     path: "/sapmnt"
+     state: directory
+     mode: "0777"
+
+- name: Ensure a temporary directory for executing the installation exists
+  file:
+    path: "/tmp/{{ bom_base_name }}"
+    state: directory
+    owner: root
+    group: sapinst
+    mode: "0777"
+
+- name: Ensure SCS is present and running
+  shell: >
+    {{ target_media_location }}/SWPM/sapinst
+    SAPINST_XML_FILE="{{ target_media_location }}/config/{{ stack_xml_file }}"
+    SAPINST_USE_HOSTNAME="{{ scs_hostname }}"
+    SAPINST_INPUT_PARAMETERS_URL={{ target_media_location }}/config/scs.inifile.params
+    SAPINST_EXECUTE_PRODUCT_ID="{{ product_id }}"
+    SAPINST_START_GUI=false
+    SAPINST_START_GUISERVER=false
+  args:
+    chdir: "/tmp/{{ bom_base_name }}"

@@ -284,6 +284,7 @@ resource "azurerm_availability_set" "web" {
   managed                      = true
 }
 
+<<<<<<< HEAD
 # FIREWALL
 
 # The following example shows how to generate a random priority
@@ -322,6 +323,8 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure-app" {
     protocols             = ["Any"]
   }
 }
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 //ASG
 

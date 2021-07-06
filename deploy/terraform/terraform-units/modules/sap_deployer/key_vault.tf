@@ -2,7 +2,11 @@
 data "azurerm_client_config" "deployer" {}
 
 data "azuread_service_principal" "deployer" {
+<<<<<<< HEAD
   count = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
+=======
+  count          = data.azurerm_client_config.deployer.object_id == "" ? 1 : 0
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   application_id = data.azurerm_client_config.deployer.client_id
 }
 
@@ -91,7 +95,12 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
+<<<<<<< HEAD
   count        = (local.enable_deployers && !local.user_kv_exist) ? 1 : 0
+=======
+
+  count        = (local.enable_deployers && !local.user_kv_exist) && data.azurerm_client_config.deployer.object_id != "" ? 1 : 0
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
@@ -108,6 +117,13 @@ resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
     "Restore",
     "Purge"
   ]
+<<<<<<< HEAD
+=======
+
+  lifecycle {
+    create_before_destroy = true
+  }
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 }
 
 // Comment out code with users.object_id for the time being.

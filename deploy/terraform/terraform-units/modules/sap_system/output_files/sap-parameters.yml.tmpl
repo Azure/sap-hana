@@ -2,11 +2,21 @@
 
 bom_base_name:                 
 sapbits_location_base_path:    
+<<<<<<< HEAD
+=======
+password_master:               
+sap_fqdn:                      
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 # TERRAFORM CREATED
 sap_sid:                       ${sid}
 kv_uri:                        ${kv_uri}
 secret_prefix:                 ${secret_prefix}
+<<<<<<< HEAD
+=======
+scs_high_availability:         ${scs_ha}
+db_high_availability:          ${db_ha}
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 disks: 
 %{~ for disk in disks }

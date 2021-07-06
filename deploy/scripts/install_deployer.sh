@@ -190,7 +190,7 @@ else
     fi
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}"/.terraform
 
 ok_to_proceed=false

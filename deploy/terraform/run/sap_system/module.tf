@@ -47,7 +47,10 @@ module "common_infrastructure" {
   authentication             = var.authentication
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+<<<<<<< HEAD
   license_type               = var.license_type
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 }
 
@@ -79,7 +82,12 @@ module "hdb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+<<<<<<< HEAD
   license_type               = var.license_type
+=======
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 }
 
 // Create Application Tier nodes
@@ -111,7 +119,11 @@ module "app_tier" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+<<<<<<< HEAD
   license_type               = var.license_type
+=======
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 }
 
@@ -142,7 +154,11 @@ module "anydb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+<<<<<<< HEAD
   license_type               = var.license_type
+=======
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 }
 
@@ -185,5 +201,11 @@ module "output_files" {
   sid_kv_user_id            = module.common_infrastructure.sid_kv_user_id
   disks                     = distinct(compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)))
   use_local_credentials     = module.common_infrastructure.use_local_credentials
+<<<<<<< HEAD
+=======
+  scs_ha                    = module.app_tier.scs_ha
+  db_ha                     = upper(try(var.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
+  ansible_user              = module.common_infrastructure.sid_username
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 }

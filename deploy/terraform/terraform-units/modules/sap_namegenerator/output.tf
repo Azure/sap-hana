@@ -1,10 +1,17 @@
 output "naming" {
   value = {
     prefix = {
+<<<<<<< HEAD
       DEPLOYER = length(var.custom_prefix) > 0 ? var.custom_prefix : local.deployer_name
       SDU      = length(var.custom_prefix) > 0 ? var.custom_prefix : local.sdu_name
       VNET     = length(var.custom_prefix) > 0 ? var.custom_prefix : local.landscape_name
       LIBRARY  = length(var.custom_prefix) > 0 ? var.custom_prefix : local.library_name
+=======
+      DEPLOYER = trimspace(length(var.custom_prefix) > 0 ? var.custom_prefix : local.deployer_name)
+      SDU      = trimspace(length(var.custom_prefix) > 0 ? var.custom_prefix : local.sdu_name)
+      VNET     = trimspace(length(var.custom_prefix) > 0 ? var.custom_prefix : local.landscape_name)
+      LIBRARY  = trimspace(length(var.custom_prefix) > 0 ? var.custom_prefix : local.library_name)
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
     }
     storageaccount_names = {
       DEPLOYER = local.deployer_storageaccount_name

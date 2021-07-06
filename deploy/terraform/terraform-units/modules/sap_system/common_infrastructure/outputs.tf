@@ -91,3 +91,10 @@ output "db_asg_id" {
 output "use_local_credentials" {
   value = local.use_local_credentials
 }
+<<<<<<< HEAD
+=======
+
+output "cloudinit_growpart_config" {
+  value = local.cloudinit_growpart_config
+}
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

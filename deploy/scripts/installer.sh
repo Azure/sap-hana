@@ -368,7 +368,7 @@ else
 fi
 
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 export TF_DATA_DIR="${param_dirname}/.terraform"
 
 if [ ! -d "${terraform_module_directory}" ]

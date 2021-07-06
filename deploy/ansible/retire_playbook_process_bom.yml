@@ -1,0 +1,16 @@
+---
+
+- hosts: scs
+  become: yes
+  vars:
+    tier: preparation
+  vars_files:
+    - "{{ inventory_dir }}/sap-system-config.yaml"
+  roles:
+    - role: dependencies-install
+    - role: disk-setup
+    - role: swap-setup
+    - role: ensure-bom
+    - role: process_bom
+    - role: sap-users
+    - role: nfs-server-setup

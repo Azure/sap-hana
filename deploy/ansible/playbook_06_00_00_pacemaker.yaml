@@ -1,0 +1,56 @@
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for PACEMAKER General Config                  |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+
+# TODO: Playbook not yet written
+#       This is a placeholder 
+
+- hosts:          scs                                           # TODO: Replace this with new inventory group; Change to correct group
+
+  name:           PACEMAKER - General Config
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+
+  tasks:
+
+  # - name: Test Connection                                     # Simple connection test for troubleshooting
+  #   ping:
+
+
+
+
+#----------------------------------------
+# BEGIN
+#
+# TODO: evaluate for inclusion and refactor.
+# SOURCE: sap-playbook
+#----------------------------------------
+
+# # Only SLES support SBD fencing
+# - hosts: iscsi
+#   become: true
+#   become_user: root
+#   roles:
+#    - role: iscsi-target-install
+#      when:
+#        - hana_database.size != "LargeInstance"
+#        - hana_database.high_availability
+#        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

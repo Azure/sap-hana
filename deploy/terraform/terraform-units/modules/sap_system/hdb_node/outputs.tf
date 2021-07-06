@@ -56,3 +56,10 @@ output "hanadb_vm_ids" {
 output "dbtier_disks" {
   value = local.enable_deployment ? local.db_disks_ansible : []
 }
+<<<<<<< HEAD
+=======
+
+output "db_ha" {
+  value = local.hdb_ha
+}
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

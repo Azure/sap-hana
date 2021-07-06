@@ -1,0 +1,269 @@
+---
+
+# Flow of old sap_playbook
+#   HOST: localhost
+#     Include output JSON
+#     Create dictionary with HANA database inforamtion from output.JSON
+#   
+#   HOST: X00_DB
+#     role: inventory-validation
+#     role: os-preparation
+#     role: os-disk-setup
+#     role: enable-prometheus
+#   
+#   
+#   HOST: ISCSI
+#     role: iscsi-target-install
+#   
+#   
+#   
+#   
+#   
+
+
+#----------------------------------------
+# BEGIN DEPRECATED
+#----------------------------------------
+
+# - hosts: localhost
+#   become: true
+#   become_user: root
+#   pre_tasks:
+#     - name: Include output JSON
+#       include_vars:
+#         file: "{{ inventory_dir }}/output.json"
+#         name: output
+
+#     - name: Create dictionary with HANA database inforamtion from output.JSON
+#       set_fact:
+#         hana_database: "{{ item }}"
+#       loop: "{{ output.databases|flatten(levels=1) }}"
+#       when: item.platform == 'HANA'
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+#----------------------------------------
+# BEGIN - MOVED
+#
+# TODO: evaluate and refactor. move to os_base_config
+#----------------------------------------
+
+# --> BEGIN SKIP 20200126
+# TODO: Temporary Skip
+# Inventory validation for HANA VMs
+# - hosts: hanadbnodes
+
+# - hosts: X00_DB
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: inventory-validation
+#       when:
+#         - hana_database.size != "LargeInstance"
+
+# --> END SKIP 20200126
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+#----------------------------------------
+# BEGIN - MOVED
+#
+# TODO: evaluate and refactor. move to os_base_config and os_sap_config
+#----------------------------------------
+
+
+# # Prepare os, disks and mount points on Hana Database servers
+# # - hosts: hanadbnodes
+# - hosts: X00_DB
+#   become: true
+#   become_user: root
+#   vars_files:
+#     - "vars/packages.yaml"
+#   pre_tasks:
+#     - name: Include SAP HANA DB sizes
+#       include_vars:
+#         file: "{{ configs_path }}/hdb_sizes.json"
+#         name: hdb_sizes
+#   max_fail_percentage: 0
+#   roles:
+#     - role: os-preparation
+#     - role: os-disk-setup
+#     - role: enable-prometheus
+#       when:
+#         - output.options.enable_prometheus == True
+#         - ansible_facts['distribution_file_variety'] == 'SUSE'
+#         - ansible_facts['distribution_version'] is regex("(12\.[3-5]|15\.\d)")
+#         - hana_database.size != "LargeInstance"
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header> 
+#
+# -------------------------------------+---------------------------------------8
+
+#----------------------------------------
+# BEGIN: Commented Section to enable BOM
+#        Process - MOVED
+#
+# TODO: evaluate and refactor. Depracate
+#----------------------------------------
+
+# # Mount Azure File share on all linux jumpboxes including rti
+# - hosts: localhost:jumpboxes_linux
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: mount-azure-files
+#       when: output.software.storage_account_sapbits.file_share_name != ""
+
+# # Mount Azure File share on all hanadbnodes. When the scenario is Large Instance, this task will be skipped
+# - hosts: hanadbnodes
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: mount-azure-files
+#       when:
+#         - output.software.storage_account_sapbits.file_share_name != ""
+#         - hana_database.size != "LargeInstance"
+
+# # Download SAP Media on Azure File Share
+# - hosts: localhost
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: sap-media-download
+
+# - hosts: hanadbnodes
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: sap-media-transfer
+#       when: hana_database.size == "LargeInstance"
+#     - role: large-instance-environment-setup
+#       when: hana_database.size == "LargeInstance"
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+#----------------------------------------
+# BEGIN - MOVED
+#
+# TODO: Port to general pacemaker section
+#----------------------------------------
+
+# # Only SLES support SBD fencing
+# - hosts: iscsi
+#   become: true
+#   become_user: root
+#   roles:
+#    - role: iscsi-target-install
+#      when:
+#        - hana_database.size != "LargeInstance"
+#        - hana_database.high_availability
+#        - hostvars[hana_database.nodes[0].ip_admin_nic].ansible_os_family == 'Suse'
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+
+#----------------------------------------
+# BEGIN: Commented Section to enable BOM
+#        Process - MOVED
+#
+# TODO: evaluate and refactor. DB install, HSR, HA
+#----------------------------------------
+
+# # Hana DB components install
+# - hosts: hanadbnodes
+#   become: true
+#   become_user: root
+#   any_errors_fatal: true
+#   vars_files:
+#     - "vars/ha-packages.yaml"
+#   pre_tasks:
+#     - name: Include SAP HANA DB sizes
+#       include_vars:
+#         file: "{{ configs_path }}/hdb_sizes.json"
+#         name: hdb_sizes
+#   roles:
+#     - role: hdb-server-install
+#     - role: hana-system-replication
+#       when: hana_database.high_availability
+#       vars:
+#         sid: "{{ hana_database.instance.sid }}"
+#         instance_number: "{{ hana_database.instance.instance_number }}"
+#         hdb_version: "{{ hana_database.db_version }}"
+#         hdb_disks: "{{ hdb_sizes[hana_database.size].storage }}"
+#         hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
+#         primary_instance:
+#           name: "{{ hana_database.nodes[0].dbname }}"
+#           ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
+#         secondary_instance:
+#           name: "{{ hana_database.nodes[1].dbname }}"
+#           ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
+#     - role: hana-os-clustering
+#       when: hana_database.high_availability
+#       vars:
+#         resource_group_name: "{{ output.infrastructure.resource_group.name }}"
+#         sid: "{{ hana_database.instance.sid }}"
+#         instance_number: "{{ hana_database.instance.instance_number }}"
+#         hdb_size: "{{ hana_database.size }}"
+#         hdb_lb_feip: "{{ hana_database.loadbalancer.frontend_ip }}"
+#         ha_cluster_password: "{{ hana_database.credentials.ha_cluster_password }}"
+#         sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
+#         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
+#         sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"
+#         sap_hana_fencing_agent_client_password: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_SECRET') }}"
+#         primary_instance:
+#           name: "{{ hana_database.nodes[0].dbname }}"
+#           ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
+#           ip_db: "{{ hana_database.nodes[0].ip_db_nic }}"
+#         secondary_instance:
+#           name: "{{ hana_database.nodes[1].dbname }}"
+#           ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
+#           ip_db: "{{ hana_database.nodes[1].ip_db_nic }}"
+
+#----------------------------------------
+# END
+#----------------------------------------
+
+
+
+#----------------------------------------
+# BEGIN: Retired Roles
+#----------------------------------------
+
+# # Linux jumpboxes components install
+# - hosts: jumpboxes_linux
+#   become: true
+#   become_user: root
+#   roles:
+#     - role: linux-jumpboxes-install
+
+# # Windows jumpboxes components install
+# - hosts: jumpboxes_windows
+#   roles:
+#     - role: windows-jumpboxes-install
+
+#----------------------------------------
+# END
+#----------------------------------------

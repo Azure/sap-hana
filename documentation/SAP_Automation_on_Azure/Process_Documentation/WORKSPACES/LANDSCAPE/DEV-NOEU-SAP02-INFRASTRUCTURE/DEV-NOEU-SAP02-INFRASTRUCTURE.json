@@ -8,18 +8,18 @@
         "vnets": {
             "sap": {
                 "name"                  : "SAP02",
-                "address_space"         : "10.111.0.0/24",
+                "address_space"         : "10.111.0.0/16",
                 "subnet_admin": {
-                  "prefix"              : "10.111.0.0/27"
+                  "prefix"              : "10.111.0.0/19"
                 },
                 "subnet_app": {
-                  "prefix"              : "10.111.0.32/27"
+                  "prefix"              : "10.111.32.0/18"
                 },
                 "subnet_db": {
-                  "prefix"              : "10.111.0.64/27"
+                  "prefix"              : "10.111.96.0/19"
                 },
                 "subnet_web": {
-                  "prefix"              : "10.111.0.96/27"
+                  "prefix"              : "10.111.128.0/19"
                 }
             }
         }

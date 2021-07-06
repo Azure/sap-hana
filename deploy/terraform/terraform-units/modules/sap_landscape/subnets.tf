@@ -8,6 +8,7 @@ resource "azurerm_subnet" "admin" {
   address_prefixes     = [local.sub_admin_prefix]
 }
 
+<<<<<<< HEAD
 resource "azurerm_subnet_route_table_association" "admin" {
   provider       = azurerm.main
   count          = local.sub_admin_defined && !local.sub_admin_existing && !local.vnet_sap_exists ? 1 : 0
@@ -15,6 +16,8 @@ resource "azurerm_subnet_route_table_association" "admin" {
   route_table_id = azurerm_route_table.rt[0].id
 }
 
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 // Creates db subnet of SAP VNET
 resource "azurerm_subnet" "db" {
   provider             = azurerm.main
@@ -25,6 +28,7 @@ resource "azurerm_subnet" "db" {
   address_prefixes     = [local.sub_db_prefix]
 }
 
+<<<<<<< HEAD
 resource "azurerm_subnet_route_table_association" "db" {
   provider       = azurerm.main
   count          = local.sub_db_defined && !local.sub_db_existing && !local.vnet_sap_exists ? 1 : 0
@@ -32,6 +36,8 @@ resource "azurerm_subnet_route_table_association" "db" {
   route_table_id = azurerm_route_table.rt[0].id
 }
 
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 // Creates app subnet of SAP VNET
 resource "azurerm_subnet" "app" {
   provider             = azurerm.main
@@ -42,6 +48,7 @@ resource "azurerm_subnet" "app" {
   address_prefixes     = [local.sub_app_prefix]
 }
 
+<<<<<<< HEAD
 resource "azurerm_subnet_route_table_association" "app" {
   provider       = azurerm.main
   count          = local.sub_app_defined && !local.sub_app_existing && !local.vnet_sap_exists ? 1 : 0
@@ -49,6 +56,8 @@ resource "azurerm_subnet_route_table_association" "app" {
   route_table_id = azurerm_route_table.rt[0].id
 }
 
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 // Creates web subnet of SAP VNET
 resource "azurerm_subnet" "web" {
   provider             = azurerm.main
@@ -59,6 +68,7 @@ resource "azurerm_subnet" "web" {
   address_prefixes     = [local.sub_web_prefix]
 }
 
+<<<<<<< HEAD
 resource "azurerm_subnet_route_table_association" "web" {
   provider       = azurerm.main
   count          = local.sub_web_defined && !local.sub_web_existing && !local.vnet_sap_exists ? 1 : 0
@@ -66,6 +76,8 @@ resource "azurerm_subnet_route_table_association" "web" {
   route_table_id = azurerm_route_table.rt[0].id
 }
 
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 # Creates admin subnet nsg
 resource "azurerm_network_security_group" "admin" {
@@ -139,6 +151,7 @@ resource "azurerm_subnet_network_security_group_association" "web" {
   network_security_group_id = azurerm_network_security_group.web[0].id
 }
 
+<<<<<<< HEAD
 ########################################################################################################
 #
 # Create a Azure Firewall Network Rule for Azure Management API and Outbound Internet
@@ -218,3 +231,5 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure-db" {
     protocols             = ["Any"]
   }
 }
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

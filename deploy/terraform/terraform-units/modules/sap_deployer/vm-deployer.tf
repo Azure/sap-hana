@@ -111,6 +111,7 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     timeout     = var.ssh-timeout
   }
 }
+<<<<<<< HEAD
 
 // Prepare deployer with pre-installed softwares if pip is created
 resource "null_resource" "prepare-deployer" {
@@ -183,3 +184,5 @@ resource "null_resource" "prepare-deployer" {
     ]
   }
 }
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

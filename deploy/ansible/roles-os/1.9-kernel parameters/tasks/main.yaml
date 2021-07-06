@@ -1,0 +1,81 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role to set kernel parameters for general hardening             |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Description:  A set of common parameters recommeneded from CIS, RH and SUSE -
+#               are applied to the host along with some distro specific params.
+#               
+# Objects:
+#   External:
+#             parameters.yaml                  - parameter file 
+#
+#   Internal:
+#             getparamlistforapply             - object to store the params 
+#                                                applicable for a host
+#
+#   Created:
+#             
+#
+# -------------------------------------+---------------------------------------8
+# Reviews:
+#
+# 
+#
+# -------------------------------------+---------------------------------------8
+---
+# -------------------------------------+---------------------------------------8
+#
+#   Task: 1.9                                  - kernel parameters
+#
+# -------------------------------------+---------------------------------------8
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+- name:                                        Ensure parameters are available
+  include_vars:                                parameters.yaml
+
+# ----------------------------------------
+# BEGIN
+# ----------------------------------------
+
+- name:                                        Gather list of parameters which need to be applied
+  set_fact:
+    getparamlistforapply:                      '{{ 
+                                                  (
+                                                    parameters["common"] 
+                                                    + 
+                                                    (
+                                                      parameters[distro_id]|default([])
+                                                    )
+                                                  ) | unique 
+                                                }}'
+
+# print only when -vv, otherwise you will have terminal nausea
+- name:                                        "Display parameters which will be applied"
+  ansible.builtin.debug:
+    var:                                       getparamlistforapply
+    verbosity:                                 2
+
+- name:                                        Set relevant kernel parameters
+  become:                                      true
+  sysctl:
+    name:                                      "{{ item.name }}"
+    value:                                     "{{ item.value }}"
+    state:                                     "{{ item.state }}"
+    sysctl_set:                                yes
+    reload:                                    yes
+    ignoreerrors:                              yes
+  loop:                                        "{{ getparamlistforapply }}"
+
+# ----------------------------------------
+# END
+# ----------------------------------------
+
+...
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/

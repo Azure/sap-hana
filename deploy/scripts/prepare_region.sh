@@ -205,7 +205,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit 64 #script usage wrong
+    exit 64                                                                                           #script usage wrong
 fi
 
 automation_config_directory=~/.sap_deployment_automation/
@@ -251,7 +251,7 @@ if [ ! -n "$DEPLOYMENT_REPO_PATH" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 65 #data format error
+    exit 65                                                                                           #data format error
 fi
 
 templen=$(echo "${ARM_SUBSCRIPTION_ID}" | wc -c)
@@ -272,9 +272,9 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     echo "#      ARM_SUBSCRIPTION_ID (subscription containing the state file storage account)     #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
-    exit 65 #data format error
+    exit 65                                                                                           #data format error
 else
-    if [ "{$arm_config_stored}" != 0 ]
+    if [ "${arm_config_stored}" != 0 ]
     then
         echo "Storing the configuration"
         save_config_var "ARM_SUBSCRIPTION_ID" "${deployer_config_information}"
@@ -304,7 +304,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit 67 #addressee unknown
+    exit 67                                                                                             #addressee unknown
 else
     if [ -f stdout.az ]
     then
@@ -338,22 +338,35 @@ then
     
     if [ $force == 1 ]
     then
-        if [ -d ./.terraform/ ]; then
-            rm .terraform -r
-        fi
+        # This is a a bit verbose
+
+        # if [ -d ./.terraform/ ]; then
+        #     rm .terraform -r
+        # fi
         
-        if [ -f terraform.tfstate ]; then
-            rm terraform.tfstate
-        fi
+        # if [ -f terraform.tfstate ]; then
+        #     rm terraform.tfstate
+        # fi
         
-        if [ -f terraform.tfstate.backup ]; then
-            rm terraform.tfstate.backup
-        fi
+        # if [ -f terraform.tfstate.backup ]; then
+        #     rm terraform.tfstate.backup
+        # fi
+        
+        
+        
+        # Another way to do it
+        
+        # [ -d .terraform ]               && rm -Rf .terraform
+        # [ -f terraform.tfstate ]        && rm     terraform.tfstate
+        # [ -f terraform.tfstate.backup ] && rm     terraform.tfstate.backup
+
+        # This is the simplest
+        rm -Rf .terraform terraform.tfstate*
     fi
     
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
                 
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_deployer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -403,7 +416,7 @@ then
         then
             allParams=$(printf " -e %s -r %s -v %s --spn_secret %s " "${environment}" "${region}" "${keyvault}" "${spn_secret}" )
             
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+            "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
             if (( $? > 0 ))
             then
                 exit $?
@@ -415,7 +428,7 @@ then
                 
                 allParams="${env_param}""${keyvault_param}""${region_param}"
                 
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams
+                "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
                 if (( $? > 0 ))
                 then
                     exit $?
@@ -468,7 +481,7 @@ then
     fi
     allParams=$(printf " -p %s -d %s %s" "${library_file_parametername}" "${relative_path}" "${approveparam}")
     
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/install_library.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_library.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -511,7 +524,7 @@ then
     fi
     allParams=$(printf " -p %s -t sap_deployer %s" "${deployer_file_parametername}" "${approveparam}")
     
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?
@@ -539,7 +552,7 @@ then
     cd "${library_dirname}" || exit
     allParams=$(printf " -p %s -t sap_library %s" "${library_file_parametername}" "${approveparam}")
 
-    "${DEPLOYMENT_REPO_PATH}"deploy/scripts/installer.sh $allParams
+    "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/installer.sh $allParams
     if (( $? > 0 ))
     then
         exit $?

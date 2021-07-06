@@ -21,7 +21,10 @@ variable "use_deployer" {
 
 locals {
   // Resources naming
+<<<<<<< HEAD
   vnet_prefix                 = var.naming.prefix.VNET
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   storageaccount_name         = var.naming.storageaccount_names.VNET.landscape_storageaccount_name
   witness_storageaccount_name = var.naming.storageaccount_names.VNET.witness_storageaccount_name
   landscape_keyvault_names    = var.naming.keyvault_names.VNET
@@ -100,7 +103,11 @@ locals {
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
   vnet_sap_arm_id = try(local.var_vnet_sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 ? true : false
+<<<<<<< HEAD
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : format("%s%s", local.vnet_prefix, local.resource_suffixes.vnet)
+=======
+  vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : format("%s%s", local.prefix, local.resource_suffixes.vnet)
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
   vnet_sap_addr   = local.vnet_sap_exists ? "" : try(local.var_vnet_sap.address_space, "")
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it

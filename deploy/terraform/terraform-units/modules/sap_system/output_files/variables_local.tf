@@ -107,6 +107,25 @@ variable "use_local_credentials" {
   description = "SDU has unique credentials"
 }
 
+<<<<<<< HEAD
+=======
+variable "db_ha" {
+  description = "Is the DB deployment highly available"
+  default = false
+}
+
+variable "scs_ha" {
+  description = "Is the SCS deployment highly available"
+  default = false
+}
+
+variable "ansible_user" {
+  description = "The ansible remote user account to use"
+  default = "azureadm"
+}
+
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 locals {
 
   tfstate_resource_id          = try(var.tfstate_resource_id, "")

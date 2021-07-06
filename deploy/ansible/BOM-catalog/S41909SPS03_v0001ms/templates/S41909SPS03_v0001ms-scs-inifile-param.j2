@@ -1,0 +1,28 @@
+#   2482103 - Installation with SWPM in unattended mode using parameter input file fails
+#   2393060 - SAPinst Framework 749 Central Note
+
+########################################################################################################################################################################################################
+#                                                                                                                                                                                                      #
+# Installation service 'SAP S/4HANA Server 1909 > SAP HANA Database > Installation > Application Server ABAP
+#                       > Distributed System > ASCS Instance', product id 'NW_ABAP_ASCS:S4HANA1909.CORE.HDB.ABAP' #
+#                                                                                                                                                                                                      #
+########################################################################################################################################################################################################
+
+
+archives.downloadBasket                                              = /usr/sap/install/download_basket
+
+nwUsers.sapadmUID                                                    = {{ sapadm_uid }}
+nwUsers.sapsysGID                                                    = {{ sapsys_gid }}
+nwUsers.sidAdmUID                                                    = {{ sidadm_uid }}
+
+NW_Delete_Sapinst_Users.removeUsers                                  = true
+NW_GetMasterPassword.masterPwd                                       = {{ password_master }}
+NW_GetSidNoProfiles.sid                                              = {{ sap_sid }}
+
+NW_SCS_Instance.ascsInstallGateway                                   = true
+NW_SCS_Instance.ascsInstallWebDispatcher                             = false
+NW_SCS_Instance.instanceNumber                                       = {{ scs_instance_number }}
+NW_SCS_Instance.scsVirtualHostname                                   = {{ sap_scs_hostname }}
+
+NW_adaptProfile.skipSecurityProfileSettings                          = true
+NW_getFQDN.FQDN                                                      = {{ sap_fqdn }}

@@ -1,0 +1,13 @@
+# -----------------------------------------------------------------------------
+#
+# Task: 1.6  - Setting OS timezone
+#
+# -----------------------------------------------------------------------------
+
+- name:             1.6 - Setting OS timezone
+  timezone:
+    name:           America/Los_Angeles               # ToDo: use per system setting from SAP SID yaml, central setting here, override ifExists from central yaml
+
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4---------------------------------------*/

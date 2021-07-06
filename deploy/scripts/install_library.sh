@@ -207,7 +207,7 @@ if [ ! -n "$ARM_SUBSCRIPTION_ID" ]; then
     exit 3
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/bootstrap/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/bootstrap/"${deployment_system}"/
 
 if [ ! -d ${terraform_module_directory} ]
 then

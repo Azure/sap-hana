@@ -1,0 +1,90 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                          Role to process the BOM                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+# Description:  Downloads the files specified in BOM file from SAP to the 
+#               ansible controller and uploads them to the storage account.
+#
+#
+# Objects:
+#   External:
+#             sapbits_location_base_path      - URL of Blob Storage
+#             sapbits_bom_files               - path to the root of the sap file store
+#             bom_base_name                   - Name of BOM
+#             sapbits_sas_token               - SAS Token
+#             download_directory              - Path to the download location on the ansible controller
+#
+#   Internal:
+#             result                          - objet to store the results of a task execution
+#
+#   Created:
+#             bom                             - object containing the specified BOM
+#
+# -------------------------------------+---------------------------------------8
+# Reviews:
+#
+#
+# -------------------------------------+---------------------------------------8
+---
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Validation for Prerequisites 
+#
+- import_tasks:     pre_checks.yaml
+# -------------------------------------+---------------------------------------8
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Create BOM download directories".
+#
+
+- name:     "BOM: Create BOM download directories"
+  file:
+    path:   "{{ item.path }}"
+    state:  directory
+    mode:   0755
+  loop:
+    - { path: "{{ download_directory }}" }
+    - { path: "{{ download_directory }}/tmp" }
+    - { path: "{{ download_directory }}/bom" }
+    - { path: "{{ download_directory }}/files" }
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Call BOM processor, passing BOM name.
+#
+# TODO:
+#       Enhance so a single task loops over bas bom and dependencies
+#
+- include_tasks:    "bom_validator.yaml"
+  vars:
+    bom_name:       "{{ bom_base_name }}"
+# -------------------------------------+---------------------------------------8
+
+
+
+# -------------------------------------+---------------------------------------8
+#
+# Description:  Call BOM processor, passing dependent BOM names.
+#
+- include_tasks:    "bom_validator.yaml"
+  vars:
+    bom_name:       "{{ bom_dependency.name }}"
+  loop:             "{{ bom.materials.dependencies | flatten(levels=1) }}"
+  loop_control:
+    loop_var:       bom_dependency
+  when:             
+    - bom.materials.dependencies is defined
+    - bom.materials.dependencies|length>0
+# -------------------------------------+---------------------------------------8
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                      |
+# +------------------------------------4--------------------------------------*/

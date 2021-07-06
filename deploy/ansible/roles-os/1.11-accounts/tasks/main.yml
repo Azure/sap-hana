@@ -1,0 +1,93 @@
+---
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |               Task: 1.11      - Create admin accounts                      |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# -------------------------------------+---------------------------------------8
+#
+# Create the admin groups first and then the admin users
+#
+# TODO:
+#   * Implement "dynamic" uid & gid rather than using static values specified
+#     in the vars config settings. Potentially track/persist values into a
+#     keyvault to avoid having to dynamically collect/analyse data at runtime.
+#   * Use dynamically generated passwords rather that static ones specified
+#     in the vars config settings. Potentially generate/store into a keyvault
+#     if not provided, and retrieve from there when needed.
+#
+# -------------------------------------+---------------------------------------8
+
+- name:           Include top-level admin accounts definitions
+  include_vars:   "admin-accounts.yml"
+
+# Need to create groups first, if they are going to be referenced
+# by the following user actions
+- name:            Create specified admin groups if needed
+  group:
+    name:          "{{ item.name }}"
+    gid:           "{{ item.gid }}"
+    state:         "{{ item.state | default('present') }}"
+  loop:            "{{ admin_groups }}"
+  loop_control:
+    label:         "{{ item.name }}"
+  when:
+    -              item.enabled | bool
+    -              item.tier in ["all", tier]
+    -              (item.state | default('present')) == "present"
+
+# Create or delete users as needed
+- name:            Manage specified admin users
+  user:
+    name:          "{{ item.name }}"
+    comment:       "{{ item.comment | default('') }}"
+    uid:           "{{ item.uid }}"
+    group:         "{{ item.group | default(item.name) }}"
+    groups:        "{{ item.groups }}"
+    shell:         "{{ item.shell | default('/bin/bash') }}"
+    password:      "{{ item.password |
+                       password_hash('sha512', 'azure/sap-hana',
+                                     rounds=10000) }}"
+    state:         "{{ item.state | default('present') }}"
+  loop:            "{{ admin_users }}"
+  loop_control:
+    label:         "{{ item.name }}"
+  when:
+    -              item.enabled | bool
+    -              item.tier in ["all", tier]
+
+# Create or delete associated /etc/sudoers.d files as needed
+# NOTE: This loops over including a separate task list, which is
+# not ideal, because we need to be able to optionally include a
+# user specific vars file on each iteration before templating the
+# corresponding /etc/sudoers.d/<username> entry. Unfortunately the
+# block action doesn't support iteration, otherwise it would be
+# the way to handle this.
+- name:            Manage associated per-user /etc/sudoers.d/ files for
+                   given sudoers role
+  include_tasks:   setup_user_sudoers.yml
+  vars:
+    sudoers_user:  "{{ item.name }}"
+    sudoers_role:  "{{ item.sudoers_role }}"
+    sudoers_state: "{{ item.state | default('present') }}"
+  loop:            "{{ admin_users }}"
+  loop_control:
+    label:         "{{ item.name }}"
+  when:
+    -              item.enabled | bool
+    -              item.tier in ["all", tier]
+
+# Remove groups after user action has removed the users that may have
+# referenced them
+- name:            Remove specified admin groups
+  group:
+    name:          "{{ item.name }}"
+    state:         "{{ item.state | default('present') }}"
+  loop:            "{{ admin_groups }}"
+  loop_control:
+    label:         "{{ item.name }}"
+  when:
+    -              item.enabled | bool
+    -              item.tier in ["all", tier]
+    -              (item.state | default('present')) == "absent"

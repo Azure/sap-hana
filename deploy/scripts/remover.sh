@@ -250,7 +250,7 @@ fi
 
 export TF_DATA_DIR="${parameterfile_dirname}"/.terraform
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]; then
     printf -v val %-40.40s "$deployment_system"
@@ -315,7 +315,7 @@ if [ "$deployment_system" == "sap_deployer" ]; then
 elif [ "$deployment_system" == "sap_library" ]; then
     echo -e "#$cyan processing $deployment_system removal as defined in $parameterfile_name $resetformatting"
 
-    terraform_bootstrap_directory="${DEPLOYMENT_REPO_PATH}deploy/terraform/bootstrap/${deployment_system}/"
+    terraform_bootstrap_directory="${DEPLOYMENT_REPO_PATH}/deploy/terraform/bootstrap/${deployment_system}/"
     if [ ! -d "${terraform_bootstrap_directory}" ]; then
         printf -v val %-40.40s "$terraform_bootstrap_directory"
         echo "#########################################################################################"

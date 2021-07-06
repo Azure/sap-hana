@@ -1,0 +1,19 @@
+---
+
+nfs_exports:
+- path: "{{ target_media_location }}"
+  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)"
+- path: "/usr/sap/{{ sap_sid | upper }}/SYS"
+  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)"
+  owner: "{{ sap_sid | lower }}adm"
+  group: "{{ sapsys_gid }}"
+- path: "/tmp/app_template"
+  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)"
+- path: "/sapmnt/{{ sap_sid | upper}}/global"
+  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)"
+  owner: "{{ sap_sid | lower }}adm"
+  group: "{{ sapsys_gid }}"
+- path: "/sapmnt/{{ sap_sid | upper}}/profile"
+  export_settings: "*(rw,no_root_squash,sync,no_subtree_check)"
+  owner: "{{ sap_sid | lower }}adm"
+  group: "{{ sapsys_gid }}"

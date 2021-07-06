@@ -1,0 +1,163 @@
+##########################################################################################################################################
+#                                                                                                                                        #
+# Installation service 'Generic Options > SAP Web Dispatcher > SAP Web Dispatcher (Unicode)', product id 'NW_Webdispatcher:NW750.IND.PD' #
+#                                                                                                                                        #
+##########################################################################################################################################
+# IMPORTANT DO NOT DELETE!!! SAPInstDes25Hash=$kv/pYwvoWdpL$9SppJFwn55PLVTGt5jAg8e1qOR+YA55LJEKdo44VI2vKsV3PC6u1iM/wYerlw5fPdhgXjJ0h8f8CeJtUK7mmCJRhyvkaakvY
+
+# Password for the Diagnostics Agent specific <dasid>adm user. Provided value may be encoded.
+# DiagnosticsAgent.dasidAdmPassword =
+
+# Windows domain in which the Diagnostics Agent users must be created. This is an optional property (Windows only).
+# DiagnosticsAgent.domain =
+
+# Windows only: Password for the Diagnostics Agent specific 'SAPService<DASID>' user.
+# DiagnosticsAgent.sapServiceDASIDPassword =
+
+# Specify whether the all operating system users are to be removed from group 'sapinst' after the execution of Software Provisioning Manager has completed.
+NW_Delete_Sapinst_Users.removeUsers = true
+
+# Master password
+NW_GetMasterPassword.masterPwd = des25(WDFiIrBpJnGpfCAxtYZpnqn5yOU=)
+
+# Human readable form of the default login language to be preselected in SAPGUI. This Parameter is potentialy prompted in addition in the screen that also asks for the <SAPSID>. It is only prompted in systems that have an ABAP stack. It is prompted for installation but not for system copy. It is asked in those installations, that perform the ABAP load. That could be the database load installation in case of a distributed system szenario, or in case of a standard system installation with all instances on one host. This Parameter is saved in the 'DEFAULT' profile. It is has no influence on language settings in a Java stack. Valid names are stored in a table of subcomponent 'NW_languagesInLoadChecks'. The available languages must be declaired in the 'LANGUAGES_IN_LOAD' parameter of the 'product.xml' file . In this file, the one-character representation of the languages is used. Check the same table in subcomponent 'NW_languagesInLoadChecks'.
+# NW_GetSidNoProfiles.SAP_GUI_DEFAULT_LANGUAGE =
+
+# Windows only: The drive to use
+# NW_GetSidNoProfiles.sapdrive =
+
+# Unix only: The SAP mount directory path. Default value is '/sapmnt'.
+# NW_GetSidNoProfiles.sapmnt = /sapmnt
+
+# The SAP system ID <SAPSID> of the system to be installed
+NW_GetSidNoProfiles.sid = X00
+
+# Only use this parameter if recommended by SAP.
+# NW_GetSidNoProfiles.strictSidCheck = true
+
+# Specify whether this system is to be a Unicode system.
+# NW_GetSidNoProfiles.unicode = true
+
+# DEPRECATED, DO NOT USE!
+# NW_SAPCrypto.SAPCryptoFile = /usr/sap/install/download_basket/SAPWEBDISP_SP_121-70005393.SAR
+
+# SAP INTERNAL USE ONLY
+# NW_System.installSAPHostAgent = true
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.dbaToolsSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.igsExeSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.igsHelperSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeDbSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapJvmSar =
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.xs2Sar =
+
+# If  this parameter is set to 'true' the message server is configured, that is parameters 'msHost', 'backEndSID', and 'msHTTPPost' are mandatory.
+# NW_Webdispatcher_Instance.configureSystemConnectivity = true
+
+# SAP Web Dispatcher instance number. Leave empty for default.
+NW_Webdispatcher_Instance.wdInstanceNumber = 00
+
+# SAP offers the option to skip setting of security profile parameters (NOT recommended) only for compatibility reasons. Set to true and the file with recommended security settings will not be taken into consideration. See SAP Note 2714839 for security recommendations.
+# NW_adaptProfile.skipSecurityProfileSettings = false
+
+# SAP INTERNAL USE ONLY
+# NW_adaptProfile.templateFiles =
+
+# The FQDN of the system
+# NW_getFQDN.FQDN =
+
+# SAP INTERNAL USE ONLY
+# NW_getFQDN.resolve = true
+
+# Specify whether you want to set FQDN for the system.
+# NW_getFQDN.setFQDN = true
+
+# Activate Internet Connection Framework (ICF) nodes
+NW_webdispatcher_Instance.activateICF = false
+
+# Back-end SAP system ID. Mandatory if 'NW_Webdispatcher_Instance.configureSystemConnectivity' is set to 'true'.
+NW_webdispatcher_Instance.backEndSID = X00
+
+# There are three types of encryption modes: 'Always' (default), 'depending on the incoming protocol', 'Never'
+# NW_webdispatcher_Instance.encryptionMode = Always
+
+# Back-end message server HTTP port. Mandatory if 'NW_Webdispatcher_Instance.configureSystemConnectivity' is set to 'true'
+NW_webdispatcher_Instance.msHTTPPort = 8100
+
+# Back-end message server host. Mandatory if 'NW_Webdispatcher_Instance.configureSystemConnectivity' is set to 'true'.
+NW_webdispatcher_Instance.msHost = x00scs01l8ad
+
+# SAP System Client. Mandatory if 'NW_Webdispatcher_Instance.activateICF' is set to 'true'
+# NW_webdispatcher_Instance.rfcClient = 000
+
+# Application Server Instance Host. Mandatory if 'NW_Webdispatcher_Instance.activateICF' is set to 'true'
+NW_webdispatcher_Instance.rfcHost = x00scs01l8ad
+
+# Application Server Instance Number. Mandatory if 'NW_Webdispatcher_Instance.activateICF' is set to 'true'
+# NW_webdispatcher_Instance.rfcInstance =
+
+# Password of RFC User. Mandatory if 'NW_Webdispatcher_Instance.activateICF' is set to 'true'
+# NW_webdispatcher_Instance.rfcPassword =
+
+# RFC User. Mandatory if 'NW_Webdispatcher_Instance.activateICF' is set to 'true'
+# NW_webdispatcher_Instance.rfcUser = DDIC
+
+# Operating systems have restrictions for maximum number of open 'file handles' (sockets) for each process. Default is 2048. Provide a much higher value for  scenarios with heavy workload.
+NW_webdispatcher_Instance.scenarioSize = 500
+
+# Set this parameter to 'true' if the SAP Web Dispatcher HTTP Port is to be used.
+# NW_webdispatcher_Instance.useWdHTTPPort = false
+
+# HTTP Port of SAP Web Dispatcher. You can only specify this parameter if 'NW_webdispatcher_Instance.useWdHTTPPort' is set to 'true'.
+NW_webdispatcher_Instance.wdHTTPPort = 8000
+
+# HTTPS Port of SAP Web Dispatcher.
+NW_webdispatcher_Instance.wdHTTPSPort = 44300
+
+# Virtual host name for the SAP Web Dispatcher instance. Leave empty if you want to use the default physical host name. The virtual host name must already be bound to a local network interface.
+NW_webdispatcher_Instance.wdVirtualHostname = x00web01l8ad
+
+# The ASP device name where the SAP system will be in installed. The property is IBM i only.
+# Values from 1 to 256 can be specified. The default is 1, the System ASP.
+# OS4.DestinationASP =
+
+# The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
+archives.downloadBasket = /usr/sap/install/download_basket/SAPWEBDISP_SP_121-70005393.SAR
+
+# Windows only: The domain of the SAP Host Agent user
+# hostAgent.domain =
+
+# Password for the 'sapadm' user of the SAP Host Agent
+# hostAgent.sapAdmPassword =
+
+# Windows only: The domain of all users of this SAP system. Leave empty for default.
+# nwUsers.sapDomain =
+
+# Windows only: The password of the 'SAPServiceSID' user
+# nwUsers.sapServiceSIDPassword =
+
+# UNIX only: The user ID of the 'sapadm' user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sapadmUID = 2100
+
+# UNIX only: The group id of the 'sapsys' group, leave empty for default. The ID is ignored if the group already exists.
+nwUsers.sapsysGID = 2000
+
+# UNIX only: The user id of the <sapsid>adm user, leave empty for default. The ID is ignored if the user already exists.
+# nwUsers.sidAdmUID =
+
+# The password of the '<sapsid>adm' user
+nwUsers.sidadmPassword = des25(hNCIdyahoJqVcRJjikyka11SJRw=)

@@ -13,6 +13,13 @@ steps:
       echo -e "$(hana-pipeline-rsa-pub)" > $HOME/.ssh/id_rsa.pub
       chmod 400 $HOME/.ssh/id_rsa
 
+      sudo apt-get update
+      sudo apt-get upgrade
+      sudo apt-get install python-setuptools
+
+      sudo apt-add-repository ppa:ansible/ansible
+      sudo pip3 install --user ansible>=2.9
+
       echo "=== Set agent IP ==="
       echo '##vso[task.setvariable variable=agent_ip]$(curl -s https://ipinfo.io/json | jq -r .ip)'
     displayName: "Pre deployment"

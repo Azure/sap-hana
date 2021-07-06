@@ -41,6 +41,7 @@ variable "deployer_tfstate_key" {
 
 variable "landscape_tfstate_key" {
   description = "The key of sap landscape's remote tfstate file"
+<<<<<<< HEAD
 
   validation {
     condition = (
@@ -64,6 +65,26 @@ variable "terraform_template_version" {
 variable "license_type" {
   description = "Specifies the license type for the OS"
   default = ""
+=======
+
+  validation {
+    condition = (
+      length(trimspace(try(var.landscape_tfstate_key, ""))) != 0
+    )
+    error_message = "The Landscape state file name must be specified."
+  }
+
+}
+
+variable "deployment" {
+  description = "The type of deployment"
+  default     = "update"
+}
+
+variable "terraform_template_version" {
+  description = "The version of Terraform templates that were identified in the state file"
+  default     = ""
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 }
 
 locals {

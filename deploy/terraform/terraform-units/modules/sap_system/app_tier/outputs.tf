@@ -170,3 +170,10 @@ output "app_tier_os_types" {
 output "apptier_disks" {
   value = local.enable_deployment ? compact(concat(local.app_disks_ansible, local.scs_disks_ansible, local.web_disks_ansible)) : []
 }
+<<<<<<< HEAD
+=======
+
+output "scs_ha" {
+  value = local.scs_high_availability
+}
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

@@ -115,6 +115,7 @@ data "azurerm_proximity_placement_group" "ppg" {
   resource_group_name = split("/", local.ppg_arm_ids[count.index])[4]
 }
 
+<<<<<<< HEAD
 # FIREWALL
 
 resource "random_integer" "db_priority" {
@@ -144,6 +145,8 @@ resource "azurerm_firewall_network_rule_collection" "firewall-azure" {
     protocols             = ["Any"]
   }
 }
+=======
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3
 
 //ASG
 
@@ -161,3 +164,19 @@ resource "azurerm_application_security_group" "db" {
   location = local.nsg_asg_with_vnet ? (local.vnet_sap_resource_group_location) : (local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location)
 }
 
+<<<<<<< HEAD
+=======
+// Define a cloud-init config that disables the automatic expansion
+// of the root partition.
+data "template_cloudinit_config" "config_growpart" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    content_type = "text/cloud-config"
+    content      = "growpart: {'mode': 'auto'}"
+  }
+}
+
+>>>>>>> c645d159518e3e6d485293e8ff8e51c836593cb3

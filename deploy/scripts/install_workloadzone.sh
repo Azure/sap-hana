@@ -372,7 +372,7 @@ then
         then
             allParams=$(printf " --workload --environment %s --region %s --vault %s --spn_secret %s --subscription %s" ${environment} ${region} ${keyvault} ${spn_secret} ${subscription})
                 
-            "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams 
+            "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams 
             if [ $? -eq 255 ]
             then
                 exit $?
@@ -393,7 +393,7 @@ then
                 
                 allParams="${env_param}""${keyvault_param}""${region_param}"
                 
-                "${DEPLOYMENT_REPO_PATH}"deploy/scripts/set_secrets.sh $allParams -w
+                "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams -w
                 if [ $? -eq 255 ]
                 then
                     exit $?
@@ -480,7 +480,7 @@ else
 
 fi
 
-terraform_module_directory="${DEPLOYMENT_REPO_PATH}"deploy/terraform/run/"${deployment_system}"/
+terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/"${deployment_system}"/
 
 if [ ! -d "${terraform_module_directory}" ]
 then
