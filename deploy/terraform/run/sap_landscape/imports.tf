@@ -23,23 +23,27 @@ data "azurerm_key_vault_secret" "subscription_id" {
 
 data "azurerm_key_vault_secret" "client_id" {
   provider     = azurerm.deployer
+  count        = local.use_spn ? 1 : 0
   name         = format("%s-client-id", local.environment)
   key_vault_id = local.spn_key_vault_arm_id
 }
 
 data "azurerm_key_vault_secret" "client_secret" {
   provider     = azurerm.deployer
+  count        = local.use_spn ? 1 : 0
   name         = format("%s-client-secret", local.environment)
   key_vault_id = local.spn_key_vault_arm_id
 }
 
 data "azurerm_key_vault_secret" "tenant_id" {
   provider     = azurerm.deployer
+  count        = local.use_spn ? 1 : 0
   name         = format("%s-tenant-id", local.environment)
   key_vault_id = local.spn_key_vault_arm_id
 }
 
 // Import current service principal
 data "azuread_service_principal" "sp" {
+  count        = local.use_spn ? 1 : 0
   application_id = local.spn.client_id
 }
