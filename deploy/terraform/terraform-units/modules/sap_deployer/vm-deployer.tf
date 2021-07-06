@@ -106,4 +106,6 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     password    = lookup(local.deployers[count.index].authentication, "password", null)
     timeout     = var.ssh-timeout
   }
+
+   tags = local.tags
 }
