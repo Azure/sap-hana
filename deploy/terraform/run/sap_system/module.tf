@@ -47,6 +47,7 @@ module "common_infrastructure" {
   authentication             = var.authentication
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  license_type               = var.license_type
 
 }
 
@@ -79,6 +80,7 @@ module "hdb_node" {
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
   cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
 
 }
 
@@ -112,6 +114,7 @@ module "app_tier" {
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
   cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
 
 }
 
@@ -143,6 +146,7 @@ module "anydb_node" {
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
   cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
 
 }
 

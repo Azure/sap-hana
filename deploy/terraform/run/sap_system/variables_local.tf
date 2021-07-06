@@ -61,6 +61,12 @@ variable "terraform_template_version" {
   default     = ""
 }
 
+variable "license_type" {
+  description = "Specifies the license type for the OS"
+  default = ""
+
+}
+
 locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
