@@ -244,7 +244,7 @@ locals {
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
   // Tags
-  tags = try(var.deployers[0].tags, {"Jumpbox" = "Deployer"})
+  tags = try(var.deployers[0].tags, {"JumpboxName" = "Deployer"})
 
 
 >>>>>>> Added tag support to deployer
