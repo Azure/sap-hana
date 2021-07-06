@@ -3,6 +3,11 @@
     Retrieve remote tfstate file of Deployer and current environment's SPN
 */
 
+
+data "azurerm_client_config" "current" {
+   provider     = azurerm.deployer
+}
+
 data "terraform_remote_state" "deployer" {
   backend = "azurerm"
   count = length(try(var.deployer_tfstate_key, "")) > 0 ? 1 : 0
