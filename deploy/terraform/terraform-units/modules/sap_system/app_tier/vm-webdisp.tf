@@ -135,7 +135,12 @@ resource "azurerm_linux_virtual_machine" "web" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
+<<<<<<< HEAD
   tags = try(var.application.web_tags, {})
+=======
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+  tags = local.web_tags
+>>>>>>> Ability to set licensing and patching on the VMs (#1202)
 }
 
 # Create the Windows Web dispatcher VM(s)
@@ -212,7 +217,11 @@ resource "azurerm_windows_virtual_machine" "web" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-  tags = try(var.application.web_tags, {})
+
+  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+
+  tags = local.web_tags
 }
 
 # Creates managed data disk
