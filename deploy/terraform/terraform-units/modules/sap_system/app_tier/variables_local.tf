@@ -86,7 +86,7 @@ variable "cloudinit_growpart_config" {
 
 variable "license_type" {
   description = "Specifies the license type for the OS"
-  default = ""
+  default     = ""
 
 }
 
@@ -123,9 +123,9 @@ locals {
       upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
   ])[0]), 2)
 
-  sid     = upper(var.application.sid)
-  prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
-// Resource group
+  sid    = upper(var.application.sid)
+  prefix = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
+  // Resource group
   rg_exists = length(try(var.infrastructure.resource_group.arm_id, "")) > 0
   rg_name = local.rg_exists ? (
     try(split("/", var.infrastructure.resource_group.arm_id)[4], "")) : (
@@ -149,9 +149,9 @@ locals {
   vnet_sap_resource_group_location = var.vnet_sap.location
 
   // APP subnet
-  sub_app_defined  = length(try(var.infrastructure.vnets.sap.subnet_app,{})) > 0
+  sub_app_defined = length(try(var.infrastructure.vnets.sap.subnet_app, {})) > 0
   sub_app_arm_id  = try(var.infrastructure.vnets.sap.subnet_app.arm_id, try(var.landscape_tfstate.app_subnet_id, ""))
-  sub_app_exists = length(local.sub_app_arm_id) > 0
+  sub_app_exists  = length(local.sub_app_arm_id) > 0
   sub_app_name = local.sub_app_exists ? (
     try(split("/", var.infrastructure.vnets.sap.subnet_app.arm_id)[10], "")) : (
     length(try(var.infrastructure.vnets.sap.subnet_app.name, "")) > 0 ? (
@@ -161,9 +161,9 @@ locals {
   )
   sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
 
-  sub_web_defined  = length(try(var.infrastructure.vnets.sap.subnet_web,{})) > 0
+  sub_web_defined = length(try(var.infrastructure.vnets.sap.subnet_web, {})) > 0
   sub_web_arm_id  = try(var.infrastructure.vnets.sap.subnet_web.arm_id, try(var.landscape_tfstate.web_subnet_id, ""))
-  sub_web_exists = length(local.sub_web_arm_id) > 0 
+  sub_web_exists  = length(local.sub_web_arm_id) > 0
   sub_web_name = local.sub_web_exists ? (
     try(split("/", var.infrastructure.vnets.sap.subnet_web.arm_id)[10], "")) : (
     length(try(var.infrastructure.vnets.sap.subnet_web.name, "")) > 0 ? (
@@ -178,7 +178,7 @@ locals {
   )
 
   // APP NSG
-  sub_app_nsg_arm_id= try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, try(var.landscape_tfstate.app_nsg_id, ""))
+  sub_app_nsg_arm_id = try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, try(var.landscape_tfstate.app_nsg_id, ""))
   sub_app_nsg_exists = length(local.sub_app_nsg_arm_id) > 0
   sub_app_nsg_name = local.sub_app_nsg_exists ? (
     try(split("/", local.sub_app_nsg_arm_id)[8], "")) : (
@@ -240,7 +240,7 @@ locals {
   // OS image for all Application Tier VMs
   // If custom image is used, we do not overwrite os reference with default value
 
-  app_custom_image = try(var.application.app_os.source_image_id, "") != "" ? true : false
+  app_custom_image = length(try(var.application.app_os.source_image_id, "")) > 0
   app_ostype       = upper(try(var.application.app_os.offer, "")) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.app_os.os_type, "LINUX")
 
   app_os = {
@@ -255,12 +255,12 @@ locals {
   // OS image for all SCS VMs
   // If custom image is used, we do not overwrite os reference with default value
   // If no publisher or no custom image is specified use the custom image from the app if specified
-  scs_custom_image = length(var.application.scs_os.source_image_id) >0 && !local.app_custom_image ? false : true
+  scs_custom_image = length(try(var.application.scs_os.source_image_id, "")) > 0
   scs_ostype       = upper(var.application.scs_os.offer) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.scs_os.os_type, local.app_ostype)
 
   scs_os = {
     "os_type"         = local.scs_ostype
-    "source_image_id" = local.scs_custom_image ? var.application.scs_os.source_image_id : local.app_os.source_image_id
+    "source_image_id" = local.scs_custom_image ? var.application.scs_os.source_image_id : ""
     "publisher"       = local.scs_custom_image ? "" : length(var.application.scs_os.publisher) > 0 ? var.application.scs_os.publisher : "suse"
     "offer"           = local.scs_custom_image ? "" : length(var.application.scs_os.offer) > 0 ? var.application.scs_os.offer : "sles-sap-12-sp5"
     "sku"             = local.scs_custom_image ? "" : length(var.application.scs_os.sku) > 0 ? var.application.scs_os.sku : "gen1"
@@ -270,11 +270,11 @@ locals {
   // OS image for all WebDispatcher VMs
   // If custom image is used, we do not overwrite os reference with default value
   // If no publisher or no custom image is specified use the custom image from the app if specified
-  web_custom_image = length(var.application.web_os.source_image_id) > 0 && !local.app_custom_image ? false : true
+  web_custom_image = length(try(var.application.web_os.source_image_id, "")) > 0
   web_ostype       = upper(var.application.web_os.offer) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.web_os.os_type, local.app_ostype)
   web_os = {
     "os_type"         = local.web_ostype
-    "source_image_id" = local.web_custom_image ? try(var.application.web_os.source_image_id, local.app_os.source_image_id) : ""
+    "source_image_id" = local.web_custom_image ? var.application.web_os.source_image_id : ""
     "publisher"       = local.web_custom_image ? "" : length(var.application.web_os.publisher) > 0 ? var.application.web_os.publisher : "suse"
     "offer"           = local.web_custom_image ? "" : length(var.application.web_os.offer) > 0 ? var.application.web_os.offer : "sles-sap-12-sp5"
     "sku"             = local.web_custom_image ? "" : length(var.application.web_os.sku) > 0 ? var.application.web_os.sku : "gen1"
