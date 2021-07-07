@@ -176,10 +176,10 @@ resource "local_file" "ansible_inventory_new_yml" {
     ersconnection     = upper(var.app_tier_os_types["scs"]) == "LINUX" ? "ssh" : "winrm"
     appconnection     = upper(var.app_tier_os_types["app"]) == "LINUX" ? "ssh" : "winrm"
     webconnection     = upper(var.app_tier_os_types["web"]) == "LINUX" ? "ssh" : "winrm"
-    appconnectiontype = try(var.application.authentication.type, "key")
-    webconnectiontype = try(var.application.authentication.type, "key")
-    scsconnectiontype = try(var.application.authentication.type, "key")
-    ersconnectiontype = try(var.application.authentication.type, "key")
+    appconnectiontype = try(var.authentication_type, "key")
+    webconnectiontype = try(var.authentication_type, "key")
+    scsconnectiontype = try(var.authentication_type, "key")
+    ersconnectiontype = try(var.authentication_type, "key")
     dbconnectiontype  = length(local.hdb_vms) > 0 ? local.hdb_vms[0].auth_type : local.anydb_vms[0].auth_type
     ansible_user      = var.ansible_user
     }
