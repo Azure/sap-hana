@@ -40,13 +40,15 @@ module "common_infrastructure" {
   options                    = local.options
   key_vault                  = local.key_vault
   naming                     = module.sap_namegenerator.naming
-  service_principal          = local.service_principal
+  service_principal          = local.use_spn ? local.service_principal : local.account
   deployer_tfstate           = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   custom_disk_sizes_filename = var.db_disk_sizes_filename
   authentication             = local.authentication
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  license_type               = var.license_type
+
 }
 
 # // Create HANA database nodes
@@ -77,6 +79,9 @@ module "hdb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
+  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
+
 }
 
 # // Create Application Tier nodes
@@ -109,6 +114,7 @@ module "app_tier" {
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
   cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
 
 }
 
@@ -140,6 +146,7 @@ module "anydb_node" {
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
   cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  license_type               = var.license_type
 
 }
 

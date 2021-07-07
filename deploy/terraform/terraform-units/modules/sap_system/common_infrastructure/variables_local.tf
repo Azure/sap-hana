@@ -45,6 +45,11 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
 }
 
+variable "license_type" {
+  description = "Specifies the license type for the OS"
+  default = ""
+
+}
 
 locals {
   // Resources naming

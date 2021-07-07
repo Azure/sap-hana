@@ -157,6 +157,9 @@ resource "azurerm_linux_virtual_machine" "scs" {
   }
 
   tags = try(var.application.scs_tags, {})
+
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+
 }
 
 # Create the SCS Windows VM(s)
@@ -234,6 +237,10 @@ resource "azurerm_windows_virtual_machine" "scs" {
   }
 
   tags = try(var.application.scs_tags, {})
+
+#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+
 }
 
 # Creates managed data disk

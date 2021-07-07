@@ -136,6 +136,7 @@ resource "azurerm_linux_virtual_machine" "web" {
   }
 
   tags = try(var.application.web_tags, {})
+  license_type = length(var.license_type) > 0 ? var.license_type : null
 }
 
 # Create the Windows Web dispatcher VM(s)
@@ -213,6 +214,9 @@ resource "azurerm_windows_virtual_machine" "web" {
   }
 
   tags = try(var.application.web_tags, {})
+
+#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
 }
 
 # Creates managed data disk

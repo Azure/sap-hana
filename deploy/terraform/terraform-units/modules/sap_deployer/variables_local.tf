@@ -236,4 +236,15 @@ locals {
   pwd_secret_name      = local.pwd_exist ? local.input_password_secret_name : format("%s-password", local.prefix)
   username_secret_name = local.username_exist ? local.input_username_secret_name : format("%s-username", local.prefix)
 
+  // Extract information from the specified key vault arm ids
+  user_kv_name    = local.user_kv_exist ? split("/", local.user_key_vault_id)[8] : local.keyvault_names.user_access
+  user_kv_rg_name = local.user_kv_exist ? split("/", local.user_key_vault_id)[4] : ""
+
+  prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
+  prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
+
+  // Tags
+  tags = try(var.deployers[0].tags, {"JumpboxName" = "Deployer"})
+
+
 }
