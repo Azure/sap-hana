@@ -106,6 +106,13 @@ resource "azurerm_linux_virtual_machine" "scs" {
 
   custom_data = var.cloudinit_growpart_config
 
+  dynamic "admin_ssh_key" {
+    for_each = range(var.deployment == "new" ? 1 : (local.enable_auth_password ? 0 : 1))
+    content {
+      username   = var.sid_username
+      public_key = var.sdu_public_key
+    }
+  }
   dynamic "os_disk" {
     iterator = disk
     for_each = flatten(
@@ -149,9 +156,10 @@ resource "azurerm_linux_virtual_machine" "scs" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
+  tags = try(var.application.scs_tags, {})
+
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
-  tags = local.scs_tags
 }
 
 # Create the SCS Windows VM(s)
@@ -229,7 +237,8 @@ resource "azurerm_windows_virtual_machine" "scs" {
   }
 
   tags = try(var.application.scs_tags, {})
-  patch_mode = "Manual"
+
+#ToDo: Remove once feature is GA  patch_mode = "Manual"
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
 }

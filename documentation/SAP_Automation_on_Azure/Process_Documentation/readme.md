@@ -340,4 +340,8 @@ The automation uses a default naming convention which is defined in the Standard
 
 ## Changing disk sizing ##
 
+<<<<<<< HEAD
  [Using_custom_disk_sizing](./Using_custom_disk_sizing.md)
+=======
+ [Using_custom_disk_sizing](./Using_custom_disk_sizing.md)
+>>>>>>> 2a067300321f797de8406637b20f08c0fd6b1534

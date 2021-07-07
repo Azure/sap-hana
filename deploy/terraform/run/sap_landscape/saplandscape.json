@@ -21,7 +21,7 @@
                     "prefix": "10.1.3.0/24"
                 },
                 "subnet_iscsi": {
-                    "name": "global-WEEU-SAP01_iscsi-subnet",
+                    "name": "GLOBAL-WEEU-SAP01_iscsi-subnet",
                     "prefix": "10.1.10.0/24"
                 }
             }

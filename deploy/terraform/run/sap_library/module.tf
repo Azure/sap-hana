@@ -11,7 +11,7 @@ module "sap_library" {
   deployer                = local.deployer
   key_vault               = local.key_vault
   service_principal       = local.service_principal
-  deployer_tfstate        = try(data.terraform_remote_state.deployer[0].outputs,[])
+  deployer_tfstate        = try(data.terraform_remote_state.deployer[0].outputs, [])
   naming                  = module.sap_namegenerator.naming
 }
 

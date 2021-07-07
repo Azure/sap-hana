@@ -46,7 +46,6 @@ locals {
 
   firewall_service_tags = format("AzureCloud.%s", local.region)
 
-
   // Resource group
   rg_exists = length(try(var.infrastructure.resource_group.arm_id, "")) > 0
   rg_name = local.rg_exists ? (

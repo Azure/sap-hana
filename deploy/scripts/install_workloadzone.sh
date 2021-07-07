@@ -183,7 +183,15 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
+<<<<<<< HEAD
     echo "#              The file needs to contain the environment attribute!!                    #"
+=======
+<<<<<<< HEAD
+    echo "#              The file needs to contain the environment attribute!!                    #"
+=======
+    echo "#     The file needs to contain the infrastructure.environment attribute!!              #"
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
+>>>>>>> 2a067300321f797de8406637b20f08c0fd6b1534
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -196,7 +204,15 @@ then
     echo "#                                                                                       #"
     echo -e "#                          $boldreduscore Incorrect parameter file. $resetformatting                                  #"
     echo "#                                                                                       #"
+<<<<<<< HEAD
     echo "#                 The file needs to contain the region attribute!!                      #"
+=======
+<<<<<<< HEAD
+    echo "#                 The file needs to contain the region attribute!!                      #"
+=======
+    echo "#       The file needs to contain the infrastructure.region attribute!!                 #"
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
+>>>>>>> 2a067300321f797de8406637b20f08c0fd6b1534
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""

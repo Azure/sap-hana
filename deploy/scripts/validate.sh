@@ -798,7 +798,15 @@ if [ "${deployment_system}" == sap_deployer ] ; then
         else
             if jq --exit-status '.infrastructure.vnets.management.name' "${parameterfile}" >/dev/null; then
                 name=$(jq --raw-output .infrastructure.vnets.management.name "${parameterfile}")
+<<<<<<< HEAD
                 echo "VNet Logical name:           " "${name}"
+=======
+<<<<<<< HEAD
+                echo "VNet Logical name  :      " "${name}"
+=======
+                echo "VNet Logical name:           " "${name}"
+>>>>>>> 1ee50dc175053dc280db5d0321be309eda89d8ab
+>>>>>>> 2a067300321f797de8406637b20f08c0fd6b1534
             fi
         fi
         if jq --exit-status '.infrastructure.vnets.management.address_space' "${parameterfile}" >/dev/null; then

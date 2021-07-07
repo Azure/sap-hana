@@ -126,7 +126,7 @@ Licensed under the MIT license.
         $iniContent.Remove($combined)
         Out-IniFile -InputObject $iniContent -Path $fileINIPath
         $iniContent = Get-IniContent -Path $fileINIPath
-    
+   
     }
     
     $changed = $false
@@ -207,24 +207,26 @@ Licensed under the MIT license.
 
                 if ($null -ne $iniContent[$deployercombined]) {
                     Write-Host "Reading the state information from the deployer"
-                    $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
-                    $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
-                    $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
-                    $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
-                    $vault = $iniContent[$deployercombined]["Vault"]
-                    $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
-                    $iniContent += @{$combined = $Category1 }
-                    Out-IniFile -InputObject $iniContent -Path $fileINIPath
-                    $iniContent = Get-IniContent -Path $fileINIPath
+                    if ($StorageAccountName.Length -eq 0) {
+                        $rgName = $iniContent[$deployercombined]["REMOTE_STATE_RG"]
+                        $saName = $iniContent[$deployercombined]["REMOTE_STATE_SA"]
+                        $tfstate_resource_id = $iniContent[$deployercombined]["tfstate_resource_id"] 
+                        $deployer_tfstate_key = $iniContent[$deployercombined]["Deployer"]
+                        $vault = $iniContent[$deployercombined]["Vault"]
+                        $Category1 = @{"REMOTE_STATE_RG" = $rgName; "REMOTE_STATE_SA" = $saName; "tfstate_resource_id" = $tfstate_resource_id ; "Landscape" = $landscape_tfstate_key; "Deployer" = $deployer_tfstate_key; "Vault" = $Vault; }
+                        $iniContent += @{$combined = $Category1 }
+                        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+                        $iniContent = Get-IniContent -Path $fileINIPath
+                    }
          
                 }
                 else {
-                    if ($null -eq $StorageAccountName -or "" -eq $StorageAccountName) {
+                    if ($StorageAccountName.Length -eq 0) {
 
                         Write-Error "The Terraform state information is not available"
 
                         $saName = Read-Host -Prompt "Please specify the storage account name for the terraform storage account"
-                        $rID = Get-AzResource -Name $saName 
+                        $rID = Get-AzStorageAccount -Name $saName
                         $rgName = $rID.ResourceGroupName
     
                         $tfstate_resource_id = $rID.ResourceId
@@ -334,7 +336,9 @@ Licensed under the MIT license.
         $saName = $StorageAccountName
     }
     else {
-        $saName = $iniContent[$combined]["REMOTE_STATE_SA"].Trim()    
+        if ($iniContent[$combined]["REMOTE_STATE_SA"].Trim().Length -gt 0) {
+            $saName = $iniContent[$combined]["REMOTE_STATE_SA"].Trim()    
+        }
     }
     
     if ($null -eq $saName -or "" -eq $saName) {
@@ -351,14 +355,18 @@ Licensed under the MIT license.
 
 
     if ($null -eq $tfstate_resource_id -or "" -eq $tfstate_resource_id) {
-        $rID = Get-AzResource -Name $saName 
-        $rgName = $rID.ResourceGroupName
-        $tfstate_resource_id = $rID.ResourceId
-        $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
-        $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
-        Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        if ($null -ne $saName -and "" -ne $saName) {
+            $rID = Get-AzResource -Name $saName -ResourceType Microsoft.Storage/storageAccounts
+            $rgName = $rID.ResourceGroupName
+            $tfstate_resource_id = $rID.ResourceId
+            $iniContent[$combined]["REMOTE_STATE_RG"] = $rgName
+            $iniContent[$combined]["tfstate_resource_id"] = $tfstate_resource_id
+            Out-IniFile -InputObject $iniContent -Path $fileINIPath
+        }
+
     }
 
+    Write-Host -ForegroundColor green "Initializing Terraform  New-SAPWorkloadZone"
 
     $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
     $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
@@ -499,6 +507,5 @@ Licensed under the MIT license.
             throw "Error executing command: $Cmd"
         }
     }
-    
     $Env:TF_DATA_DIR = $null
 }
