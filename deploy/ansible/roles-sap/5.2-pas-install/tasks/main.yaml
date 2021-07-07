@@ -53,13 +53,17 @@
 #
 - name:               "SAP PAS Install"
   shell: |
+                      set -o errexit
+                      mkdir -p /etc/sap_deployment_automation
                       export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.pas }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \
                                 SAPINST_START_GUISERVER=false
+                      touch /etc/sap_deployment_automation/sap_deployment_pas.txt
   args:
     chdir:            /usr/sap/install/SWPM
+    creates:          /etc/sap_deployment_automation/sap_deployment_pas.txt
   # Skip when TRUE (test mode)
   # when: not test_new_bom
 # *====================================4=======================================8

@@ -22,7 +22,7 @@
       "db_version": "2.00.050",
       "size": "Default",
       "os": {
-        "publisher": "SUSE",
+        "publisher": "suse",
         "offer": "sles-sap-12-sp5",
         "sku": "gen1"
       },
