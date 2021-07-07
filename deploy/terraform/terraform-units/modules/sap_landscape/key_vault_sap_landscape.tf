@@ -72,7 +72,8 @@ resource "azurerm_key_vault" "kv_user" {
 
   lifecycle {
     ignore_changes = [
-      soft_delete_enabled
+      soft_delete_enabled,
+      access_policy
     ]
   }
 }
