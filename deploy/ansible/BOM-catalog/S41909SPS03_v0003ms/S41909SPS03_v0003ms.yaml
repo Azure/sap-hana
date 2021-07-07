@@ -100,7 +100,7 @@ materials:
       extract:      true
       extractDir:   SWPM
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000000778192021
+      url:          https://softwaredownloads.sap.com/file/0020000000893902021
 
     # DB Export
     - name:         "File on DVD"

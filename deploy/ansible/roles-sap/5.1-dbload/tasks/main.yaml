@@ -1,4 +1,3 @@
-
 #   SAP: Register BOM
 #   SAP DBLOAD: deploy DBLOAD Parameter file install template
 #   SAP DBLOAD: Install
@@ -49,7 +48,7 @@
   shell: |
                       set -o errexit
                       mkdir -p /etc/sap_deployment_automation
-                       export TMPDIR=/usr/sap/install
+                      export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.dbl }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \

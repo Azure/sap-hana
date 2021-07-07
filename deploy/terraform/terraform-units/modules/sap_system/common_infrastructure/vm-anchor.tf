@@ -75,6 +75,8 @@ resource "azurerm_linux_virtual_machine" "anchor" {
     ultra_ssd_enabled = local.enable_anchor_ultra[count.index]
   }
 
+
+  license_type = length(var.license_type) > 0 ? var.license_type : null
 }
 
 # Create the Windows Application VM(s)
@@ -121,5 +123,7 @@ resource "azurerm_windows_virtual_machine" "anchor" {
   additional_capabilities {
     ultra_ssd_enabled = local.enable_anchor_ultra[count.index]
   }
-
+  
+  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
 }

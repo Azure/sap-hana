@@ -191,4 +191,8 @@ locals {
   prvt_kv_name    = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[8] : local.keyvault_names.private_access
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
+  // Tags
+  tags = try(var.deployers[0].tags, {"JumpboxName" = "Deployer"})
+
+
 }

@@ -61,6 +61,12 @@ variable "terraform_template_version" {
   default     = ""
 }
 
+variable "license_type" {
+  description = "Specifies the license type for the OS"
+  default = ""
+
+}
+
 locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
@@ -130,18 +136,25 @@ locals {
 
   deployer_subscription_id = length(local.spn_key_vault_arm_id) > 0 ? split("/", local.spn_key_vault_arm_id)[2] : ""
 
+  use_spn = !try(var.options.nospn, false)
+
+
   spn = {
     subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
-    client_id       = data.azurerm_key_vault_secret.client_id.value,
-    client_secret   = data.azurerm_key_vault_secret.client_secret.value,
-    tenant_id       = data.azurerm_key_vault_secret.tenant_id.value,
+    client_id       = local.use_spn ? data.azurerm_key_vault_secret.client_id[0].value : null,
+    client_secret   = local.use_spn ? data.azurerm_key_vault_secret.client_secret[0].value : null,
+    tenant_id       = local.use_spn ? data.azurerm_key_vault_secret.tenant_id[0].value : null
   }
 
   service_principal = {
     subscription_id = local.spn.subscription_id,
-    client_id       = local.spn.client_id,
-    client_secret   = local.spn.client_secret,
     tenant_id       = local.spn.tenant_id,
-    object_id       = data.azuread_service_principal.sp.id
+    object_id       = local.use_spn ? data.azuread_service_principal.sp[0].id : null
+  }
+
+  account = {
+    subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
+    tenant_id       = data.azurerm_client_config.current.tenant_id,
+    object_id       = data.azurerm_client_config.current.object_id
   }
 }

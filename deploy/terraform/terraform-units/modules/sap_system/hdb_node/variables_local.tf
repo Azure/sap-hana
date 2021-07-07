@@ -78,6 +78,11 @@ variable "cloudinit_growpart_config" {
   description = "A cloud-init config that configures automatic growpart expansion of root partition"
 }
 
+variable "license_type" {
+  description = "Specifies the license type for the OS"
+  default = ""
+
+}
 
 locals {
   // Resources naming

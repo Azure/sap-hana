@@ -118,8 +118,17 @@ resource "azurerm_role_assignment" "deployer_msi_sa_tfstate" {
     0
   )
 
-  scope                = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_tfstate[0].id : azurerm_storage_account.storage_tfstate[0].id
+  scope                = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0].id : azurerm_storage_account.storage_tfstate[0].id
   role_definition_name = "Storage Account Contributor"
   principal_id         = local.deployer_msi_principal_id
+}
+
+
+#ToDo Fix later
+resource "azurerm_key_vault_secret" "saplibrary_access_key" {
+  count        = length(local.deployer_kv_user_arm_id)> 0 ? 0 : 0
+  name         = "sapbits-access-key"
+  value        = local.sa_sapbits_exists  ? data.azurerm_storage_account.storage_sapbits[0].primary_access_key : azurerm_storage_account.storage_sapbits[0].primary_access_key
+  key_vault_id = local.deployer_kv_user_arm_id
 }
 

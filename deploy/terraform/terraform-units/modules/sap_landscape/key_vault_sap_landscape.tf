@@ -100,6 +100,7 @@ resource "tls_private_key" "iscsi" {
 resource "azurerm_key_vault_secret" "iscsi_ppk" {
   provider     = azurerm.main
   count        = (local.enable_landscape_kv && local.enable_iscsi_auth_key && !local.iscsi_key_exist) ? 1 : 0
+  content_type = ""
   name         = local.iscsi_ppk_name
   value        = local.iscsi_private_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -108,6 +109,7 @@ resource "azurerm_key_vault_secret" "iscsi_ppk" {
 resource "azurerm_key_vault_secret" "iscsi_pk" {
   provider     = azurerm.main
   count        = (local.enable_landscape_kv && local.enable_iscsi_auth_key && !local.iscsi_key_exist) ? 1 : 0
+  content_type = ""
   name         = local.iscsi_pk_name
   value        = local.iscsi_public_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -116,6 +118,7 @@ resource "azurerm_key_vault_secret" "iscsi_pk" {
 resource "azurerm_key_vault_secret" "iscsi_username" {
   provider     = azurerm.main
   count        = (local.enable_landscape_kv && local.enable_iscsi && !local.iscsi_username_exist) ? 1 : 0
+  content_type = ""
   name         = local.iscsi_username_name
   value        = local.iscsi_auth_username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -124,6 +127,7 @@ resource "azurerm_key_vault_secret" "iscsi_username" {
 resource "azurerm_key_vault_secret" "iscsi_password" {
   provider     = azurerm.main
   count        = (local.enable_landscape_kv && local.enable_iscsi_auth_password && !local.iscsi_pwd_exist) ? 1 : 0
+  content_type = ""
   name         = local.iscsi_pwd_name
   value        = local.iscsi_auth_password
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -193,6 +197,7 @@ resource "random_password" "created_password" {
 resource "azurerm_key_vault_secret" "sid_ppk" {
   provider     = azurerm.main
   count        = !local.sid_key_exist ? 1 : 0
+  content_type = ""
   name         = local.sid_ppk_name
   value        = local.sid_private_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -208,6 +213,7 @@ data "azurerm_key_vault_secret" "sid_ppk" {
 resource "azurerm_key_vault_secret" "sid_pk" {
   provider     = azurerm.main
   count        = !local.sid_key_exist ? 1 : 0
+  content_type = ""
   name         = local.sid_pk_name
   value        = local.sid_public_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -225,6 +231,7 @@ data "azurerm_key_vault_secret" "sid_pk" {
 resource "azurerm_key_vault_secret" "sid_username" {
   provider     = azurerm.main
   count        = (!local.sid_credentials_secret_exist) ? 1 : 0
+  content_type = ""
   name         = local.sid_username_secret_name
   value        = local.input_sid_username
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -241,6 +248,7 @@ resource "azurerm_key_vault_secret" "sid_password" {
   provider     = azurerm.main
   count        = (!local.sid_credentials_secret_exist) ? 1 : 0
   name         = local.sid_password_secret_name
+  content_type = ""
   value        = local.input_sid_password
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
@@ -257,6 +265,7 @@ data "azurerm_key_vault_secret" "sid_password" {
 resource "azurerm_key_vault_secret" "witness_access_key" {
   provider     = azurerm.main
   count        = 1
+  content_type = ""
   name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.witness_accesskey),"/[^A-Za-z0-9-]/","")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].primary_access_key : azurerm_storage_account.witness_storage[0].primary_access_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
@@ -266,6 +275,7 @@ resource "azurerm_key_vault_secret" "witness_access_key" {
 resource "azurerm_key_vault_secret" "witness_name" {
   provider     = azurerm.main
   count        = 1
+  content_type = ""
   name         = replace(format("%s%s%s", local.prefix,  var.naming.separator, local.resource_suffixes.witness_name),"/[^A-Za-z0-9-]/","")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].name : azurerm_storage_account.witness_storage[0].name
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
