@@ -1,6 +1,3 @@
-variable "infrastructure_w_defaults" {
-  description = "infrasturcture dict with default values"
-}
 
 variable "nics_dbnodes_admin" {
   description = "Admin NICs of HANA database nodes"
@@ -105,6 +102,12 @@ variable "disks" {
 
 variable "use_local_credentials" {
   description = "SDU has unique credentials"
+}
+
+variable "authentication_type" {
+  description = "VM Authentication type"
+  default = "key"
+  
 }
 
 variable "db_ha" {

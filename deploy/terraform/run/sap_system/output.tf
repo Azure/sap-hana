@@ -42,22 +42,48 @@ output "anydb_vm_ids" {
 }
 
 output "region" {
-  value = var.infrastructure.region
+  value = local.infrastructure.region
 }
 
 output "environment" {
-  value = var.infrastructure.environment
+  value = local.infrastructure.environment
 }
 
 output "sid" {
-  value = var.application.sid
+  value = local.application.sid
 }
+
+
+output "disks" {
+  value = compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks))
+
+}
+
 
 output "automation_version" {
   value = local.version_label
 }
 
-output "disks" {
-  value = compact(concat(module.hdb_node.dbtier_disks, module.anydb_node.dbtier_disks, module.app_tier.apptier_disks)) 
+output "infrastructure" {
+  value = local.infrastructure
 
 }
+
+# output "app" {
+#   value = local.application
+
+# }
+
+# output "data" {
+#   value = local.databases
+
+# }
+
+# output "options" {
+#   value = local.options
+# }
+
+# output "naming" {
+#   value = module.sap_namegenerator.naming
+# }
+

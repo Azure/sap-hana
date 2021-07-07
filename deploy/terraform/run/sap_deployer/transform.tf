@@ -35,7 +35,7 @@ locals {
     {
       size      = try(coalesce(var.vm_size, try(var.deployers[0].size, "")), "")
       disk_type = try(coalesce(var.vm_disk_type, try(var.deployers[0].disk_type, "")), "")
-      use_DHCP  = try(coalesce(var.use_DHCP, try(var.deployers[0].use_DHCP, false)), "")
+      use_DHCP  = var.use_DHCP || try(var.deployers[0].use_DHCP, false)
       authentication = {
         type = try(coalesce(var.vm_authentication_type, try(var.deployers[0].authentication.type, "")), "")
       }
@@ -67,7 +67,7 @@ locals {
   }
 
   options = {
-    enable_deployer_public_ip = try(coalesce(var.enable_deployer_public_ip, try(var.options.enable_deployer_public_ip, false)), "")
+    enable_deployer_public_ip = var.enable_deployer_public_ip ||  try(var.options.enable_deployer_public_ip, false)
   }
 
   firewall_deployment          = try(var.firewall_deployment, false)

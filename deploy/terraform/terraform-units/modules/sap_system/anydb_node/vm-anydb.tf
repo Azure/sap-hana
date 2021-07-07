@@ -109,7 +109,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
   network_interface_ids = local.anydb_dual_nics ? (
-    local.legacy_nic_order ? (
+    var.options.legacy_nic_order ? (
       [azurerm_network_interface.anydb_admin[count.index].id, azurerm_network_interface.anydb_db[count.index].id]) : (
       [azurerm_network_interface.anydb_db[count.index].id, azurerm_network_interface.anydb_admin[count.index].id]
     )) : (
@@ -179,7 +179,7 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
   network_interface_ids = local.anydb_dual_nics ? (
-    local.legacy_nic_order ? (
+    var.options.legacy_nic_order ? (
       [azurerm_network_interface.anydb_admin[count.index].id, azurerm_network_interface.anydb_db[count.index].id]) : (
       [azurerm_network_interface.anydb_db[count.index].id, azurerm_network_interface.anydb_admin[count.index].id]
     )) : (
@@ -230,11 +230,11 @@ resource "azurerm_managed_disk" "disks" {
   disk_mbps_read_write   = "UltraSSD_LRS" == local.anydb_disks[count.index].storage_account_type ? local.anydb_disks[count.index].disk_mbps_read_write : null
 
 
-  zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
-    upper(local.anydb_ostype) == "LINUX" ? (
-      [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
-      [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
-  )) : null
+  # zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
+  #   upper(local.anydb_ostype) == "LINUX" ? (
+  #     [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
+  #     [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
+  # )) : null
 
 }
 
