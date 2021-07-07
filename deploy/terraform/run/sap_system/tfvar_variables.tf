@@ -161,7 +161,7 @@ variable "anchor_vm_image" {
   default = {
     "os_type"         = ""
     "source_image_id" = ""
-    "publisher"       = "suse"
+    "publisher"       = "SUSE"
     "offer"           = "sles-sap-12-sp5"
     "sku"             = "gen1"
     "version"         = "latest"
@@ -243,7 +243,7 @@ variable "database_vm_image" {
     "publisher"       = ""
     "offer"           = ""
     "sku"             = ""
-    "version"         = ""
+    "version"         = "latest"
   }
 }
 
@@ -341,7 +341,7 @@ variable "application_server_image" {
     "publisher"       = ""
     "offer"           = ""
     "sku"             = ""
-    "version"         = ""
+    "version"         = "latest"
   }
 }
 
@@ -381,7 +381,7 @@ variable "webdispatcher_server_image" {
     "publisher"       = ""
     "offer"           = ""
     "sku"             = ""
-    "version"         = ""
+    "version"         = "latest"
   }
 }
 
@@ -422,7 +422,7 @@ variable "scs_server_image" {
     "publisher"       = ""
     "offer"           = ""
     "sku"             = ""
-    "version"         = ""
+    "version"         = "latest"
   }
 }
 

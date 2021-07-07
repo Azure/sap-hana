@@ -182,13 +182,13 @@ locals {
       "version"   = "latest"
     }
     DB2 = {
-      "publisher" = "suse",
+      "publisher" = "SUSE",
       "offer"     = "sles-sap-12-sp5",
       "sku"       = "gen1"
       "version"   = "latest"
     }
     ASE = {
-      "publisher" = "suse",
+      "publisher" = "SUSE",
       "offer"     = "sles-sap-12-sp5",
       "sku"       = "gen1"
       "version"   = "latest"
