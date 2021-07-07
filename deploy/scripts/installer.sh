@@ -156,7 +156,7 @@ if [ $force == 1 ]; then
     rm -Rf .terraform terraform.tfstate*
 fi
 
-ext=$(echo ${parameterfile} | cut -d. -f2)
+ext=$(echo ${parameterfile_name} | cut -d. -f2)
 
 # Helper variables
 if [ "${ext}" == json ]; then

@@ -162,7 +162,7 @@ then
 fi
 
 
-ext=$(echo ${parameterfile} | cut -d. -f2)
+ext=$(echo ${workload_file_parametername} | cut -d. -f2)
 
 # Helper variables
 if [ "${ext}" == json ]; then
