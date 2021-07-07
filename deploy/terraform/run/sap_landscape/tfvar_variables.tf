@@ -171,7 +171,7 @@ variable "iscsi_useDHCP" {
 variable "iscsi_image" {
   default = {
     "source_image_id" = ""
-    "publisher"       = "SUSE"
+    "publisher"       = "suse"
     "offer"           = "sles-sap-12-sp5"
     "sku"             = "gen1"
     "version"         = "latest"
