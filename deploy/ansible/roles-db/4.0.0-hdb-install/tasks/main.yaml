@@ -75,15 +75,21 @@
 
 
 #   SAP HANA: Install
+
+#ToDo make the code more robust
 - name:               "Execute hdblcm"
   # shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   shell: |
+                      set -o errexit
+                      mkdir -p /etc/sap_deployment_automation
                       pwd=$(<{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml)
                       rm {{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml
                       echo $pwd | \
                       ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
+                      touch /etc/sap_deployment_automation/sap_deployment_hana.txt
   args:
     chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
+    creates:          /etc/sap_deployment_automation/sap_deployment_hana.txt
 
 
 
