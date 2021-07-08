@@ -29,13 +29,18 @@
   loop:
     - { state: 'directory', mode: '0755', path: '{{ dir_params }}' }
 
+- name:     "Create run flag directory"
+  file:
+    path:   /etc/sap_deployment_automation
+    state:  directory
+    mode:   0755
 
 # TODO: Move the template to the BOM Directory
 #   SAP HANA: deploy hdblcm password file
 - name:               "SAP HANA: deploy hdblcm password file"
   template:
     src:              HANA_2_00_055_v1_install.rsp.xml.j2
-    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml"
+    dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
     mode:             0644
     force:            yes
   # Template parameter mapping
@@ -53,13 +58,14 @@
 
 
 
+
 # TODO: Move the template to the BOM Directory
 # TODO: Analyze file in more detail
 #   SAP HANA: deploy hdblcm install response file
 - name:               "SAP HANA: deploy hdblcm install response file"
   template:
     src:              HANA_2_00_055_v1_install.rsp.j2
-    dest:             "{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp"
+    dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp"
     mode:             0644
     force:            yes
   # Template parameter mapping
@@ -67,7 +73,7 @@
     _rsp_component_root:              "../COMPONENTS"
     _rsp_components:                  "all"
     _rsp_sapmnt:                      "/hana/shared"                              # Default Value
-    _rsp_hostname:                    "{{ inventory_hostname_short }}"            # TODO: needs to be tested with HA and scale out
+    _rsp_hostname:                    "{{ ansible_hostname }}"            # TODO: needs to be tested with HA and scale out
     _rsp_sid:                         "{{ hdb_sid|upper }}"
     _rsp_number:                      "{{ hdb_instance_number }}"
     _rsp_system_usage:                "custom"
@@ -80,16 +86,15 @@
 - name:               "Execute hdblcm"
   # shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   shell: |
-                      set -o errexit
-                      mkdir -p /etc/sap_deployment_automation
-                      pwd=$(<{{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml)
-                      rm {{ dir_params }}/hdbserver_{{ sap_sid }}_passwords.xml
+                      pwd=$(<{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml)
                       echo $pwd | \
-                      ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
-                      touch /etc/sap_deployment_automation/sap_deployment_hana.txt
+                        ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
+                      rm {{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml
+                      touch /etc/sap_deployment_automation/sap_deployment_hdb.txt
+                      
   args:
     chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
-    creates:          /etc/sap_deployment_automation/sap_deployment_hana.txt
+    creates:          /etc/sap_deployment_automation/sap_deployment_hdb.txt
 
 
 

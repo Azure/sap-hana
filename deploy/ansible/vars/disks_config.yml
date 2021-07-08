@@ -57,20 +57,6 @@ logical_volumes:
     fstype:     'xfs'
 
   - tier:       'sapos'
-    node_tier:  'scs'
-    vg:         'vg_sap'
-    lv:         'lv_sapmnt'
-    size:       '128g'
-    fstype:     'xfs'
-
-  - tier:       'sapos'
-    node_tier:  'scs'
-    vg:         'vg_sap'
-    lv:         'lv_usrsapinstall'
-    size:       '100%FREE'
-    fstype:     'xfs'
-
-  - tier:       'sapos'
     node_tier:  'hana'
     vg:         'vg_sap'
     lv:         'lv_hana_shared'
@@ -106,6 +92,22 @@ logical_volumes:
     lv:         'lv_sapmnt'
     size:       '1g'
     fstype:     'xfs'
+
+  - tier:       'preparation'
+    node_tier:  'scs'
+    vg:         'vg_sap'
+    lv:         'lv_sapmnt'
+    size:       '128g'
+    fstype:     'xfs'
+
+  - tier:       'preparation'
+    node_tier:  'scs'
+    vg:         'vg_sap'
+    lv:         'lv_usrsapinstall'
+    size:       '100%FREE'
+    fstype:     'xfs'
+
+
 
 # Define a dynamic expression based upon the 'item' fact that can
 # only be used within a loop, that determines the number of PVs
