@@ -105,7 +105,7 @@ locals {
   app_server_count      = try(local.application.application_server_count, 0)
   webdispatcher_count   = try(local.application.webdispatcher_count, 0)
   scs_high_availability = try(local.application.scs_high_availability, false)
-  scs_server_count      = try(local.application.scs_server_count, 1) * (local.scs_high_availability ? 2 : 1)
+  scs_server_count      = try(local.application.scs_server_count, 0) * (local.scs_high_availability ? 2 : 1)
 
   db_zones  = try(local.databases[0].zones, [])
   app_zones = try(local.application.app_zones, [])

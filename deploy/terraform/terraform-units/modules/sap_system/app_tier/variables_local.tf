@@ -244,12 +244,12 @@ locals {
   app_ostype       = upper(try(var.application.app_os.offer, "")) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.app_os.os_type, "LINUX")
 
   app_os = {
-    "os_type"         = local.app_ostype
-    "source_image_id" = local.app_custom_image ? var.application.app_os.source_image_id : ""
-    "publisher"       = local.app_custom_image ? "" : length(var.application.app_os.publisher) > 0 ? var.application.app_os.publisher : "SUSE"
-    "offer"           = local.app_custom_image ? "" : length(var.application.app_os.offer) > 0 ? var.application.app_os.offer : "sles-sap-12-sp5"
-    "sku"             = local.app_custom_image ? "" : length(var.application.app_os.sku) > 0 ? var.application.app_os.sku : "gen1"
-    "version"         = local.app_custom_image ? "" : length(var.application.app_os.version) > 0 ? var.application.app_os.version : "latest"
+    os_type         = local.app_ostype
+    source_image_id = local.app_custom_image ? var.application.app_os.source_image_id : ""
+    publisher       = local.app_custom_image ? "" : length(var.application.app_os.publisher) > 0 ? var.application.app_os.publisher : "SUSE"
+    offer           = local.app_custom_image ? "" : length(var.application.app_os.offer) > 0 ? var.application.app_os.offer : "sles-sap-12-sp5"
+    sku             = local.app_custom_image ? "" : length(var.application.app_os.sku) > 0 ? var.application.app_os.sku : "gen1"
+    version         = local.app_custom_image ? "" : length(var.application.app_os.version) > 0 ? var.application.app_os.version : "latest"
   }
 
   // OS image for all SCS VMs
@@ -259,12 +259,12 @@ locals {
   scs_ostype       = upper(var.application.scs_os.offer) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.scs_os.os_type, local.app_ostype)
 
   scs_os = {
-    "os_type"         = local.scs_ostype
-    "source_image_id" = local.scs_custom_image ? var.application.scs_os.source_image_id : ""
-    "publisher"       = local.scs_custom_image ? "" : length(var.application.scs_os.publisher) > 0 ? var.application.scs_os.publisher : "SUSE"
-    "offer"           = local.scs_custom_image ? "" : length(var.application.scs_os.offer) > 0 ? var.application.scs_os.offer : "sles-sap-12-sp5"
-    "sku"             = local.scs_custom_image ? "" : length(var.application.scs_os.sku) > 0 ? var.application.scs_os.sku : "gen1"
-    "version"         = local.scs_custom_image ? "" : length(var.application.scs_os.version) > 0 ? var.application.scs_os.version : "latest"
+    os_type         = local.scs_ostype
+    source_image_id = local.scs_custom_image ? var.application.scs_os.source_image_id : ""
+    publisher       = local.scs_custom_image ? "" : length(var.application.scs_os.publisher) > 0 ? var.application.scs_os.publisher : "SUSE"
+    offer           = local.scs_custom_image ? "" : length(var.application.scs_os.offer) > 0 ? var.application.scs_os.offer : "sles-sap-12-sp5"
+    sku             = local.scs_custom_image ? "" : length(var.application.scs_os.sku) > 0 ? var.application.scs_os.sku : "gen1"
+    version         = local.scs_custom_image ? "" : length(var.application.scs_os.version) > 0 ? var.application.scs_os.version : "latest"
   }
 
   // OS image for all WebDispatcher VMs
@@ -273,12 +273,12 @@ locals {
   web_custom_image = length(try(var.application.web_os.source_image_id, "")) > 0
   web_ostype       = upper(var.application.web_os.offer) == "WINDOWSSERVER" ? "WINDOWS" : try(var.application.web_os.os_type, local.app_ostype)
   web_os = {
-    "os_type"         = local.web_ostype
-    "source_image_id" = local.web_custom_image ? var.application.web_os.source_image_id : ""
-    "publisher"       = local.web_custom_image ? "" : length(var.application.web_os.publisher) > 0 ? var.application.web_os.publisher : "SUSE"
-    "offer"           = local.web_custom_image ? "" : length(var.application.web_os.offer) > 0 ? var.application.web_os.offer : "sles-sap-12-sp5"
-    "sku"             = local.web_custom_image ? "" : length(var.application.web_os.sku) > 0 ? var.application.web_os.sku : "gen1"
-    "version"         = local.web_custom_image ? "" : length(var.application.web_os.version) > 0 ? var.application.web_os.version : "latest"
+    os_type         = local.web_ostype
+    source_image_id = local.web_custom_image ? var.application.web_os.source_image_id : ""
+    publisher       = local.web_custom_image ? "" : length(var.application.web_os.publisher) > 0 ? var.application.web_os.publisher : "SUSE"
+    offer           = local.web_custom_image ? "" : length(var.application.web_os.offer) > 0 ? var.application.web_os.offer : "sles-sap-12-sp5"
+    sku             = local.web_custom_image ? "" : length(var.application.web_os.sku) > 0 ? var.application.web_os.sku : "gen1"
+    version         = local.web_custom_image ? "" : length(var.application.web_os.version) > 0 ? var.application.web_os.version : "latest"
   }
 
   // Subnet IP Offsets
