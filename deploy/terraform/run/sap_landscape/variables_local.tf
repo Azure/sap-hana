@@ -38,7 +38,7 @@ locals {
   environment = upper(local.infrastructure.environment)
 
   vnet_logical_name = local.infrastructure.vnets.sap.name
-  
+
   // SAP vnet
   var_infra       = try(local.infrastructure, {})
   var_vnet_sap    = try(local.var_infra.vnets.sap, {})
@@ -67,7 +67,7 @@ locals {
     tenant_id       = local.use_spn ? data.azurerm_key_vault_secret.tenant_id[0].value : null
   }
 
-    service_principal = {
+  service_principal = {
     subscription_id = local.spn.subscription_id,
     tenant_id       = local.spn.tenant_id,
     object_id       = local.use_spn ? data.azuread_service_principal.sp[0].id : null
