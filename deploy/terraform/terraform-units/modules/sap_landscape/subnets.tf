@@ -50,9 +50,9 @@ resource "azurerm_network_security_group" "admin" {
 
 # Associates admin nsg to admin subnet
 resource "azurerm_subnet_network_security_group_association" "admin" {
-  provider                  = azurerm.main
-  count                     = local.sub_admin_defined && !local.sub_admin_nsg_exists ? 1 : 0
-   
+  provider = azurerm.main
+  count    = local.sub_admin_defined && !local.sub_admin_nsg_exists ? 1 : 0
+
   subnet_id                 = local.sub_admin_existing ? local.sub_admin_id : azurerm_subnet.admin[0].id
   network_security_group_id = azurerm_network_security_group.admin[0].id
 }
@@ -109,5 +109,35 @@ resource "azurerm_subnet_network_security_group_association" "web" {
   count                     = local.sub_web_defined && !local.sub_web_nsg_exists ? 1 : 0
   subnet_id                 = local.sub_web_existing ? local.sub_web_id : azurerm_subnet.web[0].id
   network_security_group_id = azurerm_network_security_group.web[0].id
+}
+
+#Associate the subnets to the route table
+
+resource "azurerm_subnet_route_table_association" "admin" {
+  provider       = azurerm.main
+  count          = local.sub_admin_defined && !local.sub_admin_existing ? 1 : 0
+  subnet_id      = local.sub_admin_existing ? data.azurerm_subnet.admin[0].id : azurerm_subnet.admin[0].id
+  route_table_id = azurerm_route_table.rt[0].name
+}
+
+resource "azurerm_subnet_route_table_association" "db" {
+  provider       = azurerm.main
+  count          = local.sub_db_defined && !local.sub_db_existing ? 1 : 0
+  subnet_id      = local.sub_db_existing ? data.azurerm_subnet.db[0].id : azurerm_subnet.db[0].id
+  route_table_id = azurerm_route_table.rt[0].name
+}
+
+resource "azurerm_subnet_route_table_association" "app" {
+  provider       = azurerm.main
+  count          = local.sub_app_defined && !local.sub_app_existing ? 1 : 0
+  subnet_id      = local.sub_app_existing ? data.azurerm_subnet.app[0].id : azurerm_subnet.app[0].id
+  route_table_id = azurerm_route_table.rt[0].name
+}
+
+resource "azurerm_subnet_route_table_association" "web" {
+  provider       = azurerm.main
+  count          = local.sub_web_defined && !local.sub_web_existing ? 1 : 0
+  subnet_id      = local.sub_web_existing ? data.azurerm_subnet.web[0].id : azurerm_subnet.web[0].id
+  route_table_id = azurerm_route_table.rt[0].name
 }
 
