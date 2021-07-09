@@ -74,7 +74,7 @@ data "azurerm_network_security_group" "admin" {
 resource "azurerm_subnet_network_security_group_association" "admin" {
   provider                  = azurerm.main
   count                     = local.enable_admin_subnet ? (signum((local.sub_admin_exists ? 0 : 1) + (local.sub_admin_nsg_exists ? 0 : 1))) : 0
-  subnet_id                 = local.sub_admin_exists ? data.azurerm_subnet.admin[0].id : azurerm_subnet.admin[0].id
+  subnet_id                 = local.sub_admin_exists ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id
   network_security_group_id = local.sub_admin_nsg_exists ? data.azurerm_network_security_group.admin[0].id : azurerm_network_security_group.admin[0].id
 }
 
