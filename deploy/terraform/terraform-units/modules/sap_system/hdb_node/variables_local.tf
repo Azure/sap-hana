@@ -146,12 +146,12 @@ locals {
   // If custom image is used, we do not overwrite os reference with default value
   hdb_custom_image = length(try(local.hdb.os.source_image_id, "")) > 0
   hdb_os = {
-    "os_type"         = "LINUX"
-    "source_image_id" = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
-    "publisher"       = try(local.hdb.os.publisher, local.hdb_custom_image ? "" : "SUSE")
-    "offer"           = try(local.hdb.os.offer, local.hdb_custom_image ? "" : "sles-sap-12-sp5")
-    "sku"             = try(local.hdb.os.sku, local.hdb_custom_image ? "" : "gen1")
-    "version"         = try(local.hdb.os.version, local.hdb_custom_image ? "" : "latest")
+    os_type         = "LINUX"
+    source_image_id = local.hdb_custom_image ? local.hdb.os.source_image_id : ""
+    publisher       = local.hdb_custom_image ? "" : length(try(local.hdb.os.publisher, "")) > 0 ? local.hdb.os.publisher : "SUSE"
+    offer           = local.hdb_custom_image ? "" : length(try(local.hdb.os.offer, "")) > 0 ? local.hdb.os.offer : "sles-sap-12-sp5"
+    sku             = local.hdb_custom_image ? "" : length(try(local.hdb.os.sku, "")) > 0 ? local.hdb.os.sku : "gen1"
+    version         = local.hdb_custom_image ? "" : length(try(local.hdb.os.version, "")) > 0 ? local.hdb.os.version : "latest"
   }
 
   hdb_size = try(local.hdb.size, "Default")

@@ -31,7 +31,7 @@ resource "azurerm_network_interface_application_security_group_association" "web
 # Create Application NICs
 resource "azurerm_network_interface" "web_admin" {
   provider                      = azurerm.main
-  count                         = local.enable_deployment && var.application.use_DHCP ? local.webdispatcher_count : 0
+  count                         = local.enable_deployment && var.application.dual_nics ? local.webdispatcher_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.admin_nic)
   location                      = var.resource_group[0].location
   resource_group_name           = var.resource_group[0].name
@@ -68,10 +68,10 @@ resource "azurerm_linux_virtual_machine" "web" {
   //If length of zones > 1 distribute servers evenly across zones
   zone = local.use_web_avset ? null : local.web_zones[count.index % max(local.web_zone_count, 1)]
 
-  network_interface_ids = var.application.use_DHCP ? (
+  network_interface_ids = var.application.dual_nics ? (
     var.options.legacy_nic_order ? (
-      [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
-      [azurerm_network_interface.web[count.index].id, azurerm_network_interface.web_admin[count.index].id]
+      [azurerm_network_interface.scs_admin[count.index].id, azurerm_network_interface.scs[count.index].id]) : (
+      [azurerm_network_interface.scs[count.index].id, azurerm_network_interface.scs_admin[count.index].id]
     )
     ) : (
     [azurerm_network_interface.web[count.index].id]
@@ -158,7 +158,7 @@ resource "azurerm_windows_virtual_machine" "web" {
   //If length of zones > 1 distribute servers evenly across zones
   zone = local.use_web_avset ? null : local.web_zones[count.index % max(local.web_zone_count, 1)]
 
-  network_interface_ids = var.application.use_DHCP ? (
+  network_interface_ids = var.application.dual_nics ? (
     var.options.legacy_nic_order ? (
       [azurerm_network_interface.web_admin[count.index].id, azurerm_network_interface.web[count.index].id]) : (
       [azurerm_network_interface.web[count.index].id, azurerm_network_interface.web_admin[count.index].id]
@@ -215,7 +215,7 @@ resource "azurerm_windows_virtual_machine" "web" {
   }
 
 
-#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  #ToDo: Remove once feature is GA  patch_mode = "Manual"
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = try(var.application.web_tags, {})

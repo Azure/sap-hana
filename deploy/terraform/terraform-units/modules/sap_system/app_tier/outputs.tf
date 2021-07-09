@@ -69,7 +69,7 @@ output "fileshare_lb_ip" {
 // Output for DNS
 output "dns_info_vms" {
   value = local.enable_deployment ? (
-    var.application.use_DHCP ? (
+    var.application.dual_nics ? (
       zipmap(
         compact(concat(
           local.full_appserver_names,

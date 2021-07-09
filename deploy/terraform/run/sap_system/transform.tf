@@ -38,7 +38,7 @@ locals {
   }
   options_temp = {
     enable_secure_transfer = true
-    resource_offset        = max(var.resource_offset, try(var.options.resource_offset,0))
+    resource_offset        = max(var.resource_offset, try(var.options.resource_offset, 0))
     nsg_asg_with_vnet      = var.nsg_asg_with_vnet || try(var.options.nsg_asg_with_vnet, false)
     legacy_nic_order       = var.legacy_nic_order || try(var.options.legacy_nic_order, false)
   }
@@ -60,18 +60,49 @@ locals {
         username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
       }
       avset_arm_ids = try(coalesce(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])), [])
-      os = {
-        source_image_id = try(coalesce(var.database_vm_image.source_image_id, try(var.databases[0].os.source_image_id, "")), "")
-        publisher       = try(coalesce(var.database_vm_image.publisher, try(var.databases[0].os.publisher, "")), "")
-        offer           = try(coalesce(var.database_vm_image.offer, try(var.databases[0].os.offer, "")), "")
-        sku             = try(coalesce(var.database_vm_image.sku, try(var.databases[0].os.sku, "")), "")
-        version         = try(coalesce(var.database_vm_image.version, try(var.databases[0].version, "")), "")
-      }
 
       use_ANF = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
 
     }
   ]
+
+  db_os = {
+    source_image_id = try(coalesce(var.database_vm_image.source_image_id, try(var.databases[0].os.source_image_id, "")), "")
+    publisher       = try(coalesce(var.database_vm_image.publisher, try(var.databases[0].os.publisher, "")), "")
+    offer           = try(coalesce(var.database_vm_image.offer, try(var.databases[0].os.offer, "")), "")
+    sku             = try(coalesce(var.database_vm_image.sku, try(var.databases[0].os.sku, "")), "")
+    version         = try(coalesce(var.database_vm_image.version, try(var.databases[0].version, "")), "")
+  }
+  db_os_specified = (length(local.db_os.source_image_id) + length(local.db_os.publisher)) > 0
+
+
+  app_os = {
+    source_image_id = try(coalesce(var.application_server_image.source_image_id, try(var.application.app_os.source_image_id, try(var.application.os.source_image_id, ""))), "")
+    publisher       = try(coalesce(var.application_server_image.publisher, try(var.application.app_os.publisher, try(var.application.os.publisher, ""))), "")
+    offer           = try(coalesce(var.application_server_image.offer, try(var.application.app_os.offer, try(var.application.os.offer, ""))), "")
+    sku             = try(coalesce(var.application_server_image.sku, try(var.application.app_os.sku, try(var.application.os.sku, ""))), "")
+    version         = try(coalesce(var.application_server_image.version, try(var.application.app_os.version, try(var.application.os.version, ""))), "")
+  }
+  app_os_specified = (length(local.app_os.source_image_id) + length(local.app_os.publisher)) > 0
+
+  scs_os = {
+    source_image_id = try(coalesce(var.scs_server_image.source_image_id, try(var.application.scs_os.source_image_id, "")), "")
+    publisher       = try(coalesce(var.scs_server_image.publisher, try(var.application.scs_os.publisher, "")), "")
+    offer           = try(coalesce(var.scs_server_image.offer, try(var.application.scs_os.offer, "")), "")
+    sku             = try(coalesce(var.scs_server_image.sku, try(var.application.scs_os.sku, "")), "")
+    version         = try(coalesce(var.scs_server_image.version, try(var.application.scs_os.version, "")), "")
+  }
+  scs_os_specified = (length(local.scs_os.source_image_id) + length(local.scs_os.publisher)) > 0
+
+  web_os = {
+    source_image_id = try(coalesce(var.webdispatcher_server_image.source_image_id, try(var.application.web_os.source_image_id, "")), "")
+    publisher       = try(coalesce(var.webdispatcher_server_image.publisher, try(var.application.web_os.publisher, "")), "")
+    offer           = try(coalesce(var.webdispatcher_server_image.offer, try(var.application.web_os.offer, "")), "")
+    sku             = try(coalesce(var.webdispatcher_server_image.sku, try(var.application.web_os.sku, "")), "")
+    version         = try(coalesce(var.webdispatcher_server_image.version, try(var.application.web_os.version, "")), "")
+  }
+  web_os_specified = (length(local.web_os.source_image_id) + length(local.web_os.publisher)) > 0
+
   application_temp = {
     sid = try(coalesce(var.sid, try(var.application.sid, "")), "")
 
@@ -87,14 +118,6 @@ locals {
     application_server_count = max(var.application_server_count, try(var.application.application_server_count, 0))
     app_sku                  = try(coalesce(var.application_server_sku, var.application.app_sku), "")
 
-    app_os = {
-      source_image_id = try(coalesce(var.application_server_image.source_image_id, try(var.application.app_os.source_image_id, try(var.application.os.source_image_id, ""))), "")
-      publisher       = try(coalesce(var.application_server_image.publisher, try(var.application.app_os.publisher, try(var.application.os.publisher, ""))), "")
-      offer           = try(coalesce(var.application_server_image.offer, try(var.application.app_os.offer, try(var.application.os.offer, ""))), "")
-      sku             = try(coalesce(var.application_server_image.sku, try(var.application.app_os.sku, try(var.application.os.sku, ""))), "")
-      version         = try(coalesce(var.application_server_image.version, try(var.application.app_os.version, try(var.application.os.version, ""))), "")
-    }
-
     scs_server_count      = max(var.scs_server_count, try(var.application.scs_server_count, 1))
     scs_high_availability = try(coalesce(var.scs_high_availability, try(var.application.scs_high_availability, false)), false)
     scs_instance_number   = try(coalesce(var.scs_instance_number, var.application.scs_instance_number), "01")
@@ -102,25 +125,8 @@ locals {
 
     scs_sku = try(coalesce(var.scs_server_sku, var.application.scs_sku), "")
 
-    scs_os = {
-      source_image_id = try(coalesce(var.scs_server_image.source_image_id, try(var.application.scs_os.source_image_id, "")), "")
-      publisher       = try(coalesce(var.scs_server_image.publisher, try(var.application.scs_os.publisher, "")), "")
-      offer           = try(coalesce(var.scs_server_image.offer, try(var.application.scs_os.offer, "")), "")
-      sku             = try(coalesce(var.scs_server_image.sku, try(var.application.scs_os.sku, "")), "")
-      version         = try(coalesce(var.scs_server_image.version, try(var.application.scs_os.version, "")), "")
-    }
-
     webdispatcher_count = max(var.webdispatcher_server_count, try(var.application.webdispatcher_count, 0))
     web_sku             = try(coalesce(var.webdispatcher_server_sku, var.application.web_sku), "")
-
-    web_os = {
-      source_image_id = try(coalesce(var.webdispatcher_server_image.source_image_id, try(var.application.web_os.source_image_id, "")), "")
-      publisher       = try(coalesce(var.webdispatcher_server_image.publisher, try(var.application.web_os.publisher, "")), "")
-      offer           = try(coalesce(var.webdispatcher_server_image.offer, try(var.application.web_os.offer, "")), "")
-      sku             = try(coalesce(var.webdispatcher_server_image.sku, try(var.application.web_os.sku, "")), "")
-      version         = try(coalesce(var.webdispatcher_server_image.version, try(var.application.web_os.version, "")), "")
-    }
-
 
   }
 
@@ -221,6 +227,7 @@ locals {
   db_zones_temp = try(coalesce(var.database_vm_zones, try(var.databases[0].zones, [])), [])
 
   databases = [merge(local.databases_temp[0], (
+    local.db_os_specified ? { "os" = local.db_os } : null), (
     length(local.dbnodes) > 0 ? { "dbnodes" = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { "zones" = local.db_zones_temp } : null
     )
@@ -281,6 +288,9 @@ locals {
   web_tags = try(coalesce(var.webdispatcher_server_tags, try(var.application.web_tags, {})), {})
 
   application = merge(local.application_temp, (
+    local.app_os_specified ? { "app_os" = local.app_os } : null), (
+    local.scs_os_specified ? { "scs_os" = local.scs_os } : null), (
+    local.web_os_specified ? { "web_os" = local.web_os } : null), (
     length(local.app_zones_temp) > 0 ? { "app_zones" = local.app_zones_temp } : null), (
     length(local.scs_zones_temp) > 0 ? { "scs_zones" = local.scs_zones_temp } : null), (
     length(local.web_zones_temp) > 0 ? { "web_zones" = local.web_zones_temp } : null), (
