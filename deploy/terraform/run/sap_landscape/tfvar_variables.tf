@@ -34,125 +34,125 @@ This block describes the variables for the VNet block in the json file
 
 */
 
-variable "sap_network_name" {
+variable "network_name" {
   default = ""
 }
 
-variable "sap_network_arm_id" {
+variable "network_arm_id" {
   default = ""
 }
 
-variable "sap_network_address_space" {
+variable "network_address_space" {
   default = ""
 }
 
 /* admin subnet information */
 
-variable "sap_admin_subnet_name" {
+variable "admin_subnet_name" {
   default = ""
 }
 
-variable "sap_admin_subnet_arm_id" {
+variable "admin_subnet_arm_id" {
   default = ""
 }
 
-variable "sap_admin_subnet_address_prefix" {
+variable "admin_subnet_address_prefix" {
   default = ""
 }
 
-variable "sap_admin_subnet_nsg_name" {
+variable "admin_subnet_nsg_name" {
   default = ""
 }
 
-variable "sap_admin_subnet_nsg_arm_id" {
+variable "admin_subnet_nsg_arm_id" {
   default = ""
 }
 
 /* db subnet information */
 
-variable "sap_db_subnet_name" {
+variable "db_subnet_name" {
   default = ""
 }
 
-variable "sap_db_subnet_arm_id" {
+variable "db_subnet_arm_id" {
   default = ""
 }
 
-variable "sap_db_subnet_address_prefix" {
+variable "db_subnet_address_prefix" {
   default = ""
 }
 
-variable "sap_db_subnet_nsg_name" {
+variable "db_subnet_nsg_name" {
   default = ""
 }
 
-variable "sap_db_subnet_nsg_arm_id" {
+variable "db_subnet_nsg_arm_id" {
   default = ""
 }
 
 /* app subnet information */
 
-variable "sap_app_subnet_name" {
+variable "app_subnet_name" {
   default = ""
 }
 
-variable "sap_app_subnet_arm_id" {
+variable "app_subnet_arm_id" {
   default = ""
 }
 
-variable "sap_app_subnet_address_prefix" {
+variable "app_subnet_address_prefix" {
   default = ""
 }
 
-variable "sap_app_subnet_nsg_name" {
+variable "app_subnet_nsg_name" {
   default = ""
 }
 
-variable "sap_app_subnet_nsg_arm_id" {
+variable "app_subnet_nsg_arm_id" {
   default = ""
 }
 
 /* web subnet information */
 
-variable "sap_web_subnet_name" {
+variable "web_subnet_name" {
   default = ""
 }
 
-variable "sap_web_subnet_arm_id" {
+variable "web_subnet_arm_id" {
   default = ""
 }
 
-variable "sap_web_subnet_address_prefix" {
+variable "web_subnet_address_prefix" {
   default = ""
 }
 
-variable "sap_web_subnet_nsg_name" {
+variable "web_subnet_nsg_name" {
   default = ""
 }
 
-variable "sap_web_subnet_nsg_arm_id" {
+variable "web_subnet_nsg_arm_id" {
   default = ""
 }
 
 /* iscsi subnet information */
 
-variable "sap_iscsi_subnet_name" {
+variable "iscsi_subnet_name" {
   default = ""
 }
 
-variable "sap_iscsi_subnet_arm_id" {
+variable "iscsi_subnet_arm_id" {
   default = ""
 }
 
-variable "sap_iscsi_subnet_address_prefix" {
+variable "iscsi_subnet_address_prefix" {
   default = ""
 }
 
-variable "sap_iscsi_subnet_nsg_name" {
+variable "iscsi_subnet_nsg_name" {
   default = ""
 }
 
-variable "sap_iscsi_subnet_nsg_arm_id" {
+variable "iscsi_subnet_nsg_arm_id" {
   default = ""
 }
 

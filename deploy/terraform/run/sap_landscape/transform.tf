@@ -104,12 +104,12 @@ locals {
   )
 
   subnet_iscsi = merge((
-    { "name" = try(coalesce(var.sap_iscsi_subnet_name, try(var.infrastructure.vnets.sap.subnet_iscsi.name, "")), "") }), (
-    { "arm_id" = try(coalesce(var.sap_iscsi_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")), "") }), (
-    { "prefix" = try(coalesce(var.sap_iscsi_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")), "") }), (
+    { "name" = try(coalesce(var.iscsi_subnet_name, try(var.infrastructure.vnets.sap.subnet_iscsi.name, "")), "") }), (
+    { "arm_id" = try(coalesce(var.iscsi_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")), "") }), (
+    { "prefix" = try(coalesce(var.iscsi_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")), "") }), (
     local.subnet_web_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.sap_iscsi_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.sap_iscsi_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, "")), "")
+      "name"   = try(coalesce(var.iscsi_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")), "")
+      "arm_id" = try(coalesce(var.iscsi_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, "")), "")
       }
     }) : null
     )
