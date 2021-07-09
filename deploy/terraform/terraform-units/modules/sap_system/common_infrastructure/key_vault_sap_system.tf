@@ -29,7 +29,7 @@ data "azurerm_key_vault_secret" "sid_password" {
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
   provider                   = azurerm.main
-  count                      = local.enable_sid_deployment && local.use_local_credentials == 0 ? 1 : 0
+  count                      = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
