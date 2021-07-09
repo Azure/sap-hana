@@ -38,19 +38,11 @@ resource "azurerm_subnet" "admin" {
 resource "azurerm_subnet_route_table_association" "admin" {
   provider       = azurerm.main
   count          = !local.sub_admin_exists && local.enable_admin_subnet && length(local.route_table_id) > 0 ? 1 : 0
-  subnet_id      = local.sub_admin_exists ? data.azurerm_subnet.admin[0].id : azurerm_subnet.admin[0].id
+  subnet_id      = local.sub_admin_exists ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id
   route_table_id = local.route_table_id
 }
 
 
-// Imports data of exists SAP admin subnet
-data "azurerm_subnet" "admin" {
-  provider             = azurerm.main
-  count                = local.sub_admin_exists ? 1 : 0
-  name                 = split("/", local.sub_admin_arm_id)[10]
-  resource_group_name  = split("/", local.sub_admin_arm_id)[4]
-  virtual_network_name = split("/", local.sub_admin_arm_id)[8]
-}
 
 // Creates db subnet of SAP VNET
 resource "azurerm_subnet" "db" {
@@ -65,17 +57,8 @@ resource "azurerm_subnet" "db" {
 resource "azurerm_subnet_route_table_association" "db" {
   provider       = azurerm.main
   count          = !local.sub_db_exists && local.enable_db_deployment && length(local.route_table_id) > 0 ? 1 : 0
-  subnet_id      = local.sub_db_exists ? data.azurerm_subnet.db[0].id : azurerm_subnet.db[0].id
+  subnet_id      = local.sub_db_exists ? local.sub_db_arm_id: azurerm_subnet.db[0].id
   route_table_id = local.route_table_id
-}
-
-// Imports data of exists db subnet
-data "azurerm_subnet" "db" {
-  provider             = azurerm.main
-  count                = local.sub_db_exists ? 1 : 0
-  name                 = split("/", local.sub_db_arm_id)[10]
-  resource_group_name  = split("/", local.sub_db_arm_id)[4]
-  virtual_network_name = split("/", local.sub_db_arm_id)[8]
 }
 
 // Scale out on ANF
