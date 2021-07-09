@@ -114,30 +114,43 @@ resource "azurerm_subnet_network_security_group_association" "web" {
 #Associate the subnets to the route table
 
 resource "azurerm_subnet_route_table_association" "admin" {
+    depends_on = [
+    azurerm_route_table.rt
+  ]
+
   provider       = azurerm.main
   count          = local.sub_admin_defined && !local.sub_admin_existing ? 1 : 0
   subnet_id      = local.sub_admin_existing ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id
-  route_table_id = azurerm_route_table.rt[0].name
+  route_table_id = azurerm_route_table.rt[0].id
 }
 
 resource "azurerm_subnet_route_table_association" "db" {
+  depends_on = [
+    azurerm_route_table.rt
+  ]
   provider       = azurerm.main
   count          = local.sub_db_defined && !local.sub_db_existing ? 1 : 0
   subnet_id      = local.sub_db_existing ? local.sub_db_arm_id : azurerm_subnet.db[0].id
-  route_table_id = azurerm_route_table.rt[0].name
+  route_table_id = azurerm_route_table.rt[0].id
 }
 
 resource "azurerm_subnet_route_table_association" "app" {
+  depends_on = [
+    azurerm_route_table.rt
+  ]
   provider       = azurerm.main
   count          = local.sub_app_defined && !local.sub_app_existing ? 1 : 0
   subnet_id      = local.sub_app_existing ? local.sub_app_arm_id : azurerm_subnet.app[0].id
-  route_table_id = azurerm_route_table.rt[0].name
+  route_table_id = azurerm_route_table.rt[0].id
 }
 
 resource "azurerm_subnet_route_table_association" "web" {
+  depends_on = [
+    azurerm_route_table.rt
+  ]
   provider       = azurerm.main
   count          = local.sub_web_defined && !local.sub_web_existing ? 1 : 0
   subnet_id      = local.sub_web_existing ? local.sub_web_arm_id : azurerm_subnet.web[0].id
-  route_table_id = azurerm_route_table.rt[0].name
+  route_table_id = azurerm_route_table.rt[0].id
 }
 
