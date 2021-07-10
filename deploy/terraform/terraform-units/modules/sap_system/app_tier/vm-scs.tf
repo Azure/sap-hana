@@ -257,7 +257,7 @@ resource "azurerm_managed_disk" "scs" {
 
 resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
   provider        = azurerm.main
-  count           = 0# local.enable_deployment ? length(local.scs_data_disks) : 0
+  count           = local.enable_deployment ? length(local.scs_data_disks) : 0
   managed_disk_id = azurerm_managed_disk.scs[count.index].id
   virtual_machine_id = upper(local.scs_ostype) == "LINUX" ? (
     azurerm_linux_virtual_machine.scs[local.scs_data_disks[count.index].vm_index].id) : (
