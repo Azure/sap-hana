@@ -19,7 +19,7 @@ locals {
           arm_id = try(coalesce(var.management_subnet_arm_id, try(var.infrastructure.vnets.management.subnet_mgmt.arm_id, "")), "")
           prefix = try(coalesce(var.management_subnet_address_prefix, try(var.infrastructure.vnets.management.subnet_mgmt.prefix, "")), "")
           nsg = {
-            name        = try(coalesce(var.deployer_sub_mgmt_nsg_name, try(var.infrastructure.vnets.management.nsg_mgmt.name, "")), "")
+            name        = try(coalesce(var.management_subnet_nsg_name, try(var.infrastructure.vnets.management.nsg_mgmt.name, "")), "")
             arm_id      = try(coalesce(var.management_subnet_nsg_arm_id, try(var.infrastructure.vnets.management.nsg_mgmt.arm_id, "")), "")
             allowed_ips = try(coalesce(var.management_subnet_nsg_allowed_ips, try(var.management_subnet_nsg_arm_id, "")), [])
           }

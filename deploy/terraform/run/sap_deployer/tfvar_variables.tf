@@ -66,7 +66,7 @@ variable "management_firewall_subnet_address_prefix" {
   default = ""
 }
 
-variable "deployer_sub_mgmt_nsg_name" {
+variable "management_subnet_nsg_name" {
   default = ""
 }
 
@@ -173,12 +173,12 @@ This block describes the variables for the options section block in the json fil
 */
 
 variable "enable_deployer_public_ip" {
-  default = null
+  default = false
 }
 
 variable "firewall_deployment" {
   description = "Boolean flag indicating if an Azure Firewall should be deployed"
-  default = null
+  default = false
 }
 
 variable "firewall_rule_subnets" {
@@ -193,5 +193,5 @@ variable "firewall_allowed_ipaddresses" {
 
 
 variable "deployer_assign_subscription_permissions" {
-  default = null
+  default = false
 }
