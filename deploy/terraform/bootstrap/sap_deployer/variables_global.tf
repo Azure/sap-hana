@@ -73,19 +73,7 @@ variable "authentication" {
     path_to_private_key = ""
 
   }
-
-  validation {
-    condition = (
-      length(var.authentication) >= 1
-    )
-    error_message = "Either ssh keys or user credentials must be specified."
-  }
-  validation {
-    condition = (
-      length(trimspace(var.authentication.username)) != 0
-    )
-    error_message = "The default username for the Virtual machines must be specified."
-  }
+  
 }
 
 variable "key_vault" {
