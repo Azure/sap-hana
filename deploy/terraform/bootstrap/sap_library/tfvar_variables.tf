@@ -10,12 +10,13 @@ variable "environment" {
   default     = ""
 }
 
-variable "location" {
+
+variable "codename" {
   type    = string
   default = ""
 }
 
-variable "codename" {
+variable "location" {
   type    = string
   default = ""
 }
@@ -94,22 +95,22 @@ variable "library_sapmedia_account_kind" {
 }
 
 variable "library_sapmedia_file_share_enable_deployment" {
-  default = null
+  default = true
 }
 
 variable "library_sapmedia_file_share_is_existing" {
-  default = null
+  default = false
 }
 
 variable "library_sapmedia_file_share_name" {
   default = "sapbits"
 }
 variable "library_sapmedia_blob_container_enable_deployment" {
-  default = null
+  default = true
 }
 
 variable "library_sapmedia_blob_container_is_existing" {
-  default = null
+  default = false
 }
 
 variable "library_sapmedia_blob_container_name" {

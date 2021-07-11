@@ -23,31 +23,31 @@ locals {
   }
   storage_account_sapbits = {
     arm_id                   = try(coalesce(var.library_sapmedia_arm_id, try(var.storage_account_sapbits.arm_id, "")), "")
-    account_tier             = coalesce(var.library_sapmedia_account_tier, var.storage_account_sapbits.account_tier)
-    account_replication_type = coalesce(var.library_sapmedia_account_replication_type, var.storage_account_sapbits.account_replication_type)
-    account_kind             = coalesce(var.library_sapmedia_account_kind, var.storage_account_sapbits.account_kind)
+    account_tier             = coalesce(var.library_sapmedia_account_tier, try(var.storage_account_sapbits.account_tier, ""))
+    account_replication_type = coalesce(var.library_sapmedia_account_replication_type, try(var.storage_account_sapbits.account_replication_type, ""))
+    account_kind             = coalesce(var.library_sapmedia_account_kind, try(var.storage_account_sapbits.account_kind, ""))
     file_share = {
-      enable_deployment = coalesce(var.library_sapmedia_file_share_enable_deployment, try(var.storage_account_sapbits.file_share.enable_deployment, true))
-      is_existing       = coalesce(var.library_sapmedia_file_share_is_existing, try(var.storage_account_sapbits.file_share.is_existing, false))
-      name              = coalesce(var.library_sapmedia_file_share_name, try(var.storage_account_sapbits.file_share.name,"sapbits"))
+      enable_deployment = var.library_sapmedia_file_share_enable_deployment || try(var.storage_account_sapbits.file_share.enable_deployment, true)
+      is_existing       = var.library_sapmedia_file_share_is_existing && try(var.storage_account_sapbits.file_share.is_existing, false)
+      name              = coalesce(var.library_sapmedia_file_share_name, try(var.storage_account_sapbits.file_share.name, "sapbits"))
     }
     sapbits_blob_container = {
-      enable_deployment = coalesce(var.library_sapmedia_blob_container_enable_deployment, try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, true))
-      is_existing       = coalesce(var.library_sapmedia_blob_container_is_existing, try(var.storage_account_sapbits.sapbits_blob_container.is_existing, false))
+      enable_deployment = var.library_sapmedia_blob_container_enable_deployment || try(var.storage_account_sapbits.sapbits_blob_container.enable_deployment, true)
+      is_existing       = var.library_sapmedia_blob_container_is_existing && try(var.storage_account_sapbits.sapbits_blob_container.is_existing, false)
       name              = coalesce(var.library_sapmedia_blob_container_name, try(var.storage_account_sapbits.sapbits_blob_container.name, "sapbits"))
     }
   }
   storage_account_tfstate = {
     arm_id                   = try(coalesce(var.library_terraform_state_arm_id, try(var.storage_account_tfstate.arm_id, "")), "")
-    account_tier             = coalesce(var.library_terraform_state_account_tier, var.storage_account_tfstate.account_tier)
-    account_replication_type = coalesce(var.library_terraform_state_account_replication_type, var.storage_account_tfstate.account_replication_type)
-    account_kind             = coalesce(var.library_terraform_state_account_kind, var.storage_account_tfstate.account_kind)
+    account_tier             = coalesce(var.library_terraform_state_account_tier, try(var.storage_account_tfstate.account_tier, ""))
+    account_replication_type = coalesce(var.library_terraform_state_account_replication_type, try(var.storage_account_tfstate.account_replication_type, ""))
+    account_kind             = coalesce(var.library_terraform_state_account_kind, try(var.storage_account_tfstate.account_kind, ""))
     tfstate_blob_container = {
-      is_existing = coalesce(var.library_terraform_state_blob_container_is_existing, try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false))
+      is_existing = var.library_terraform_state_blob_container_is_existing && try(var.storage_account_tfstate.tfstate_blob_container.is_existing, false)
       name        = coalesce(var.library_terraform_state_blob_container_name, try(var.storage_account_tfstate.tfstate_blob_container.name, "tfstate"))
     }
     ansible_blob_container = {
-      is_existing = coalesce(var.library_ansible_blob_container_is_existing, try(var.storage_account_tfstate.ansible_blob_container.is_existing, false))
+      is_existing = var.library_ansible_blob_container_is_existing && try(var.storage_account_tfstate.ansible_blob_container.is_existing, false)
       name        = coalesce(var.library_ansible_blob_container_name, try(var.storage_account_tfstate.ansible_blob_container.name, "ansible"))
     }
   }
