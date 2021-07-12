@@ -33,21 +33,23 @@ module "common_infrastructure" {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
-  is_single_node_hana        = "true"
-  application                = local.application
-  databases                  = local.databases
-  infrastructure             = local.infrastructure
-  options                    = local.options
-  key_vault                  = local.key_vault
-  naming                     = module.sap_namegenerator.naming
-  service_principal          = local.use_spn ? local.service_principal : local.account
-  deployer_tfstate           = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  custom_disk_sizes_filename = var.db_disk_sizes_filename
-  authentication             = local.authentication
-  terraform_template_version = var.terraform_template_version
-  deployment                 = var.deployment
-  license_type               = var.license_type
+  is_single_node_hana                = "true"
+  application                        = local.application
+  databases                          = local.databases
+  infrastructure                     = local.infrastructure
+  options                            = local.options
+  key_vault                          = local.key_vault
+  naming                             = module.sap_namegenerator.naming
+  service_principal                  = local.use_spn ? local.service_principal : local.account
+  deployer_tfstate                   = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
+  landscape_tfstate                  = data.terraform_remote_state.landscape.outputs
+  custom_disk_sizes_filename         = var.db_disk_sizes_filename
+  authentication                     = local.authentication
+  terraform_template_version         = var.terraform_template_version
+  deployment                         = var.deployment
+  license_type                       = var.license_type
+  enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
+
 
 }
 

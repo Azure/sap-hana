@@ -19,6 +19,11 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "enable_purge_control_for_keyvaults" {
+  description = "Allow the deployment to control the purge protection"
+}
+
+
 locals {
   // Resources naming
   storageaccount_name         = var.naming.storageaccount_names.VNET.landscape_storageaccount_name

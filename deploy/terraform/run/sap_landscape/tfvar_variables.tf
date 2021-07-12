@@ -236,3 +236,7 @@ variable "diagnostics_storage_account_arm_id" {
 variable "witness_storage_account_arm_id" {
   default = ""
 }
+
+variable "enable_purge_control_for_keyvaults" {
+  default = true
+}
