@@ -25,7 +25,10 @@ data "azurerm_resource_group" "library" {
 
 
 resource "azurerm_private_dns_zone" "dns" {
+  depends_on = [
+    azurerm_resource_group.library
+  ]
   count               = length(var.dns_label) > 0 ? 1 : 0
   name                = var.dns_label
-  resource_group_name = local.rg_name
+  resource_group_name = local.rg_exists ? split("/", local.rg_arm_id)[4] : azurerm_resource_group.library[0].name
 }
