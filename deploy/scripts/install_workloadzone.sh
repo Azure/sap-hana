@@ -139,6 +139,8 @@ workload_file_parametername=$(basename "${parameterfile}")
 
 param_dirname=$(dirname "${parameterfile}")
 
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+
 if [ $param_dirname != '.' ]; then
     echo ""
     echo "#########################################################################################"
@@ -161,7 +163,6 @@ then
     exit
 fi
 
-
 ext=$(echo ${workload_file_parametername} | cut -d. -f2)
 
 # Helper variables
@@ -169,7 +170,6 @@ if [ "${ext}" == json ]; then
     environment=$(jq --raw-output .infrastructure.environment "${parameterfile}")
     region=$(jq --raw-output .infrastructure.region "${parameterfile}")
 else
-
     load_config_vars "${param_dirname}"/"${parameterfile}" "environment"
     load_config_vars "${param_dirname}"/"${parameterfile}" "location"
     region=$(echo ${location} | xargs)
@@ -215,18 +215,7 @@ then
     then
         rm $workload_config_information
     fi
-    if [ -d ./.terraform/ ]; then
-        rm .terraform -r
-    fi
-    
-    if [ -f terraform.tfstate ]; then
-        rm terraform.tfstate
-    fi
-    
-    if [ -f terraform.tfstate.backup ]; then
-        rm terraform.tfstate.backup
-    fi
-    
+    rm -Rf .terraform terraform.tfstate*
 fi
 
 #Plugins
@@ -234,8 +223,6 @@ if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
     mkdir "$HOME/.terraform.d/plugin-cache"
 fi
-export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
-
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 
@@ -282,6 +269,14 @@ load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
 load_config_vars "${workload_config_information}" "keyvault"
 load_config_vars "${workload_config_information}" "deployer_tfstate_key"
 
+if [ ! -z "${tfstate_resource_id}" ]
+then
+  REMOTE_STATE_RG=$(echo $tfstate_resource_id | cut -d / -f5)
+  REMOTE_STATE_SA=$(echo $tfstate_resource_id | cut -d / -f9)
+  STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d / -f3)
+fi
+
+
 # Checking for valid az session
 az account show > stdout.az 2>&1
 temp=$(grep "az login" stdout.az)
@@ -308,6 +303,13 @@ account_set=0
 
 if [ ! -z "${STATE_SUBSCRIPTION}" ]
 then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo "#                   Changing the subscription to: $STATE_SUBSCRIPTION                   #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
     $(az account set --sub "${STATE_SUBSCRIPTION}")
     account_set=1
 fi
@@ -322,26 +324,35 @@ then
     fi
     
     deployer_config_information="${automation_config_directory}""${deployer_environment}""${region}"
-    load_config_vars "${deployer_config_information}" "keyvault"
-    load_config_vars "${deployer_config_information}" "REMOTE_STATE_RG"
-    load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
-    load_config_vars "${deployer_config_information}" "tfstate_resource_id"
-    load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
+    if [ -f $deployer_config_information ]
+    then
+        load_config_vars "${deployer_config_information}" "keyvault"
+        load_config_vars "${deployer_config_information}" "REMOTE_STATE_RG"
+        load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
+        load_config_vars "${deployer_config_information}" "tfstate_resource_id"
+        load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
+    fi
 
-    if [ -z $STATE_SUBSCRIPTION]
+    if [ -z "${STATE_SUBSCRIPTION}" ]
     then
         # Retain post processing in case tfstate_resource_id was set by earlier
         # version of script tools.
         STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
     fi
-
     
     if [ -z $REMOTE_STATE_RG ]
     then
-        get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
-        load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
-        load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
         load_config_vars "${workload_config_information}" "tfstate_resource_id"
+        if [ ! -z "${tfstate_resource_id}" ]
+        then
+            REMOTE_STATE_RG=$(echo $tfstate_resource_id | cut -d / -f5)
+            REMOTE_STATE_SA=$(echo $tfstate_resource_id | cut -d / -f9)
+            STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d / -f3)
+        else
+            get_and_store_sa_details ${REMOTE_STATE_SA} "${workload_config_information}"
+            load_config_vars "${workload_config_information}" "STATE_SUBSCRIPTION"
+            load_config_vars "${workload_config_information}" "REMOTE_STATE_RG"
+        fi
 
     fi
     
