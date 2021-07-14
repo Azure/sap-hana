@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     }
   }
 
-  custom_data = var.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   dynamic "os_disk" {
     iterator = disk

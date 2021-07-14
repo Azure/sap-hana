@@ -22,8 +22,8 @@ locals {
   resource_group_defined = (length(local.resource_group.name) + length(local.resource_group.arm_id)) > 0
 
   ppg = {
-    arm_ids = try(coalesce(var.proximityplacementgroup_arm_ids, try(var.infrastructure.ppg.arm_ids, [])), [])
-    names   = try(coalesce(var.proximityplacementgroup_names, try(var.infrastructure.ppg.names, [])), [])
+    arm_ids = distinct(concat(var.proximityplacementgroup_arm_ids, try(var.infrastructure.ppg.arm_ids, [])))
+    names   = distinct(concat(var.proximityplacementgroup_names, try(var.infrastructure.ppg.names, [])))
   }
 
   ppg_defined = (length(local.ppg.names) + length(local.ppg.arm_ids)) > 0
@@ -59,7 +59,7 @@ locals {
         type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
         username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
       }
-      avset_arm_ids = try(coalesce(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])), [])
+      avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
 
       use_ANF = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
 
@@ -147,7 +147,7 @@ locals {
       type     = try(coalesce(var.anchor_vm_authentication_type, try(var.infrastructure.anchor_vms.authentication.type, "key")), "key")
       username = try(coalesce(var.anchor_vm_authentication_username, try(var.authentication.username, "azureadm")), "azureadm")
     }
-    nic_ips = try(coalesce(var.anchor_vm_nic_ips, try(var.infrastructure.anchor_vms.nic_ips, [])), [])
+    nic_ips = distinct(concat(var.anchor_vm_nic_ips, try(var.infrastructure.anchor_vms.nic_ips, [])))
     }
     ) : (
     null
@@ -224,7 +224,7 @@ locals {
     { "vnets" = local.temp_vnet }
   )
 
-  db_zones_temp = try(coalesce(var.database_vm_zones, try(var.databases[0].zones, [])), [])
+  db_zones_temp = distinct(concat(var.database_vm_zones, try(var.databases[0].zones, [])))
 
   databases = [merge(local.databases_temp[0], (
     local.db_os_specified ? { "os" = local.db_os } : null), (
@@ -270,18 +270,18 @@ locals {
   disk_encryption_set_id      = try(coalesce(var.vm_disk_encryption_set_id, try(var.options.disk_encryption_set_id, null)), null)
   options                     = merge(local.options_temp, (local.disk_encryption_set_defined ? { "disk_encryption_set_id" = local.disk_encryption_set_id } : null))
 
-  app_zones_temp = try(coalesce(var.application_server_zones, try(var.application.app_zones, [])), [])
-  scs_zones_temp = try(coalesce(var.scs_server_zones, try(var.application.scs_zones, [])), [])
-  web_zones_temp = try(coalesce(var.webdispatcher_server_zones, try(var.application.web_zones, [])), [])
+  app_zones_temp = distinct(concat(var.application_server_zones, try(var.application.app_zones, [])))
+  scs_zones_temp = distinct(concat(var.scs_server_zones, try(var.application.scs_zones, [])))
+  web_zones_temp = distinct(concat(var.webdispatcher_server_zones, try(var.application.web_zones, [])))
 
-  app_nic_ips       = try(coalesce(var.application_server_app_nic_ips, try(var.application.app_nic_ips, [])), [])
-  app_admin_nic_ips = try(coalesce(var.application_server_admin_nic_ips, try(var.application.app_admin_nic_ips, [])), [])
-  scs_nic_ips       = try(coalesce(var.scs_server_app_nic_ips, try(var.application.scs_nic_ips, [])), [])
-  scs_admin_nic_ips = try(coalesce(var.scs_server_admin_nic_ips, try(var.application.scs_admin_nic_ips, [])), [])
-  scs_lb_ips        = try(coalesce(var.scs_server_loadbalancer_ips, try(var.application.scs_lb_ips, [])), [])
-  web_nic_ips       = try(coalesce(var.webdispatcher_server_app_nic_ips, try(var.application.web_nic_ips, [])), [])
-  web_admin_nic_ips = try(coalesce(var.webdispatcher_server_admin_nic_ips, try(var.application.web_admin_nic_ips, [])), [])
-  web_lb_ips        = try(coalesce(var.webdispatcher_server_loadbalancer_ips, try(var.application.web_lb_ips, [])), [])
+  app_nic_ips       = distinct(concat(var.application_server_app_nic_ips, try(var.application.app_nic_ips, [])))
+  app_admin_nic_ips = distinct(concat(var.application_server_admin_nic_ips, try(var.application.app_admin_nic_ips, [])))
+  scs_nic_ips       = distinct(concat(var.scs_server_app_nic_ips, try(var.application.scs_nic_ips, [])))
+  scs_admin_nic_ips = distinct(concat(var.scs_server_admin_nic_ips, try(var.application.scs_admin_nic_ips, [])))
+  scs_lb_ips        = distinct(concat(var.scs_server_loadbalancer_ips, try(var.application.scs_lb_ips, [])))
+  web_nic_ips       = distinct(concat(var.webdispatcher_server_app_nic_ips, try(var.application.web_nic_ips, [])))
+  web_admin_nic_ips = distinct(concat(var.webdispatcher_server_admin_nic_ips, try(var.application.web_admin_nic_ips, [])))
+  web_lb_ips        = distinct(concat(var.webdispatcher_server_loadbalancer_ips, try(var.application.web_lb_ips, [])))
 
   app_tags = try(coalesce(var.application_server_tags, try(var.application.app_tags, {})), {})
   scs_tags = try(coalesce(var.scs_server_tags, try(var.application.scs_tags, {})), {})
