@@ -63,7 +63,7 @@ locals {
 
       use_ANF  = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
       no_ppg   = var.database_no_ppg || try(var.databases[0].no_ppg, false)
-      no_avset = var.database_no_avset || try(var.databases[0].np_avset, false)
+      no_avset = var.database_no_avset || try(var.databases[0].no_avset, false)
 
     }
   ]
