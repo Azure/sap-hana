@@ -47,8 +47,7 @@ locals {
 
   dbnodes = try(compact(var.database_vm_nodes, var.databases[0].dbnodes), {})
 
-  databases_temp = [
-    {
+  databases_temp =  {
       high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
       use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
 
@@ -66,7 +65,7 @@ locals {
       no_avset = var.database_no_avset || try(var.databases[0].no_avset, false)
 
     }
-  ]
+  
 
   db_os = {
     os_type         = try(coalesce(var.database_vm_image.os_type, try(var.databases[0].os.os_type, "")), "LINUX")
