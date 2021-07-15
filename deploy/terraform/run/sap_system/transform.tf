@@ -302,8 +302,8 @@ locals {
 
   application = merge(local.application_temp, (
     local.app_os_specified ? { "app_os" = local.app_os } : null), (
-    local.scs_os_specified ? { "scs_os" = local.scs_os } : null), (
-    local.web_os_specified ? { "web_os" = local.web_os } : null), (
+    local.scs_os_specified ? { "scs_os" = local.scs_os } : (local.app_os_specified ? { "scs_os" = local.app_os } : null)), (
+    local.web_os_specified ? { "web_os" = local.web_os } : (local.app_os_specified ? { "web_os" = local.app_os } : null)), (
     length(local.app_zones_temp) > 0 ? { "app_zones" = local.app_zones_temp } : null), (
     length(local.scs_zones_temp) > 0 ? { "scs_zones" = local.scs_zones_temp } : null), (
     length(local.web_zones_temp) > 0 ? { "web_zones" = local.web_zones_temp } : null), (
