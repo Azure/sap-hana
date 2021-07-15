@@ -271,6 +271,10 @@ variable "database_no_avset" {
   default = false
 }
 
+variable "database_dual_nics" {
+  default = false
+}
+
 variable "database_no_ppg" {
   default = false
 }
