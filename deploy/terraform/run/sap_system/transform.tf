@@ -47,7 +47,7 @@ locals {
 
   dbnodes = try(compact(var.database_vm_nodes, var.databases[0].dbnodes), {})
 
-  databases_temp = [{
+  databases_temp = {
       high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
       use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
 
@@ -65,7 +65,7 @@ locals {
       no_ppg   = var.database_no_ppg || try(var.databases[0].no_ppg, false)
       no_avset = var.database_no_avset || try(var.databases[0].no_avset, false)
 
-    }]
+    }
   
 
   db_os = {
@@ -239,7 +239,7 @@ locals {
 
   db_zones_temp = distinct(concat(var.database_vm_zones, try(var.databases[0].zones, [])))
 
-  databases = [merge(local.databases_temp[0], (
+  databases = [merge(local.databases_temp, (
     local.db_os_specified ? { "os" = local.db_os } : null), (
     length(local.dbnodes) > 0 ? { "dbnodes" = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { "zones" = local.db_zones_temp } : null
