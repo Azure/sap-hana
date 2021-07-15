@@ -319,10 +319,5 @@ locals {
     length(local.scs_tags) > 0 ? { "scs_tags" = local.scs_tags } : null), (
     length(local.web_tags) > 0 ? { "web_tags" = local.web_tags } : null
     )
-
   )
-
-
-
-
 }
