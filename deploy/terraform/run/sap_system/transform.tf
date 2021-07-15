@@ -127,7 +127,7 @@ locals {
     app_no_avset             = var.application_server_no_avset || try(var.application.app_no_avset, false)
 
     scs_server_count      = max(var.scs_server_count, try(var.application.scs_server_count, 1))
-    scs_high_availability = try(coalesce(var.scs_high_availability, try(var.application.scs_high_availability, false)), false)
+    scs_high_availability = var.scs_high_availability || try(var.application.scs_high_availability, false)
     scs_instance_number   = try(coalesce(var.scs_instance_number, var.application.scs_instance_number), "01")
     ers_instance_number   = try(coalesce(var.ers_instance_number, var.application.ers_instance_number), "02")
 
