@@ -257,7 +257,7 @@ locals {
   diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
   # scs_high_availability:         ${scs_ha}
   # db_high_availability:          ${db_ha}
-  parameters = format("sap_sid:               %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+  parameters = format("sap_sid:               %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s\nscs_lb_ip:             %s\ndb_lb_ip:              %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha, var.scs_lb_ip, var.db_lb_ip)
 
   args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
   argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), format("---\nbom_base_name:\nsapbits_location_base_path:\nsap_fqdn:               %s\n...", local.dns_label))

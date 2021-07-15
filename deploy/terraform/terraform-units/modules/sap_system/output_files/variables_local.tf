@@ -125,6 +125,17 @@ variable "ansible_user" {
   default     = "azureadm"
 }
 
+variable "db_lb_ip" {
+  description = "DB Load Balancer IP"
+  default     = ""
+}
+
+variable "scs_lb_ip" {
+  description = "SCS Load Balancer IP"
+  default     = ""
+}
+
+
 
 locals {
 
