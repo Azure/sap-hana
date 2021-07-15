@@ -48,25 +48,25 @@ locals {
   dbnodes = try(compact(var.database_vm_nodes, var.databases[0].dbnodes), {})
 
   databases_temp = {
-      high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
-      use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
+    high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
+    use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
 
-      platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
-      size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
+    platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
+    size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
 
-      authentication = {
-        type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
-        username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
-      }
-      avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
-
-      use_ANF  = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
-      use_ANF  = var.database_dual_nics || try(var.databases[0].dual_nics, false)
-      no_ppg   = var.database_no_ppg || try(var.databases[0].no_ppg, false)
-      no_avset = var.database_no_avset || try(var.databases[0].no_avset, false)
-
+    authentication = {
+      type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
+      username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
     }
-  
+    avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
+
+    use_ANF   = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+    dual_nics = var.database_dual_nics || try(var.databases[0].dual_nics, false)
+    no_ppg    = var.database_no_ppg || try(var.databases[0].no_ppg, false)
+    no_avset  = var.database_no_avset || try(var.databases[0].no_avset, false)
+
+  }
+
 
   db_os = {
     os_type         = try(coalesce(var.database_vm_image.os_type, try(var.databases[0].os.os_type, "")), "LINUX")
