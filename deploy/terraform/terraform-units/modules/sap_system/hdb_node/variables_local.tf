@@ -117,7 +117,7 @@ locals {
   enable_deployment = (length(local.hdb_list) > 0) ? true : false
 
   // Filter the list of databases to only HANA platform entries
-  hdb = try(local.hdb_list[0], {})
+  hdb = var.databases[0]
 
   //ANF support
   use_ANF = try(local.hdb.use_ANF, false)

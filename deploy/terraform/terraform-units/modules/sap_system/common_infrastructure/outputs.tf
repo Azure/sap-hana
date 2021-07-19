@@ -28,11 +28,11 @@ output "ppg" {
 
 
 output "admin_subnet" {
-  value = local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0]
+  value = local.sub_admin_exists ? local.sub_admin_arm_id : azurerm_subnet.admin[0]
 }
 
 output "db_subnet" {
-  value = local.sub_db_exists ? data.azurerm_subnet.db[0] : azurerm_subnet.db[0] 
+  value = local.sub_db_exists ? local.sub_db_arm_id : azurerm_subnet.db[0] 
 }
 
 output "sid_kv_user_id" {

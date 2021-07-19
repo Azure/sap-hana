@@ -160,7 +160,7 @@ module "output_files" {
   databases             = local.databases
   infrastructure        = local.infrastructure
   authentication        = local.authentication
-  authentication_type   = local.application.authentication.type
+  authentication_type   = try(local.application.authentication.type, "key")
   iscsi_private_ip      = module.common_infrastructure.iscsi_private_ip
   nics_dbnodes_admin    = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db       = module.hdb_node.nics_dbnodes_db

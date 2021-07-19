@@ -117,12 +117,12 @@ locals {
       upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
   ])[0]), 2)
 
+  anydb          = var.databases[0]
+
   // Support dynamic addressing
   use_DHCP = try(local.anydb.use_DHCP, false)
 
-  anydb          = try(local.anydb_databases[0], {})
   anydb_platform = try(local.anydb.platform, "NONE")
-  anydb_version  = try(local.anydb.db_version, "")
 
   // Dual network cards
   anydb_dual_nics = try(local.anydb.dual_nics, false)
@@ -227,7 +227,6 @@ locals {
   // Update database information with defaults
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
-    { db_version = local.anydb_version },
     { size = local.anydb_size },
     { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
     { high_availability = local.anydb_ha },
