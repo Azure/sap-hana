@@ -29,7 +29,7 @@
 
 ## Notes
 
-- For the workshop the *default* naming convention is referenced and used. For the **Deployer** there are three fields.
+- For the workshop the *default* naming convention is referenced and used. For the **Landscape** there are three fields.
   - `<ENV>`-`<REGION>`-`<SAP_VNET>`-INFRASTRUCTURE
 
     | Field        | Legnth   | Value  |
@@ -62,54 +62,41 @@
     ```
     <br/>
 
-2. Create *backend* parameter file.
+
+2. Create input parameter 
     <br/>*`Observe Naming Convention`*<br/>
     ```bash
-    cat <<EOF > backend
-    resource_group_name   = "NP-EUS2-SAP_LIBRARY"
-    storage_account_name  = "<tfstate_storage_account_name>"
-    container_name        = "tfstate"
-    key                   = "NP-EUS2-SAP00-INFRASTRUCTURE.terraform.tfstate"
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LANDSCAPE/DEMO-SCUS-SAP00-INFRASTRUCTURE; cd $_
+
+    cat <<EOF > DEMO-SCUS-SAP00-INFRASTRUCTURE.json
+    {
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "southcentralus",
+        "vnets": {
+          "sap": {
+            "name"                            : "SAP00",
+            "address_space"                   : "10.1.0.0/16"
+          }
+        }
+      }
+    }
     EOF
     ```
-    |                      |           |
-    | -------------------- | --------- |
-    | resource_group_name  | The name of the Resource Group where the TFSTATE Storage Account is located. |
-    | storage_account_name | The name of the Storage Account that was deployed durring the SAP_LIBRARY deployment, used used for the TFSTATE files. |
-    | key                  | A composit of the `SAP Workload VNET` Resource Group name and the `.terraform.tfstate` extension. |
     <br/>
 
-3. Create input parameter [JSON](templates/NP-EUS2-SAP00-INFRASTRUCTURE.json)
-    <br/>*`Observe Naming Convention`*<br/>
-    ```bash
-    vi NP-EUS2-SAP00-INFRASTRUCTURE.json
-    ```
-    <br/>
-
-4. Terraform
-    1. Initialization
-       ```bash
-       terraform init  --backend-config backend                                        \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-
-    2. Plan
-       <br/>*`Observe Naming Convention`*<br/>
-       ```bash
-       terraform plan  --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-
-    3. Apply
-       <br/>*`Observe Naming Convention`*<br/>
-       ```bash
-       terraform apply --auto-approve                                                  \
-                       --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                     \
-                       ../../../sap-hana/deploy/terraform/run/sap_landscape/
-       ```
-       <br/>
+3. Deployment
+    <br/>*`User the deployment data from the previous step for storageaccountname and vault. `*<br/>
+     ```bash
+     $DEPLOYMENT_REPO_PATH/deploy/scripts/install_workloadzone.sh            \
+     --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json                     \
+     --deployer_tfstate_key DEMO-SCUS-DEP00-INFRASTRUCTURE.terraform.tfstate \
+     --storageaccountname demoscustfstate###                                 \
+     --deployer_environment DEMO                                             \
+     --vault DEMOSCUSDEP00user###                                            \
+     ```
 
 
 <br/><br/><br/><br/>
 
-# Next: [SAP Deployment Unit - SDU](06-sdu.md) <!-- omit in toc -->
+# Next: [SAP Deployment Unit - SDU](04-sdu.md) <!-- omit in toc -->

@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     }
   }
 
-  custom_data = var.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   dynamic "os_disk" {
     iterator = disk
@@ -230,11 +230,11 @@ resource "azurerm_managed_disk" "disks" {
   disk_mbps_read_write   = "UltraSSD_LRS" == local.anydb_disks[count.index].storage_account_type ? local.anydb_disks[count.index].disk_mbps_read_write : null
 
 
-  # zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
-  #   upper(local.anydb_ostype) == "LINUX" ? (
-  #     [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
-  #     [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
-  # )) : null
+  zones = !local.use_avset ? (
+    upper(local.anydb_ostype) == "LINUX" ? (
+      [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
+      [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
+  )) : null
 
 }
 

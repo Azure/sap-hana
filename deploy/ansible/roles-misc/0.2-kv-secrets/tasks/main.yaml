@@ -1,0 +1,171 @@
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                         Key Vault helpers                                  |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 0.2     - kv-secrets
+#
+# -------------------------------------+---------------------------------------8
+
+# -------------------------------------+---------------------------------------8
+#
+# <Comment Header>
+#
+# -------------------------------------+---------------------------------------8
+
+# ----------------------------------------
+# BEGIN
+# ----------------------------------------
+
+# ----------------------------------------
+# END
+# ----------------------------------------
+
+
+# -------------------------------------+---------------------------------------8
+#
+
+
+
+- name: "BoM Secrets: Retrieve S User details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name "S-Username"
+  changed_when: false
+  register: keyvault_secret_show_SUser
+  no_log: true
+  when:
+    - tier == "bom"
+
+
+- name: "BoM Secrets: Extract S User secret details"
+  set_fact:
+    SUser: >-
+      {{ (keyvault_secret_show_SUser.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "bom"
+
+- name: Show S User
+  debug:
+    var:                          SUser
+    verbosity:                    2  
+  when:
+    - tier == "bom"
+
+
+- name: "BoM Secrets: Retrieve S Password details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name "S-Password"
+  changed_when: false
+  register: keyvault_secret_show_SPassword
+  no_log: true  
+  when:
+    - tier == "bom"
+
+- name: "BoM Secrets: Extract S User Password secret details"
+  set_fact:
+    SPassword: >-
+      {{ (keyvault_secret_show_SPassword.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "bom"
+
+- name: "BoM Secrets: Retrieve Access Key details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name "sapbits-access-key"
+  changed_when: false
+  register: keyvault_secret_show_AccessKey
+  no_log: true
+  when:
+    - tier == "bom"
+
+- name: "BoM Secrets: Extract S User Password details"
+  set_fact:
+    sapbits_access_key: >-
+      {{ (keyvault_secret_show_AccessKey.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "bom"
+
+- name: "BoM Secrets: Retrieve Access Key details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name "sapbits-access-key"
+  changed_when: false
+  register: keyvault_secret_show_AccessKey
+  no_log: true
+  when:
+    - tier == "bom"
+
+- name: "BoM Secrets: Retrieve Fencing agent SPN ID details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name {{ fencing_spn_id }}
+  changed_when: false
+  register: keyvault_secret_show_fencing_spn_id
+  no_log: true
+  when:
+    - tier == "fencing"
+
+- name: "BoM Secrets: Extract Fencing agent SPN ID"
+  set_fact:
+    fencing_spn_id: >-
+      {{ (keyvault_secret_show_fencing_spn_id.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "fencing"
+
+- name: "BoM Secrets: Retrieve Fencing agent SPN PWD details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name {{ fencing_spn_pwd }}
+  changed_when: false
+  register: keyvault_secret_show_fencing_spn_pwd
+  no_log: true
+  when:
+    - tier == "fencing"
+
+- name: "BoM Secrets: Extract Fencing agent SPN PWD"
+  set_fact:
+    fencing_spn_pwd: >-
+      {{ (keyvault_secret_show_fencing_spn_pwd.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "fencing"
+
+- name: "BoM Secrets: Retrieve Fencing agent SPN Tenant details"
+  command: >-
+    az keyvault secret show
+      --vault-name {{ kv_uri }}
+      --name {{ fencing_spn_tenant }}
+  changed_when: false
+  register: keyvault_secret_show_fencing_spn_tenant
+  no_log: true
+  when:
+    - tier == "fencing"
+
+- name: "BoM Secrets: Extract Fencing agent SPN Tenant"
+  set_fact:
+    fencing_spn_id: >-
+      {{ (keyvault_secret_show_fencing_spn_tenant.stdout | from_json).value }}
+  no_log: true
+  when:
+    - tier == "fencing"
+
+
+...
+# /*---------------------------------------------------------------------------8
+# |                                   END                                     |
+# +------------------------------------4--------------------------------------*/

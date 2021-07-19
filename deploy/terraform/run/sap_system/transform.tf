@@ -22,8 +22,8 @@ locals {
   resource_group_defined = (length(local.resource_group.name) + length(local.resource_group.arm_id)) > 0
 
   ppg = {
-    arm_ids = try(coalesce(var.proximityplacementgroup_arm_ids, try(var.infrastructure.ppg.arm_ids, [])), [])
-    names   = try(coalesce(var.proximityplacementgroup_names, try(var.infrastructure.ppg.names, [])), [])
+    arm_ids = distinct(concat(var.proximityplacementgroup_arm_ids, try(var.infrastructure.ppg.arm_ids, [])))
+    names   = distinct(concat(var.proximityplacementgroup_names, try(var.infrastructure.ppg.names, [])))
   }
 
   ppg_defined = (length(local.ppg.names) + length(local.ppg.arm_ids)) > 0
@@ -47,26 +47,29 @@ locals {
 
   dbnodes = try(compact(var.database_vm_nodes, var.databases[0].dbnodes), {})
 
-  databases_temp = [
-    {
-      high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
-      use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
+  databases_temp = {
+    high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
+    use_DHCP          = var.database_vm_use_DHCP || try(var.databases[0].use_DHCP, false)
 
-      platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
-      size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
+    platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
+    size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
 
-      authentication = {
-        type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
-        username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
-      }
-      avset_arm_ids = try(coalesce(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])), [])
-
-      use_ANF = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
-
+    authentication = {
+      type     = try(coalesce(var.database_vm_authentication_type, try(var.databases[0].authentication.type, "key")), "key")
+      username = try(coalesce(var.automation_username, try(var.databases[0].authentication.username, "azureadm")), "azureadm")
     }
-  ]
+    avset_arm_ids = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
+
+    use_ANF   = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+    dual_nics = var.database_dual_nics || try(var.databases[0].dual_nics, false)
+    no_ppg    = var.database_no_ppg || try(var.databases[0].no_ppg, false)
+    no_avset  = var.database_no_avset || try(var.databases[0].no_avset, false)
+
+  }
+
 
   db_os = {
+    os_type         = try(coalesce(var.database_vm_image.os_type, try(var.databases[0].os.os_type, "")), "LINUX")
     source_image_id = try(coalesce(var.database_vm_image.source_image_id, try(var.databases[0].os.source_image_id, "")), "")
     publisher       = try(coalesce(var.database_vm_image.publisher, try(var.databases[0].os.publisher, "")), "")
     offer           = try(coalesce(var.database_vm_image.offer, try(var.databases[0].os.offer, "")), "")
@@ -77,6 +80,7 @@ locals {
 
 
   app_os = {
+    os_type         = try(coalesce(var.application_server_image.os_type, try(var.application.app_os.os_type, try(var.application.os.os_type, ""))), "LINUX")
     source_image_id = try(coalesce(var.application_server_image.source_image_id, try(var.application.app_os.source_image_id, try(var.application.os.source_image_id, ""))), "")
     publisher       = try(coalesce(var.application_server_image.publisher, try(var.application.app_os.publisher, try(var.application.os.publisher, ""))), "")
     offer           = try(coalesce(var.application_server_image.offer, try(var.application.app_os.offer, try(var.application.os.offer, ""))), "")
@@ -86,6 +90,7 @@ locals {
   app_os_specified = (length(local.app_os.source_image_id) + length(local.app_os.publisher)) > 0
 
   scs_os = {
+    os_type         = try(coalesce(var.scs_server_image.os_type, try(var.application.scs_os.os_type, "")), "LINUX")
     source_image_id = try(coalesce(var.scs_server_image.source_image_id, try(var.application.scs_os.source_image_id, "")), "")
     publisher       = try(coalesce(var.scs_server_image.publisher, try(var.application.scs_os.publisher, "")), "")
     offer           = try(coalesce(var.scs_server_image.offer, try(var.application.scs_os.offer, "")), "")
@@ -95,6 +100,7 @@ locals {
   scs_os_specified = (length(local.scs_os.source_image_id) + length(local.scs_os.publisher)) > 0
 
   web_os = {
+    os_type         = try(coalesce(var.webdispatcher_server_image.os_type, try(var.application.web_os.os_type, "")), "LINUX")
     source_image_id = try(coalesce(var.webdispatcher_server_image.source_image_id, try(var.application.web_os.source_image_id, "")), "")
     publisher       = try(coalesce(var.webdispatcher_server_image.publisher, try(var.application.web_os.publisher, "")), "")
     offer           = try(coalesce(var.webdispatcher_server_image.offer, try(var.application.web_os.offer, "")), "")
@@ -117,16 +123,22 @@ locals {
 
     application_server_count = max(var.application_server_count, try(var.application.application_server_count, 0))
     app_sku                  = try(coalesce(var.application_server_sku, var.application.app_sku), "")
+    app_no_ppg               = var.application_server_no_ppg || try(var.application.app_no_ppg, false)
+    app_no_avset             = var.application_server_no_avset || try(var.application.app_no_avset, false)
 
     scs_server_count      = max(var.scs_server_count, try(var.application.scs_server_count, 1))
-    scs_high_availability = try(coalesce(var.scs_high_availability, try(var.application.scs_high_availability, false)), false)
+    scs_high_availability = var.scs_high_availability || try(var.application.scs_high_availability, false)
     scs_instance_number   = try(coalesce(var.scs_instance_number, var.application.scs_instance_number), "01")
     ers_instance_number   = try(coalesce(var.ers_instance_number, var.application.ers_instance_number), "02")
 
-    scs_sku = try(coalesce(var.scs_server_sku, var.application.scs_sku), "")
+    scs_sku      = try(coalesce(var.scs_server_sku, var.application.scs_sku), "")
+    scs_no_ppg   = var.scs_server_no_ppg || try(var.application.scs_no_ppg, false)
+    scs_no_avset = var.scs_server_no_avset || try(var.application.scs_no_avset, false)
 
     webdispatcher_count = max(var.webdispatcher_server_count, try(var.application.webdispatcher_count, 0))
     web_sku             = try(coalesce(var.webdispatcher_server_sku, var.application.web_sku), "")
+    web_no_ppg          = var.webdispatcher_server_no_ppg || try(var.application.web_no_ppg, false)
+    web_no_avset        = var.webdispatcher_server_no_avset || try(var.application.web_no_avset, false)
 
   }
 
@@ -136,6 +148,7 @@ locals {
     accelerated_networking = var.anchor_vm_accelerated_networking || try(var.infrastructure.anchor_vms.accelerated_networking, false)
     sku                    = try(coalesce(var.anchor_vm_sku, try(var.infrastructure.anchor_vms.sku, "Standard_D2s_v3")), "Standard_D2s_v3")
     os = {
+      os_type         = try(coalesce(var.anchor_vm_image.os_type, try(var.infrastructure.anchor_vms.os.os_type, "")), "LINUX")
       source_image_id = try(coalesce(var.anchor_vm_image.source_image_id, try(var.infrastructure.anchor_vms.os.source_image_id, "")), "")
       publisher       = try(coalesce(var.anchor_vm_image.publisher, try(var.infrastructure.anchor_vms.os.publisher, "")), "")
       offer           = try(coalesce(var.anchor_vm_image.offer, try(var.infrastructure.anchor_vms.os.offer, "")), "")
@@ -147,7 +160,7 @@ locals {
       type     = try(coalesce(var.anchor_vm_authentication_type, try(var.infrastructure.anchor_vms.authentication.type, "key")), "key")
       username = try(coalesce(var.anchor_vm_authentication_username, try(var.authentication.username, "azureadm")), "azureadm")
     }
-    nic_ips = try(coalesce(var.anchor_vm_nic_ips, try(var.infrastructure.anchor_vms.nic_ips, [])), [])
+    nic_ips = distinct(concat(var.anchor_vm_nic_ips, try(var.infrastructure.anchor_vms.nic_ips, [])))
     }
     ) : (
     null
@@ -224,9 +237,9 @@ locals {
     { "vnets" = local.temp_vnet }
   )
 
-  db_zones_temp = try(coalesce(var.database_vm_zones, try(var.databases[0].zones, [])), [])
+  db_zones_temp = distinct(concat(var.database_vm_zones, try(var.databases[0].zones, [])))
 
-  databases = [merge(local.databases_temp[0], (
+  databases = [merge(local.databases_temp, (
     local.db_os_specified ? { "os" = local.db_os } : null), (
     length(local.dbnodes) > 0 ? { "dbnodes" = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { "zones" = local.db_zones_temp } : null
@@ -270,18 +283,18 @@ locals {
   disk_encryption_set_id      = try(coalesce(var.vm_disk_encryption_set_id, try(var.options.disk_encryption_set_id, null)), null)
   options                     = merge(local.options_temp, (local.disk_encryption_set_defined ? { "disk_encryption_set_id" = local.disk_encryption_set_id } : null))
 
-  app_zones_temp = try(coalesce(var.application_server_zones, try(var.application.app_zones, [])), [])
-  scs_zones_temp = try(coalesce(var.scs_server_zones, try(var.application.scs_zones, [])), [])
-  web_zones_temp = try(coalesce(var.webdispatcher_server_zones, try(var.application.web_zones, [])), [])
+  app_zones_temp = distinct(concat(var.application_server_zones, try(var.application.app_zones, [])))
+  scs_zones_temp = distinct(concat(var.scs_server_zones, try(var.application.scs_zones, [])))
+  web_zones_temp = distinct(concat(var.webdispatcher_server_zones, try(var.application.web_zones, [])))
 
-  app_nic_ips       = try(coalesce(var.application_server_app_nic_ips, try(var.application.app_nic_ips, [])), [])
-  app_admin_nic_ips = try(coalesce(var.application_server_admin_nic_ips, try(var.application.app_admin_nic_ips, [])), [])
-  scs_nic_ips       = try(coalesce(var.scs_server_app_nic_ips, try(var.application.scs_nic_ips, [])), [])
-  scs_admin_nic_ips = try(coalesce(var.scs_server_admin_nic_ips, try(var.application.scs_admin_nic_ips, [])), [])
-  scs_lb_ips        = try(coalesce(var.scs_server_loadbalancer_ips, try(var.application.scs_lb_ips, [])), [])
-  web_nic_ips       = try(coalesce(var.webdispatcher_server_app_nic_ips, try(var.application.web_nic_ips, [])), [])
-  web_admin_nic_ips = try(coalesce(var.webdispatcher_server_admin_nic_ips, try(var.application.web_admin_nic_ips, [])), [])
-  web_lb_ips        = try(coalesce(var.webdispatcher_server_loadbalancer_ips, try(var.application.web_lb_ips, [])), [])
+  app_nic_ips       = distinct(concat(var.application_server_app_nic_ips, try(var.application.app_nic_ips, [])))
+  app_admin_nic_ips = distinct(concat(var.application_server_admin_nic_ips, try(var.application.app_admin_nic_ips, [])))
+  scs_nic_ips       = distinct(concat(var.scs_server_app_nic_ips, try(var.application.scs_nic_ips, [])))
+  scs_admin_nic_ips = distinct(concat(var.scs_server_admin_nic_ips, try(var.application.scs_admin_nic_ips, [])))
+  scs_lb_ips        = distinct(concat(var.scs_server_loadbalancer_ips, try(var.application.scs_lb_ips, [])))
+  web_nic_ips       = distinct(concat(var.webdispatcher_server_app_nic_ips, try(var.application.web_nic_ips, [])))
+  web_admin_nic_ips = distinct(concat(var.webdispatcher_server_admin_nic_ips, try(var.application.web_admin_nic_ips, [])))
+  web_lb_ips        = distinct(concat(var.webdispatcher_server_loadbalancer_ips, try(var.application.web_lb_ips, [])))
 
   app_tags = try(coalesce(var.application_server_tags, try(var.application.app_tags, {})), {})
   scs_tags = try(coalesce(var.scs_server_tags, try(var.application.scs_tags, {})), {})
@@ -289,8 +302,8 @@ locals {
 
   application = merge(local.application_temp, (
     local.app_os_specified ? { "app_os" = local.app_os } : null), (
-    local.scs_os_specified ? { "scs_os" = local.scs_os } : null), (
-    local.web_os_specified ? { "web_os" = local.web_os } : null), (
+    local.scs_os_specified ? { "scs_os" = local.scs_os } : (local.app_os_specified ? { "scs_os" = local.app_os } : null)), (
+    local.web_os_specified ? { "web_os" = local.web_os } : (local.app_os_specified ? { "web_os" = local.app_os } : null)), (
     length(local.app_zones_temp) > 0 ? { "app_zones" = local.app_zones_temp } : null), (
     length(local.scs_zones_temp) > 0 ? { "scs_zones" = local.scs_zones_temp } : null), (
     length(local.web_zones_temp) > 0 ? { "web_zones" = local.web_zones_temp } : null), (
@@ -306,10 +319,5 @@ locals {
     length(local.scs_tags) > 0 ? { "scs_tags" = local.scs_tags } : null), (
     length(local.web_tags) > 0 ? { "web_tags" = local.web_tags } : null
     )
-
   )
-
-
-
-
 }

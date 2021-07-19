@@ -93,7 +93,7 @@ variable "vm_disk_type" {
 }
 
 variable "use_DHCP" {
-  default = null
+  default = false
 }
 
 /*

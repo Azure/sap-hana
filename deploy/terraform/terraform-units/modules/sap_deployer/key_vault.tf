@@ -72,13 +72,7 @@ data "azurerm_key_vault" "kv_user" {
 }
 
 resource "azurerm_key_vault_access_policy" "kv_user_msi" {
-  count = (local.enable_deployers && !local.user_kv_exist) ? (
-    data.azurerm_client_config.deployer.object_id == "" ? (
-      0) : (
-      1
-    )) : (
-    0
-  )
+  count = (local.enable_deployers && !local.user_kv_exist) ? 1 : 0
 
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
@@ -99,7 +93,7 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 
 resource "azurerm_key_vault_access_policy" "kv_user_pre_deployer" {
 
-  count        = (local.enable_deployers && !local.user_kv_exist) && data.azurerm_client_config.deployer.object_id != "" ? 1 : 0
+  count        = (local.enable_deployers && !local.user_kv_exist) ? 1 : 0
   key_vault_id = azurerm_key_vault.kv_user[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id

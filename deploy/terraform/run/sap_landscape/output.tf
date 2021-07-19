@@ -100,3 +100,7 @@ output "db_nsg_id" {
 output "web_nsg_id" {
   value = module.sap_landscape.admin_nsg_id
 }
+
+output "dns_label" {
+  value = var.dns_label
+}

@@ -312,6 +312,14 @@ then
     if [ -z "${temp}" ]
     then
         touch "${deployer_config_information}"
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo "#                  Keyvault to use for SPN details: $temp                     #
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+
         save_config_var "keyvault" "${deployer_config_information}"
         return_value=0
     else

@@ -62,7 +62,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   ]
   size = local.observer_size
 
-  custom_data = var.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   os_disk {
     name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.osdisk)

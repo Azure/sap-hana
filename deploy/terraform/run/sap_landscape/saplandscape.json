@@ -35,5 +35,6 @@
     "options": {},
     "tfstate_resource_id"                      : "",
     "deployer_tfstate_key"                     : "",
+    "dns_label"                                : "sap.agcicat.net",
     "enable_purge_control_for_keyvaults"       : false
 }

@@ -90,7 +90,7 @@ resource "azurerm_linux_virtual_machine" "web" {
     }
   }
 
-  custom_data = var.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   dynamic "os_disk" {
     iterator = disk
@@ -233,7 +233,7 @@ resource "azurerm_managed_disk" "web" {
   disk_size_gb           = local.web_data_disks[count.index].disk_size_gb
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = local.web_zonal_deployment && (local.webdispatcher_count == local.web_zone_count) ? (
+  zones = !local.use_web_avset  ? (
     upper(local.web_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]) : (
       [azurerm_windows_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]
