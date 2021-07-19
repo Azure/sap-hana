@@ -392,7 +392,7 @@ locals {
   use_avset = local.db_server_count > 0 && !try(local.hdb.no_avset, false) ? !local.zonal_deployment || (local.db_server_count != local.db_zone_count) : false
 
   //PPG control flag
-  no_ppg = local.hdb.no_ppg
+  no_ppg = var.databases[0].no_ppg
 
 
 }

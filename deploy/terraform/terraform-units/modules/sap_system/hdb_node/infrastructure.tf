@@ -32,7 +32,7 @@ resource "azurerm_lb" "hdb" {
 
   frontend_ip_configuration {
     name                          = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-    subnet_id                     = var.db_subnet.id
+    subnet_id                     = var.db_subnet
     private_ip_address            = local.use_DHCP ? null : try(local.hana_database.loadbalancer.frontend_ip, cidrhost(var.db_subnet.address_prefixes[0], tonumber(count.index) + local.hdb_ip_offsets.hdb_lb))
     private_ip_address_allocation = local.use_DHCP ? "Dynamic" : "Static"
   }

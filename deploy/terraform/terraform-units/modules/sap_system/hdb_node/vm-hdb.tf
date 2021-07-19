@@ -22,7 +22,7 @@ resource "azurerm_network_interface" "nics_dbnodes_admin" {
 
   ip_configuration {
     name      = "ipconfig1"
-    subnet_id = var.admin_subnet.id
+    subnet_id = var.admin_subnet
     private_ip_address = local.use_DHCP ? (
       null) : (
       lookup(local.hdb_vms[count.index], "admin_nic_ip", false) != false ? (
@@ -48,7 +48,7 @@ resource "azurerm_network_interface" "nics_dbnodes_db" {
   ip_configuration {
     primary   = true
     name      = "ipconfig1"
-    subnet_id = var.db_subnet.id
+    subnet_id = var.db_subnet
 
     private_ip_address = local.use_DHCP ? (
       null) : (
