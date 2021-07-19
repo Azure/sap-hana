@@ -425,10 +425,12 @@ locals {
   //If we deploy more than one server in zone put them in an availability set
   use_avset = local.db_server_count > 0 && try(!local.anydb.no_avset, false) ? !local.zonal_deployment || (local.db_server_count != local.db_zone_count) : false
 
-
-
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
   )
+
+  //PPG control flag
+  no_ppg = local.anydb.no_ppg
+
 
 }

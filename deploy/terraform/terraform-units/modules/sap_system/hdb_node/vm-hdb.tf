@@ -117,7 +117,11 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     }
   }
 
-  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  //If no ppg defined do not put the database in a proximity placement group
+  proximity_placement_group_id = local.no_ppg ? (
+    null) : (
+    local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  )
 
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   availability_set_id = local.use_avset ? (

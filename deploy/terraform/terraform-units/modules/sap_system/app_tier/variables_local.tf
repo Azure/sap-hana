@@ -646,4 +646,11 @@ locals {
 
   fpips = (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? concat(local.std_ips, local.winha_ips) : local.std_ips
 
+
+  //PPG control flags
+  app_no_ppg = var.application.app_no_ppg
+  scs_no_ppg = var.application.scs_no_ppg
+  web_no_ppg = var.application.web_no_ppg
+
+
 }
