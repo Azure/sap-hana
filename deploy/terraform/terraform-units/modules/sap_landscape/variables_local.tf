@@ -19,6 +19,10 @@ variable "use_deployer" {
   description = "Use the deployer"
 }
 
+variable "create_spn" {
+  description = "Flag controlling the Fencing SPN creation"
+}
+
 locals {
   // Resources naming
   storageaccount_name         = var.naming.storageaccount_names.VNET.landscape_storageaccount_name

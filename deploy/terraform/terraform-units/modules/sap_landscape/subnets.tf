@@ -114,7 +114,7 @@ resource "azurerm_subnet_network_security_group_association" "web" {
 #Associate the subnets to the route table
 
 resource "azurerm_subnet_route_table_association" "admin" {
-    depends_on = [
+  depends_on = [
     azurerm_route_table.rt
   ]
 

@@ -18,6 +18,7 @@ provider "azurerm" {
   client_id       = local.use_spn ? local.spn.client_id : null
   client_secret   = local.use_spn ? local.spn.client_secret : null
   tenant_id       = local.use_spn ? local.spn.tenant_id : null
+  use_msi         = false
   alias           = "main"
 }
 
@@ -27,10 +28,28 @@ provider "azurerm" {
   alias           = "deployer"
 }
 
+provider "azurerm" {
+  features {}
+  subscription_id = length(local.deployer_subscription_id) > 0 ? local.deployer_subscription_id : null
+  use_msi         = false
+  client_id       = null
+  client_secret   = null
+  tenant_id       = null
+  alias           = "fencing"
+}
+
+
 provider "azuread" {
   client_id     = local.use_spn ? local.spn.client_id : null
   client_secret = local.use_spn ? local.spn.client_secret : null
   tenant_id     = local.use_spn ? local.spn.tenant_id : null
+}
+
+provider "azuread" {
+  client_id     = null
+  client_secret = null
+  tenant_id     = null
+  alias         = "fencing"
 }
 
 terraform {

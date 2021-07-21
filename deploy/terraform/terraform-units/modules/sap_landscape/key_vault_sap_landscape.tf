@@ -17,7 +17,7 @@ resource "azurerm_key_vault" "kv_prvt" {
 
   access_policy {
     tenant_id = local.service_principal.tenant_id
-    object_id = local.service_principal.object_id
+    object_id = local.service_principal.object_id != "" ? local.service_principal.object_id : "00000000-0000-0000-0000-000000000000"
 
     secret_permissions = [
       "get",
@@ -56,7 +56,7 @@ resource "azurerm_key_vault" "kv_user" {
 
   access_policy {
     tenant_id = local.service_principal.tenant_id
-    object_id = local.service_principal.object_id
+    object_id = local.service_principal.object_id != "" ? local.service_principal.object_id : "00000000-0000-0000-0000-000000000000"
 
     secret_permissions = [
       "Get",
@@ -267,7 +267,7 @@ resource "azurerm_key_vault_secret" "witness_access_key" {
   provider     = azurerm.main
   count        = 1
   content_type = ""
-  name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.witness_accesskey),"/[^A-Za-z0-9-]/","")
+  name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.witness_accesskey), "/[^A-Za-z0-9-]/", "")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].primary_access_key : azurerm_storage_account.witness_storage[0].primary_access_key
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
@@ -277,7 +277,7 @@ resource "azurerm_key_vault_secret" "witness_name" {
   provider     = azurerm.main
   count        = 1
   content_type = ""
-  name         = replace(format("%s%s%s", local.prefix,  var.naming.separator, local.resource_suffixes.witness_name),"/[^A-Za-z0-9-]/","")
+  name         = replace(format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.witness_name), "/[^A-Za-z0-9-]/", "")
   value        = length(var.witness_storage_account.arm_id) > 0 ? data.azurerm_storage_account.witness_storage[0].name : azurerm_storage_account.witness_storage[0].name
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }

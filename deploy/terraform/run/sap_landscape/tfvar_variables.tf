@@ -236,3 +236,7 @@ variable "diagnostics_storage_account_arm_id" {
 variable "witness_storage_account_arm_id" {
   default = ""
 }
+
+variable "create_fencing_spn" {
+  default = true
+}

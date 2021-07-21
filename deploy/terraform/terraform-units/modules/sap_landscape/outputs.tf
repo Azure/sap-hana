@@ -50,7 +50,7 @@ output "storageaccount_name" {
   value = length(var.diagnostics_storage_account.arm_id) > 0 ? (
     data.azurerm_storage_account.storage_bootdiag[0].name) : (
     azurerm_storage_account.storage_bootdiag[0].name
-    )
+  )
 }
 
 output "storageaccount_rg_name" {
