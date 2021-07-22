@@ -26,6 +26,7 @@
 #----------------------------------------
 
 
+
 #----------------------------------------
 # BEGIN
 #
@@ -34,6 +35,9 @@
 #                  Is there a better way to do this other than using
 #                  'command' or 'shell'?
 #----------------------------------------
+
+
+
 
 - name:     Ensure zypper repo is configured on SLE VMs
   block:
@@ -111,6 +115,65 @@
 #                  Is there a better way to do this other than using
 #                  'command' or 'shell'?
 #----------------------------------------
+
+
+- name:     Ensure additional zypper repo is configured on SLE VMs
+  block:
+    # If there are no repos configured zypper lr will fail with rc == 6
+    - name:     Check that zypper repos are registered
+      command:    zypper lr
+      # command/shell actions always report changed even if they are
+      # not making any changes; we know this command action doesn't
+      # change anything so ensure it doesn't report as changed.
+      changed_when: false
+      args:
+        warn: false  # quieten warning about using zypper directly
+
+  when:     ansible_os_family|upper == 'SUSE'
+
+#----------------------------------------
+#
+# 20210722 -  Adding support for additional repos
+#
+#----------------------------------------
+
+
+- name:             1.3 - Import repo list
+  include_vars:     repos.yaml
+
+# Analyse the repo list for this distribution selecting only those
+# packages assigned to the active tier or 'all'.
+- name:             Determine repos appropriate for tier
+  set_fact:
+    repos_for_tier: "{{ repos[distro_full_id] |
+                           selectattr('tier', 'in', ['all', tier]) |
+                           list }}"
+
+# Print list of matching repos if verbosity it 1 or greater
+- debug:
+    var: "{{ repos_for_tier }}"
+    verbosity: 1
+
+# Add repositories 
+- name:              Add the repositories
+  zypper_repository:
+    repo:               "{{ item.repo }}"
+    state:              "{{ item.state }}"
+    overwrite_multiple: yes
+    disable_gpg_check:  yes
+    auto_import_keys:   yes
+  loop:                "{{ repos_for_tier }}"
+  register:            zypresult
+  ignore_errors:       true
+  failed_when:        
+    - zypresult.rc != 0
+    - zypresult.rc != 4
+  when:     ansible_os_family|upper == 'SUSE'
+
+- name:              Add the repositories result
+  debug:
+    var: zypresult
+    verbosity: 2
 
 
 ...
