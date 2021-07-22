@@ -96,7 +96,7 @@ packages:
       - { tier: 'os', package: 'tuned',           state: 'present' }
       - { tier: 'os', package: 'numad',           state: 'present' }
       - { tier: 'os', package: 'ntp',             state: 'absent' }
-      - { tier: 'ha', package: 'jq',             state: 'present' }
+      - { tier: 'ha', package: 'jq',              state: 'present' }
 
       # TODO(rtamalin): Ensure SLE 15 SP2 uses /usr/bin/python3 rather
       # than /usr/bin/python.

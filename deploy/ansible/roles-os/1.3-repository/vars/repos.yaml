@@ -12,19 +12,19 @@
 repos:
     redhat7:
     redhat8:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',          state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',          state: 'present'}
     suse15.1:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',           state: 'present'}
     suse15.0:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15/home:ngncc.repo',               state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15/home:ngncc.repo',               state: 'present'}
     suse12.5:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP5/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP5/home:ngncc.repo',           state: 'present'}
     suse12.4:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP4/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP4/home:ngncc.repo',           state: 'present'}
     suse12.3:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP3/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP3/home:ngncc.repo',           state: 'present'}
     suse12.2:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP2/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP2/home:ngncc.repo',           state: 'present'}
     suse12.1:
-      - { tier: 'os', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP1/home:ngncc.repo',           state: 'present'}
+      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP1/home:ngncc.repo',           state: 'present'}
 
