@@ -13,8 +13,8 @@
 
 - name:             "2.1 - Install OS packages for SAP: {{ ansible_os_family|upper }}-{{ ansible_distribution_major_version }}"
   package:
-    name:           "{{ item }}" 
-    state:          present
+    name:           "{{ item.package }}" 
+    state:          "{{ item.state }}"
   loop:             "{{ packages[ansible_os_family|lower] }}"
 
 # /*----------------------------------------------------------------------------8
