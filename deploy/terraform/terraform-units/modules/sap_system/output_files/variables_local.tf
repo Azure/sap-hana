@@ -194,7 +194,7 @@ locals {
   ips_app = [for key, value in local.ips_primary_app : value.private_ip_address]
   ips_web = [for key, value in local.ips_primary_web : value.private_ip_address]
 
-  ips_primary_anydb = length(var.nics_anydb_admin) > 0 ? var.nics_anydb_admin : var.nics_anydb
+  ips_primary_anydb = var.nics_anydb
   ips_anydbnodes    = [for key, value in local.ips_primary_anydb : value.private_ip_address]
 
   anydatabases = [

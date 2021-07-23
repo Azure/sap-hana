@@ -13,7 +13,8 @@ The principles of the SAP Automation frameworks adhers to the principles of the 
 |Term           | Description|
 | :-            | :-         |
 |System         |An SAP system is an instance of an SAP application that has the resources the application needs to run, like virtual machines (VMs), disks, load balancers, proximity placement groups, availability sets, subnets, and network security groups. The application is identified by a unique 3 letter identifier SID.|
-|Landscape      |A landscape is a collection of systems in different environments in an SAP application. The example diagram shows three SAP landscapes: SAP ERP Central Component (ECC), SAP customer relationship management (CRM), and SAP Business Warehouse (BW).|
+|Environment    |An Environment is defined as a distinct tier along an SAP transport path, for example Sandbox, Development, QA, or Production. Each environment can contain a number of Systems.|
+|Landscape      |A landscape is a collection of systems in different environments in an SAP application. The example diagram below shows three SAP landscapes, each containing 3 Systems: SAP ERP (D10/Q10/P10), SAP CRM (D20/Q20/P30), and SAP BW (D30/Q30/P30).|
 |Workload Zone  |A workload zone is also called a deployment environment, and partitions the SAP application into environments like non-prod and prod or can further segment a landscape into tiers like development, quality assurance, and production. A deployment environment provides shared resources like virtual networks and key vaults to all the systems in the Workload Zone.  
 
 <br>

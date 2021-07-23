@@ -36,33 +36,33 @@ materials:
       url:          https://softwaredownloads.sap.com/file/0020000000381822021
 
     - name:         HANA Server
-      archive:      IMDB_SERVER20_056_0-80002046.SAR
+      archive:      IMDB_SERVER20_056_0-80002031.SAR
       extract:      true
       extractDir:   CD_HDBSERVER
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000000958442021
+      url:          https://softwaredownloads.sap.com/file/0020000000958462021
       
 
     - name:         X
-      archive:      IMDB_AFL20_055_0-80001894.SAR
+      archive:      IMDB_AFL20_056_0-80001894.SAR
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/SAP_HANA_AFL/packages
-      url:          https://softwaredownloads.sap.com/file/0020000000458262021
+      url:          https://softwaredownloads.sap.com/file/0020000000958302021
 
     - name:         X
-      archive:      IMDB_LCAPPS_2055_4-20010426.SAR
+      archive:      IMDB_LCAPPS_2056_0-20010426.SAR
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/SAP_HANA_LCAPPS/packages
-      url:          https://softwaredownloads.sap.com/file/0020000000833822021
+      url:          https://softwaredownloads.sap.com/file/0020000000958622021
 
     - name:         X
-      archive:      VCH190900_2055_0-80004631.SAR
+      archive:      VCH190900_2056_0-80004631.SAR
       extract:      true
       extractDir:   CD_HDBSERVER/COMPONENTS
       creates:      COMPONENTS/VCH_AFL_1909/packages
-      url:          https://softwaredownloads.sap.com/file/0020000000393862021
+      url:          https://softwaredownloads.sap.com/file/0020000000958552021
 
     - name:         X
       archive:      SAPHOSTAGENT51_51-20009394.SAR

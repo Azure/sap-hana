@@ -26,10 +26,11 @@
 
 # If Microsoft supplied BOM not found
 
-# - name:             Retrieve BOM ({{ bom_name }}) from Storage Account
-#   debug:
-#     msg:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_name }}/{{ bom_name }}.yaml{{ sapbits_sas_token }}"
-#   when:             microsoft_supplied_bom.stat.exists != true
+- name:             Retrieve BOM ({{ bom_name }}) from Storage Account
+  debug:
+    msg:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_name }}/{{ bom_name }}.yaml{{ sapbits_sas_token }}"
+    verbosity:      1
+  when:             microsoft_supplied_bom.stat.exists != true
 
 
 # If Microsoft supplied BOM not found

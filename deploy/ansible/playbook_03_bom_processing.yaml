@@ -44,11 +44,17 @@
     tags:
       - 2.3-sap-mounts 
 
-  - include_role:
-      name:     roles-sap-os/2.6-sap-exports
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.6-sap-exports
+    tags:
+      - 2.6-sap-exports
 
-  - include_role:
-      name:     roles-sap/3.3-bom-processing
+  - block:
+    - include_role:
+        name:     roles-sap/3.3-bom-processing
+    tags:
+      - 3.3-bom-processing
 
 
 ...
