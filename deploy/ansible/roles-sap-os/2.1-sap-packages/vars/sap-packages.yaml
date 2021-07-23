@@ -2,17 +2,15 @@
 
 packages:
     redhat:
-      - tuned-profiles-sap*
-      - compat-sap-c++-*                
-      - libatomic                     
-      - uuidd
-      - csh
-
-    suse: 
-      - sapconf
-      - saptune
-      - libgcc_s1  
-      - libstdc++6 
-      - libatomic1 
-      - uuidd
-
+      - { package: 'tuned-profiles-sap*',          state: 'present' }
+      - { package: 'compat-sap-c++-*',             state: 'present' }
+      - { package: 'libatomic',                    state: 'present' }
+      - { package: 'uuidd',                        state: 'present' }
+      - { package: 'csh',                          state: 'present' }
+    suse:
+      - { package: 'sapconf',                      state: 'present' }
+      - { package: 'saptune',                      state: 'present' }
+      - { package: 'libgcc_s1',                    state: 'present' }
+      - { package: 'libstdc++6',                   state: 'present' }
+      - { package: 'libatomic1',                   state: 'present' }
+      - { package: 'uuidd',                        state: 'present' }

@@ -101,8 +101,8 @@ steps:
       sapsystem_env=${{parameters.sapsystem_env}}
       sapsystem_isRelease=${sapsystem_env%%$buildId*}
 
-      [ -z ${{parameters.osImage_publisher}} ] && osImage_publisher="suse" || osImage_publisher=${{parameters.osImage_publisher}}
-      [[ ${osImage_publisher} == "suse" ]] && isSles=true || isSles=false
+      [ -z ${{parameters.osImage_publisher}} ] && osImage_publisher="SUSE" || osImage_publisher=${{parameters.osImage_publisher}}
+      [[ ${osImage_publisher} == "SUSE" ]] && isSles=true || isSles=false
 
       # subnet is decided by buildId if it is unit test.
       if [ -z "${sapsystem_isRelease}" ]

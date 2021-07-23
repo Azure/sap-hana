@@ -1,21 +1,23 @@
 {
   "infrastructure": {
-    "region": "westeurope",
-    "environment": "np",
+    "environment"                            : "np",
+    "region"                                 : "westeurope",
     "vnets": {
       "management": {
-        "address_space": "10.0.0.0/26",
+        "name"                               : "DEP00",
+        "address_space"                      : "10.0.0.0/26",
         "subnet_mgmt": {
-          "prefix": "10.0.0.16/28"
+          "prefix"                           : "10.0.0.16/28"
         }
       }
     }
   },
   "deployers": [
     {
-      "size": "Standard_D4ds_v4",
-      "disk_type" : "Premium_LRS",
-      "use_DHCP" : true
+      "size"                                 : "Standard_D4ds_v4",
+      "disk_type"                            : "Premium_LRS",
+      "use_DHCP"                             : true
     }
-  ]
+  ],
+  "enable_purge_control_for_keyvaults"       : false
 }

@@ -81,3 +81,5 @@ variable "key_vault" {
   }
 
 }
+
+variable "dns_label" {}

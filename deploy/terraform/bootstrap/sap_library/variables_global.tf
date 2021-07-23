@@ -36,3 +36,8 @@ variable "deployer_statefile_foldername" {
   description = "Folder name of folder containing the terraform state file"
   default     = ""
 }
+
+variable "dns_label" {
+  description = "DNS label"
+  default = ""
+}

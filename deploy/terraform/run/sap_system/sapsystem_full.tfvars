@@ -86,6 +86,9 @@ database_vm_image = {
 #database_platform="HANA"
 #database_size="Default"
 
+#database_no_avset=false
+#database_no_ppg=false
+
 #database_vm_zones=["1","2"]
 #database_vm_useDHCP=false
 
@@ -103,6 +106,8 @@ application_server_count = 3
 #application_server_app_nic_ips=[]
 #application_server_app_admin_nic_ips=[]
 #application_server_sku="Standard_D4s_v3"
+#application_server_no_avset=false
+#application_server_no_ppg=false
 #application_server_tags={},
 #application_server_zones=["1","2","3"]
 #application_server_image= {
@@ -124,6 +129,8 @@ ers_instance_number   = "02"
 #scs_server_loadbalancer_ips=[]
 
 #scs_server_sku="Standard_D4s_v3"
+#scs_server_no_avset=false
+#scs_server_no_ppg=false
 #scs_server_tags={},
 #scs_server_zones=["1","2","3"]
 #scs_server_image= {
@@ -140,6 +147,8 @@ webdispatcher_server_count = 1
 #webdispatcher_server_loadbalancer_ips=[]
 
 #webdispatcher_server_sku="Standard_D4s_v3"
+#webdispatcher_server_no_avset=false
+#webdispatcher_server_no_ppg=false
 #webdispatcher_server_tags={},
 #webdispatcher_server_zones=["1","2","3"]
 #webdispatcher_server_image= {

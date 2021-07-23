@@ -154,3 +154,7 @@ variable "library_ansible_blob_container_is_existing" {
 variable "library_ansible_blob_container_name" {
   default = "ansible"
 }
+
+variable "enable_purge_control_for_keyvaults" {
+  default = true
+}

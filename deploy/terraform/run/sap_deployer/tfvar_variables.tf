@@ -93,7 +93,11 @@ variable "vm_disk_type" {
 }
 
 variable "use_DHCP" {
+<<<<<<< HEAD
   default = null
+=======
+  default = false
+>>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
 }
 
 /*
@@ -194,4 +198,8 @@ variable "firewall_allowed_ipaddresses" {
 
 variable "deployer_assign_subscription_permissions" {
   default = false
+}
+
+variable "enable_purge_control_for_keyvaults" {
+  default = true
 }

@@ -72,7 +72,7 @@ locals {
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
   // The environment of sap landscape and sap system
   environment     = upper(local.infrastructure.environment)
-  vnet_sap_arm_id = data.terraform_remote_state.landscape.outputs.vnet_sap_arm_id
+  vnet_sap_arm_id = try(data.terraform_remote_state.landscape.outputs.vnet_sap_arm_id, "")
 
   vnet_logical_name = local.infrastructure.vnets.sap.name
   vnet_sap_exists   = length(local.vnet_sap_arm_id) > 0 ? true : false

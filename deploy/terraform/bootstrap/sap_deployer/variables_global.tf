@@ -85,3 +85,7 @@ variable "assign_subscription_permissions" {
   description = "Assign permissions on the subscription"
   default     = true
 }
+
+variable "enable_purge_control_for_keyvaults" {
+  default = true
+}

@@ -217,9 +217,9 @@ if [ ! -n "${region}" ]; then
     exit 64                                                                                           #script usage wrong
 fi
 
-automation_config_directory=~/.sap_deployment_automation/
-generic_config_information="${automation_config_directory}"config
-deployer_config_information="${automation_config_directory}""${environment}""${region}"
+automation_config_directory=~/.sap_deployment_automation
+generic_config_information="${automation_config_directory}"/config
+deployer_config_information="${automation_config_directory}"/"${environment}""${region}"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]; then
@@ -231,6 +231,8 @@ if [ $force == 1 ]; then
     if [ -f "${deployer_config_information}" ]; then
         rm "${deployer_config_information}"
     fi
+    rm -Rf .terraform terraform.tfstate*
+    
 fi
 
 init "${automation_config_directory}" "${generic_config_information}" "${deployer_config_information}"
@@ -331,12 +333,16 @@ if [ 0 == $step ]; then
     echo "#########################################################################################"
     echo ""
 
+<<<<<<< HEAD
     cd "${deployer_dirname}" || exit
 
+=======
+>>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
     if [ $force == 1 ]; then
         rm -Rf .terraform terraform.tfstate*
     fi
 
+<<<<<<< HEAD
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
 
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
@@ -347,6 +353,9 @@ if [ 0 == $step ]; then
     step=1
     save_config_var "step" "${deployer_config_information}"
 
+=======
+    #Persist the parameters
+>>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
     if [ ! -z "$subscription" ]; then
         save_config_var "subscription" "${deployer_config_information}"
         kvsubscription=$subscription
@@ -361,6 +370,21 @@ if [ 0 == $step ]; then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
 
+<<<<<<< HEAD
+=======
+    cd "${deployer_dirname}" || exit
+
+    allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
+
+    "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
+    if (($? > 0)); then
+        exit $?
+    fi
+
+    step=1
+    save_config_var "step" "${deployer_config_information}"
+
+>>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
 else
     echo ""
     echo "#########################################################################################"
@@ -372,11 +396,19 @@ else
 fi
 
 unset TF_DATA_DIR
+load_config_vars "${deployer_config_information}" "keyvault"
+echo "Using the keyvault: " $keyvault
 
 if [ 1 == $step ]; then
     load_config_vars "${deployer_config_information}" "keyvault"
     echo "Using the keyvault: " $keyvault
     secretname="${environment}"-client-id
+    echo ""
+    echo "#########################################################################################"
+    echo "#                           Validating keyvault access                                  #"
+    echo "#########################################################################################"
+    echo ""
+
     az keyvault secret show --name "$secretname" --vault "$keyvault" --only-show-errors 2>error.log
     if [ -s error.log ]; then
         if [ ! -z "$spn_secret" ]; then
@@ -390,8 +422,7 @@ if [ 1 == $step ]; then
             read -p "Do you want to specify the SPN Details Y/N?" ans
             answer=${ans^^}
             if [ "$answer" == 'Y' ]; then
-
-                allParams="${env_param}""${keyvault_param}""${region_param}"
+                allParams=$(printf " -e %s -r %s -v %s " "${environment}" "${region}" "${keyvault}" )
 
                 "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/set_secrets.sh $allParams
                 if (($? > 0)); then
@@ -409,6 +440,7 @@ if [ 1 == $step ]; then
         cd "${curdir}" || exit
         step=2
         save_config_var "step" "${deployer_config_information}"
+
     fi
 fi
 unset TF_DATA_DIR

@@ -51,6 +51,11 @@ variable "license_type" {
 
 }
 
+variable "enable_purge_control_for_keyvaults" {
+  description = "Allow the deployment to control the purge protection"
+}
+
+
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -382,5 +387,5 @@ locals {
 
 locals {
   // 'Cg==` is empty string, base64 encoded.
-  cloudinit_growpart_config = try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
+  cloudinit_growpart_config = null # This needs more though as changing of it is a destructive action try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
 }

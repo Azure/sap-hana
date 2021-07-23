@@ -62,4 +62,4 @@ Environment
 <br/><br/><br/><br/>
 
 
-# Next: [Bootstrapping the Deployer](01-bootstrap-deployer.md) <!-- omit in toc -->
+# Next: [Prepare the region](02-prepare-environment.md) <!-- omit in toc -->

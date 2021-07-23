@@ -13,7 +13,7 @@ resource "azurerm_lb" "anydb" {
 
   frontend_ip_configuration {
     name      = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_feip)
-    subnet_id = var.db_subnet.id
+    subnet_id = var.db_subnet
 
     private_ip_address = local.use_DHCP ? (
       null) : (

@@ -1,38 +1,40 @@
 {
-    "tfstate_resource_id": "",
-    "deployer_tfstate_key": "",
     "infrastructure": {
-        "environment": "np",
-        "region": "westeurope",
+        "environment"                          : "np",
+        "region"                               : "westeurope",
         "vnets": {
             "sap": {
-                "name": "SAP01",
-                "address_space": "10.1.0.0/16",
+                "name"                         : "SAP01",
+                "address_space"                : "10.1.0.0/16",
                 "subnet_admin": {
-                    "prefix": "10.1.0.0/25"
+                    "prefix"                   : "10.1.0.0/25"
                 },
                 "subnet_app": {
-                    "prefix": "10.1.1.0/24"
+                    "prefix"                   : "10.1.1.0/24"
                 },
                 "subnet_db": {
-                    "prefix": "10.1.2.0/24"
+                    "prefix"                   : "10.1.2.0/24"
                 },
                 "subnet_web": {
-                    "prefix": "10.1.3.0/24"
+                    "prefix"                   : "10.1.3.0/24"
                 },
                 "subnet_iscsi": {
-                    "name": "global-WEEU-SAP01_iscsi-subnet",
-                    "prefix": "10.1.10.0/24"
+                    "name"                     : "global-WEEU-SAP01_iscsi-subnet",
+                    "prefix"                   : "10.1.10.0/24"
                 }
             }
         },
         "iscsi": {
-            "iscsi_count": 3
+            "iscsi_count"                      : 0
         }
     },
     "authentication": {
-        "username": "azureadm",
-        "password": ""
+        "username"                             : "azureadm",
+        "password"                             : ""
     },
-    "options": {}
+    "options": {},
+    "tfstate_resource_id"                      : "",
+    "deployer_tfstate_key"                     : "",
+    "dns_label"                                : "sap.agcicat.net",
+    "enable_purge_control_for_keyvaults"       : false
 }

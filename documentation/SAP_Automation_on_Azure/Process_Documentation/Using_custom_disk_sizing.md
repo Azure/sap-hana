@@ -26,7 +26,7 @@ The structure of the disk layout file is shown below:
         },
         {
           "name"        : "[NAME_OF_DISK]",
-          "count"       : [NUMBER_OF_DISKS],
+          "count"       : NUMBER_OF_DISKS,
           "disk_type"   : "Premium_LRS",
           "size_gb"     : 128,
           "caching"     : "ReadWrite",
@@ -48,7 +48,7 @@ It is possible to add multiple nodes in the structure to create additional disks
 
 ```json
 {
-  "type" : {
+  "db" : {
     "Default": {
       "compute": {
         "vm_size"                 : "Standard_D4s_v3",
@@ -89,7 +89,7 @@ It is possible to add multiple nodes in the structure to create additional disks
           "size_gb"               : 256,
           "caching"               : "ReadWrite",
           "write_accelerator"     : false,
-          "start_lun":            : 13
+          "start_lun"             : 13
         }
 
       ]
@@ -107,7 +107,7 @@ If there is a need to grow the system by adding additional disks to an already d
 
 ```json
 {
-  "type" : {
+  "db" : {
     "Default": {
       "compute": {
         "vm_size"                 : "Standard_D4s_v3",
@@ -148,7 +148,7 @@ If there is a need to grow the system by adding additional disks to an already d
           "size_gb"               : 256,
           "caching"               : "ReadWrite",
           "write_accelerator"     : false,
-          "start_lun":            : 13
+          "start_lun"             : 13
         }
         ,
         {

@@ -47,7 +47,7 @@ resource "azurerm_linux_virtual_machine" "anchor" {
     }
   }
 
-  custom_data = local.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? local.cloudinit_growpart_config : null
 
   os_disk {
     name                   = format("%s%s%s%s", local.prefix, var.naming.separator, local.anchor_virtualmachine_names[count.index], local.resource_suffixes.osdisk)

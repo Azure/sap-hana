@@ -15,6 +15,11 @@ variable "assign_subscription_permissions" {
   description = "Assign permissions on the subscription"
 }
 
+variable "enable_purge_control_for_keyvaults" {
+  description = "Allow the deployment to control the purge protection"
+}
+
+
 variable "bootstrap" {}
 
 // Set defaults

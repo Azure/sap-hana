@@ -189,30 +189,41 @@ resource "local_file" "ansible_inventory_new_yml" {
   directory_permission = "0770"
 }
 
-resource "local_file" "sap-parameters_yml" {
-  content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
-    sid           = var.hdb_sid,
-    kv_uri        = local.kv_name,
-    secret_prefix = local.secret_prefix,
-    disks         = var.disks
-    scs_ha        = var.scs_ha
-    db_ha         = var.db_ha
-    }
-  )
-  filename             = format("%s/sap-parameters.yaml", path.cwd)
-  file_permission      = "0660"
-  directory_permission = "0770"
-}
+# resource "local_file" "sap-parameters_yml" {
+#   content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
+#     sid           = var.hdb_sid,
+#     kv_uri        = local.kv_name,
+#     secret_prefix = local.secret_prefix,
+#     disks         = var.disks
+#     scs_ha        = var.scs_ha
+#     db_ha         = var.db_ha
+#     dns           = local.dns_label
+#     }
+#   )
+#   filename             = format("%s/sap-parameters.yaml", path.cwd)
+#   file_permission      = "0660"
+#   directory_permission = "0770"
+# }
 
 
 resource "azurerm_storage_blob" "hosts_yaml" {
   provider               = azurerm.deployer
-  name                   = format("%s_hosts.yml", trimspace(var.naming.prefix.SDU))
+  name                   = format("%s_hosts.yaml", trimspace(var.naming.prefix.SDU))
   storage_account_name   = local.tfstate_storage_account_name
   storage_container_name = local.ansible_container_name
   type                   = "Block"
   source                 = local_file.ansible_inventory_new_yml.filename
 }
+
+resource "azurerm_storage_blob" "sap_parameters_yaml" {
+  provider               = azurerm.deployer
+  name                   = format("%s_sap-parameters.yaml", trimspace(var.naming.prefix.SDU))
+  storage_account_name   = local.tfstate_storage_account_name
+  storage_container_name = local.ansible_container_name
+  type                   = "Block"
+  source                 = format("%s/sap-parameters.yaml", path.cwd)
+}
+
 
 resource "null_resource" "create-parameters-file" {
   provisioner "local-exec" {
@@ -246,9 +257,9 @@ locals {
   diskstring = format("disks:\n  - %s", join("\n  - ", var.disks))
   # scs_high_availability:         ${scs_ha}
   # db_high_availability:          ${db_ha}
-  parameters = format("sap_sid:               %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha)
+  parameters = format("sap_sid:               %s\nkv_uri:                %s\nsecret_prefix:         %s\nscs_high_availability: %s\ndb_high_availability:  %s\nscs_lb_ip:             %s\ndb_lb_ip:              %s", local.sid, local.kv_uri, local.secret_prefix, local.scs_ha, local.db_ha, var.scs_lb_ip, var.db_lb_ip)
 
   args      = format("\"create=true path=%s state=present mode='0660' marker='# {mark} TERRAFORM CREATED BLOCK' insertbefore='^...' block='%s\n\n%s'\"", format("%s/sap-parameters.yaml", path.cwd), local.parameters, local.diskstring)
-  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), "---\n...")
+  argsempty = format("\"create=true path=%s state=present mode='0660' line='%s'\"", format("%s/sap-parameters.yaml", path.cwd), format("---\nbom_base_name:\nsapbits_location_base_path:\nsap_fqdn:               %s\n...", local.dns_label))
 
 }
