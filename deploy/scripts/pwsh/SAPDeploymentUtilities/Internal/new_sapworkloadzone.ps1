@@ -437,7 +437,7 @@ Licensed under the MIT license.
             $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
         }
     }
-=======
+
 
     Write-Host -ForegroundColor green "Running refresh, please wait"
     $Command = " refresh -var-file " + $fInfo.Fullname + $tfstate_parameter + $landscape_tfstate_key_parameter + $deployer_tfstate_key_parameter
@@ -446,11 +446,7 @@ Licensed under the MIT license.
     Add-Content -Path "deployment.log" -Value $Cmd
     Write-Verbose $Cmd
 
-<<<<<<< HEAD
->>>>>>> 76788828... TFVars support for landscape (#1179)
-=======
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
-    
+ 
     $Command = " output automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"
