@@ -333,16 +333,13 @@ if [ 0 == $step ]; then
     echo "#########################################################################################"
     echo ""
 
-<<<<<<< HEAD
     cd "${deployer_dirname}" || exit
 
-=======
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
     if [ $force == 1 ]; then
         rm -Rf .terraform terraform.tfstate*
     fi
 
-<<<<<<< HEAD
+
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
 
     "${DEPLOYMENT_REPO_PATH}"/deploy/scripts/install_deployer.sh $allParams
@@ -353,9 +350,9 @@ if [ 0 == $step ]; then
     step=1
     save_config_var "step" "${deployer_config_information}"
 
-=======
+
     #Persist the parameters
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
+
     if [ ! -z "$subscription" ]; then
         save_config_var "subscription" "${deployer_config_information}"
         kvsubscription=$subscription
@@ -370,8 +367,7 @@ if [ 0 == $step ]; then
         save_config_var "tenant_id" "${deployer_config_information}"
     fi
 
-<<<<<<< HEAD
-=======
+
     cd "${deployer_dirname}" || exit
 
     allParams=$(printf " -p %s %s" "${deployer_file_parametername}" "${approveparam}")
@@ -384,7 +380,7 @@ if [ 0 == $step ]; then
     step=1
     save_config_var "step" "${deployer_config_information}"
 
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
+
 else
     echo ""
     echo "#########################################################################################"
