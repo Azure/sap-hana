@@ -162,11 +162,8 @@ module "output_files" {
   databases             = local.databases
   infrastructure        = local.infrastructure
   authentication        = local.authentication
-<<<<<<< HEAD
   authentication_type   = local.application.authentication.type
-=======
   authentication_type   = try(local.application.authentication.type, "key")
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
   iscsi_private_ip      = module.common_infrastructure.iscsi_private_ip
   nics_dbnodes_admin    = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db       = module.hdb_node.nics_dbnodes_db
@@ -194,10 +191,7 @@ module "output_files" {
   scs_ha                = module.app_tier.scs_ha
   db_ha                 = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
   ansible_user          = module.common_infrastructure.sid_username
-<<<<<<< HEAD
-=======
   scs_lb_ip             = module.app_tier.scs_lb_ip
   db_lb_ip              = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_lb_ip : module.anydb_node.db_lb_ip
->>>>>>> a87bd113f3e52becee218283ed4c30674d4025ea
 
 }
