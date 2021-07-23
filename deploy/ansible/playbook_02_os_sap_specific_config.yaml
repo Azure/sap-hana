@@ -37,26 +37,38 @@
 # Uses the same role as the OS plabook but is controlled by the sapos tier setting
   - block:
       - include_role:
+          name:     roles-os/1.4-packages
+    tags:
+      - 1.4-packages
+
+  - block:
+      - include_role:
           name: roles-os/1.5-disk-setup
     tags:
       - 1.5-disk-setup
 
-  - include_role:
-      name:     roles-sap-os/2.3-sap-mounts
 
-# - role: dependencies-install                                  # --> roles-sap/sap-packages (playbook_02_os_sap_specific_config)
-  - include_role:
-      name:     roles-sap-os/2.1-sap-packages                   
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.3-sap-mounts
+    tags:
+      - 2.3-sap-mounts
 
 
 # - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
-  - include_role:
-      name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+    tags:
+      - 2.3-sap-users
 
 
 # - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
-  - include_role:
-      name:     roles-sap-os/2.10-sap-notes                     # TODO: 
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.10-sap-notes                     # TODO: 
+    tags:
+      - 2.10-sap-notes
 
 
 
