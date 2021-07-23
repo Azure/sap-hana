@@ -12,7 +12,6 @@
 repos:
     redhat7:
     redhat8:
-      - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',          state: 'present'}
     suse15.1:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',           state: 'present'}
     suse15.0:
