@@ -2,20 +2,36 @@
 
 # Running the automation from Linux
 
-## **Pre-Requisites**
+This page describes how to run the automated deployment from a Linux VM running in Azure.
 
-1. **Terraform** - Terraform can be downloaded from [Download Terraform - Terraform by HashiCorp](https://www.terraform.io/downloads.html).
-2. **Azure CLI** - Azure CLI can be installed from <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=script>
+## **Prerequisites**
+
+You will need a Linux Virtual Machine running in your Azure subscription. This VM can be a simple Ubuntu VM - create it by selecting an Ubuntu server image and accept all defaults suggested by the Azure portal. If you select SSH as connection method, remember to download the PEM file to your local PC (you will then need to use Puttygen or a similar tool to create a private key file for SSH connections). Otherwise, you can specify user/pwd as connection - this is simpler.
+
+Once the Linux VM is up and running, connect to it using Puty or a similar tool. You will need to install the following tools on it:
+
+1. **Terraform** - Terraform is installed by running these commands:
+
+mkdir terraform
+cd terraform
+apt install unzip
+wget https://releases.hashicorp.com/terraform/1.0.2/terraform_1.0.2_linux_amd64.zip
+unzip terraform_1.0.2_linux_amd64.zip
+mv terraform /usr/local/bin
+
+2. **Azure CLI** - Azure CLI can be installed as follows:
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 ## **Deployment** ##
 
-1. Navigate to the home root directory
-2. Create a directory "Azure_SAP_Automated_Deployment"
+1. Navigate to the home root directory on your Linux VM.
+2. Create a directory named "Azure_SAP_Automated_Deployment"
    ```bash
    mkdir ~/Azure_SAP_Automated_Deployment; cd $_
    ```
 
-3. Navigate to that directory and clone the sap-hana repository by running:
+3. Navigate to the newly created directory and clone the sap-hana repository by running:
 
     ```bash
     git clone <https://github.com/Azure/sap-hana.git> 
