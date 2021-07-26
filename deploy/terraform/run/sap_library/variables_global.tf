@@ -40,3 +40,7 @@ variable "terraform_template_version" {
   default     = ""
 }
 
+variable "dns_label" {
+  description = "DNS label"
+  default = ""
+}

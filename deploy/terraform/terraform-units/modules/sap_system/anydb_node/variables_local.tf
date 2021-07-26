@@ -81,9 +81,20 @@ variable "license_type" {
 locals {
   // Imports database sizing information
 
+  default_filepath = format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")
+  custom_sizing    = length(var.custom_disk_sizes_filename) > 0
 
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")))
-  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+  // Imports database sizing information
+  file_name = local.custom_sizing ? (
+    fileexists(var.custom_disk_sizes_filename) ? (
+      var.custom_disk_sizes_filename) : (
+      format("%s/%s", path.cwd, var.custom_disk_sizes_filename)
+    )) : (
+    local.default_filepath
+
+  )
+
+  sizes = jsondecode(file(local.file_name))
 
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
@@ -117,12 +128,9 @@ locals {
       upper(pair.Location) == upper(local.region) ? pair.MaximumFaultDomainCount : ""
   ])[0]), 2)
 
-  // Support dynamic addressing
-  use_DHCP = try(local.anydb.use_DHCP, false)
 
-  anydb          = try(local.anydb_databases[0], {})
-  anydb_platform = try(local.anydb.platform, "NONE")
-  anydb_version  = try(local.anydb.db_version, "")
+  // Support dynamic addressing
+  use_DHCP = var.databases[0].use_DHCP
 
   // Dual network cards
   anydb_dual_nics = try(local.anydb.dual_nics, false)
@@ -134,8 +142,11 @@ locals {
     if contains(["ORACLE", "DB2", "SQLSERVER", "ASE"], upper(try(database.platform, "NONE")))
   ]
 
-  // Enable deployment based on length of local.anydb_databases
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
+
+  anydb          = local.enable_deployment ? local.anydb_databases[0] : {}
+  anydb_platform = local.enable_deployment ? try(local.anydb.platform, "NONE") : "NONE"
+  // Enable deployment based on length of local.anydb_databases
 
   // If custom image is used, we do not overwrite os reference with default value
   anydb_custom_image = try(local.anydb.os.source_image_id, "") != "" ? true : false
@@ -182,13 +193,13 @@ locals {
       "version"   = "latest"
     }
     DB2 = {
-      "publisher" = "suse",
+      "publisher" = "SUSE",
       "offer"     = "sles-sap-12-sp5",
       "sku"       = "gen1"
       "version"   = "latest"
     }
     ASE = {
-      "publisher" = "suse",
+      "publisher" = "SUSE",
       "offer"     = "sles-sap-12-sp5",
       "sku"       = "gen1"
       "version"   = "latest"
@@ -227,7 +238,6 @@ locals {
   // Update database information with defaults
   anydb_database = merge(local.anydb,
     { platform = local.anydb_platform },
-    { db_version = local.anydb_version },
     { size = local.anydb_size },
     { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
     { high_availability = local.anydb_ha },
@@ -423,11 +433,14 @@ locals {
   zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
 
   //If we deploy more than one server in zone put them in an availability set
-  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
-
+  use_avset = local.db_server_count > 0 && try(!local.anydb.no_avset, false) ? !local.zonal_deployment || (local.db_server_count != local.db_zone_count) : false
 
   full_observer_names = flatten([for vm in local.observer_virtualmachine_names :
     format("%s%s%s%s", local.prefix, var.naming.separator, vm, local.resource_suffixes.vm)]
   )
+
+  //PPG control flag
+  no_ppg = var.databases[0].no_ppg
+
 
 }

@@ -80,7 +80,7 @@ variable "cloudinit_growpart_config" {
 
 variable "license_type" {
   description = "Specifies the license type for the OS"
-  default = ""
+  default     = ""
 
 }
 
@@ -92,21 +92,27 @@ locals {
   storageaccount_names = var.naming.storageaccount_names.SDU
   resource_suffixes    = var.naming.resource_suffixes
 
+  default_filepath = format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  custom_sizing    = length(var.custom_disk_sizes_filename) > 0
+
   // Imports database sizing information
-  file_name = length(var.custom_disk_sizes_filename) > 0 ? (
-    format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
-    format("%s%s", path.module, "/../../../../../configs/hdb_sizes.json")
+  file_name = local.custom_sizing ? (
+    fileexists(var.custom_disk_sizes_filename) ? (
+      var.custom_disk_sizes_filename) : (
+      format("%s/%s", path.cwd, var.custom_disk_sizes_filename)
+    )) : (
+    local.default_filepath
+
   )
 
-  sizes         = jsondecode(file(local.file_name))
-  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+  sizes = jsondecode(file(local.file_name))
 
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
   region  = var.infrastructure.region
   sid     = upper(var.sap_sid)
-  prefix    = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
-  rg_name   = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
+  prefix  = try(var.infrastructure.resource_group.name, trimspace(var.naming.prefix.SDU))
+  rg_name = try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
 
 
   hdb_list = [
@@ -117,7 +123,7 @@ locals {
   enable_deployment = (length(local.hdb_list) > 0) ? true : false
 
   // Filter the list of databases to only HANA platform entries
-  hdb = try(local.hdb_list[0], {})
+  hdb = var.databases[0]
 
   //ANF support
   use_ANF = try(local.hdb.use_ANF, false)
@@ -176,9 +182,9 @@ locals {
   node_count      = try(length(local.hdb.dbnodes), 1)
   db_server_count = local.hdb_ha ? local.node_count * 2 : local.node_count
 
-  hdb_ins    = try(local.hdb.instance, {})
-  hdb_sid    = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
-  hdb_nr     = try(local.hdb_ins.instance_number, "01")
+  hdb_ins = try(local.hdb.instance, {})
+  hdb_sid = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
+  hdb_nr  = try(local.hdb_ins.instance_number, "01")
 
   dbnodes = local.hdb_ha ? (
     flatten([for idx, dbnode in try(local.hdb.dbnodes, [{}]) :
@@ -389,6 +395,10 @@ locals {
   zonal_deployment = local.db_zone_count > 0 || local.enable_ultradisk ? true : false
 
   //If we deploy more than one server in zone put them in an availability set
-  use_avset = !local.zonal_deployment || local.db_server_count != local.db_zone_count
+  use_avset = local.db_server_count > 0 && !try(local.hdb.no_avset, false) ? !local.zonal_deployment || (local.db_server_count != local.db_zone_count) : false
+
+  //PPG control flag
+  no_ppg = var.databases[0].no_ppg
+
 
 }

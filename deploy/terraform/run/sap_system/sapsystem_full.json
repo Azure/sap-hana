@@ -1,233 +1,182 @@
 {
-  "tfstate_resource_id": "",
-  "deployer_tfstate_key": "",
-  "landscape_tfstate_key": "",
+  "tfstate_resource_id"                    : "",
+  "deployer_tfstate_key"                   : "",
+  "landscape_tfstate_key"                  : "",
   "infrastructure": {
-    "anchor_vms": {
-      "sku": "Standard_D4s_v4",
-      "authentication": {
-        "type": "key"
-      },
-      "accelerated_networking": true,
-      "os": {
-        "publisher": "SUSE",
-        "offer": "sles-sap-12-sp5",
-        "sku": "gen1"
-      },
-      "nic_ips": [
-        "",
-        "",
-        ""
-      ],
-      "use_DHCP": false
-    },
-    "environment": "NP",
-    "region": "westeurope",
+    "environment"                          : "NP",
+    "region"                               : "westeurope",
     "resource_group": {
-      "name": "",
-      "arm_id": ""
+      "name"                               : "",
+      "arm_id"                             : ""
     },
     "ppg":{
-      "arm_ids" : [],
-      "names": [""]
-    
+      "arm_ids"                            : [],
+      "names"                              : [""]
+    },
+    "anchor_vms": {
+      "sku"                                : "Standard_D4s_v4",
+      "authentication": {
+        "type"                             : "key"
+      },
+      "accelerated_networking"             : true,
+      "os": {
+        "os_type"                          : "LINUX",
+        "source_image_id"                  : "",
+        "publisher"                        : "SUSE",
+        "offer"                            : "sles-sap-12-sp5",
+        "sku"                              : "gen1"
+      },
+      "nic_ips"                            : ["","",""],
+      "use_DHCP"                           : false
 
     },
     "vnets": {
       "sap": {
-        "arm_id": "",
-        "name": "",
-        "address_space": "10.1.0.0/16",
+        "arm_id"                           : "",
+        "name"                             : "",
+        "address_space"                    : "10.1.0.0/16",
         "subnet_admin": {
-          "name": "",
-          "prefix": "10.1.1.0/24",
-          "arm_id": "",
+          "name":                          "",
+          "prefix"                         : "10.1.1.0/24",
+          "arm_id"                         : "",
           "nsg": {
-            "name": "",
-            "arm_id": ""
+            "name"                         : "",
+            "arm_id"                       : ""
           }
         },
         "subnet_db": {
-          "name": "",
-          "prefix": "10.1.2.0/24",
-          "arm_id": "",
+          "name"                           : "",
+          "prefix"                         : "10.1.2.0/24",
+          "arm_id"                         : "",
           "nsg": {
-            "name": "",
-            "arm_id": ""
+            "name"                         : "",
+            "arm_id"                       : ""
           }
         },
         "subnet_app": {
-          "name": "",
-          "prefix": "10.1.3.0/24",
-          "arm_id": "",
+          "name"                           : "",
+          "prefix"                         : "10.1.3.0/24",
+          "arm_id"                         : "",
           "nsg": {
-            "name": "",
-            "arm_id": ""
+            "name"                         : "",
+            "arm_id"                       : ""
           }
         },
         "subnet_web": {
-          "name": "",
-          "prefix": "10.1.4.0/24",
-          "arm_id": "",
-          "nsg": {
-            "name": "",
-            "arm_id": ""
+          "name"                           : "",
+          "prefix"                         : "10.1.4.0/24",
+          "arm_id"                         : "",
+          "nsg"                            : {
+            "name"                         : "",
+            "arm_id"                       : ""
           }
         }
       }
     }
   },
   "key_vault": {
-    "kv_user_id": "",
-    "kv_prvt_id": "",
-    "kv_spn_id": ""
+    "kv_user_id"                           : "",
+    "kv_prvt_id"                           : "",
+    "kv_spn_id"                            : ""
   },
   "databases": [
     {
       "authentication": {
-        "type": "key"
+        "type"                             : "key"
       },
       "avset_arm_ids": [
         "/subscriptions/xxxx/resourceGroups/yyyy/providers/Microsoft.Compute/availabilitySets/PROTO-SID_db_avset"
       ],
-      "db_version": "2.00.050",
+      "no_ppg"                             : false, 
+      "no_avset"                           : false, 
       "dbnodes": [
         {
-          "name": "hdb1",
-          "role": "worker",
-          "db_nic_ips": [
-            "",
-            ""
-          ],
-          "admin_nic_ips": [
-            "",
-            ""
-          ],
-          "storage_nic_ips": [
-            "",
-            ""
-          ]
-        },
-        {
-          "name": "hdb2",
-          "role": "worker",
-          "db_nic_ips": [
-            "",
-            ""
-          ],
-          "admin_nic_ips": [
-            "",
-            ""
-          ],
-          "storage_nic_ips": [
-            "",
-            ""
-          ]
-        },
-        {
-          "name": "hdb3",
-          "role": "standby",
-          "db_nic_ips": [
-            "",
-            ""
-          ],
-          "admin_nic_ips": [
-            "",
-            ""
-          ],
-          "storage_nic_ips": [
-            "",
-            ""
-          ]
+          "name"                           : "hdb1",
+          "role"                           : "worker",
+          "db_nic_ips"                     : ["",""],
+          "admin_nic_ips"                  : ["",""],
+          "storage_nic_ips"                : ["",""]
         }
       ],
-      "high_availability": false,
+      "high_availability"                  : false,
       "os": {
-        "os_type": "",
-        "source_image_id": "",
-        "publisher": "SUSE",
-        "offer": "sles-sap-12-sp5",
-        "sku": "gen1"
+        "os_type"                          : "LINUX",
+        "source_image_id"                  : "",
+        "publisher"                        : "SUSE",
+        "offer"                            : "sles-sap-12-sp5",
+        "sku"                              : "gen1"
       },
-      "platform": "HANA",
-      "size": "Default",
-      "use_DHCP": false,
-      "zones": [
-        "1"
-      ]
+      "platform"                           : "HANA",
+      "size"                               : "Default",
+      "use_DHCP"                           : false,
+      "zones"                              : ["1"]
     }
   ],
   "application": {
-    "enable_deployment": true,
+    "enable_deployment"                    : true,
     "authentication": {
-      "type": "key"
+      "type"                               : "key"
     },
-    "sid": "PRD",
-    "use_DHCP": false,
-    "dual_nics": false,
-    "vm_sizing": "New",
-    "application_server_count": 3,
-    "app_nic_ips": [],
-    "app_admin_nic_ips": [],
-    "app_sku": "",
-    "app_tags": {},
-    "app_zones": [
-      "1",
-      "2"
-    ],
+    "sid"                                  : "PRD",
+    "use_DHCP"                             : false,
+    "dual_nics"                            : false,
+    "vm_sizing"                            : "New",
+    "application_server_count"             : 3,
+    "app_nic_ips"                          : [],
+    "app_admin_nic_ips"                    : [],
+    "app_sku"                              : "",
+    "app_no_ppg"                           : false, 
+    "app_avset"                            : false, 
+    "app_tags"                             : {},
+    "app_zones"                            : ["1","2"],
     "app_os": {
-      "os_type": "",
-      "source_image_id": "",
-      "publisher": "SUSE",
-      "offer": "sles-sap-12-sp5",
-      "sku": "gen1"
+      "os_type"                            : "",
+      "source_image_id"                    : "",
+      "publisher"                          : "SUSE",
+      "offer"                              : "sles-sap-12-sp5",
+      "sku"                                : "gen1"
     },
-    "scs_admin_nic_ips": [],
-    "scs_high_availability": false,
-    "scs_instance_number": "01",
-    "ers_instance_number": "02",
-    "scs_lb_ips": [],
-    "scs_nic_ips": [],
+    "scs_admin_nic_ips"                    : [],
+    "scs_high_availability"                : false,
+    "scs_instance_number"                  : "01",
+    "ers_instance_number"                  : "02",
+    "scs_lb_ips"                           : [],
+    "scs_nic_ips"                          : [],
     "scs_os": {
-      "os_type": "",
-      "source_image_id": "",
-      "publisher": "SUSE",
-      "offer": "sles-sap-12-sp5",
-      "sku": "gen1"
+      "os_type"                            : "",
+      "source_image_id"                    : "",
+      "publisher"                          : "SUSE",
+      "offer"                              : "sles-sap-12-sp5",
+      "sku"                                : "gen1"
     },
-    "scs_server_count": 1,
-    "scs_sku": "",
-    "scs_tags": {},
-    "scs_zones": [
-      "1"
-    ],
-    "web_lb_ips": [],
-    "web_nic_ips": [],
-    "web_admin_nic_ips": [],
+    "scs_server_count"                     : 1,
+    "scs_sku"                              : "",
+    "scs_tags"                             : {},
+    "scs_zones"                            : ["1"],
+    "web_lb_ips"                           : [],
+    "web_nic_ips"                          : [],
+    "web_admin_nic_ips"                    : [],
     "web_os": {
-      "os_type": "",
-      "source_image_id": "",
-      "publisher": "SUSE",
-      "offer": "sles-sap-12-sp5",
-      "sku": "gen1"
+      "os_type"                            : "",
+      "source_image_id"                    : "",
+      "publisher"                          : "SUSE",
+      "offer"                              : "sles-sap-12-sp5",
+      "sku"                                : "gen1"
     },
-    "web_sku": "",
-    "web_tags": {},
-    "web_zones": [
-      "1"
-    ],
-    "webdispatcher_count": 1
+    "web_sku"                              : "",
+    "web_tags"                             : {},
+    "web_zones"                            : ["1"],
+    "webdispatcher_count"                  : 1
   },
   "authentication": {
-    "username": "azureadm",
-    "password": "T0pS€cr€t",
-    "path_to_public_key": "sshkey.pub",
-    "path_to_private_key": "sshkey"
+    "username"                             : "azureadm",
+    "password"                             : "",
+    "path_to_public_key"                   : "sshkey.pub",
+    "path_to_private_key"                  : "sshkey"
   },
   "options": {
-    "enable_secure_transfer": true,
-    "resource_offset": 0,
-    "disk_encryption_set_id": "",
-    "nsg_asg_with_vnet": false
+    "resource_offset"                      : 0,
+    "disk_encryption_set_id"               : "",
+    "nsg_asg_with_vnet"                    : false
   }
 }

@@ -93,11 +93,20 @@ variable "license_type" {
 locals {
   // Imports Disk sizing sizing information
 
+  default_filepath = format("%s%s", path.module, "/../../../../../configs/app_sizes.json")
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
-  sizes = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? (
-    format("%s/%s", path.cwd, var.custom_disk_sizes_filename)) : (
-    format("%s%s", path.module, "/../../../../../configs/app_sizes.json")))
+
+  // Imports application tier sizing information
+  file_name = local.custom_sizing ? (
+    fileexists(var.custom_disk_sizes_filename) ? (
+      var.custom_disk_sizes_filename) : (
+      format("%s/%s", path.cwd, var.custom_disk_sizes_filename)
+    )) : (
+    local.default_filepath
+
   )
+
+  sizes = jsondecode(file(local.file_name))
 
   faults = jsondecode(file(format("%s%s", path.module, "/../../../../../configs/max_fault_domain_count.json")))
 
@@ -597,20 +606,20 @@ locals {
   app_zones            = try(var.application.app_zones, [])
   app_zonal_deployment = length(local.app_zones) > 0 ? true : false
   app_zone_count       = length(local.app_zones)
-  //If we deploy more than one server in zone put them in an availability set
-  use_app_avset = local.application_server_count > 0 ? !local.app_zonal_deployment || local.application_server_count != local.app_zone_count : false
+  //If we deploy more than one server in zone put them in an availability set unless specified otherwise
+  use_app_avset = local.application_server_count > 0 && !var.application.app_no_avset ? !local.app_zonal_deployment || local.application_server_count != local.app_zone_count : false
 
   scs_zones            = try(var.application.scs_zones, [])
   scs_zonal_deployment = length(local.scs_zones) > 0 ? true : false
   scs_zone_count       = length(local.scs_zones)
   //If we deploy more than one server in zone put them in an availability set
-  use_scs_avset = local.scs_server_count > 0 ? (!local.scs_zonal_deployment || local.scs_server_count != local.scs_zone_count) : false
+  use_scs_avset = local.scs_server_count > 0 && !var.application.scs_no_avset ? (!local.scs_zonal_deployment || local.scs_server_count != local.scs_zone_count) : false
 
   web_zones            = try(var.application.web_zones, [])
   web_zonal_deployment = length(local.web_zones) > 0 ? true : false
   web_zone_count       = length(local.web_zones)
   //If we deploy more than one server in zone put them in an availability set
-  use_web_avset = local.webdispatcher_count > 0 ? (!local.web_zonal_deployment || local.webdispatcher_count != local.web_zone_count) : false
+  use_web_avset = local.webdispatcher_count > 0 && !var.application.web_no_avset ? (!local.web_zonal_deployment || local.webdispatcher_count != local.web_zone_count) : false
 
   winha_ips = [
     {
@@ -645,5 +654,12 @@ locals {
   ]
 
   fpips = (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? concat(local.std_ips, local.winha_ips) : local.std_ips
+
+
+  //PPG control flags
+  app_no_ppg = var.application.app_no_ppg
+  scs_no_ppg = var.application.scs_no_ppg
+  web_no_ppg = var.application.web_no_ppg
+
 
 }

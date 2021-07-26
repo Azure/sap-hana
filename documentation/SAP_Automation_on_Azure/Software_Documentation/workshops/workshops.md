@@ -26,4 +26,11 @@
 
   1.  [Accelerated](accelerated/overview.md) This workshop uses several scripts to accelerate the process.
 
+### 3. Software Download Process
+  This workshop will work through the steps of downloading the SAP Software.
+  <br /><br />
+
+  1.  [Software Download](software-download/readme.md) This workshop uses several scripts to accelerate the process.
+
+
 <br/><br/>

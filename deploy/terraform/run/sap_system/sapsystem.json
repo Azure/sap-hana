@@ -1,50 +1,46 @@
 {
-  "tfstate_resource_id": "",
-  "deployer_tfstate_key": "",
-  "landscape_tfstate_key": "",
   "infrastructure": {
-    "environment": "np",
-    "region": "westeurope",
-    "resource_group": {
-      "is_existing": "false",
-      "arm_id": ""
-    },
+    "environment"                            : "np",
+    "region"                                 : "westeurope",
     "vnets": {
       "sap": {
-        "name": "SAP01"
+        "name"                               : "SAP01"
       }
     }
   },
   "databases": [
     {
-      "platform": "HANA",
-      "high_availability": false,
-      "db_version": "2.00.050",
-      "size": "Default",
+      "platform"                             : "HANA",
+      "high_availability"                    : false,
+      "db_version"                           : "2.00.050",
+      "size"                                 : "Default",
       "os": {
-        "publisher": "suse",
-        "offer": "sles-sap-12-sp5",
-        "sku": "gen1"
+        "publisher"                          : "SUSE",
+        "offer"                              : "sles-sap-12-sp5",
+        "sku"                                : "gen1"
       },
       "authentication": {
-        "type": "key"
+        "type"                               : "key"
       },
-      "use_DHCP": true
+      "use_DHCP"                             : true
     }
   ],
   "application": {
-    "enable_deployment": true,
-    "sid": "PRD",
-    "scs_instance_number": "01",
-    "ers_instance_number": "02",
-    "scs_high_availability": false,
-    "application_server_count": 1,
-    "webdispatcher_count": 1,
+    "enable_deployment"                      : true,
+    "sid"                                    : "PRD",
+    "scs_instance_number"                    : "01",
+    "ers_instance_number"                    : "02",
+    "scs_high_availability"                  : false,
+    "application_server_count"               : 1,
+    "webdispatcher_count"                    : 1,
     "authentication": {
-      "type": "key"
+      "type"                                 : "key"
     },
-    "use_DHCP": true
+    "use_DHCP"                               : true
   },
-  "options": {
-  }
+  "options": {},
+  "tfstate_resource_id"                      : "",
+  "deployer_tfstate_key"                     : "",
+  "landscape_tfstate_key"                    : "",
+  "enable_purge_control_for_keyvaults"       : false
 }

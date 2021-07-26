@@ -227,6 +227,7 @@ variable "resource_suffixes" {
     "deployer_state"       = "_DEPLOYER.terraform.tfstate"
     "deployer_subnet"      = "_deployment-subnet"
     "deployer_subnet_nsg"  = "_deployment-nsg"
+    "dns_link"            = "dns-link"
     "fencing_agent_spn"    = "fencing-agent"
     "fencing_agent_id"     = "-fencing-spn-id"
     "fencing_agent_pwd"    = "-fencing-spn-pwd"
@@ -283,7 +284,6 @@ variable "resource_suffixes" {
     "witness"              = "-witness"
     "witness_accesskey"    = "-witness-accesskey"
     "witness_name"         = "-witness-name"
-
   }
 }
 

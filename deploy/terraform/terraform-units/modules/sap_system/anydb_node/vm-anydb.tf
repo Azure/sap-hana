@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     }
   }
 
-  custom_data = var.cloudinit_growpart_config
+  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   dynamic "os_disk" {
     iterator = disk
@@ -96,8 +96,11 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
     }
   }
 
-
-  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  //If no ppg defined do not put the database in a proximity placement group
+  proximity_placement_group_id = local.no_ppg ? (
+    null) : (
+    local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  )
 
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   availability_set_id = local.use_avset ? (
@@ -138,7 +141,7 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   }
 
   license_type = length(var.license_type) > 0 ? var.license_type : null
-  
+
   tags = local.tags
 }
 
@@ -167,7 +170,11 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
     }
   }
 
-  proximity_placement_group_id = local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  //If no ppg defined do not put the database in a proximity placement group
+  proximity_placement_group_id = local.no_ppg ? (
+    null) : (
+    local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+  )
 
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
   availability_set_id = local.use_avset ? (
@@ -208,10 +215,10 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   boot_diagnostics {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
-  
-#ToDo: Remove once feature is GA  patch_mode = "Manual"
-  license_type = length(var.license_type) > 0 ? var.license_type : null 
-  
+
+  #ToDo: Remove once feature is GA  patch_mode = "Manual"
+  license_type = length(var.license_type) > 0 ? var.license_type : null
+
   tags = local.tags
 }
 
@@ -230,11 +237,11 @@ resource "azurerm_managed_disk" "disks" {
   disk_mbps_read_write   = "UltraSSD_LRS" == local.anydb_disks[count.index].storage_account_type ? local.anydb_disks[count.index].disk_mbps_read_write : null
 
 
-  # zones = local.enable_ultradisk || local.db_server_count == local.db_zone_count ? (
-  #   upper(local.anydb_ostype) == "LINUX" ? (
-  #     [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
-  #     [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
-  # )) : null
+  zones = !local.use_avset ? (
+    upper(local.anydb_ostype) == "LINUX" ? (
+      [azurerm_linux_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]) : (
+      [azurerm_windows_virtual_machine.dbserver[local.anydb_disks[count.index].vm_index].zone]
+  )) : null
 
 }
 

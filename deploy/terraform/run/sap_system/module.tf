@@ -33,21 +33,23 @@ module "common_infrastructure" {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
   }
-  is_single_node_hana        = "true"
-  application                = local.application
-  databases                  = local.databases
-  infrastructure             = local.infrastructure
-  options                    = local.options
-  key_vault                  = local.key_vault
-  naming                     = module.sap_namegenerator.naming
-  service_principal          = local.use_spn ? local.service_principal : local.account
-  deployer_tfstate           = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  custom_disk_sizes_filename = var.db_disk_sizes_filename
-  authentication             = local.authentication
-  terraform_template_version = var.terraform_template_version
-  deployment                 = var.deployment
-  license_type               = var.license_type
+  is_single_node_hana                = "true"
+  application                        = local.application
+  databases                          = local.databases
+  infrastructure                     = local.infrastructure
+  options                            = local.options
+  key_vault                          = local.key_vault
+  naming                             = module.sap_namegenerator.naming
+  service_principal                  = local.use_spn ? local.service_principal : local.account
+  deployer_tfstate                   = length(local.deployer_tfstate_key) > 0 ? data.terraform_remote_state.deployer[0].outputs : null
+  landscape_tfstate                  = data.terraform_remote_state.landscape.outputs
+  custom_disk_sizes_filename         = var.db_disk_sizes_filename
+  authentication                     = local.authentication
+  terraform_template_version         = var.terraform_template_version
+  deployment                         = var.deployment
+  license_type                       = var.license_type
+  enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
+
 
 }
 
@@ -79,7 +81,7 @@ module "hdb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
-  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
   license_type               = var.license_type
 
 }
@@ -113,7 +115,7 @@ module "app_tier" {
   landscape_tfstate          = data.terraform_remote_state.landscape.outputs
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
-  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
   license_type               = var.license_type
 
 }
@@ -145,7 +147,7 @@ module "anydb_node" {
   db_asg_id                  = module.common_infrastructure.db_asg_id
   terraform_template_version = var.terraform_template_version
   deployment                 = var.deployment
-  cloudinit_growpart_config  = module.common_infrastructure.cloudinit_growpart_config
+  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
   license_type               = var.license_type
 
 }
@@ -160,7 +162,7 @@ module "output_files" {
   databases             = local.databases
   infrastructure        = local.infrastructure
   authentication        = local.authentication
-  authentication_type   = local.application.authentication.type
+  authentication_type   = try(local.application.authentication.type, "key")
   iscsi_private_ip      = module.common_infrastructure.iscsi_private_ip
   nics_dbnodes_admin    = module.hdb_node.nics_dbnodes_admin
   nics_dbnodes_db       = module.hdb_node.nics_dbnodes_db
@@ -188,5 +190,7 @@ module "output_files" {
   scs_ha                = module.app_tier.scs_ha
   db_ha                 = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ha : module.anydb_node.db_ha
   ansible_user          = module.common_infrastructure.sid_username
+  scs_lb_ip             = module.app_tier.scs_lb_ip
+  db_lb_ip              = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_lb_ip : module.anydb_node.db_lb_ip
 
 }

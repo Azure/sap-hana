@@ -51,6 +51,11 @@ variable "license_type" {
 
 }
 
+variable "enable_purge_control_for_keyvaults" {
+  description = "Allow the deployment to control the purge protection"
+}
+
+
 locals {
   // Resources naming
   vnet_prefix                 = trimspace(var.naming.prefix.VNET)
@@ -152,6 +157,18 @@ locals {
     format("%s%s", path.module, "/../../../../../configs/anydb_sizes.json")
   )
 
+  custom_sizing = length(var.custom_disk_sizes_filename) > 0
+
+   // Imports database sizing information
+  file_name = local.custom_sizing ? (
+    fileexists(var.custom_disk_sizes_filename) ? (
+      var.custom_disk_sizes_filename) : (
+      format("%s/%s", path.cwd, var.custom_disk_sizes_filename)
+    )) : (
+    local.default_filepath
+
+  )
+
 
   //Enable xDB deployment 
   xdb_list = [
@@ -168,9 +185,8 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes         = jsondecode(file(length(var.custom_disk_sizes_filename) > 0 ? format("%s/%s", path.cwd, var.custom_disk_sizes_filename) : local.default_filepath))
-  custom_sizing = length(var.custom_disk_sizes_filename) > 0
-
+  sizes         = jsondecode(file(local.file_name))
+  
   db_sizing = local.enable_sid_deployment ? lookup(local.sizes.db, var.databases[0].size).storage : []
 
   enable_ultradisk = try(
@@ -382,5 +398,5 @@ locals {
 
 locals {
   // 'Cg==` is empty string, base64 encoded.
-  cloudinit_growpart_config = try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
+  cloudinit_growpart_config = null # This needs more though as changing of it is a destructive action try(data.template_cloudinit_config.config_growpart.rendered, "Cg==")
 }

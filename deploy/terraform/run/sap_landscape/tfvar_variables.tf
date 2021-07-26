@@ -240,3 +240,7 @@ variable "witness_storage_account_arm_id" {
 variable "create_fencing_spn" {
   default = true
 }
+
+  variable "enable_purge_control_for_keyvaults" {
+  default = true
+}

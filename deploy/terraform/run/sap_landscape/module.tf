@@ -22,6 +22,10 @@ module "sap_landscape" {
   witness_storage_account     = local.witness_storage_account
   use_deployer                = length(var.deployer_tfstate_key) > 0
   create_spn                  = local.options.create_fencing_spn
+  dns_label                   = var.dns_label
+  dns_resource_group_name     = length(var.dns_resource_group_name) > 0 ? var.dns_resource_group_name : local.saplib_resource_group_name
+  enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
+
 }
 
 module "sap_namegenerator" {

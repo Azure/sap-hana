@@ -11,10 +11,15 @@
 - [Procedure](#procedure)
   - [Destroy SDU](#destroy-sdu)
   - [Destroy Workload VNET](#destroy-workload-vnet)
+  - [Destroy Region](#destroy-region)
 
 <br/><br/>
 
 ## Overview
+
+Execute the first two steps from the deployer VM.
+
+Execute the destroy region command from the cloud shell.
 
 
 ---
@@ -28,14 +33,14 @@
 <br/>
 
 ```
-cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/NP-EUS2-SAP00-X00
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_SYSTEM/DEMO-SCUS-SAP00-X00
 ```
 
 
 ```
-terraform destroy --auto-approve                                                        \
-                  --var-file=NP-EUS2-SAP00-X00.json                                      \
-                  ../../../sap-hana/deploy/terraform/run/sap_system/
+$DEPLOYMENT_REPO_PATH/deploy/scripts/remover.sh            \
+     --parameterfile DEMO-SCUS-SAP00-X00.json              \
+     --type sap_system
 ```
 <br/><br/>
 
@@ -44,13 +49,28 @@ terraform destroy --auto-approve                                                
 <br/>
 
 ```
-cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/NP-EUS2-SAP00-INFRASTRUCTURE
+cd ~/Azure_SAP_Automated_Deployment/WORKSPACES/SAP_LANDSCAPE/DEMO-SCUS-SAP00-INFRASTRUCTURE
 ```
 
 
 ```
-terraform destroy --auto-approve                                                        \
-                  --var-file=NP-EUS2-SAP00-INFRASTRUCTURE.json                           \
-                  ../../../sap-hana/deploy/terraform/run/sap_system/
+$DEPLOYMENT_REPO_PATH/deploy/scripts/remover.sh            \
+     --parameterfile DEMO-SCUS-SAP00-INFRASTRUCTURE.json              \
+     --type sap_landscape
 ```
 <br/><br/>
+
+### Destroy region
+
+Execute this in the cloud shell
+<br/>
+
+```bash
+   cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
+
+
+   ${DEPLOYMENT_REPO_PATH}/deploy/scripts/remove_region.sh                                                     \
+        --deployer_parameter_file DEPLOYER/DEMO-SCUS-DEP00-INFRASTRUCTURE/DEMO-SCUS-DEP00-INFRASTRUCTURE.json  \
+        --library_parameter_file LIBRARY/DEMO-SCUS-SAP_LIBRARY/DEMO-SCUS-SAP_LIBRARY.json                      
+        
+```

@@ -112,18 +112,29 @@ variable "authentication_type" {
 
 variable "db_ha" {
   description = "Is the DB deployment highly available"
-  default = false
+  default     = false
 }
 
 variable "scs_ha" {
   description = "Is the SCS deployment highly available"
-  default = false
+  default     = false
 }
 
 variable "ansible_user" {
   description = "The ansible remote user account to use"
-  default = "azureadm"
+  default     = "azureadm"
 }
+
+variable "db_lb_ip" {
+  description = "DB Load Balancer IP"
+  default     = ""
+}
+
+variable "scs_lb_ip" {
+  description = "SCS Load Balancer IP"
+  default     = ""
+}
+
 
 
 locals {
@@ -183,7 +194,7 @@ locals {
   ips_app = [for key, value in local.ips_primary_app : value.private_ip_address]
   ips_web = [for key, value in local.ips_primary_web : value.private_ip_address]
 
-  ips_primary_anydb = length(var.nics_anydb_admin) > 0 ? var.nics_anydb_admin : var.nics_anydb
+  ips_primary_anydb = var.nics_anydb
   ips_anydbnodes    = [for key, value in local.ips_primary_anydb : value.private_ip_address]
 
   anydatabases = [
@@ -216,4 +227,5 @@ locals {
   ])
 
   secret_prefix = var.use_local_credentials ? var.naming.prefix.SDU : var.naming.prefix.VNET
+  dns_label     = try(var.landscape_tfstate.dns_label, "")
 }

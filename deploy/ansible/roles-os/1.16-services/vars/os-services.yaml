@@ -25,8 +25,6 @@ services:
  
     redhat8:
       - { tier: 'os', service: 'auditd',       node_tier: 'all',     state: 'started' }
-      - { tier: 'os', service: 'multipathd',   node_tier: 'all',     state: 'stopped' }
-      - { tier: 'os', service: 'sbd',          node_tier: 'all',     state: 'enabled' }
       - { tier: 'os', service: 'oddjobd',      node_tier: 'all',     state: 'disabled' }
    
     suse12:

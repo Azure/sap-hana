@@ -29,13 +29,13 @@ data "azurerm_key_vault_secret" "sid_password" {
 // Create private KV with access policy
 resource "azurerm_key_vault" "sid_kv_prvt" {
   provider                   = azurerm.main
-  count                      = local.enable_sid_deployment && !local.prvt_kv_override ? 1 : 0
+  count                      = local.enable_sid_deployment && local.use_local_credentials ? 1 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_retention_days = 7
-  purge_protection_enabled   = true
+  purge_protection_enabled   = var.enable_purge_control_for_keyvaults
   sku_name                   = "standard"
 
   access_policy {
@@ -72,7 +72,7 @@ resource "azurerm_key_vault" "sid_kv_user" {
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
   tenant_id                  = local.service_principal.tenant_id
   soft_delete_retention_days = 7
-  purge_protection_enabled   = true
+  purge_protection_enabled   = var.enable_purge_control_for_keyvaults
   sku_name                   = "standard"
 
   access_policy {
