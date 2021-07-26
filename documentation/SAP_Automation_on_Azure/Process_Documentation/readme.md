@@ -20,9 +20,9 @@ The SAP Deployment Automation Framework provides both Terraform templates and An
 
 ## Planning ##
 
-This section covers the high level steps for the planning process and the decisions that need to be made.
+This section covers the high level steps for the planning process and the decisions that need to be made before the actual deployment.
 
-The Terraform deployment will use the Microsoft provided Terraform templates from this repository and the customer provided parameter files that contain the system specific information. During the deployment information from both will be merged..
+The Terraform deployment will use the Microsoft-provided Terraform templates from this repository along with the customer-enhanced parameter files that contain system-specific information. During the deployment, information from both will be merged. Note: the Terraform parameter files are in the /terraform folder (and its subfolders) of this repository - please see the relevant sections below on how to manage these files.
 
 ### **Credentials management** ###
 
@@ -316,19 +316,19 @@ The sample deployment will create a deployment environment, the shared library f
 
 ## Choosing the orchestration environment ##
 
-The templates and scripts need to be executed from an execution environment, currently the supported environments are:
+The templates and scripts need to be run from within an execution environment. Currently the supported environments are:
 
 - Azure Cloud Shell
-- Azure hosted Virtual Machine
-- Local PC
+- Azure-hosted Linux Virtual Machine
+- Powershell on Local PC
 
 The links below explain how to deploy using the different deployment environments.
 
-[Deploying from cloud shell](./Getting_started_with_the_SAP_Deployment_Automation_cloudshell.md)
+[Deploying Azure from cloud shell](./Getting_started_with_the_SAP_Deployment_Automation_cloudshell.md)
 
-[Deploying from the Linux](./Getting_started_with_the_SAP_Deployment_Automation_bash.md)
+[Deploying from Azure-hosted Linux VM](./Getting_started_with_the_SAP_Deployment_Automation_bash.md)
 
-[Deploying using PowerShell](./Getting_started_with_the_SAP_Deployment_Automation_pwsh.md)
+[Deploying using PowerShell on Local PC](./Getting_started_with_the_SAP_Deployment_Automation_pwsh.md)
 
 
 ## Changing the naming convention ##
