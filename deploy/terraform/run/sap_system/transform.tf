@@ -96,6 +96,13 @@ locals {
   }
   db_os_specified = (length(local.db_os.source_image_id) + length(local.db_os.publisher)) > 0
 
+  db_sid_specified = length(var.database_sid) + length (try(var.databases[0].sid, ""))) > 0
+
+  instance = {
+    sid     = try(coalesce(var.database_sid,try(var.databases[0].sid, "")), upper(var.databases[0].platform) == "HANA" ? "hdb" : lower(substr(var.databases[0].platform,0,3)))
+    instance_number = upper(var.databases[0].platform) == "HANA" ? coalesce(var.database_instance_number,try(var.databases[0].instance_number, "01")) : ""
+  }
+
   app_authentication = {
     type     = try(coalesce(var.app_tier_authentication_type, try(var.application.authentication.type, "")), "")
     username = try(coalesce(var.automation_username, try(var.application.authentication.username, "")), "")
@@ -312,7 +319,8 @@ locals {
     local.db_avset_arm_ids_defined ? { avset_arm_ids = local.avset_arm_ids } : null), (
     length(local.dbnodes) > 0 ? { dbnodes = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { zones = local.db_zones_temp } : null), (
-    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} })
+    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} }), (
+    local.db_sid_specified ? {instance = local.instance}: null)
     )
   ]
 

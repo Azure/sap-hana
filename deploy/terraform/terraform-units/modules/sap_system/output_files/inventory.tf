@@ -144,7 +144,7 @@ resource "local_file" "ansible_inventory_new_yml" {
     ips_pas = length(local.ips_app) > 0 ? slice(local.ips_app, 0, 1) : [],
     ips_app = length(local.ips_app) > 1 ? slice(local.ips_app, 1, length(local.ips_app)) : []
     ips_web = length(local.ips_web) > 0 ? local.ips_web : [],
-    sid     = var.hdb_sid,
+    sid     = var.sap_sid,
     passervers = length(local.ips_app) > 0 ? (
       slice(var.naming.virtualmachine_names.APP_VMNAME, 0, 1)) : (
       []
@@ -184,14 +184,15 @@ resource "local_file" "ansible_inventory_new_yml" {
     ansible_user      = var.ansible_user
     }
   )
-  filename             = format("%s/%s_hosts.yaml", path.cwd, var.hdb_sid)
+  filename             = format("%s/%s_hosts.yaml", path.cwd, var.sap_sid)
   file_permission      = "0660"
   directory_permission = "0770"
 }
 
 resource "local_file" "sap-parameters_yml" {
   content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
-    sid           = var.hdb_sid,
+    sid           = var.sap_sid,
+    db_sid = var.db_sid
     kv_uri        = local.kv_name,
     secret_prefix = local.secret_prefix,
     disks         = var.disks
@@ -213,7 +214,7 @@ resource "local_file" "sap-parameters_yml" {
 
 resource "azurerm_storage_blob" "hosts_yaml" {
   provider               = azurerm.deployer
-  name                   = format("%s_hosts.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.hdb_sid)
+  name                   = format("%s_hosts.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.sap_sid)
   storage_account_name   = local.tfstate_storage_account_name
   storage_container_name = local.ansible_container_name
   type                   = "Block"
@@ -225,7 +226,7 @@ resource "azurerm_storage_blob" "sap_parameters_yaml" {
     local_file.sap-parameters_yml
   ]
   provider               = azurerm.deployer
-  name                   = format("%s_sap-parameters.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.hdb_sid)
+  name                   = format("%s_sap-parameters.yaml", length(trimspace(var.naming.prefix.SDU)) > 0 ? trimspace(var.naming.prefix.SDU) : var.sap_sid)
   storage_account_name   = local.tfstate_storage_account_name
   storage_container_name = local.ansible_container_name
   type                   = "Block"

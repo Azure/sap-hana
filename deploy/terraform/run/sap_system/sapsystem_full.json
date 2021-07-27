@@ -108,6 +108,8 @@
       },
       "platform"                           : "HANA",
       "size"                               : "Default",
+      "sid"                                : "HDB",
+      "instance_number"                    : "01",
       "use_DHCP"                           : false,
       "zones"                              : ["1"]
     }

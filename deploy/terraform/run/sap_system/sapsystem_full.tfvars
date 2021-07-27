@@ -85,6 +85,8 @@ database_vm_image = {
 
 #database_platform="HANA"
 #database_size="Default"
+#database_sid="HDB"
+#database_instance_number="01"
 
 #database_no_avset=false
 #database_no_ppg=false
