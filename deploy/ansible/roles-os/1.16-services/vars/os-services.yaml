@@ -17,22 +17,25 @@
 # redhat8:
 #      - { tier: 'os', service: 'auditd',       node_tier: 'all',     state: 'started' }
 
+# -------------------------------------+---------------------------------------8
+#
+# TODO     - Add specific rules instead of disabling firewalld
+#
+# -------------------------------------+---------------------------------------8
 services:
     redhat7:
+        - { tier: 'os',          service: 'firewalld',      node_tier: 'all',     state: 'disabled' }
+        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'started'  }
 #      - { tier: 'os', service: '',  node_tier: 'all',    state: 'started' }
-     
-    
- 
+
     redhat8:
-      - { tier: 'os', service: 'auditd',       node_tier: 'all',     state: 'started' }
-      - { tier: 'os', service: 'oddjobd',      node_tier: 'all',     state: 'disabled' }
-   
+        - { tier: 'os',          service: 'auditd',       node_tier: 'all',     state: 'started'   }
+        - { tier: 'os',          service: 'oddjobd',      node_tier: 'all',     state: 'disabled'  }
+        - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'disabled'  }
+        - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'restarted' }
+
     suse12:
-#      - { tier: 'os', service: '',  node_tier: 'all',     state: 'started' }
-      
- 
+        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }
 
     suse15:
-#      - { tier: 'os', service: '',  node_tier: 'all',     state: 'started' }
-      
-
+        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }

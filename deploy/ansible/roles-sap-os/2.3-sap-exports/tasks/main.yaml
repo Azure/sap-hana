@@ -30,15 +30,13 @@
   when:     item.tier == "all" or
             item.tier == tier
 
-
-- name: "Exports: Enable NFS Service"
-  service:
-    name:    nfsserver
-    state:   restarted
-    enabled: yes
-
-
-
+# Leveraging functionality from the 1.16-serices role
+# - name: "Exports: Enable NFS Service on Suse"
+#   service:
+#     name:    nfsserver
+#     state:   restarted
+#     enabled: yes
+#   when:      ansible_os_family|upper == "SUSE"
 
 
 # - name: Ensure the NFS utils package is installed

@@ -53,6 +53,7 @@
 
 ### Logical SAP Workload VNET
 
+Logon to the deployer using the ssh key downloaded in the previous step.
 <br/>
 
 1. Create Working Directory.

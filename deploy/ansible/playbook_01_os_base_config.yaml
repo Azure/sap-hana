@@ -84,12 +84,18 @@
 
   - block:
       - include_role:
+          name:     roles-os/1.9-kernelparameters
+    tags:
+      - 1.9-kernelparameters
+
+  - block:
+      - include_role:
           name:     roles-os/1.11-accounts
     tags:
       - 1.11-accounts
 
   - block:
-      - include_role:
+    - include_role:
           name:     roles-os/1.16-services
     tags:
       - 1.16-services

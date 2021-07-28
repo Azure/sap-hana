@@ -320,15 +320,15 @@ The templates and scripts need to be run from within an execution environment. C
 
 - Azure Cloud Shell
 - Azure-hosted Linux Virtual Machine
-- Powershell on Local PC
+- Powershell on Local Windows PC
 
 The links below explain how to deploy using the different deployment environments.
 
-[Deploying Azure from cloud shell](./Getting_started_with_the_SAP_Deployment_Automation_cloudshell.md)
+[Deploying from Azure Cloud Shell](./Getting_started_with_the_SAP_Deployment_Automation_cloudshell.md)
 
 [Deploying from Azure-hosted Linux VM](./Getting_started_with_the_SAP_Deployment_Automation_bash.md)
 
-[Deploying using PowerShell on Local PC](./Getting_started_with_the_SAP_Deployment_Automation_pwsh.md)
+[Deploying using PowerShell on local Windows PC](./Getting_started_with_the_SAP_Deployment_Automation_pwsh.md)
 
 
 ## Changing the naming convention ##

@@ -36,7 +36,7 @@
 #              Mount NFS Filesystems
 #
   - include_role:
-      name:     roles-sap-os/sap-mounts
+      name:     roles-sap-os/2.6-sap-mounts
 # -------------------------------------+---------------------------------------8
 
 

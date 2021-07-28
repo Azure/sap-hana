@@ -27,7 +27,7 @@
       tier:     web                                                             # SAP Install phase: Web Dispatcher
 
   - include_role:
-      name:     roles-sap-os/sap-mounts
+      name:     roles-sap-os/2.6-sap-mounts
 
   - include_role:
       name:     roles-sap/5.4-web-install

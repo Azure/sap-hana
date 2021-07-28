@@ -50,9 +50,9 @@
 
   - block:
     - include_role:
-        name:     roles-sap-os/2.3-sap-mounts
+        name:     roles-sap-os/2.6-sap-mounts
     tags:
-      - 2.3-sap-mounts
+      - 2.6-sap-mounts
 
 
 # - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
@@ -60,7 +60,7 @@
     - include_role:
         name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
     tags:
-      - 2.3-sap-users
+      - 2.5-sap-users
 
 
 # - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)

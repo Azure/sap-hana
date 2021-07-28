@@ -81,16 +81,7 @@
     export ARM_SUBSCRIPTION_ID=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
     ```
 
-
-2. Terraform
-     ```bash
-     mkdir -p ~/bin; cd $_
-     wget  https://releases.hashicorp.com/terraform/0.14.7/terraform_0.14.7_linux_amd64.zip
-     unzip terraform_0.14.7_linux_amd64.zip
-     alias terraform=~/bin/terraform
-     ```
-
-3. Repository
+2. Repository
    1. Clone the Repository and Checkout the branch.
         ```bash
         mkdir -p ~/Azure_SAP_Automated_Deployment; cd $_
@@ -98,7 +89,7 @@
         cd  ~/Azure_SAP_Automated_Deployment/sap-hana
         ```
 
-    1. (*Optional*) Checkout Branch
+    1. (*Optional*) Checkout Branch (beta branch is recommended)
         ```bash
         git checkout <branch_name>
         ```
@@ -116,7 +107,7 @@
         <br/>
 
 4. DEPLOYER - Create Working Directory and prepare JSON.
-    <br/>*`Observe Naming Convention`*<br/>
+    <br/>*`Observe Naming Convention` Choose a suitable location*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-SCUS-DEP00-INFRASTRUCTURE; cd $_
 
@@ -148,7 +139,7 @@
     <br/>
 
 5. SAP_LIBRARY - Create Working Directory and prepare JSON.
-    <br/>*`Observe Naming Convention`*<br/>
+    <br/>*`Observe Naming Convention` Use same location as for the deployer*<br/>
     ```bash
     mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-SCUS-SAP_LIBRARY; cd $_
 
