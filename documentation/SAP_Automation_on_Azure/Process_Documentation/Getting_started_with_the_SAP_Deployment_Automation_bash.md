@@ -4,8 +4,26 @@
 
 ## **Pre-Requisites**
 
-1. **Terraform** - Terraform can be downloaded from [Download Terraform - Terraform by HashiCorp](https://www.terraform.io/downloads.html).
-2. **Azure CLI** - Azure CLI can be installed from <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=script>
+You will need a Linux VM - the easiest way is to deploy it in your Azure subscription. Select a standard image (Ubuntu) and leave all defaults as-is. Once the Lunux VM is up and running, connect to it using SSH (a tool like Putty will work just fine).
+
+On your Linux deployer VM, you will need the following tools:
+
+1. **Terraform** - run the following steps to install it (below are sample commands for installing version 0.15.4):
+
+apt install unzip
+wget https://releases.hashicorp.com/terraform/0.15.4/terraform_0.15.4_linux_amd64.zip
+unzip terraform_1.0.2_linux_amd64.zip
+mv terraform /usr/local/bin
+
+2. **Azure CLI** - Azure CLI can be installed by running: 
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+3. **The JQ JSON command-line processor** - run the following command to install it:
+
+sudo apt install jq
+
+With these tools on the Linux VM, you should be ready to run the deployment.
 
 ## **Deployment** ##
 
