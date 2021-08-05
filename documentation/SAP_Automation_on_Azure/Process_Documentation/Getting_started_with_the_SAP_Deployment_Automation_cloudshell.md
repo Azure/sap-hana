@@ -150,6 +150,9 @@ A sample output is listed below
 
 For deploying the supporting infrastructure for the Azure region(Deployer, Library) use the prepare_region.sh script. Navigate to the root folder of your repository containing your parameter files (DEPLOYMENT-WORKSPACES).
 
+Before executing the below script, please log with your Service Principal:
+az login --service-principal -u <app-id> -p <password-or-cert> --tenant <tenant>
+
 ```bash
 cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
 
