@@ -233,7 +233,10 @@ locals {
   scs_high_availability    = var.application.scs_high_availability
   application_server_count = var.application.application_server_count
   scs_server_count         = var.application.scs_server_count * (local.scs_high_availability ? 2 : 1)
+  enable_scs_lb_deployment = local.scs_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.scs_server_count > 1)
+  
   webdispatcher_count      = var.application.webdispatcher_count
+  enable_web_lb_deployment = local.webdispatcher_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.webdispatcher_count > 1)
 
   app_nic_ips       = try(var.application.app_nic_ips, [])
   app_admin_nic_ips = try(var.application.app_admin_nic_ips, [])

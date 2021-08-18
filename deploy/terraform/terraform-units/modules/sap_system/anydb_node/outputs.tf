@@ -30,7 +30,7 @@ output "any_database_info" {
 }
 
 output "anydb_loadbalancers" {
-  value = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.anydb_ha ) ? azurerm_lb.anydb : null
+  value = local.enable_db_lb_deployment ? azurerm_lb.anydb : null
 }
 
 // Output for DNS
@@ -52,7 +52,7 @@ output "dns_info_vms" {
 
 }
 output "dns_info_loadbalancers" {
-  value = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.anydb_ha ) ? (
+  value = local.enable_db_lb_deployment ? (
     zipmap([format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)], [azurerm_lb.anydb[0].private_ip_addresses[0]])) : (
     null
   )
