@@ -24,7 +24,7 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "hdb" {
   provider            = azurerm.main
-  count               = local.enable_deployment ? 1 : 0
+  count               = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.hdb_ha ) ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location

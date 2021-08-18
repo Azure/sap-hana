@@ -59,30 +59,31 @@ module "hdb_node" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }
-  databases                  = local.databases
-  infrastructure             = local.infrastructure
-  options                    = local.options
-  resource_group             = module.common_infrastructure.resource_group
-  vnet_sap                   = module.common_infrastructure.vnet_sap
-  storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
-  ppg                        = module.common_infrastructure.ppg
-  sid_kv_user_id             = module.common_infrastructure.sid_kv_user_id
-  naming                     = module.sap_namegenerator.naming
-  custom_disk_sizes_filename = var.db_disk_sizes_filename
-  admin_subnet               = module.common_infrastructure.admin_subnet
-  db_subnet                  = module.common_infrastructure.db_subnet
-  storage_subnet             = module.common_infrastructure.storage_subnet
-  anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
-  sid_password               = module.common_infrastructure.sid_password
-  sid_username               = module.common_infrastructure.sid_username
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
-  sap_sid                    = local.sap_sid
-  db_asg_id                  = module.common_infrastructure.db_asg_id
-  terraform_template_version = var.terraform_template_version
-  deployment                 = var.deployment
-  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
-  license_type               = var.license_type
+  }                  
+  databases                                    = local.databases
+  infrastructure                               = local.infrastructure
+  options                                      = local.options
+  resource_group                               = module.common_infrastructure.resource_group
+  vnet_sap                                     = module.common_infrastructure.vnet_sap
+  storage_bootdiag_endpoint                    = module.common_infrastructure.storage_bootdiag_endpoint
+  ppg                                          = module.common_infrastructure.ppg
+  sid_kv_user_id                               = module.common_infrastructure.sid_kv_user_id
+  naming                                       = module.sap_namegenerator.naming
+  custom_disk_sizes_filename                   = var.db_disk_sizes_filename
+  admin_subnet                                 = module.common_infrastructure.admin_subnet
+  db_subnet                                    = module.common_infrastructure.db_subnet
+  storage_subnet                               = module.common_infrastructure.storage_subnet
+  anchor_vm                                    = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password                                 = module.common_infrastructure.sid_password
+  sid_username                                 = module.common_infrastructure.sid_username
+  sdu_public_key                               = module.common_infrastructure.sdu_public_key
+  sap_sid                                      = local.sap_sid
+  db_asg_id                                    = module.common_infrastructure.db_asg_id
+  terraform_template_version                   = var.terraform_template_version
+  deployment                                   = var.deployment
+  cloudinit_growpart_config                    = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
+  license_type                                 = var.license_type
+  use_loadbalancers_for_standalone_deployments = var.use_loadbalancers_for_standalone_deployments
 
 }
 
@@ -92,31 +93,32 @@ module "app_tier" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }
-  application                = local.application
-  infrastructure             = local.infrastructure
-  options                    = local.options
-  resource_group             = module.common_infrastructure.resource_group
-  vnet_sap                   = module.common_infrastructure.vnet_sap
-  storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
-  ppg                        = module.common_infrastructure.ppg
-  sid_kv_user_id             = module.common_infrastructure.sid_kv_user_id
-  naming                     = module.sap_namegenerator.naming
-  admin_subnet               = module.common_infrastructure.admin_subnet
-  custom_disk_sizes_filename = var.app_disk_sizes_filename
-  anydb_vm_ids               = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
-  hdb_vm_ids                 = module.hdb_node.hdb_vms
-  sid_password               = module.common_infrastructure.sid_password
-  sid_username               = module.common_infrastructure.sid_username
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
-  route_table_id             = module.common_infrastructure.route_table_id
-  firewall_id                = module.common_infrastructure.firewall_id
-  sap_sid                    = local.sap_sid
-  landscape_tfstate          = data.terraform_remote_state.landscape.outputs
-  terraform_template_version = var.terraform_template_version
-  deployment                 = var.deployment
-  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
-  license_type               = var.license_type
+  }                  
+  application                                  = local.application
+  infrastructure                               = local.infrastructure
+  options                                      = local.options
+  resource_group                               = module.common_infrastructure.resource_group
+  vnet_sap                                     = module.common_infrastructure.vnet_sap
+  storage_bootdiag_endpoint                    = module.common_infrastructure.storage_bootdiag_endpoint
+  ppg                                          = module.common_infrastructure.ppg
+  sid_kv_user_id                               = module.common_infrastructure.sid_kv_user_id
+  naming                                       = module.sap_namegenerator.naming
+  admin_subnet                                 = module.common_infrastructure.admin_subnet
+  custom_disk_sizes_filename                   = var.app_disk_sizes_filename
+  anydb_vm_ids                                 = module.anydb_node.anydb_vms // Workaround to create dependency from anchor to db to app
+  hdb_vm_ids                                   = module.hdb_node.hdb_vms
+  sid_password                                 = module.common_infrastructure.sid_password
+  sid_username                                 = module.common_infrastructure.sid_username
+  sdu_public_key                               = module.common_infrastructure.sdu_public_key
+  route_table_id                               = module.common_infrastructure.route_table_id
+  firewall_id                                  = module.common_infrastructure.firewall_id
+  sap_sid                                      = local.sap_sid
+  landscape_tfstate                            = data.terraform_remote_state.landscape.outputs
+  terraform_template_version                   = var.terraform_template_version
+  deployment                                   = var.deployment
+  cloudinit_growpart_config                    = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
+  license_type                                 = var.license_type
+  use_loadbalancers_for_standalone_deployments = var.use_loadbalancers_for_standalone_deployments
 
 }
 
@@ -126,29 +128,30 @@ module "anydb_node" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }
-  databases                  = local.databases
-  infrastructure             = local.infrastructure
-  options                    = local.options
-  resource_group             = module.common_infrastructure.resource_group
-  vnet_sap                   = module.common_infrastructure.vnet_sap
-  storage_bootdiag_endpoint  = module.common_infrastructure.storage_bootdiag_endpoint
-  ppg                        = module.common_infrastructure.ppg
-  sid_kv_user_id             = module.common_infrastructure.sid_kv_user_id
-  naming                     = module.sap_namegenerator.naming
-  custom_disk_sizes_filename = var.db_disk_sizes_filename
-  admin_subnet               = module.common_infrastructure.admin_subnet
-  db_subnet                  = module.common_infrastructure.db_subnet
-  anchor_vm                  = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
-  sid_password               = module.common_infrastructure.sid_password
-  sid_username               = module.common_infrastructure.sid_username
-  sdu_public_key             = module.common_infrastructure.sdu_public_key
-  sap_sid                    = local.sap_sid
-  db_asg_id                  = module.common_infrastructure.db_asg_id
-  terraform_template_version = var.terraform_template_version
-  deployment                 = var.deployment
-  cloudinit_growpart_config  = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
-  license_type               = var.license_type
+  }                  
+  databases                                    = local.databases
+  infrastructure                               = local.infrastructure
+  options                                      = local.options
+  resource_group                               = module.common_infrastructure.resource_group
+  vnet_sap                                     = module.common_infrastructure.vnet_sap
+  storage_bootdiag_endpoint                    = module.common_infrastructure.storage_bootdiag_endpoint
+  ppg                                          = module.common_infrastructure.ppg
+  sid_kv_user_id                               = module.common_infrastructure.sid_kv_user_id
+  naming                                       = module.sap_namegenerator.naming
+  custom_disk_sizes_filename                   = var.db_disk_sizes_filename
+  admin_subnet                                 = module.common_infrastructure.admin_subnet
+  db_subnet                                    = module.common_infrastructure.db_subnet
+  anchor_vm                                    = module.common_infrastructure.anchor_vm // Workaround to create dependency from anchor to db to app
+  sid_password                                 = module.common_infrastructure.sid_password
+  sid_username                                 = module.common_infrastructure.sid_username
+  sdu_public_key                               = module.common_infrastructure.sdu_public_key
+  sap_sid                                      = local.sap_sid
+  db_asg_id                                    = module.common_infrastructure.db_asg_id
+  terraform_template_version                   = var.terraform_template_version
+  deployment                                   = var.deployment
+  cloudinit_growpart_config                    = null # This needs more consideration module.common_infrastructure.cloudinit_growpart_config
+  license_type                                 = var.license_type
+  use_loadbalancers_for_standalone_deployments = var.use_loadbalancers_for_standalone_deployments
 
 }
 

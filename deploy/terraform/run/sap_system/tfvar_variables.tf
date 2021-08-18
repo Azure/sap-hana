@@ -501,3 +501,8 @@ variable "legacy_nic_order" {
 variable "enable_purge_control_for_keyvaults" {
   default = true
 }
+
+variable "use_loadbalancers_for_standalone_deployments" {
+  default = true
+}
+

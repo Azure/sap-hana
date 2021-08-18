@@ -58,8 +58,10 @@ data "azurerm_subnet" "subnet_sap_web" {
 
 # Create the SCS Load Balancer
 resource "azurerm_lb" "scs" {
+  
   provider            = azurerm.main
-  count               = local.enable_deployment && local.scs_server_count > 0 ? 1 : 0
+  
+  count               = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.scs_high_availability ) ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -222,7 +224,7 @@ resource "azurerm_availability_set" "app" {
 # Create the Web dispatcher Load Balancer
 resource "azurerm_lb" "web" {
   provider            = azurerm.main
-  count               = local.enable_deployment && local.webdispatcher_count > 0 ? 1 : 0
+  count               = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.webdispatcher_count > 1 ) ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location

@@ -77,6 +77,10 @@ variable "license_type" {
 
 }
 
+variable "use_loadbalancers_for_standalone_deployments" {
+  description = "Defines if load balancers are used even for standalone deployments"
+  default     = true
+}
 
 locals {
   // Imports database sizing information

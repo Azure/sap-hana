@@ -260,3 +260,5 @@ webdispatcher_server_count=0
 #resource_offset=1
 #vm_disk_encryption_set_id=""
 #nsg_asg_with_vnet=false
+
+#use_loadbalancers_for_standalone_deployments=false

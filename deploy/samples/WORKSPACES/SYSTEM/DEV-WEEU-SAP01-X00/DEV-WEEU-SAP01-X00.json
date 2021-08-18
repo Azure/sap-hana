@@ -43,5 +43,6 @@
   },
   "options": {
     "resource_offset"               : 1
-  }
+  },
+  "use_loadbalancers_for_standalone_deployments" : true
 }
