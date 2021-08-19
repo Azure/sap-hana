@@ -5,7 +5,7 @@ This block describes the variable for the infrastructure block in the json file
 */
 
 environment="DEV"
-location="westeurope"
+location="northeurope"
 #codename=
 
 
@@ -20,14 +20,14 @@ This block describes the variables for the VNet block in the json file
 
 network_name="SAP01"
 #network_arm_id=""
-network_address_space=["10.110.0.0/16"]
+network_address_space=["10.111.0.0/16"]
 
 
 /* admin subnet information */
 
 #admin_subnet_name=""
 #admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_admin"
-admin_subnet_address_prefix=["10.110.0.0/19"]
+admin_subnet_address_prefix=["10.111.0.0/19"]
 
 #admin_subnet_nsg_name=""
 #admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_adminSubnet-nsg"
@@ -36,7 +36,7 @@ admin_subnet_address_prefix=["10.110.0.0/19"]
 
 #db_subnet_name=""
 #db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_db"
-db_subnet_address_prefix=["10.110.96.0/19"]
+db_subnet_address_prefix=["10.111.96.0/19"]
 
 #db_subnet_nsg_name=""
 #db_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_dbSubnet-nsg"
@@ -45,7 +45,7 @@ db_subnet_address_prefix=["10.110.96.0/19"]
 
 #app_subnet_name=""
 #app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_app"
-app_subnet_address_prefix=["10.110.32.0/19"]
+app_subnet_address_prefix=["10.111.32.0/19"]
 
 #app_subnet_nsg_name=""
 #app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_appSubnet-nsg"
@@ -54,7 +54,7 @@ app_subnet_address_prefix=["10.110.32.0/19"]
 
 #web_subnet_name=""
 #web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/PROD_WUS2_SAP04-vnet/subnets/PROD-WUS2-SAP04-subnet_web"
-web_subnet_address_prefix=["10.110.128.0/19"]
+web_subnet_address_prefix=["10.111.128.0/19"]
 
 #web_subnet_nsg_name=""
 #web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/PROD-WUS2-SAP04-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/PROD-WUS2-SAP04_webSubnet-nsg"

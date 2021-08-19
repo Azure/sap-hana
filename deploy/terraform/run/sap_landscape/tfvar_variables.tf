@@ -43,7 +43,7 @@ variable "network_arm_id" {
 }
 
 variable "network_address_space" {
-  default = ""
+  default = [""]
 }
 
 /* admin subnet information */
@@ -57,7 +57,7 @@ variable "admin_subnet_arm_id" {
 }
 
 variable "admin_subnet_address_prefix" {
-  default = ""
+  default = [""]
 }
 
 variable "admin_subnet_nsg_name" {
@@ -79,7 +79,7 @@ variable "db_subnet_arm_id" {
 }
 
 variable "db_subnet_address_prefix" {
-  default = ""
+  default = [""]
 }
 
 variable "db_subnet_nsg_name" {
@@ -101,7 +101,7 @@ variable "app_subnet_arm_id" {
 }
 
 variable "app_subnet_address_prefix" {
-  default = ""
+  default = [""]
 }
 
 variable "app_subnet_nsg_name" {
@@ -123,7 +123,7 @@ variable "web_subnet_arm_id" {
 }
 
 variable "web_subnet_address_prefix" {
-  default = ""
+  default = [""]
 }
 
 variable "web_subnet_nsg_name" {
@@ -145,7 +145,7 @@ variable "iscsi_subnet_arm_id" {
 }
 
 variable "iscsi_subnet_address_prefix" {
-  default = ""
+  default = [""]
 }
 
 variable "iscsi_subnet_nsg_name" {

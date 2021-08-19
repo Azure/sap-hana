@@ -267,10 +267,10 @@ locals {
     try(split("/", var.infrastructure.vnets.sap.subnet_admin.arm_id)[10], "")) : (
     length(var.infrastructure.vnets.sap.subnet_admin.name) > 0 ? (
       var.infrastructure.vnets.sap.subnet_admin.name) : (
-      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet)
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet[0])
     )
   )
-  sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
+  sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, [""]) : [""]
 
   sub_db_defined = length(try(var.infrastructure.vnets.sap.subnet_db,{})) > 0
   sub_db_arm_id  = try(var.infrastructure.vnets.sap.subnet_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
@@ -279,10 +279,10 @@ locals {
     try(split("/", var.infrastructure.vnets.sap.subnet_db.arm_id)[10], "")) : (
     length(try(var.infrastructure.vnets.sap.subnet_db.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_db.name) : (
-      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet)
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet[0])
     )
   )
-  sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
+  sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, [""]) : [""]
 
   //APP subnet
   sub_app_defined = length(try(var.infrastructure.vnets.sap.subnet_app,{})) > 0
@@ -292,11 +292,11 @@ locals {
     try(split("/", var.infrastructure.vnets.sap.subnet_app.arm_id)[10], "")) : (
     length(try(var.infrastructure.vnets.sap.subnet_app.name, "")) > 0 ? (
       var.infrastructure.vnets.sap.subnet_app.name) : (
-      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet)
+      format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet[0])
     )
 
   )
-  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
+  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, [""]) : [""]
 
   sub_admin_nsg_arm_id = try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, try(var.landscape_tfstate.admin_nsg_id, ""))
   sub_admin_nsg_exists = length(local.sub_admin_nsg_arm_id) > 0

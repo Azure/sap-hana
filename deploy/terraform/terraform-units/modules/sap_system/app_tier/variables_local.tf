@@ -173,7 +173,7 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.app_subnet)
     )
   )
-  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
+  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, [""]) : [""]
 
   sub_web_defined = length(try(var.infrastructure.vnets.sap.subnet_web, {})) > 0
   sub_web_arm_id  = try(var.infrastructure.vnets.sap.subnet_web.arm_id, try(var.landscape_tfstate.web_subnet_id, ""))
@@ -185,7 +185,7 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet)
     )
   )
-  sub_web_prefix = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.prefix, "") : ""
+  sub_web_prefix = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.prefix, [""]) : [""]
   sub_web_deployed = try(local.sub_web_defined ? (
     local.sub_web_exists ? data.azurerm_subnet.subnet_sap_web[0] : azurerm_subnet.subnet_sap_web[0]) : (
     local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0] : azurerm_subnet.subnet_sap_app[0]), null

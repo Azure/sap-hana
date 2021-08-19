@@ -14,7 +14,7 @@ resource "azurerm_subnet" "iscsi" {
   name                 = local.sub_iscsi_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-  address_prefixes     = [local.sub_iscsi_prefix]
+  address_prefixes     = local.sub_iscsi_prefix
 }
 
 // Imports data of existing SAP iSCSI subnet

@@ -50,7 +50,7 @@ variable "infrastructure" {
     condition = (
       contains(keys(var.infrastructure.vnets.sap), "subnet_admin") ? (
         var.infrastructure.vnets.sap.subnet_admin != null ? (
-          length(trimspace(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_admin.prefix, ""))) != 0) : (
+          length(trimspace(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_admin.prefix[0], ""))) != 0) : (
           true
         )) : (
         true
@@ -63,7 +63,7 @@ variable "infrastructure" {
     condition = (
       contains(keys(var.infrastructure.vnets.sap), "subnet_app") ? (
         var.infrastructure.vnets.sap.subnet_app != null ? (
-          length(trimspace(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_app.prefix, ""))) != 0) : (
+          length(trimspace(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_app.prefix[0], ""))) != 0) : (
           true
         )) : (
         true
@@ -76,7 +76,7 @@ variable "infrastructure" {
     condition = (
       contains(keys(var.infrastructure.vnets.sap), "subnet_db") ? (
         var.infrastructure.vnets.sap.subnet_db != null ? (
-          length(trimspace(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_db.prefix, ""))) != 0) : (
+          length(trimspace(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) != 0 || length(trimspace(try(var.infrastructure.vnets.sap.subnet_db.prefix[0], ""))) != 0) : (
           true
         )) : (
         true

@@ -49,14 +49,6 @@ variable "network_name" {
   default = ""
 }
 
-variable "network_arm_id" {
-  default = ""
-}
-
-variable "network_address_space" {
-  default = ""
-}
-
 /* admin subnet information */
 
 variable "admin_subnet_name" {

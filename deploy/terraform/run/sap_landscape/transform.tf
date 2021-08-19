@@ -1,31 +1,5 @@
 
 locals {
-  subnet_admin_defined        = (length(var.admin_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix, "")) + length(var.admin_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) > 0
-  subnet_admin_arm_id_defined = (length(var.admin_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) > 0
-  subnet_admin_nsg_defined    = (length(var.admin_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_admin.nsg.name, "")) + length(var.admin_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, ""))) > 0
-
-  subnet_db_defined     = (length(var.db_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix, "")) + length(var.db_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) > 0
-  subnet_db_arm_id_defined = (length(var.db_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) > 0
-  subnet_db_nsg_defined = (length(var.db_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_db.nsg.name, "")) + length(var.db_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, ""))) > 0
-
-  subnet_app_defined     = (length(var.app_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix, "")) + length(var.app_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) > 0
-  subnet_app_arm_id_defined = (length(var.app_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) > 0
-  subnet_app_nsg_defined = (length(var.app_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_app.nsg.name, "")) + length(var.app_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, ""))) > 0
-
-  subnet_web_defined     = (length(var.web_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix, "")) + length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
-  subnet_web_arm_id_defined = (length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
-  subnet_web_nsg_defined = (length(var.web_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.name, "")) + length(var.web_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, ""))) > 0
-
-  subnet_iscsi_defined     = (length(var.iscsi_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")) + length(var.iscsi_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
-  subnet_iscsi_arm_id_defined = (length(var.iscsi_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
-  subnet_iscsi_nsg_defined = (length(var.iscsi_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, ""))) > 0
-
-  resource_group = {
-    name   = try(coalesce(var.resourcegroup_name, try(var.infrastructure.resource_group.name, "")), "")
-    arm_id = try(coalesce(var.resourcegroup_arm_id, try(var.infrastructure.resource_group.arm_id, "")), "")
-  }
-  resource_group_defined = (length(local.resource_group.name) + length(local.resource_group.arm_id)) > 0
-
 
   temp_infrastructure = {
     environment = coalesce(var.environment, try(var.infrastructure.environment, ""))
@@ -33,99 +7,112 @@ locals {
     codename    = try(var.codename, try(var.infrastructure.codename, ""))
   }
 
-  authentication = {
-    username            = try(coalesce(var.automation_username, try(var.authentication.username, "azureadm")), "azureadm")
-    password            = try(coalesce(var.automation_password, try(var.authentication.password, "")), "")
-    path_to_public_key  = try(coalesce(var.automation_path_to_public_key, try(var.authentication.path_to_public_key, "")), "")
-    path_to_private_key = try(coalesce(var.automation_path_to_private_key, try(var.authentication.path_to_private_key, "")), "")
+  resource_group = {
+    name   = try(coalesce(var.resourcegroup_name, try(var.infrastructure.resource_group.name, "")), "")
+    arm_id = try(coalesce(var.resourcegroup_arm_id, try(var.infrastructure.resource_group.arm_id, "")), "")
   }
-  options = {
-    enable_secure_transfer = true
-  }
-  key_vault = {
-    kv_user_id = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")
-    kv_prvt_id = try(coalesce(var.automation_keyvault_id, try(var.key_vault.kv_prvt_id, "")), "")
-    kv_prvt_id = try(coalesce(var.spn_keyvault_id, try(var.key_vault.kv_spn_id, "")), "")
-  }
-  diagnostics_storage_account = {
-    arm_id = try(coalesce(var.diagnostics_storage_account_arm_id, try(var.diagnostics_storage_account.arm_id, "")), "")
-  }
-  witness_storage_account = {
-    arm_id = try(coalesce(var.witness_storage_account_arm_id, try(var.witness_storage_account.arm_id, "")), "")
-  }
+  resource_group_defined = (length(local.resource_group.name) + length(local.resource_group.arm_id)) > 0
 
+  #Define the Networking
   vnets = {
   }
+
   sap = {
     name          = try(coalesce(var.network_name, try(var.infrastructure.vnets.sap.name, "")), "")
     arm_id        = try(coalesce(var.network_arm_id, try(var.infrastructure.vnets.sap.arm_id, "")), "")
-    address_space = try(coalesce(var.network_address_space, try(var.infrastructure.vnets.sap.address_space, "")), "")
+    address_space = flatten([try(coalesce(var.network_address_space, try(var.infrastructure.vnets.sap.address_space, [""])), [""])])
   }
 
+  # Check if subnets and nsgs are defined
+  subnet_admin_defined        = (length(var.admin_subnet_address_prefix[0]) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix[0], "")) + length(var.admin_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) > 0
+  subnet_admin_arm_id_defined = (length(var.admin_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, ""))) > 0
+  subnet_admin_nsg_defined    = (length(var.admin_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_admin.nsg.name, "")) + length(var.admin_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, ""))) > 0
+
+  subnet_db_defined        = (length(var.db_subnet_address_prefix[0]) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix[0], "")) + length(var.db_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) > 0
+  subnet_db_arm_id_defined = (length(var.db_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, ""))) > 0
+  subnet_db_nsg_defined    = (length(var.db_subnet_nsg_name) + length(try(var.infrastructure.vnenots.sap.subnet_db.nsg.name, "")) + length(var.db_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, ""))) > 0
+
+  subnet_app_defined        = (length(var.app_subnet_address_prefix[0]) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix[0], "")) + length(var.app_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) > 0
+  subnet_app_arm_id_defined = (length(var.app_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, ""))) > 0
+  subnet_app_nsg_defined    = (length(var.app_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_app.nsg.name, "")) + length(var.app_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, ""))) > 0
+
+  subnet_web_defined        = (length(var.web_subnet_address_prefix[0]) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix[0], "")) + length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
+  subnet_web_arm_id_defined = (length(var.web_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, ""))) > 0
+  subnet_web_nsg_defined    = (length(var.web_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.name, "")) + length(var.web_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, ""))) > 0
+
+  subnet_iscsi_defined        = (length(var.iscsi_subnet_address_prefix[0]) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.prefix[0], "")) + length(var.iscsi_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
+  subnet_iscsi_arm_id_defined = (length(var.iscsi_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
+  subnet_iscsi_nsg_defined    = (length(var.iscsi_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, ""))) > 0
+
+
+  # Construct the subnet nodes
   subnet_admin = merge((
-    { "name" = try(coalesce(var.admin_subnet_name, try(var.infrastructure.vnets.sap.subnet_admin.name, "")), "") }), (
-    local.subnet_admin_arm_id_defined ? { "arm_id" = try(coalesce(var.admin_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")), "") } : null), (
-    { "prefix" = try(coalesce(var.admin_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_admin.prefix, "")), "") }), (
-    local.subnet_admin_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.admin_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_admin.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.admin_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, "")), "")
+    { name = try(coalesce(var.admin_subnet_name, try(var.infrastructure.vnets.sap.subnet_admin.name, "")), "") }), (
+    local.subnet_admin_arm_id_defined ? { arm_id = try(coalesce(var.admin_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")), "") } : null), (
+    { prefix = flatten([try(coalesce(var.admin_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_admin.prefix, [""])), [""])]) }), (
+    local.subnet_admin_nsg_defined ? ({ nsg = {
+      name   = try(coalesce(var.admin_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_admin.nsg.name, "")), "")
+      arm_id = try(coalesce(var.admin_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_admin.nsg.arm_id, "")), "")
       }
     }) : null
     )
   )
 
   subnet_db = merge((
-    { "name" = try(coalesce(var.db_subnet_name, try(var.infrastructure.vnets.sap.subnet_db.name, "")), "") }), (
-    local.subnet_db_arm_id_defined ? { "arm_id" = try(coalesce(var.db_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")), "") } : null), (
-    { "prefix" = try(coalesce(var.db_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_db.prefix, "")), "") }), (
-    local.subnet_db_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.db_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_db.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.db_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, "")), "")
+    { name = try(coalesce(var.db_subnet_name, try(var.infrastructure.vnets.sap.subnet_db.name, "")), "") }), (
+    local.subnet_db_arm_id_defined ? { arm_id = try(coalesce(var.db_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")), "") } : null), (
+    { prefix = flatten([try(coalesce(var.db_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_db.prefix, [""])), [""])]) }), (
+    local.subnet_db_nsg_defined ? ({ nsg = {
+      name   = try(coalesce(var.db_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_db.nsg.name, "")), "")
+      arm_id = try(coalesce(var.db_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_db.nsg.arm_id, "")), "")
       }
     }) : null
     )
   )
+
   subnet_app = merge((
-    { "name" = try(coalesce(var.app_subnet_name, try(var.infrastructure.vnets.sap.subnet_app.name, "")), "") }), (
-    local.subnet_app_arm_id_defined ? { "arm_id" = try(coalesce(var.app_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")), "") } : null), (
-    { "prefix" = try(coalesce(var.app_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_app.prefix, "")), "") }), (
-    local.subnet_app_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.app_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_app.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.app_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, "")), "")
+    { name = try(coalesce(var.app_subnet_name, try(var.infrastructure.vnets.sap.subnet_app.name, "")), "") }), (
+    local.subnet_app_arm_id_defined ? { arm_id = try(coalesce(var.app_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")), "") } : null), (
+    { prefix = flatten([try(coalesce(var.app_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_app.prefix, [""])), [""])]) }), (
+    local.subnet_app_nsg_defined ? ({ nsg = {
+      name   = try(coalesce(var.app_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_app.nsg.name, "")), "")
+      arm_id = try(coalesce(var.app_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_app.nsg.arm_id, "")), "")
       }
     }) : null
     )
   )
+
   subnet_web = merge((
-    { "name" = try(coalesce(var.web_subnet_name, try(var.infrastructure.vnets.sap.subnet_web.name, "")), "") }), (
+    { name = try(coalesce(var.web_subnet_name, try(var.infrastructure.vnets.sap.subnet_web.name, "")), "") }), (
     local.subnet_web_arm_id_defined ? { "arm_id" = try(coalesce(var.web_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")), "") } : null), (
-    { "prefix" = try(coalesce(var.web_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_web.prefix, "")), "") }), (
-    local.subnet_web_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.web_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_web.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.web_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, "")), "")
+    { prefix = flatten([try(coalesce(var.web_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_web.prefix, [""])), [""])]) }), (
+    local.subnet_web_nsg_defined ? ({ nsg = {
+      name   = try(coalesce(var.web_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_web.nsg.name, "")), "")
+      arm_id = try(coalesce(var.web_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_web.nsg.arm_id, "")), "")
       }
     }) : null
     )
   )
 
   subnet_iscsi = merge((
-    { "name" = try(coalesce(var.iscsi_subnet_name, try(var.infrastructure.vnets.sap.subnet_iscsi.name, "")), "") }), (
-    local.subnet_iscsi_arm_id_defined ? { "arm_id" = try(coalesce(var.iscsi_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")), "") }: null), (
-    { "prefix" = try(coalesce(var.iscsi_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")), "") }), (
-    local.subnet_web_nsg_defined ? ({ "nsg" = {
-      "name"   = try(coalesce(var.iscsi_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")), "")
-      "arm_id" = try(coalesce(var.iscsi_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, "")), "")
+    { name = try(coalesce(var.iscsi_subnet_name, try(var.infrastructure.vnets.sap.subnet_iscsi.name, "")), "") }), (
+    local.subnet_iscsi_arm_id_defined ? { arm_id = try(coalesce(var.iscsi_subnet_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")), "") } : null), (
+    { prefix = flatten([try(coalesce(var.iscsi_subnet_address_prefix, try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, [""])), [""])]) }), (
+    local.subnet_web_nsg_defined ? ({ nsg = {
+      name   = try(coalesce(var.iscsi_subnet_nsg_name, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")), "")
+      arm_id = try(coalesce(var.iscsi_subnet_nsg_arm_id, try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, "")), "")
       }
     }) : null
     )
   )
 
+  # Add the subnets (if defined)
   all_subnets = merge(local.sap, (
-    local.subnet_admin_defined ? { "subnet_admin" = local.subnet_admin } : null), (
-    local.subnet_db_defined ? { "subnet_db" = local.subnet_db } : null), (
-    local.subnet_app_defined ? { "subnet_app" = local.subnet_app } : null), (
-    local.subnet_web_defined ? { "subnet_web" = local.subnet_web } : null), (
-    local.subnet_iscsi_defined ? { "subnet_iscsi" = local.subnet_iscsi } : null
+    local.subnet_admin_defined ? { subnet_admin = local.subnet_admin } : null), (
+    local.subnet_db_defined ? { subnet_db = local.subnet_db } : null), (
+    local.subnet_app_defined ? { subnet_app = local.subnet_app } : null), (
+    local.subnet_web_defined ? { subnet_web = local.subnet_web } : null), (
+    local.subnet_iscsi_defined ? { subnet_iscsi = local.subnet_iscsi } : null
     )
   )
 
@@ -150,11 +137,32 @@ locals {
     }
   }
 
-
+  #Assemble the infrastructure block
   infrastructure = merge(local.temp_infrastructure, (
-    local.resource_group_defined ? { "resource_group" = local.resource_group } : null), (
-    { "vnets" = local.temp_vnet }), (
-    local.iscsi.iscsi_count > 0 ? { "iscsi" = local.iscsi } : null)
+    local.resource_group_defined ? { resource_group = local.resource_group } : null), (
+    { vnets = local.temp_vnet }), (
+    local.iscsi.iscsi_count > 0 ? { iscsi = local.iscsi } : null)
   )
+
+  authentication = {
+    username            = try(coalesce(var.automation_username, try(var.authentication.username, "azureadm")), "azureadm")
+    password            = try(coalesce(var.automation_password, try(var.authentication.password, "")), "")
+    path_to_public_key  = try(coalesce(var.automation_path_to_public_key, try(var.authentication.path_to_public_key, "")), "")
+    path_to_private_key = try(coalesce(var.automation_path_to_private_key, try(var.authentication.path_to_private_key, "")), "")
+  }
+  options = {
+    enable_secure_transfer = true
+  }
+  key_vault = {
+    kv_user_id = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")
+    kv_prvt_id = try(coalesce(var.automation_keyvault_id, try(var.key_vault.kv_prvt_id, "")), "")
+    kv_prvt_id = try(coalesce(var.spn_keyvault_id, try(var.key_vault.kv_spn_id, "")), "")
+  }
+  diagnostics_storage_account = {
+    arm_id = try(coalesce(var.diagnostics_storage_account_arm_id, try(var.diagnostics_storage_account.arm_id, "")), "")
+  }
+  witness_storage_account = {
+    arm_id = try(coalesce(var.witness_storage_account_arm_id, try(var.witness_storage_account.arm_id, "")), "")
+  }
 
 }

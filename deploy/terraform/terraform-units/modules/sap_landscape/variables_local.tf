@@ -114,7 +114,7 @@ locals {
   vnet_sap_arm_id = try(var.infrastructure.vnets.sap.arm_id, "")
   vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : format("%s%s", local.prefix, local.resource_suffixes.vnet)
-  vnet_sap_addr   = local.vnet_sap_exists ? "" : try(var.infrastructure.vnets.sap.address_space, "")
+  vnet_sap_addr   = local.vnet_sap_exists ? [""] : try(var.infrastructure.vnets.sap.address_space, [""])
 
   // By default, Ansible ssh key for SID uses generated public key. Provide sshkey.path_to_public_key and path_to_private_key overides it
 
@@ -122,14 +122,14 @@ locals {
   sid_private_key = local.sid_key_exist ? data.azurerm_key_vault_secret.sid_ppk[0].value : try(file(var.authentication.path_to_private_key), tls_private_key.sid[0].private_key_pem)
 
   // iSCSI subnet
-  enable_sub_iscsi = (length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, ""))) > 0
+  enable_sub_iscsi = (length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.prefix[0], ""))) > 0
   sub_iscsi_arm_id = try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, "")
   sub_iscsi_exists = length(local.sub_iscsi_arm_id) > 0
   sub_iscsi_name = local.sub_iscsi_exists ? (
     try(split("/", local.sub_iscsi_arm_id)[10], "")) : (
     length(try(var.infrastructure.vnets.sap.subnet_iscsi.name, "")) > 0 ? var.infrastructure.vnets.sap.subnet_iscsi.name : format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.iscsi_subnet)
   )
-  sub_iscsi_prefix = local.sub_iscsi_exists ? "" : try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, "")
+  sub_iscsi_prefix = local.sub_iscsi_exists ? [""] : try(var.infrastructure.vnets.sap.subnet_iscsi.prefix, [""])
 
   // iSCSI NSG
   var_sub_iscsi_nsg    = try(var.infrastructure.vnets.sap.subnet_iscsi.nsg, {})
@@ -199,7 +199,7 @@ locals {
   // As either of the arm_id or the prefix need to be specified to create a subnet the lack of both indicate that the subnet is to be created in the SDU
 
 
-  sub_admin_defined  = (length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix, ""))) > 0
+  sub_admin_defined  = (length(try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_admin.prefix[0], ""))) > 0
   sub_admin_arm_id   = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.arm_id, "") : ""
   sub_admin_existing = length(local.sub_admin_arm_id) > 0
   sub_admin_name = local.sub_admin_existing ? (
@@ -209,9 +209,9 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.admin_subnet)
     )
   )
-  sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
+  sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, [""]) : [""]
 
-  sub_db_defined  = (length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix, ""))) > 0
+  sub_db_defined  = (length(try(var.infrastructure.vnets.sap.subnet_db.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_db.prefix[0], ""))) > 0
   sub_db_arm_id   = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.arm_id, "") : ""
   sub_db_existing = length(local.sub_db_arm_id) > 0
   sub_db_name = local.sub_db_existing ? (
@@ -221,9 +221,9 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_subnet)
     )
   )
-  sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
+  sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, [""]) : [""]
 
-  sub_app_defined  = (length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix, ""))) > 0
+  sub_app_defined  = (length(try(var.infrastructure.vnets.sap.subnet_app.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_app.prefix[0], ""))) > 0
   sub_app_arm_id   = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.arm_id, "") : ""
   sub_app_existing = length(local.sub_app_arm_id) > 0
   sub_app_name = local.sub_app_existing ? (
@@ -234,9 +234,9 @@ locals {
     )
 
   )
-  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, "") : ""
+  sub_app_prefix = local.sub_app_defined ? try(var.infrastructure.vnets.sap.subnet_app.prefix, [""]) : [""]
 
-  sub_web_defined  = (length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix, ""))) > 0
+  sub_web_defined  = (length(try(var.infrastructure.vnets.sap.subnet_web.arm_id, "")) + length(try(var.infrastructure.vnets.sap.subnet_web.prefix[0], ""))) > 0
   sub_web_arm_id   = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.arm_id, "") : ""
   sub_web_existing = length(local.sub_web_arm_id) > 0
   sub_web_name = local.sub_web_existing ? (
@@ -246,7 +246,7 @@ locals {
       format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_subnet)
     )
   )
-  sub_web_prefix = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.prefix, "") : ""
+  sub_web_prefix = local.sub_web_defined ? try(var.infrastructure.vnets.sap.subnet_web.prefix, [""]) : [""]
 
   //NSGs
 

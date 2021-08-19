@@ -5,7 +5,7 @@ resource "azurerm_subnet" "admin" {
   name                 = local.sub_admin_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-  address_prefixes     = [local.sub_admin_prefix]
+  address_prefixes     = local.sub_admin_prefix
 }
 
 // Creates db subnet of SAP VNET
@@ -15,7 +15,7 @@ resource "azurerm_subnet" "db" {
   name                 = local.sub_db_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-  address_prefixes     = [local.sub_db_prefix]
+  address_prefixes     = local.sub_db_prefix
 }
 
 // Creates app subnet of SAP VNET
@@ -25,7 +25,7 @@ resource "azurerm_subnet" "app" {
   name                 = local.sub_app_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-  address_prefixes     = [local.sub_app_prefix]
+  address_prefixes     = local.sub_app_prefix
 }
 
 // Creates web subnet of SAP VNET
@@ -35,7 +35,7 @@ resource "azurerm_subnet" "web" {
   name                 = local.sub_web_name
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-  address_prefixes     = [local.sub_web_prefix]
+  address_prefixes     = local.sub_web_prefix
 }
 
 

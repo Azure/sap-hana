@@ -33,7 +33,7 @@ resource "azurerm_subnet" "admin" {
   name                 = local.sub_admin_name
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
-  address_prefixes     = [local.sub_admin_prefix]
+  address_prefixes     = local.sub_admin_prefix
 }
 
 resource "azurerm_subnet_route_table_association" "admin" {
@@ -60,7 +60,7 @@ resource "azurerm_subnet" "db" {
   name                 = local.sub_db_name
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
-  address_prefixes     = [local.sub_db_prefix]
+  address_prefixes     = local.sub_db_prefix
 }
 
 resource "azurerm_subnet_route_table_association" "db" {
@@ -86,7 +86,7 @@ resource "azurerm_subnet" "storage" {
   name                 = local.sub_storage_name
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
-  address_prefixes     = [local.sub_storage_prefix]
+  address_prefixes     = local.sub_storage_prefix
 }
 
 // Imports data of existing db subnet

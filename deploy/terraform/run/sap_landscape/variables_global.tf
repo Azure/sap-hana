@@ -47,15 +47,15 @@ variable "deployment" {
 
 variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
-  default = ""
+  default     = ""
 }
 
 variable "dns_label" {
   description = "DNS label"
-  default = ""
+  default     = ""
 }
 
 variable "dns_resource_group_name" {
   description = "DNS resource group name"
-  default = ""
+  default     = ""
 }

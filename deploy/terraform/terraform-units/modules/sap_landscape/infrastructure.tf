@@ -32,7 +32,7 @@ resource "azurerm_virtual_network" "vnet_sap" {
   name                = local.vnet_sap_name
   location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
-  address_space       = [local.vnet_sap_addr]
+  address_space       = local.vnet_sap_addr
 }
 
 // Imports data of existing SAP VNET
