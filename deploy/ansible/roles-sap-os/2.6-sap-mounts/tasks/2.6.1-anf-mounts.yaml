@@ -59,14 +59,16 @@
   ansible.builtin.file:
     path:        "{{ item.path }}"
     state:       directory
+    group:       sapsys
+    owner:       "{{ sap_sid|lower }}adm"
     mode:        0755
   loop:
-    - { tier == 'sapos', path: '/saptmp/sapmnt/{{ sap_sid|upper }}' }
+    - { tier == 'sapos', path: '/saptmp/sapmnt{{ sap_sid|upper }}'     }
     - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ascs' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}sys' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}pas' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}aas' }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers'  }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}sys'  }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}pas'  }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}aas'  }
   when:     tier == 'sapos' and node_tier == 'scs'
 
 
@@ -107,15 +109,37 @@
   ansible.builtin.file:
     path:        "{{ item.path }}"
     state:       directory
-    #attr:        i+ 
-    owner:       root 
+    group:       sapsys
     mode:        0755
   loop:
-    - { tier == 'sapos', path: '/sapmnt/{{ sap_sid|upper }}' }
+    - { tier == 'sapos', path: '/sapmnt/{{ sap_sid|upper }}'      }
+    - { tier == 'sapos', path: '/usr/sap/{{ sap_sid|upper }}/SYS' }
     # - { tier == 'sapos', path: '/usr/sap/{{ sap_sid|upper }}/ASCS00' }
     # - { tier == 'sapos', path: '/usr/sap/{{ sap_sid|upper }}/ERS01' }
-    - { tier == 'sapos', path: '/usr/sap/{{ sap_sid|upper }}/SYS' }
-  when:     tier == 'sapos' 
+  when:     tier == 'sapos'
+  register: isCreatedNow
+
+#- name: "debug"
+#  ansible.builtin.debug: 
+#    var: isCreatedNow
+
+- name: "Mount: Change attribute only when we create SAP Directories (ANF)"
+  ansible.builtin.file:
+    path:        "{{ item.item.path }}"
+    state:       directory
+    attr:        i+ 
+  loop: "{{ isCreatedNow.results }}"
+  when:     tier == 'sapos' and 
+            item is changed
+  register: set_immutable_attribute
+#  failed_when: false
+  
+#- name: "debug"
+#  ansible.builtin.debug: 
+#    var: set_immutable_attribute
+#
+#- ansible.builtin.fail:
+#    msg: here
 
 
 # Configure Autofs
