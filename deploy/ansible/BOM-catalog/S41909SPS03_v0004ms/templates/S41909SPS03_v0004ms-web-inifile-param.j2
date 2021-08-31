@@ -17,10 +17,10 @@ archives.downloadBasket                                               = /usr/sap
 nwUsers.sapadmUID                                                     = {{ sapadm_uid }}
 nwUsers.sapsysGID                                                     = {{ sapsys_gid }}
 nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
-nwUsers.sidadmPassword                                                = {{ password_master }}
+nwUsers.sidadmPassword                                                = {{ hana_password_master }}
 
 NW_Delete_Sapinst_Users.removeUsers                                   = true
-NW_GetMasterPassword.masterPwd                                        = {{ password_master }}
+NW_GetMasterPassword.masterPwd                                        = {{ hana_password_master }}
 
 NW_adaptProfile.skipSecurityProfileSettings                           = true
 NW_getFQDN.FQDN                                                       = {{ sap_fqdn }}

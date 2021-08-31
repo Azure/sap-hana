@@ -5,7 +5,24 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+#      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
+
 
 - hosts:          "{{ sap_sid|upper }}_PAS"
 
@@ -26,6 +43,7 @@
 # -------------------------------------+---------------------------------------8
   - ansible.builtin.set_fact:
       tier:     dbload                                                          # SAP Install phase: DBLOAD
+      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 
