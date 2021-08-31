@@ -35,7 +35,17 @@
   - include_role:
       name:     roles-sap-os/2.4-hosts-file
 
+
+
 # Uses the same role as the OS plabook but is controlled by the sapos tier setting
+
+  - block:
+      - include_role:
+          name:     roles-os/1.11-accounts
+    tags:
+      - 1.11-accounts
+
+
   - block:
       - include_role:
           name:     roles-os/1.4-packages

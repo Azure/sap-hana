@@ -339,6 +339,7 @@ then
 else
     terraform -chdir="${terraform_module_directory}" apply ${approve} -var-file="${var_file}" 2>error.log
 fi
+return_value=$?
  
 if [ 0 != $return_value ] ; then
     echo ""

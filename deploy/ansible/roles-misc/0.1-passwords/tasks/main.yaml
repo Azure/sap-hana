@@ -1,0 +1,25 @@
+ name: Construct SAP system password secret name
+  ansible.builtin.set_fact:
+    sap_password_id: "{{ secret_prefix }}-sap-password"
+
+- name: "SAP system password secret name"
+  ansible.builtin.debug:
+    var:                          sap_password_id
+    verbosity:                    1
+
+- name: "Retrieve SAP system password"
+  block:
+    - name: "Get SAP password from keyvault"
+      command: >-
+        az keyvault secret show
+          --vault-name {{ kv_uri }}
+          --name {{ sap_password_id }}
+      changed_when: false
+      register: keyvault_secret_show_sap_password_id
+      no_log: false
+  when:
+    - tier == "hdb"
+  rescue:
+    - name: "Debug"
+      ansible.builtin.debug:
+        var:  keyvault_secret_show_sap_password_id

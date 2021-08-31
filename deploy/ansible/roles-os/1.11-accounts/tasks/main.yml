@@ -35,6 +35,7 @@
   when:
     -              item.enabled | bool
     -              item.tier in ["all", tier]
+    -              item.node_tier in ["all", node_tier]
     -              (item.state | default('present')) == "present"
 
 # Create or delete users as needed
@@ -46,15 +47,16 @@
     group:         "{{ item.group | default(item.name) }}"
     groups:        "{{ item.groups }}"
     shell:         "{{ item.shell | default('/bin/bash') }}"
-    password:      "{{ item.password |
-                       password_hash('sha512', 'azure/sap-hana',
-                                     rounds=10000) }}"
+#    password:      "{{ item.password |
+#                       password_hash('sha512', 'azure/sap-hana',
+#                                     rounds=10000) }}"
     state:         "{{ item.state | default('present') }}"
   loop:            "{{ admin_users }}"
   loop_control:
     label:         "{{ item.name }}"
   when:
     -              item.enabled | bool
+    -              item.node_tier in ["all", node_tier]
     -              item.tier in ["all", tier]
 
 # Create or delete associated /etc/sudoers.d files as needed
@@ -77,6 +79,7 @@
   when:
     -              item.enabled | bool
     -              item.tier in ["all", tier]
+    -              item.node_tier in ["all", node_tier]
 
 # Remove groups after user action has removed the users that may have
 # referenced them
@@ -90,4 +93,5 @@
   when:
     -              item.enabled | bool
     -              item.tier in ["all", tier]
+    -              item.node_tier in ["all", node_tier]
     -              (item.state | default('present')) == "absent"
