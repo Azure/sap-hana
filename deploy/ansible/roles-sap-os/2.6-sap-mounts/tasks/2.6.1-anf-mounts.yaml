@@ -129,7 +129,7 @@
     state:       directory
     attr:        i+ 
   loop: "{{ isCreatedNow.results }}"
-  when:     tier == 'sapos' and 
+  when:     tier == 'saposx' and 
             item is changed
   register: set_immutable_attribute
 #  failed_when: false

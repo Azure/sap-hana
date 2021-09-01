@@ -72,7 +72,7 @@ admin_users:
     shell:        /bin/csh
     state:        present
     tier:         sapos
-    node_tier:    [scs, pas, ers, app]
+    node_tier:    all  #TODO Change to only use the specific node_tiers
     enabled:      true
 
   - name:         "{{ hdb_sid|lower }}adm"
