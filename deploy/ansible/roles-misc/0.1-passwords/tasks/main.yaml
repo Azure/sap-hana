@@ -32,7 +32,7 @@
         msg: "{{ keyvault_secret_show_sap_password_id.rc }}"
     - name: Construct SAP system password 
       ansible.builtin.set_fact:
-        sap_password: "{{ lookup('password', '/tmp/sappasswordfile chars=printable,digits') }}"
+        sap_password: "{{ lookup('password', '/tmp/sappasswordfile chars=ascii_lowercase,ascii_uppercase,digits length=14') }}"
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
     - name: "Debug, pwd"
