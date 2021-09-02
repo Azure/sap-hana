@@ -66,11 +66,11 @@
 
 
 # - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
-  - block:
-    - include_role:
-        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
-    tags:
-      - 2.5-sap-users
+#  - block:
+#    - include_role:
+#        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+#    tags:
+#      - 2.5-sap-users
 
 
 # - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)

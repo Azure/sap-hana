@@ -53,7 +53,7 @@ logical_volumes:
     node_tier:  'all'
     vg:         'vg_sap'
     lv:         'lv_usrsap'
-    size:       '64g'
+    size:       '128g'
     fstype:     'xfs'
 
   - tier:       'sapos'

@@ -226,7 +226,7 @@ database_vm_use_DHCP=true
 # sid is a mandatory field that defines the SAP Application SID
 sid="X02"
 
-#app_tier_vm_sizing="New"
+app_tier_vm_sizing="Production"
 
 
 # app_tier_use_DHCP is a boolean flag controlling if Azure subnet provided IP addresses should be used (true)
