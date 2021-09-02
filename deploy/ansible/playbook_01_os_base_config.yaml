@@ -5,6 +5,24 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  hdb
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
 # -------------------------------------+---------------------------------------8
 #
 # <Comment Header> 
@@ -37,6 +55,7 @@
   # Specify the active tier for this playbook run
   - ansible.builtin.set_fact:
       tier:     os
+      hana_password_master:   "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 
