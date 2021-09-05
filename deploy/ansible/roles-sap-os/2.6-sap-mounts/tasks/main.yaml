@@ -19,12 +19,17 @@
     - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_data/lv_hana_data',                path: '/hana/data' }
     - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_log/lv_hana_log',                  path: '/hana/log' }
     - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',            path: '/hana/backup' }
-    - { tier: 'web',          type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt' }
-    - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
-    - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
     - { tier: 'hdb',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'ers',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }   
+    - { tier: 'ers',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    # we don't need to re-mount /usr/sap/install as it is already mounted during HANA installation phase
     - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
+    - { tier: 'pas',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'pas',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
     - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }   
+    - { tier: 'web',          type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt' }
     - { tier: 'web',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
   when:         item.tier == "all" or
                 item.tier == tier
