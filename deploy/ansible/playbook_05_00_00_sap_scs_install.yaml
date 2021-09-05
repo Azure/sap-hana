@@ -61,6 +61,19 @@
     tags:
       - 5.0.0-scs-install
 
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step5"
+      state: touch
+
 
 ...
 # /*---------------------------------------------------------------------------8

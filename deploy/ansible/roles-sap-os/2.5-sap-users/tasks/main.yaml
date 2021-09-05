@@ -63,13 +63,13 @@
     comment:      "{{ item.comment }}"
     uid:          "{{ item.uid }}"
     group:        "{{ item.group }}"
-    password:     "{{ password_master | password_hash('sha512', inventory_hostname) }}"
+    password:     "{{ hana_password_master | password_hash('sha512', inventory_hostname) }}"
     append:       no
     shell:        /bin/csh
     create_home:  yes
     home:         "{{ item.home }}"
   loop:
-    - { tier: 'all',         user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
+    - { tier: 'sapos',        user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
 #    - { tier: 'scs',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
 #    - { tier: 'pas',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
 #    - { tier: 'app',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
