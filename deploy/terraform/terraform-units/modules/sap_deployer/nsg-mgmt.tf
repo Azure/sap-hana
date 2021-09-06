@@ -21,8 +21,8 @@ data "azurerm_network_security_group" "nsg_mgmt" {
 // Link management nsg with management vnet
 resource "azurerm_subnet_network_security_group_association" "associate_nsg_mgmt" {
   count                     = local.enable_deployers ? signum((local.vnet_mgmt_exists ? 0 : 1) + (local.sub_mgmt_nsg_exists ? 0 : 1)) : 0
-  subnet_id                 = local.sub_mgmt_deployed.id
-  network_security_group_id = local.sub_mgmt_nsg_deployed.id
+  subnet_id                 = (local.enable_deployers && !local.sub_mgmt_exists) ? azurerm_subnet.subnet_mgmt[0].id : data.azurerm_subnet.subnet_mgmt[0].id
+  network_security_group_id = (local.enable_deployers && !local.sub_mgmt_nsg_exists) ? azurerm_network_security_group.nsg_mgmt[0].id : data.azurerm_network_security_group.nsg_mgmt[0].id
 }
 
 // Add SSH network security rule
@@ -30,7 +30,7 @@ resource "azurerm_network_security_rule" "nsr_ssh" {
   count                        = local.enable_deployers && !local.sub_mgmt_nsg_exists ? 1 : 0
   name                         = "ssh"
   resource_group_name          = local.sub_mgmt_nsg_deployed.resource_group_name
-  network_security_group_name  = local.sub_mgmt_nsg_deployed.name
+  network_security_group_name  = local.enable_deployers && !local.sub_mgmt_nsg_exists ? azurerm_network_security_group.nsg_mgmt[0].name : data.azurerm_network_security_group.nsg_mgmt[0].name
   priority                     = 101
   direction                    = "Inbound"
   access                       = "allow"
@@ -46,7 +46,7 @@ resource "azurerm_network_security_rule" "nsr_rdp" {
   count                        = local.enable_deployers && !local.sub_mgmt_nsg_exists ? 1 : 0
   name                         = "rdp"
   resource_group_name          = local.sub_mgmt_nsg_deployed.resource_group_name
-  network_security_group_name  = local.sub_mgmt_nsg_deployed.name
+  network_security_group_name  = local.enable_deployers && !local.sub_mgmt_nsg_exists ? azurerm_network_security_group.nsg_mgmt[0].name : data.azurerm_network_security_group.nsg_mgmt[0].name
   priority                     = 102
   direction                    = "Inbound"
   access                       = "allow"
@@ -62,7 +62,7 @@ resource "azurerm_network_security_rule" "nsr_winrm" {
   count                        = local.enable_deployers && !local.sub_mgmt_nsg_exists ? 1 : 0
   name                         = "winrm"
   resource_group_name          = local.sub_mgmt_nsg_deployed.resource_group_name
-  network_security_group_name  = local.sub_mgmt_nsg_deployed.name
+  network_security_group_name  = local.enable_deployers && !local.sub_mgmt_nsg_exists ? azurerm_network_security_group.nsg_mgmt[0].name : data.azurerm_network_security_group.nsg_mgmt[0].name
   priority                     = 103
   direction                    = "Inbound"
   access                       = "allow"
