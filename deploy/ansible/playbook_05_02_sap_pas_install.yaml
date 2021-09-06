@@ -85,7 +85,7 @@
     - vars/ansible-input-api.yaml                               # API Input template with defaults
   tasks:
   - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step50"
+      path: "{{ _workspace_directory }}/.step502"
       state: touch
 
 
