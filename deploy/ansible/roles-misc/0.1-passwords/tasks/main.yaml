@@ -1,6 +1,13 @@
- name: Construct SAP system password secret name
+- name: Construct SAP system password secret name
   ansible.builtin.set_fact:
-    sap_password_id: "{{ secret_prefix }}-sap-password"
+    sap_password_id: "{{ secret_prefix }}-{{ sap_sid }}-sap-password"
+
+- name: "Create Password secret"
+  ansible.builtin.shell: |
+    az keyvault secret set --vault-name {{ kv_uri }} --name {{ sap_password_id }} --value "{{ password_master }}"
+  when: 
+    - password_master is defined
+    - "password_master | trim | length != 0" 
 
 - name: "SAP system password secret name"
   ansible.builtin.debug:
@@ -14,12 +21,37 @@
         az keyvault secret show
           --vault-name {{ kv_uri }}
           --name {{ sap_password_id }}
+#          --only-show-errors
+      
       changed_when: false
       register: keyvault_secret_show_sap_password_id
       no_log: false
-  when:
-    - tier == "hdb"
   rescue:
-    - name: "Debug"
-      ansible.builtin.debug:
-        var:  keyvault_secret_show_sap_password_id
+    - name: "Debug, Error code"
+      ansible.builtin.debug: 
+        msg: "{{ keyvault_secret_show_sap_password_id.rc }}"
+    - name: Construct SAP system password 
+      ansible.builtin.set_fact:
+        sap_password: "{{ lookup('password', '/tmp/sappasswordfile chars=ascii_lowercase,ascii_uppercase,digits length=14') }}"
+      when: 3 == keyvault_secret_show_sap_password_id.rc
+
+    - name: "Debug, pwd"
+      ansible.builtin.debug: 
+        var: sap_password
+      when: 3 == keyvault_secret_show_sap_password_id.rc
+
+    - name: "Create Password secret"
+      ansible.builtin.shell: |
+        az keyvault secret set --vault-name {{ kv_uri }} --name {{ sap_password_id }} --value "{{ sap_password }}"
+      when: 3 == keyvault_secret_show_sap_password_id.rc
+
+- name: "Extract SAP password"
+  ansible.builtin.set_fact:
+    sap_password: >-
+      {{ (keyvault_secret_show_sap_password_id.stdout | from_json).value }}
+  no_log: false
+
+- name: "Debug, pwd"
+  ansible.builtin.debug: 
+    var: sap_password
+

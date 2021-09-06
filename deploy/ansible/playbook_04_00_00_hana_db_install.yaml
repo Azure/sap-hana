@@ -5,9 +5,24 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
-# Steps:
-#   01) NFS: Mount
-#
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  hdb
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
 
 - hosts:          "{{ sap_sid|upper }}_DB"
 
@@ -27,10 +42,13 @@
 #
 # -------------------------------------+---------------------------------------8
 
-  - ansible.builtin.set_fact:
-      tier:     hdb                                                             # Actions for HANA DB Servers
+  - name: "Setting the DB facts "
+    ansible.builtin.set_fact:
+      tier:                   hdb                                     # Actions for HANA DB Servers
+      hana_password_master:   "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
+
 
 # -------------------------------------+---------------------------------------8
 # Role: sap-mounts
@@ -38,6 +56,14 @@
 # Description: Mount Filesystems
 #              Mount NFS Filesystems
 #
+
+# - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+    tags:
+      - 2.5-sap-users
+
   - block:
       - include_role:
           name:     roles-sap-os/2.6-sap-mounts
@@ -51,11 +77,6 @@
           name:     roles-db/4.0.0-hdb-install
     tags:
       - 4.0.0-hdb-install
-      
-
-
-
-
 
 #----------------------------------------
 # BEGIN
@@ -90,6 +111,21 @@
 #----------------------------------------
 # END
 #----------------------------------------
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step4"
+      state: touch
+
+
 
 ...
 # /*----------------------------------------------------------------------------8

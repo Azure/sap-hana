@@ -46,10 +46,10 @@
   # Template parameter mapping
   vars:
     pwd_os_root:                      "***"                                       # Not used at this time
-    pwd_os_sapadm:                    "{{ password_master }}"
-    pwd_master:                       "{{ password_master }}"
-    pwd_os_sidadm:                    "{{ password_master }}"
-    pwd_hdb_system:                   "{{ password_master }}"
+    pwd_os_sapadm:                    "{{ hana_password_master }}"
+    pwd_master:                       "{{ hana_password_master }}"
+    pwd_os_sidadm:                    "{{ hana_password_master }}"
+    pwd_hdb_system:                   "{{ hana_password_master }}"
     pwd_lss_user:                     "***"                                       # Not used at this time
     pwd_lss_backup:                   "***"                                       # Not used at this time
     pwd_streaming_cluster_manager:    "***"                                       # Not used at this time

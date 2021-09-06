@@ -41,6 +41,7 @@ sap_fqdn:                     ""                                                
 sapadm_uid:                   2100
 sapinst_gid:                  2001
 sapsys_gid:                   2000
+hdbshm_gid:                   2002
 scs_hostname:                 ""
 scs_instance_number:          "00"                                                      # SAP Install
 sidadm_uid:                   2000
