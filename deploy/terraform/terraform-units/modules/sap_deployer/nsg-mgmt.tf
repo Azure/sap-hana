@@ -53,11 +53,11 @@ resource "azurerm_network_security_rule" "nsr_ssh" {
 
 // Add RDP network security rule
 resource "azurerm_network_security_rule" "nsr_rdp" {
- depends_on = [
+  depends_on = [
     data.azurerm_network_security_group.nsg_mgmt,
     azurerm_network_security_group.nsg_mgmt
   ]
-   count                        = !local.sub_mgmt_nsg_exists ? 1 : 0
+  count                        = !local.sub_mgmt_nsg_exists ? 1 : 0
   name                         = "rdp"
   resource_group_name          = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0].resource_group_name : azurerm_network_security_group.nsg_mgmt[0].resource_group_name
   network_security_group_name  = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0].name : azurerm_network_security_group.nsg_mgmt[0].name
@@ -73,11 +73,11 @@ resource "azurerm_network_security_rule" "nsr_rdp" {
 
 // Add WinRM network security rule
 resource "azurerm_network_security_rule" "nsr_winrm" {
- depends_on = [
+  depends_on = [
     data.azurerm_network_security_group.nsg_mgmt,
     azurerm_network_security_group.nsg_mgmt
   ]
-   count                        = !local.sub_mgmt_nsg_exists ? 1 : 0
+  count                        = !local.sub_mgmt_nsg_exists ? 1 : 0
   name                         = "winrm"
   resource_group_name          = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0].resource_group_name : azurerm_network_security_group.nsg_mgmt[0].resource_group_name
   network_security_group_name  = local.sub_mgmt_nsg_exists ? data.azurerm_network_security_group.nsg_mgmt[0].name : azurerm_network_security_group.nsg_mgmt[0].name
