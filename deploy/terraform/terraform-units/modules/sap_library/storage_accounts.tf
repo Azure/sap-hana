@@ -176,8 +176,8 @@ data "azurerm_storage_account_sas" "sapbits_sas_token" {
     file  = false
   }
 
-  start  = format("YYYY-MM-DD", timestamp())
-  expiry = format("YYYY-MM-DD", timeadd(timestamp(), "8760h"))
+  start  = formatdate("YYYY-MM-DD", timestamp())
+  expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "8760h"))
 
 
   permissions {
