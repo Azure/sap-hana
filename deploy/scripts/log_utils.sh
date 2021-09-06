@@ -1,9 +1,9 @@
 #!/bin/bash
 # we only want to source the file once
-if [[ $isLibSourced ]]; then
+if [[ $__isLibSourced ]]; then
     return
 else
-    readonly isLibSourced=1
+    readonly __isLibSourced=1
 fi
 
 # only code that executes when lib is sourced should be the init code
@@ -35,10 +35,28 @@ function __init_log() {
     # variables.
 
     # shellcheck disable=SC2034
-    readonly color_normal="\033[0m" color_red="\033[0;31m" \
-        color_green="\033[0;32m" color_cyan="\033[0;36m" \
-        color_yellow="\033[0;33m" color_magenta="\033[0;35m" \
-        color_white="\033[0;37m" color_bold="\033[1m"
+    if [ -t 1 ]; then
+        # set up colors
+        [[ $color_normal ]] || color_normal="\033[0m"
+        [[ $color_red ]] || color_red="\033[0;31m"
+        [[ $color_green ]] || color_green="\033[0;32m"
+        [[ $color_yellow ]] || color_yellow="\033[0;33m"
+        [[ $color_magenta ]] || color_magenta="\033[0;35m"
+        [[ $color_cyan ]] || color_cyan="\033[0;36m"
+        [[ $color_white ]] || color_white="\033[0;37m"
+    else
+        # no colors when stdout is not a terminal
+        color_normal=""
+        color_red=""
+        color_green=""
+        color_yellow=""
+        color_magenta=""
+        color_cyan=""
+        color_white=""
+    fi
+
+    readonly color_normal color_red color_green color_yellow color_magenta color_cyan color_white
+
 
     # clear out any old values
     # shellcheck disable=SC2034
@@ -50,6 +68,21 @@ function __init_log() {
 
     # set default log level mapper to INFO
     log_level_mapper["default"]=3
+    
+    # initialize log files and redirect stdout and stderr to log files
+    printf "Execution started at : %s\n" "${DATETIME}" > "${INFOLOGFILENAME}" 
+    printf "Execution started at : %s\n" "${DATETIME}" > "${DEBUGLOGFILENAME}"
+    exec 3>&1 4>&2
+    
+    tail -f "${INFOLOGFILENAME}" &
+
+    readonly PROCESS_OF_LOG="$$"
+
+    exec 3> >(exec 4> >(tee -a "${DEBUGLOGFILENAME}" 2>&1))
+    #exec 3> >(tee "${DEBUGLOGFILENAME}") 4> >(tee "${DEBUGLOGFILENAME}" 2>&1)
+
+    # shellcheck disable=SC2034
+    trap reset_file_descriptors EXIT HUP INT ABRT QUIT TERM
 }
 
 # set log level function
@@ -65,12 +98,12 @@ function set_log_level() {
         if [[ $l ]]; then
             log_level_mapper[$logger]=$l
         else
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 WARN \
+            printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 WARN \
                 "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Unknown log level '$curr_log_level' for logger '$logger'; setting to INFO"
             log_level_mapper[$logger]=3
         fi
     else
-        printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 WARN \
+        printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 WARN \
             "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Option '-l' needs an argument" >&2
     fi
 }
@@ -112,26 +145,35 @@ function _writelog_to_file() {
         shift 2
     }
     #file=$1
+    file="${SCRIPTDIR}/$1"
+    #writes a message to the log file
+    # we may not need this, if the log file doesn't exist, create it
+    if [ ! -f "${file}" ]; then
+        touch "${file}"
+    fi
     log_level="${log_levels[$current_log_level]}"
     log_level_set="${log_level_mapper[$logger]}"
 
     #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     #+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     who_called="+${BASH_SOURCE[2]/$HOME/\~}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
+
     if [[ $log_level_set ]]; then
-        ((log_level_set >= log_level)) && {
+        if ((log_level_set >= log_level)) && [[ -f "${file}" ]]; then
             printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
                 "$who_called"
-            printf '%s\n' "$@"
-            #writes a message to the log file
-            #if the log file doesn't exist, create it
-            if [ ! -f "${SCRIPTDIR}/${INFOLOGFILENAME}" ]; then
-                touch "${SCRIPTDIR}/${INFOLOGFILENAME}"
-            fi
+            #printf '%s\n' "$@" >> "${file}"
             shift
-            printf '[%(%Y-%m-%d %H:%M:%S)T] %-7s %s %s\n' -1 "$current_log_level" \
-                "$who_called" "$@" >>"${SCRIPTDIR}/${INFOLOGFILENAME}"
-        }
+            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
+                "$who_called" "$@" >>"${file}"
+        else
+            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
+                "$who_called"
+            #printf '%s\n' "$@" >> "${file}"
+            shift
+            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
+                "$who_called" "$@" >>"${file}"
+        fi
     else
         printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 WARN \
             "$who_called Unknown logger '$logger'; setting to default"
@@ -139,27 +181,8 @@ function _writelog_to_file() {
 
 }
 
-function _printlog_from_file() {
-    local current_log_level=$1
-    shift
-    local logger=default log_level_set log_level
-    [[ $1 = "-l" ]] && {
-        logger=$2
-        shift 2
-    }
-    file=$1
-    log_level="${log_levels[$current_log_level]}"
-    log_level_set="${log_level_mapper[$logger]}"
-    who_called="+${BASH_SOURCE[2]}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
-    if [[ $log_level_set ]]; then
-        if ((log_level_set >= log_level)) && [[ -f $file ]]; then
-            log_debug "contents of file '$1'"
-            cat -- "$1"
-        fi
-    else
-        printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "WARN" "$who_called unknow logger '$log_level'"
-    fi
-}
+#placeholder, we need to decide if we ever need to _printlog_from_file() 
+
 
 # main logging functions
 #
@@ -214,6 +237,22 @@ function __list_available_environment_variables(){
                 --only-match '(?<=^declare -x )[^=]+')
     readonly envVars
     printf "%s\n" "${envVars[@]}"
+}
+
+function __list_available_environment_variables(){
+    local envVars
+    compgen -v | while read -r envVars; do
+        printf "$envVars=%q\n" "${!envVars}"
+    done
+}
+
+function reset_file_descriptors() {
+    # reset the file descriptors set above
+    exec 2>&4 1>&3
+    # close all file descriptors
+    exec 3>&- 4>&-
+    # remove the background process for log file
+    pkill -P "${PROCESS_OF_LOG}"
 }
 
 dump_stack_trace() {
