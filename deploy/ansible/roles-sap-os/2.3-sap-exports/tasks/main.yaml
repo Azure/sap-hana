@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   '{{ item.mode }}'
+    mode:   0755
   loop:
     - { tier: 'preparation', path: '/usr/sap/install' }
     - { tier: 'preparation', path: '/usr/sap/trans' }

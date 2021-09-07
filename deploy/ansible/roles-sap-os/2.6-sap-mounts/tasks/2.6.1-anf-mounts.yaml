@@ -12,7 +12,7 @@
   register: autofs_mapping_changed
   when:     tier == 'sapos' 
 
-- name:     "Mount: Ensure the  services is restarted"
+- name:     "Mount: Ensure the services is restarted"
   block:
     - name: "Mount: Ensure the rpcbind service is restarted" 
       ansible.builtin.systemd:
@@ -60,7 +60,6 @@
     path:        "{{ item.path }}"
     state:       directory
     group:       sapsys
-    owner:       "{{ sap_sid|lower }}adm"
     mode:        0755
   loop:
     - { tier == 'sapos', path: '/saptmp/sapmnt{{ sap_sid|upper }}'     }
@@ -163,7 +162,7 @@
     block: |
               /sapmnt/{{ sap_sid|upper }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/sapmnt{{ sap_sid|upper }}
               /usr/sap/{{ sap_sid|upper }}/SYS -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}sys
-  when:     node_tier == 'scs'
+  when:     node_tier == 'scs' and tier == 'sapos'
   register: autofs_configuration_changed_scs
   
 - name:                 "Mount: Update auto.direct"
@@ -173,7 +172,7 @@
               /usr/sap/install -nfsvers=4.1,nobind,sec=sys {{ nfs_server }}:/usr/sap/install
               /sapmnt/{{ sap_sid|upper }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/sapmnt{{ sap_sid|upper }}
               /usr/sap/{{ sap_sid|upper }}/SYS -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}sys
-  when:     node_tier != 'scs'
+  when:     node_tier != 'scs' and tier == 'sapos'
   register: autofs_configuration_changed
 
 - name: "Mount: Ensure the Autofs service is restarted" 
