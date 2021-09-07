@@ -125,6 +125,45 @@ function is_valid_guid() {
     fi
 }
 
+function getEnvVarValue() {
+    local varName=$1
+    local varValue=$(printenv $varName)
+    echo "${varValue}"
+}
+
+function checkforEnvVar() {
+    local env_var=
+    env_var=$(declare -p "$1")
+    if ! [[  -v $1 && $env_var =~ ^declare\ -x ]]; then
+        echo "Error: Define $1 environment variable"
+        return 1
+    else
+        echo "OK: $1 environment variable is defined"
+        getEnvVarValue "$1"
+        return 0
+    fi
+}
+
+# Check if we are running in CloudShell, we have the following three environment 
+# variables: POWERSHELL_DISTRIBUTION_CHANNEL, AZURE_HTTP_USER_AGENT, and 
+# AZUREPS_HOST_ENVIRONMENT. We will use the first one to determine if we are
+# running in CloudShell.
+# Default values for these variables are:
+# POWERSHELL_DISTRIBUTION_CHANNEL=CloudShell
+# AZURE_HTTP_USER_AGENT=cloud-shell/1.0
+# AZUREPS_HOST_ENVIRONMENT=cloud-shell/1.0
+function checkIfCloudShell() {
+    local isRunInCloudShell=1 # default value is false
+    if [ "$POWERSHELL_DISTRIBUTION_CHANNEL" == "CloudShell" ]; then
+        isRunInCloudShell=0
+        echo "isRunInCloudShell: true"
+    else
+        echo "isRunInCloudShell: false"
+    fi
+    
+    return $isRunInCloudShell
+}
+
 function set_azure_cloud_environment() {
     #Description
     # Find the cloud environment where we are executing.
@@ -161,6 +200,26 @@ function set_azure_cloud_environment() {
     else
         echo -e "\t\t[set_azure_cloud_environment]: Unable to determine the Azure cloud environment"
     fi
+}
+
+function is_running_in_azureCloudShell() {
+    #Description
+    # Check if we are running in Azure Cloud Shell
+    #AZURE_HTTP_USER_AGENT=cloud-shell/1.0
+    typeset -px AZURE_HTTP_USER_AGENT | cut -d= -f 2 | cut -d'/' -f 1
+    cloudIDUsed=$(az account show | grep "cloudShellID")
+    if [ ! -z "${cloudIDUsed}" ];
+    then 
+        echo ""
+        echo "#########################################################################################"
+        echo "#                                                                                       #"
+        echo -e "#     $boldred Please login using your credentials or service principal credentials! $resetformatting      #"
+        echo "#                                                                                       #"
+        echo "#########################################################################################"
+        echo ""
+        exit 67                                                                                             #addressee unknown
+    fi
+    return 0
 }
 
 function set_executing_user_environment_variables() {
@@ -271,3 +330,5 @@ function print_script_name_and_function() {
 #print the function name being executed
 #printf maybe instead of echo
 #printf "%s\n" "${FUNCNAME[@]}"
+#check the AZURE_HTTP_USER_AGENT=cloud-shell/1.0 to identify the cloud shell
+#update template to user the following user http://localhost:50342/oauth2/token
