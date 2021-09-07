@@ -62,6 +62,10 @@ password_db_xsa_admin:        ""
 download_templates:           false
 prometheus:                   false                                                      # Install Prometheus Monitoring Agent
 
+# Keyvault 
+deployer-kv-name:             "deployer-kv-name"                                         # Name of secret containing the deployer keyvault name in the workload zone keyvault
+sapbits-location-secret:      "sapbits_location_base_path"                               # Name of secret containing the SAP Binaries storage account container URL
+sapbits-sas-token-secret:     "sapbits-sas-token"                                        # Name of secret containing the SAP Binaries storage account SAS token
 
 sap_swap:
   - { tier: 'scs',  swap_size_mb: '4096' }

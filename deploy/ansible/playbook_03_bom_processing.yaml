@@ -5,6 +5,27 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts: localhost
+  name: Get Storage account details from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  sa
+
+  - block:
+    - include_role:
+        name:     roles-misc/0.3.sap-installation-media-storage-details
+        public:   yes      
+    tags:
+      - 0.3.sap-installation-media-storage-details
+
+
+
 # Steps:
 #   01) NFS: Make Local Shares available via NFS Exports
 #   02) Process BOM (Download and Extract)
@@ -60,6 +81,9 @@
   - block:
     - include_role:
         name:     roles-sap/3.3-bom-processing
+    vars:
+      sapbits_location_base_path: "{{ hostvars.localhost.sapbits-location-base-path }}"
+      sapbits_sas_token:          "{{ hostvars.localhost.sapbits_sas_token }}"
     tags:
       - 3.3-bom-processing
 
