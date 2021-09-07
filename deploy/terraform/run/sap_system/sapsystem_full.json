@@ -122,7 +122,7 @@
     "sid"                                  : "PRD",
     "use_DHCP"                             : false,
     "dual_nics"                            : false,
-    "vm_sizing"                            : "New",
+    "vm_sizing"                            : "Production",
     "application_server_count"             : 3,
     "app_nic_ips"                          : [],
     "app_admin_nic_ips"                    : [],

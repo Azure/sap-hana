@@ -5,7 +5,24 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+#      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
+
 
 - hosts:          "{{ sap_sid|upper }}_PAS"
 
@@ -26,9 +43,16 @@
 # -------------------------------------+---------------------------------------8
   - ansible.builtin.set_fact:
       tier:     dbload                                                          # SAP Install phase: DBLOAD
+      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 
+# - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+    tags:
+      - 2.5-sap-users
 
   - block:
       - include_role:
@@ -41,6 +65,21 @@
           name:     roles-sap/5.1-dbload
     tags:
       - 5.1-dbload
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step501"
+      state: touch
+
+
 
 ...
 # /*---------------------------------------------------------------------------8

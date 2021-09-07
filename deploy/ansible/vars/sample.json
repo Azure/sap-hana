@@ -1,0 +1,26 @@
+{
+    "type": {
+        "KEY": {
+            "compute": {
+                "vm_size": "Standard_D4s_v3"
+            },
+            "storage": [
+                {
+                    "name": "os",
+                    "count": 1,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite"
+                },
+                {
+                    "name": "[NAME_OF_DISK]",
+                    "count": 2,
+                    "disk_type": "Premium_LRS",
+                    "size_gb": 128,
+                    "caching": "ReadWrite",
+                    "start_lun": 0
+                }
+            ]
+        }
+    }
+}

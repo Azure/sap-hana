@@ -5,6 +5,23 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+
 # Steps:
 #   01) Hana DB system replication 
 #
@@ -18,7 +35,7 @@
   gather_facts:   true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
-
+   
 
   tasks:
 # -------------------------------------+---------------------------------------8
@@ -29,8 +46,9 @@
 
   - set_fact:
       tier:     hdb                                                             # Actions for HANA DB Servers
-      primary_instance_name : "{{ ansible_play_hosts_all[0] }}"                 # Setting up Primary Instance Name 
+      primary_instance_name :  "{{ ansible_play_hosts_all[0] }}"                 # Setting up Primary Instance Name 
       secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"                # Setting up Secondary Instance Name
+      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
 
 
   - block:
@@ -39,6 +57,20 @@
     tags:
       - 4.0.1-hdb-hsr
       
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step401"
+      state: touch
+
 
 
 ...
