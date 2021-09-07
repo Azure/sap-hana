@@ -77,25 +77,17 @@
     tags:
       - 1.5-disk-setup
 
-
-  # - block:
-  #   - include_role:
-  #       name:     roles-sap-os/2.5-sap-users
-  #   tags:
-  #     - 2.5-sap-users
-
   - block:
       - include_role:
           name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
     tags:
       - 2.5-sap-users
 
-#   - block:
-#     - include_role:
-#         name:     roles-sap-os/2.2-sapPermissions
-#     tags:
-#       - 2.2-sapPermissions
-
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.6-sap-mounts
+    tags:
+      - 2.6-sap-mounts
 
 # - role: 2.10-sap-notes                                        # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
   - block:
