@@ -304,3 +304,16 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
     "List"
   ]
 }
+
+
+
+//Witness access key
+resource "azurerm_key_vault_secret" "deployer_kv_user_name" {
+  provider     = azurerm.main
+  count        = length(trimspace(local.deployer_kv_user_name)) > 0 ? 1 : 0
+  content_type = ""
+  name         = "deployer-kv-name"
+  value        = local.deployer_kv_user_name
+  key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
+}
+

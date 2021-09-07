@@ -306,4 +306,7 @@ locals {
     )
   )
 
+  # Store the Deployer KV in workload zone KV
+  deployer_kv_user_name = try(var.deployer_tfstate.deployer_kv_user_name, "") 
+
 }
