@@ -283,7 +283,7 @@ echo "#                                                                         
 echo "#########################################################################################"
 echo ""
 
-terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" $extra_vars 2>error.log
+terraform -chdir="${terraform_module_directory}"  apply ${approve} -var-file="${var_file}" $extra_vars 
 return_value=$?
     
 if [ 0 != $return_value ] ; then
@@ -294,8 +294,6 @@ if [ 0 != $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat error.log
-    rm error.log
     unset TF_DATA_DIR
     exit $return_value
 fi

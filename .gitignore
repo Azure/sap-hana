@@ -31,3 +31,6 @@ deploy/scripts/pwsh/SAPDeploymentUtilities/Output/stats.json
 
 
 **/.terraform.lock.hcl
+
+# Ignore python bytecode files
+*.pyc
