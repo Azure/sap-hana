@@ -58,6 +58,12 @@
 
   - block:
       - include_role:
+          name:     roles-sap-os/2.6-sap-mounts
+    tags:
+      - 2.6-sap-mounts
+
+  - block:
+      - include_role:
           name:     roles-sap/5.0.0-scs-install
     tags:
       - 5.0.0-scs-install

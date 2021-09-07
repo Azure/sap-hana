@@ -104,7 +104,6 @@ options=(
         # Special menu entries
         "BOM Download"
         "BOM Upload"
-        "Tester"
         "Install SAP (1-7)"
         "Post SAP Install (8-12)"
         "All Playbooks"
@@ -129,7 +128,6 @@ all_playbooks=(
         ${cmd_dir}/playbook_06_00_00_pacemaker.yaml
         ${cmd_dir}/playbook_06_00_01_pacemaker_scs.yaml
         ${cmd_dir}/playbook_06_00_03_pacemaker_hana.yaml
-        ${cmd_dir}/tester.yaml
         ${cmd_dir}/tester.yaml
         ${cmd_dir}/tester.yaml
         ${cmd_dir}/playbook_bom_downloader.yaml

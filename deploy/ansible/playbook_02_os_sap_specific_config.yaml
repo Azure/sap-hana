@@ -76,6 +76,12 @@
           name: roles-os/1.5-disk-setup
     tags:
       - 1.5-disk-setup
+  
+  - block:
+      - include_role:
+          name: roles-os/1.9-kernelparameters
+    tags:
+      - 1.9-kernelparameters
 
   - block:
       - include_role:
