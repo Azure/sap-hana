@@ -205,21 +205,35 @@ function set_azure_cloud_environment() {
 function is_running_in_azureCloudShell() {
     #Description
     # Check if we are running in Azure Cloud Shell
-    #AZURE_HTTP_USER_AGENT=cloud-shell/1.0
-    typeset -px AZURE_HTTP_USER_AGENT | cut -d= -f 2 | cut -d'/' -f 1
-    cloudIDUsed=$(az account show | grep "cloudShellID")
-    if [ ! -z "${cloudIDUsed}" ];
-    then 
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo -e "#     $boldred Please login using your credentials or service principal credentials! $resetformatting      #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-        exit 67                                                                                             #addressee unknown
+    azureCloudShellIsSetup=1 # default value is false
+
+    echo -e "\t\t[is_running_in_azureCloudShell]: Identifying if we are running in Azure Cloud Shell"
+    cloudShellCheck=$(checkIfCloudShell)
+    
+    if [[ (($cloudShellCheck == 0)) ]]; then 
+        echo -e "\t\t[is_running_in_azureCloudShell]: Identified we are running in Azure Cloud Shell"
+        echo -e "\t\t[is_running_in_azureCloudShell]: Checking if we have a valid login in Azure Cloud Shell"
+        cloudIDUsed=$(az account show | grep "cloudShellID")
+        if [ -n "${cloudIDUsed}" ]; then
+            echo -e "\t\t[is_running_in_azureCloudShell]: We are using CloudShell MSI and need to run 'az login'"
+            echo ""
+            echo "#########################################################################################"
+            echo "#                                                                                       #"
+            echo -e "#     $boldred Please login using your credentials or service principal credentials! $resetformatting      #"
+            echo "#                                                                                       #"
+            echo "#########################################################################################"
+            echo ""
+            azureCloudShellIsSetup=67                         #addressee unknown
+        else 
+            echo -e "\t\t[is_running_in_azureCloudShell]: We have a valid login in Azure Cloud Shell"
+            azureCloudShellIsSetup=0                         #we are good to go
+        fi
+    else
+        echo -e "\t\t[is_running_in_azureCloudShell]: We are not running Azure Cloud Shell"
+        azureCloudShellIsSetup=1                             #set return to further logic
     fi
-    return 0
+
+    return $azureCloudShellIsSetup
 }
 
 function set_executing_user_environment_variables() {
