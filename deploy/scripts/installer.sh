@@ -628,7 +628,7 @@ if [ 2 == $return_value ] ; then
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo -e "#                               $boldreduscore!!! Risk for Data loss !!!$resetformatting                               #"
+        echo -e "#                               $boldreduscore!!! Risk for Data loss !!!$resetformatting                              #"
         echo "#                                                                                       #"
         echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
         echo "#                                                                                       #"

@@ -16,8 +16,8 @@ hdb_sid_admin_user: "{{ hdb_sid | lower }}adm"
 hana_tenant_database_name: "{{ hdb_sid | upper }}"
 
 # HANA utility commands
-hdbsql_systemdb_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d SYSTEMDB -u SYSTEM -p {{ password_master }}"
-hdbsql_tenant_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ password_master }}"
+hdbsql_systemdb_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d SYSTEMDB -u SYSTEM -p {{ hana_password_master }}"
+hdbsql_tenant_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ hana_password_master }}"
 hdbnsutil_command: "hdbnsutil"
 sapcontrol_command: "sapcontrol -nr {{ hdb_instance_number }}"
 

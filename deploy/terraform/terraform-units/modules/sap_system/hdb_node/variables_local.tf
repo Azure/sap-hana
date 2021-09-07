@@ -288,12 +288,12 @@ locals {
     ]
   }
 
-  loadbalancer_ports = flatten([
+  loadbalancer_ports = local.enable_deployment ? flatten([
     for port in local.lb_ports[split(".", local.hdb_version)[0]] : {
       sid  = var.sap_sid
-      port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
+      port = tonumber(port) + (tonumber(try(local.hana_database.instance.instance_number, 0)) * 100)
     }
-  ])
+  ]) : null
 
 
   // List of data disks to be created for HANA DB nodes

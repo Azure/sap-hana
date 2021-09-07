@@ -10,7 +10,7 @@
 #   ----------  ----------------  ----------------------------------------------
 #   2020        Centiq            Sprint 8: SAP Install Framework
 #   2020/12/22  Morgan Deegan     Simplify and Update inline documentation
-#
+#   2021/09/01  Kimmo Forss       Obsolete
 #
 # Facts:
 
@@ -63,16 +63,34 @@
     comment:      "{{ item.comment }}"
     uid:          "{{ item.uid }}"
     group:        "{{ item.group }}"
+    password:     "{{ hana_password_master | password_hash('sha512', inventory_hostname) }}"
     append:       no
     shell:        /bin/csh
     create_home:  yes
     home:         "{{ item.home }}"
   loop:
-    - { tier: 'all',         user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
-    - { tier: 'scs',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
-    - { tier: 'pas',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
-    - { tier: 'app',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { tier: 'sapos',        user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
+#    - { tier: 'scs',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+#    - { tier: 'pas',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+#    - { tier: 'app',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+#    - { tier: 'hdb',         user: '{{ hdb_sid | lower }}adm', uid: '{{ hdbadm_uid }}', group: 'sapsys', home: '/home/{{ hdb_sid|lower }}adm', comment: 'SAP {{ hdb_sid|upper }} Admin' }
     # TODO: add user for WebDisp Functionality
     # - { tier: 'WEB',         user: 'webadm',                   uid: '32002',            group: 'sapsys', home: '/home/webadm',                 comment: 'SAP WebDisp Admin' }
-  when:     item.tier == "all" or
-            item.tier == tier
+  when:     item.node_tier == "all" or
+            item.node_tier == node_tier
+
+- name:       "SAP: Create SAP Users"
+  ansible.builtin.debug:
+    msg:          "{{ item.user }} - {{ tier }} - {{ item.node_tier }}"
+    verbosity:    2
+  loop:
+    - { node_tier: 'all',         user: 'sapadm',                   uid: '{{ sapadm_uid }}', group: 'sapsys', home: '/home/sapadm',                 comment: 'SAP Host Agent' }
+    - { node_tier: 'scs',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { node_tier: 'ers',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { node_tier: 'pas',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { node_tier: 'app',         user: '{{ sap_sid | lower }}adm', uid: '{{ sidadm_uid }}', group: 'sapsys', home: '/home/{{ sap_sid|lower }}adm', comment: 'SAP {{ sap_sid|upper }} Admin' }
+    - { node_tier: 'hana',        user: '{{ hdb_sid | lower }}adm', uid: '{{ hdbadm_uid }}', group: 'sapsys', home: '/home/{{ hdb_sid|lower }}adm', comment: 'SAP {{ hdb_sid|upper }} Admin' }
+    # TODO: add user for WebDisp Functionality
+    # - { tier: 'WEB',         user: 'webadm',                   uid: '32002',            group: 'sapsys', home: '/home/webadm',                 comment: 'SAP WebDisp Admin' }
+  when:     item.node_tier == "all" or
+            item.node_tier == node_tier

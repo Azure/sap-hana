@@ -520,10 +520,15 @@ variable "anf_sapmnt_volume_size" {
   default = 512
 }
 
-
 variable "anf_shared_volume_size" {
   default = 512
 }
+
+variable "use_ANF" {
+  default = false
+}
+
+
 variable "use_loadbalancers_for_standalone_deployments" {
   default = true
 }

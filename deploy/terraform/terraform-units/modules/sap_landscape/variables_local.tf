@@ -29,6 +29,7 @@ variable "ANF_settings" {
     size_in_tb    = 4
 
   }
+}
   
 variable "create_spn" {
   description = "Flag controlling the Fencing SPN creation"

@@ -51,6 +51,7 @@ module "common_infrastructure" {
   enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
   anf_shared_volume_size             = var.anf_shared_volume_size
   anf_sapmnt_volume_size             = var.anf_sapmnt_volume_size
+  use_ANF                            = var.use_ANF
 
 
 }

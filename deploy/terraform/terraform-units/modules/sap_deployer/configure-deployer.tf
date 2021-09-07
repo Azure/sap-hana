@@ -28,6 +28,7 @@ resource "null_resource" "prepare-deployer" {
       tenant_id       = data.azurerm_subscription.primary.tenant_id
       }
     )
+
     destination = "/tmp/configure_deployer.sh"
   }
 
@@ -47,4 +48,20 @@ resource "null_resource" "prepare-deployer" {
       "/tmp/configure_deployer.sh"
     ]
   }
+
+}
+
+resource "local_file" "configure_deployer" {
+  count = local.enable_deployer_public_ip ? 0 : length(local.deployers)
+  content = templatefile(format("%s/templates/configure_deployer.sh.tmpl", path.module), {
+    tfversion       = "0.14.7",
+    rg_name         = local.rg_name,
+    client_id       = azurerm_user_assigned_identity.deployer.client_id,
+    subscription_id = data.azurerm_subscription.primary.subscription_id,
+    tenant_id       = data.azurerm_subscription.primary.tenant_id
+    }
+  )
+  filename             = format("%s/configure_deployer.sh", path.cwd)
+  file_permission      = "0660"
+  directory_permission = "0770"
 }

@@ -123,10 +123,10 @@ resource "azurerm_role_assignment" "deployer_msi_sa_tfstate" {
   principal_id         = local.deployer_msi_principal_id
 }
 
-resource "azurerm_key_vault_secret" "saplibrary_access_key" {
-  count        = length(local.deployer_kv_user_arm_id)> 0 ? 1 : 0
-  name         = "sapbits-access-key"
-  value        = local.sa_sapbits_exists  ? data.azurerm_storage_account.storage_sapbits[0].primary_access_key : azurerm_storage_account.storage_sapbits[0].primary_access_key
-  key_vault_id = local.deployer_kv_user_arm_id
-}
+# resource "azurerm_key_vault_secret" "saplibrary_access_key" {
+#   count        = length(local.deployer_kv_user_arm_id)> 0 ? 1 : 0
+#   name         = "sapbits-access-key"
+#   value        = local.sa_sapbits_exists  ? data.azurerm_storage_account.storage_sapbits[0].primary_access_key : azurerm_storage_account.storage_sapbits[0].primary_access_key
+#   key_vault_id = local.deployer_kv_user_arm_id
+# }
 

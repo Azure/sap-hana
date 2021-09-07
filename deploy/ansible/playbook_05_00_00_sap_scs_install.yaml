@@ -24,7 +24,8 @@
 #      
 
 
-- hosts:          "{{ sap_sid|upper }}_SCS"
+- hosts:          "{{ sap_sid|upper }}_SCS :
+                  {{ sap_sid|upper }}_ERS"
 
   name:           SAP Installation - SCS
   remote_user:    "{{ orchestration_ansible_user }}"                

@@ -10,12 +10,34 @@
 # settings to be used when creating/managing admin groups
 # -------------------------------------+---------------------------------------8
 
+# Create User Groups for SAP:
+#   sapsys - once defined, typically remains constant across all systems. Used
+#   for file access in shared directories between SID's.
+#
+#   sapinst - typically only used durring install, and removed after. Potentially
+#   can be depracated. 
+# 
+
+
 admin_groups:
   - name:         example
     gid:          "2000"
     state:        present
     tier:         example
     enabled:      true
+    node_tier:    none
+#  - name:         sapsys
+#    gid:          "{{ sapsys_gid }}"
+#    state:        present
+#    tier:         sapos
+#    enabled:      true
+#    node_tier:    all
+#  - name:         sapinst
+#    gid:          "2001"
+#    state:        present
+#    tier:         sapos
+#    enabled:      true
+#    node_tier:    all
 
 # -------------------------------------+---------------------------------------8
 #
@@ -36,3 +58,44 @@ admin_users:
     state:        present
     tier:         example
     enabled:      true
+    node_tier:    none
+
+#  - name:         sapadm
+#   comment:      "SAP Host Agent"
+#    uid:          "{{ sapadm_uid }}"
+#    group:        sapsys
+#    groups:       ["sapsys"]
+#    password:     "some_password_string"
+#    sudoers_role: "admin_no_password"
+#    shell:        /bin/csh
+#    state:        present
+#    tier:         sapos
+#    node_tier:    all
+#    enabled:      true
+
+#  - name:         "{{ sap_sid|lower }}adm"
+#    comment:      "SAP System Administrator"
+#    uid:          "{{ sidadm_uid }}"
+#    group:        sapsys
+#    groups:       ["sapsys"]
+#    password:     "some_password_string"
+#    sudoers_role: "admin_no_password"
+#    shell:        /bin/csh
+#    state:        present
+#    tier:         sapos
+#    node_tier:    all
+#    enabled:      true
+
+#  - name:         "{{ hdb_sid|lower }}adm"
+#    comment:      "SAP HANA Database System Administrator"
+#    uid:          "{{ hdbadm_uid }}"
+#    group:        sapsys
+#    groups:       ["sapsys"]
+#    password:     "some_password_string"
+#    sudoers_role: "admin_no_password"
+#    shell:        /bin/csh
+#    state:        present
+#    tier:         sapos
+#    node_tier:    all
+#    enabled:      true
+

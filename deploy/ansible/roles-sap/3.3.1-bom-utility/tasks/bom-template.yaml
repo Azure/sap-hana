@@ -57,7 +57,7 @@
 #       scs_instance_number
 #       sap_scs_hostname
 #       sap_fqdn
-#       password_master
+#       hana_password_master
 #       sapadm_uid
 #       sapsys_gid
 #       sidadm_uid
@@ -71,7 +71,7 @@
       - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
       - "DB Hostname          : {{ sap_db_hostname }}"
       - "FQDN                 : {{ sap_fqdn }}"
-      - "Master Password      : {{ password_master }}"
+      - "Master Password      : {{ hana_password_master }}"
       - "sapadm UID           : {{ sapadm_uid }}"
       - "sapsys GID           : {{ sapsys_gid }}"
       - "<sid>adm UID         : {{ sidadm_uid }}"

@@ -44,27 +44,28 @@ data "azurerm_virtual_network" "vnet_sap" {
 }
 
 # // Peers management VNET to SAP VNET
-# resource "azurerm_virtual_network_peering" "peering_management_sap" {
-#   provider                     = azurerm.main
-#   count                        = local.vnet_sap_exists || !var.use_deployer ? 0 : 1
-#   name                         = substr(format("%s_to_%s", split("/", local.vnet_mgmt_id)[8], local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name), 0, 80)
-#   virtual_network_name         = split("/", local.vnet_mgmt_id)[8]
-#   resource_group_name          = split("/", local.vnet_mgmt_id)[4]
-#   remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].id : azurerm_virtual_network.vnet_sap[0].id
-#   allow_virtual_network_access = true
-# }
+resource "azurerm_virtual_network_peering" "peering_management_sap" {
+  provider                     = azurerm.deployer
+  count                        = local.vnet_sap_exists || !var.use_deployer ? 0 : 1
+  name                         = substr(format("%s_to_%s", split("/", local.vnet_mgmt_id)[8], local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name), 0, 80)
+  virtual_network_name         = split("/", local.vnet_mgmt_id)[8]
+  resource_group_name          = split("/", local.vnet_mgmt_id)[4]
+  remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].id : azurerm_virtual_network.vnet_sap[0].id
 
-# // Peers SAP VNET to management VNET
-# resource "azurerm_virtual_network_peering" "peering_sap_management" {
-#   provider                     = azurerm.main
-#   count                        = local.vnet_sap_exists || !var.use_deployer ? 0 : 1
-#   name                         = substr(format("%s_to_%s", local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name, split("/", local.vnet_mgmt_id)[8]), 0, 80)
-#   resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
-#   virtual_network_name         = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
-#   remote_virtual_network_id    = local.vnet_mgmt_id
-#   allow_virtual_network_access = true
-#   allow_forwarded_traffic      = true
-# }
+  allow_virtual_network_access = true
+}
+
+// Peers SAP VNET to management VNET
+resource "azurerm_virtual_network_peering" "peering_sap_management" {
+  provider                     = azurerm.main
+  count                        = local.vnet_sap_exists || !var.use_deployer ? 0 : 1
+  name                         = substr(format("%s_to_%s", local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name, split("/", local.vnet_mgmt_id)[8]), 0, 80)
+  resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  virtual_network_name         = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
+  remote_virtual_network_id    = local.vnet_mgmt_id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic      = true
+}
 
 // Creates boot diagnostics storage account
 resource "azurerm_storage_account" "storage_bootdiag" {

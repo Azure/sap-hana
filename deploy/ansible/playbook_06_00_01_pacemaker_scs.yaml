@@ -41,6 +41,21 @@
    - include_role:
       name:     roles-os/6.0.0.01-HANA
      when: db_high_availability == true          
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step601"
+      state: touch
+
+
 ...
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |

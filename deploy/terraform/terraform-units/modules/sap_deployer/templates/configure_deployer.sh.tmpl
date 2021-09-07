@@ -159,6 +159,31 @@ pkg_mgr_refresh()
     pkg_mgr_refreshed=true
 }
 
+
+pkg_mgr_upgrade()
+{
+    typeset -g pkg_mgr pkg_mgr_upgraded
+
+    if [[ -z "$${pkg_mgr:-}" ]]; then
+        pkg_mgr_init
+    fi
+
+    if [[ -n "$${pkg_mgr_upgraded:-}" ]]; then
+        return
+    fi
+
+    case "$${pkg_mgr}" in
+    (apt-get)
+        sudo $${pkg_mgr} upgrade --quiet -y
+        ;;
+    (zypper)
+        sudo $${pkg_mgr} --gpg-auto-import-keys --quiet upgrade 
+        ;;
+    esac
+
+    pkg_mgr_upgraded=true
+}
+
 pkg_mgr_install()
 {
     typeset -g pkg_mgr
@@ -174,6 +199,7 @@ pkg_mgr_install()
         ;;
     esac
 }
+
 
 #
 # Directories and paths
@@ -223,6 +249,15 @@ esac
 required_pkgs=(
     jq
     unzip
+    ca-certificates
+    curl
+    apt-transport-https
+    lsb-release
+    gnupg
+)
+
+cli_pkgs=(
+    azure-cli
 )
 
 # Include distro version agnostic packages into required packages list
@@ -250,6 +285,7 @@ pkg_mgr_refresh
 # Install required packages as determined above
 pkg_mgr_install "$${required_pkgs[@]}"
 
+
 # Prepare Azure SAP Automated Deployment folder structure
 mkdir -p \
     $${asad_ws}/LOCAL/$${rg_name} \
@@ -275,10 +311,25 @@ wget -nv -O /tmp/$${tf_zip} https://releases.hashicorp.com/terraform/$${tfversio
 sudo unzip -o /tmp/$${tf_zip} -d $${tf_dir}
 sudo ln -vfs ../$(basename $${tf_dir})/terraform $${tf_bin}/terraform
 
+rel=$(lsb_release -a | grep Release | cut -d':' -f2 | xargs)
+# Ubuntu 20.04 (Focal Fossa) and 20.10 (Groovy Gorilla) include an azure-cli package with version 2.0.81 provided by the universe repository. 
+# This package is outdated and not recommended. If this package is installed, remove the package
+if [ "$rel" == "20.04" ]; then
+  echo "Removing Azure CLI"
+  sudo apt remove azure-cli -y 
+  sudo apt autoremove -y
+  sudo apt update -y
+fi
 #
 # Install az cli using provided scripting
 #
-curl -sL https://aka.ms/InstallAzureCLI${pkg_type^} | sudo bash
+
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash > /dev/null
+
+# Ensure our package metadata cache is up to date
+pkg_mgr_refresh
+
+pkg_mgr_upgrade
 
 #
 # Install latest Ansible revision of specified version for all users.
@@ -386,9 +437,8 @@ echo export ANSIBLE_COLLECTIONS_PATHS=$${ansible_collections} | sudo tee -a /etc
 
 # Set env for MSI
 echo export ARM_USE_MSI=true | sudo tee -a /etc/profile.d/deploy_server.sh
-echo "export ARM_MSI_ENDPOINT='http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01'" | sudo tee -a /etc/profile.d/deploy_server.sh
-echo export ARM_CLIENT_ID=$${client_id} | sudo tee -a /etc/profile.d/deploy_server.sh
-echo export ARM_SUBSCRIPTION_ID=$${subscription_id} | sudo tee -a /etc/profile.d/deploy_server.sh
+#echo export ARM_CLIENT_ID=$${client_id} | sudo tee -a /etc/profile.d/deploy_server.sh
+#echo export ARM_SUBSCRIPTION_ID=$${subscription_id} | sudo tee -a /etc/profile.d/deploy_server.sh
 echo export ARM_TENANT_ID=$${tenant_id} | sudo tee -a /etc/profile.d/deploy_server.sh
 echo export DEPLOYMENT_REPO_PATH=$HOME/Azure_SAP_Automated_Deployment/sap-hana | sudo tee -a /etc/profile.d/deploy_server.sh
 

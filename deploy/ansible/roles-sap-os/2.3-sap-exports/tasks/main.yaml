@@ -3,7 +3,7 @@
   ansible.builtin.file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   0755
+    mode:   '{{ item.mode }}'
   loop:
     - { tier: 'preparation', path: '/usr/sap/install' }
     - { tier: 'preparation', path: '/usr/sap/trans' }
@@ -30,7 +30,8 @@
   loop:
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/trans',              line: '/usr/sap/trans *(rw,sync,no_wdelay,no_root_squash)' }
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',            line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)' }
-    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=',        line: 'NFS3_SERVER_SUPPORT="no"' }
+      # - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=',        line: 'NFS3_SERVER_SUPPORT="no"' }
+    - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=',        line: 'NFS3_SERVER_SUPPORT="yes"' }
     - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS4_SUPPORT=',               line: 'NFS4_SUPPORT="yes"' }
   when:     (ansible_os_family|upper == "SUSE" or (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat7") and (item.tier == "all" or item.tier == tier)
 
@@ -58,7 +59,7 @@
   loop:
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/trans',              line: '/usr/sap/trans *(rw,sync,no_wdelay,no_root_squash)'              }
     - { tier: 'preparation', path: '/etc/exports',       regexp: '^/usr/sap/install',            line: '/usr/sap/install *(rw,sync,no_wdelay,no_root_squash)'            }
-    - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers3=',                    line: ' vers3=n'                                                        }
+    - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers3=',                    line: ' vers3=y'                                                        }
     - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers4.1=',                  line: ' vers4.1=y'                                                      }
     - { tier: 'preparation', path: '/etc/nfs.conf',      regexp: '^# vers4.2=',                  line: ' vers4.2=y'                                                      }
   when:     (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8" and (item.tier == "all" or item.tier == tier)

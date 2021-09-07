@@ -251,7 +251,7 @@ locals {
   scs_size = length(var.application.scs_sku) > 0 ? var.application.scs_sku : local.app_size
   web_size = length(var.application.web_sku) > 0 ? var.application.web_sku : local.app_size
 
-  vm_sizing = length(var.application.vm_sizing) > 0 ? var.application.vm_sizing : length(local.app_size) > 0 ? "New" : "Default"
+  vm_sizing = length(var.application.vm_sizing) > 0 ? var.application.vm_sizing : length(local.app_size) > 0 ? "Production" : "Default"
 
 
   // OS image for all Application Tier VMs

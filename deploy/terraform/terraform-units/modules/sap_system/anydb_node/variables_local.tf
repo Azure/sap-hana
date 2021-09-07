@@ -148,7 +148,7 @@ locals {
 
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  anydb          = local.enable_deployment ? local.anydb_databases[0] : {}
+  anydb          = local.enable_deployment ? local.anydb_databases[0] : []
   anydb_platform = local.enable_deployment ? try(local.anydb.platform, "NONE") : "NONE"
   // Enable deployment based on length of local.anydb_databases
 
@@ -241,7 +241,7 @@ locals {
   observer_os              = local.anydb_os
 
   // Update database information with defaults
-  anydb_database = merge(local.anydb,
+  anydb_database = local.enable_deployment ? merge(local.anydb,
     { platform = local.anydb_platform },
     { size = local.anydb_size },
     { os = merge({ os_type = local.anydb_ostype }, local.anydb_os) },
@@ -249,7 +249,7 @@ locals {
     { auth_type = local.sid_auth_type },
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
-  )
+  ) : []
 
 
   dbnodes = local.anydb_ha ? (

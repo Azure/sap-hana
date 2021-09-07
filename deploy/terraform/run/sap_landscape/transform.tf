@@ -46,7 +46,7 @@ locals {
   }
   options = {
     enable_secure_transfer = true
-    create_fencing_spn     = var.create_fencing_spn || try(var.options.create_fencing_spn, true)
+    create_fencing_spn     = var.create_fencing_spn || try(var.options.create_fencing_spn, false)
   }
   key_vault = {
     kv_user_id = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")

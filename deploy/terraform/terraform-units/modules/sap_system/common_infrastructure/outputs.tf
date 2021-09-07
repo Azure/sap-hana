@@ -28,7 +28,10 @@ output "ppg" {
 
 
 output "admin_subnet" {
-  value = local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0]
+  value = local.enable_admin_subnet ? (
+    local.sub_admin_exists ? data.azurerm_subnet.admin[0] : azurerm_subnet.admin[0]) : (
+    null
+  )
 }
 
 output "db_subnet" {
@@ -59,18 +62,18 @@ output "storage_subnet" {
 
 output "sid_password" {
   sensitive = true
-  value = local.sid_auth_password
+  value     = local.sid_auth_password
 }
 
 output "sid_username" {
   sensitive = true
-  value = local.sid_auth_username
+  value     = local.sid_auth_username
 }
 
 //Output the SDU specific SSH key
 output "sdu_public_key" {
   sensitive = true
-  value = local.sid_public_key
+  value     = local.sid_public_key
 }
 
 output "route_table_id" {

@@ -310,10 +310,14 @@ then
     if [ -z "${temp}" ]
     then
         touch "${deployer_config_information}"
+        printf -v val %-.20s "$keyvault"            
+
+        printf -v val %-.20s "$keyvault"            
+
         echo ""
         echo "#########################################################################################"
         echo "#                                                                                       #"
-        echo "#                  Keyvault to use for SPN details: $temp                     #
+        echo -e "#                Keyvault to use for SPN details:$cyan $val $resetformatting                 #"
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""

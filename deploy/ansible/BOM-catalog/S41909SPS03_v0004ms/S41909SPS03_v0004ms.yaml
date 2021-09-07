@@ -234,10 +234,10 @@ materials:
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000410162020
 
-    - name:         "Patch 3 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
-      archive:      SUM20SP11_3-80002456.SAR
+    - name:         "Patch 4 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP11_4-80002456.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000001125852021 
+      url:          https://softwaredownloads.sap.com/file/0020000001213242021
 
     - name:         "SP12 Patch4 for UMML4HANA 1"
       archive:      HANAUMML12_4-70001054.ZIP
