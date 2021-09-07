@@ -294,8 +294,6 @@ if [ 0 != $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat error.log
-    rm error.log
     unset TF_DATA_DIR
     exit $return_value
 fi
