@@ -104,3 +104,7 @@ output "web_nsg_id" {
 output "dns_label" {
   value = var.dns_label
 }
+
+output "spn_kv_id" {
+  value = local.spn_key_vault_arm_id
+}
