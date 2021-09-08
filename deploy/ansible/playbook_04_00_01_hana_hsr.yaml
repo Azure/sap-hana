@@ -21,6 +21,12 @@
     tags:
        - 0.1-passwords
 
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step401"
+      state: absent
+
+
+
 
 # Steps:
 #   01) Hana DB system replication 

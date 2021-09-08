@@ -264,7 +264,7 @@ variable "database_size" {
 }
 
 variable "database_sid" {
-  default = ""
+  default = "HDB"
 }
 
 variable "database_instance_number" {

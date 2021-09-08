@@ -23,6 +23,10 @@
     tags:
        - 0.1-passwords
 
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step4"
+      state: absent
+
 
 - hosts:          "{{ sap_sid|upper }}_DB"
 

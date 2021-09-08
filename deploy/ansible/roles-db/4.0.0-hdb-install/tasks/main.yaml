@@ -80,6 +80,11 @@
 
 
 #   SAP HANA: Install
+- name:     "Create run flag directory"
+  ansible.builtin.file:
+    path:   /etc/sap_deployment_automation
+    state:  directory
+    mode:   0755
 
 - name:               "SAP DB Install reset"
   ansible.builtin.file: 
@@ -100,7 +105,7 @@
                       
   args:
     chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
-    removes:          "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
+    creates:          /etc/sap_deployment_automation/sap_deployment_hdb.txt
 
 
 

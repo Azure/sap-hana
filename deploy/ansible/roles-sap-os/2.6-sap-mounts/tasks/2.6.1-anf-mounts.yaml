@@ -213,12 +213,12 @@
     name: autofs
     state: restarted
 
-# - name: "Mount: Ensure the NFS service is restarted" 
-#   ansible.builtin.systemd:
-#     name: "{{ nfs_service }}"
-#     state: restarted
-#   when: 
-#     - node_tier == 'scs'
+- name: "Mount: Ensure the NFS service is restarted" 
+  ansible.builtin.systemd:
+    name: "{{ nfs_service }}"
+    state: restarted
+  when: 
+    - node_tier == 'scs'
 
 # - name: "Mount: Clear the cache of the nfsidmap daemon (ANF)"
 #   ansible.builtin.shell: |
