@@ -4,10 +4,11 @@
 */
 module "sap_library" {
   source                  = "../../terraform-units/modules/sap_library"
-  providers = {
-    azurerm.main     = azurerm
-    azurerm.deployer = azurerm.deployer
-  }
+# commenting out for fixing issues
+#  providers = {
+#    azurerm.main     = azurerm
+#    azurerm.deployer = azurerm.deployer
+#  }
   infrastructure          = local.infrastructure
   storage_account_sapbits = local.storage_account_sapbits
   storage_account_tfstate = local.storage_account_tfstate
