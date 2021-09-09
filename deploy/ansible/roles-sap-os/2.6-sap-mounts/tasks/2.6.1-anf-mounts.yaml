@@ -76,12 +76,10 @@
     group:       sapsys
     mode:        0755
   loop:
-    - { path: '/saptmp/sapmnt{{ sap_sid|upper }}'     }
-#    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
-#    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}'  }
-    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ascs' }
-    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ers'  }
-    - { path: '/saptmp/usrsap{{ sap_sid|upper }}sys'  }
+    - { path: '/saptmp/sapmnt{{ sap_sid|upper }}'                              }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}'  }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}sys'                           }
   when:     
     - tier == 'sapos' 
     - node_tier == 'scs'
@@ -101,14 +99,10 @@
     state:      absent
     mode:       0755
   loop:
-    - { tier == 'sapos', path: '/saptmp/sapmnt{{ sap_sid|upper }}' }
-#    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
-#    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ascs' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}sys' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}pas' }
-    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}aas' }
+    - { tier == 'sapos', path: '/saptmp/sapmnt{{ sap_sid|upper }}'                              }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}'  }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}sys'                           }
   when:     
     - tier == 'sapos' 
     - node_tier == 'scs'
@@ -184,16 +178,14 @@
     block: |
               /sapmnt/{{ sap_sid|upper }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/sapmnt{{ sap_sid|upper }}
               /usr/sap/{{ sap_sid|upper }}/SYS -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}sys
-              /usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ascs
-              /usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ers
-#              /usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}
-#              /usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}
+              /usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}
+              /usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}
   register: autofs_configuration_changed_scs
   when:     
     - tier == 'sapos' 
     - node_tier == 'scs' or node_tier == 'ers'
   
-- name:                 "Mount: Update auto.direct"
+- name:                 "Mount: Update auto.direct (app)"
   ansible.builtin.blockinfile:
     path: /etc/auto.direct
     block: |
@@ -203,8 +195,17 @@
   register: autofs_configuration_changed
   when:     
     - tier == 'sapos' 
-    - node_tier != 'scs'
-    - node_tier != 'ers'
+    - node_tier == 'pas' or node_tier =='app'
+    
+- name:                 "Mount: Update auto.direct (db)"
+  ansible.builtin.blockinfile:
+    path: /etc/auto.direct
+    block: |
+              /usr/sap/install -nfsvers=4.1,nobind,sec=sys {{ nfs_server }}:/usr/sap/install
+  register: autofs_configuration_changed
+  when:     
+    - tier == 'sapos' 
+    - node_tier =='hana'
 
 - name: "Mount: Ensure the Autofs service is restarted" 
   ansible.builtin.systemd:
