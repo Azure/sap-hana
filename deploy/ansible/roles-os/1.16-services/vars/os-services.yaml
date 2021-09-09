@@ -34,8 +34,8 @@ services:
         - { tier: 'os',          service: 'oddjobd',      node_tier: 'all',     state: 'disabled'  }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'stopped'   }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'disabled'  }
-        - { tier: 'os',          service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
-        - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'restarted' }
+        - { tier: 'sapos',       service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
+        - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
         - { tier: 'ha',          service: 'pcsd',         node_tier: 'all',     state: 'started'   }
         - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
 

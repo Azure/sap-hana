@@ -1,48 +1,59 @@
 
-- name: "Get Deployer Keyvault name from keyvault"
-  command: >-
+- name: Get Deployer Keyvault name from keyvault
+  ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
-      --name  {{ deployer-kv-name }}
+      --name {{ deployer_kv_name }}
   changed_when: false
-  register: deployer-kv-name
-  no_log: false
+  register: deployer_kv_name_secret
 
-- name: "Extract SAP Binaries Storage Account information"
-  command: >-
-    az keyvault secret show
-      --vault-name {{ deployer-kv-name }}
-      --name {{ sapbits-location-secret }}
-  changed_when: false
-  register: sapbits-location-base-path-secret
-  no_log: false
-
+- name: Save Deployer Keyvault name
   ansible.builtin.set_fact:
-    sapbits-location-base-path: >-
-      {{ (sapbits-location-base-path-secret.stdout | from_json).value }}
+    deployer_kv_name: >-
+      {{ (deployer_kv_name_secret.stdout | from_json).value }}
+
+
+- name: Debug, Deployer Keyvault
+  ansible.builtin.debug: 
+    var: deployer_kv_name
+    verbosity: 2
+
+
+- name: Extract SAP Binaries Storage Account information
+  ansible.builtin.command: >-
+    az keyvault secret show
+      --vault-name {{ deployer_kv_name }}
+      --name {{ sapbits_location_secret }}
+  changed_when: false
+  register: sapbits_location_base_path_secret
   no_log: false
 
-- name: "Debug, storage account"
+- name: Save SAP Binaries Storage Account information
+  ansible.builtin.set_fact:
+    sapbits_location_base_path: >-
+      {{ (sapbits_location_base_path_secret.stdout | from_json).value }}
+
+- name: Debug, storage account
   ansible.builtin.debug: 
-    var: sapbits-location-base-path
+    var: sapbits_location_base_path
+    verbosity: 2
     
 
-- name: "Extract SAP Binaries Storage Account SAS"
-  command: >-
+- name: Extract SAP Binaries Storage Account SAS
+  ansible.builtin.command: >-
     az keyvault secret show
-      --vault-name {{ deployer-kv-name }}
-      --name {{ sapbits-sas-token-secret }}
+      --vault-name {{ deployer_kv_name }}
+      --name {{ sapbits_sas_token_secret }}
   changed_when: false
-  register: sapbits_sas_token-secret
-  no_log: false
+  register: sapbits_sas_token_secret
 
+- name: Extract SAP Binaries Storage Account SAS
   ansible.builtin.set_fact:
     sapbits_sas_token: >-
-      {{ (sapbits_sas_token-secret.stdout | from_json).value }}
+      {{ (sapbits_sas_token_secret.stdout | from_json).value }}
   no_log: false
 
-- name: "Debug, SAS Token"
+- name: Debug, SAS Token
   ansible.builtin.debug: 
     var: sapbits_sas_token
-    
-
+    verbosity: 2
