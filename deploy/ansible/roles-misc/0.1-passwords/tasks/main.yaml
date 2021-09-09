@@ -45,6 +45,17 @@
         az keyvault secret set --vault-name {{ kv_uri }} --name {{ sap_password_id }} --value "{{ sap_password }}"
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
+    - name: "Get SAP password from keyvault"
+      command: >-
+        az keyvault secret show
+          --vault-name {{ kv_uri }}
+          --name {{ sap_password_id }}
+#          --only-show-errors
+      
+      changed_when: false
+      register: keyvault_secret_show_sap_password_id
+      no_log: false
+
 - name: "Extract SAP password"
   ansible.builtin.set_fact:
     sap_password: >-
