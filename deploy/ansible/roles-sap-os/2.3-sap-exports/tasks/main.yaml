@@ -1,25 +1,16 @@
 ---
 
-- name: "Exports: Create SAP Install Directories"
+- name: "Exports: Create SAP Directories"
   ansible.builtin.file:
     path:   "{{ item.path }}"
     state:  directory
-    mode:   0777
+    mode:   0755
   loop:
     - { tier: 'preparation', path: '/usr/sap/install' }
     - { tier: 'preparation', path: '/usr/sap/trans' }
-  when:     item.tier == tier
-
-- name: "Exports: Create SAP Directories (sapmnt)"
-  ansible.builtin.file:
-    path:   "{{ item.path }}"
-    state:  directory
-    mode:   0777
-  loop:
     - { tier: 'preparation', path: '/sapmnt/{{ sap_sid|upper }}' }
-  when:     
-    - item.tier == tier
-    - sap_mnt is undefined
+  when:     item.tier == "all" or
+            item.tier == tier
 
 
 - name: "Exports: NFS Server Config on Suse"
