@@ -154,27 +154,15 @@ resource "azurerm_key_vault_secret" "sapbits_location_base_path" {
   key_vault_id = local.deployer_kv_user_arm_id
 }
 
-data "azurerm_storage_account_sas" "sapbits_sas_token" {
+data "azurerm_storage_account_blob_container_sas" "sapbits_sas_token" {
   connection_string = local.sa_sapbits_exists ? (
     data.azurerm_storage_account.storage_sapbits[0].primary_connection_string) : (
     azurerm_storage_account.storage_sapbits[0].primary_connection_string
   )
 
+  container_name    = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].name : azurerm_storage_account.storage_sapbits[0].name
+
   https_only     = true
-  signed_version = "2017-07-29"
-
-  resource_types {
-    service   = true
-    container = false
-    object    = false
-  }
-
-  services {
-    blob  = true
-    queue = false
-    table = false
-    file  = false
-  }
 
   start  = formatdate("YYYY-MM-DD", timestamp())
   expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "8760h"))
@@ -196,6 +184,6 @@ resource "azurerm_key_vault_secret" "sapbits_sas_token_secret" {
   provider     = azurerm.deployer
   count        = length(local.deployer_kv_user_arm_id) > 0 ? 1 : 0
   name         = "sapbits-sas-token"
-  value        = data.azurerm_storage_account_sas.sapbits_sas_token.sas
+  value        = data.azurerm_storage_account_blob_container_sas.sapbits_sas_token.sas
   key_vault_id = local.deployer_kv_user_arm_id
 }
