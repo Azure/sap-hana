@@ -148,7 +148,7 @@ locals {
 
   enable_deployment = (length(local.anydb_databases) > 0) ? true : false
 
-  anydb          = local.enable_deployment ? local.anydb_databases[0] : []
+  anydb          = local.enable_deployment ? local.anydb_databases[0] : null
   anydb_platform = local.enable_deployment ? try(local.anydb.platform, "NONE") : "NONE"
   // Enable deployment based on length of local.anydb_databases
 
@@ -249,7 +249,7 @@ locals {
     { auth_type = local.sid_auth_type },
     { dbnodes = local.dbnodes },
     { loadbalancer = local.loadbalancer }
-  ) : []
+  ) : null
 
 
   dbnodes = local.anydb_ha ? (
