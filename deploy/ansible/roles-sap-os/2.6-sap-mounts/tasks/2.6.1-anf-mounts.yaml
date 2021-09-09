@@ -82,8 +82,6 @@
     - { path: '/saptmp/usrsap{{ sap_sid|upper }}ascs' }
     - { path: '/saptmp/usrsap{{ sap_sid|upper }}ers'  }
     - { path: '/saptmp/usrsap{{ sap_sid|upper }}sys'  }
-    - { path: '/saptmp/usrsap{{ sap_sid|upper }}pas'  }
-    - { path: '/saptmp/usrsap{{ sap_sid|upper }}aas'  }
   when:     
     - tier == 'sapos' 
     - node_tier == 'scs'

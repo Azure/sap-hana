@@ -38,6 +38,17 @@
     sap_ciVirtualHostname:        
     sap_appVirtualHostname:       
 
+- name:     "Create run flag directory"
+  ansible.builtin.file:
+    path:   /etc/sap_deployment_automation
+    state:  directory
+    mode:   0755
+
+- name:               "SAP SCS reset"
+  ansible.builtin.file: 
+    path: /etc/sap_deployment_automation/sap_deployment_scs.txt
+    state: absent
+  when: reinstall == true 
 
 - name:     "Create run flag directory"
   ansible.builtin.file:
@@ -70,7 +81,7 @@
 - name:               "SAP SCS Install"
   ansible.builtin.shell: |
                       set -o errexit
-                      mkdir -p /etc/sap_deployment_automation
+                      export TMPDIR=/usr/sap/install
                       ./sapinst SAPINST_INPUT_PARAMETERS_URL=/usr/sap/install/downloads/{{ sap_inifile }}     \
                                 SAPINST_EXECUTE_PRODUCT_ID={{ bom.product_ids.scs }}                          \
                                 SAPINST_SKIP_DIALOGS=true                                                     \
