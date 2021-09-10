@@ -301,6 +301,9 @@ else
 fi
 account_set=0
 
+#setting the user environment variables
+set_executing_user_environment_variables "${spn_secret}"
+
 if [ ! -z $STATE_SUBSCRIPTION ]
 then
     echo ""

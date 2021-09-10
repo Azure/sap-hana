@@ -245,8 +245,10 @@ function set_executing_user_environment_variables() {
     local az_subscription_id
     local az_tenant_id
     local az_client_id
-    local az_client_secret
-
+    local az_client_secret  
+    
+    az_client_secret="$1"
+    
     echo -e "\t[set_executing_user_environment_variables]: Identifying the executing user and client"
 
     set_azure_cloud_environment
@@ -266,6 +268,9 @@ function set_executing_user_environment_variables() {
         az_user_obj_id=$(az ad signed-in-user show --query objectId -o tsv)
         az_user_name=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 
+        # this is the user object id but exporeted as client_id to make it easier to use in TF
+        export TF_VAR_arm_client_id=${az_user_obj_id}
+        
         echo -e "\t[set_executing_user_environment_variables]: logged in user objectID: ${az_user_obj_id} (${az_user_name})"
         echo -e "\t[set_executing_user_environment_variables]: Initializing state with user: ${az_user_name}"
     else

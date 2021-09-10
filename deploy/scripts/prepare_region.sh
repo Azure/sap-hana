@@ -335,8 +335,8 @@ then
     exit 67                                                                                             #addressee unknown
 fi
 
-#setting the user environment variables
-set_executing_user_environment_variables
+ #setting the user environment variables
+ set_executing_user_environment_variables "${spn_secret}"
 
 load_config_vars "${deployer_config_information}" "step"
 
