@@ -101,6 +101,15 @@ output "web_nsg_id" {
   value = module.sap_landscape.admin_nsg_id
 }
 
+output "ANF_pool_settings" {
+  value = module.sap_landscape.ANF_pool_settings
+}
+
+
 output "dns_label" {
   value = var.dns_label
+}
+
+output "spn_kv_id" {
+  value = local.spn_key_vault_arm_id
 }

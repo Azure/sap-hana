@@ -1,0 +1,5 @@
+---
+#Commenting the parameters, Azure Fencing Agent would be used
+#iscsi_object: iqn.2006-04
+
+#iscsi_port: 3260

@@ -5,13 +5,7 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
-# TODO: Playbook not yet written
-#       This is a placeholder 
-#       This should probably be two playbooks:
-#       1) HSR Configuration
-#       2) PACEMAKER Config
-
-- hosts:          scs                                           # TODO: Replace this with new inventory group; Change to correct group
+- hosts:          "{{ sap_sid|upper }}_DB" 
 
   name:           PACEMAKER - HANA
   remote_user:    "{{ orchestration_ansible_user }}"                
@@ -21,20 +15,8 @@
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
-
   tasks:
 
-  # - name: Test Connection                                     # Simple connection test for troubleshooting
-  #   ping:
-
-
-
-#----------------------------------------
-# BEGIN
-#
-# TODO: evaluate for inclusion and refactor.
-# SOURCE: sap-playbook
-#----------------------------------------
 
 # -------------------------------------+---------------------------------------8
 #
@@ -43,71 +25,85 @@
 # -------------------------------------+---------------------------------------8
 
 
-#----------------------------------------
-# BEGIN: Commented Section to enable BOM
-#        Process
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
+# +------------------------------------4--------------------------------------*/
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for Pacemaker -HANA                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+- hosts: localhost
+  name: Get SPN from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  fencing
+
+  - include_role:
+      name:     roles-misc/0.2-kv-secrets
+    tags:
+       - kv-secrets
+
+- hosts:          "{{ sap_sid|upper }}_DB"
+  
+  name:           "PACEMAKER - HANA"
+  remote_user:    "{{ orchestration_ansible_user }}"                
+  become:         yes
+  become_user:    root
+  gather_facts:   true
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+
+  tasks:
+# -------------------------------------+---------------------------------------8
 #
-# TODO: evaluate and refactor. DB install, HSR, HA Playbooks
-#----------------------------------------
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+  - debug:
+     msg: "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
 
-# # Hana DB components install
-# - hosts: hanadbnodes
-#   become: true
-#   become_user: root
-#   any_errors_fatal: true
-#   vars_files:
-#     - "vars/ha-packages.yaml"
-#   pre_tasks:
-#     - name: Include SAP HANA DB sizes
-#       include_vars:
-#         ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
-#         name: hdb_sizes
-#   roles:
-#     - role: hana-system-replication
-#       when: hana_database.high_availability
-#       vars:
-#         sid: "{{ hana_database.instance.sid }}"
-#         instance_number: "{{ hana_database.instance.instance_number }}"
-#         hdb_version: "{{ hana_database.db_version }}"
-#         hdb_disks: "{{ hdb_sizes[hana_database.size].storage }}"
-#         hana_system_user_password: "{{ hana_database.credentials.db_systemdb_password }}"
-#         primary_instance:
-#           name: "{{ hana_database.nodes[0].dbname }}"
-#           ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
-#         secondary_instance:
-#           name: "{{ hana_database.nodes[1].dbname }}"
-#           ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
-#     - role: hana-os-clustering
-#       when: hana_database.high_availability
-#       vars:
-#         resource_group_name: "{{ output.infrastructure.resource_group.name }}"
-#         sid: "{{ hana_database.instance.sid }}"
-#         instance_number: "{{ hana_database.instance.instance_number }}"
-#         hdb_size: "{{ hana_database.size }}"
-#         hdb_lb_feip: "{{ hana_database.loadbalancer.frontend_ip }}"
-#         ha_cluster_password: "{{ hana_database.credentials.ha_cluster_password }}"
-#         sap_hana_fencing_agent_subscription_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_SUBSCRIPTION_ID') }}"
-#         sap_hana_fencing_agent_tenant_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_TENANT_ID') }}"
-#         sap_hana_fencing_agent_client_id: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_ID') }}"
-#         sap_hana_fencing_agent_client_password: "{{ lookup('env', 'SAP_HANA_FENCING_AGENT_CLIENT_SECRET') }}"
-#         primary_instance:
-#           name: "{{ hana_database.nodes[0].dbname }}"
-#           ip_admin: "{{ hana_database.nodes[0].ip_admin_nic }}"
-#           ip_db: "{{ hana_database.nodes[0].ip_db_nic }}"
-#         secondary_instance:
-#           name: "{{ hana_database.nodes[1].dbname }}"
-#           ip_admin: "{{ hana_database.nodes[1].ip_admin_nic }}"
-#           ip_db: "{{ hana_database.nodes[1].ip_db_nic }}"
+  - set_fact:
+      tier:                                      [ ha, fencing ]
+      primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
+      secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
+      sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
+      sap_hana_fencing_spn_client_pwd:           "{{ hostvars.localhost.sap_fencing_spn_pwd }}"
+      sap_hana_fencing_spn_tenant_id:            "{{ hostvars.localhost.sap_fencing_spn_tenant_id }}"
+    tags:
+      - always
 
-#----------------------------------------
-# END
-#----------------------------------------
-
-
-
-
-
+  - block:
+      - include_role:
+          name:     roles-sap/5.5-hanadb-pacemaker
+        when: db_high_availability == true          
+    tags:
+      - 5.5-hanadb-pacemaker
 ...
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step603"
+      state: touch
+
+
+
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
 # +------------------------------------4--------------------------------------*/

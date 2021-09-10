@@ -1,0 +1,38 @@
+---
+
+- name: HSR - Ensure the secondary node {{ ssfs_file_path }} file is backed up and removed
+  block:
+
+    - name: HSR - Check {{ ssfs_file_path }} backup file exists on the secondary node
+      ansible.builtin.stat:
+        path: "{{ ssfs_file_path }}.bak"
+      register: ssfs_backup_result
+
+    - name: HSR - Ensure {{ ssfs_file_path }} file is backed up on the secondary node
+      ansible.builtin.file:
+        src: "{{ ssfs_file_path }}"
+        path: "{{ ssfs_file_path }}.bak"
+        state: hard
+      when: ssfs_backup_result.stat.exists == false
+
+    - name: HSR - Ensure original {{ ssfs_file_path }} file is removed from the secondary node
+      ansible.builtin.file:
+        path: "{{ ssfs_file_path }}"
+        state: absent
+  when: ansible_hostname != primary_instance_name
+
+- name: HSR - Ensure the primary node {{ ssfs_file_path }} file is placed on the secondary node
+  when: ansible_hostname == secondary_instance_name
+  block:
+
+    # Note that we use the IP of the primary node and not its hostname, because
+    # it appears that the RTI attempts to resolve the hostname itself and fails.
+
+    - name: HSR - Ensure the primary node {{ ssfs_file_path }} file is placed on the secondary node
+      synchronize:
+        set_remote_user: false
+        src: "{{ ssfs_file_path }}"
+        dest: "{{ ssfs_file_path }}"
+        mode: push
+        archive: true
+      delegate_to: "{{ primary_instance_ip_db }}"

@@ -1,0 +1,57 @@
+---
+
+# Variables in this file are required by the role, but are computed from default variables (e.g. sid),
+# from the playbook/environment (e.g. hana_database), or are "SAP standard" values.
+#
+# They may be overridden, if required, but normally are not
+
+hana_group: "sapsys"
+hana_dir: "/hana"
+sap_dir: "/usr/sap"
+hdb_sid_backup_dir: "/hana/backup"
+
+hdb_sid_admin_user: "{{ hdb_sid | lower }}adm"
+
+# HANA
+hana_tenant_database_name: "{{ hdb_sid | upper }}"
+
+# HANA utility commands
+hdbsql_systemdb_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d SYSTEMDB -u SYSTEM -p {{ hana_password_master }}"
+hdbsql_tenant_command: "hdbsql -n localhost -i {{ hdb_instance_number }} -d {{ hana_tenant_database_name }} -u SYSTEM -p {{ hana_password_master }}"
+hdbnsutil_command: "hdbnsutil"
+sapcontrol_command: "sapcontrol -nr {{ hdb_instance_number }}"
+
+# SQL Commands
+
+# SQL to ensure the HANA DB is able to parse and process queries
+dummy_cmd: "SELECT * FROM DUMMY"
+
+# SQL to determine current log mode (we need "normal")
+get_log_mode_cmd: "SELECT VALUE FROM M_INIFILE_CONTENTS
+  WHERE FILE_NAME='global.ini'
+  AND LAYER_NAME='DEFAULT'
+  AND SECTION='persistence'
+  AND KEY='log_mode'"
+
+# SQL to take a SYSTEMDB full backup
+backup_cmd_for_systemdb: "BACKUP DATA USING FILE ('{{ backup_file_for_systemdb_full_path }}')"
+
+# SQL to take a tenant DB full backup
+backup_cmd_for_tenant: "BACKUP DATA USING FILE ('{{ backup_file_for_tenant_full_path }}')"
+
+# SQL to confirm a system backup has been taken for SYSTEMDB
+backup_exists_cmd_for_systemdb: "SELECT SYS.M_BACKUP_CATALOG.BACKUP_ID FROM SYS.M_BACKUP_CATALOG
+  INNER JOIN SYS.M_BACKUP_CATALOG_FILES ON SYS.M_BACKUP_CATALOG.ENTRY_ID = SYS.M_BACKUP_CATALOG_FILES.ENTRY_ID
+  WHERE SYS.M_BACKUP_CATALOG.STATE_NAME='successful'
+  AND SYS.M_BACKUP_CATALOG.ENTRY_TYPE_NAME='complete data backup'
+  AND SYS.M_BACKUP_CATALOG_FILES.DESTINATION_PATH LIKE '{{ backup_file_for_systemdb_full_path }}%'"
+
+# SQL to confirm a system backup has been taken for the tenant DB
+backup_exists_cmd_for_tenant: "SELECT SYS.M_BACKUP_CATALOG.BACKUP_ID FROM SYS.M_BACKUP_CATALOG
+  INNER JOIN SYS.M_BACKUP_CATALOG_FILES ON SYS.M_BACKUP_CATALOG.ENTRY_ID = SYS.M_BACKUP_CATALOG_FILES.ENTRY_ID
+  WHERE SYS.M_BACKUP_CATALOG.STATE_NAME='successful'
+  AND SYS.M_BACKUP_CATALOG.ENTRY_TYPE_NAME='complete data backup'
+  AND SYS.M_BACKUP_CATALOG_FILES.DESTINATION_PATH LIKE '{{ backup_file_for_tenant_full_path }}%'"
+
+# Expected response if no backups have been taken
+backup_cmd_no_rows_found: "BACKUP_ID\\n0 rows selected"

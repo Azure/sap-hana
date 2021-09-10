@@ -96,7 +96,7 @@ function missing {
 
 show_help=false
 force=0
-INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:a:v:ifh --longoptions parameterfile:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,auto-approve,force,help -- "$@")
+INPUT_ARGUMENTS=$(getopt -n install_workloadzone -o p:d:e:k:o:s:c:p:t:v:aifh --longoptions parameterfile:,deployer_tfstate_key:,deployer_environment:,subscription:,spn_id:,spn_secret:,tenant_id:,state_subscription:,vault:,storageaccountname:,ado,auto-approve,force,help -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   showhelp
@@ -106,7 +106,7 @@ eval set -- "$INPUT_ARGUMENTS"
 while :
 do
   case "$1" in
-    -p | --parameterfile)                     parameterfile="$2"               ; shift 2 ;;
+    -p | --parameterfile)                      parameterfile="$2"               ; shift 2 ;;
     -d | --deployer_tfstate_key)               deployer_tfstate_key="$2"        ; shift 2 ;;
     -e | --deployer_environment)               deployer_environment="$2"        ; shift 2 ;;
     -k | --state_subscription)                 STATE_SUBSCRIPTION="$2"          ; shift 2 ;;
@@ -115,6 +115,7 @@ do
     -c | --spn_id)                             client_id="$2"                   ; shift 2 ;;
     -v | --vault)                              keyvault="$2"                    ; shift 2 ;;
     -p | --spn_secret)                         spn_secret="$2"                  ; shift 2 ;;
+    -a | --ado)                                called_from_ado=1                ; shift ;;
     -t | --tenant_id)                          tenant_id="$2"                   ; shift 2 ;;
     -f | --force)                              force=1                          ; shift ;;
     -i | --auto-approve)                       approve="--auto-approve"         ; shift ;;
@@ -222,7 +223,13 @@ then
 fi
 
 #Plugins
-mkdir -p "$HOME/.terraform.d/plugin-cache"
+if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
+then
+    mkdir "$HOME/.terraform.d/plugin-cache"
+fi
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
+export ARM_USE_MSI=false
+
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 
@@ -309,7 +316,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "# $cyan Changing the subscription to: $STATE_SUBSCRIPTION             $resetformatting      #"
+    echo -e "#       $cyan Changing the subscription to: $STATE_SUBSCRIPTION $resetformatting            #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
@@ -518,7 +525,7 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    exit -1
+    exit 1
 fi
 
 ok_to_proceed=false
@@ -542,33 +549,45 @@ fi
 
 if [ ! -d ./.terraform/ ];
 then
-    terraform -chdir="${terraform_module_directory}" init -upgrade=true  --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
-    --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-    --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-    --backend-config "container_name=tfstate" \
+    terraform -chdir="${terraform_module_directory}" init -upgrade=true  \
+    --backend-config "subscription_id=${STATE_SUBSCRIPTION}"             \
+    --backend-config "resource_group_name=${REMOTE_STATE_RG}"            \
+    --backend-config "storage_account_name=${REMOTE_STATE_SA}"           \
+    --backend-config "container_name=tfstate"                            \
     --backend-config "key=${key}.terraform.tfstate"
+    return_value=$?
 else
     temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
     if [ ! -z "${temp}" ]
     then
         
-        terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
-        --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-        --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-        --backend-config "container_name=tfstate" \
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true -force-copy \
+        --backend-config "subscription_id=${STATE_SUBSCRIPTION}"                        \
+        --backend-config "resource_group_name=${REMOTE_STATE_RG}"                       \
+        --backend-config "storage_account_name=${REMOTE_STATE_SA}"                      \
+        --backend-config "container_name=tfstate"                                       \
         --backend-config "key=${key}.terraform.tfstate"
+        return_value=$?
     else
         check_output=1
-        terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure --backend-config "subscription_id=${STATE_SUBSCRIPTION}" \
-        --backend-config "resource_group_name=${REMOTE_STATE_RG}" \
-        --backend-config "storage_account_name=${REMOTE_STATE_SA}" \
-        --backend-config "container_name=tfstate" \
+        terraform -chdir="${terraform_module_directory}" init -upgrade=true -reconfigure \
+        --backend-config "subscription_id=${STATE_SUBSCRIPTION}"                         \
+        --backend-config "resource_group_name=${REMOTE_STATE_RG}"                        \
+        --backend-config "storage_account_name=${REMOTE_STATE_SA}"                       \
+        --backend-config "container_name=tfstate"                                        \
         --backend-config "key=${key}.terraform.tfstate"
+        return_value=$?
     fi
-    if [ 0 != $? ]    
-    then
-      exit $?
-    fi
+fi
+if [ 0 != $return_value ]
+then
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                            $boldreduscore!!! Error when Initializing !!!$resetformatting                            #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit $return_value        
 fi
 
 if [ 1 == $check_output ]
@@ -603,6 +622,10 @@ then
             echo "#        Please inspect the output of Terraform plan carefully before proceeding        #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
+            if [ 1 == $called_from_ado ] ; then
+              unset TF_DATA_DIR
+              exit 1
+            fi
             
             read -p "Do you want to continue Y/N?"  ans
             answer=${ans^^}
@@ -610,15 +633,14 @@ then
                 ok_to_proceed=true
             else
                 unset TF_DATA_DIR
-
                 exit 1
             fi
         else
-            
+            printf -v val %-.20s "$deployed_using_version"            
             echo ""
             echo "#########################################################################################"
             echo "#                                                                                       #"
-            echo "# Terraform templates version:" $deployed_using_version "were used in the deployment "
+            echo -e "#             $cyan Deployed using the Terraform templates version: $val $resetformatting               #"
             echo "#                                                                                       #"
             echo "#########################################################################################"
             echo ""
@@ -645,27 +667,33 @@ then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
-    cat plan_output.log
-    exit $?
+    if [ -f plan_output.log ] ; then
+        cat plan_output.log
+        rm plan_output.log
+    fi
+    unset TF_DATA_DIR
+    exit $return_value
+fi
+if [ 0 == $return_value ] ; then
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    if [ -f plan_output.log ]
+    then
+        rm plan_output.log
+    fi
+    
+    unset TF_DATA_DIR
+    exit $return_value
 fi
 
 
 if [ ! $new_deployment ]
 then
-    if [ 0 == $return_value ]    
-    then
-        echo ""
-        echo "#########################################################################################"
-        echo "#                                                                                       #"
-        echo -e "#                          $cyan Infrastructure is up to date $resetformatting                               #"
-        echo "#                                                                                       #"
-        echo "#########################################################################################"
-        echo ""
-        rm plan_output.log
-        unset TF_DATA_DIR
-    
-        exit 0
-    fi
     if [ grep "0 to change, 0 to destroy" plan_output.log ]
     then
         echo ""
@@ -677,6 +705,10 @@ then
         echo "#                                                                                       #"
         echo "#########################################################################################"
         echo ""
+        if [ 1 == $called_from_ado ] ; then
+            unset TF_DATA_DIR
+            exit 1
+        fi
         read -n 1 -r -s -p $'Press enter to continue...\n'
         
         cat plan_output.log

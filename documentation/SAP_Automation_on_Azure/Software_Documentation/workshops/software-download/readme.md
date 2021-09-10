@@ -6,21 +6,13 @@
 
 ## Table of contents <!-- omit in toc -->
 
-- [Overview](#overview)
 - [Steps](#steps)
+- [Overview](#overview)
 
 <br/><br/>
 
-## Overview
-![Overview]()
-
-The automation ansible playbooks need the SAP software to be downloaded before the installation. This download must be performed by the customer using their SAP credentials. By following the steps in this workshop the SAP software will be downloaded to a storage account in the customer environment.
-
-Playbooks
-- SAP Bill of Materials (BOM) processing - SAP Software Download
-
 ## Steps
-1. [Downloading the software](01-ansible-download.md)
+1. [Executing Ansible](01-ansible-download.md)
 
 <br/>
 
@@ -28,7 +20,14 @@ Playbooks
 
 <br/>
 
+## Overview
+![Overview]()
+
+Playbooks
+- SAP Bill of Materials (BOM) processing - SAP Software Download
+
+
 <br/><br/><br/><br/>
 
 
-# Next: [Downloading the software](01-ansible-download.md) <!-- omit in toc -->
+# Next: [Executing Ansible](01-ansible-download.md) <!-- omit in toc -->

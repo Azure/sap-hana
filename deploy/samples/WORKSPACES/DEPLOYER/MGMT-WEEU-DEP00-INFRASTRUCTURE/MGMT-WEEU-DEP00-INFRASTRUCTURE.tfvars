@@ -3,6 +3,7 @@
 # The environment value is a mandatory field, it is used for partitioning the environments, for example (PROD and NP)
 environment="MGMT"
 
+
 # The location/region value is a mandatory field, it is used to control where the resources are deployed
 location="westeurope"
 
@@ -47,11 +48,11 @@ management_firewall_subnet_address_prefix="10.10.20.0/26"
 #
 ########################################################
 
-# vm_size is optional and defines the virtual machine SKU
-#vm_size="Standard_D4ds_v4"
+# deployer_size is optional and defines the virtual machine SKU
+#deployer_size="Standard_D4ds_v4"
 
-# vm_disk_type is optional and defines the virtual machine disk type
-#vm_disk_type"="Premium_LRS"
+# deployer_disk_type is optional and defines the virtual machine disk type
+#deployer_disk_type"="Premium_LRS"
 
 # use_DHCP is a boolean flag controlling if Azure subnet provided IP addresses should be used (true)
 #use_DHCP=false
@@ -60,9 +61,9 @@ management_firewall_subnet_address_prefix="10.10.20.0/26"
 #private_ip_address=""
 
 #
-# The vm_image defines the Virtual machine image to use, if source_image_id is specified the deployment will use the custom image provided, in this case os_type must also be specified
+# The deployer_image defines the Virtual machine image to use, if source_image_id is specified the deployment will use the custom image provided, in this case os_type must also be specified
 
-#vm_image={
+#deployer_image={
 #    "os_type"         = "Linux"    
 #    "source_image_id" =""
 #    "publisher"       ="Canonical"
@@ -76,20 +77,20 @@ management_firewall_subnet_address_prefix="10.10.20.0/26"
 This block describes the variables for the authentication section block in the json file
 */
 
-# vm_authentication_type defines the authentication type for the deployer virtual machine 
-#vm_authentication_type="key"
+# deployer_authentication_type defines the authentication type for the deployer virtual machine 
+#deployer_authentication_type="key"
 
-# vm_authentication_username defines the username for the deployer virtual machine
-#vm_authentication_username="azureadm"
+# deployer_authentication_username defines the username for the deployer virtual machine
+#deployer_authentication_username="azureadm"
 
-# vm_authentication_password if defined is the password for the deployer virtual machine
-#vm_authentication_password=""
+# deployer_authentication_password if defined is the password for the deployer virtual machine
+#deployer_authentication_password=""
 
-# vm_authentication_path_to_public_key if defined is the path to the file containing the public key for the deployer virtual machine
-#vm_authentication_path_to_public_key=""
+# deployer_authentication_path_to_public_key if defined is the path to the file containing the public key for the deployer virtual machine
+#deployer_authentication_path_to_public_key=""
 
-# vm_authentication_path_to_private_key if defined is the path to the file containing the private key for the deployer virtual machine
-#vm_authentication_path_to_private_key=""
+# deployer_authentication_path_to_private_key if defined is the path to the file containing the private key for the deployer virtual machine
+#deployer_authentication_path_to_private_key=""
 
 # These variables define the keyvault that is used to store the deployer credentials
 # user_keyvault_id is the Azure resource identifier for the keyvault that will contain the credentials keys

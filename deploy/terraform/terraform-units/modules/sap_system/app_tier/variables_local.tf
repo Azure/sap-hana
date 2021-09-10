@@ -90,6 +90,11 @@ variable "license_type" {
 
 }
 
+variable "use_loadbalancers_for_standalone_deployments" {
+  description = "Defines if load balancers are used even for standalone deployments"
+  default     = true
+}
+
 locals {
   // Imports Disk sizing sizing information
 
@@ -228,7 +233,10 @@ locals {
   scs_high_availability    = var.application.scs_high_availability
   application_server_count = var.application.application_server_count
   scs_server_count         = var.application.scs_server_count * (local.scs_high_availability ? 2 : 1)
+  enable_scs_lb_deployment = local.scs_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.scs_server_count > 1)
+  
   webdispatcher_count      = var.application.webdispatcher_count
+  enable_web_lb_deployment = local.webdispatcher_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.webdispatcher_count > 1)
 
   app_nic_ips       = try(var.application.app_nic_ips, [])
   app_admin_nic_ips = try(var.application.app_admin_nic_ips, [])
@@ -243,7 +251,7 @@ locals {
   scs_size = length(var.application.scs_sku) > 0 ? var.application.scs_sku : local.app_size
   web_size = length(var.application.web_sku) > 0 ? var.application.web_sku : local.app_size
 
-  vm_sizing = length(var.application.vm_sizing) > 0 ? var.application.vm_sizing : length(local.app_size) > 0 ? "New" : "Default"
+  vm_sizing = length(var.application.vm_sizing) > 0 ? var.application.vm_sizing : length(local.app_size) > 0 ? "Production" : "Default"
 
 
   // OS image for all Application Tier VMs

@@ -1,0 +1,71 @@
+---
+
+#############################################################################################
+# This file runs common pre-provisioning tasks before the OS specific clustering is performed
+#############################################################################################
+- name: Ensure clustering software is installed
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ ha_packages[ansible_os_family] | flatten(levels=1) }}"
+  when: hdb_size != "LargeInstance"
+
+- name: Ensure systemctl daemon is reloaded
+  ansible.builtin.systemd:
+    daemon_reload: True
+
+# Configure SSH Keys for inter-node communication as root
+- name: Ensure there are SSH keys for the root user to communicate between nodes
+  ansible.builtin.shell: ssh-keygen -b 4096 -t rsa -f /root/.ssh/id_rsa -q -N ""
+  args:
+    creates: /root/.ssh/id_rsa
+
+- name: Ensure there is a public key for the root user SSH key
+  ansible.builtin.shell: ssh-keygen -f /root/.ssh/id_rsa -y > /root/.ssh/id_rsa.pub
+  args:
+    creates: /root/.ssh/id_rsa.pub
+
+- name: Ensure the Public SSH keys are available for exchanging SSH key trust between nodes
+  ansible.builtin.shell: cat /root/.ssh/id_rsa.pub
+  register: cluster_public_ssh_key
+  changed_when: False
+
+- name: Ensure the Primary Node public key is authorized on all nodes, required for crm_clustering
+  ansible.builtin.authorized_key:
+    user: root
+    key: "{{ hostvars[primary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
+
+- name: Ensure the Secondary Node public key is authorized on all nodes, required for crm_clustering
+  ansible.builtin.authorized_key:
+    user: root
+    key: "{{ hostvars[secondary_instance.ip_admin].cluster_public_ssh_key.stdout }}"
+
+# @TODO NTP server for datetime sync?
+
+# Set up Hosts entries for the cluster nodes
+- name: Ensure the Primary node hosts entry exists
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: EOF
+    regexp: "{{ primary_instance.name }}"
+    line: "{{ primary_instance.ip_db }} {{ primary_instance.name }}"
+
+- name: Ensure the Secondary node hosts entry exists
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    state: present
+    insertafter: EOF
+    regexp: "{{ secondary_instance.name }}"
+    line: "{{ secondary_instance.ip_db }} {{ secondary_instance.name }}"
+
+# Clustering commands are based on the Host OS
+- name: "Cluster based on OS in VM {{ ansible_host }}"
+  include_tasks: "5.5.3.0-cluster-{{ ansible_os_family }}.yml"
+  when: hdb_size != "LargeInstance"
+
+- name: Ensure cluster is configured in Large Instance
+  include_tasks: "cluster-{{ ansible_os_family }}-large-instance.yml"
+  when:
+    - hdb_size == "LargeInstance"
+    - ansible_os_family == "Suse"

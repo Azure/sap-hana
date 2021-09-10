@@ -115,3 +115,7 @@ variable "terraform_template_version" {
   description = "The version of Terraform templates that were identified in the state file"
   default     = ""
 }
+
+variable "arm_client_id" {
+  default = "70000000-0000-0000-0000-000000000000"
+}

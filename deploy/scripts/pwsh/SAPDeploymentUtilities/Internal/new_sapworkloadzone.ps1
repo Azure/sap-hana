@@ -368,6 +368,45 @@ Licensed under the MIT license.
 
     Write-Host -ForegroundColor green "Initializing Terraform  New-SAPWorkloadZone"
 
+    $terraform_module_directory = Join-Path -Path $repo -ChildPath "\deploy\terraform\run\$Type"
+    $Env:TF_DATA_DIR = (Join-Path -Path $fInfo.Directory.FullName -ChildPath ".terraform")
+
+
+    Write-Host -ForegroundColor green "Initializing Terraform  New-SAPWorkloadZone"
+
+    $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
+    if (Test-Path ".terraform" -PathType Container) {
+        if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
+
+            $jsonData = Get-Content -Path .\.terraform\terraform.tfstate | ConvertFrom-Json
+
+            if ("azurerm" -eq $jsonData.backend.type) {
+                $Command = " init -upgrade=true"
+            }
+        }
+    } 
+
+    $Cmd = "terraform -chdir=$terraform_module_directory $Command"
+    Add-Content -Path "deployment.log" -Value $Cmd
+    Write-Verbose $Cmd
+
+    & ([ScriptBlock]::Create($Cmd)) 
+    if ($LASTEXITCODE -ne 0) {
+        $Env:TF_DATA_DIR = $null
+        throw "Error executing command: $Cmd"
+    }
+
+    $deployer_tfstate_key_parameter = ""
+    $tfstate_parameter = " -var tfstate_resource_id=" + $tfstate_resource_id
+    if ($Deployerstatefile.Length -gt 0) {
+        $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $Deployerstatefile
+    }
+    else {
+        if ($deployer_tfstate_key.Length -gt 0) {
+            $deployer_tfstate_key_parameter = " -var deployer_tfstate_key=" + $deployer_tfstate_key    
+        }
+    }
+
     $Command = " init -upgrade=true -backend-config ""subscription_id=$state_subscription_id"" -backend-config ""resource_group_name=$rgName"" -backend-config ""storage_account_name=$saName"" -backend-config ""container_name=tfstate"" -backend-config ""key=$envkey"" "
     if (Test-Path ".terraform" -PathType Container) {
         if (Test-Path ".\.terraform\terraform.tfstate" -PathType Leaf) {
@@ -408,7 +447,6 @@ Licensed under the MIT license.
     Add-Content -Path "deployment.log" -Value $Cmd
     Write-Verbose $Cmd
 
-    
     $Command = " output automation_version"
 
     $Cmd = "terraform -chdir=$terraform_module_directory $Command"

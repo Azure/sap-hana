@@ -218,7 +218,7 @@ locals {
   // public ip address of the first deployer
   deployer_public_ip_address = local.enable_deployers && local.enable_deployer_public_ip ? local.deployer_public_ip_address_list[0] : ""
 
-  
+
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")
   prvt_key_vault_id = try(var.key_vault.kv_prvt_id, "")
@@ -249,7 +249,7 @@ locals {
   prvt_kv_rg_name = local.prvt_kv_exist ? split("/", local.prvt_key_vault_id)[4] : ""
 
   // Tags
-  tags = try(var.deployers[0].tags, {"JumpboxName" = "Deployer"})
+  tags = try(var.deployers[0].tags, { "JumpboxName" = "Deployer" })
 
 
 }

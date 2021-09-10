@@ -3,8 +3,8 @@ deployer_tfstate_key  = null
 landscape_tfstate_key = null
 # Infrastructure block
 
-environment = "NP"
-region      = "westeurope"
+environment="NP"
+location="westeurope"
 #resource_group_name=""
 #resource_group_arm_id=""
 #proximityplacementgroup_names=[]
@@ -30,25 +30,25 @@ network_name          = "SAP01"
 network_address_space = "10.1.0.0/16"
 
 #admin_subnet_name=""
-admin_subnet_prefix = "10.1.1.0/24"
+admin_subnet_address_prefix = "10.1.1.0/24"
 #admin_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_admin"
 #admin_subnet_nsg_name=""
 #admin_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_adminSubnet-nsg"
 
 #db_subnet_name=""
-db_subnet_prefix = "10.1.2.0/24"
+db_subnet_address_prefix = "10.1.2.0/24"
 #db_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_db"
 #db_subnet_nsg_name="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_dbSubnet-nsg"
 #db_subnet_nsg_arm_id=""
 
 #app_subnet_name=""
-app_subnet_prefix = "10.1.3.0/24"
+app_subnet_address_prefix = "10.1.3.0/24"
 #app_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_app"
 #app_subnet_nsg_name=""
 #app_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_appSubnet-nsg"
 
 #web_subnet_name=""
-web_subnet_prefix = "10.1.4.0/24"
+web_subnet_address_prefix = "10.1.4.0/24"
 #web_subnet_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/virtualNetworks/DEV-WEEU-SAP01-vnet/subnets/DEV-WEEU-SAP01-subnet_web"
 #web_subnet_nsg_name=""
 #web_subnet_nsg_arm_id="/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/DEV-WEEU-SAP01-INFRASTRUCTURE/providers/Microsoft.Network/networkSecurityGroups/DEV-WEEU-SAP01_webSubnet-nsg"
@@ -85,12 +85,15 @@ database_vm_image = {
 
 #database_platform="HANA"
 #database_size="Default"
+#database_sid="HDB"
+#database_instance_number="01"
 
 #database_no_avset=false
 #database_no_ppg=false
 
 #database_vm_zones=["1","2"]
 #database_vm_useDHCP=false
+#database_HANA_use_ANF_scaleout_scenario=false
 
 #Application tier
 enable_app_tier_deployment = true
@@ -98,18 +101,13 @@ enable_app_tier_deployment = true
 sid = "PRD"
 #app_tier_use_DHCP=false
 #app_tier_dual_nics=false
-#app_tier_vm_sizing="New"
+app_tier_vm_sizing="Production"
+#app_disk_sizes_filename=""
 
 # Application Server
 
 application_server_count = 3
-#application_server_app_nic_ips=[]
-#application_server_app_admin_nic_ips=[]
 #application_server_sku="Standard_D4s_v3"
-#application_server_no_avset=false
-#application_server_no_ppg=false
-#application_server_tags={},
-#application_server_zones=["1","2","3"]
 #application_server_image= {
 #  os_type=""
 #  source_image_id=""
@@ -117,6 +115,14 @@ application_server_count = 3
 #  offer="sles-sap-12-sp5"
 #  sku="gen1"
 #}
+#application_server_zones=["1","2","3"]
+#application_server_app_nic_ips=[]
+#application_server_app_admin_nic_ips=[]
+
+#application_server_no_avset=false
+#application_server_no_ppg=false
+
+#application_server_tags={},
 
 # SCS Server
 
@@ -167,3 +173,8 @@ automation_username = "azureadm"
 resource_offset = 0
 #vm_disk_encryption_set_id=""
 #nsg_asg_with_vnet=false
+
+
+#ANF
+anf_sapmnt_volume_size=512
+anf_shared_volume_size=512

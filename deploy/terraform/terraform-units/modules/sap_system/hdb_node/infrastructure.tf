@@ -24,7 +24,7 @@ Load balancer front IP address range: .4 - .9
 
 resource "azurerm_lb" "hdb" {
   provider            = azurerm.main
-  count               = local.enable_deployment ? 1 : 0
+  count               = local.enable_db_lb_deployment ? 1 : 0
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location
@@ -41,7 +41,7 @@ resource "azurerm_lb" "hdb" {
 
 resource "azurerm_lb_backend_address_pool" "hdb" {
   provider        = azurerm.main
-  count           = local.enable_deployment ? 1 : 0
+  count           = local.enable_db_lb_deployment ? 1 : 0
   name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_bepool)
   loadbalancer_id = azurerm_lb.hdb[count.index].id
 
@@ -49,7 +49,7 @@ resource "azurerm_lb_backend_address_pool" "hdb" {
 
 resource "azurerm_lb_probe" "hdb" {
   provider            = azurerm.main
-  count               = local.enable_deployment ? 1 : 0
+  count               = local.enable_db_lb_deployment ? 1 : 0
   resource_group_name = var.resource_group[0].name
   loadbalancer_id     = azurerm_lb.hdb[count.index].id
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_hp)
@@ -64,7 +64,7 @@ resource "azurerm_lb_probe" "hdb" {
 # In a scale-out scenario, we need to rewrite this code according to the scale-out + HA reference architecture.
 resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
   depends_on              = [azurerm_network_interface.nics_dbnodes_db]
-  count                   = local.enable_deployment ? length(local.hdb_vms) : 0
+  count                   = local.enable_db_lb_deployment ? length(local.hdb_vms) : 0
   network_interface_id    = azurerm_network_interface.nics_dbnodes_db[count.index].id
   ip_configuration_name   = azurerm_network_interface.nics_dbnodes_db[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.hdb[0].id
@@ -72,7 +72,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "hdb" {
 
 resource "azurerm_lb_rule" "hdb" {
   provider                       = azurerm.main
-  count                          = local.enable_deployment ? 1 : 0
+  count                          = local.enable_db_lb_deployment ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.hdb[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb_rule)

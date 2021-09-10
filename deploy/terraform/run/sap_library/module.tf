@@ -3,6 +3,10 @@
   Setup sap library
 */
 module "sap_library" {
+#  providers = {
+#    azurerm.main     = azurerm
+#    azurerm.deployer = azurerm.deployer
+#  }
   source                  = "../../terraform-units/modules/sap_library"
   infrastructure          = local.infrastructure
   storage_account_sapbits = local.storage_account_sapbits

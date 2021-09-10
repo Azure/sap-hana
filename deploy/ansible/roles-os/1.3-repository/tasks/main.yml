@@ -73,7 +73,7 @@
 
     - name: Verify that zypper repos are configured after re-registering \
             SLE instance
-      command: zypper lr
+      ansible.builtin.command: zypper lr
       args:
         warn: false  # quieten warning about using zypper directly
 
@@ -121,7 +121,7 @@
   block:
     # If there are no repos configured zypper lr will fail with rc == 6
     - name:     Check that zypper repos are registered
-      command:    zypper lr
+      ansible.builtin.command:    zypper lr
       # command/shell actions always report changed even if they are
       # not making any changes; we know this command action doesn't
       # change anything so ensure it doesn't report as changed.
@@ -144,13 +144,13 @@
 # Analyse the repo list for this distribution selecting only those
 # packages assigned to the active tier or 'all'.
 - name:             Determine repos appropriate for tier
-  set_fact:
+  ansible.builtin.set_fact:
     repos_for_tier: "{{ repos[distro_full_id] |
                           selectattr('tier', 'in', ['all', tier]) |
                           list }}"
 
 # Print list of matching repos if verbosity it 1 or greater
-- debug:
+- ansible.builtin.debug:
     var: "{{ repos_for_tier }}"
     verbosity: 1
 
@@ -171,7 +171,7 @@
   when:     ansible_os_family|upper == 'SUSE'
 
 - name:              Add the repositories result
-  debug:
+  ansible.builtin.debug:
     var: zypresult
     verbosity: 2
 

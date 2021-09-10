@@ -25,6 +25,7 @@
 services:
     redhat7:
         - { tier: 'os',          service: 'firewalld',      node_tier: 'all',     state: 'disabled' }
+        - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
         - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'started'  }
 #      - { tier: 'os', service: '',  node_tier: 'all',    state: 'started' }
 
@@ -33,11 +34,15 @@ services:
         - { tier: 'os',          service: 'oddjobd',      node_tier: 'all',     state: 'disabled'  }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'stopped'   }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'disabled'  }
-        - { tier: 'os',          service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
-        - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'restarted' }
+        - { tier: 'sapos',       service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
+        - { tier: 'preparation', service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
+        - { tier: 'ha',          service: 'pcsd',         node_tier: 'all',     state: 'started'   }
+        - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
 
     suse12:
-        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }
+        - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
+        - { tier: 'preparation', service: 'nfsserver',    node_tier: 'scs',     state: 'restarted' }
 
     suse15:
-        - { tier: 'preparation', service: 'nfsserver',      node_tier: 'scs',     state: 'restarted'  }
+        - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
+        - { tier: 'preparation', service: 'nfsserver',    node_tier: 'scs',     state: 'restarted' }

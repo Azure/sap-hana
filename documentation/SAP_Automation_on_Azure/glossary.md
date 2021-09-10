@@ -17,7 +17,7 @@
 
 ## System
 
-The SAP system will contain the resources which are needed for the SAP application, these include the virtual machines, disks, load balancers, proximity placement groups, availability sets, subnets, network security groups etc. The system deployment leverages the key vaults from the environment deployment (sap_landscape) for credentials management, the Virtual network information from the environment (sap_landscape). The Terraform deployment will store its state file in the storage account defined in the environment (sap_library)
+The SAP system will contain the resources which are needed for the SAP application, these include the virtual machines, disks, load balancers, proximity placement groups, availability sets, subnets, network security groups etc. The system deployment leverages the key vaults from the environment deployment (sap\_landscape) for credentials management, the Virtual network information from the environment (sap\_landscape). The Terraform deployment will store its state file in the storage account defined in the environment (sap\_library)
 
 ## Environment
 

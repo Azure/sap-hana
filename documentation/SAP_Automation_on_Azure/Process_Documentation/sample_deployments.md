@@ -33,14 +33,14 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Deployer                 | [DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json](../../../deploy/samples/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
-| Library                  | [LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
-| Workload                 | [LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
-| System                   | [SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
+| Deployer                 | [DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json](./WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
+| Library                  | [LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
+| Workload                 | [LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json](./WORKSPACES//LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
+| System                   | [SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json](./WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
 
 <br>
 
-From the cloned repository copy the following folders from the *deploy/samples/WORKSPACES* to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
+From the cloned repository copy the following folders to your root folder (*Azure_SAP_Automated_Deployment/WORKSPACES*) for parameter files
 
 - DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE
 - LIBRARY/MGMT-WEEU-SAP_LIBRARY
@@ -52,16 +52,16 @@ The helper script below can be used to copy the pertinent folders.
 ```bash
     cd ~/Azure_SAP_Automated_Deployment
     mkdir -p WORKSPACES/DEPLOYER
-    cp sap-hana/deploy/samples/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
 
     mkdir -p WORKSPACES/LIBRARY
-    cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
     mkdir -p WORKSPACES/LANDSCAPE
-    cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
     mkdir -p WORKSPACES/SYSTEM
-    cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00 WORKSPACES/SYSTEM/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00 WORKSPACES/SYSTEM/. -r
     cd WORKSPACES
 
 ```
@@ -171,9 +171,9 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Library                  | [LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json) |
-| Workload                 | [DEV-NOEU-SAP02-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE/DEV-NOEU-SAP02-INFRASTRUCTURE.json) |
-| System                   | [DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json) |
+| Library                  | [LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY/MGMT-NOEU-SAP_LIBRARY.json) |
+| Workload                 | [DEV-NOEU-SAP02-INFRASTRUCTURE.json](./WORKSPACES//LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE/DEV-NOEU-SAP02-INFRASTRUCTURE.json) |
+| System                   | [DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json](./WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02/DEV-NOEU-SAP02-X02.json) |
 
 <br>
 
@@ -189,13 +189,13 @@ The helper script below can be used to copy the folders.
 cd ~/Azure_SAP_Automated_Deployment
 
 mkdir -p WORKSPACES/LIBRARY
-cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LIBRARY/MGMT-NOEU-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
 mkdir -p WORKSPACES/LANDSCAPE
-cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LANDSCAPE/DEV-NOEU-SAP02-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
 mkdir -p WORKSPACES/SYSTEM
-cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02 WORKSPACES/SYSTEM/. -r
+cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/SYSTEM/DEV-NOEU-SAP02-X02 WORKSPACES/SYSTEM/. -r
 cd WORKSPACES
 ```
 
@@ -329,10 +329,10 @@ A sample configuration for this is available here:
 
 | Component                | Template |
 | :------------------------| :----------------------------------------------------------------------- |
-| Deployer                 | [DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES/DEPLOYER/MGMT-EUS2-DEP00-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json)
-| Library                  | [LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json)
-| Workload                 | [LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES//LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json)
-| System                   | [SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json)
+| Deployer                 | [DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json](./WORKSPACES/DEPLOYER/MGMT-EUS2-DEP00-INFRASTRUCTURE/MGMT-EUS2-DEP01-INFRASTRUCTURE.json)
+| Library                  | [LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY/MGMT-EUS2-SAP_LIBRARY.json)
+| Workload                 | [LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json](./WORKSPACES//LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE/QA-EUS2-SAP03-INFRASTRUCTURE.json)
+| System                   | [SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json](./WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01/QA-EUS2-SAP03-X01.json)
 
 <br>
 
@@ -348,16 +348,16 @@ The helper script below can be used to copy the pertinent folders.
 ```bash
     cd ~/Azure_SAP_Automated_Deployment
     mkdir -p WORKSPACES/DEPLOYER
-    cp sap-hana/deploy/samples/WORKSPACES/DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/DEPLOYER/MGMT-EUS2-DEP01-INFRASTRUCTURE WORKSPACES/DEPLOYER/. -r
 
     mkdir -p WORKSPACES/LIBRARY
-    cp sap-hana/deploy/samples/WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LIBRARY/MGMT-EUS2-SAP_LIBRARY WORKSPACES/LIBRARY/. -r
 
     mkdir -p WORKSPACES/LANDSCAPE
-    cp sap-hana/deploy/samples/WORKSPACES/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/LANDSCAPE/QA-EUS2-SAP03-INFRASTRUCTURE WORKSPACES/LANDSCAPE/. -r
 
     mkdir -p WORKSPACES/SYSTEM
-    cp sap-hana/deploy/samples/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01 WORKSPACES/SYSTEM/. -r
+    cp sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES/SYSTEM/QA-EUS2-SAP03-X01 WORKSPACES/SYSTEM/. -r
     cd WORKSPACES
 
 ```
@@ -468,11 +468,11 @@ A sample configuration for this is available here
 
 | Component                  | Template |
 | :--------------------------|  :----------------------------------------------------------------------- |
-| Library                    | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](../../../DEPLOY/SAMPLES/WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
-| Workload                   | [PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json](../../../DEPLOY/SAMPLES/WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json) |
-| System                     | [PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json) |
-| System (custom disk sizes) | [PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json) |
-| Custom disk size file      | [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json) |
+| Library                    | [MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json](./WORKSPACES/LIBRARY/MGMT-WUS2-SAP_LIBRARY/MGMT-WUS2-SAP_LIBRARY.json) |
+| Workload                   | [PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json](./WORKSPACES/LANDSCAPE/PROD-WUS2-SAP04-INFRASTRUCTURE/PROD-WUS2-SAP04-INFRASTRUCTURE.json) |
+| System                     | [PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X03/PROD-WUS2-SAP04-X03.json) |
+| System (custom disk sizes) | [PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/PROD-WUS2-SAP04-X04.json) |
+| Custom disk size file      | [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json) |
 
 <br>
 
@@ -584,7 +584,7 @@ When using PowerShell the same can be achieved with the ***New-SAPSystem*** Powe
 
 ## **Scenario 4: Brownfield without deployer using a custom disk configuration** ##
 
-This deployment has a custom disk configuration for the HANA deployment.The custom disk sizing for the system is defined here: [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](../../../DEPLOY/SAMPLES/WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json)
+This deployment has a custom disk configuration for the HANA deployment.The custom disk sizing for the system is defined here: [PROD-WUS2-SAP04-X04/X04-Disk_sizes.json](./WORKSPACES/SYSTEM/PROD-WUS2-SAP04-X04/X04-Disk_sizes.json)
 
 **Note** To match the disk sizes with the deployment the node beneath the "db" node needs to be the same as the database.size attribute in the configuration json
 

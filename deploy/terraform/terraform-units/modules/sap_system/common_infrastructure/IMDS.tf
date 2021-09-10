@@ -1,11 +1,11 @@
 variable "api-version" {
   description = "IMDS API Version"
-  default     = "2019-04-30"
+  default     = "2021-02-01"
 }
 
 variable "auto-deploy-version" {
   description = "Version for automated deployment"
-  default     = "Fe"
+  default     = "Ni"
 }
 
 variable "scenario" {

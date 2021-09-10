@@ -15,8 +15,12 @@ variable "loadbalancers" {
   description = "List of LoadBalancers created for HANA Databases"
 }
 
-variable "hdb_sid" {
-  description = "List of SIDs used when generating Load Balancers"
+variable "sap_sid" {
+  description = "SAP SID"
+}
+
+variable "db_sid" {
+  description = "Database SID"
 }
 
 variable "hana_database_info" {
@@ -135,6 +139,10 @@ variable "scs_lb_ip" {
   default     = ""
 }
 
+variable "sap_mnt" {
+  description= "ANF Volume"
+  default = ""
+}
 
 
 locals {

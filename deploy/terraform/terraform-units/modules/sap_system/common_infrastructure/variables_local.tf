@@ -47,7 +47,7 @@ variable "terraform_template_version" {
 
 variable "license_type" {
   description = "Specifies the license type for the OS"
-  default = ""
+  default     = ""
 
 }
 
@@ -55,6 +55,17 @@ variable "enable_purge_control_for_keyvaults" {
   description = "Allow the deployment to control the purge protection"
 }
 
+variable "anf_shared_volume_size" {
+  description = "The volume size in GB for shared"
+}
+
+variable "anf_sapmnt_volume_size" {
+  description = "The volume size in GB for sapmnt"
+}
+
+variable "use_ANF" {
+  default = false
+}
 
 locals {
   // Resources naming
@@ -66,9 +77,9 @@ locals {
   //Region and metadata
   region    = var.infrastructure.region
   sid       = upper(var.application.sid)
-  prefix    = length(try(var.infrastructure.resource_group.name, "")) > 0 ? var.infrastructure.resource_group.name :  trimspace(var.naming.prefix.SDU)
+  prefix    = length(try(var.infrastructure.resource_group.name, "")) > 0 ? var.infrastructure.resource_group.name : trimspace(var.naming.prefix.SDU)
   rg_exists = length(try(var.infrastructure.resource_group.arm_id, "")) > 0
-// Resource group
+  // Resource group
   rg_name = local.rg_exists ? (
     try(split("/", var.infrastructure.resource_group.arm_id)[4], "")) : (
     length(try(var.infrastructure.resource_group.name, "")) > 0 ? var.infrastructure.resource_group.name : try(var.infrastructure.resource_group.name, format("%s%s", local.prefix, local.resource_suffixes.sdu_rg))
@@ -159,7 +170,7 @@ locals {
 
   custom_sizing = length(var.custom_disk_sizes_filename) > 0
 
-   // Imports database sizing information
+  // Imports database sizing information
   file_name = local.custom_sizing ? (
     fileexists(var.custom_disk_sizes_filename) ? (
       var.custom_disk_sizes_filename) : (
@@ -185,8 +196,8 @@ locals {
   //Enable SID deployment
   enable_sid_deployment = local.enable_db_deployment || local.enable_app_deployment
 
-  sizes         = jsondecode(file(local.file_name))
-  
+  sizes = jsondecode(file(local.file_name))
+
   db_sizing = local.enable_sid_deployment ? lookup(local.sizes.db, var.databases[0].size).storage : []
 
   enable_ultradisk = try(
@@ -259,7 +270,7 @@ locals {
   //Admin subnet
   enable_admin_subnet = try(var.application.dual_nics, false) || try(var.databases[0].dual_nics, false) || (try(upper(local.db.platform), "NONE") == "HANA")
 
-  sub_admin_defined = length(try(var.infrastructure.vnets.sap.subnet_admin,{})) > 0
+  sub_admin_defined = length(try(var.infrastructure.vnets.sap.subnet_admin, {})) > 0
   sub_admin_arm_id  = try(var.infrastructure.vnets.sap.subnet_admin.arm_id, try(var.landscape_tfstate.admin_subnet_id, ""))
   sub_admin_exists  = length(local.sub_admin_arm_id) > 0
 
@@ -272,7 +283,7 @@ locals {
   )
   sub_admin_prefix = local.sub_admin_defined ? try(var.infrastructure.vnets.sap.subnet_admin.prefix, "") : ""
 
-  sub_db_defined = length(try(var.infrastructure.vnets.sap.subnet_db,{})) > 0
+  sub_db_defined = length(try(var.infrastructure.vnets.sap.subnet_db, {})) > 0
   sub_db_arm_id  = try(var.infrastructure.vnets.sap.subnet_db.arm_id, try(var.landscape_tfstate.db_subnet_id, ""))
   sub_db_exists  = length(local.sub_db_arm_id) > 0
   sub_db_name = local.sub_db_exists ? (
@@ -285,7 +296,7 @@ locals {
   sub_db_prefix = local.sub_db_defined ? try(var.infrastructure.vnets.sap.subnet_db.prefix, "") : ""
 
   //APP subnet
-  sub_app_defined = length(try(var.infrastructure.vnets.sap.subnet_app,{})) > 0
+  sub_app_defined = length(try(var.infrastructure.vnets.sap.subnet_app, {})) > 0
   sub_app_arm_id  = try(var.infrastructure.vnets.sap.subnet_app.arm_id, try(var.landscape_tfstate.app_subnet_id, ""))
   sub_app_exists  = length(local.sub_app_arm_id) > 0
   sub_app_name = local.sub_app_exists ? (
@@ -393,6 +404,12 @@ locals {
 
   // Current service principal
   service_principal = try(var.service_principal, {})
+
+  ANF_pool_settings = var.use_ANF ? (
+    try(var.landscape_tfstate.ANF_pool_settings, { use_ANF = false })
+    ) : (
+    { use_ANF = false }
+  )
 
 }
 

@@ -151,7 +151,7 @@ The deployment configuration file defines the region and the environment name an
    }
    ```
 
-A sample deployment environment configuration is specified in [Deployment Environment](../../../deploy/samples/WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
+A sample deployment environment configuration is specified in [Deployment Environment](WORKSPACES/DEPLOYER/MGMT-WEEU-DEP00-INFRASTRUCTURE/MGMT-WEEU-DEP00-INFRASTRUCTURE.json)
 
 For more details on the deployer see [Deployer](../Software_Documentation/product_documentation-deployer.md)
 
@@ -185,7 +185,7 @@ The SAP Library configuration file defines the region and the environment name .
    }
 ```
 
-A sample deployment for the SAP library configuration is specified in [Library Environment](../../../deploy/samples/WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
+A sample deployment for the SAP library configuration is specified in [Library Environment](WORKSPACES/LIBRARY/MGMT-WEEU-SAP_LIBRARY/MGMT-WEEU-SAP_LIBRARY.json)
 
 For more details on the SAP Library see [SAP Library](../Software_Documentation/product_documentation-sap_library.md)
 For more details on the configuration of the SAP Library see [SAP Library Configuration](../Software_Documentation/configuration-sap_library.md)
@@ -257,7 +257,7 @@ The Workload Zone configuration file defines the region and the environment name
     }
 ```
 
-A sample workload zone configuration is specified in [Workload Zone Environment](../../../deploy/samples/WORKSPACES/LANDSCAPE/DEV-WEEU-SAP01-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
+A sample workload zone configuration is specified in [Workload Zone Environment](WORKSPACES/LANDSCAPE/DEV-WEEU-SAP00-INFRASTRUCTURE/DEV-WEEU-SAP01-INFRASTRUCTURE.json)
 
 The deployment will create a Virtual network and a storage account for boot diagnostics and a storage account which can be used as the witness disk for Windows High Availability Architectures and two key vaults. The deployment will populate the keyvault with the default credentials for the Virtual Machines.
 
@@ -270,8 +270,7 @@ For more details on the configuration of the SAP Library see [Workload Zone Conf
 
 The SAP System is the actual SAP Application, it contains all the Azure artifacts required to host the SAP Application.
 
-A sample SAP System configuration is specified in [SAP System](../../../deploy/samples/WORKSPACES/SYSTEM/DEV-WEEU-SAP01-X00/DEV-WEEU-SAP01-X00.json)
-
+A sample SAP System configuration is specified in [SAP System](WORKSPACES/SYSTEM/DEV-WEEU-SAP00-X00/DEV-WEEU-SAP01-X00.json)
 
 The deployment will create a SAP system that has an Hana database server, 2 application servers, 1 central services server and a web dispatcher and two key vaults (which can be ignored for now).
 
@@ -309,7 +308,7 @@ This step deploys the actual infrastructure for the SAP System (SID)
 
 ## Sample files ##
 
-The repository contains a folder [WORKSPACES](../../../deploy/samples/WORKSPACES) that has a set of sample parameter files that can be used to deploy the supporting components and the SAP System. The folder structure is documented here: [Deployment folder structure](Deployment_folder_structure.md)
+The repository contains a folder [WORKSPACES](WORKSPACES) that has a set of sample parameter files that can be used to deploy the supporting components and the SAP System. The folder structure is documented here: [Deployment folder structure](Deployment_folder_structure.md)
 
 The name of the environment is **DEV** and it is deployed to West Europe. The SID of the application is X00.
 
@@ -334,10 +333,10 @@ The links below explain how to deploy using the different deployment environment
 
 ## Changing the naming convention ##
 
-The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming](./Software_Documentation/standards-naming.md)
+The automation uses a default naming convention which is defined in the Standard naming convention document [standards-naming](.//Software_Documentation/standards-naming.md)
 
 <!-- TODO: Why is the following link a full URL? Shouldn't it be a relative path like all the others? -->
-[naming conventions for the deployment](./Changing_the_naming_convention.md) should be defined upfront and can be customized according the needs.
+[naming conventions for the deployment](https://github.com/Azure/sap-hana/blob/documentation-updates/documentation/SAP_Automation_on_Azure/Process_Documentation/Changing_the_naming_convention.md) should be defined upfront and can be customized according the needs.
 
 ## Changing disk sizing ##
 

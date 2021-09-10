@@ -134,6 +134,29 @@ variable "web_subnet_nsg_arm_id" {
   default = ""
 }
 
+
+/* ANF subnet information */
+
+variable "anf_subnet_name" {
+  default = ""
+}
+
+variable "anf_subnet_arm_id" {
+  default = ""
+}
+
+variable "anf_subnet_address_prefix" {
+  default = ""
+}
+
+variable "anf_subnet_nsg_name" {
+  default = ""
+}
+
+variable "anf_subnet_nsg_arm_id" {
+  default = ""
+}
+
 /* iscsi subnet information */
 
 variable "iscsi_subnet_name" {
@@ -237,6 +260,10 @@ variable "witness_storage_account_arm_id" {
   default = ""
 }
 
-variable "enable_purge_control_for_keyvaults" {
+variable "create_fencing_spn" {
+  default = false
+}
+
+  variable "enable_purge_control_for_keyvaults" {
   default = true
 }

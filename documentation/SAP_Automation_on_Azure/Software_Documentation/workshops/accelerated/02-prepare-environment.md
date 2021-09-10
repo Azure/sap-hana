@@ -132,11 +132,45 @@
       "options": {
         "enable_deployer_public_ip"           : true
       },
-      "firewall_deployment"                   : true
+      "firewall_deployment"                   : true,
+      "enable_purge_control_for_keyvaults"    : false
     }
     EOF
     ```
     <br/>
+    
+    For a deployment to *westeurope* use this:
+
+    ```bash
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE; cd $_
+
+    cat <<EOF > DEMO-WEEU-DEP00-INFRASTRUCTURE.json
+    {
+      "infrastructure": {
+        "environment"                         : "DEMO",
+        "region"                              : "westeurope",
+        "vnets": {
+          "management": {
+            "name"                            : "DEP00",
+            "address_space"                   : "10.0.0.0/25",
+            "subnet_mgmt": {
+              "prefix"                        : "10.0.0.64/28"
+            },
+            "subnet_fw": {
+              "prefix"                        : "10.0.0.0/26"
+            }
+          }
+        }
+      },
+      "options": {
+        "enable_deployer_public_ip"           : true
+      },
+      "firewall_deployment"                   : true,
+      "enable_purge_control_for_keyvaults"    : false
+    }
+    EOF
+    ```
+
 
 5. SAP_LIBRARY - Create Working Directory and prepare JSON.
     <br/>*`Observe Naming Convention` Use same location as for the deployer*<br/>
@@ -158,6 +192,26 @@
     EOF
     ```
     <br/>
+    
+    For a deployment to *westeurope* use this:
+    
+    ```bash
+    mkdir -p ~/Azure_SAP_Automated_Deployment/WORKSPACES/LIBRARY/DEMO-WEEU-SAP_LIBRARY; cd $_
+
+    cat <<EOF > DEMO-WEEU-SAP_LIBRARY.json
+    {
+      "infrastructure": {
+      "environment"                           : "DEMO",
+      "region"                                : "westeurope"
+      },
+      "deployer": {
+        "environment"                         : "DEMO",
+        "region"                              : "westeurope",
+        "vnet"                                : "DEP00"
+      }
+    }
+    EOF
+    ```
 
 
 6.  Prepare the environment
@@ -175,7 +229,17 @@
     ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh --parameterfile LIBRARY/DEMO-SCUS-SAP_LIBRARY/DEMO-SCUS-SAP_LIBRARY.json \
                                                        --type sap_library
     ```
+
     <br/>
+    For a deployment to *westeurope* use this:
+    
+    ```bash
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh --parameterfile DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json \
+                                                       --type sap_deployer
+
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/validate.sh --parameterfile LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json \
+                                                       --type sap_library
+    ```
 
     3. Execute
     ```bash
@@ -185,6 +249,14 @@
         --auto-approve
     ```
     <br/>
+    For a deployment to *westeurope* use this:
+
+    ```bash
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
+        --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
+        --library_parameter_file LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json                      \
+        --auto-approve
+    ```
 
     4. Answer Input
        1. Do you want to specify the SPN Details Y/N?
@@ -207,6 +279,20 @@
         --auto-approve
     ```
 
+For a deployment to *westeurope* use this:
+    
+        ```bash
+    ${DEPLOYMENT_REPO_PATH}/deploy/scripts/prepare_region.sh                                                   \
+        --deployer_parameter_file DEPLOYER/DEMO-WEEU-DEP00-INFRASTRUCTURE/DEMO-WEEU-DEP00-INFRASTRUCTURE.json  \
+        --library_parameter_file LIBRARY/DEMO-WEEU-SAP_LIBRARY/DEMO-WEEU-SAP_LIBRARY.json                      \
+        --subscription xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx                                                    \ 
+        --spn_id yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy                                                          \
+        --spn_secret "zzzzzzzzzzzzzzz"                                                                         \
+        --tenant_id ttttttttt-tttt-tttt-tttt-ttttttttttt                                                       \
+        --auto-approve
+    ```
+
+
 7.  Post Processing
     1. In Output Section make note of the following 
        1. deployer_public_ip_address
@@ -222,6 +308,7 @@
     2. Extract SSH Keys
        1. Private Key
           <br/>*`Observe Naming Convention`*<br/>
+          <br/>*`Update Vault name`*<br/>
           ```
           az keyvault secret show               \
             --vault-name DEMOSCUSDEP00userXXX   \
@@ -229,6 +316,17 @@
             jq -r .value > sshkey
           ```
           <br/>
+
+          <br/>*`Observe Naming Convention`*<br/>
+          <br/>*`Update Vault name`*<br/>
+          ```
+          az keyvault secret show               \
+            --vault-name DEMOWEEUDEP00userXXX   \
+            --name DEMO-WEEU-DEP00-sshkey     | \
+            jq -r .value > sshkey
+          ```
+          <br/>
+
 
 
     3. Download the Private Key for use in your SSH Terminal Application

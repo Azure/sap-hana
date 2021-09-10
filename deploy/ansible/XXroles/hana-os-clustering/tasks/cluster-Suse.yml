@@ -2,6 +2,7 @@
 
 # SLES Clustering
 # Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
+# Ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-suse-pacemaker
 
 - name: Ensure a list of package version is available for checking the cloud-netconfig-azure version
   package_facts:

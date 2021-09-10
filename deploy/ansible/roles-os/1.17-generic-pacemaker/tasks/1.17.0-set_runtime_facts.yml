@@ -1,0 +1,65 @@
+---
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |      Set Runtime Paramters - e.g Sub ID , Resource group name              |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+# ----------------------------------------
+# BEGIN
+# ----------------------------------------
+
+- name: " Retrieve Subscription ID and Resource Group Name"
+  ansible.builtin.shell: curl -H Metadata:true --noproxy "*" "http://169.254.169.254/metadata/instance?api-version=2021-02-01"
+  register: hanavmmetadata
+  changed_when: false
+  args:
+    warn: false
+
+- name: "Show IMDS results"
+  ansible.builtin.debug:
+    var: hanavmmetadata
+    verbosity: 2
+
+- name: save the Json data to a Variable as a Fact
+  ansible.builtin.set_fact:
+    jsondata: "{{ hanavmmetadata.stdout | from_json }}"
+  no_log: true
+
+- name: " Extract Subscription ID "
+  ansible.builtin.set_fact:
+    sap_hana_fencing_spn_subscription_id: "{{ jsondata | json_query('compute.subscriptionId') }}"
+  no_log: true
+    
+- name: " Extract ResourceGroup Name "
+  ansible.builtin.set_fact:
+    resource_group_name: "{{ jsondata | json_query('compute.resourceGroupName') }}"
+  no_log: true
+   
+- name: set the primary intance db nic and admin nic IP
+  ansible.builtin.set_fact:
+    primary_instance_ip_db: "{{ hostvars[primary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
+    primary_instance_ip_admin: "{{ hostvars[primary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
+
+- name: set the secondary intance db nic and admin nic IP
+  set_fact:
+    secondary_instance_ip_db: "{{ hostvars[secondary_instance_name]['ansible_eth0']['ipv4']['address'] }}"
+    secondary_instance_ip_admin: "{{ hostvars[secondary_instance_name]['ansible_eth1']['ipv4']['address'] }}"
+
+- name: "Show Subscription ID"
+  ansible.builtin.debug:
+    var: sap_hana_fencing_spn_subscription_id
+    verbosity: 2
+
+- name: "Show Resource Group Name"
+  ansible.builtin.debug:
+    var: resource_group_name
+    verbosity: 2
+
+
+# /*---------------------------------------------------------------------------8
+# |                                   END                                     |
+# +------------------------------------4--------------------------------------*/
+
+...

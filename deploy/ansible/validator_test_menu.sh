@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=/opt/terraform/bin:/opt/ansible/bin:${PATH}
+
 cmd_dir="$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")"
 
 
@@ -29,6 +31,7 @@ fi
 # entry associated with the specific setting.
 #
 export           ANSIBLE_HOST_KEY_CHECKING=False
+export           ANSIBLE_COLLECTIONS_PATHS=/opt/ansible/collections${ANSIBLE_COLLECTIONS_PATHS:+${ANSIBLE_COLLECTIONS_PATHS}}
 
 # We really should be determining the user dynamically, or requiring
 # that it be specified in the inventory settings (currently true)

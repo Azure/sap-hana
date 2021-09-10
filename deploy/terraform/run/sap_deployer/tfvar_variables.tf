@@ -84,15 +84,15 @@ This block describes the variables for the deployes section block in the json fi
 
 */
 
-variable "vm_size" {
-  default = "Standard_D4ds_v4"
+variable "deployer_size" {
+  default = ""
 }
 
-variable "vm_disk_type" {
+variable "deployer_disk_type" {
   default = "Premium_LRS"
 }
 
-variable "use_DHCP" {
+variable "deployer_use_DHCP" {
   default = false
 }
 
@@ -100,7 +100,7 @@ variable "use_DHCP" {
 This block describes the variables for the deployer OS section block in the json file
 */
 
-variable "vm_image" {
+variable "deployer_image" {
   default = {
     "source_image_id" = ""
     "publisher"       = "Canonical"
@@ -110,7 +110,7 @@ variable "vm_image" {
   }
 }
 
-variable "private_ip_address" {
+variable "deployer_private_ip_address" {
   default = ""
 }
 
@@ -118,23 +118,23 @@ variable "private_ip_address" {
 This block describes the variables for the authentication section block in the json file
 */
 
-variable "vm_authentication_type" {
+variable "deployer_authentication_type" {
   default = "key"
 }
 
-variable "vm_authentication_username" {
+variable "deployer_authentication_username" {
   default = "azureadm"
 }
 
-variable "vm_authentication_password" {
+variable "deployer_authentication_password" {
   default = ""
 }
 
-variable "vm_authentication_path_to_public_key" {
+variable "deployer_authentication_path_to_public_key" {
   default = ""
 }
 
-variable "vm_authentication_path_to_private_key" {
+variable "deployer_authentication_path_to_private_key" {
   default = ""
 }
 
@@ -172,7 +172,7 @@ variable "deployer_password_secret_name" {
 This block describes the variables for the options section block in the json file
 */
 
-variable "enable_deployer_public_ip" {
+variable "deployer_enable_public_ip" {
   default = false
 }
 

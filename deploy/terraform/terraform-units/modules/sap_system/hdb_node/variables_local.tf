@@ -81,8 +81,13 @@ variable "cloudinit_growpart_config" {
 variable "license_type" {
   description = "Specifies the license type for the OS"
   default     = ""
-
 }
+
+variable "use_loadbalancers_for_standalone_deployments" {
+  description = "Defines if load balancers are used even for standalone deployments"
+  default     = true
+}
+
 
 locals {
   // Resources naming
@@ -179,8 +184,11 @@ locals {
     "password" = var.sid_password
   }
 
-  node_count      = try(length(local.hdb.dbnodes), 1)
+  node_count      = local.enable_deployment ? try(length(local.hdb.dbnodes), 1) : 0
   db_server_count = local.hdb_ha ? local.node_count * 2 : local.node_count
+
+  enable_db_lb_deployment = local.db_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.db_server_count >  1)
+
 
   hdb_ins = try(local.hdb.instance, {})
   hdb_sid = try(local.hdb_ins.sid, local.sid) // HANA database sid from the Databases array for use as reference to LB/AS
@@ -280,12 +288,12 @@ locals {
     ]
   }
 
-  loadbalancer_ports = flatten([
+  loadbalancer_ports = local.enable_deployment ? flatten([
     for port in local.lb_ports[split(".", local.hdb_version)[0]] : {
       sid  = var.sap_sid
-      port = tonumber(port) + (tonumber(local.hana_database.instance.instance_number) * 100)
+      port = tonumber(port) + (tonumber(try(local.hana_database.instance.instance_number, 0)) * 100)
     }
-  ])
+  ]) : null
 
 
   // List of data disks to be created for HANA DB nodes

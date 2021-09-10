@@ -52,7 +52,7 @@
 
 - name:         Create sudoers file for {{ sudoers_user }} with
                 role {{ sudoers_role }} if required
-  template:
+  ansible.builtin.template:
     src:        "sudoers_{{ sudoers_role }}.j2"
     dest:       "{{ sudoers_path }}/{{ sudoers_user }}"
     mode:       "0440"

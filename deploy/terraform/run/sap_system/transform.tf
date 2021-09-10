@@ -69,6 +69,7 @@ locals {
   avset_arm_ids             = distinct(concat(var.database_vm_avset_arm_ids, try(var.databases[0].avset_arm_ids, [])))
   db_avset_arm_ids_defined  = length(local.avset_arm_ids) > 0
   frontend_ip               = try(coalesce(var.database_loadbalancer_ip, try(var.databases[0].loadbalancer.frontend_ip, "")), "")
+  db_tags = try(coalesce(var.database_tags, try(var.databases[0].tags, {})), {})
 
   databases_temp = {
     high_availability = var.database_high_availability || try(var.databases[0].high_availability, false)
@@ -77,7 +78,7 @@ locals {
     platform = try(coalesce(var.database_platform, try(var.databases[0].platform, "HANA")), "")
     size     = try(coalesce(var.database_size, try(var.databases[0].size, "")), "")
 
-    use_ANF   = var.HANA_use_ANF || try(var.databases[0].use_ANF, false)
+    use_ANF   = var.database_HANA_use_ANF_scaleout_scenario || try(var.databases[0].use_ANF, false)
     dual_nics = var.database_dual_nics || try(var.databases[0].dual_nics, false)
     no_ppg    = var.database_no_ppg || try(var.databases[0].no_ppg, false)
     no_avset  = var.database_no_avset || try(var.databases[0].no_avset, false)
@@ -95,6 +96,13 @@ locals {
     version         = try(coalesce(var.database_vm_image.version, try(var.databases[0].os.version, "")), "")
   }
   db_os_specified = (length(local.db_os.source_image_id) + length(local.db_os.publisher)) > 0
+
+  db_sid_specified = (length(var.database_sid) + length (try(var.databases[0].sid, ""))) > 0
+
+  instance = {
+    sid     = try(coalesce(var.database_sid,try(var.databases[0].sid, "")), upper(var.databases[0].platform) == "HANA" ? "hdb" : lower(substr(var.databases[0].platform,0,3)))
+    instance_number = upper(local.databases_temp.platform) == "HANA" ? coalesce(var.database_instance_number,try(var.databases[0].instance_number, "01")) : ""
+  }
 
   app_authentication = {
     type     = try(coalesce(var.app_tier_authentication_type, try(var.application.authentication.type, "")), "")
@@ -312,7 +320,9 @@ locals {
     local.db_avset_arm_ids_defined ? { avset_arm_ids = local.avset_arm_ids } : null), (
     length(local.dbnodes) > 0 ? { dbnodes = local.dbnodes } : null), (
     length(local.db_zones_temp) > 0 ? { zones = local.db_zones_temp } : null), (
-    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} })
+    length(local.frontend_ip) > 0 ? { loadbalancer = { frontend_ip = local.frontend_ip } } : { loadbalancer = {} }), (
+    length(local.db_tags) > 0 ? { tags = local.db_tags } : null), (
+    local.db_sid_specified ? {instance = local.instance}: null)
     )
   ]
 

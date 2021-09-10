@@ -19,12 +19,10 @@
    1. [Capabilities](Software_Documentation/product_documentation-capabilities.md)
    2. [Deployer](Software_Documentation/product_documentation-deployer.md)
    3. [SAP Library](Software_Documentation/product_documentation-sap_library.md)
-   4. [Workload Zone](Software_Documentation/product_documentation-sap-workload_vnet.md)
-   5. [System (SDU)](Software_Documentation/product_documentation-sap_deployment_unit.md)
+   4. [SAP Workload VNET](Software_Documentation/product_documentation-sap-workload_vnet.md)
+   5. [SAP Deployment Unit (SDU)](Software_Documentation/product_documentation-sap_deployment_unit.md)
    6. [Features](Software_Documentation/product_documentation-features.md)
       1. [Detail 1]()
-   7. [Process Documentation](Process_Documentation/readme.md)
-      1. [Samples](Process_Documentation/sample_deployments.md)
 1. [Configuration](Software_Documentation/configuration.md)
    1. [Deployer](Software_Documentation/configuration-deployer.md)
    2. [SAP Library](Software_Documentation/configuration-sap_library.md)
@@ -40,7 +38,6 @@
 1. Appendix
    1. Standards
       1. [Naming Standards](Software_Documentation/standards-naming.md)
-      2. [Disk Sizing](Process_Documentation/Using_custom_disk_sizing.md)
    2. [FAQ](Software_Documentation/appendix-faq.md)
    3. [Troubleshooting Guides](Software_Documentation/appendix-troubleshooting_guides.md)
       1. [Doc 00001](Software_Documentation/appendix-troubleshooting_guides-doc_00001.md)

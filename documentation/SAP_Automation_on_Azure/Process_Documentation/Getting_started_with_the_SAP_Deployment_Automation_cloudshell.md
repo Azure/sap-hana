@@ -62,7 +62,7 @@ For the purpose of this document we will talk about two ways of authenticating t
 
     ```bash
     cd ~/Azure_SAP_Automated_Deployment
-    cp -R sap-hana/deploy/samples/WORKSPACES WORKSPACES
+    cp -R sap-hana/documentation/SAP_Automation_on_Azure/Process_Documentation/WORKSPACES WORKSPACES
 
     cd ~/Azure_SAP_Automated_Deployment/WORKSPACES
     ```

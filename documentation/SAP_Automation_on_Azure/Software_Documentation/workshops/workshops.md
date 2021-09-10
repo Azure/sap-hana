@@ -26,10 +26,6 @@
 
   1.  [Accelerated](accelerated/overview.md) This workshop uses several scripts to accelerate the process.
 
-2.  [Post Deployment Configuration and SAP Install](manual-post-deployment-configuration/overview.md)
-      This workshop goes through the manual, step-by-step, process.
-      <br/><br/>
-
 ### 3. Software Download Process
   This workshop will work through the steps of downloading the SAP Software.
   <br /><br />

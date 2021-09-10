@@ -87,3 +87,11 @@ output "infrastructure" {
 #   value = module.sap_namegenerator.naming
 # }
 
+output "sapmnt_path" {
+  value = module.common_infrastructure.sapmnt_path
+}
+
+# output "shared_path" {
+#   value = module.common_infrastructure.shared_path
+# }
+

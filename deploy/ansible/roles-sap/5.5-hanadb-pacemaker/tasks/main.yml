@@ -1,0 +1,8 @@
+---
+- import_tasks: 5.5.1-set_runtime_facts.yml
+- import_tasks: 5.5.2-pre_checks.yml
+
+- import_tasks: 5.5.3-provision.yml
+  when: cluster_existence_check_result.rc != 0
+
+- import_tasks: 5.5.4-post_provision_report.yml

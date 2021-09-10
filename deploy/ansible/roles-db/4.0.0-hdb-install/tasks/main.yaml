@@ -46,16 +46,15 @@
   # Template parameter mapping
   vars:
     pwd_os_root:                      "***"                                       # Not used at this time
-    pwd_os_sapadm:                    "{{ password_master }}"
-    pwd_master:                       "{{ password_master }}"
-    pwd_os_sidadm:                    "{{ password_master }}"
-    pwd_hdb_system:                   "{{ password_master }}"
+    pwd_os_sapadm:                    "{{ hana_password_master }}"
+    pwd_master:                       "{{ hana_password_master }}"
+    pwd_os_sidadm:                    "{{ hana_password_master }}"
+    pwd_hdb_system:                   "{{ hana_password_master }}"
     pwd_lss_user:                     "***"                                       # Not used at this time
     pwd_lss_backup:                   "***"                                       # Not used at this time
     pwd_streaming_cluster_manager:    "***"                                       # Not used at this time
     pwd_ase_user:                     "***"                                       # Not used at this time
     pwd_org_manager:                  "***"                                       # Not used at this time
-
 
 
 
@@ -81,11 +80,23 @@
 
 
 #   SAP HANA: Install
+- name:     "Create run flag directory"
+  ansible.builtin.file:
+    path:   /etc/sap_deployment_automation
+    state:  directory
+    mode:   0755
+
+- name:               "SAP DB Install reset"
+  ansible.builtin.file: 
+    path: /etc/sap_deployment_automation/sap_deployment_hdb.txt
+    state: absent
+  when: reinstall == true 
 
 #ToDo make the code more robust
 - name:               "Execute hdblcm"
   # ansible.builtin.shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   ansible.builtin.shell: |
+                      set -o errexit
                       pwd=$(<{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml)
                       echo $pwd | \
                         ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml

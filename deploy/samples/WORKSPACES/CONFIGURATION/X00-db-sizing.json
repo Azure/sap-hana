@@ -1,6 +1,6 @@
 {
   "app": {
-    "New": {
+    "Production": {
       "compute": {
         "vm_size": "Standard_D2s_v3",
         "accelerated_networking": false
@@ -26,7 +26,7 @@
     }
   },
   "scs": {
-    "New": {
+    "Production": {
       "compute": {
         "vm_size": "Standard_D4s_v3",
         "accelerated_networking": false
@@ -52,7 +52,7 @@
     }
   },
   "web": {
-    "New": {
+    "Production": {
       "compute": {
         "vm_size": "Standard_D4s_v3",
         "accelerated_networking": false

@@ -1,0 +1,93 @@
+---
+
+- name: HSR - Ensure HANA 1.0 is configured for System Replication
+  become_user: "{{ hdb_sid_admin_user }}"
+  block:
+
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/sap-hana-high-availability#configure-sap-hana-10-system-replication
+    - name: HSR - Ensure replication user exists
+      ansible.builtin.shell: |
+        source ~/.bashrc
+        {{ hdbsql_systemdb_command }} 'CREATE USER {{ hana_1_hsr_user }} PASSWORD "{{ hana_1_hsr_password }}"'
+        {{ hdbsql_systemdb_command }} 'GRANT DATA ADMIN TO {{ hana_1_hsr_user }}'
+        {{ hdbsql_systemdb_command }} 'ALTER USER {{ hana_1_hsr_user }} DISABLE PASSWORD LIFETIME'
+
+    - name: HSR - Ensure keystore entry exists
+      ansible.builtin.shell: |
+        source ~/.bashrc
+        hdbuserstore SET hdbhaloc localhost:3{{ hdb_instance_number }}15 {{ hana_1_hsr_user }} {{ hana_1_hsr_password }}
+  when:
+    - ansible_hostname == primary_instance_name
+    - hdb_version[0:2] == "1."  # https://www.blue.works/en/hana-version-numbering-explained/
+    - not hana_system_replication_enabled
+
+- name: HSR - Perform pre-flight backup checks
+  become_user: "{{ hdb_sid_admin_user }}"
+  block:
+
+    - name: HSR - Check backup file exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
+      ansible.builtin.stat:
+        path: "{{ hdb_sid_backup_dir }}/INITIAL_SYSTEMDB_BACKUP_databackup_0_1"
+      register: systemdb_backup_file
+      failed_when: not systemdb_backup_file.stat.exists
+      changed_when: false
+
+    - name: HSR - Check backup file exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
+      ansible.builtin.stat:
+        path: "{{ hdb_sid_backup_dir }}/INITIAL_{{ hana_tenant_database_name }}_BACKUP_databackup_0_1"
+      register: tenant_backup_file
+      failed_when: not tenant_backup_file.stat.exists
+      changed_when: false
+      when: hana_has_tenant_db
+  when: ansible_hostname == primary_instance_name
+
+- name: HSR - Ensure HANA is configured for System Replication
+  become_user: "{{ hdb_sid_admin_user }}"
+  block:
+
+    - name: HSR - Ensure Primary node is configured for System Replication
+      ansible.builtin.shell: >
+        source ~/.bashrc ;
+        {{ hdbnsutil_command }} -sr_enable --name=SITEA
+      register: hana_status
+      # rc == 102 means nameserver is already active
+      failed_when: hana_status.rc != 0 and hana_status.rc != 102
+      tags:
+        - skip_ansible_lint
+
+    - name: HSR - Check replication state on primary
+      ansible.builtin.shell: >
+        source ~/.bashrc ;
+        {{ hdbnsutil_command }} -sr_state | grep 'mode: primary'
+      changed_when: false
+
+    - import_tasks: 4.0.1.5.0-set_global_ini_values.yml
+    - import_tasks: stop_hana.yml
+    - import_tasks: start_hana.yml
+  when: ansible_hostname == primary_instance_name #and not hana_system_replication_enabled
+
+- name: HSR - Ensure System Replication is configured command 
+  ansible.builtin.debug:
+    msg: "source ~/.bashrc ;{{ hdbnsutil_command }} -sr_register --remoteHost={{ primary_instance_name }} --remoteInstance={{ hdb_instance_number }} --replicationMode={{ hana_replication_mode }} --operationMode={{ hana_operation_mode }} --name=SITEB"
+    verbosity: 4
+
+
+- name: HSR - Ensure System Replication is configured
+  become_user: "{{ hdb_sid_admin_user }}"
+  block:
+
+    - import_tasks: stop_hana.yml
+
+    # TODO: make replicationMode and operationMode configurable
+    - name: HSR - Ensure Secondary node is registered as secondary in replication
+      ansible.builtin.shell: >
+        source ~/.bashrc ;
+        {{ hdbnsutil_command }} -sr_register --remoteHost={{ primary_instance_name }}
+        --remoteInstance={{ hdb_instance_number }} --replicationMode={{ hana_replication_mode }}
+        --operationMode={{ hana_operation_mode }} --name=SITEB
+      tags:
+        - skip_ansible_lint
+
+    - import_tasks: start_hana.yml
+  when: ansible_hostname == secondary_instance_name and not hana_system_replication_enabled
+

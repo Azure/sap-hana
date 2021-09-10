@@ -27,7 +27,7 @@ resource "azurerm_network_interface" "deployer" {
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = local.sub_mgmt_deployed.id
+    subnet_id                     = (local.enable_deployers && !local.sub_mgmt_exists) ? azurerm_subnet.subnet_mgmt[0].id : data.azurerm_subnet.subnet_mgmt[0].id
     private_ip_address            = local.deployers[count.index].use_DHCP ? "" : local.deployers[count.index].private_ip_address
     private_ip_address_allocation = local.deployers[count.index].use_DHCP ? "Dynamic" : "Static"
     public_ip_address_id          = local.enable_deployer_public_ip ? azurerm_public_ip.deployer[count.index].id : ""
@@ -43,7 +43,7 @@ resource "azurerm_user_assigned_identity" "deployer" {
 
 # // Add role to be able to deploy resources
 resource "azurerm_role_assignment" "sub_contributor" {
-  count                = var.assign_subscription_permissions && try(data.azurerm_client_config.deployer.object_id, "") != "" ? 1 : 0
+  count                = var.assign_subscription_permissions ? 1 : 0
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Contributor"
   principal_id         = azurerm_user_assigned_identity.deployer.principal_id
@@ -107,5 +107,5 @@ resource "azurerm_linux_virtual_machine" "deployer" {
     timeout     = var.ssh-timeout
   }
 
-   tags = local.tags
+  tags = local.tags
 }

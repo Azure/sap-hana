@@ -1,0 +1,43 @@
+---
+
+- name: HSR - Ensure backup directory exists for HANA database with System Identifier {{ hdb_sid }}
+  file:
+    path: "{{ hdb_sid_backup_dir }}"
+    state: directory
+    owner: "{{ hdb_sid_admin_user }}"
+
+- name: HSR - Ensure backup is taken on primary node
+  # If HSR is already enabled, we don't need to do this
+  become_user: "{{ hdb_sid_admin_user }}"
+  block:
+    - name: HSR - Check whether backup exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
+      ansible.builtin.shell: >
+        . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_exists_cmd_for_systemdb }}"
+      register: backup_exists_cmd_for_systemdb_result
+      changed_when: false
+
+    - name: HSR - Ensure backup exists for SYSTEMDB database for System Identifier {{ hdb_sid }}
+      ansible.builtin.shell: >
+        . ~/.bashrc && {{ hdbsql_systemdb_command }} "{{ backup_cmd_for_systemdb }}"
+      vars:
+        # Note. Conditional bare variables deprecation notice is supressed here by ansible.cfg
+        backup_required: "('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_systemdb_result.stdout) "
+      when: backup_required
+
+    - name: HSR - Check if there is a tenant db needing backup
+      block:
+
+        - name: HSR - Check whether backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
+          ansible.builtin.shell: >
+            . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_exists_cmd_for_tenant }}"
+          register: backup_exists_cmd_for_tenant_result
+          changed_when: false
+
+        - name: HSR - Ensure backup exists for tenant {{ hana_tenant_database_name }} database for System Identifier {{ hdb_sid }}
+          ansible.builtin.shell: >
+            . ~/.bashrc && {{ hdbsql_tenant_command }} "{{ backup_cmd_for_tenant }}"
+          vars:
+            backup_required: "('{{ backup_cmd_no_rows_found }}' in backup_exists_cmd_for_tenant_result.stdout)"
+          when: backup_required
+      when: hana_has_tenant_db
+  when: ansible_hostname == primary_instance_name and not hana_system_replication_enabled

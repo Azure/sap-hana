@@ -15,7 +15,7 @@
 
 #   OS: hosts file, Entries - /etc/hosts
 - name:           "OS: Common, Entries - /etc/hosts"
-  blockinfile:
+  ansible.builtin.blockinfile:
     path:         /etc/hosts
     mode:         0644
     create:       yes
@@ -26,7 +26,7 @@
 
 
 - name:           "OS: SID, Entries - /etc/hosts"
-  blockinfile:
+  ansible.builtin.blockinfile:
     path:         /etc/hosts
     mode:         0644
     create:       yes

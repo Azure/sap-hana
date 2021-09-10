@@ -331,6 +331,7 @@ if [ 1 == $return_value ] ; then
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
+
     if [ -f plan_output.log ]; then
         cat plan_output.log
         rm plan_output.log

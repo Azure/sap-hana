@@ -70,7 +70,7 @@
 
 # # If Microsoft supplied BOM not found
 # - name:             Retrieve BOM ({{ bom_base_name }}) from Storage Account
-#   block:
+#   ansible.builtin.block:
 #     - name:             Download BOM ({{ bom_base_name }}) from Storage Account
 #       ansible.builtin.get_url:
 #         url:            "{{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/boms/{{ bom_base_name }}/{{ bom_base_name }}.yaml{{ sapbits_sas_token }}"

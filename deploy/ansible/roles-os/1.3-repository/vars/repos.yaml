@@ -12,26 +12,19 @@
 # For example, XX.Y where XX is the major version and Y is the minor version
 repos:
     redhat7.9:
-
     redhat8.2:
 # we do not have any repos that are needed for RedHat at the moment.
     suse15.1:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15_SP1/home:ngncc.repo',           state: 'present'}
-    
     suse15.0:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_15/home:ngncc.repo',               state: 'present'}
-    
     suse12.5:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP5/home:ngncc.repo',           state: 'present'}
-    
     suse12.4:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP4/home:ngncc.repo',           state: 'present'}
-    
     suse12.3:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP3/home:ngncc.repo',           state: 'present'}
-    
     suse12.2:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP2/home:ngncc.repo',           state: 'present'}
-    
     suse12.1:
       - { tier: 'ha', repo: 'https://download.opensuse.org/repositories/home:ngncc/SLE_12_SP1/home:ngncc.repo',           state: 'present'}

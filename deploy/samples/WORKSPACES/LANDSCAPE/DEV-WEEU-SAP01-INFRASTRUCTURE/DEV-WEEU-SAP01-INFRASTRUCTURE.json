@@ -20,8 +20,13 @@
                 },
                 "subnet_web": {
                   "prefix"              : "10.110.128.0/19"
+                },
+                "subnet_anf" : {
+                  "prefix"              : "10.110.64.0/27"
                 }
+
             }
         }
-    }
+    },
+    "use_ANF"                           : false
 }

@@ -1,0 +1,244 @@
+
+- name: Set the NFS Server name
+  ansible.builtin.set_fact:
+    nfs_server: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
+
+- name: Set the NFS Service name
+  ansible.builtin.set_fact:
+    nfs_service: "{% if distro_id == 'redhat8' %}nfs-server{% else %}nfsserver{% endif %}"
+
+- name: "Mount: Ensure the NFS service is stopped" 
+  ansible.builtin.systemd:
+    name: "{{ nfs_service }}"
+    state: stopped
+  when: 
+    - node_tier == 'scs'
+
+
+- name: "Mount: Disable ID mapping (ANF)"
+  ansible.builtin.lineinfile:
+    path:   /etc/idmapd.conf
+    regexp: '^[ #]*Domain = '
+    line:   'Domain = defaultv4iddomain.com'
+    insertafter: '[General]'
+  register: autofs_mapping_changed
+  when:     tier == 'sapos' 
+
+- name:     "Mount: Ensure the services are restarted"
+  block:
+    - name: "Mount: Ensure the NFS ID Map service is restarted" 
+      ansible.builtin.systemd:
+        name: "nfs-idmapd"
+        state: restarted
+    - name: "Mount: Ensure the NFS service is restarted" 
+      ansible.builtin.systemd:
+        name: "{{ nfs_service }}"
+        state: restarted
+    - name: "Mount: Ensure the rpcbind service is restarted" 
+      ansible.builtin.systemd:
+        name: rpcbind
+        state: restarted
+  when: autofs_mapping_changed is changed 
+
+- name: "Mount: Create /saptmp (ANF)"
+  ansible.builtin.file:
+    path:        "/saptmp"
+    state:       directory
+    group:       sapsys
+
+  # Mount Filesystem on ANF
+  # This is needed so that we can create the correct directory
+- name:     "Mount: Filesystems on ANF"
+  block:
+    - name:     "Mount: Filesystems on ANF"
+      ansible.builtin.mount:
+        src:    "{{ sap_mnt }}"
+        path:   "/saptmp"
+        fstype: "nfs4"
+        opts:   "rw,hard,rsize=65536,wsize=65536,sec=sys,vers=4.1,tcp"
+        state:  mounted
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs'
+  # rescue:
+  #   - name: "Mount: Clear the cache of the nfsidmap daemon (ANF)"
+  #     ansible.builtin.shell: |
+  #                     nfsidmap -c
+  #   - name: "Mount: Ensure the rpcbind service is restarted" 
+  #     ansible.builtin.systemd:
+  #       name: rpcbind
+  #       state: restarted
+
+- name: "Mount: Create SAP Directories (ANF)"
+  ansible.builtin.file:
+    path:        "{{ item.path }}"
+    state:       directory
+    group:       sapsys
+    mode:        0755
+  loop:
+    - { path: '/saptmp/sapmnt{{ sap_sid|upper }}'                              }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}'  }
+    - { path: '/saptmp/usrsap{{ sap_sid|upper }}sys'                           }
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs'
+
+- name:     "Mount: Unmount filesystems (ANF)"
+  ansible.builtin.mount:
+    src:    "{{ sap_mnt }}"
+    path:   "/saptmp"
+    state:  unmounted
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs'
+
+- name: "Mount: Delete locally created SAP Directories (ANF)"
+  ansible.builtin.file:
+    path:       "{{ item.path }}"
+    state:      absent
+    mode:       0755
+  loop:
+    - { tier == 'sapos', path: '/saptmp/sapmnt{{ sap_sid|upper }}'                              }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}' }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}'  }
+    - { tier == 'sapos', path: '/saptmp/usrsap{{ sap_sid|upper }}sys'                           }
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs'
+
+- name:     "Mount: Cleanup fstab and directory (ANF)"
+  ansible.builtin.mount:
+    src:    "{{ sap_mnt }}"
+    path:   "/saptmp"
+    fstype: "nfs4"
+    opts:   "rw,hard,rsize=65536,wsize=65536,sec=sys,vers=4.1,tcp"
+    state:  absent
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs'
+
+# Configure shared directories
+- name: "Mount: Create SAP Directories (ANF)"
+  ansible.builtin.file:
+    path:        "{{ item.path }}"
+    state:       directory
+    owner:       "{{ sidadm_uid }}"
+    group:       sapsys
+  loop:
+    - { path: '/sapmnt/{{ sap_sid|upper }}'      }
+    - { path: '/usr/sap/{{ sap_sid|upper }}/SYS' }
+    - { path: '/usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }}' }
+    - { path: '/usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }}' }
+  when:     tier == 'sapos'
+  register: isCreatedNow
+
+#- name: "debug"
+#  ansible.builtin.debug: 
+#    var: isCreatedNow
+
+- name: "Mount: Change attribute only when we create SAP Directories (ANF)"
+  ansible.builtin.file:
+    path:        "{{ item.item.path }}"
+    state:       directory
+    attr:        i+ 
+  loop: "{{ isCreatedNow.results }}"
+  when:     
+    - tier == 'sapos'
+    - item.item is changed
+  register: set_immutable_attribute
+#  failed_when: false
+  
+#- name: "debug"
+#  ansible.builtin.debug: 
+#    var: set_immutable_attribute
+#
+#- ansible.builtin.fail:
+#    msg: here
+
+
+# Configure Autofs
+- name:                 "Mount: Create auto.master"
+  ansible.builtin.lineinfile:
+    state:              present
+    dest:               /etc/auto.master
+    line:               '/- /etc/auto.direct'
+  when:     tier == 'sapos'
+
+- name:                 "Mount: Create auto.direct"
+  ansible.builtin.file:
+    state:              touch
+    path:               /etc/auto.direct
+    mode:              '0644'
+  when:     tier == 'sapos'
+
+- name:                 "Mount: Update auto.direct (scs)"
+  ansible.builtin.blockinfile:
+    path: /etc/auto.direct
+    block: |
+              /sapmnt/{{ sap_sid|upper }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/sapmnt{{ sap_sid|upper }}
+              /usr/sap/{{ sap_sid|upper }}/SYS -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}sys
+              /usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ascs{{ scs_instance_number }}
+              /usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}ers{{ ers_instance_number }}
+  register: autofs_configuration_changed_scs
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'scs' or node_tier == 'ers'
+  
+- name:                 "Mount: Update auto.direct (app)"
+  ansible.builtin.blockinfile:
+    path: /etc/auto.direct
+    block: |
+              /usr/sap/install -nfsvers=4.1,nobind,sec=sys {{ nfs_server }}:/usr/sap/install
+              /sapmnt/{{ sap_sid|upper }} -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/sapmnt{{ sap_sid|upper }}
+              /usr/sap/{{ sap_sid|upper }}/SYS -nfsvers=4.1,nobind,sec=sys {{ sap_mnt }}/usrsap{{ sap_sid|upper }}sys
+  register: autofs_configuration_changed
+  when:     
+    - tier == 'sapos' 
+    - node_tier == 'pas' or node_tier =='app'
+    
+- name:                 "Mount: Update auto.direct (db)"
+  ansible.builtin.blockinfile:
+    path: /etc/auto.direct
+    block: |
+              /usr/sap/install -nfsvers=4.1,nobind,sec=sys {{ nfs_server }}:/usr/sap/install
+  register: autofs_configuration_changed
+  when:     
+    - tier == 'sapos' 
+    - node_tier =='hana'
+
+- name: "Mount: Ensure the Autofs service is restarted" 
+  ansible.builtin.systemd:
+    name: autofs
+    state: restarted
+
+- name: "Mount: Ensure the NFS service is restarted" 
+  ansible.builtin.systemd:
+    name: "{{ nfs_service }}"
+    state: restarted
+  when: 
+    - node_tier == 'scs'
+
+# - name: "Mount: Clear the cache of the nfsidmap daemon (ANF)"
+#   ansible.builtin.shell: |
+#                   nfsidmap -r root
+# - name: "Mount: Ensure the rpcbind service is restarted" 
+#   ansible.builtin.systemd:
+#     name: rpcbind
+#     state: restarted
+
+# Configure shared direcotries
+# - name:     "Create the shared directories for SAP installation (ANF)"
+#   ansible.builtin.file:
+#     path:        "{{item.path}}"
+#     state:       directory
+#     #group:       sapsys
+#     #owner:       "{{ sap_sid|lower }}adm"
+#     attributes:  +i
+#   when: tier == 'sapos'
+#   loop:
+#     - { tier: 'sapos', path: '/sapmnt/{{ sap_sid|upper }}'     }
+#     - { tier: 'sapos', path: '/sapmnt/{{ sap_sid|upper }}sys' }
+#   #TODO: Add to loop in near future
+#     #sudo mkdir -p /usr/sap/QAS/ASCS00
+#     #sudo mkdir -p /usr/sap/QAS/ERS01

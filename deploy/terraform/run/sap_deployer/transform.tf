@@ -33,27 +33,27 @@ locals {
   }
   deployers = [
     {
-      size      = try(coalesce(var.vm_size, try(var.deployers[0].size, "")), "")
-      disk_type = try(coalesce(var.vm_disk_type, try(var.deployers[0].disk_type, "")), "")
-      use_DHCP  = var.use_DHCP || try(var.deployers[0].use_DHCP, false)
+      size      = try(coalesce(var.deployer_size, try(var.deployers[0].size, "")), "Standard_D4ds_v4")
+      disk_type = try(coalesce(var.deployer_disk_type, try(var.deployers[0].disk_type, "")), "")
+      use_DHCP  = var.deployer_use_DHCP || try(var.deployers[0].use_DHCP, false)
       authentication = {
-        type = try(coalesce(var.vm_authentication_type, try(var.deployers[0].authentication.type, "")), "")
+        type = try(coalesce(var.deployer_authentication_type, try(var.deployers[0].authentication.type, "")), "")
       }
       os = {
-        source_image_id = try(coalesce(var.vm_image.source_image_id, try(var.deployers[0].os.source_image_id, "")), "")
-        publisher       = try(coalesce(var.vm_image.publisher, try(var.deployers[0].os.publisher, "")), "")
-        offer           = try(coalesce(var.vm_image.offer, try(var.deployers[0].os.offer, "")), "")
-        sku             = try(coalesce(var.vm_image.sku, try(var.deployers[0].os.sku, "")), "")
-        version         = try(coalesce(var.vm_image.version, try(var.deployers[0].sku, "")), "")
+        source_image_id = try(coalesce(var.deployer_image.source_image_id, try(var.deployers[0].os.source_image_id, "")), "")
+        publisher       = try(coalesce(var.deployer_image.publisher, try(var.deployers[0].os.publisher, "")), "")
+        offer           = try(coalesce(var.deployer_image.offer, try(var.deployers[0].os.offer, "")), "")
+        sku             = try(coalesce(var.deployer_image.sku, try(var.deployers[0].os.sku, "")), "")
+        version         = try(coalesce(var.deployer_image.version, try(var.deployers[0].sku, "")), "")
       }
-      private_ip_address = try(coalesce(var.private_ip_address, var.deployers[0].private_ip_address), "")
+      private_ip_address = try(coalesce(var.deployer_private_ip_address, var.deployers[0].private_ip_address), "")
     }
   ]
   authentication = {
-    username            = try(coalesce(var.vm_authentication_username, try(var.authentication.username, "")), "")
-    password            = try(coalesce(var.vm_authentication_password, try(var.authentication.password, "")), "")
-    path_to_public_key  = try(coalesce(var.vm_authentication_path_to_public_key, try(var.authentication.path_to_public_key, "")), "")
-    path_to_private_key = try(coalesce(var.vm_authentication_path_to_private_key, try(var.authentication.path_to_private_key, "")), "")
+    username            = try(coalesce(var.deployer_authentication_username, try(var.authentication.username, "")), "")
+    password            = try(coalesce(var.deployer_authentication_password, try(var.authentication.password, "")), "")
+    path_to_public_key  = try(coalesce(var.deployer_authentication_path_to_public_key, try(var.authentication.path_to_public_key, "")), "")
+    path_to_private_key = try(coalesce(var.deployer_authentication_path_to_private_key, try(var.authentication.path_to_private_key, "")), "")
 
   }
   key_vault = {
@@ -67,7 +67,7 @@ locals {
   }
 
   options = {
-    enable_deployer_public_ip = var.enable_deployer_public_ip ||  try(var.options.enable_deployer_public_ip, false)
+    enable_deployer_public_ip = var.deployer_enable_public_ip ||  try(var.options.enable_deployer_public_ip, false)
   }
 
   firewall_deployment          = try(var.firewall_deployment, false)

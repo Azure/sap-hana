@@ -30,6 +30,33 @@ variable "deployer_tfstate_key" {
 
 }
 
+variable "use_ANF" {
+  description = "Boolean flag indicating if ANF will be used"
+  default     = false
+}
+
+variable "ANF_account_arm_id" {
+  description = "The resource identifier (if any) for the NetApp account"
+  default     = ""
+}
+
+variable "ANF_account_name" {
+  description = "The NetApp account name (if any)"
+  default     = ""
+}
+
+variable "ANF_service_level" {
+  description = "The NetApp Service Level"
+  default     = "Standard"
+}
+
+variable "ANF_pool_size" {
+  description = "The NetApp Pool size"
+  default     = 4
+}
+
+
+
 locals {
 
   version_label = trimspace(file("${path.module}/../../../configs/version.txt"))
@@ -79,4 +106,12 @@ locals {
     object_id       = data.azurerm_client_config.current.object_id
   }
 
+  ANF_settings = {
+    use           = var.use_ANF
+    name          = var.ANF_account_name
+    arm_id        = var.ANF_account_arm_id
+    service_level = var.ANF_service_level
+    size_in_tb    = var.ANF_pool_size
+
+  }
 }

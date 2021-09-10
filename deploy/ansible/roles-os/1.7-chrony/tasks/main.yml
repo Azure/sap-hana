@@ -151,7 +151,7 @@
       register:      chrony_remove_existing_settings
 
     - name: Add/Update custom settings block
-      blockinfile:
+      ansible.builtin.blockinfile:
         path:        /etc/chrony.conf
         marker:      "# {mark} ANSIBLE MANAGED BLOCK"
         insertafter: "^# Please consider joining the pool .*"
@@ -171,7 +171,7 @@
     - (chrony_conf_entries | count) > 0
 
 - name: Do we need to restart chronyd?
-  debug:
+  ansible.builtin.debug:
     var: chronyd_restart_required
     verbosity: 1
 
@@ -185,7 +185,7 @@
 
 # On SLES systems the service is installed in a disabled state
 - name: Ensure chronyd service is enabled
-  service:
+  ansible.builtin.service:
     name: chronyd
     enabled: true
 
@@ -208,7 +208,7 @@
 #
 # -------------------------------------+---------------------------------------8
 - name: Ensure chronyd service is running
-  service:
+  ansible.builtin.service:
     name: chronyd
     state: started
   when:

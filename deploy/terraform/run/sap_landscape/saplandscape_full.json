@@ -48,6 +48,15 @@
                         "arm_id"                       : "" 
                     }
                 },
+                "subnet_anf": {
+                    "name"                             : "",
+                    "prefix"                           : "10.5.0.0/28",
+                    "nsg" :
+                    {
+                        "name"                         : "",
+                        "arm_id"                       : "" 
+                    }
+                },
                     
                 "subnet_iscsi": {
                     "name"                             : "global-WEEU-sap0_iscsi-subnet",

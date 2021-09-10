@@ -47,23 +47,23 @@ output "web_admin_ip" {
 }
 
 output "web_lb_ip" {
-  value = local.enable_deployment && local.webdispatcher_count > 0 ? azurerm_lb.web[0].frontend_ip_configuration[0].private_ip_address : ""
+  value = local.enable_web_lb_deployment ? try(azurerm_lb.web[0].frontend_ip_configuration[0].private_ip_address, "") : ""
 }
 
 output "scs_lb_ip" {
-  value = local.enable_deployment && local.scs_server_count > 0 ? azurerm_lb.scs[0].frontend_ip_configuration[0].private_ip_address : ""
+  value = local.enable_scs_lb_deployment ? try(azurerm_lb.scs[0].frontend_ip_configuration[0].private_ip_address, "") : ""
 }
 
 output "ers_lb_ip" {
-  value = local.enable_deployment && local.scs_server_count > 0 ? azurerm_lb.scs[0].frontend_ip_configuration[1].private_ip_address : ""
+  value = local.enable_scs_lb_deployment && local.scs_high_availability ? try(azurerm_lb.scs[0].frontend_ip_configuration[1].private_ip_address, "") : ""
 }
 
 output "cluster_lb_ip" {
-  value = local.enable_deployment && local.scs_server_count > 0 && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? azurerm_lb.scs[0].frontend_ip_configuration[2].private_ip_address : ""
+  value = local.enable_scs_lb_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? try(azurerm_lb.scs[0].frontend_ip_configuration[2].private_ip_address, "") : ""
 }
 
 output "fileshare_lb_ip" {
-  value = local.enable_deployment && local.scs_server_count > 0 && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? azurerm_lb.scs[0].frontend_ip_configuration[3].private_ip_address : ""
+  value = local.enable_scs_lb_deployment && (local.scs_high_availability && upper(local.scs_ostype) == "WINDOWS") ? try(azurerm_lb.scs[0].frontend_ip_configuration[3].private_ip_address, "") : ""
 }
 
 // Output for DNS
@@ -104,42 +104,42 @@ output "dns_info_vms" {
 }
 
 output "dns_info_loadbalancers" {
-  value = !local.enable_deployment ? null : (
+  value = !(local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.scs_high_availability )) ? null : (
     zipmap(
       compact([
-        local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",
-        local.scs_server_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, "ers") : "",
-        local.scs_server_count > 0 ? (
+        local.enable_scs_lb_deployment ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",
+        local.enable_scs_lb_deployment ? format("%s%s%s", local.prefix, var.naming.separator, "ers") : "",
+        local.enable_scs_lb_deployment ? (
           local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
             format("%s%s%s", local.prefix, var.naming.separator, "clst")) : (
             ""
           )) : (
           ""
         ),
-        local.scs_server_count > 0 ? (
+        local.enable_scs_lb_deployment ? (
           local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
             format("%s%s%s", local.prefix, var.naming.separator, "fs")) : (
             ""
           )) : (
           ""
         ),
-        local.webdispatcher_count > 0 ? format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) : ""
+        local.enable_web_lb_deployment ? format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb) : ""
       ]),
       compact([
-        local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[0] : "",
-        local.scs_server_count > 0 ? azurerm_lb.scs[0].private_ip_addresses[1] : "",
-        local.scs_server_count > 0 ? (
+        local.enable_scs_lb_deployment ? try(azurerm_lb.scs[0].private_ip_addresses[0], "") : "",
+        local.enable_scs_lb_deployment ? try(azurerm_lb.scs[0].private_ip_addresses[1], "") : "",
+        local.enable_scs_lb_deployment ? (
           local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? (
             azurerm_lb.scs[0].private_ip_addresses[2]) : (
             ""
           )) : (
           ""
         ),
-        local.scs_server_count > 0 ? (
+        local.enable_scs_lb_deployment ? (
           local.win_ha_scs && length(azurerm_lb.scs[0].private_ip_addresses) == 4 ? azurerm_lb.scs[0].private_ip_addresses[3] : "") : (
           ""
         ),
-        local.webdispatcher_count > 0 ? azurerm_lb.web[0].private_ip_address : ""
+        local.enable_web_lb_deployment ? try(azurerm_lb.web[0].private_ip_address, "") : ""
       ])
     )
   )

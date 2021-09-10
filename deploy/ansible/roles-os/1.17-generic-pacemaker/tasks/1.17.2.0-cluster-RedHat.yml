@@ -1,0 +1,123 @@
+---
+
+# RHEL Clustering 
+# Azure ref: https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
+
+# @TODO Subscribe to subscriptions/repos if required
+# This code assumes the deployment is using RHEL SAP image
+
+- name: Ensure HA Cluster password is set to something secure
+  ansible.builtin.user:
+    name: hacluster
+    password: "{{ password_ha_db_cluster | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+
+- name: Ensure the firewall service is configured to allow High Availability traffic
+  ansible.builtin.firewalld:
+    service: high-availability
+    state: enabled
+    permanent: True
+
+- name: Ensure the Pacemaker service is started and enabled
+  ansible.builtin.systemd:
+    name: pcsd
+    state: started
+    enabled: True
+
+# Basic Pacemaker cluster configuration:
+# https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
+- name: "Create the cluster on the primary node: {{ primary_instance_name }}" 
+  block:
+    - name: Ensure the cluster can authenticate nodes as hacluster
+      ansible.builtin.shell: "pcs cluster auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
+      when: ansible_distribution_major_version == "7"
+    
+    - name: Ensure the cluster can authenticate nodes as hacluster
+      ansible.builtin.shell: "pcs host auth {{ primary_instance_name }} {{ secondary_instance_name }} -u hacluster -p {{ password_ha_db_cluster }}"
+      when: ansible_distribution_major_version == "8"
+
+    # Ref https://docs.microsoft.com/en-us/azure/virtual-machines/maintenance-and-updates#maintenance-that-doesnt-require-a-reboot
+    - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
+      ansible.builtin.shell: "pcs cluster setup --name {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} --token {{ cluster_totem.token }}"
+      when: ansible_distribution_major_version == "7"
+
+    - name: Ensure the cluster is created with a token large enough to allow memory preserving maintenance
+      ansible.builtin.shell: "pcs cluster setup {{ hdb_sid | upper }}_cluster {{ primary_instance_name }} {{ secondary_instance_name }} totem token={{ cluster_totem.token }}"
+      when: ansible_distribution_major_version == "8"
+
+    - name: Ensure the cluster is starting on all nodes
+      ansible.builtin.shell: pcs cluster start --all
+
+    - name: Wait until cluster has stabilised
+      ansible.builtin.shell: pcs status | grep '^Online:'
+      register: cluster_stable_check
+      retries: 30
+      delay: 10
+      until: "'{{ primary_instance_name }} {{ secondary_instance_name }}' in cluster_stable_check.stdout or '{{ secondary_instance_name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
+      when: ansible_distribution_major_version != "8"
+
+    - name: Wait until cluster has stabilised
+      ansible.builtin.shell: pcs status | grep '* Online:'
+      register: cluster_stable_check
+      retries: 30
+      delay: 10
+      until: "'{{ primary_instance_name }} {{ secondary_instance_name }}' in cluster_stable_check.stdout or '{{ secondary_instance_name }} {{ primary_instance_name }}' in cluster_stable_check.stdout"
+      when: ansible_distribution_major_version == "8"
+
+    - name: Allow Concurrent Fencing 
+      ansible.builtin.shell: pcs property set concurrent-fencing=true
+  when: ansible_hostname == primary_instance_name 
+
+- name: Ensure the expected quorum votes is set for the cluster
+  ansible.builtin.shell: "pcs quorum expected-votes {{ cluster_quorum.expected_votes }}"
+
+- name: Configure the cluster STONITH device on the primary node
+  block:
+    - name: Ensure STONITH timeout is raised
+      ansible.builtin.shell: pcs property set stonith-timeout=900
+
+    # This command assumes the Azure VM resource name matches the hostname
+    # If this changes, the pcmk_host_map should be used
+    - name: Ensure the STONTIH device is configured
+      ansible.builtin.shell: >
+        pcs stonith create rsc_st_azure fence_azure_arm
+        login="{{ sap_hana_fencing_spn_client_id }}"
+        passwd="{{ sap_hana_fencing_spn_client_pwd }}"
+        resourceGroup="{{ resource_group_name }}"
+        tenantId="{{ sap_hana_fencing_spn_tenant_id }}"
+        subscriptionId="{{ sap_hana_fencing_spn_subscription_id }}"
+        power_timeout=240 
+        pcmk_reboot_timeout=900
+        pcmk_monitor_timeout=120
+        pcmk_monitor_retries=4 
+        pcmk_action_limit=3
+        pcmk_delay_max=15
+        op monitor interval=3600
+      when: ansible_distribution_major_version == "7"
+        
+    
+    - name: Ensure the STONTIH device is configured
+      ansible.builtin.shell: >
+        pcs stonith create rsc_st_azure fence_azure_arm
+        login="{{ sap_hana_fencing_spn_client_id }}"
+        passwd="{{ sap_hana_fencing_spn_client_pwd }}"
+        resourceGroup="{{ resource_group_name }}"
+        tenantId="{{ sap_hana_fencing_spn_tenant_id }}"
+        subscriptionId="{{ sap_hana_fencing_spn_subscription_id }}"
+        power_timeout=240
+        pcmk_reboot_timeout=900
+        pcmk_monitor_timeout=120
+        pcmk_monitor_retries=4 
+        pcmk_action_limit=3
+        pcmk_delay_max=15
+        op monitor interval=3600
+      when: ansible_distribution_major_version == "8"
+
+    - name: Ensure the STONITH action is set to reboot
+      ansible.builtin.shell: pcs property set stonith-action=reboot
+
+    - name: Ensure the STONITH device is enabled
+      ansible.builtin.shell: pcs property set stonith-enabled=true
+  when: ansible_hostname == primary_instance_name
+
+
+#End of Generic Pacemaker setup 

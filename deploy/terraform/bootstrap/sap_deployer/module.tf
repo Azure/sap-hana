@@ -16,6 +16,7 @@ module "sap_deployer" {
   assign_subscription_permissions    = local.assign_subscription_permissions
   bootstrap                          = true
   enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
+  arm_client_id                      = var.arm_client_id
 }
 
 module "sap_namegenerator" {

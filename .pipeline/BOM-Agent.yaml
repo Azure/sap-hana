@@ -9,7 +9,7 @@ trigger:
     - beta/*
   paths:
     include:
-    - deploy/ansible/BOM-catalog*
+    - deploy/ansible/BOM-catalog/*.yaml
 
 
 pool:
@@ -17,12 +17,14 @@ pool:
 
 steps:
 
+  - checkout: self
+    clean: true
 
-- task: Ansible@0
-  displayName: 'Run the BOM downloader for $(BOM)'
-  inputs:
-    ansibleInterface: 'agentMachine'
-    playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_downloader.yaml'
-    inventoriesAgentMachine: 'noInventory'
-    args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
+  - task: Ansible@0
+    displayName: 'Run the BOM downloader for $(BOM)'
+    inputs:
+      ansibleInterface: 'agentMachine'
+      playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_downloader.yaml'
+      inventoriesAgentMachine: 'noInventory'
+      args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
 

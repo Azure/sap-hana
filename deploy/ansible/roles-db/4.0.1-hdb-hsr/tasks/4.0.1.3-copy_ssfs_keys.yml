@@ -1,0 +1,67 @@
+---
+
+- name: HSR - Ensure the Primary node SSFS files are present on the primary node
+  when: ansible_hostname == primary_instance_name
+  block:
+
+    - name: HSR - Ensure the Primary node SSFS_{{ hdb_hdb_sid | upper }}.DAT file exists
+      ansible.builtin.stat:
+        path: "{{ path_ssfs_dat }}"
+      register: primary_dat_file_result
+      failed_when: primary_dat_file_result.failed
+      when: ansible_hostname == primary_instance_name
+
+    - name: HSR - Ensure the Primary node SSFS_{{ hdb_sid | upper }}.KEY file exists
+      ansible.builtin.stat:
+        path: "{{ path_ssfs_key }}"
+      register: primary_key_file_result
+      failed_when: primary_key_file_result.failed
+
+- name: HSR - Ensure the Primary node XSA SSFS_{{ hdb_sid | upper }}.DAT file exists
+  ansible.builtin.stat:
+    path: "{{ path_xsa_ssfs_dat }}"
+  register: primary_xsa_dat_file_result
+  failed_when: false
+
+- name: HSR - Ensure the Primary node XSA SSFS_{{ hdb_sid | upper }}.KEY file exists
+  ansible.builtin.stat:
+    path: "{{ path_xsa_ssfs_key }}"
+  register: primary_xsa_key_file_result
+  failed_when: false
+
+- name: HSR - Ensure XSA install fact set
+  ansible.builtin.set_fact:
+    xsa_installed: "{{ (primary_xsa_dat_file_result.stat.exists and primary_xsa_key_file_result.stat.exists) | bool }}"
+    # Note. Both files need to be present to confirm xsa has been installed.
+    # If both files are missing, we skip the xsa file copy tasks.
+    # If only one file is present, the copy tasks will fail, which is sensible.
+
+- name: HSR - Ensure key files are in place
+  # If HSR is already enabled, we don't need to do this
+  block:
+
+    - name: HSR - Ensure {{ path_ssfs_dat }} file is copied
+      import_tasks: 4.0.1.3.0-copy_single_ssfs_key.yml
+      vars:
+        ssfs_file_path: "{{ path_ssfs_dat }}"
+
+    - name: HSR - Ensure {{ path_ssfs_key }} file is copied
+      import_tasks: 4.0.1.3.0-copy_single_ssfs_key.yml
+      vars:
+        ssfs_file_path: "{{ path_ssfs_key }}"
+
+    - name: HSR - Ensure XSA key files are copied if they exist
+      when: xsa_installed
+      block:
+
+        - name: HSR - Ensure {{ path_xsa_ssfs_dat }} file is copied
+          import_tasks: 4.0.1.3.0-copy_single_ssfs_key.yml
+          vars:
+            ssfs_file_path: "{{ path_xsa_ssfs_dat }}"
+
+        - name: HSR - Ensure {{ path_xsa_ssfs_key }} file is copied
+          import_tasks: 4.0.1.3.0-copy_single_ssfs_key.yml
+          vars:
+            ssfs_file_path: "{{ path_xsa_ssfs_key }}"
+  when: not hana_system_replication_enabled
+

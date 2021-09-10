@@ -5,6 +5,28 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.set_fact:
+      tier:  hdb
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step1"
+      state: absent
+
 # -------------------------------------+---------------------------------------8
 #
 # <Comment Header> 
@@ -13,7 +35,9 @@
 
 - hosts:              "{{ sap_sid|upper }}_DB  :
                        {{ sap_sid|upper }}_SCS :
+                       {{ sap_sid|upper }}_ERS :
                        {{ sap_sid|upper }}_PAS :
+                       {{ sap_sid|upper }}_ERS :
                        {{ sap_sid|upper }}_APP :
                        {{ sap_sid|upper }}_WEB"
 
@@ -37,6 +61,7 @@
   # Specify the active tier for this playbook run
   - ansible.builtin.set_fact:
       tier:     os
+      hana_password_master:   "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 
@@ -101,6 +126,12 @@
       - 1.16-services
 
   - include_role:
+      name:     roles-os/1.16-services
+
+  - include_role:
+      name:     roles-os/1.16-services
+
+  - include_role:
       name:     roles-os/1.20-prometheus
     tags:
       - 1.20-prometheus
@@ -109,6 +140,21 @@
             and (     (     ansible_distribution_major_version == '12'
                         and ansible_distribution_release is search('[3-5]' ) )
                   or  (     ansible_distribution_major_version == '15' ) )
+
+
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step1"
+      state: touch
 
 
 ...
@@ -120,30 +166,3 @@
 # 0      1         2         3         4         5         6         7         8
 # 345678901234567890123456789012345678901234567890123456789012345678901234567890
 #
-
-
-
-
-#----------------------------------------
-# BEGIN example reference for refactoring
-#
-# TODO: evaluate for inclusion and refactor.
-#        this is how hdb_sizes was registered
-# SOURCE: sap-playbook
-#----------------------------------------
-
-# √  pre_tasks:
-# √    - name: Include SAP HANA DB sizes
-# √      include_vars:
-# √        ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
-# √        name: hdb_sizes
-
-#----------------------------------------
-# END
-#----------------------------------------
-
-
-
-# # ansible.builtin.debug: Example of listing hostvars for a specific server.
-  # - ansible.builtin.debug:
-  #     var: hostvars['x00scs00l373']

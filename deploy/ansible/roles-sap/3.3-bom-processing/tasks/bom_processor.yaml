@@ -226,7 +226,7 @@
 #------------------</DEBUGGING>------------------
 
 # - name: "Ensure media property is iterated"
-#   block:
+#   ansible.builtin.block:
 #     - name: Ensure target folders exist
 #       ansible.builtin.file:
 #         path: "{{ download_location }}"

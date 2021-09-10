@@ -49,7 +49,7 @@
 
 - name: Ensure Prometheus is installed and configured
   when: not (add_repo_status.failed is defined and add_repo_status.failed == true)
-  block:
+  ansible.builtin.block:
   - name: Install Prometheus with Node and HA Cluster exporters
     zypper:
       name: "{{ item }}"
@@ -59,7 +59,7 @@
       - prometheus-ha_cluster_exporter
 
   - name: Set arguments for Node exporter
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/sysconfig/prometheus-node_exporter
       regexp: 'ARGS=.*'
       line: 'ARGS="--collector.systemd"'

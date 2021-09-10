@@ -1,7 +1,4 @@
 {
-  "tfstate_resource_id"                    : "",
-  "deployer_tfstate_key"                   : "",
-  "landscape_tfstate_key"                  : "",
   "infrastructure": {
     "environment"                          : "NP",
     "region"                               : "westeurope",
@@ -108,6 +105,8 @@
       },
       "platform"                           : "HANA",
       "size"                               : "Default",
+      "sid"                                : "HDB",
+      "instance_number"                    : "01",
       "use_DHCP"                           : false,
       "zones"                              : ["1"]
     }
@@ -120,7 +119,7 @@
     "sid"                                  : "PRD",
     "use_DHCP"                             : false,
     "dual_nics"                            : false,
-    "vm_sizing"                            : "New",
+    "vm_sizing"                            : "Production",
     "application_server_count"             : 3,
     "app_nic_ips"                          : [],
     "app_admin_nic_ips"                    : [],
@@ -178,5 +177,11 @@
     "resource_offset"                      : 0,
     "disk_encryption_set_id"               : "",
     "nsg_asg_with_vnet"                    : false
-  }
+  },
+  "tfstate_resource_id"                    : "",
+  "deployer_tfstate_key"                   : "",
+  "landscape_tfstate_key"                  : "",
+  "anf_sapmnt_volume_size"                 : 512,
+  "anf_shared_volume_size"                 : 512
+
 }

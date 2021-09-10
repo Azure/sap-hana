@@ -50,7 +50,7 @@ output "storageaccount_name" {
   value = length(var.diagnostics_storage_account.arm_id) > 0 ? (
     data.azurerm_storage_account.storage_bootdiag[0].name) : (
     azurerm_storage_account.storage_bootdiag[0].name
-    )
+  )
 }
 
 output "storageaccount_rg_name" {
@@ -122,6 +122,14 @@ output "web_subnet_id" {
   )
 }
 
+
+output "anf_subnet_id" {
+  value = local.sub_anf_defined ? (
+    local.sub_anf_existing ? local.sub_anf_arm_id : azurerm_subnet.anf[0].id) : (
+    ""
+  )
+}
+
 output "admin_nsg_id" {
   value = local.sub_admin_defined ? (
     local.sub_admin_nsg_exists ? local.sub_admin_nsg_arm_id : azurerm_network_security_group.admin[0].id) : (
@@ -142,6 +150,7 @@ output "db_nsg_id" {
     ""
   )
 }
+
 output "web_nsg_id" {
   value = local.sub_web_defined ? (
     local.sub_web_nsg_exists ? local.sub_web_nsg_arm_id : azurerm_network_security_group.web[0].id) : (
@@ -149,3 +158,24 @@ output "web_nsg_id" {
   )
 }
 
+
+output "ANF_pool_settings" {
+  value = var.ANF_settings.use ? {
+    use_ANF = true
+    account_name = var.ANF_settings.use && length(var.ANF_settings.arm_id) > 0 ? (
+      data.azurerm_netapp_account.workload_netapp_account[0].name) : (
+      azurerm_netapp_account.workload_netapp_account[0].name
+    )
+    pool_name     =  azurerm_netapp_pool.workload_netapp_pool[0].name
+    service_level = azurerm_netapp_pool.workload_netapp_pool[0].service_level
+    size_in_tb    = azurerm_netapp_pool.workload_netapp_pool[0].size_in_tb
+    subnet_id = local.sub_anf_defined ? (
+      local.sub_anf_existing ? local.sub_anf_arm_id : azurerm_subnet.anf[0].id) : (
+      ""
+    )
+    resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
+    location = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+    } : {
+    use_ANF = false
+  }
+}

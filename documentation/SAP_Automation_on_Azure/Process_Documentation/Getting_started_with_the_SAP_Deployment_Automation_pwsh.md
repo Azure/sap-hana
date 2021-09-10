@@ -28,7 +28,7 @@ Once the pre-requisites are met, proceed with the next steps.
    ```
 
 4. Copy the content from the
-   `sap-hana\deploy\samples\WORKSPACES` to the `Azure_SAP_Automated_Deployment\WORKSPACES` folder.
+   `sap-hana\documentation\SAP_Automation_on_Azure\Process_Documentation\WORKSPACES` to the `Azure_SAP_Automated_Deployment\WORKSPACES` folder.
 
 5. Navigate to the `Azure_SAP_Automated_Deployment\WORKSPACES` folder.
 

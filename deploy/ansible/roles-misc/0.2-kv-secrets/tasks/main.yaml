@@ -107,24 +107,50 @@
   when:
     - tier == "bom"
 
-- name: "BoM Secrets: Retrieve Fencing agent SPN ID details"
-  ansible.builtin.command: >-
+- name: Construct SPN Client ID secret name
+  ansible.builtin.set_fact:
+    fencing_spn_client_id: "{{ secret_prefix }}-fencing-spn-id"
+
+- name: "SPN Secrets:  Fencing agent SPN Client ID"
+  ansible.builtin.debug:
+    var:                          sap_fencing_spn_client_id
+    verbosity:                    1
+
+- name: "SPN Secrets: Retrieve Fencing agent SPN Client ID details"
+  command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
-      --name {{ fencing_spn_id }}
+      --name {{ fencing_spn_client_id }}
   changed_when: false
-  register: keyvault_secret_show_fencing_spn_id
-  no_log: true
+  register: keyvault_secret_show_fencing_spn_client_id
+  no_log: false
   when:
     - tier == "fencing"
 
-- name: "BoM Secrets: Extract Fencing agent SPN ID"
-  ansible.builtin.set_fact:
-    fencing_spn_id: >-
-      {{ (keyvault_secret_show_fencing_spn_id.stdout | from_json).value }}
-  no_log: true
+- name: "SPN Secrets:  Fencing agent SPN Client ID"
+  ansible.builtin.debug:
+    var:                          keyvault_secret_show_fencing_spn_client_id
+    verbosity:                    1
   when:
     - tier == "fencing"
+
+
+- name: "SPN Secrets: Extract Fencing agent SPN Client ID"
+  ansible.builtin.set_fact:
+    sap_fencing_spn_client_id: >-
+      {{ (keyvault_secret_show_fencing_spn_client_id.stdout | from_json).value }}
+  no_log: false
+  when:
+    - tier == "fencing"
+
+- name: "SPN Secrets: Fencing agent SPN Client ID"
+  ansible.builtin.debug:
+    var: sap_fencing_spn_client_id
+    verbosity: 2
+
+- name: Construct SPN Client ID Password name
+  ansible.builtin.set_fact:
+    fencing_spn_pwd: "{{ secret_prefix }}-fencing-spn-pwd"
 
 - name: "BoM Secrets: Retrieve Fencing agent SPN PWD details"
   ansible.builtin.command: >-
@@ -139,27 +165,31 @@
 
 - name: "BoM Secrets: Extract Fencing agent SPN PWD"
   ansible.builtin.set_fact:
-    fencing_spn_pwd: >-
+    sap_fencing_spn_pwd: >-
       {{ (keyvault_secret_show_fencing_spn_pwd.stdout | from_json).value }}
   no_log: true
   when:
     - tier == "fencing"
 
+- name: Construct SPN Tenant ID name
+  ansible.builtin.set_fact:
+    fencing_spn_tenant_id: "{{ secret_prefix }}-fencing-spn-tenant"
+
 - name: "BoM Secrets: Retrieve Fencing agent SPN Tenant details"
   ansible.builtin.command: >-
     az keyvault secret show
       --vault-name {{ kv_uri }}
-      --name {{ fencing_spn_tenant }}
+      --name {{ fencing_spn_tenant_id }}
   changed_when: false
-  register: keyvault_secret_show_fencing_spn_tenant
+  register: keyvault_secret_show_fencing_spn_tenant_id
   no_log: true
   when:
     - tier == "fencing"
 
 - name: "BoM Secrets: Extract Fencing agent SPN Tenant"
   ansible.builtin.set_fact:
-    fencing_spn_id: >-
-      {{ (keyvault_secret_show_fencing_spn_tenant.stdout | from_json).value }}
+    sap_fencing_spn_tenant_id: >-
+      {{ (keyvault_secret_show_fencing_spn_tenant_id.stdout | from_json).value }}
   no_log: true
   when:
     - tier == "fencing"

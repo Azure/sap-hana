@@ -5,6 +5,31 @@
 # +------------------------------------4--------------------------------------*/
 ---
 
+- hosts: localhost
+  name: Get SAP Password from KeyVault
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+
+  - include_role:
+      name:     roles-misc/0.1-passwords
+      public:   yes      
+    tags:
+       - 0.1-passwords
+
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step503"
+      state: absent
+
+
+
+#      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
+
+
 - hosts:          "{{ sap_sid|upper }}_APP"
 
   name:           SAP Installation - APP
@@ -24,13 +49,42 @@
 #
 # -------------------------------------+---------------------------------------8
   - ansible.builtin.set_fact:
-      tier:     app                                                             # SAP Install phase: APP - Application Server
+      tier:                    app                                               # SAP Install phase: APP - Application Server
+      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
 
-  - include_role:
-      name:     roles-sap-os/2.6-sap-mounts
+# - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
+    tags:
+      - 2.5-sap-users
 
-  - include_role:
-      name:     roles-sap/5.3-app-install
+  - block:
+      - include_role:
+          name:     roles-sap-os/2.6-sap-mounts
+    tags:
+      - 2.6-sap-mounts
+
+  - block:
+      - include_role:
+          name:     roles-sap/5.3-app-install
+    tags:
+      - 5.3-app-install
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step503"
+      state: touch
+
+
 
 ...
 # /*---------------------------------------------------------------------------8

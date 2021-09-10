@@ -27,7 +27,7 @@
         "version"                   : "latest"
       },
       "platform"                    : "HANA",
-      "size"                        : "Default",
+      "size"                        : "S4Demo",
       "use_DHCP"                    : true,
       "dbnodes"                     : [ {} ]
     }

@@ -59,7 +59,7 @@ resource "azurerm_network_interface" "scs_admin" {
 # Associate SCS VM NICs with the Load Balancer Backend Address Pool
 resource "azurerm_network_interface_backend_address_pool_association" "scs" {
   provider                = azurerm.main
-  count                   = local.enable_deployment ? local.scs_server_count : 0
+  count                   = local.enable_scs_lb_deployment ? local.scs_server_count : 0
   network_interface_id    = azurerm_network_interface.scs[count.index].id
   ip_configuration_name   = azurerm_network_interface.scs[count.index].ip_configuration[0].name
   backend_address_pool_id = azurerm_lb_backend_address_pool.scs[0].id

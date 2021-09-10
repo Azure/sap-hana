@@ -11,7 +11,7 @@
 #       1) ERS Install and Config
 #       2) PACEMAKER Config of SCS and ERS
 
-- hosts:          scs                                           # TODO: Replace this with new inventory group; Change to correct group
+- hosts:          "{{ sap_sid|upper }}_SCS"                                           
 
   name:           PACEMAKER - SCS and ERS
   remote_user:    "{{ orchestration_ansible_user }}"                
@@ -26,6 +26,34 @@
 
   # - name: Test Connection                                     # Simple connection test for troubleshooting
   #   ping:
+
+  tasks:
+# -------------------------------------+---------------------------------------8
+#
+# Build the list of tasks to be executed in order here. 
+#
+# -------------------------------------+---------------------------------------8
+
+  # Specify the active tier for this playbook run
+ # - set_fact:
+ #     tier:     os
+
+   - include_role:
+      name:     roles-os/6.0.0.01-HANA
+     when: db_high_availability == true          
+
+- hosts: localhost
+  name: Log results
+  remote_user:    "{{ orchestration_ansible_user }}"
+  become:         no
+  become_user:    root
+  gather_facts:   yes
+  vars_files:
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
+  tasks:
+  - ansible.builtin.file:
+      path: "{{ _workspace_directory }}/.step601"
+      state: touch
 
 
 ...

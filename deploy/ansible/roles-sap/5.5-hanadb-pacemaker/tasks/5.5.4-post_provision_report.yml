@@ -1,0 +1,27 @@
+---
+
+- name: Pause to give cluster time to stabilize
+  pause:
+    seconds: "{{ cluster_status_report_wait_in_s }}"
+
+- name: Check the post-provisioning cluster status
+  ansible.builtin.shell: "{{ cluster_status_cmd[ansible_os_family] }}"
+  register: cluster_status_report
+  changed_when: False
+  failed_when: False
+
+- name: Output cluster status
+  ansible.builtin.debug:
+    msg: "{{ cluster_status_report.stdout }}"
+
+- name: Check the SBD devices status
+  ansible.builtin.shell: crm_mon -1 | grep sbd
+  register: sbd_status_report
+  changed_when: False
+  failed_when: False
+  when: ansible_os_family == 'Suse'
+
+- name: Output SBD status
+  ansible.builtin.debug:
+    msg: "{{ sbd_status_report.stdout }}"
+  when: ansible_os_family == 'Suse'

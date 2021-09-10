@@ -18,7 +18,8 @@
                            list }}"
 
 # Print list of matching services if verbosity is 1 or greater
-- ansible.builtin.debug:
+- name: "[DEBUG] 1.16 - Show services"
+  ansible.builtin.debug:
     var: services_to_process
     verbosity: 1
 

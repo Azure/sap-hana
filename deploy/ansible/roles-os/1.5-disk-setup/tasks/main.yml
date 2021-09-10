@@ -69,12 +69,12 @@
   include_vars:                   disks_config.yml
 
 - name:                           "print unique disks"
-  debug:
+  ansible.builtin.debug:
     var:                          disktypes
     verbosity:                    2
 
 - name:                           "Print volume group details"
-  debug:
+  ansible.builtin.debug:
     var:                          volume_groups
     verbosity:                    2
 
@@ -83,7 +83,7 @@
 # -------------------------------------+---------------------------------------8
 #
 - name:                           "Volume Group creation"
-  lvg:
+  ansible.builtin.lvg:
     vg:                           "{{ item.vg }}"
     pvs:                          "{{ item.pvs }}"
     pesize:                       4M
@@ -97,7 +97,7 @@
 # -------------------------------------+---------------------------------------8
 #
 - name:                           "Logical Volume creation"
-  lvol:
+  ansible.builtin.lvol:
     lv:                           "{{ item.lv }}"
     vg:                           "{{ item.vg }}"
     size:                         "{{ item.size }}"
@@ -116,7 +116,7 @@
 # -------------------------------------+---------------------------------------8
 #
 - name:                           "Filesystem creation"
-  filesystem:
+  ansible.builtin.filesystem:
     dev:                          "{{ dev_path_from_lv_item }}"
     fstype:                       "{{ item.fstype }}"
     opts:                         "{{ item.fsopts | default('') }}"

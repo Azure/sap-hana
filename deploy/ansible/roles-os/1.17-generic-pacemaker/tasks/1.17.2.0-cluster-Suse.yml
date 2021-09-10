@@ -1,0 +1,152 @@
+---
+
+# SLES Clustering
+# Ref: https://documentation.suse.com/sle-ha/12-SP4/html/SLE-HA-install-quick/index.html
+
+- name: Ensure a list of package version is available for checking the cloud-netconfig-azure version
+  package_facts:
+
+
+# Pacemaker can create a large number of processes
+- name: Ensure Process limit is raised
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system.conf
+    state: present
+    regexp: "^#?\\s*DefaultTasksMax="
+    line: "DefaultTasksMax=4096"
+  register: raise_process_limit
+
+# Reduce the size of Dirty Cache Parameter 1
+# Deprecated- these changes will happen through 1.9-kernelparameters 
+#- name: Reduce the size of Dirty Cache vm.dirty_bytes  
+#  ansible.builtin.lineinfile:
+#    path: /etc/sysctl.conf
+#    state: present
+#    regexp: "^#?\\s*vm.dirty_bytes="
+#    line: "vm.dirty_bytes=629145600"
+#  register: reduce_dirty_cache_1
+
+# Reduce the size of Dirty Cache Parameter 2
+# Deprecated- these changes will happen through 1.9-kernelparameters 
+#- name: Reduce the size of dirty cache vm.dirty_background_bytes
+#  ansible.builtin.lineinfile:
+#    path: /etc/sysctl.conf
+#    state: present
+#    regexp: "^#?\\s*vm.dirty_background="
+#    line: "vm.dirty_background_bytes=314572800"
+#  register: reduce_dirty_cache_2
+
+# eth0 is the "db" NIC
+- name: Ensure clustering can manage Virtual IPs on the Database Interface
+  when: ansible_facts.packages['cloud-netconfig-azure'] and (ansible_facts.packages['cloud-netconfig-azure'][0].version | float) < 1.3
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network/ifcfg-eth0
+    state: present
+    regexp: "^#?\\s*CLOUD_NETCONFIG_MANAGE="
+    line: "CLOUD_NETCONFIG_MANAGE='no'"
+
+# SLES 12 Activate public cloud extension & Install Azure Python SDK
+- name: Install Azure python SDK Sles 12
+  ansible.builtin.shell: |
+    SUSEConnect -p sle-module-public-cloud/12/x86_64
+    sudo zypper --non-interactive install 'python-azure-mgmt-compute=4.6.2'
+  when: ansible_distribution_major_version == "12"
+
+# SLES 15 Activate public cloud extension & Install Azure Python SDK
+- name: Install Azure python SDK Sles 15
+  ansible.builtin.shell: |
+    SUSEConnect -p sle-module-public-cloud/15.1/x86_64
+    sudo zypper --non-interactive install 'python3-azure-mgmt-compute=4.6.2'
+  when: ansible_distribution_major_version == "15"
+
+
+# https://rpm.pbone.net/index.php3/stat/45/idpl/27916721/numer/8/nazwa/ha-cluster-init
+- name: Ensure Primary node initiates the Cluster
+  when: inventory_hostname == primary_instance_name
+  block:
+    - name: Ensure csync2 is configured
+      shell: crm cluster init -y csync2 --interface eth1
+
+    - name: Ensure corosync is configured
+      shell: crm cluster init -y -u corosync --interface eth1
+
+    - name: Ensure cluster (hdb_{{ hdb_sid | upper }}) is configured
+      shell: "crm cluster init -y cluster --name 'hdb_{{ hdb_sid | upper }}' --interface eth1"
+
+- name: Ensure Secondary node joins the Cluster
+  when: inventory_hostname == secondary_instance_name
+  block:
+    - name: Ensure the configuration files are synchronised
+      shell: "crm cluster join -y -c {{ primary_instance_ip_db }} csync2 --interface eth1"
+
+    - name: Ensure the cluster is joined
+      shell: "crm cluster join -y -c {{ primary_instance_ip_db }} cluster --interface eth1"
+
+- name: Ensure HA Cluster password is set to something secure
+  ansible.builtin.user:
+    name: hacluster
+    password: "{{ password_ha_db_cluster | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+
+- name: Ensure cluster configuration contains correct details
+  ansible.builtin.template:
+    src: corosync.conf.j2
+    dest: /etc/corosync/corosync.conf
+    mode: 0600
+
+- name: Ensure the Corosync service is restarted on primary node.
+  ansible.builtin.systemd:
+    name: corosync
+    state: restarted
+  when: inventory_hostname == primary_instance_name
+
+- pause:
+    seconds: 15
+
+- name: Ensure the Corosync service is restarted on secondary node
+  ansible.builtin.systemd:
+    name: corosync
+    state: restarted
+  when: inventory_hostname == secondary_instance_name
+
+- pause:
+    seconds: 15
+
+
+- name: Ensure the STONITH Azure fence agent is created when SBD not used
+  block: 
+    - name:  Enable Stonith
+      ansible.builtin.shell: |
+        sudo crm configure property stonith-enabled=true
+        crm configure property concurrent-fencing=true
+
+    - name: Create Azure Fencing Agent 
+      ansible.builtin.shell: >
+        crm configure primitive rsc_st_azure stonith:fence_azure_arm params
+        subscriptionId="{{ sap_hana_fencing_spn_subscription_id }}"
+        resourceGroup="{{ resource_group_name }}"
+        tenantId="{{ sap_hana_fencing_spn_tenant_id }}"
+        login="{{ sap_hana_fencing_spn_client_id }}"
+        passwd="{{ sap_hana_fencing_spn_client_pwd }}"
+    
+    - name: Stonith Timeout Property
+      shell: sudo crm configure property stonith-timeout=900
+
+- name: Ensure Azure scheduled events is configured
+  when: inventory_hostname == primary_instance_name
+  block:
+  # After configuring the Pacemaker resources for azure-events agent, when you place the cluster in or out of maintenance mode, you may get warning messages like:
+  # WARNING: cib-bootstrap-options: unknown attribute 'hostName_ hostname'
+  # WARNING: cib-bootstrap-options: unknown attribute 'azure-events_globalPullState'
+  # WARNING: cib-bootstrap-options: unknown attribute 'hostName_ hostname'
+  # These warning messages can be ignored.
+    - name:  Ensure Pacemaker resources for the Azure agent is created
+      shell: crm configure primitive rsc_azure-events ocf:heartbeat:azure-events op monitor interval=10s
+
+    - name: Ensure clone resource azure-events is configure
+      shell: crm configure clone cln_azure-events rsc_azure-events
+      
+    - name: Ensure maintenance mode is disabled
+      shell: "crm configure property maintenance-mode=false"
+
+#END of Generic Packemaker Tasks 
+

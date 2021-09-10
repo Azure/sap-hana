@@ -5,3 +5,7 @@ provider "azurerm" {
 provider "azurerm" {
   alias = "deployer"
 }
+
+provider "azuread" {
+  alias         = "fencing"
+}

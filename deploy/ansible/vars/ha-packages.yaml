@@ -1,15 +1,16 @@
 ---
+#Deprecating this vars file - The HA packages will be installed from roles-os->1.4-packages 
 
-ha_packages:
-  RedHat:
-    - pcs
-    - pacemaker
-    - fence-agents-azure-arm
-    - nmap-ncat
-    - resource-agents-sap-hana
-  Suse:
-    - socat
-    - corosync
-    - resource-agents
-    - fence-agents
-    - cloud-netconfig-azure
+#ha_packages:
+#  RedHat:
+#    - pcs
+#    - pacemaker
+#    - fence-agents-azure-arm
+#    - nmap-ncat
+#    - resource-agents-sap-hana
+#  Suse:
+#    - socat
+#    - corosync
+#    - resource-agents
+#    - fence-agents
+#    - cloud-netconfig-azure

@@ -43,7 +43,7 @@ data "azurerm_virtual_network" "vnet_sap" {
   resource_group_name = split("/", local.vnet_sap_arm_id)[4]
 }
 
-// Peers management VNET to SAP VNET
+# // Peers management VNET to SAP VNET
 resource "azurerm_virtual_network_peering" "peering_management_sap" {
   provider                     = azurerm.deployer
   count                        = local.vnet_sap_exists || !var.use_deployer ? 0 : 1
@@ -51,6 +51,7 @@ resource "azurerm_virtual_network_peering" "peering_management_sap" {
   virtual_network_name         = split("/", local.vnet_mgmt_id)[8]
   resource_group_name          = split("/", local.vnet_mgmt_id)[4]
   remote_virtual_network_id    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].id : azurerm_virtual_network.vnet_sap[0].id
+
   allow_virtual_network_access = true
 }
 
@@ -101,7 +102,7 @@ resource "azurerm_route" "admin" {
   ]
   provider               = azurerm.main
   count                  = length(local.firewall_ip) > 0 ? 1 : 0
-  name                   = format("%s%s%s", local.prefix, var.naming.separator, "fw-route")
+  name                   = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.fw_route)
   resource_group_name    = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   route_table_name       = azurerm_route_table.rt[0].name
   address_prefix         = "0.0.0.0/0"

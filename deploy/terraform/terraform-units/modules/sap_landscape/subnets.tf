@@ -38,6 +38,28 @@ resource "azurerm_subnet" "web" {
   address_prefixes     = [local.sub_web_prefix]
 }
 
+// Creates anf subnet of SAP VNET
+resource "azurerm_subnet" "anf" {
+  provider             = azurerm.main
+  count                = local.sub_anf_defined && !local.sub_anf_existing ? 1 : 0
+  name                 = local.sub_anf_name
+  resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
+  address_prefixes     = [local.sub_anf_prefix]
+
+  delegation {
+    name = "delegation"
+    service_delegation {
+      actions = [
+        "Microsoft.Network/networkinterfaces/*",
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+      name = "Microsoft.Netapp/volumes"
+    }
+  }
+
+}
+
 
 # Creates admin subnet nsg
 resource "azurerm_network_security_group" "admin" {
@@ -114,7 +136,7 @@ resource "azurerm_subnet_network_security_group_association" "web" {
 #Associate the subnets to the route table
 
 resource "azurerm_subnet_route_table_association" "admin" {
-    depends_on = [
+  depends_on = [
     azurerm_route_table.rt
   ]
 
