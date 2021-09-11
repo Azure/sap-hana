@@ -19,13 +19,19 @@ data "azurerm_network_security_group" "nsg_web" {
 resource "azurerm_subnet_network_security_group_association" "Associate_nsg_web" {
   provider                  = azurerm.main
   count                     = local.enable_deployment && local.sub_web_defined ? (signum((local.sub_web_exists ? 0 : 1) + (local.sub_web_nsg_exists ? 0 : 1))) : 0
-  subnet_id                 = local.sub_web_deployed.id
-  network_security_group_id = local.sub_web_nsg_deployed.id
+  subnet_id                 = local.sub_web_exists ? data.azurerm_subnet.subnet_sap_web[0].id : azurerm_subnet.subnet_sap_web[0].id
+  network_security_group_id = local.sub_web_nsg_exists ? data.azurerm_network_security_group.nsg_web[0].id : azurerm_network_security_group.nsg_web[0].id
 }
 
 # NSG rule to deny internet access
 resource "azurerm_network_security_rule" "webRule_internet" {
+  depends_on = [
+    data.azurerm_network_security_group.nsg_web,
+    azurerm_network_security_group.nsg_web
+  ]
+
   provider                     = azurerm.main
+
   count                        = local.enable_deployment && local.sub_web_defined ? (local.sub_web_nsg_exists ? 0 : 1) : 0
   name                         = "Internet"
   priority                     = 100

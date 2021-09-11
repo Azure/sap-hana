@@ -291,7 +291,7 @@ if [ -n "${temp}" ]; then
     then
         rm stdout.az
     fi
-    exit 1
+    exit 67                                                                                             #addressee unknown
 else
     if [ -f stdout.az ]
     then
@@ -301,6 +301,23 @@ else
 fi
 
 account_set=0
+
+cloudIDUsed=$(az account show | grep "cloudShellID")
+if [ ! -z "${cloudIDUsed}" ];
+then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 67                                                                                             #addressee unknown
+fi
+
+#setting the user environment variables
+set_executing_user_environment_variables "none"
+
 
 if [ ! -z "${STATE_SUBSCRIPTION}" ]
 then

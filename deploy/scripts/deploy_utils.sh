@@ -328,7 +328,10 @@ function set_executing_user_environment_variables() {
                 ARM_SUBSCRIPTION_ID=${az_subscription_id}
                 ARM_TENANT_ID=${az_tenant_id}
                 ARM_CLIENT_ID=${az_exec_user_name}
-                ARM_CLIENT_SECRET=${az_client_secret}
+                if [ "none" != "$az_client_secret" ]; then
+                
+                  ARM_CLIENT_SECRET=${az_client_secret}
+                fi 
 
                 echo -e "\t[set_executing_user_environment_variables]: exporting environment variables"
                 export ARM_SUBSCRIPTION_ID

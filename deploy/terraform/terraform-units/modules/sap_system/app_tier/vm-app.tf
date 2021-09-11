@@ -1,5 +1,9 @@
 # Create Application NICs
 resource "azurerm_network_interface" "app" {
+  depends_on = [
+    data.azurerm_subnet.subnet_sap_app,
+    azurerm_subnet.subnet_sap_app
+  ]
   provider                      = azurerm.main
   count                         = local.enable_deployment ? local.application_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.nic)
