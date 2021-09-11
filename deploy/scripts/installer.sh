@@ -620,6 +620,21 @@ if [ 0 == $return_value ] ; then
             landscape_tfstate_key
         fi
     fi
+
+    if [ "${deployment_system}" == sap_library ]
+    then
+        
+        tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+        STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+
+        az account set --sub $STATE_SUBSCRIPTION
+
+        REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
+        
+        get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
+        
+    fi
+
     unset TF_DATA_DIR
     exit $return_value
 fi
@@ -703,6 +718,11 @@ fi
 if [ "${deployment_system}" == sap_library ]
 then
     
+    tfstate_resource_id=$(terraform -chdir="${terraform_module_directory}" output tfstate_resource_id| tr -d \")
+    STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+
+    az account set --sub $STATE_SUBSCRIPTION
+
     REMOTE_STATE_SA=$(terraform -chdir="${terraform_module_directory}" output remote_state_storage_account_name| tr -d \")
     
     get_and_store_sa_details ${REMOTE_STATE_SA} "${system_config_information}"
