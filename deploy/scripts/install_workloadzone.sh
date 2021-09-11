@@ -228,8 +228,6 @@ then
     mkdir "$HOME/.terraform.d/plugin-cache"
 fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
-export ARM_USE_MSI=false
-
 
 init "${automation_config_directory}" "${generic_config_information}" "${workload_config_information}"
 

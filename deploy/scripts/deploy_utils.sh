@@ -199,6 +199,7 @@ function set_azure_cloud_environment() {
         esac
 
         export AZURE_ENVIRONMENT=${azure_cloud_environment}
+        echo -e "\t\t[set_azure_cloud_environment]: Azure cloud environment: ${azure_cloud_environment}"
     else
         echo -e "\t\t[set_azure_cloud_environment]: Unable to determine the Azure cloud environment"
     fi
@@ -259,6 +260,8 @@ function set_executing_user_environment_variables() {
     az_exec_user_name=$(az account show -o json | jq -r .user.name)
     az_tenant_id=$(az account show -o json | jq -r .tenantId)
 
+    echo -e "\t\t[set_executing_user_environment_variables]: User type: "${az_exec_user_type}""
+
     # if you are executing as user, we do not want to set any exports to run Terraform
     # else, if you are executing as service principal, we need to export the ARM variables
     if [ "${az_exec_user_type}" == "user" ]; then
@@ -281,6 +284,8 @@ function set_executing_user_environment_variables() {
         az_client_id=$(az account show --query user.name -o tsv)
         az_subscription_id=$(az account show --query id -o tsv)
 
+        echo -e "\t\t[set_executing_user_environment_variables]: client id: "${az_client_id}""
+
         #do we need to get details of the service principal?
         if [ "${az_client_id}" == "null" ]; then
             echo -e "\t[set_executing_user_environment_variables]: unable to identify the executing user and client"
@@ -292,6 +297,11 @@ function set_executing_user_environment_variables() {
             az_user_name=$(az ad signed-in-user show --query userPrincipalName -o tsv)
             echo -e "\t[set_executing_user_environment_variables]: logged in using '${az_exec_user_type}'"
             echo -e "\t[set_executing_user_environment_variables]: Nothing to do"
+            # echo -e "\t[set_executing_user_environment_variables]: ARM_SUBSCRIPTION_ID: '$ARM_SUBSCRIPTION_ID}'"
+            # echo -e "\t[set_executing_user_environment_variables]: ARM_TENANT_ID: '$ARM_TENANT_ID}'"
+            # echo -e "\t[set_executing_user_environment_variables]: ARM_CLIENT_ID: '$ARM_CLIENT_ID}'"
+            # echo -e "\t[set_executing_user_environment_variables]: ARM_CLIENT_SECRET: '$ARM_CLIENT_SECRET}'"
+            # echo -e "\t[set_executing_user_environment_variables]: ARM_USE_MSI: '$ARM_USE_MSI}'"
             ;;
         "userAssignedIdentity")
             echo -e "\t[set_executing_user_environment_variables]: logged in using User Assigned Identity: '${az_exec_user_type}'"
@@ -314,6 +324,7 @@ function set_executing_user_environment_variables() {
                 fi
 
                 #export the environment variables
+                
                 ARM_SUBSCRIPTION_ID=${az_subscription_id}
                 ARM_TENANT_ID=${az_tenant_id}
                 ARM_CLIENT_ID=${az_exec_user_name}
