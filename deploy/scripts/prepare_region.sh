@@ -673,7 +673,7 @@ if [ 4 == $step ]; then
         exit $?
     fi
     cd "${curdir}" || exit
-    step=3
+    step=5
     save_config_var "step" "${deployer_config_information}"
 fi
 
@@ -697,6 +697,8 @@ if [ 5 == $step ]; then
     
         if [ ! -z ${sshsecret} ]
         then
+            step=3
+            save_config_var "step" "${deployer_config_information}"
             printf "%s\n" "Collecting secrets from KV"
             temp_file=$(mktemp)
             ppk=$(az keyvault secret show --vault-name "${keyvault}" --name "${sshsecret}" | jq -r .value)
@@ -722,8 +724,6 @@ if [ 5 == $step ]; then
             scp -i "${temp_file}" -o StrictHostKeyChecking=no -o ConnectTimeout=120 "${deployer_config_information}" azureadm@"${deployer_public_ip_address}":"${remote_config_dir}"/
             
             rm "${temp_file}"
-            step=3
-            save_config_var "step" "${deployer_config_information}"
         else
             step=3
             save_config_var "step" ${deployer_config_information}
