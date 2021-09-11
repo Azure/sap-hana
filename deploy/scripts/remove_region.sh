@@ -279,6 +279,20 @@ else
 
 fi
 
+cloudIDUsed=$(az account show | grep "cloudShellID")
+if [ ! -z "${cloudIDUsed}" ];
+then 
+    echo ""
+    echo "#########################################################################################"
+    echo "#                                                                                       #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
+    echo "#                                                                                       #"
+    echo "#########################################################################################"
+    echo ""
+    exit 67                                                                                             #addressee unknown
+fi
+
+
 curdir=$(pwd)
 
 #we know that we have a valid az session so let us set the environment variables
@@ -294,6 +308,34 @@ relative_path="${curdir}"/"${deployer_dirname}"
 
 terraform_module_directory="${DEPLOYMENT_REPO_PATH}"/deploy/terraform/run/sap_deployer/
 export TF_DATA_DIR="${param_dirname}/.terraform"
+
+if [ -z "${storage_account}" ]; then
+    load_config_vars "${deployer_config_information}" "STATE_SUBSCRIPTION"
+    load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
+    load_config_vars "${deployer_config_information}" "REMOTE_STATE_RG"
+    load_config_vars "${deployer_config_information}" "tfstate_resource_id"
+    
+    if [ ! -z "${STATE_SUBSCRIPTION}" ]
+    then
+        subscription="${STATE_SUBSCRIPTION}"
+        if [ $account_set==0 ]
+        then
+            $(az account set --sub "${STATE_SUBSCRIPTION}")
+            account_set=1
+        fi
+        
+    fi
+
+    if [ ! -z "${REMOTE_STATE_SA}" ]
+        storage_account="${REMOTE_STATE_SA}"
+    fi
+
+    if [ ! -z "${REMOTE_STATE_RG}" ]
+        resource_group="${REMOTE_STATE_RG}"
+    fi
+
+
+fi
 
 temp=$(grep "\"type\": \"local\"" .terraform/terraform.tfstate)
 if [ -z "${temp}" ]
