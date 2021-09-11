@@ -332,7 +332,7 @@ then
     echo ""
     echo "#########################################################################################"
     echo "#                                                                                       #"
-    echo -e "#     $boldred Please login using your credentials or service principal credentials! $resetformatting      #"
+    echo -e "#         $boldred Please login using your credentials or service principal credentials! $resetformatting       #"
     echo "#                                                                                       #"
     echo "#########################################################################################"
     echo ""
