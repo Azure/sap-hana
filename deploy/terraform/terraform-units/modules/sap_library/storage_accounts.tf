@@ -160,15 +160,6 @@ data "azurerm_storage_account_blob_container_sas" "sapbits_sas_token" {
     azurerm_storage_account.storage_sapbits[0].primary_connection_string
   )
 
-  lifecycle {
-    ignore_changes = [
-      // Ignore changes to object_id
-      start,
-      expiry
-
-    ]
-  }
-
   container_name    = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].name : azurerm_storage_account.storage_sapbits[0].name
 
   https_only     = true
@@ -192,4 +183,12 @@ resource "azurerm_key_vault_secret" "sapbits_sas_token_secret" {
   name         = "sapbits-sas-token"
   value        = data.azurerm_storage_account_blob_container_sas.sapbits_sas_token.sas
   key_vault_id = local.deployer_kv_user_arm_id
+
+  lifecycle {
+    ignore_changes = [
+      // Ignore changes to object_id
+      value
+    ]
+  }
+
 }
