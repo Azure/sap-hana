@@ -478,9 +478,9 @@ then
     echo "${ppk}" > "${temp_file}"
     chmod 600 "${temp_file}"
     
-    remote_deployer_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
-    remote_library_dir="~/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
-    remote_config_dir="~/.sap_deployment_automation"
+    remote_deployer_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$deployer_parameter_file")
+    remote_library_dir="$HOME/Azure_SAP_Automated_Deployment/WORKSPACES/"$(dirname "$library_parameter_file")
+    remote_config_dir="$HOME/.sap_deployment_automation"
     
     echo "$remote_deployer_dir"
     echo "$remote_library_dir"

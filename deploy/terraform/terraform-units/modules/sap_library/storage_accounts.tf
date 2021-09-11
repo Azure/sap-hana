@@ -160,13 +160,21 @@ data "azurerm_storage_account_blob_container_sas" "sapbits_sas_token" {
     azurerm_storage_account.storage_sapbits[0].primary_connection_string
   )
 
+  lifecycle {
+    ignore_changes = [
+      // Ignore changes to object_id
+      start,
+      expiry
+
+    ]
+  }
+
   container_name    = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].name : azurerm_storage_account.storage_sapbits[0].name
 
   https_only     = true
 
   start  = formatdate("YYYY-MM-DD", timestamp())
   expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "8760h"))
-
 
   permissions {
     read    = true
