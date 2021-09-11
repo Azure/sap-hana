@@ -327,10 +327,12 @@ if [ -z "${storage_account}" ]; then
     fi
 
     if [ ! -z "${REMOTE_STATE_SA}" ]
+    then
         storage_account="${REMOTE_STATE_SA}"
     fi
 
     if [ ! -z "${REMOTE_STATE_RG}" ]
+    then
         resource_group="${REMOTE_STATE_RG}"
     fi
 
