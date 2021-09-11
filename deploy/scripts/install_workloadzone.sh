@@ -279,6 +279,11 @@ then
   REMOTE_STATE_RG=$(echo $tfstate_resource_id | cut -d / -f5)
   REMOTE_STATE_SA=$(echo $tfstate_resource_id | cut -d / -f9)
   STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d / -f3)
+  save_config_vars "${workload_config_information}" \
+    tfstate_resource_id \
+    REMOTE_STATE_SA \
+    REMOTE_STATE_RG \
+    STATE_SUBSCRIPTION
 fi
 
 
@@ -339,6 +344,14 @@ then
         load_config_vars "${deployer_config_information}" "REMOTE_STATE_SA"
         load_config_vars "${deployer_config_information}" "tfstate_resource_id"
         load_config_vars "${deployer_config_information}" "deployer_tfstate_key"
+
+        save_config_vars "${workload_config_information}" \
+        keyvault \
+        deployer_tfstate_key \
+        tfstate_resource_id \
+        REMOTE_STATE_SA \
+        REMOTE_STATE_RG
+
     fi
 
     if [ -z $STATE_SUBSCRIPTION ]
@@ -346,6 +359,7 @@ then
         # Retain post processing in case tfstate_resource_id was set by earlier
         # version of script tools.
         STATE_SUBSCRIPTION=$(echo $tfstate_resource_id | cut -d/ -f3 | tr -d \" | xargs)
+        az account set --sub $STATE_SUBSCRIPTION
     fi
     
     if [ -z $REMOTE_STATE_RG ]
@@ -368,7 +382,10 @@ then
 
     save_config_vars "${workload_config_information}" \
     keyvault \
-    deployer_tfstate_key
+    deployer_tfstate_key \
+    tfstate_resource_id \
+    REMOTE_STATE_SA \
+    REMOTE_STATE_RG
     
     if [ -n $STATE_SUBSCRIPTION ]
     then
