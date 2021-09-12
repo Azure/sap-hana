@@ -166,7 +166,7 @@ output "ANF_pool_settings" {
       data.azurerm_netapp_account.workload_netapp_account[0].name) : (
       azurerm_netapp_account.workload_netapp_account[0].name
     )
-    pool_name     =  azurerm_netapp_pool.workload_netapp_pool[0].name
+    pool_name     = azurerm_netapp_pool.workload_netapp_pool[0].name
     service_level = azurerm_netapp_pool.workload_netapp_pool[0].service_level
     size_in_tb    = azurerm_netapp_pool.workload_netapp_pool[0].size_in_tb
     subnet_id = local.sub_anf_defined ? (
@@ -174,7 +174,7 @@ output "ANF_pool_settings" {
       ""
     )
     resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
-    location = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+    location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
     } : {
     use_ANF = false
   }

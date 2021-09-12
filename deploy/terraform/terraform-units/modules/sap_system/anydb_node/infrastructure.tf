@@ -3,10 +3,10 @@ Load balancer front IP address range: .4 - .9
 +--------------------------------------4--------------------------------------*/
 
 resource "azurerm_lb" "anydb" {
-  provider            = azurerm.main
-  count               = local.enable_db_lb_deployment ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
-  sku                 = "Standard"
+  provider = azurerm.main
+  count    = local.enable_db_lb_deployment ? 1 : 0
+  name     = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)
+  sku      = "Standard"
 
   resource_group_name = var.resource_group[0].name
   location            = var.resource_group[0].location

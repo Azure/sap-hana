@@ -192,7 +192,7 @@ resource "local_file" "ansible_inventory_new_yml" {
 resource "local_file" "sap-parameters_yml" {
   content = templatefile(format("%s/sap-parameters.yml.tmpl", path.module), {
     sid           = var.sap_sid,
-    db_sid = var.db_sid
+    db_sid        = var.db_sid
     kv_uri        = local.kv_name,
     secret_prefix = local.secret_prefix,
     disks         = var.disks
@@ -264,6 +264,6 @@ locals {
   pass      = lookup(local.itemvalues, "password_master", "")
   clst_pass = lookup(local.itemvalues, "password_ha_db_cluster", "")
 
-  token    = lookup(local.itemvalues, "sapbits_sas_token", "")
+  token = lookup(local.itemvalues, "sapbits_sas_token", "")
 }
 

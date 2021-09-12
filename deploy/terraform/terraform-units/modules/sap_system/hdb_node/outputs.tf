@@ -12,7 +12,7 @@ output "nics_dbnodes_db" {
 }
 
 output "loadbalancers" {
-  value = local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.hdb_ha ) ? azurerm_lb.hdb : null
+  value = local.enable_deployment && (var.use_loadbalancers_for_standalone_deployments || local.hdb_ha) ? azurerm_lb.hdb : null
 }
 
 output "hdb_sid" {

@@ -12,11 +12,11 @@ resource "azurerm_netapp_volume" "shared" {
   subnet_id           = local.ANF_pool_settings.subnet_id
   protocols           = ["NFSv4.1"]
   export_policy_rule {
-    allowed_clients   = ["0.0.0.0/0"]
-    protocols_enabled = ["NFSv4.1"]
-    rule_index        = 1
-    unix_read_only    = false
-    unix_read_write   = true
+    allowed_clients     = ["0.0.0.0/0"]
+    protocols_enabled   = ["NFSv4.1"]
+    rule_index          = 1
+    unix_read_only      = false
+    unix_read_write     = true
     root_access_enabled = true
   }
   storage_quota_in_gb = var.anf_shared_volume_size
@@ -37,11 +37,11 @@ resource "azurerm_netapp_volume" "sapmnt" {
   subnet_id           = local.ANF_pool_settings.subnet_id
   protocols           = ["NFSv4.1"]
   export_policy_rule {
-    allowed_clients   = ["0.0.0.0/0"]
-    protocols_enabled = ["NFSv4.1"]
-    rule_index        = 1
-    unix_read_only    = false
-    unix_read_write   = true
+    allowed_clients     = ["0.0.0.0/0"]
+    protocols_enabled   = ["NFSv4.1"]
+    rule_index          = 1
+    unix_read_only      = false
+    unix_read_write     = true
     root_access_enabled = true
   }
   storage_quota_in_gb = var.anf_sapmnt_volume_size

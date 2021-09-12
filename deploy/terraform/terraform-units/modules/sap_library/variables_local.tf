@@ -115,5 +115,5 @@ locals {
 
 
   deployer_kv_user_arm_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_kv_user_arm_id, "") : ""
-  
+
 }

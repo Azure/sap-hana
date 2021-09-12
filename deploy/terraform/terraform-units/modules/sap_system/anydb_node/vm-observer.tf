@@ -24,13 +24,13 @@ resource "azurerm_network_interface" "observer" {
 
 # Create the Linux Application VM(s)
 resource "azurerm_linux_virtual_machine" "observer" {
-  provider                        = azurerm.main
-  depends_on                      = [var.anchor_vm]
-  count                           = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
-  resource_group_name             = var.resource_group[0].name
-  location                        = var.resource_group[0].location
-  name                            = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
-  computer_name                   = local.observer_computer_names[count.index]
+  provider            = azurerm.main
+  depends_on          = [var.anchor_vm]
+  count               = local.deploy_observer && upper(local.anydb_ostype) == "LINUX" ? length(local.zones) : 0
+  resource_group_name = var.resource_group[0].name
+  location            = var.resource_group[0].location
+  name                = format("%s%s%s%s", local.prefix, var.naming.separator, local.observer_virtualmachine_names[count.index], local.resource_suffixes.vm)
+  computer_name       = local.observer_computer_names[count.index]
 
   admin_username                  = var.sid_username
   admin_password                  = local.enable_auth_key ? null : var.sid_password
@@ -88,7 +88,7 @@ resource "azurerm_linux_virtual_machine" "observer" {
   }
 
   license_type = length(var.license_type) > 0 ? var.license_type : null
-  
+
   tags = local.tags
 }
 
@@ -143,7 +143,7 @@ resource "azurerm_windows_virtual_machine" "observer" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  #ToDo: Remove once feature is GA  patch_mode = "Manual"
   license_type = length(var.license_type) > 0 ? var.license_type : null
-  tags = local.tags
+  tags         = local.tags
 }

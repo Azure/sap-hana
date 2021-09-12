@@ -62,7 +62,8 @@ module "hdb_node" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }                  
+  }
+  depends_on                                   = [module.common_infrastructure]
   databases                                    = local.databases
   infrastructure                               = local.infrastructure
   options                                      = local.options
@@ -96,7 +97,8 @@ module "app_tier" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }                  
+  }
+  depends_on                                   = [module.common_infrastructure]
   application                                  = local.application
   infrastructure                               = local.infrastructure
   options                                      = local.options
@@ -131,7 +133,8 @@ module "anydb_node" {
   providers = {
     azurerm.main     = azurerm
     azurerm.deployer = azurerm.deployer
-  }                  
+  }
+  depends_on                                   = [module.common_infrastructure]
   databases                                    = local.databases
   infrastructure                               = local.infrastructure
   options                                      = local.options

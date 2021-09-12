@@ -1,9 +1,7 @@
 # Create Application NICs
+
 resource "azurerm_network_interface" "app" {
-  depends_on = [
-    data.azurerm_subnet.subnet_sap_app,
-    azurerm_subnet.subnet_sap_app
-  ]
+  depends_on                    = [azurerm_network_interface.scs]
   provider                      = azurerm.main
   count                         = local.enable_deployment ? local.application_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.app_virtualmachine_names[count.index], local.resource_suffixes.nic)
@@ -150,9 +148,9 @@ resource "azurerm_linux_virtual_machine" "app" {
   }
 
   license_type = length(var.license_type) > 0 ? var.license_type : null
-  
+
   tags = try(var.application.app_tags, {})
- 
+
 }
 
 # Create the Windows Application VM(s)
@@ -232,9 +230,9 @@ resource "azurerm_windows_virtual_machine" "app" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  #ToDo: Remove once feature is GA  patch_mode = "Manual"
   license_type = length(var.license_type) > 0 ? var.license_type : null
-  
+
   tags = try(var.application.app_tags, {})
 
 }
@@ -251,7 +249,7 @@ resource "azurerm_managed_disk" "app" {
   disk_size_gb           = local.app_data_disks[count.index].disk_size_gb
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = !local.use_app_avset  ? (
+  zones = !local.use_app_avset ? (
     upper(local.app_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.app[local.app_data_disks[count.index].vm_index].zone]) : (
       [azurerm_windows_virtual_machine.app[local.app_data_disks[count.index].vm_index].zone]

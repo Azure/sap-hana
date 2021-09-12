@@ -104,7 +104,7 @@ output "dns_info_vms" {
 }
 
 output "dns_info_loadbalancers" {
-  value = !(local.enable_deployment && ( var.use_loadbalancers_for_standalone_deployments || local.scs_high_availability )) ? null : (
+  value = !(local.enable_deployment && (var.use_loadbalancers_for_standalone_deployments || local.scs_high_availability)) ? null : (
     zipmap(
       compact([
         local.enable_scs_lb_deployment ? format("%s%s%s", local.prefix, var.naming.separator, "scs") : "",

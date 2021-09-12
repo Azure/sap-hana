@@ -140,8 +140,8 @@ variable "scs_lb_ip" {
 }
 
 variable "sap_mnt" {
-  description= "ANF Volume"
-  default = ""
+  description = "ANF Volume"
+  default     = ""
 }
 
 

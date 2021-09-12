@@ -9,12 +9,6 @@ resource "azurerm_subnet" "subnet_sap_app" {
   address_prefixes     = [local.sub_app_prefix]
 }
 
-resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
-  provider       = azurerm.main
-  count          = !local.sub_app_exists && local.enable_deployment && length(var.route_table_id) > 0 ? 1 : 0
-  subnet_id      = local.sub_app_exists ? data.azurerm_subnet.subnet_sap_app[0].id : azurerm_subnet.subnet_sap_app[0].id
-  route_table_id = var.route_table_id
-}
 
 # Imports data of existing SAP app subnet
 data "azurerm_subnet" "subnet_sap_app" {
@@ -28,18 +22,12 @@ data "azurerm_subnet" "subnet_sap_app" {
 # Creates web dispatcher subnet of SAP VNET
 resource "azurerm_subnet" "subnet_sap_web" {
   provider             = azurerm.main
+  depends_on           = [azurerm_subnet.subnet_sap_app]
   count                = local.enable_deployment && local.sub_web_defined ? (local.sub_web_exists ? 0 : 1) : 0
   name                 = local.sub_web_name
   resource_group_name  = local.vnet_sap_resource_group_name
   virtual_network_name = local.vnet_sap_name
   address_prefixes     = [local.sub_web_prefix]
-}
-
-resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
-  provider       = azurerm.main
-  count          = local.enable_deployment && local.enable_deployment && local.sub_web_defined && length(var.route_table_id) > 0 ? (local.sub_web_exists ? 0 : 1) : 0
-  subnet_id      = local.sub_web_exists ? data.azurerm_subnet.subnet_sap_web[0].id : azurerm_subnet.subnet_sap_web[0].id
-  route_table_id = var.route_table_id
 }
 
 # Imports data of existing SAP web dispatcher subnet
@@ -157,7 +145,7 @@ resource "azurerm_lb_rule" "ers" {
 
 resource "azurerm_lb_rule" "clst" {
   provider                       = azurerm.main
-  count                          = local.enable_scs_lb_deployment && local.win_ha_scs  ? 1 : 0
+  count                          = local.enable_scs_lb_deployment && local.win_ha_scs ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_clst_rule)
@@ -172,7 +160,7 @@ resource "azurerm_lb_rule" "clst" {
 
 resource "azurerm_lb_rule" "fs" {
   provider                       = azurerm.main
-  count                          = local.enable_scs_lb_deployment && local.win_ha_scs  ? 1 : 0
+  count                          = local.enable_scs_lb_deployment && local.win_ha_scs ? 1 : 0
   resource_group_name            = var.resource_group[0].name
   loadbalancer_id                = azurerm_lb.scs[0].id
   name                           = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.scs_fs_rule)
@@ -240,10 +228,10 @@ resource "azurerm_lb" "web" {
 }
 
 resource "azurerm_lb_backend_address_pool" "web" {
-  provider            = azurerm.main
-  count               = local.enable_web_lb_deployment ? 1 : 0
-  name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
-  loadbalancer_id     = azurerm_lb.web[0].id
+  provider        = azurerm.main
+  count           = local.enable_web_lb_deployment ? 1 : 0
+  name            = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_alb_bepool)
+  loadbalancer_id = azurerm_lb.web[0].id
 }
 
 //TODO: azurerm_lb_probe
@@ -266,7 +254,7 @@ resource "azurerm_lb_rule" "web" {
 # Associate Web dispatcher VM NICs with the Load Balancer Backend Address Pool
 resource "azurerm_network_interface_backend_address_pool_association" "web" {
   provider                = azurerm.main
-  depends_on = [azurerm_lb_backend_address_pool.web]
+  depends_on              = [azurerm_lb_backend_address_pool.web]
   count                   = local.enable_web_lb_deployment ? 1 : 0
   network_interface_id    = azurerm_network_interface.web[count.index].id
   ip_configuration_name   = azurerm_network_interface.web[count.index].ip_configuration[0].name
@@ -302,4 +290,20 @@ resource "azurerm_application_security_group" "web" {
   name                = format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.web_asg)
   resource_group_name = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_name : var.resource_group[0].name
   location            = local.nsg_asg_with_vnet ? local.vnet_sap_resource_group_location : var.resource_group[0].location
+}
+
+resource "azurerm_subnet_route_table_association" "subnet_sap_app" {
+  depends_on     = [azurerm_network_interface.app]
+  provider       = azurerm.main
+  count          = !local.sub_app_exists && local.enable_deployment && length(var.route_table_id) > 0 ? 1 : 0
+  subnet_id      = azurerm_subnet.subnet_sap_app[0].id
+  route_table_id = var.route_table_id
+}
+
+resource "azurerm_subnet_route_table_association" "subnet_sap_web" {
+  depends_on     = [azurerm_network_interface.web]
+  provider       = azurerm.main
+  count          = local.enable_deployment && local.enable_deployment && local.sub_web_defined && length(var.route_table_id) > 0 ? (local.sub_web_exists ? 0 : 1) : 0
+  subnet_id      = azurerm_subnet.subnet_sap_web[0].id
+  route_table_id = var.route_table_id
 }

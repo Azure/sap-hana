@@ -12,13 +12,13 @@ locals {
   deployer = {
     environment = coalesce(var.deployer_environment, try(var.deployer.environment, ""))
     region      = coalesce(var.deployer_location, try(var.deployer.region, ""))
-    vnet        = coalesce(var.deployer_vnet, try(var.deployer.vnet,""))
+    vnet        = coalesce(var.deployer_vnet, try(var.deployer.vnet, ""))
     use         = coalesce(var.deployer_use, try(var.deployer.use, true))
 
   }
   key_vault = {
-    kv_user_id     = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")
-    kv_prvt_id     = try(coalesce(var.automation_keyvault_id, try(var.key_vault.kv_prvt_id, "")), "")
+    kv_user_id = try(coalesce(var.user_keyvault_id, try(var.key_vault.kv_user_id, "")), "")
+    kv_prvt_id = try(coalesce(var.automation_keyvault_id, try(var.key_vault.kv_prvt_id, "")), "")
     kv_prvt_id = try(coalesce(var.spn_keyvault_id, try(var.key_vault.kv_spn_id, "")), "")
   }
   storage_account_sapbits = {

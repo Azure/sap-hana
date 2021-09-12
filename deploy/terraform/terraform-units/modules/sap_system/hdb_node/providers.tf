@@ -1,5 +1,5 @@
 provider "azurerm" {
-  alias = "main" 
+  alias = "main"
 }
 
 provider "azurerm" {

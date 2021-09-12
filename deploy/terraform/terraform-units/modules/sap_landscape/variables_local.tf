@@ -22,15 +22,15 @@ variable "use_deployer" {
 variable "ANF_settings" {
   description = "ANF settings"
   default = {
-    use    = false
-    name   = ""
-    arm_id = ""
+    use           = false
+    name          = ""
+    arm_id        = ""
     service_level = "Standard"
     size_in_tb    = 4
 
   }
 }
-  
+
 variable "create_spn" {
   description = "Flag controlling the Fencing SPN creation"
 }
@@ -41,12 +41,12 @@ variable "enable_purge_control_for_keyvaults" {
 
 variable "dns_label" {
   description = "DNS label"
-  default = ""
+  default     = ""
 }
 
 variable "dns_resource_group_name" {
   description = "DNS resource group name"
-  default = ""
+  default     = ""
 }
 
 locals {
@@ -128,7 +128,7 @@ locals {
 
   // SAP vnet
   vnet_sap_arm_id = try(var.infrastructure.vnets.sap.arm_id, "")
-  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0 
+  vnet_sap_exists = length(local.vnet_sap_arm_id) > 0
   vnet_sap_name   = local.vnet_sap_exists ? try(split("/", local.vnet_sap_arm_id)[8], "") : format("%s%s", local.prefix, local.resource_suffixes.vnet)
   vnet_sap_addr   = local.vnet_sap_exists ? "" : try(var.infrastructure.vnets.sap.address_space, "")
 
@@ -320,6 +320,6 @@ locals {
   )
 
   # Store the Deployer KV in workload zone KV
-  deployer_kv_user_name = try(var.deployer_tfstate.deployer_kv_user_name, "") 
+  deployer_kv_user_name = try(var.deployer_tfstate.deployer_kv_user_name, "")
 
 }

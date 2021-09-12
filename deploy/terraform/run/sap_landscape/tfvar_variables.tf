@@ -264,6 +264,6 @@ variable "create_fencing_spn" {
   default = false
 }
 
-  variable "enable_purge_control_for_keyvaults" {
+variable "enable_purge_control_for_keyvaults" {
   default = true
 }

@@ -187,7 +187,7 @@ locals {
   node_count      = local.enable_deployment ? try(length(local.hdb.dbnodes), 1) : 0
   db_server_count = local.hdb_ha ? local.node_count * 2 : local.node_count
 
-  enable_db_lb_deployment = local.db_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.db_server_count >  1)
+  enable_db_lb_deployment = local.db_server_count > 0 && (var.use_loadbalancers_for_standalone_deployments || local.db_server_count > 1)
 
 
   hdb_ins = try(local.hdb.instance, {})

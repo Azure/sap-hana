@@ -20,9 +20,9 @@ locals {
   subnet_iscsi_arm_id_defined = (length(var.iscsi_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.arm_id, ""))) > 0
   subnet_iscsi_nsg_defined    = (length(var.iscsi_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.name, "")) + length(var.iscsi_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_iscsi.nsg.arm_id, ""))) > 0
 
-  subnet_anf_defined     = (length(var.anf_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_anf.prefix, "")) + length(var.anf_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_anf.arm_id, ""))) > 0
+  subnet_anf_defined        = (length(var.anf_subnet_address_prefix) + length(try(var.infrastructure.vnets.sap.subnet_anf.prefix, "")) + length(var.anf_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_anf.arm_id, ""))) > 0
   subnet_anf_arm_id_defined = (length(var.anf_subnet_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_anf.arm_id, ""))) > 0
-  subnet_anf_nsg_defined = (length(var.anf_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_anf.nsg.name, "")) + length(var.anf_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_anf.nsg.arm_id, ""))) > 0
+  subnet_anf_nsg_defined    = (length(var.anf_subnet_nsg_name) + length(try(var.infrastructure.vnets.sap.subnet_anf.nsg.name, "")) + length(var.anf_subnet_nsg_arm_id) + length(try(var.infrastructure.vnets.sap.subnet_anf.nsg.arm_id, ""))) > 0
 
 
   resource_group = {

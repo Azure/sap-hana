@@ -212,6 +212,15 @@ system_config_information="${automation_config_directory}""${environment}""${reg
 deployer_tfstate_key_parameter=''
 landscape_tfstate_key_parameter=''
 
+parallelism=10
+
+#Provide a way to limit the number of parallell tasks for Terraform
+if [ -n "${TF_PARALLELLISM}" ]; then
+    parallelism=TF_PARALLELLISM
+   
+fi
+
+echo "Parallelism count $parallelism"
 
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
@@ -707,7 +716,7 @@ if [ $ok_to_proceed ]; then
     
     allParams=$(printf " -var-file=%s %s %s %s %s %s %s" "${var_file}" "${extra_vars}" "${tfstate_parameter}" "${landscape_tfstate_key_parameter}" "${deployer_tfstate_key_parameter}" "${deployment_parameter}" "${version_parameter}" )
     
-    terraform -chdir="${terraform_module_directory}" apply ${approve} $allParams  2>error.log
+    terraform -chdir="${terraform_module_directory}" apply -parallelism=$parallelism ${approve} $allParams  2>error.log
     return_value=$?
     
     if [ 0 != $return_value ] ; then

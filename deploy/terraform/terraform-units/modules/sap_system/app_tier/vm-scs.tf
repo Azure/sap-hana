@@ -1,10 +1,5 @@
 # Create SCS NICs
 resource "azurerm_network_interface" "scs" {
-  depends_on = [
-    data.azurerm_subnet.subnet_sap_app,
-    azurerm_subnet.subnet_sap_app
-  ]
-
   provider                      = azurerm.main
   count                         = local.enable_deployment ? local.scs_server_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.scs_virtualmachine_names[count.index], local.resource_suffixes.nic)
@@ -241,7 +236,7 @@ resource "azurerm_windows_virtual_machine" "scs" {
     storage_account_uri = var.storage_bootdiag_endpoint
   }
 
-#ToDo: Remove once feature is GA  patch_mode = "Manual"
+  #ToDo: Remove once feature is GA  patch_mode = "Manual"
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = try(var.application.scs_tags, {})
@@ -259,7 +254,7 @@ resource "azurerm_managed_disk" "scs" {
   disk_size_gb           = local.scs_data_disks[count.index].disk_size_gb
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = !local.use_scs_avset  ? (
+  zones = !local.use_scs_avset ? (
     upper(local.scs_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.scs[local.scs_data_disks[count.index].vm_index].zone]) : (
       [azurerm_windows_virtual_machine.scs[local.scs_data_disks[count.index].vm_index].zone]

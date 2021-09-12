@@ -39,5 +39,5 @@ variable "deployer_statefile_foldername" {
 
 variable "dns_label" {
   description = "DNS label"
-  default = ""
+  default     = ""
 }

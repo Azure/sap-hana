@@ -67,7 +67,7 @@ locals {
   }
 
   options = {
-    enable_deployer_public_ip = var.deployer_enable_public_ip ||  try(var.options.enable_deployer_public_ip, false)
+    enable_deployer_public_ip = var.deployer_enable_public_ip || try(var.options.enable_deployer_public_ip, false)
   }
 
   firewall_deployment          = try(var.firewall_deployment, false)

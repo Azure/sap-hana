@@ -17,6 +17,7 @@ data "azurerm_network_security_group" "nsg_app" {
 
 # Associates SAP app nsg to SAP app subnet
 resource "azurerm_subnet_network_security_group_association" "Associate_nsg_app" {
+  depends_on                = [azurerm_network_interface.app]
   provider                  = azurerm.main
   count                     = local.enable_deployment ? (signum((local.sub_app_exists ? 0 : 1) + (local.sub_app_nsg_exists ? 0 : 1))) : 0
   subnet_id                 = local.sub_app_exists ? local.sub_app_arm_id : azurerm_subnet.subnet_sap_app[0].id

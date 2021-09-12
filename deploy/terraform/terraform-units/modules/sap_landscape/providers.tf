@@ -7,5 +7,5 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  alias         = "fencing"
+  alias = "fencing"
 }

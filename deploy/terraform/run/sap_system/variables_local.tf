@@ -63,7 +63,7 @@ variable "terraform_template_version" {
 
 variable "license_type" {
   description = "Specifies the license type for the OS"
-  default = ""
+  default     = ""
 
 }
 

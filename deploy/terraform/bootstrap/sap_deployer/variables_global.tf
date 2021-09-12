@@ -73,7 +73,7 @@ variable "authentication" {
     path_to_private_key = ""
 
   }
-  
+
 }
 
 variable "key_vault" {

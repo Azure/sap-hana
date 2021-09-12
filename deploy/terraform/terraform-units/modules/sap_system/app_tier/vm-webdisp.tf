@@ -1,9 +1,6 @@
 # Create Web dispatcher NICs
 resource "azurerm_network_interface" "web" {
-  depends_on = [
-    data.azurerm_subnet.subnet_sap_app,
-    azurerm_subnet.subnet_sap_app
-  ]
+  depends_on                    = [azurerm_network_interface.app]
   provider                      = azurerm.main
   count                         = local.enable_deployment ? local.webdispatcher_count : 0
   name                          = format("%s%s%s%s", local.prefix, var.naming.separator, local.web_virtualmachine_names[count.index], local.resource_suffixes.nic)
@@ -245,7 +242,7 @@ resource "azurerm_managed_disk" "web" {
   disk_size_gb           = local.web_data_disks[count.index].disk_size_gb
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = !local.use_web_avset  ? (
+  zones = !local.use_web_avset ? (
     upper(local.web_ostype) == "LINUX" ? (
       [azurerm_linux_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]) : (
       [azurerm_windows_virtual_machine.web[local.web_data_disks[count.index].vm_index].zone]

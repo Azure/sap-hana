@@ -198,7 +198,7 @@ resource "azurerm_managed_disk" "data_disk" {
 
   disk_encryption_set_id = try(var.options.disk_encryption_set_id, null)
 
-  zones = !local.use_avset  ? (
+  zones = !local.use_avset ? (
     [azurerm_linux_virtual_machine.vm_dbnode[local.data_disk_list[count.index].vm_index].zone]) : (
     null
   )

@@ -160,20 +160,20 @@ data "azurerm_storage_account_blob_container_sas" "sapbits_sas_token" {
     azurerm_storage_account.storage_sapbits[0].primary_connection_string
   )
 
-  container_name    = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].name : azurerm_storage_account.storage_sapbits[0].name
+  container_name = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].name : azurerm_storage_account.storage_sapbits[0].name
 
-  https_only     = true
+  https_only = true
 
   start  = formatdate("YYYY-MM-DD", timestamp())
   expiry = formatdate("YYYY-MM-DD", timeadd(timestamp(), "8760h"))
 
   permissions {
-    read    = true
-    write   = false
-    delete  = false
-    list    = false
-    add     = false
-    create  = false
+    read   = true
+    write  = false
+    delete = false
+    list   = false
+    add    = false
+    create = false
   }
 }
 
