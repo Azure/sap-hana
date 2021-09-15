@@ -279,6 +279,7 @@ resource "azurerm_virtual_machine_extension" "web_lnx_aem_extension" {
 SETTINGS
 }
 
+
 resource "azurerm_virtual_machine_extension" "web_win_aem_extension" {
   provider             = azurerm.main
   count                = local.enable_deployment ? (upper(local.web_ostype) == "WINDOWS" ? local.webdispatcher_count : 0) : 0

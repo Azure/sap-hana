@@ -291,6 +291,7 @@ resource "azurerm_virtual_machine_extension" "scs_lnx_aem_extension" {
 SETTINGS
 }
 
+
 resource "azurerm_virtual_machine_extension" "scs_win_aem_extension" {
   provider             = azurerm.main
   count                = local.enable_deployment ? (upper(local.scs_ostype) == "WINDOWS" ? local.scs_server_count : 0) : 0

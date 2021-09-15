@@ -274,8 +274,9 @@ resource "azurerm_virtual_machine_extension" "anydb_lnx_aem_extension" {
     "system": "SAP"
   }
 SETTINGS
-
 }
+
+
 resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
   provider             = azurerm.main
   count                = local.enable_deployment ? length(local.anydb_vms) : 0
@@ -289,5 +290,4 @@ resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
     "system": "SAP"
   }
 SETTINGS
-
 }

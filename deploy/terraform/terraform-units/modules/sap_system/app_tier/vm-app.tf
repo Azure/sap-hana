@@ -283,8 +283,8 @@ resource "azurerm_virtual_machine_extension" "app_lnx_aem_extension" {
     "system": "SAP"
   }
 SETTINGS
-
 }
+
 
 resource "azurerm_virtual_machine_extension" "app_win_aem_extension" {
   provider             = azurerm.main
