@@ -8,12 +8,8 @@ resource "azurerm_resource_group" "library" {
   count    = local.rg_exists ? 0 : 1
   name     = local.rg_name
   location = local.region
+  tags     = var.infrastructure.tags
 
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
 }
 
 // Imports data of existing resource group

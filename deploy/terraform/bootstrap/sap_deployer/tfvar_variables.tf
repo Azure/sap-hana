@@ -28,6 +28,11 @@ variable "resourcegroup_arm_id" {
   default = ""
 }
 
+
+variable "resourcegroup_tags" {
+  default = {}
+}
+
 /*
 
 This block describes the variables for the VNet block in the json file

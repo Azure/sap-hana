@@ -92,3 +92,7 @@ output "firewall_id" {
 output "automation_version" {
   value = local.version_label
 }
+
+output "tags" {
+  value = local.infrastructure.tags
+}

@@ -28,6 +28,10 @@ variable "resourcegroup_arm_id" {
   default = ""
 }
 
+variable "resourcegroup_tags" {
+  default = {}
+}
+
 variable "proximityplacementgroup_names" {
   default = []
 }
