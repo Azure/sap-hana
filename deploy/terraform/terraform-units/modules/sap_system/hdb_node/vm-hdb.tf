@@ -224,5 +224,9 @@ resource "azurerm_virtual_machine_extension" "hdb_linux_extension" {
   publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
   type                 = "MonitorX64Linux"
   type_handler_version = "1.0"
-
+  settings             = <<SETTINGS
+  {
+    "system": "SAP"
+  }
+SETTINGS
 }
