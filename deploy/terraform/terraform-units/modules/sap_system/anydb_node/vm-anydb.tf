@@ -269,6 +269,11 @@ resource "azurerm_virtual_machine_extension" "anydb_lnx_aem_extension" {
   publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
   type                 = "MonitorX64Linux"
   type_handler_version = "1.0"
+  settings             = <<SETTINGS
+  {
+    "system": "SAP"
+  }
+SETTINGS
 
 }
 resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
@@ -279,5 +284,10 @@ resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
   publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
   type                 = "MonitorX64Windows"
   type_handler_version = "1.0"
+  settings             = <<SETTINGS
+  {
+    "system": "SAP"
+  }
+SETTINGS
 
 }
