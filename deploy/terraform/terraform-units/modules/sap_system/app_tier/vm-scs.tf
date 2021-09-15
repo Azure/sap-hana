@@ -276,7 +276,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
   lun                       = local.scs_data_disks[count.index].lun
 }
 
-resource "azurerm_virtual_machine_extension" "scs_linux_extension" {
+resource "azurerm_virtual_machine_extension" "scs_lnx_aem_extension" {
   provider             = azurerm.main
   count                = local.enable_deployment ? (upper(local.scs_ostype) == "LINUX" ? local.scs_server_count : 0) : 0
   name                 = "MonitorX64Linux"
@@ -284,5 +284,14 @@ resource "azurerm_virtual_machine_extension" "scs_linux_extension" {
   publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
   type                 = "MonitorX64Linux"
   type_handler_version = "1.0"
+}
 
+resource "azurerm_virtual_machine_extension" "scs_win_aem_extension" {
+  provider             = azurerm.main
+  count                = local.enable_deployment ? (upper(local.scs_ostype) == "WINDOWS" ? local.scs_server_count : 0) : 0
+  name                 = "MonitorX64Windows"
+  virtual_machine_id   = azurerm_windows_virtual_machine.scs[count.index].id
+  publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
+  type                 = "MonitorX64Windows"
+  type_handler_version = "1.0"
 }

@@ -261,13 +261,23 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_disks" {
 
 
 # VM Extension 
-resource "azurerm_virtual_machine_extension" "anydb_linux_extension" {
+resource "azurerm_virtual_machine_extension" "anydb_lnx_aem_extension" {
   provider             = azurerm.main
   count                = local.enable_deployment ? length(local.anydb_vms) : 0
   name                 = "MonitorX64Linux"
   virtual_machine_id   = azurerm_linux_virtual_machine.dbserver[count.index].id
   publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
   type                 = "MonitorX64Linux"
+  type_handler_version = "1.0"
+
+}
+resource "azurerm_virtual_machine_extension" "anydb_win_aem_extension" {
+  provider             = azurerm.main
+  count                = local.enable_deployment ? length(local.anydb_vms) : 0
+  name                 = "MonitorX64Windows"
+  virtual_machine_id   = azurerm_windows_virtual_machine.dbserver[count.index].id
+  publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
+  type                 = "MonitorX64Windows"
   type_handler_version = "1.0"
 
 }
