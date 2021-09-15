@@ -214,3 +214,15 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm_dbnode_data_disk" {
   write_accelerator_enabled = local.data_disk_list[count.index].write_accelerator_enabled
   lun                       = local.data_disk_list[count.index].lun
 }
+
+# VM Extension 
+resource "azurerm_virtual_machine_extension" "hdb_linux_extension" {
+  provider             = azurerm.main
+  count                = local.enable_deployment ? length(local.hdb_vms) : 0
+  name                 = "MonitorX64Linux"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm_dbnode[count.index].id
+  publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
+  type                 = "MonitorX64Linux"
+  type_handler_version = "1.0"
+
+}

@@ -275,3 +275,14 @@ resource "azurerm_virtual_machine_data_disk_attachment" "scs" {
   write_accelerator_enabled = local.scs_data_disks[count.index].write_accelerator_enabled
   lun                       = local.scs_data_disks[count.index].lun
 }
+
+resource "azurerm_virtual_machine_extension" "scs_linux_extension" {
+  provider             = azurerm.main
+  count                = local.enable_deployment ? (upper(local.scs_ostype) == "LINUX" ? local.scs_server_count : 0) : 0
+  name                 = "MonitorX64Linux"
+  virtual_machine_id   = azurerm_linux_virtual_machine.scs[count.index].id
+  publisher            = "Microsoft.AzureCAT.AzureEnhancedMonitoring"
+  type                 = "MonitorX64Linux"
+  type_handler_version = "1.0"
+
+}
