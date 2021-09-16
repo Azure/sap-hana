@@ -294,14 +294,8 @@ function set_executing_user_environment_variables() {
 
         case "${az_client_id}" in
         "systemAssignedIdentity")
-            az_user_name=$(az ad signed-in-user show --query userPrincipalName -o tsv)
             echo -e "\t[set_executing_user_environment_variables]: logged in using '${az_exec_user_type}'"
             echo -e "\t[set_executing_user_environment_variables]: Nothing to do"
-            # echo -e "\t[set_executing_user_environment_variables]: ARM_SUBSCRIPTION_ID: '$ARM_SUBSCRIPTION_ID}'"
-            # echo -e "\t[set_executing_user_environment_variables]: ARM_TENANT_ID: '$ARM_TENANT_ID}'"
-            # echo -e "\t[set_executing_user_environment_variables]: ARM_CLIENT_ID: '$ARM_CLIENT_ID}'"
-            # echo -e "\t[set_executing_user_environment_variables]: ARM_CLIENT_SECRET: '$ARM_CLIENT_SECRET}'"
-            # echo -e "\t[set_executing_user_environment_variables]: ARM_USE_MSI: '$ARM_USE_MSI}'"
             ;;
         "userAssignedIdentity")
             echo -e "\t[set_executing_user_environment_variables]: logged in using User Assigned Identity: '${az_exec_user_type}'"
