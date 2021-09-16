@@ -143,6 +143,13 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
+
+  lifecycle  {
+  ignore_changes = [
+    // Ignore changes to computername
+    computer_name
+  ]
+
 }
 
 // Section for Windows Virtual machine 
@@ -220,6 +227,11 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
+  lifecycle  {
+  ignore_changes = [
+    // Ignore changes to computername
+    computer_name
+  ]
 }
 
 // Creates managed data disks

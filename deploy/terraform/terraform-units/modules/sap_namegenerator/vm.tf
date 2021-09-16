@@ -17,11 +17,11 @@ locals {
   ]
 
   anydb_computer_names = [for idx in range(var.db_server_count) :
-    format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx + var.resource_offset, 0, local.random_id_vm_verified)
+    format("%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx + var.resource_offset, 0, local.random_id_vm_verified)
   ]
 
   anydb_computer_names_ha = [for idx in range(var.db_server_count) :
-    format("%sd%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx + var.resource_offset, 1, local.random_id_vm_verified)
+    format("%s%s%02dl%d%s", lower(var.sap_sid), lower(var.db_sid), idx + var.resource_offset, 1, local.random_id_vm_verified)
   ]
 
   anydb_vm_names = [for idx in range(var.db_server_count) :
