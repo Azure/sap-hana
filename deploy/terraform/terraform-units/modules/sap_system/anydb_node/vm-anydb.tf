@@ -144,12 +144,12 @@ resource "azurerm_linux_virtual_machine" "dbserver" {
 
   tags = local.tags
 
-  lifecycle {
-    ignore_changes = [
-      // Ignore changes to computername
-      computer_name,
-      tags
-    ]
+  lifecycle  {
+  ignore_changes = [
+    // Ignore changes to computername
+    tags,
+    computer_name
+  ]
   }
 
 }
@@ -229,12 +229,12 @@ resource "azurerm_windows_virtual_machine" "dbserver" {
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
-  lifecycle {
-    ignore_changes = [
-      // Ignore changes to computername
-      computer_name,
-      tags
-    ]
+  lifecycle  {
+  ignore_changes = [
+    // Ignore changes to computername
+    computer_name, 
+    tags
+  ]
   }
 }
 

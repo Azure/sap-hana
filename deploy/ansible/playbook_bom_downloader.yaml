@@ -30,11 +30,24 @@
 # -------------------------------------+---------------------------------------8
 
   - block:
+    - ansible.builtin.set_fact:
+        tier:     bom
+  
+
+  - block:
+    - include_role:
+        name:     roles-misc/0.2-kv-secrets
+        public:   yes      
+    tags:
+      - 0.2-kv-secrets
+
+  - block:
     - include_role:
         name:     roles-misc/0.3.sap-installation-media-storage-details
         public:   yes      
     tags:
       - 0.3.sap-installation-media-storage-details
+
 
   - ansible.builtin.set_fact:
       tier:     preparation

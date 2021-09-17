@@ -66,7 +66,7 @@ This step will leverage an Ansible playbool to download software from SAP, the d
     ---
     bom_base_name:               S41909SPS03_v0004ms
     sapbits_location_base_path:  https://<storage_account_FQDN>/sapbits
-    kv_uri:                      
+    kv_name:                      
     ...
     EOF
     

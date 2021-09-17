@@ -43,11 +43,13 @@
 # Description:  Create BOM download directories".
 #
 
-- name:     "BOM: Create BOM download directories"
-  file:
-    path:   "{{ item.path }}"
-    state:  directory
-    mode:   0755
+- name:               "BOM: Create BOM download directories"
+  file:          
+    path:             "{{ item.path }}"
+    state:            directory
+    mode:             0755
+  become:             yes
+  become_user:        root
   loop:
     - { path: "{{ download_directory }}" }
     - { path: "{{ download_directory }}/tmp" }

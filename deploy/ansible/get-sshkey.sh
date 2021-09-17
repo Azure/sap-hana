@@ -4,7 +4,7 @@
 #
 #################################################################################
 
-kv=$(grep "kv_uri:" sap-parameters.yaml  | cut -d: -f2 | xargs )
+kv=$(grep "kv_name:" sap-parameters.yaml  | cut -d: -f2 | xargs )
 ksecret_prefix=$(grep "secret_prefix:" sap-parameters.yaml  | cut -d: -f2 | xargs )
 
 ksecret=$ksecret_prefix-sid-sshkey

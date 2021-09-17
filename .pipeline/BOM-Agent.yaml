@@ -26,5 +26,5 @@ steps:
       ansibleInterface: 'agentMachine'
       playbookPathOnAgentMachine: $(Pipeline.Workspace)'/s/deploy/ansible/playbook_bom_downloader.yaml'
       inventoriesAgentMachine: 'noInventory'
-      args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_uri=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
+      args: '--extra-vars "sapbits_location_base_path=$(sapbits) bom_base_name=$(BOM) kv_name:=$(kv) SUser=$(S-Username) SPassword=$(S-Password) sapbits_access_key=$(sapbits-access-key) "'
 

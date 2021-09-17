@@ -101,12 +101,6 @@ playbook_options=(
         "${@}"
 )
 
-# List of playbooks to run through
-playbooks=(
-  # Retrieve the SSH key first before running remaining playbooks
-  ${cmd_dir}/pb_get-keyvault-secret.yaml
-)
-
 select opt in "${options[@]}";
 do
         echo "You selected ($REPLY) $opt"

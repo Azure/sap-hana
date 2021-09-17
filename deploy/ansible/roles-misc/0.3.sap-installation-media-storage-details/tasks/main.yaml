@@ -4,13 +4,13 @@
 
 - name: Deployer Keyvault name
   ansible.builtin.set_fact:
-    deployer_kv_name: "{{ kv_uri }}"
+    deployer_kv_name: "{{ kv_name }}"
   when: bom_processing is  defined
 
 - name: Get Deployer Keyvault name from keyvault
   ansible.builtin.command: >-
     az keyvault secret show
-      --vault-name {{ kv_uri }}
+      --vault-name {{ kv_name }}
       --name {{ deployer_kv_name }}
   changed_when: false
   register: deployer_kv_name_secret

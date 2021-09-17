@@ -4,7 +4,7 @@
 
 - name: "Create Password secret"
   ansible.builtin.shell: |
-    az keyvault secret set --vault-name {{ kv_uri }} --name {{ sap_password_id }} --value "{{ password_master }}"
+    az keyvault secret set --vault-name {{ kv_name }} --name {{ sap_password_id }} --value "{{ password_master }}"
   when: 
     - password_master is defined
     - "password_master | trim | length != 0" 
@@ -19,7 +19,7 @@
     - name: "Get SAP password from keyvault"
       command: >-
         az keyvault secret show
-          --vault-name {{ kv_uri }}
+          --vault-name {{ kv_name }}
           --name {{ sap_password_id }}
 #          --only-show-errors
       
@@ -42,13 +42,13 @@
 
     - name: "Create Password secret"
       ansible.builtin.shell: |
-        az keyvault secret set --vault-name {{ kv_uri }} --name {{ sap_password_id }} --value "{{ sap_password }}"
+        az keyvault secret set --vault-name {{ kv_name }} --name {{ sap_password_id }} --value "{{ sap_password }}"
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
     - name: "Get SAP password from keyvault"
       command: >-
         az keyvault secret show
-          --vault-name {{ kv_uri }}
+          --vault-name {{ kv_name }}
           --name {{ sap_password_id }}
 #          --only-show-errors
       

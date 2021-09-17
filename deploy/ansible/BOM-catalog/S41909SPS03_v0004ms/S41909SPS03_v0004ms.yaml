@@ -96,11 +96,11 @@ materials:
 
    # SWPM
     - name:         "SWPM20SP09; OS: Linux on x86_64 64bit"
-      archive:      SWPM20SP09_3-80003424.SAR
+      archive:      SWPM20SP09_5-80003424.SAR
       extract:      true
       extractDir:   SWPM
       creates:      SIGNATURE.SMF
-      url:          https://softwaredownloads.sap.com/file/0020000001174792021
+      url:          https://softwaredownloads.sap.com/?file=0020000001335532021
 
     # DB Export
     - name:         "File on DVD"
@@ -234,10 +234,10 @@ materials:
       download:     false
       url:          https://softwaredownloads.sap.com/file/0020000000410162020
 
-    - name:         "Patch 4 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
-      archive:      SUM20SP11_4-80002456.SAR
+    - name:         "Patch 5 for SOFTWARE UPDATE MANAGER 2.0 SP11 ; OS: Linux on x86_64 64bit"
+      archive:      SUM20SP11_5-80002457.SAR
       download:     false
-      url:          https://softwaredownloads.sap.com/file/0020000001213242021
+      url:          https://softwaredownloads.sap.com/?file=0020000001330162021
 
     - name:         "SP12 Patch4 for UMML4HANA 1"
       archive:      HANAUMML12_4-70001054.ZIP

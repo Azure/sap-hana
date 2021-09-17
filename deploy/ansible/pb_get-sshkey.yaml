@@ -24,7 +24,7 @@
   - name: Retrieve SSH Key secret details
     command: >-
       az keyvault secret show
-        --vault-name {{ kv_uri }}
+        --vault-name {{ kv_name }}
         --name {{ secret_name }}
     changed_when: false
     register: keyvault_secret_show
