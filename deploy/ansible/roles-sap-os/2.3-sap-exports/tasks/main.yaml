@@ -1,5 +1,6 @@
 ---
 
+
 - name: "Exports: Create SAP Directories"
   ansible.builtin.file:
     path:   "{{ item.path }}"
@@ -9,6 +10,8 @@
     - { path: '/usr/sap/install' }
     - { path: '/usr/sap/trans' }
     - { path: '/sapmnt/{{ sap_sid|upper }}' }
+  when:     
+    - node_tier == 'scs'
 
 
 - name: "Exports: NFS Server Config on Suse"
@@ -61,7 +64,6 @@
   when:     
     - (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8" 
     - node_tier == 'scs'
-    - sap_mnt is not defined 
 
 - name: "Exports: NFS Server Config on  : {{ ansible_os_family|lower ~ ansible_distribution_major_version }} (sapmnt)"
   ansible.builtin.lineinfile:

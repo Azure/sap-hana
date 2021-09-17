@@ -93,14 +93,14 @@ logical_volumes:
     size:       '1g'
     fstype:     'xfs'
 
-  - tier:       'preparation'
+  - tier:       'sapos'
     node_tier:  'scs'
     vg:         'vg_sap'
     lv:         'lv_sapmnt'
     size:       '128g'
     fstype:     'xfs'
 
-  - tier:       'preparation'
+  - tier:       'sapos'
     node_tier:  'scs'
     vg:         'vg_sap'
     lv:         'lv_usrsapinstall'

@@ -12,13 +12,13 @@
     # Get all the hostnames in <SID>_SCS group and return only the first hostname
     nfs_server:   "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
   loop: 
-    - { tier: 'all',          type: 'xfs',   src: '/dev/vg_sap/lv_usrsap',                         path: '/usr/sap'         }
-    - { tier: 'preparation',  type: 'xfs',   src: '/dev/vg_sap/lv_usrsapinstall',                  path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_sap/lv_hana_shared',                    path: '/hana/shared'     }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_data/lv_hana_data',                path: '/hana/data'       }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_log/lv_hana_log',                  path: '/hana/log'        }
-    - { tier: 'hdb',          type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',            path: '/hana/backup'     }
-  when:         (item.tier == "all" or item.tier == tier) 
+    - { node_tier: 'all',  type: 'xfs',   src: '/dev/vg_sap/lv_usrsap',                 path: '/usr/sap'         }
+    - { node_tier: 'scs',  type: 'xfs',   src: '/dev/vg_sap/lv_usrsapinstall',          path: '/usr/sap/install' }                # Special Install Structure; Destroy on Completion
+    - { node_tier: 'hana', type: 'xfs',   src: '/dev/vg_sap/lv_hana_shared',            path: '/hana/shared'     }
+    - { node_tier: 'hana', type: 'xfs',   src: '/dev/vg_hana_data/lv_hana_data',        path: '/hana/data'       }
+    - { node_tier: 'hana', type: 'xfs',   src: '/dev/vg_hana_log/lv_hana_log',          path: '/hana/log'        }
+    - { node_tier: 'hana', type: 'xfs',   src: '/dev/vg_hana_backup/lv_hana_backup',    path: '/hana/backup'     }
+  when:         (item.node_tier == "all" or item.node_tier == node_tier) 
 
 
 - name: Set the NFS Server name
