@@ -1,18 +1,36 @@
 ---
 
+# bom_base_name is the name of the SAP Application Bill of Materials file
 bom_base_name:                 ${bom}
 
 # TERRAFORM CREATED
 sap_fqdn:                      ${dns}                      
+
+# sap_sid is the application SID
 sap_sid:                       ${sid}
+
+# sap_sid is the database SID
 hdb_sid:                       ${db_sid}
+
+# kv_uri is the name of the keyvault containing the system credentials
 kv_uri:                        ${kv_uri}
+
+# secret_prefix is the prefix for the name of the secret stored in keyvault
 secret_prefix:                 ${secret_prefix}
+
+# scs_high_availability is a booloan flag indicating if the SAP Central Services are deployed using high availability 
 scs_high_availability:         ${scs_ha}
+
+# scs_lb_ip is the IP address of the load balancer in from of the SAP Central Services virtual machines
 scs_lb_ip:                     ${scs_lb_ip}
+
+# db_high_availability is a booloan flag indicating if the SAP database servers are deployed using high availability
 db_high_availability:          ${db_ha}
+# db_lb_ip is the IP address of the load balancer in from of the database virtual machines
 db_lb_ip:                      ${db_lb_ip}
-sap_mnt:                       ${sap_mnt}
+
+${sap_mnt}
+
 disks: 
 %{~ for disk in disks }
   - ${disk} 

@@ -26,7 +26,7 @@
     nfs_server: "{{ query('inventory_hostnames', '{{ sap_sid|upper }}_SCS') | first }}"
  
 # Mount Filesystems
-- name:     "Mount Filesystems when not using ANF"
+- name:     "Mount Filesystems when not using ANF (all)"
   mount:
     src:    "{{ item.src }}"
     path:   "{{ item.path }}"
@@ -34,29 +34,34 @@
     opts:   defaults
     state:  mounted
   loop: 
-    - { tier: 'ers',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }   
-    - { tier: 'ers',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
-    - { tier: 'hdb',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
-    - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
-    - { tier: 'dbload',       type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
-    # dbload is running from PAS and hence we do not need to remount these volumes again
-    #- { tier: 'pas',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
-    #- { tier: 'pas',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }
-    - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
-    - { tier: 'app',          type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }   
-    - { tier: 'web',          type: 'xfs',   src: '/dev/vg_sap/lv_sapmnt',                         path: '/sapmnt'                     }
-    - { tier: 'web',          type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
+    - { type: 'nfs4',  src: '{{ nfs_server }}:/sapmnt/{{ sap_sid|upper }}',  path: '/sapmnt/{{ sap_sid|upper }}' }   
+    - { type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
   when:         
     - sap_mnt is not defined
-    - item.tier == tier
+    - node_tier != 'hana'
+    - node_tier != 'scs'
     
+# Mount Filesystems
+- name:     "Mount Filesystems when not using ANF (hana)"
+  mount:
+    src:    "{{ item.src }}"
+    path:   "{{ item.path }}"
+    fstype: "{{ item.type }}"
+    opts:   defaults
+    state:  mounted
+  loop: 
+    - { type: 'nfs4',  src: '{{ nfs_server }}:/usr/sap/install',             path: '/usr/sap/install'            }                # Special Install Structure; Destroy on Completion
+  when:         
+    - sap_mnt is not defined
+    - node_tier == 'hana'
+
+
 
 
 # Import this task only if the sap_mnt is defined, i.e. ANF is used
 - import_tasks: 2.6.1-anf-mounts.yaml
   when: 
   - sap_mnt is defined
-  - sap_mnt | trim | length != 0
-
+  
 
 ...

@@ -27,7 +27,7 @@
 
 
 
-#      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
+#      password_master:    "{{ hostvars.localhost.sap_password }}"
 
 
 - hosts:          "{{ sap_sid|upper }}_APP"
@@ -50,20 +50,8 @@
 # -------------------------------------+---------------------------------------8
   - ansible.builtin.set_fact:
       tier:                    app                                               # SAP Install phase: APP - Application Server
-      hana_password_master:    "{{ hostvars.localhost.sap_password }}"
+      password_master:    "{{ hostvars.localhost.sap_password }}"
 
-# - role: sap-users                                             # --> roles-sap/sap-users (playbook_02_os_sap_specific_config)
-  - block:
-    - include_role:
-        name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
-    tags:
-      - 2.5-sap-users
-
-  - block:
-      - include_role:
-          name:     roles-sap-os/2.6-sap-mounts
-    tags:
-      - 2.6-sap-mounts
 
   - block:
       - include_role:

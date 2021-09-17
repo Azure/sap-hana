@@ -52,7 +52,7 @@
 # -------------------------------------+---------------------------------------8
   - ansible.builtin.set_fact:
       tier:     sapos
-      hana_password_master:   "{{ hostvars.localhost.sap_password }}"
+      password_master:   "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 
@@ -93,6 +93,20 @@
           name:     roles-sap-os/2.5-sap-users                          # TODO: Centiq copy (rework done)
     tags:
       - 2.5-sap-users
+
+  - block:
+    - include_role:
+        name:     roles-sap-os/2.3-sap-exports
+    tags:
+      - 2.3-sap-exports
+
+  - block:
+      - include_role:
+          name:     roles-os/1.16-services
+    tags:
+      - 1.16-services
+
+
 
   - block:
     - include_role:

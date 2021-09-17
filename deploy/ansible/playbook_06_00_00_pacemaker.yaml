@@ -57,7 +57,7 @@
   tasks:
   - ansible.builtin.set_fact:
       tier:     ha
-      hana_password_master:       "{{ hostvars.localhost.sap_password }}"
+      password_master:       "{{ hostvars.localhost.sap_password }}"
       password_ha_db_cluster:     "{{ hostvars.localhost.db_cluster_password }}"
     tags:
       - always

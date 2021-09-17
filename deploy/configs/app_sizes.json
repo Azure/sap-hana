@@ -87,7 +87,7 @@
           "count": 1,
           "name": "os",
           "disk_type": "Premium_LRS",
-          "size_gb": 64,
+          "size_gb": 128,
           "caching": "ReadWrite",
           "write_accelerator": false
         },

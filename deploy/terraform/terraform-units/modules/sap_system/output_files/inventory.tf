@@ -202,7 +202,7 @@ resource "local_file" "sap-parameters_yml" {
     db_ha         = var.db_ha
     dns           = local.dns_label
     bom           = local.bom
-    sap_mnt       = var.sap_mnt
+    sap_mnt       = length(trimspace(var.sap_mnt)) >  0 ? format("sap_mnt:                       %s", var.sap_mnt) : ""
     }
   )
   filename             = format("%s/sap-parameters.yaml", path.cwd)

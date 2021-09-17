@@ -61,7 +61,7 @@
   # Specify the active tier for this playbook run
   - ansible.builtin.set_fact:
       tier:     os
-      hana_password_master:   "{{ hostvars.localhost.sap_password }}"
+      password_master:   "{{ hostvars.localhost.sap_password }}"
     tags:
       - always
 

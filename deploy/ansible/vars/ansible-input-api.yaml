@@ -49,7 +49,6 @@ sidadm_uid:                   2000
 hdbadm_uid:                   2200
 scs_lb_ip:                    ""                                                        # SAP HA   
 db_lb_ip:                     ""                                                        # SAP HA
-sap_mnt:                      ""                                                        # ANF  
 reinstall:                    false                                                     # Provide a way to override the idempotency flags for SAP tasks
 
 orchestration_ansible_user:   azureadm
