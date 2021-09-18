@@ -1,7 +1,7 @@
 ---
 
 - name:     "SAP: File Permissions"
-  file:
+  ansible.builtin.file:
     path:   "{{ item.path }}"
     owner:  "{{ item.owner }}"
     group:  "{{ item.group }}"
@@ -15,26 +15,3 @@
             item.tier == node_tier
 
 ...
-
-
-
-# - name: "Ensure /usr/sap permissions are correct"
-#   file:
-#      path: "/usr/sap"
-#      state: directory
-#      mode: "0777"
-#      group: "sapsys"
-
-# - name: "Ensure /sapmnt permissions are correct"
-#   file:
-#      path: "/sapmnt"
-#      state: directory
-#      mode: "0777"
-
-# - name: Ensure a temporary directory for executing the installation exists
-#   file:
-#     path: "/tmp/{{ bom_base_name }}"
-#     state: directory
-#     owner: root
-#     group: sapinst
-#     mode: "0777"

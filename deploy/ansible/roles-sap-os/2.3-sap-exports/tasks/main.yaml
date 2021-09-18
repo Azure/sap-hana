@@ -10,9 +10,8 @@
     - { path: '/usr/sap/install' }
     - { path: '/usr/sap/trans' }
     - { path: '/sapmnt/{{ sap_sid|upper }}' }
-  when:     
+  when:
     - node_tier == 'scs'
-
 
 - name: "Exports: NFS Server Config on Suse"
   ansible.builtin.lineinfile:
@@ -28,8 +27,8 @@
       # - { tier: 'preparation', path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=',        line: 'NFS3_SERVER_SUPPORT="no"' }
     - { path: '/etc/sysconfig/nfs', regexp: '^NFS3_SERVER_SUPPORT=',        line: 'NFS3_SERVER_SUPPORT="yes"' }
     - { path: '/etc/sysconfig/nfs', regexp: '^NFS4_SUPPORT=',               line: 'NFS4_SUPPORT="yes"' }
-  when:     
-    - (ansible_os_family|upper == "SUSE" or (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat7") 
+  when:
+    - (ansible_os_family|upper == "SUSE" or (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat7")
     - node_tier == 'scs'
 
 - name: "Exports: NFS Server Config on Suse (sapmnt)"
@@ -42,10 +41,10 @@
     mode:   0644
   loop:
     - { path: '/etc/exports',       regexp: '^/sapmnt/{{ sap_sid|upper }}', line: '/sapmnt/{{ sap_sid|upper }} *(rw,sync,no_wdelay,no_root_squash)' }
-  when:     
-    - (ansible_os_family|upper == "SUSE" or (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat7") 
+  when:
+    - (ansible_os_family|upper == "SUSE" or (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat7")
     - node_tier == 'scs'
-    - sap_mnt is not defined 
+    - sap_mnt is not defined
 
 - name: "Exports: NFS Server Config on  : {{ ansible_os_family|lower ~ ansible_distribution_major_version }}"
   ansible.builtin.lineinfile:
@@ -61,8 +60,8 @@
     - { path: '/etc/nfs.conf',      regexp: '^# vers3=',                    line: ' vers3=y'                                                        }
     - { path: '/etc/nfs.conf',      regexp: '^# vers4.1=',                  line: ' vers4.1=y'                                                      }
     - { path: '/etc/nfs.conf',      regexp: '^# vers4.2=',                  line: ' vers4.2=y'                                                      }
-  when:     
-    - (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8" 
+  when:
+    - (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8"
     - node_tier == 'scs'
 
 - name: "Exports: NFS Server Config on  : {{ ansible_os_family|lower ~ ansible_distribution_major_version }} (sapmnt)"
@@ -75,9 +74,7 @@
     mode:   0644
   loop:
     - { path: '/etc/exports',       regexp: '^/sapmnt/{{ sap_sid|upper }}', line: '/sapmnt/{{ sap_sid|upper }} *(rw,sync,no_wdelay,no_root_squash)' }
-  when:   
-    - (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8" 
+  when:
+    - (ansible_os_family|lower ~ ansible_distribution_major_version) == "redhat8"
     - node_tier == 'scs'
-    - sap_mnt is not defined 
-
-
+    - sap_mnt is not defined
