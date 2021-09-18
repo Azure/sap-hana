@@ -41,7 +41,6 @@
         state: restarted
   when: 
     - autofs_mapping_changed is changed 
-    - node_tier == 'scs'
 
 - name: "Mount: Create /saptmp (ANF)"
   ansible.builtin.file:

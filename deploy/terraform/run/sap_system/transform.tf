@@ -117,7 +117,7 @@ locals {
     enable_deployment = var.enable_app_tier_deployment && try(var.application.enable_deployment, true)
     use_DHCP          = var.app_tier_use_DHCP || try(var.application.use_DHCP, false)
     dual_nics         = var.app_tier_dual_nics || try(var.application.dual_nics, false)
-    vm_sizing         = try(coalesce(var.app_tier_vm_sizing, try(var.application.vm_sizing, "")), "")
+    vm_sizing         = try(coalesce(var.app_tier_vm_sizing, try(var.application.vm_sizing, "")), "Production")
 
     application_server_count = max(var.application_server_count, try(var.application.application_server_count, 0))
     app_sku                  = try(coalesce(var.application_server_sku, var.application.app_sku), "")

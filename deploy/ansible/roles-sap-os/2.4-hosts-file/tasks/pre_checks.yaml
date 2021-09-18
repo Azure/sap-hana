@@ -8,7 +8,7 @@
   assert:
     that:
       - "sap_fqdn is defined"                                 # Has the variable been defined
-      - "sap_fqdn | trim | length != 0"                       #   and given a value
+      - "sap_fqdn | trim | length > 0"                       #   and given a value
 
 # -------------------------------------+---------------------------------------8
 
