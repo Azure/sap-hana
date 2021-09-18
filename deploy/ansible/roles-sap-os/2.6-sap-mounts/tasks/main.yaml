@@ -55,6 +55,20 @@
     - sap_mnt is not defined
     - node_tier == 'hana'
 
+# Mount Filesystems
+- name:     "Mount Filesystems when not using ANF (scs)"
+  mount:
+    src:    "{{ item.src }}"
+    path:   "{{ item.path }}"
+    fstype: "{{ item.type }}"
+    opts:   defaults
+    state:  mounted
+  loop: 
+    - { type: 'xfs',  src: '/dev/vg_sap/lv_sapmnt',  path: '/sapmnt/{{ sap_sid|upper }}' }   
+  when:         
+    - sap_mnt is not defined
+    - node_tier == 'scs'
+
 
 
 
