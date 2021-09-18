@@ -22,7 +22,8 @@
     line:   'Domain = defaultv4iddomain.com'
     insertafter: '[General]'
   register: autofs_mapping_changed
-  when:     tier == 'sapos' 
+  when:     
+    - tier == 'sapos' 
 
 - name:     "Mount: Ensure the services are restarted"
   block:
@@ -38,13 +39,17 @@
       ansible.builtin.systemd:
         name: rpcbind
         state: restarted
-  when: autofs_mapping_changed is changed 
+  when: 
+    - autofs_mapping_changed is changed 
+    - node_tier == 'scs'
 
 - name: "Mount: Create /saptmp (ANF)"
   ansible.builtin.file:
     path:        "/saptmp"
     state:       directory
     group:       sapsys
+  when: 
+    - node_tier == 'scs'
 
   # Mount Filesystem on ANF
   # This is needed so that we can create the correct directory
@@ -73,6 +78,7 @@
   ansible.builtin.file:
     path:        "{{ item.path }}"
     state:       directory
+    owner:       '{{ sidadm_uid }}'
     group:       sapsys
     mode:        0755
   loop:
@@ -130,7 +136,8 @@
     - { path: '/usr/sap/{{ sap_sid|upper }}/SYS' }
     - { path: '/usr/sap/{{ sap_sid|upper }}/ASCS{{ scs_instance_number }}' }
     - { path: '/usr/sap/{{ sap_sid|upper }}/ERS{{ ers_instance_number }}' }
-  when:     tier == 'sapos'
+  when: 
+    - tier == 'sapos'
   register: isCreatedNow
 
 #- name: "debug"
@@ -207,11 +214,6 @@
     - tier == 'sapos' 
     - node_tier =='hana'
 
-- name: "Mount: Ensure the Autofs service is restarted" 
-  ansible.builtin.systemd:
-    name: autofs
-    state: restarted
-
 - name: "Mount: Ensure the NFS service is restarted" 
   ansible.builtin.systemd:
     name: "{{ nfs_service }}"
@@ -219,26 +221,9 @@
   when: 
     - node_tier == 'scs'
 
-# - name: "Mount: Clear the cache of the nfsidmap daemon (ANF)"
-#   ansible.builtin.shell: |
-#                   nfsidmap -r root
-# - name: "Mount: Ensure the rpcbind service is restarted" 
-#   ansible.builtin.systemd:
-#     name: rpcbind
-#     state: restarted
+- name: "Mount: Ensure the Autofs service is restarted" 
+  ansible.builtin.systemd:
+    name: autofs
+    state: restarted
 
-# Configure shared direcotries
-# - name:     "Create the shared directories for SAP installation (ANF)"
-#   ansible.builtin.file:
-#     path:        "{{item.path}}"
-#     state:       directory
-#     #group:       sapsys
-#     #owner:       "{{ sap_sid|lower }}adm"
-#     attributes:  +i
-#   when: tier == 'sapos'
-#   loop:
-#     - { tier: 'sapos', path: '/sapmnt/{{ sap_sid|upper }}'     }
-#     - { tier: 'sapos', path: '/sapmnt/{{ sap_sid|upper }}sys' }
-#   #TODO: Add to loop in near future
-#     #sudo mkdir -p /usr/sap/QAS/ASCS00
-#     #sudo mkdir -p /usr/sap/QAS/ERS01
+
