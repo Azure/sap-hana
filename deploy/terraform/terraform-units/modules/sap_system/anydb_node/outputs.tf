@@ -22,7 +22,7 @@ output "anydb_db_ip" {
 }
 
 output "db_lb_ip" {
-  value = local.enable_deployment && (var.use_loadbalancers_for_standalone_deployments || local.anydb_ha) ? try(azurerm_lb.anydb[0].frontend_ip_configuration[0].private_ip_address, "") : ""
+  value = local.enable_db_lb_deployment  && (var.use_loadbalancers_for_standalone_deployments || local.anydb_ha) ? try(azurerm_lb.anydb[0].frontend_ip_configuration[0].private_ip_address, "") : ""
 }
 
 output "any_database_info" {
@@ -53,7 +53,7 @@ output "dns_info_vms" {
 }
 
 output "dns_info_loadbalancers" {
-  value = local.enable_deployment ? (
+  value = local.enable_db_lb_deployment  ? (
     zipmap([format("%s%s%s", local.prefix, var.naming.separator, local.resource_suffixes.db_alb)], [azurerm_lb.anydb[0].private_ip_addresses[0]])) : (
     null
   )
