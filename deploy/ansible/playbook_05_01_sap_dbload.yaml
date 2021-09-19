@@ -56,6 +56,13 @@
         - always
 
     - block:
+        - name:                        Include 2.6-sap-mounts role
+          ansible.builtin.include_role:
+            name:                      roles-sap-os/2.6-sap-mounts
+      tags:
+        - 2.6-sap-mounts
+
+    - block:
         - name:                        Include 5.1-dbload role
           ansible.builtin.include_role:
             name:                      roles-sap/5.1-dbload
