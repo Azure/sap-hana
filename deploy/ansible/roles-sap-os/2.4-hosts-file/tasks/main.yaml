@@ -8,7 +8,7 @@
 
 # -------------------------------------+---------------------------------------8
 #
-# Description:  Validation for Prerequisites 
+# Description:  Validation for Prerequisites
 #
 - import_tasks:     pre_checks.yaml
 # -------------------------------------+---------------------------------------8
@@ -18,8 +18,8 @@
   ansible.builtin.blockinfile:
     path:         /etc/hosts
     mode:         0644
-    create:       yes
-    backup:       yes
+    create:       true
+    backup:       true
     state:        present
     block:        "{{ lookup('file', 'hosts.block') }}"
     marker:       "# {mark} ANSIBLE MANAGED BLOCK - COMMON"

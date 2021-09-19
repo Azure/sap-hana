@@ -1,40 +1,47 @@
 # /*----------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for HANA DB Install                           |
+# |                      Prepare for HANA DB Install                           |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-- hosts: localhost
-  name: Get SAP Password from KeyVault
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Get SAP Password from KeyVault
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
+
   tasks:
-  - ansible.builtin.set_fact:
-      tier:  hdb
+    - name:                            Set hdb fact
+      ansible.builtin.set_fact:
+        tier:                          hdb
 
-  - include_role:
-      name:     roles-misc/0.1-passwords
-      public:   yes      
-    tags:
-       - 0.1-passwords
+    - name:                            Include 0.1-passwords Role
+      ansible.builtin.include_role:
+        name:                          roles-misc/0.1-passwords
+        public:                        true
+      tags:
+        - 0.1-passwords
 
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step4"
-      state: absent
+    - name:                            Remove .step4 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step4"
+        state:                          absent
+
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for HANA DB Install                           |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
 
-- hosts:          "{{ sap_sid|upper }}_DB"
+- hosts:                               "{{ sap_sid|upper }}_DB"
 
-  name:           DB Installation - HANA
-  remote_user:    "{{ orchestration_ansible_user }}"                
-  become:         yes
-  become_user:    root
-  gather_facts:   true
+  name:                                DB Installation - HANA
+  remote_user:                         "{{ orchestration_ansible_user }}"
+  become:                              true
+  become_user:                         root
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
 
@@ -42,73 +49,42 @@
   tasks:
 # -------------------------------------+---------------------------------------8
 #
-# Build the list of tasks to be executed in order here. 
+# Build the list of tasks to be executed in order here.
 #
 # -------------------------------------+---------------------------------------8
 
-  - name: "Setting the DB facts "
-    ansible.builtin.set_fact:
-      tier:                   hdb                                     # Actions for HANA DB Servers
-      password_master:   "{{ hostvars.localhost.sap_password }}"
-    tags:
-      - always
+    - name:                            Setting the DB facts
+      ansible.builtin.set_fact:
+        tier:                          hdb                                     # Actions for HANA DB Serve
+        password_master:               "{{ hostvars.localhost.sap_password }}"
+      tags:
+        - always
 
+    - block:
+        - name:                        Include 4.0.0-hdb-install role
+          ansible.builtin.include_role:
+            name:                      roles-db/4.0.0-hdb-install
+      tags:
+        - 4.0.0-hdb-install
 
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                         PLAYBOOK FOR HANA DB LOGGING                       |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
-
-  - block:
-      - include_role:
-          name:     roles-db/4.0.0-hdb-install
-    tags:
-      - 4.0.0-hdb-install
-
-#----------------------------------------
-# BEGIN
-#
-# TODO: evaluate for inclusion and refactor.
-# SOURCE: sap-playbook
-#----------------------------------------
-
-
-#----------------------------------------
-# BEGIN: Commented Section to enable BOM
-#        Process
-#
-# TODO: evaluate and refactor. DB install, HSR, HA
-#----------------------------------------
-
-# # Hana DB components install
-# - hosts: hanadbnodes
-#   become: true
-#   become_user: root
-#   any_errors_fatal: true
-#   vars_files:
-#     - "vars/ha-packages.yaml"
-#   pre_tasks:
-#     - name: Include SAP HANA DB sizes
-#       include_vars:
-#         ansible.builtin.file: "{{ configs_path }}/hdb_sizes.json"
-#         name: hdb_sizes
-#   roles:
-#     - role: hdb-server-install
-
-#----------------------------------------
-# END
-#----------------------------------------
-
-- hosts: localhost
-  name: Log results
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Log results
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
-  tasks:
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step4"
-      state: touch
 
+  tasks:
+    - name:                           Create .step4 flag
+      ansible.builtin.file:
+        path:                         "{{ _workspace_directory }}/.step4"
+        state:                        touch
+        mode:                         0755
 
 
 ...

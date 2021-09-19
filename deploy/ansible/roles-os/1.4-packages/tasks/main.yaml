@@ -6,7 +6,7 @@
 # +------------------------------------4--------------------------------------*/
 
 - name:             1.4 - Import package list
-  include_vars:     os-packages.yaml
+  ansible.builtin.include_vars:     os-packages.yaml
 
   # Print list of matching packages if verbosity it 1 or greater
 - name: Show tier
@@ -52,7 +52,7 @@
 # TODO: Do we want to remap 'present' to 'latest' to install latest version
 # for packages that may not be up-to-date?
 - name:             "1.4 - Update OS packages: {{ distro_name }}"
-  package:
+  ansible.builtin.package:
     name:           "{{ packages_for_tier |
                         selectattr('state', 'equalto', item.state) |
                         map(attribute='package') |
@@ -64,7 +64,7 @@
 
 
 - name:             "1.4 - Update OS packages: {{ distro_name }}"
-  package:
+  ansible.builtin.package:
     name:           "{{ packages_for_tier |
                         selectattr('state', 'equalto', item.state) |
                         map(attribute='package') |
@@ -75,7 +75,7 @@
     - { state: 'absent' }   # Then remove packages that we don't want
 
 - name:             "1.4 - Update OS packages: {{ distro_full_id }}"
-  package:
+  ansible.builtin.package:
     name:           "{{ packages_for_specific_tier |
                         selectattr('state', 'equalto', item.state) |
                         map(attribute='package') |
@@ -87,7 +87,7 @@
 
 
 - name:             "1.4 - Update OS packages: {{ distro_full_id }}"
-  package:
+  ansible.builtin.package:
     name:           "{{ packages_for_specific_tier |
                         selectattr('state', 'equalto', item.state) |
                         map(attribute='package') |

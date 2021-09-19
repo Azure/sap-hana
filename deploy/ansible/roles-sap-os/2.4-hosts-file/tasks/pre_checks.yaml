@@ -2,13 +2,13 @@
 
 # -------------------------------------+---------------------------------------8
 #
-# Description:  Validation for Prerequisites 
+# Description:  Validation for Prerequisites
 #
 - name:   Check required variables are present and not empty
-  assert:
+  ansible.builtin.assert:
     that:
       - "sap_fqdn is defined"                                 # Has the variable been defined
-      - "sap_fqdn | trim | length > 1"                       #   and given a value
+      - "sap_fqdn | default('none') | trim | length > 4"      #   and given a value
 
 # -------------------------------------+---------------------------------------8
 

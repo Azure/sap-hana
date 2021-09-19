@@ -4,17 +4,17 @@
 #
 # -----------------------------------------------------------------------------
 
-- name: 1.0 - Enable logging for sudo operations
+- name:                                1.0 - Enable logging for sudo operations
   ansible.builtin.blockinfile:
-    path: /etc/sudoers
-    state: present
-    insertafter: 'EOF'
-    validate: visudo -cf %s
+    path:                              /etc/sudoers
+    state:                             present
+    insertafter:                       'EOF'
+    validate:                          visudo -cf %s
     block: |
-      Defaults logfile="/var/log/sudo.log"
-      Defaults iolog_dir="/var/log/sudo/${user}"
-      Defaults log_input
-#      Additional option to also logo outputs instead of inputs only      
+                                       Defaults logfile="/var/log/sudo.log"
+                                       Defaults iolog_dir="/var/log/sudo/${user}"
+                                       Defaults log_input
+#      Additional option to also logo outputs instead of inputs only
 #      Defaults log_input, log_output
 
 # /*----------------------------------------------------------------------------8

@@ -11,176 +11,176 @@
 # (absent). See the definition of 'distro_id' to determine what to use when
 # creating an entry for a new distribution.
 packages:
-    redhat7:
-      - { tier: 'os',    package: '@base',                                                    state: 'present' }
-      - { tier: 'os',    package: 'gtk2',                                                     state: 'present' }
-      - { tier: 'os',    package: 'libicu',                                                   state: 'present' }
-      - { tier: 'os',    package: 'xulrunner',                                                state: 'present' }
-      - { tier: 'os',    package: 'sudo',                                                     state: 'present' }
-      - { tier: 'os',    package: 'tcsh',                                                     state: 'present' }
-      - { tier: 'os',    package: 'libssh2',                                                  state: 'present' }
-      - { tier: 'os',    package: 'expect',                                                   state: 'present' }
-      - { tier: 'os',    package: 'cairo',                                                    state: 'present' }
-      - { tier: 'os',    package: 'graphviz',                                                 state: 'present' }
-      - { tier: 'os',    package: 'iptraf-ng',                                                state: 'present' }
-      - { tier: 'os',    package: 'krb5-workstation',                                         state: 'present' }
-      - { tier: 'os',    package: 'krb5-libs',                                                state: 'present' }
-      - { tier: 'os',    package: 'libpng12',                                                 state: 'present' }
-      - { tier: 'os',    package: 'nfs-utils',                                                state: 'present' }
-      - { tier: 'os',    package: 'lm_sensors',                                               state: 'present' }
-      - { tier: 'os',    package: 'rsyslog',                                                  state: 'present' }
-      - { tier: 'os',    package: 'openssl',                                                  state: 'present' }
-      - { tier: 'os',    package: 'PackageKit-gtk3-module',                                   state: 'present' }
-      - { tier: 'os',    package: 'libcanberra-gtk2',                                         state: 'present' }
-      - { tier: 'os',    package: 'libtool-ltdl',                                             state: 'present' }
-      - { tier: 'os',    package: 'xorg-x11-xauth',                                           state: 'present' }
-      - { tier: 'os',    package: 'numactl',                                                  state: 'present' }
-      - { tier: 'os',    package: 'xfsprogs',                                                 state: 'present' }
-      - { tier: 'os',    package: 'net-tools',                                                state: 'present' }
-      - { tier: 'os',    package: 'bind-utils',                                               state: 'present' }
-      - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
-      - { tier: 'os',    package: 'gdisk',                                                    state: 'present' }
-      - { tier: 'os',    package: 'sg3_utils',                                                state: 'present' }
-      - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
-      - { tier: 'os',    package: 'numad',                                                    state: 'present' }
-      - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
-      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
-      - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' } 
-      - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
-      - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
-      - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
-      - { tier: 'sapos', package: 'csh',                                                      state: 'present' }     
+  redhat7:
+    - { tier: 'os',    package: '@base',                                                    state: 'present' }
+    - { tier: 'os',    package: 'gtk2',                                                     state: 'present' }
+    - { tier: 'os',    package: 'libicu',                                                   state: 'present' }
+    - { tier: 'os',    package: 'xulrunner',                                                state: 'present' }
+    - { tier: 'os',    package: 'sudo',                                                     state: 'present' }
+    - { tier: 'os',    package: 'tcsh',                                                     state: 'present' }
+    - { tier: 'os',    package: 'libssh2',                                                  state: 'present' }
+    - { tier: 'os',    package: 'expect',                                                   state: 'present' }
+    - { tier: 'os',    package: 'cairo',                                                    state: 'present' }
+    - { tier: 'os',    package: 'graphviz',                                                 state: 'present' }
+    - { tier: 'os',    package: 'iptraf-ng',                                                state: 'present' }
+    - { tier: 'os',    package: 'krb5-workstation',                                         state: 'present' }
+    - { tier: 'os',    package: 'krb5-libs',                                                state: 'present' }
+    - { tier: 'os',    package: 'libpng12',                                                 state: 'present' }
+    - { tier: 'os',    package: 'nfs-utils',                                                state: 'present' }
+    - { tier: 'os',    package: 'lm_sensors',                                               state: 'present' }
+    - { tier: 'os',    package: 'rsyslog',                                                  state: 'present' }
+    - { tier: 'os',    package: 'openssl',                                                  state: 'present' }
+    - { tier: 'os',    package: 'PackageKit-gtk3-module',                                   state: 'present' }
+    - { tier: 'os',    package: 'libcanberra-gtk2',                                         state: 'present' }
+    - { tier: 'os',    package: 'libtool-ltdl',                                             state: 'present' }
+    - { tier: 'os',    package: 'xorg-x11-xauth',                                           state: 'present' }
+    - { tier: 'os',    package: 'numactl',                                                  state: 'present' }
+    - { tier: 'os',    package: 'xfsprogs',                                                 state: 'present' }
+    - { tier: 'os',    package: 'net-tools',                                                state: 'present' }
+    - { tier: 'os',    package: 'bind-utils',                                               state: 'present' }
+    - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
+    - { tier: 'os',    package: 'gdisk',                                                    state: 'present' }
+    - { tier: 'os',    package: 'sg3_utils',                                                state: 'present' }
+    - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
+    - { tier: 'os',    package: 'numad',                                                    state: 'present' }
+    - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
+    - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+    - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' }
+    - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
+    - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
+    - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
+    - { tier: 'sapos', package: 'csh',                                                      state: 'present' }
     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
-      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
+    - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+    - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
+    - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
+    - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
+    - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
     #------------------------- End - Packages required for Clustering -----------------------------------------8
-    redhat7.4: 
-      # Install Right Version of Azure Fence Agent 
-      # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
-      - { tier: 'ha',    package: 'fence-agents-azure-arm-4.0.11-66.el7_4.12',                state: 'present' }
-    redhat7.5: 
-      # Install Right Version of Azure Fence Agent 
-      # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
-      - { tier: 'ha',    package: 'fence-agents-azure-arm-4.0.11-86.el7_5.8',                 state: 'present' }
-    redhat7.6: 
-      # Install Right Version of Azure Fence Agent 
-      # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
-      - { tier: 'ha',    package: 'fence-agents-azure-arm-4.2.1-11.el7_6.8',                  state: 'present' }
-    redhat7.7:
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-    redhat7.8:
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-    redhat7.9:
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-    redhat8:
-      - { tier: 'os',    package: '@base',                                                    state: 'present' }
-      - { tier: 'os',    package: 'gtk2',                                                     state: 'present' }
-      - { tier: 'os',    package: 'libicu',                                                   state: 'present' }
-      - { tier: 'os',    package: 'sudo',                                                     state: 'present' }
-      - { tier: 'os',    package: 'tcsh',                                                     state: 'present' }
-      - { tier: 'os',    package: 'libssh2',                                                  state: 'present' }
-      - { tier: 'os',    package: 'expect',                                                   state: 'present' }
-      - { tier: 'os',    package: 'cairo',                                                    state: 'present' }
-      - { tier: 'os',    package: 'graphviz',                                                 state: 'present' }
-      - { tier: 'os',    package: 'iptraf-ng',                                                state: 'present' }
-      - { tier: 'os',    package: 'krb5-workstation',                                         state: 'present' }
-      - { tier: 'os',    package: 'krb5-libs',                                                state: 'present' }
-      - { tier: 'os',    package: 'libpng12',                                                 state: 'present' }
-      - { tier: 'os',    package: 'nfs-utils',                                                state: 'present' }
-      - { tier: 'os',    package: 'lm_sensors',                                               state: 'present' }
-      - { tier: 'os',    package: 'rsyslog',                                                  state: 'present' }
-      - { tier: 'os',    package: 'openssl',                                                  state: 'present' }
-      - { tier: 'os',    package: 'PackageKit-gtk3-module',                                   state: 'present' }
-      - { tier: 'os',    package: 'libcanberra-gtk2',                                         state: 'present' }
-      - { tier: 'os',    package: 'libtool-ltdl',                                             state: 'present' }
-      - { tier: 'os',    package: 'xorg-x11-xauth',                                           state: 'present' }
-      - { tier: 'os',    package: 'numactl',                                                  state: 'present' }
-      - { tier: 'os',    package: 'xfsprogs',                                                 state: 'present' }
-      - { tier: 'os',    package: 'net-tools',                                                state: 'present' }
-      - { tier: 'os',    package: 'bind-utils',                                               state: 'present' }
-      - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
-      - { tier: 'os',    package: 'gdisk',                                                    state: 'present' }
-      - { tier: 'os',    package: 'sg3_utils',                                                state: 'present' }
-      - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
-      - { tier: 'os',    package: 'numad',                                                    state: 'present' }
-      - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
-      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
-      - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' } 
-      - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
-      - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
-      - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
-      - { tier: 'sapos', package: 'csh',                                                      state: 'present' }
-     #------------------------- Begin - Packages required for Clustering ---------------------------------------8
-      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-      - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
-      - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
-      - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
-    #------------------------- End - Packages required for Clustering -----------------------------------------8
-    redhat8.1:
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-    redhat8.2:
-      - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
-    suse12:
-      - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
-      - { tier: 'os',    package: 'libyui-qt-pkg7',                                           state: 'present' }
-      - { tier: 'os',    package: 'glibc',                                                    state: 'present' }
-      - { tier: 'os',    package: 'systemd',                                                  state: 'present' }
-      - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
-      - { tier: 'os',    package: 'numad',                                                    state: 'present' }
-      - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
-      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
-      - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
-      - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
-      - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
-      - { tier: 'sapos', package: 'libatomic1',                                               state: 'present' }
-      - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
-    #------------------------- Begin - Packages required for Clustering ------------------------------------8
-      - { tier: 'ha',    package: 'socat',                                                    state: 'present' }
-      - { tier: 'ha',    package: 'corosync',                                                 state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents>=4.3',                                     state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents>=4.4.0',                                      state: 'present' }
-      - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',                               state: 'present' }
-    #Assumption: Public_Cloud_Module_x86_64 already available 
-      - { tier: 'ha',    package: 'python-azure-mgmt-compute=4.6.2',                          state: 'present' }
-      - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
-      - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',     state: 'present' }
-    #-------------------------- End - packages required for Clustering ------------------------------------8
-    suse12.4:
-    suse12.5:
-    suse15:
-      - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
-      - { tier: 'os',    package: 'libyui-qt-pkg11',                                          state: 'present' }
-      - { tier: 'os',    package: 'glibc',                                                    state: 'present' }
-      - { tier: 'os',    package: 'systemd',                                                  state: 'present' }
-      - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
-      - { tier: 'os',    package: 'numad',                                                    state: 'present' }
-      - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
-      - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
-      - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
-      - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
-      - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
-      - { tier: 'sapos', package: 'libatomic1',                                               state: 'present' }
-      - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
-    #----------------------- Begin - Packages required for Clustering -------------------------------------8
-      - { tier: 'ha',    package: 'socat',                                                    state: 'present' }
-      - { tier: 'ha',    package: 'corosync',                           node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'resource-agents>=4.3',               node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'fence-agents>=4.4.0',                node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',         node_tier: 'hana',          state: 'present' }
-    #Assumption: Public_Cloud_Module_x86_64 already available 
-      - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'scs',           state: 'present' }
-      - { tier: 'ha',    package: 'jq',                                 node_tier: 'scs',           state: 'present' }
-      - { tier: 'ha',    package: 'jq',                                 node_tier: 'hana',          state: 'present' }
-      - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',           state: 'present' }
-    #------------------------ End - packages required for Clustering --------------------------------------8
-      # TODO(rtamalin): Ensure SLE 15 SP2 uses /usr/bin/python3 rather
-      # than /usr/bin/python.
-      # Required to enable ansible to use /usr/bin/python on SLE 15 SP2
-      - { tier: 'os', package: 'python2-rpm',                                                state: 'present' }
-    suse15.1:
+  redhat7.4:
+    # Install Right Version of Azure Fence Agent
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
+    - { tier: 'ha',    package: 'fence-agents-azure-arm-4.0.11-66.el7_4.12',                state: 'present' }
+  redhat7.5:
+    # Install Right Version of Azure Fence Agent
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
+    - { tier: 'ha',    package: 'fence-agents-azure-arm-4.0.11-86.el7_5.8',                 state: 'present' }
+  redhat7.6:
+    # Install Right Version of Azure Fence Agent
+    # https://docs.microsoft.com/en-us/azure/virtual-machines/workloads/sap/high-availability-guide-rhel-pacemaker
+    - { tier: 'ha',    package: 'fence-agents-azure-arm-4.2.1-11.el7_6.8',                  state: 'present' }
+  redhat7.7:
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+  redhat7.8:
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+  redhat7.9:
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+  redhat8:
+    - { tier: 'os',    package: '@base',                                                    state: 'present' }
+    - { tier: 'os',    package: 'gtk2',                                                     state: 'present' }
+    - { tier: 'os',    package: 'libicu',                                                   state: 'present' }
+    - { tier: 'os',    package: 'sudo',                                                     state: 'present' }
+    - { tier: 'os',    package: 'tcsh',                                                     state: 'present' }
+    - { tier: 'os',    package: 'libssh2',                                                  state: 'present' }
+    - { tier: 'os',    package: 'expect',                                                   state: 'present' }
+    - { tier: 'os',    package: 'cairo',                                                    state: 'present' }
+    - { tier: 'os',    package: 'graphviz',                                                 state: 'present' }
+    - { tier: 'os',    package: 'iptraf-ng',                                                state: 'present' }
+    - { tier: 'os',    package: 'krb5-workstation',                                         state: 'present' }
+    - { tier: 'os',    package: 'krb5-libs',                                                state: 'present' }
+    - { tier: 'os',    package: 'libpng12',                                                 state: 'present' }
+    - { tier: 'os',    package: 'nfs-utils',                                                state: 'present' }
+    - { tier: 'os',    package: 'lm_sensors',                                               state: 'present' }
+    - { tier: 'os',    package: 'rsyslog',                                                  state: 'present' }
+    - { tier: 'os',    package: 'openssl',                                                  state: 'present' }
+    - { tier: 'os',    package: 'PackageKit-gtk3-module',                                   state: 'present' }
+    - { tier: 'os',    package: 'libcanberra-gtk2',                                         state: 'present' }
+    - { tier: 'os',    package: 'libtool-ltdl',                                             state: 'present' }
+    - { tier: 'os',    package: 'xorg-x11-xauth',                                           state: 'present' }
+    - { tier: 'os',    package: 'numactl',                                                  state: 'present' }
+    - { tier: 'os',    package: 'xfsprogs',                                                 state: 'present' }
+    - { tier: 'os',    package: 'net-tools',                                                state: 'present' }
+    - { tier: 'os',    package: 'bind-utils',                                               state: 'present' }
+    - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
+    - { tier: 'os',    package: 'gdisk',                                                    state: 'present' }
+    - { tier: 'os',    package: 'sg3_utils',                                                state: 'present' }
+    - { tier: 'os',    package: 'lvm2',                                                     state: 'present' }
+    - { tier: 'os',    package: 'numad',                                                    state: 'present' }
+    - { tier: 'os',    package: 'cifs-utils',                                               state: 'present' }
+    - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+    - { tier: 'sapos', package: 'tuned-profiles-sap*',                                      state: 'present' }
+    - { tier: 'sapos', package: 'compat-sap-c++-*',                                         state: 'present' }
+    - { tier: 'sapos', package: 'libatomic',                                                state: 'present' }
+    - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
+    - { tier: 'sapos', package: 'csh',                                                      state: 'present' }
+    #------------------------- Begin - Packages required for Clustering ---------------------------------------8
+    - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+    - { tier: 'ha',    package: 'pcs',                                                      state: 'present' }
+    - { tier: 'ha',    package: 'pacemaker',                                                state: 'present' }
+    - { tier: 'ha',    package: 'nmap-ncat',                                                state: 'present' }
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+    - { tier: 'ha',    package: 'resource-agents-sap-hana',                                 state: 'present' }
+  #------------------------- End - Packages required for Clustering -----------------------------------------8
+  redhat8.1:
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+  redhat8.2:
+    - { tier: 'ha',    package: 'fence-agents-azure-arm',                                   state: 'present' }
+  suse12:
+    - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
+    - { tier: 'os',    package: 'libyui-qt-pkg7',                                           state: 'present' }
+    - { tier: 'os',    package: 'glibc',                                                    state: 'present' }
+    - { tier: 'os',    package: 'systemd',                                                  state: 'present' }
+    - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
+    - { tier: 'os',    package: 'numad',                                                    state: 'present' }
+    - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
+    - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+    - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
+    - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
+    - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
+    - { tier: 'sapos', package: 'libatomic1',                                               state: 'present' }
+    - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
+  #------------------------- Begin - Packages required for Clustering ------------------------------------8
+    - { tier: 'ha',    package: 'socat',                                                    state: 'present' }
+    - { tier: 'ha',    package: 'corosync',                                                 state: 'present' }
+    - { tier: 'ha',    package: 'resource-agents>=4.3',                                     state: 'present' }
+    - { tier: 'ha',    package: 'fence-agents>=4.4.0',                                      state: 'present' }
+    - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',                               state: 'present' }
+  #Assumption: Public_Cloud_Module_x86_64 already available 
+    - { tier: 'ha',    package: 'python-azure-mgmt-compute=4.6.2',                          state: 'present' }
+    - { tier: 'ha',    package: 'jq',                                                       state: 'present' }
+    - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',     state: 'present' }
+  #-------------------------- End - packages required for Clustering ------------------------------------8
+  suse12.4:
+  suse12.5:
+  suse15:
+    - { tier: 'os',    package: 'chrony',                                                   state: 'present' }
+    - { tier: 'os',    package: 'libyui-qt-pkg11',                                          state: 'present' }
+    - { tier: 'os',    package: 'glibc',                                                    state: 'present' }
+    - { tier: 'os',    package: 'systemd',                                                  state: 'present' }
+    - { tier: 'os',    package: 'tuned',                                                    state: 'present' }
+    - { tier: 'os',    package: 'numad',                                                    state: 'present' }
+    - { tier: 'os',    package: 'ntp',                                                      state: 'absent' }
+    - { tier: 'sapos', package: 'autofs',                                                   state: 'present' }
+    - { tier: 'sapos', package: 'saptune',                                                  state: 'present' }
+    - { tier: 'sapos', package: 'libgcc_s1',                                                state: 'present' }
+    - { tier: 'sapos', package: 'libstdc++6',                                               state: 'present' }
+    - { tier: 'sapos', package: 'libatomic1',                                               state: 'present' }
+    - { tier: 'sapos', package: 'uuidd',                                                    state: 'present' }
+  # ----------------------- Begin - Packages required for Clustering -------------------------------------8
+    - { tier: 'ha',    package: 'socat',                                                    state: 'present' }
+    - { tier: 'ha',    package: 'corosync',                           node_tier: 'hana',          state: 'present' }
+    - { tier: 'ha',    package: 'resource-agents>=4.3',               node_tier: 'hana',          state: 'present' }
+    - { tier: 'ha',    package: 'fence-agents>=4.4.0',                node_tier: 'hana',          state: 'present' }
+    - { tier: 'ha',    package: 'cloud-netconfig-azure>=1.3',         node_tier: 'hana',          state: 'present' }
+  # Assumption: Public_Cloud_Module_x86_64 already available
+    - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'hana',          state: 'present' }
+    - { tier: 'ha',    package: 'python3-azure-mgmt-compute=4.6.2',   node_tier: 'scs',           state: 'present' }
+    - { tier: 'ha',    package: 'jq',                                 node_tier: 'scs',           state: 'present' }
+    - { tier: 'ha',    package: 'jq',                                 node_tier: 'hana',          state: 'present' }
+    - { tier: 'ha',    package: 'sap-suse-cluster-connector',         node_tier: 'scs',           state: 'present' }
+  # ------------------------ End - packages required for Clustering --------------------------------------8
+    # TODO(rtamalin): Ensure SLE 15 SP2 uses /usr/bin/python3 rather
+    # than /usr/bin/python.
+    # Required to enable ansible to use /usr/bin/python on SLE 15 SP2
+    - { tier: 'os', package: 'python2-rpm',                                                state: 'present' }
+  suse15.1:

@@ -66,7 +66,7 @@
 # -------------------------------------+---------------------------------------8
 #
 - name:                           Load the disk configuration settings
-  include_vars:                   disks_config.yml
+  ansible.builtin.include_vars:   disks_config.yml
 
 - name:                           "print unique disks"
   ansible.builtin.debug:
@@ -77,7 +77,6 @@
   ansible.builtin.debug:
     var:                          volume_groups
     verbosity:                    2
-
 
 
 # -------------------------------------+---------------------------------------8
@@ -93,7 +92,6 @@
     - tier == "sapos"
 
 
-
 # -------------------------------------+---------------------------------------8
 #
 - name:                           "Logical Volume creation"
@@ -102,15 +100,14 @@
     vg:                           "{{ item.vg }}"
     size:                         "{{ item.size }}"
     opts:                         "{{ lvol_opts_from_lv_item }}"
-    active:                       yes
+    active:                       true
     state:                        present
-    shrink:                       no
-    resizefs:                     no
+    shrink:                       false
+    resizefs:                     false
   loop: "{{ logical_volumes }}"
   when:
     - item.tier in ["all", tier]
     - item.node_tier in ["all", node_tier]
-
 
 
 # -------------------------------------+---------------------------------------8

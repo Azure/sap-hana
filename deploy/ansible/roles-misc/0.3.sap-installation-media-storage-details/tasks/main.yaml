@@ -1,11 +1,11 @@
 - name: Debug
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: bom_processing
 
 - name: Deployer Keyvault name
   ansible.builtin.set_fact:
     deployer_kv_name: "{{ kv_name }}"
-  when: bom_processing is  defined
+  when: bom_processing is defined
 
 - name: Get Deployer Keyvault name from keyvault
   ansible.builtin.command: >-
@@ -24,10 +24,9 @@
 
 
 - name: Debug, Deployer Keyvault
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: deployer_kv_name
 #    verbosity: 2
-
 
 
 - name: Extract SAP Binaries Storage Account information
@@ -45,10 +44,10 @@
       {{ (sapbits_location_base_path_secret.stdout | from_json).value }}
 
 - name: Debug, storage account
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: sapbits_location_base_path
     verbosity: 2
-    
+
 
 - name: Extract SAP Binaries Storage Account SAS
   ansible.builtin.command: >-
@@ -65,6 +64,6 @@
   no_log: false
 
 - name: Debug, SAS Token
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: sapbits_sas_token
     verbosity: 2

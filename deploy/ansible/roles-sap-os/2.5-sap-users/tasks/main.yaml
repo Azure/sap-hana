@@ -29,8 +29,8 @@
 #   for file access in shared directories between SID's.
 #
 #   sapinst - typically only used durring install, and removed after. Potentially
-#   can be depracated. 
-# 
+#   can be depracated.
+#
 - name:       "SAP: Create SAP Groups"
   ansible.builtin.group:
     name:         "{{ item.group }}"
@@ -53,10 +53,10 @@
 #   sapadm - once defined, typically remains constant across all systems. Used
 #   for file access in shared directories between SID's.
 #
-#   <sid>adm - SAP admin user for SID. 
+#   <sid>adm - SAP admin user for SID.
 #
-#   webadm - SAP admin user for web dispatcher. same as <sid>adm. 
-# 
+#   webadm - SAP admin user for web dispatcher. same as <sid>adm.
+#
 - name:       "SAP: Create SAP Users"
   ansible.builtin.user:
     name:         "{{ item.user }}"

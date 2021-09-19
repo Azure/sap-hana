@@ -1,37 +1,28 @@
 # /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |       Playbook for performing general baseline OS configuration tasks      |
+# |       Preparation for performing general baseline OS configuration tasks   |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-- hosts: localhost
-  name: Get SAP Password from KeyVault
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Get SAP Password from KeyVault
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
   tasks:
-  - ansible.builtin.set_fact:
-      tier:  hdb
 
-  - include_role:
-      name:     roles-misc/0.1-passwords
-      public:   yes      
-    tags:
-       - 0.1-passwords
+    - name:                            Remove .step1 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step1"
+        state:                          absent
 
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step1"
-      state: absent
 
-# -------------------------------------+---------------------------------------8
-#
-# <Comment Header> 
-#
-# -------------------------------------+---------------------------------------8
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |       Playbook for performing general baseline OS configuration tasks      |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
 - hosts:              "{{ sap_sid|upper }}_DB  :
                        {{ sap_sid|upper }}_SCS :
@@ -42,8 +33,8 @@
                        {{ sap_sid|upper }}_WEB"
 
   name:               OS - Base Configuration
-  remote_user:        "{{ orchestration_ansible_user }}"                
-  become:             yes
+  remote_user:        "{{ orchestration_ansible_user }}"
+  become:             true
   become_user:        root
   gather_facts:       true                                                      # Important to collect hostvars information
   any_errors_fatal:   true
@@ -54,109 +45,121 @@
   tasks:
 # -------------------------------------+---------------------------------------8
 #
-# Build the list of tasks to be executed in order here. 
+# Build the list of tasks to be executed in order here.
 #
 # -------------------------------------+---------------------------------------8
 
   # Specify the active tier for this playbook run
-  - ansible.builtin.set_fact:
-      tier:     os
-      password_master:   "{{ hostvars.localhost.sap_password }}"
-    tags:
-      - always
+    - name:                            Setting the os tier facts
+      ansible.builtin.set_fact:
+        tier:                          os                                     # Actions for HANA DB Serve
+      tags:
+        - always
 
-  - block:
-      - include_role:
-          name:     roles-os/1.0-sudoers
-    tags:
-      - 1.0-sudoers
+    - block:
+        - name:                        Include 1.0-sudoers role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.0-sudoers
+      tags:
+        - 1.0-sudoers
 
-  - block:
-      - include_role:
-          name:     roles-os/1.1-swap
-    tags:
-      - 1.1-swap
+    - block:
+        - name:                        Include 1.1-swap role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.1-swap
+      tags:
+        - 1.1-swap
 
-  - block:
-      - include_role:
-          name:     roles-os/1.2-hostname
-    tags:
-      - 1.2-hostname
+    - block:
+        - name:                        Include 1.2-hostname role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.2-hostname
+      tags:
+        - 1.2-hostname
 
-  - block:
-      - include_role:
-          name:     roles-os/1.5-disk-setup
-    tags:
-      - 1.5-disk-setup
+    - block:
+        - name:                        Include 1.5-disk-setup role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.5-disk-setup
+      tags:
+        - 1.5-disk-setup
 
-  - block:
-      - include_role:
-          name:     roles-os/1.3-repository
-    tags:
-      - 1.3-repository
+    - block:
+        - name:                        Include 1.3-repository role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.3-repository
+      tags:
+        - 1.3-repository
 
-  - block:
-      - include_role:
-          name:     roles-os/1.4-packages
-    tags:
-      - 1.4-packages
+    - block:
+        - name:                        Include 1.4-packages role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.4-packages
+      tags:
+        - 1.4-packages
 
-  - block:
-      - include_role:
-          name:     roles-os/1.7-chrony
-    tags:
-      - 1.7-chrony
+    - block:
+        - name:                        Include 1.7-chrony role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.7-chrony
+      tags:
+        - 1.7-chrony
 
-  - block:
-      - include_role:
-          name:     roles-os/1.9-kernelparameters
-    tags:
-      - 1.9-kernelparameters
+    - block:
+        - name:                        Include 1.9-kernelparameters role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.9-kernelparameters
+      tags:
+        - 1.9-kernelparameters
 
-  - block:
-      - include_role:
-          name:     roles-os/1.11-accounts
-    tags:
-      - 1.11-accounts
+    - block:
+        - name:                        Include 1.11-accounts role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.11-accounts
+      tags:
+        - 1.11-accounts
 
-  - block:
-    - include_role:
-          name:     roles-os/1.16-services
-    tags:
-      - 1.16-services
+    - block:
+        - name:                        Include 1.16-services role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.16-services
+      tags:
+        - 1.16-services
 
-  - include_role:
-      name:     roles-os/1.20-prometheus
-    tags:
-      - 1.20-prometheus
-    when:   prometheus
-            and             ansible_os_family|upper == "SUSE"
-            and (     (     ansible_distribution_major_version == '12'
-                        and ansible_distribution_release is search('[3-5]' ) )
-                  or  (     ansible_distribution_major_version == '15' ) )
+    - block:
+        - name:                        Include 1.20-prometheus role
+          ansible.builtin.include_role:
+            name:                      roles-os/1.20-prometheus
+      when:   prometheus
+              and             ansible_os_family|upper == "SUSE"
+              and (     (     ansible_distribution_major_version == '12'
+                          and ansible_distribution_release is search('[3-5]' ) )
+                    or  (     ansible_distribution_major_version == '15' ) )
+      tags:
+        - 1.20-prometheus
+
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |     Logging for performing OS configuration tasks                          |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
 
-
-- hosts: localhost
-  name: Log results
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Log results
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
+
   tasks:
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step1"
-      state: touch
+    - name:                           Create .step1 flag
+      ansible.builtin.file:
+        path:                         "{{ _workspace_directory }}/.step1"
+        state:                        touch
+        mode:                         0755
 
 
 ...
-# /*---------------------------------------------------------------------------8
-# |                                   END                                      |
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
 # +------------------------------------4--------------------------------------*/
-
-#
-# 0      1         2         3         4         5         6         7         8
-# 345678901234567890123456789012345678901234567890123456789012345678901234567890
-#

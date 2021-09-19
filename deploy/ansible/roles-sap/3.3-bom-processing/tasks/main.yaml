@@ -32,28 +32,27 @@
 ---
 
 
-
 # -------------------------------------+---------------------------------------8
 #
-# Description:  Validation for Prerequisites 
+# Description:  Validation for Prerequisites
 #
 - import_tasks:     pre_checks.yaml
 # -------------------------------------+---------------------------------------8
 
-- include_role:
+- ansible.builtin.include_role:
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
   vars:
     bom_name:                     "{{ bom_base_name }}"
 
 
-- name:  
-  set_fact:
+- name:                           Save the BOM
+  ansible.builtin.set_fact:
     bom_base:                     "{{ bom }}"
 
 # # -------------------------------------+---------------------------------------8
 # #
-# # Description:  Check if BOM is Microsoft supplied and register BOM as an object. 
+# # Description:  Check if BOM is Microsoft supplied and register BOM as an object.
 # #               If not, download from storage account location.
 # #
 # - name:             Check for Microsoft Supplied BOM ({{ bom_base_name }})
@@ -91,7 +90,6 @@
 # # -------------------------------------+---------------------------------------8
 
 
-
 # -------------------------------------+---------------------------------------8
 #
 # Description:  Process Main BOM.
@@ -106,7 +104,6 @@
 # -------------------------------------+---------------------------------------8
 
 
-
 # -------------------------------------+---------------------------------------8
 #
 # Description:  Process BOM dependencies.
@@ -118,7 +115,7 @@
   loop:             "{{ bom_base.materials.dependencies | flatten(levels=1) }}"
   loop_control:
     loop_var:       bom_dependency
-  when:             
+  when:
     - bom_base.materials.dependencies is defined
     - bom_base.materials.dependencies|length>0
 # -------------------------------------+---------------------------------------8

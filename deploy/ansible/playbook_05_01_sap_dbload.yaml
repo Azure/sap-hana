@@ -1,80 +1,88 @@
 # /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                      Playbook for SAP DB Load                              |
+# |                      Prepare for SAP DB Load                               |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-- hosts: localhost
-  name: Get SAP Password from KeyVault
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Get SAP Password from KeyVault
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
+
   tasks:
 
-  - include_role:
-      name:     roles-misc/0.1-passwords
-      public:   yes      
-    tags:
-       - 0.1-passwords
+    - name:                            Include 0.1-passwords Role
+      ansible.builtin.include_role:
+        name:                          roles-misc/0.1-passwords
+        public:                        true
+      tags:
+        - 0.1-passwords
 
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step501"
-      state: absent
+    - name:                            Remove .step501 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step501"
+        state:                          absent
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                      Playbook for SAP DB Load                              |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
 
+- hosts:                               "{{ sap_sid|upper }}_PAS"
 
-#      password_master:    "{{ hostvars.localhost.sap_password }}"
-
-
-- hosts:          "{{ sap_sid|upper }}_PAS"
-
-  name:           SAP Installation - DB Load
-  remote_user:    "{{ orchestration_ansible_user }}"                
-  become:         yes
-  become_user:    root
-  gather_facts:   true
+  name:                                DB Installation - HANA
+  remote_user:                         "{{ orchestration_ansible_user }}"
+  become:                              true
+  become_user:                         root
+  gather_facts:                        true
   vars_files:
-    - vars/ansible-input-api.yaml                                               # API Input template with defaults
-
+    - vars/ansible-input-api.yaml                               # API Input template with defaults
 
   tasks:
 # -------------------------------------+---------------------------------------8
 #
-# Build the list of tasks to be executed in order here. 
+# Build the list of tasks to be executed in order here.
 #
 # -------------------------------------+---------------------------------------8
-  - ansible.builtin.set_fact:
-      tier:     dbload                                                          # SAP Install phase: DBLOAD
-      password_master:    "{{ hostvars.localhost.sap_password }}"
-    tags:
-      - always
+    - name:                            Setting the dbload facts
+      ansible.builtin.set_fact:
+        tier:                          dbload                                                          # SAP Install phase: DBLOAD
+        password_master:               "{{ hostvars.localhost.sap_password }}"
+      tags:
+        - always
 
-  - block:
-      - include_role:
-          name:     roles-sap/5.1-dbload
-    tags:
-      - 5.1-dbload
+    - block:
+        - name:                        Include 5.1-dbload role
+          ansible.builtin.include_role:
+            name:                      roles-sap/5.1-dbload
+      tags:
+        - 5.1-dbload
 
-- hosts: localhost
-  name: Log results
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |                         PLAYBOOK FOR HANA DB LOGGING                       |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+- hosts:                               localhost
+  name:                                Log results
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
-  tasks:
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step501"
-      state: touch
 
+  tasks:
+    - name:                           Create .step501 flag
+      ansible.builtin.file:
+        path:                         "{{ _workspace_directory }}/.step501"
+        state:                        touch
+        mode:                         0755
 
 
 ...
-# /*---------------------------------------------------------------------------8
-# |                                    END                                     |
+# /*----------------------------------------------------------------------------8
+# |                                    END                                      |
 # +------------------------------------4--------------------------------------*/

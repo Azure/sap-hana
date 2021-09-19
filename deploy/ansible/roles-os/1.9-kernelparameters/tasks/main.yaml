@@ -5,22 +5,22 @@
 # +------------------------------------4--------------------------------------*/
 # Description:  A set of common parameters recommeneded from CIS, RH and SUSE -
 #               are applied to the host along with some distro specific params.
-#               
+#
 # Objects:
 #   External:
-#             parameters.yaml                  - parameter file 
+#             parameters.yaml                  - parameter file
 #
 #   Internal:
-#             getparamlistforapply             - object to store the params 
+#             getparamlistforapply             - object to store the params
 #                                                applicable for a host
 #
 #   Created:
-#             
+#
 #
 # -------------------------------------+---------------------------------------8
 # Reviews:
 #
-# 
+#
 #
 # -------------------------------------+---------------------------------------8
 ---
@@ -36,22 +36,22 @@
 #
 # -------------------------------------+---------------------------------------8
 - name:                                        Ensure parameters are available
-  include_vars:                                parameters.yaml
+  ansible.builtin.include_vars:                parameters.yaml
 
 # ----------------------------------------
 # BEGIN
 # ----------------------------------------
 
 - name:                                        Gather list of parameters which need to be applied
-  set_fact:
-    getparamlistforapply:                      '{{ 
+  ansible.builtin.set_fact:
+    getparamlistforapply:                      '{{
                                                   (
-                                                    parameters["common"] 
-                                                    + 
+                                                    parameters["common"]
+                                                    +
                                                     (
                                                       parameters[distro_id]|default([])
                                                     )
-                                                  ) | unique 
+                                                  ) | unique
                                                 }}'
 
 # print only when -vv, otherwise you will have terminal nausea
@@ -66,9 +66,9 @@
     name:                                      "{{ item.name }}"
     value:                                     "{{ item.value }}"
     state:                                     "{{ item.state }}"
-    sysctl_set:                                yes
-    reload:                                    yes
-    ignoreerrors:                              yes
+    sysctl_set:                                true
+    reload:                                    true
+    ignoreerrors:                              true
   loop:                                        "{{ getparamlistforapply }}"
   when:
           - item.tier in ["all", tier]

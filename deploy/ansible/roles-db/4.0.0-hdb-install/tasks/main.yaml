@@ -14,19 +14,18 @@
 
 ---
 
-- name:  
-  set_fact:
+- name:                           Set dir_params fact
+  ansible.builtin.set_fact:
     dir_params:                   "{{ target_media_location }}/.params"
 
-- name:  
-  debug:
-    var: dir_params
-
+- name:                           Show dir_params
+  ansible.builtin.debug:
+    var:                          dir_params
 
 
 #   0x) Create hidden directory for parameter files
 - name:     "Create hidden directory"
-  file:
+  ansible.builtin.file:
     path:   "{{ item.path }}"
     state:  directory
     mode:   '{{ item.mode }}'
@@ -35,7 +34,7 @@
     - { state: 'directory', mode: '0755', path: '{{ dir_params }}' }
 
 - name:     "Create run flag directory"
-  file:
+  ansible.builtin.file:
     path:   /etc/sap_deployment_automation
     state:  directory
     mode:   0755
@@ -43,11 +42,11 @@
 # TODO: Move the template to the BOM Directory
 #   SAP HANA: deploy hdblcm password file
 - name:               "SAP HANA: deploy hdblcm password file"
-  template:
+  ansible.builtin.template:
     src:              HANA_2_00_055_v1_install.rsp.xml.j2
     dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
     mode:             0644
-    force:            yes
+    force:            true
   # Template parameter mapping
   vars:
     pwd_os_root:                      "***"                                       # Not used at this time
@@ -62,16 +61,15 @@
     pwd_org_manager:                  "***"                                       # Not used at this time
 
 
-
 # TODO: Move the template to the BOM Directory
 # TODO: Analyze file in more detail
 #   SAP HANA: deploy hdblcm install response file
 - name:               "SAP HANA: deploy hdblcm install response file"
-  template:
+  ansible.builtin.template:
     src:              HANA_2_00_055_v1_install.rsp.j2
     dest:             "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp"
     mode:             0644
-    force:            yes
+    force:            true
   # Template parameter mapping
   vars:
     _rsp_component_root:              "../COMPONENTS"
@@ -83,7 +81,6 @@
     _rsp_system_usage:                "custom"
 
 
-
 #   SAP HANA: Install
 - name:     "Create run flag directory"
   ansible.builtin.file:
@@ -92,12 +89,12 @@
     mode:   0755
 
 - name:               "SAP DB Install reset"
-  ansible.builtin.file: 
+  ansible.builtin.file:
     path: /etc/sap_deployment_automation/sap_deployment_hdb.txt
     state: absent
-  when: reinstall == true 
+  when: reinstall
 
-#ToDo make the code more robust
+# ToDo make the code more robust
 - name:               "Execute hdblcm"
   # ansible.builtin.shell:              "pwd=$(<../hdbserver_{{ sap_sid }}_passwords.xml); rm ../hdbserver_{{ sap_sid }}_passwords.xml; echo $pwd | ./hdblcm --batch --action=install --configfile='../hdbserver_{{ sap_sid }}_install.cfg' --read_password_from_stdin=xml"
   ansible.builtin.shell: |
@@ -107,15 +104,10 @@
                         ./hdblcm --batch --action=install --configfile='{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_install.rsp' --read_password_from_stdin=xml
                       rm {{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml
                       touch /etc/sap_deployment_automation/sap_deployment_hdb.txt
-                      
+
   args:
     chdir:            "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
     creates:          /etc/sap_deployment_automation/sap_deployment_hdb.txt
-
-
-
-
-
 
 # #   0x) remove hidden directory for parameter files
 # - name:     "remove hidden directory"

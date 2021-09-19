@@ -5,9 +5,9 @@
 - name: "Create Password secret"
   ansible.builtin.shell: |
     az keyvault secret set --vault-name {{ kv_name }} --name {{ sap_password_id }} --value "{{ password_master }}"
-  when: 
+  when:
     - password_master is defined
-    - "password_master | trim | length != 0" 
+    - "password_master | trim | length != 0"
 
 - name: "SAP system password secret name"
   ansible.builtin.debug:
@@ -17,26 +17,26 @@
 - name: "Retrieve SAP system password"
   block:
     - name: "Get SAP password from keyvault"
-      command: >-
+      ansible.builtin.command: >-
         az keyvault secret show
           --vault-name {{ kv_name }}
           --name {{ sap_password_id }}
 #          --only-show-errors
-      
+
       changed_when: false
       register: keyvault_secret_show_sap_password_id
       no_log: false
   rescue:
     - name: "Debug, Error code"
-      ansible.builtin.debug: 
+      ansible.builtin.debug:
         msg: "{{ keyvault_secret_show_sap_password_id.rc }}"
-    - name: Construct SAP system password 
+    - name: Construct SAP system password
       ansible.builtin.set_fact:
-        sap_password: "{{ lookup('password', '/tmp/sappasswordfile length=12 chars=ascii_lowercase,ascii_uppercase,digits') }}"
+        sap_password: "{{ lookup('password', '/tmp/sappasswordfile length=12 chars=ascii_lowercase,ascii_uppercase,digits,printable') }}"
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
     - name: "Debug, pwd"
-      ansible.builtin.debug: 
+      ansible.builtin.debug:
         var: sap_password
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
@@ -46,12 +46,12 @@
       when: 3 == keyvault_secret_show_sap_password_id.rc
 
     - name: "Get SAP password from keyvault"
-      command: >-
+      ansible.builtin.command: >-
         az keyvault secret show
           --vault-name {{ kv_name }}
           --name {{ sap_password_id }}
 #          --only-show-errors
-      
+
       changed_when: false
       register: keyvault_secret_show_sap_password_id
       no_log: false
@@ -63,7 +63,7 @@
   no_log: false
 
 - name: "Debug, pwd"
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: sap_password
     verbosity:                    2
 
@@ -71,4 +71,3 @@
 - name: Cluster passwords
   include_tasks: 0.1.1-ha_clusterpasswords.yaml
   when: db_high_availability or scs_high_availability
-  

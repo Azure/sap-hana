@@ -1,42 +1,44 @@
 # /*---------------------------------------------------------------------------8
 # |                                                                            |
-# |                       Playbook for SAP SCS Install                         |
+# |                       Prepare for SAP SCS Install                          |
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
 
-- hosts: localhost
-  name: Get SAP Password from KeyVault
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+- hosts:                               localhost
+  name:                                Get SAP Password from KeyVault
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
   tasks:
 
-  - include_role:
-      name:     roles-misc/0.1-passwords
-      public:   yes      
-    tags:
-       - 0.1-passwords
+    - name:                            Remove .step5 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step5"
+        state:                         absent
+
+    - name:                            Include 0.1 passwords role
+      ansible.builtin.include_role:
+        name:                          roles-misc/0.1-passwords
+        public:                        true
+      tags:
+        - 0.1-passwords
 
 
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step5"
-      state: absent
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for SAP SCS Install                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
 
-#      
 
+- hosts:                               "{{ sap_sid|upper }}_SCS"
 
-- hosts:          "{{ sap_sid|upper }}_SCS :
-                  {{ sap_sid|upper }}_ERS"
-
-  name:           SAP Installation - SCS
-  remote_user:    "{{ orchestration_ansible_user }}"                
-  become:         yes
-  become_user:    root
-  gather_facts:   true
+  name:                                SAP Installation - SCS
+  remote_user:                         "{{ orchestration_ansible_user }}"
+  become:                              true
+  become_user:                         root
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                                               # API Input template with defaults
 
@@ -44,35 +46,49 @@
   tasks:
 # -------------------------------------+---------------------------------------8
 #
-# Build the list of tasks to be executed in order here. 
+# Build the list of tasks to be executed in order here.
 #
 # -------------------------------------+---------------------------------------8
 
-  - ansible.builtin.set_fact:
-      tier:     scs
-      password_master:    "{{ hostvars.localhost.sap_password }}"
-      
-    tags:
-      - always
+    - name:                            Set 'scs' tier facts
+      ansible.builtin.set_fact:
+        tier:                          scs
+        password_master:               "{{ hostvars.localhost.sap_password }}"
+      tags:
+        - always
 
-  - block:
-      - include_role:
-          name:     roles-sap/5.0.0-scs-install
-    tags:
-      - 5.0.0-scs-install
+    - name:                            Show SAP password
+      ansible.builtin.debug:
+        msg:                           "{{ hostvars.localhost.sap_password }}"
+        verbosity:                       2
 
-- hosts: localhost
-  name: Log results
-  remote_user:    "{{ orchestration_ansible_user }}"
-  become:         no
-  become_user:    root
-  gather_facts:   yes
+
+    - block:
+        - name:                        Include 5.0.0-scs-install role
+          ansible.builtin.include_role:
+            name:                      roles-sap/5.0.0-scs-install
+      tags:
+        - 5.0.0-scs-install
+
+# /*---------------------------------------------------------------------------8
+# |                                                                            |
+# |                       Playbook for SAP SCS Logging                         |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+
+
+- hosts:                               localhost
+  name:                                Log results
+  gather_facts:                        true
   vars_files:
     - vars/ansible-input-api.yaml                               # API Input template with defaults
+
   tasks:
-  - ansible.builtin.file:
-      path: "{{ _workspace_directory }}/.step5"
-      state: touch
+    - name:                            Create .step5 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step5"
+        state:                         touch
+        mode:                          0755
 
 
 ...

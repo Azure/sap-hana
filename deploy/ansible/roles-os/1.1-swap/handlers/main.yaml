@@ -1,8 +1,8 @@
 # ---
 
-- name:                           Restart waagent
+- name:                                Restart waagent
   service:
-    name:                         waagent
-    state:                        restarted
+    name:                              waagent
+    state:                             restarted
 
 # ...

@@ -19,8 +19,7 @@
 #   download
 #   archive
 #   permissions
-#   
-
+#
 
 
 # Steps:
@@ -33,13 +32,10 @@
 #   07) Extract files - UNZIP
 #   08) Purge BOM file from Ansible Controller
 
-
-
 #   01) Register BOM
-- include_role:
+- ansible.builtin.include_role:
     name:                         roles-sap/3.3.1-bom-utility
     tasks_from:                   bom-register
-
 
 
 #   02) Create static download directories
@@ -53,7 +49,6 @@
     - { path: '/usr/sap/install/download_basket' }
 
 
-
 #   03) Create dynamic extract directories
 - name: "BOM: Create BOM directories"
   ansible.builtin.file:
@@ -65,18 +60,15 @@
                   or (item.extractDir == '') )
 
 
-
-
 # Download Files
 #------------------<DEBUGGING>-------------------
-# - ansible.builtin.debug:  
-#     msg:      
+# - ansible.builtin.debug:
+#     msg:
 #       - "URL : {{ sapbits_location_base_path }}/{{ sapbits_bom_files }}/archives/{{ item.archive }}{% if sapbits_sas_token is not undefined %}{{ sapbits_sas_token }}{% endif %}"
 #       - "DEST: {{ target_media_location }}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
 #       - "MODE: {% if item.permissions is undefined %}0644{% else %}{{ item.permissions }}{% endif %}"
 #   loop:       "{{ bom.materials.media|flatten(levels=1) }}"
 #------------------</DEBUGGING>------------------
-
 
 
 #   04) Download media from bom
@@ -97,7 +89,6 @@
             item.download
 
 
-
 #   05) Extract files - SAPCAR
 - name:         "BOM: Extract File, SAPCAR"
   ansible.builtin.command:      "{{ target_media_location }}/downloads/SAPCAR -manifest SIGNATURE.SMF -xf {{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
@@ -105,12 +96,11 @@
     chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
   loop:         "{{ bom.materials.media|flatten(levels=1) }}"
-  when:       
+  when:
     - item.extract is not undefined
     - item.extract
     - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="SAR") ) or
       ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="SAR") )
-
 
 
 #   06) Extract files - UNRAR
@@ -120,20 +110,19 @@
     chdir:      "{{ target_media_location }}/{{ item.extractDir }}"
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
   loop:         "{{ bom.materials.media|flatten(levels=1) }}"
-  when:       
+  when:
     - item.extract is not undefined
     - item.extract
     - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="RAR") ) or
       ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="RAR") )
 
 
-
 #   07) Extract files - UNZIP
 - name:         "BOM: Extract File, UNZIP"
-  unarchive:
+  ansible.builtin.unarchive:
     src:        "{{ target_media_location }}/{% if item.path is undefined %}downloads{% else %}{{ item.path }}{% endif %}/{% if item.filename is undefined %}{{ item.archive }}{% else %}{{ item.filename }}{% endif %}"
     dest:       "{{ target_media_location }}/{{ item.extractDir }}"
-    remote_src: yes
+    remote_src: ytruees
     creates:    "{{ target_media_location }}/{{ item.extractDir }}/{% if item.creates is defined %}{{ item.creates }}{% else %}NOT_DEFINED{% endif %}"
   loop:         "{{ bom.materials.media|flatten(levels=1) }}"
   when:       
@@ -141,7 +130,6 @@
     - item.extract
     - ( item.filename is undefined and (item.archive |regex_search('[^.]+(?=\\.*$)')|upper=="ZIP") ) or
       ( item.filename is defined   and (item.filename|regex_search('[^.]+(?=\\.*$)')|upper=="ZIP") )
-
 
 
 # #   08) Purge BOM file from Ansible Controller
@@ -157,19 +145,6 @@
 # /*---------------------------------------------------------------------------8
 # |                                   END                                      |
 # +------------------------------------4--------------------------------------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # - name:         "Ensure {{ target_media_location }} exists"
 #   ansible.builtin.file:
@@ -207,11 +182,9 @@
 #   loop:               "{{ bom_dependencies | flatten(levels=1) }}"
 
 
-
-
 #------------------<DEBUGGING>-------------------
 # - name:           Ensure target folders exist
-#   ansible.builtin.debug:  
+#   ansible.builtin.debug:
 #     msg:          "{{ download_location }}"
 #   loop:           "{{
 #                       bom_media |
@@ -244,13 +217,13 @@
 #       check_mode: "{{ test_mode is defined and test_mode }}"
 
 
-#------------------<DEBUGGING>-------------------
-# - ansible.builtin.debug:  
+# ------------------<DEBUGGING>-------------------
+# - ansible.builtin.debug:
 #     msg:          "{{ download_iterator }}"
 #   loop:           "{{ bom_media | flatten(levels=1) }}"
 #   loop_control:
 #     loop_var:     download_iterator
-#------------------</DEBUGGING>------------------
+# ------------------</DEBUGGING>------------------
 
 
     # - name: Ensure media are downloaded
@@ -269,7 +242,6 @@
     #   loop_control:
     #     loop_var:                   download_iterator
     #   check_mode:                   "{{ test_mode is defined and test_mode }}"
-
 
 
 # - name: Determine SWPM archive name
