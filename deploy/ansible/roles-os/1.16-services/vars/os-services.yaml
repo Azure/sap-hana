@@ -26,14 +26,14 @@ services:
     redhat7:
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'disabled'  }
         - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
-        - { tier: 'sapos',       service: 'nfsserver',    node_tier: 'scs',     state: 'tarted' }
+        - { tier: 'sapos',       service: 'nfsserver',    node_tier: 'scs',     state: 'started' }
 
     redhat8:
         - { tier: 'os',          service: 'auditd',       node_tier: 'all',     state: 'started'   }
         - { tier: 'os',          service: 'oddjobd',      node_tier: 'all',     state: 'disabled'  }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'stopped'   }
         - { tier: 'os',          service: 'firewalld',    node_tier: 'all',     state: 'disabled'  }
-        - { tier: 'sapos',       service: 'nfs-server',   node_tier: 'scs',     state: 'started' }
+        - { tier: 'sapos',       service: 'nfs-server',   node_tier: 'scs',     state: 'started'   }
         - { tier: 'sapos',       service: 'autofs',       node_tier: 'all',     state: 'started'   }
         - { tier: 'ha',          service: 'pcsd',         node_tier: 'all',     state: 'started'   }
 
