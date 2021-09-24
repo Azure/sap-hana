@@ -4,10 +4,10 @@
 
 - name: "Create Password secret"
   ansible.builtin.shell: |
-    az keyvault secret set --vault-name {{ kv_name }} --name {{ sap_password_id }} --value "{{ password_master }}"
+    az keyvault secret set --vault-name {{ kv_name }} --name {{ sap_password_id }} --value "{{ main_password }}"
   when:
-    - password_master is defined
-    - "password_master | trim | length != 0"
+    - main_password is defined
+    - "main_password | trim | length != 0"
 
 - name: "SAP system password secret name"
   ansible.builtin.debug:

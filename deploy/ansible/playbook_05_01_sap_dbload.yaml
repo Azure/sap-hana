@@ -51,7 +51,7 @@
     - name:                            Setting the dbload facts
       ansible.builtin.set_fact:
         tier:                          dbload                                                          # SAP Install phase: DBLOAD
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
       tags:
         - always
 

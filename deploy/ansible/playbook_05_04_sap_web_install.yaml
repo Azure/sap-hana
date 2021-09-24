@@ -55,7 +55,7 @@
     - name:                            Set 'web' tier facts
       ansible.builtin.set_fact:
         tier:                          web
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
       tags:
         - always
 
