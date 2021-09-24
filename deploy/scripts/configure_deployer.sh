@@ -464,12 +464,14 @@ echo export ANSIBLE_COLLECTIONS_PATHS=${ansible_collections} | sudo tee -a /etc/
 # Set env for MSI
 echo export ARM_USE_MSI=true | sudo tee -a /etc/profile.d/deploy_server.sh
 
-if [ ! -n ${client_id} ] then
+if [ ! -n "${client_id}" ]; then
   echo export ARM_CLIENT_ID=${client_id} | sudo tee -a /etc/profile.d/deploy_server.sh
 fi
-if [ ! -n ${tenant_id} ] then
+
+if [ ! -n "${tenant_id}" ]; then
   echo export ARM_TENANT_ID=${tenant_id} | sudo tee -a /etc/profile.d/deploy_server.sh
 fi
+
 echo export ARM_SUBSCRIPTION_ID=${subscription_id} | sudo tee -a /etc/profile.d/deploy_server.sh
 echo export DEPLOYMENT_REPO_PATH=$HOME/Azure_SAP_Automated_Deployment/sap-hana | sudo tee -a /etc/profile.d/deploy_server.sh
 
