@@ -478,3 +478,4 @@ echo export DEPLOYMENT_REPO_PATH=$HOME/Azure_SAP_Automated_Deployment/sap-hana |
 # Ensure that the user's account is logged in to Azure with specified creds
 echo az login --identity --output none | sudo tee -a /etc/profile.d/deploy_server.sh
 echo 'echo ${USER} account ready for use with Azure SAP Automated Deployment' | sudo tee -a /etc/profile.d/deploy_server.sh
+
