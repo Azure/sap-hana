@@ -56,9 +56,10 @@ output "user_vault_name" {
   value = local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].name : azurerm_key_vault.kv_user[0].name
 }
 
-output "prvt_vault_name" {
-  value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
-}
+# TODO Add this back when we separate the usage
+# output "prvt_vault_name" {
+#   value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
+# }
 
 // output the secret name of private key
 output "ppk_secret_name" {

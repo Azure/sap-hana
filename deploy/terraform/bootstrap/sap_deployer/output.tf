@@ -49,9 +49,10 @@ output "deployer_kv_user_arm_id" {
   value     = module.sap_deployer.deployer_kv_user_arm_id
 }
 
-output "deployer_kv_prvt_name" {
-  value = module.sap_deployer.prvt_vault_name
-}
+# TODO Add this back when we separate the usage
+# output "deployer_kv_prvt_name" {
+#  value = module.sap_deployer.prvt_vault_name
+#}
 
 output "deployer_kv_user_name" {
   value = module.sap_deployer.user_vault_name

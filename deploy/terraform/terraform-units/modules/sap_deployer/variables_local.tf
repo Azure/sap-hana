@@ -19,8 +19,11 @@ variable "enable_purge_control_for_keyvaults" {
   description = "Allow the deployment to control the purge protection"
 }
 
-
 variable "bootstrap" {}
+
+variable "use_private_link" {
+  default = false
+}
 
 // Set defaults
 locals {

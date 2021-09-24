@@ -110,6 +110,9 @@ resource "azurerm_subnet" "subnet_mgmt" {
   resource_group_name  = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].resource_group_name : azurerm_virtual_network.vnet_mgmt[0].resource_group_name
   virtual_network_name = local.vnet_mgmt_exists ? data.azurerm_virtual_network.vnet_mgmt[0].name : azurerm_virtual_network.vnet_mgmt[0].name
   address_prefixes     = [local.sub_mgmt_prefix]
+
+  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_service_network_policies = false
 }
 
 data "azurerm_subnet" "subnet_mgmt" {
