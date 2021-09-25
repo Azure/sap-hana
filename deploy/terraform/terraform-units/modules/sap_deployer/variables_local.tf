@@ -21,7 +21,7 @@ variable "enable_purge_control_for_keyvaults" {
 
 variable "bootstrap" {}
 
-variable "use_private_link" {
+variable "use_private_endpoint" {
   default = false
 }
 

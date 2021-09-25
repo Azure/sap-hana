@@ -159,7 +159,7 @@ variable "library_ansible_blob_container_name" {
   default = "ansible"
 }
 
-variable "use_private_link" {
+variable "use_private_endpoint" {
   default = false
 }
 

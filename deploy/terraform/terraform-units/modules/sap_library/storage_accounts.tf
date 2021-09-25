@@ -28,6 +28,12 @@ resource "azurerm_storage_account" "storage_tfstate" {
       days = 7
     }
   }
+
+  network_rules {
+    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    ip_rules                   = [local.deployer_public_ip_address]
+    virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
+  }
 }
 
 data "azurerm_storage_container" "storagecontainer_tfstate" {
@@ -64,6 +70,23 @@ resource "azurerm_storage_container" "storagecontainer_ansible" {
   container_access_type = local.sa_tfstate_container_access_type
 }
 
+resource "azurerm_private_endpoint" "storage_tfstate" {
+  count               = var.use_private_endpoint ? 1 : 0
+  name                = format("%s%s", local.prefix, local.resource_suffixes.storage_private_link_tf)
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
+  subnet_id           = local.subnet_mgmt_id
+
+  private_service_connection {
+    name                           = format("%s%s", local.prefix, local.resource_suffixes.storage_private_svc_tf)
+    is_manual_connection           = false
+    private_connection_resource_id = local.sa_tfstate_exists ? data.azurerm_storage_account.storage_tfstate[0].id : azurerm_storage_account.storage_tfstate[0].id
+    subresource_names = [
+      "File"
+    ]
+  }
+}
+
 
 // Imports existing storage account for storing SAP bits
 data "azurerm_storage_account" "storage_sapbits" {
@@ -87,7 +110,31 @@ resource "azurerm_storage_account" "storage_sapbits" {
   // To support all access levels 'Blob' 'Private' and 'Container'
   allow_blob_public_access = true
   // TODO: soft delete for file share
+
+  network_rules {
+    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    ip_rules                   = [local.deployer_public_ip_address]
+    virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
+  }
 }
+
+resource "azurerm_private_endpoint" "storage_sapbits" {
+  count               = var.use_private_endpoint ? 1 : 0
+  name                = format("%s%s", local.prefix, local.resource_suffixes.storage_private_link_sap)
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.library[0].name : azurerm_resource_group.library[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.library[0].location : azurerm_resource_group.library[0].location
+  subnet_id           = local.subnet_mgmt_id
+
+  private_service_connection {
+    name                           = format("%s%s", local.prefix, local.resource_suffixes.storage_private_svc_sap)
+    is_manual_connection           = false
+    private_connection_resource_id = local.sa_sapbits_exists ? data.azurerm_storage_account.storage_sapbits[0].id : azurerm_storage_account.storage_sapbits[0].id
+    subresource_names = [
+      "File"
+    ]
+  }
+}
+
 
 // Imports existing storage blob container for SAP bits
 data "azurerm_storage_container" "storagecontainer_sapbits" {

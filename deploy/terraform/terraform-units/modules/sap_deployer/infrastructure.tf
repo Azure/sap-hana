@@ -112,7 +112,9 @@ resource "azurerm_subnet" "subnet_mgmt" {
   address_prefixes     = [local.sub_mgmt_prefix]
 
   enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
+  enforce_private_link_service_network_policies  = false
+
+  service_endpoints = ["Microsoft.Storage", "Microsoft.KeyVault"]
 }
 
 data "azurerm_subnet" "subnet_mgmt" {

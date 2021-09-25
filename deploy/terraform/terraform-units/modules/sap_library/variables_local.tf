@@ -17,6 +17,10 @@ variable "service_principal" {
   description = "Current service principal used to authenticate to Azure"
 }
 
+variable "use_private_endpoint" {
+  default = false
+}
+
 locals {
 
   storageaccount_names = var.naming.storageaccount_names.LIBRARY
@@ -95,6 +99,10 @@ locals {
   deployer_tfstate          = var.deployer_tfstate
   deployer_defined          = length(var.deployer_tfstate) > 0
   deployer_msi_principal_id = local.deployer_defined ? try(local.deployer_tfstate.deployer_uai.principal_id, local.deployer_tfstate.deployer_uai) : ""
+
+  subnet_mgmt_id = local.deployer_defined ? local.deployer_tfstate.subnet_mgmt_id : ""
+
+  deployer_public_ip_address = local.deployer_defined ? local.deployer_tfstate.deployer_public_ip_address : ""
 
   // If the user specifies arm id of key vaults in input, the key vault will be imported instead of creating new key vaults
   user_key_vault_id = try(var.key_vault.kv_user_id, "")

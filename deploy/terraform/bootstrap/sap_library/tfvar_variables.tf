@@ -163,6 +163,6 @@ variable "enable_purge_control_for_keyvaults" {
   default = true
 }
 
-variable "use_private_link" {
+variable "use_private_endpoint" {
   default = false
 }

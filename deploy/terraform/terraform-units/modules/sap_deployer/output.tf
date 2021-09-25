@@ -105,3 +105,7 @@ output "firewall_ip" {
 output "firewall_id" {
   value = var.firewall_deployment ? azurerm_firewall.firewall[0].id : ""
 }
+
+output "subnet_mgmt_id" {
+  value = local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id
+}

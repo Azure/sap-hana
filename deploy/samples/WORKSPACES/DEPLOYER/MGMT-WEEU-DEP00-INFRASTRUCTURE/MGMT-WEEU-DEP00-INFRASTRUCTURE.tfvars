@@ -14,6 +14,10 @@ location="westeurope"
 #resource_group_name=""
 #resource_group_arm_id=""
 
+
+#resourcegroup_tags = {
+# tag=value    
+#    }
 #
 # Networking information
 #
@@ -128,3 +132,6 @@ firewall_deployment=true
 
 # assign_subscription_permissions is a boolean flag controlling if the deployment credential should be assigned Contribuor permissions on the subscription
 #assign_subscription_permissions=true
+
+# use_private_endpoint is a boolean flag controlling if the keyvaults and storage accounts have private endpoints
+use_private_endpoint=true

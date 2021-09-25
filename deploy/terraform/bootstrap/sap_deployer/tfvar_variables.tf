@@ -200,6 +200,6 @@ variable "deployer_assign_subscription_permissions" {
   default = false
 }
 
-variable "use_private_link" {
+variable "use_private_endpoint" {
   default = false
 }

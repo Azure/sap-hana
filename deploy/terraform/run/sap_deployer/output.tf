@@ -13,6 +13,11 @@ output "vnet_mgmt_id" {
   value = module.sap_deployer.vnet_mgmt.id
 }
 
+output "subnet_mgmt_id" {
+  value = module.sap_deployer.subnet_mgmt_id
+}
+
+
 # output "subnet_mgmt" {
 #   sensitive = true
 #   value     = module.sap_deployer.subnet_mgmt

@@ -61,11 +61,13 @@ resource "azurerm_key_vault" "kv_user" {
     ]
   }
 
-  network_acls {
-    default_action             = "Deny"
+  network_acls  {
     bypass                     = "AzureServices"
-    virtual_network_subnet_ids = [local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id]
+    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    ip_rules                   = [local.enable_deployer_public_ip ? azurerm_public_ip.deployer[0].ip_address : null]
+    virtual_network_subnet_ids = var.use_private_endpoint ? [local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id] : []
   }
+
 }
 
 // Import an existing user Key Vault
@@ -246,7 +248,7 @@ data "azurerm_key_vault_secret" "pwd" {
 
 
 resource "azurerm_private_endpoint" "kv_user" {
-  count               = var.use_private_link ? 1 : 0
+  count               = var.use_private_endpoint ? 1 : 0
   name                = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_link)
   resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location

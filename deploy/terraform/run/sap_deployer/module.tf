@@ -17,7 +17,7 @@ module "sap_deployer" {
   bootstrap                          = false
   enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
   arm_client_id                      = var.arm_client_id
-  use_private_link                   = var.use_private_link
+  use_private_endpoint               = var.use_private_endpoint
 
 }
 
