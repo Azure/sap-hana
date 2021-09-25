@@ -14,7 +14,7 @@ locals {
     environment = coalesce(var.deployer_environment, try(var.deployer.environment, ""))
     region      = coalesce(var.deployer_location, try(var.deployer.region, ""))
     vnet        = coalesce(var.deployer_vnet, try(var.deployer.vnet, ""))
-    use         = coalesce(var.deployer_use, try(var.deployer.use, true))
+    use         = coalesce(var.use_deployer, try(var.deployer.use, true))
 
   }
   key_vault = {

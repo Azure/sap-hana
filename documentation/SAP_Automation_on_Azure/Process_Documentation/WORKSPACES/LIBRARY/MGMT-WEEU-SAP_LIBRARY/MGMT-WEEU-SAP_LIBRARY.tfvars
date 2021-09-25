@@ -7,7 +7,7 @@ location="westeurope"
 deployer_environment="MGMT"
 deployer_location="westeurope"
 deployer_vnet="DEP00"
-#deployer_use=true
+#use_deployer=true
 
 #user_keyvault_id=""
 #automation_keyvault_id=""

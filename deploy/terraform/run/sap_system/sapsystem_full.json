@@ -182,6 +182,7 @@
   "deployer_tfstate_key"                   : "",
   "landscape_tfstate_key"                  : "",
   "anf_sapmnt_volume_size"                 : 512,
-  "anf_shared_volume_size"                 : 512
+  "anf_shared_volume_size"                 : 512,
+  "license_type"                           : ""
 
 }
