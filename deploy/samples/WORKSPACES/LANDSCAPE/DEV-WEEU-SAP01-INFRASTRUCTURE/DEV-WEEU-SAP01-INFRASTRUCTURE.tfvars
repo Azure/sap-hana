@@ -276,7 +276,7 @@ use_ANF=false
 #ANF_service_level is the service level for the NetApp pool
 #ANF_service_level="Standard"
 
-#ANF_pool_size is the pool size for the NetApp pool
+#ANF_pool_size is the pool size in TB for the NetApp pool
 
 #ANF_pool_size=4
 
@@ -292,3 +292,6 @@ use_ANF=false
 # ANF requires a dedicated subnet, the address space for the subnet is provided with  anf_subnet_address_prefix 
 # anf_subnet_address_prefix is a mandatory parameter if the subnets are not defined in the workload or if existing subnets are not used
 #anf_subnet_address_prefix=10.110.64.0/27
+
+# use_private_endpoint is a boolean flag controlling if the keyvaults and storage accounts have private endpoints
+#use_private_endpoint=true

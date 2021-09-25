@@ -49,6 +49,11 @@ variable "dns_resource_group_name" {
   default     = ""
 }
 
+variable "use_private_endpoint" {
+  description = "Private endpoint"
+  default     = false
+}
+
 locals {
   // Resources naming
   storageaccount_name         = var.naming.storageaccount_names.VNET.landscape_storageaccount_name
@@ -75,6 +80,10 @@ locals {
   firewall_rgname = local.firewall_exists ? try(split("/", local.firewall_id)[4], "") : ""
 
   firewall_service_tags = format("AzureCloud.%s", local.region)
+
+  deployer_subnet_mgmt_id = try(var.deployer_tfstate.subnet_mgmt_id, null)
+
+  deployer_public_ip_address = try(var.deployer_tfstate.deployer_public_ip_address, null)
 
 
   // Resource group

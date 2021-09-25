@@ -6,6 +6,11 @@ resource "azurerm_subnet" "admin" {
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
   address_prefixes     = [local.sub_admin_prefix]
+
+  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_service_network_policies  = false
+
+  service_endpoints = ["Microsoft.Storage", "Microsoft.KeyVault"]
 }
 
 // Creates db subnet of SAP VNET
@@ -178,10 +183,10 @@ resource "azurerm_subnet_route_table_association" "web" {
 
 # Creates network security rule to allow internal traffic for SAP db subnet
 resource "azurerm_network_security_rule" "nsr_internal_db" {
-  provider = azurerm.main
-  count    = local.sub_db_nsg_exists ? 0 : 0
-  name     = "allow-internal-traffic"
-  resource_group_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
+  provider                     = azurerm.main
+  count                        = local.sub_db_nsg_exists ? 0 : 0
+  name                         = "allow-internal-traffic"
+  resource_group_name          = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   network_security_group_name  = azurerm_network_security_group.db[0].name
   priority                     = 101
   direction                    = "Inbound"
@@ -197,8 +202,8 @@ resource "azurerm_network_security_rule" "nsr_internal_db" {
 resource "azurerm_network_security_rule" "nsr_external_db" {
   provider = azurerm.main
 
-  count = local.sub_db_nsg_exists ? 0 : 0
-  name  = "deny-inbound-traffic"
+  count               = local.sub_db_nsg_exists ? 0 : 0
+  name                = "deny-inbound-traffic"
   resource_group_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
 
 

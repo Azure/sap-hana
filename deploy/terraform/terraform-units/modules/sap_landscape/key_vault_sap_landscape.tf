@@ -5,8 +5,9 @@
 
 // Create private KV with access policy
 resource "azurerm_key_vault" "kv_prvt" {
-  provider                   = azurerm.main
-  count                      = (local.enable_landscape_kv && !local.prvt_kv_exist) ? 1 : 0
+  provider = azurerm.main
+  # TODO Add this back when we separate the usage
+  count                      = (local.enable_landscape_kv && !local.prvt_kv_exist) ? 0 : 0
   name                       = local.prvt_kv_name
   location                   = local.region
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
@@ -76,6 +77,14 @@ resource "azurerm_key_vault" "kv_user" {
       access_policy
     ]
   }
+
+  network_acls {
+    bypass                     = "AzureServices"
+    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    ip_rules                   = [local.deployer_public_ip_address]
+    virtual_network_subnet_ids = var.use_private_endpoint ? [local.deployer_subnet_mgmt_id] : []
+  }
+
 }
 
 // Import an existing user Key Vault
@@ -301,7 +310,8 @@ resource "azurerm_key_vault_access_policy" "kv_user_msi" {
 
   secret_permissions = [
     "Get",
-    "List"
+    "List",
+    "Set"
   ]
 }
 
@@ -317,3 +327,24 @@ resource "azurerm_key_vault_secret" "deployer_kv_user_name" {
   key_vault_id = local.user_kv_exist ? local.user_key_vault_id : azurerm_key_vault.kv_user[0].id
 }
 
+
+resource "azurerm_private_endpoint" "kv_user" {
+  provider            = azurerm.main
+  count               = local.sub_admin_defined && var.use_private_endpoint ? 1 : 0
+  name                = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_link)
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.resource_group[0].name : azurerm_resource_group.resource_group[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.resource_group[0].location : azurerm_resource_group.resource_group[0].location
+  subnet_id = local.sub_admin_defined ? (
+    local.sub_admin_existing ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id) : (
+    ""
+  )
+
+  private_service_connection {
+    name                           = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_svc)
+    is_manual_connection           = false
+    private_connection_resource_id = local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].id : azurerm_key_vault.kv_user[0].id
+    subresource_names = [
+      "Vault"
+    ]
+  }
+}
