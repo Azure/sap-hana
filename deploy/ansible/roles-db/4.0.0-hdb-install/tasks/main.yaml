@@ -37,6 +37,15 @@
     state:                             directory
     mode:                              0755
 
+#   SAP HANA: debug hdblcm password file
+- name:                                "SAP HANA: debug hdblcm password file"
+  ansible.builtin.debug:
+    msg:
+      - "FILE: {{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
+      - "PWD:  {{ main_password }}"
+    verbosity:                         4
+
+
 #   SAP HANA: deploy hdblcm password file
 - name:                                "SAP HANA: deploy hdblcm password file"
   ansible.builtin.template:
@@ -44,13 +53,14 @@
     dest:                              "{{ dir_params }}/hdbserver_{{ ansible_hostname }}_{{ sap_sid }}_passwords.xml"
     mode:                              0644
     force:                             true
+
   # Template parameter mapping
   vars:
     pwd_os_root:                      "***"                                       # Not used at this time
-    pwd_os_sapadm:                    "{{ password_master }}"
-    pwd_master:                       "{{ password_master }}"
-    pwd_os_sidadm:                    "{{ password_master }}"
-    pwd_hdb_system:                   "{{ password_master }}"
+    pwd_os_sapadm:                    "{{ main_password }}"
+    pwd_master:                       "{{ main_password }}"
+    pwd_os_sidadm:                    "{{ main_password }}"
+    pwd_hdb_system:                   "{{ main_password }}"
     pwd_lss_user:                     "***"                                       # Not used at this time
     pwd_lss_backup:                   "***"                                       # Not used at this time
     pwd_streaming_cluster_manager:    "***"                                       # Not used at this time

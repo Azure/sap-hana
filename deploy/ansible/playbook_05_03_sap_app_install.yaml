@@ -53,7 +53,7 @@
     - name:                            Set 'app' tier facts
       ansible.builtin.set_fact:
         tier:                          app                                     # SAP Install phase: APP - Application Server
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
 
     - block:
         - name:                        Include 2.6-sap-mounts role

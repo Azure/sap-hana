@@ -75,7 +75,7 @@
     - name:                            Set 'ha' tier facts
       ansible.builtin.set_fact:
         tier:                          ha
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
         password_ha_db_cluster:        "{{ hostvars.localhost.db_cluster_password }}"
       when: db_high_availability
       tags:
@@ -171,7 +171,7 @@
     - name:                            Set 'ha' tier facts
       ansible.builtin.set_fact:
         tier:                          ha
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
         password_ha_db_cluster:        "{{ hostvars.localhost.db_cluster_password }}"
       when: scs_high_availability
       tags:

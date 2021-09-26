@@ -477,7 +477,7 @@ The file should be saved with a meaningful name relating to the SAP Product, e.g
       1. `archives.downloadBasket                             = {{ download_basket_dir }}`
       1. `HDB_Schema_Check_Dialogs.schemaPassword             = {{ password_hana_system }}`
       1. `HDB_Userstore.doNotResolveHostnames                 = {{ hdb_hostname }}`
-      1. `hostAgent.sapAdmPassword                            = {{ password_master }}`
+      1. `hostAgent.sapAdmPassword                            = {{ main_password }}`
       1. `NW_AS.instanceNumber                                = {{ aas_instance_number }}`
       1. `NW_checkMsgServer.abapMSPort                        = 36{{ scs_instance_number }}`
       1. `NW_CI_Instance.ascsVirtualHostname                  = {{ scs_hostname }}`
@@ -487,9 +487,9 @@ The file should be saved with a meaningful name relating to the SAP Product, e.g
       1. `NW_CI_Instance.scsVirtualHostname                   = {{ scs_hostname }}`
       1. `NW_DI_Instance.virtualHostname                      = {{ aas_hostname }}`
       1. `NW_getFQDN.FQDN                                     = {{ sap_fqdn }}`
-      1. `NW_GetMasterPassword.masterPwd                      = {{ password_master }}`
+      1. `NW_GetMasterPassword.masterPwd                      = {{ main_password }}`
       1. `NW_GetSidNoProfiles.sid                             = {{ app_sid | upper }}`
-      1. `NW_HDB_DB.abapSchemaPassword                        = {{ password_master }}`
+      1. `NW_HDB_DB.abapSchemaPassword                        = {{ main_password }}`
       1. `NW_HDB_getDBInfo.dbhost                             = {{ hdb_hostname }}`
       1. `NW_HDB_getDBInfo.dbsid                              = {{ hdb_sid | upper }}`
       1. `NW_HDB_getDBInfo.instanceNumber                     = {{ hdb_instance_number }}`
@@ -499,7 +499,7 @@ The file should be saved with a meaningful name relating to the SAP Product, e.g
       1. `NW_readProfileDir.profileDir                        = /usr/sap/{{ app_sid | upper }}/SYS/profile`
       1. `NW_Recovery_Install_HDB.extractLocation             = /usr/sap/{{ hdb_sid | upper }}/HDB{{ hdb_instance_number }}/backup/data/DB_{{ hdb_sid | upper }}`
       1. `NW_Recovery_Install_HDB.sidAdmName                  = {{ hdb_sid | lower }}adm`
-      1. `NW_Recovery_Install_HDB.sidAdmPassword              = {{ password_master }}`
+      1. `NW_Recovery_Install_HDB.sidAdmPassword              = {{ main_password }}`
       1. `NW_SAPCrypto.SAPCryptoFile                          = {{ download_basket_dir }}/SAPEXE_300-80004393.SAR`
       1. `NW_SCS_Instance.instanceNumber                      = {{ scs_instance_number }}`
       1. `NW_Unpack.igsExeSar                                 = {{ download_basket_dir }}/igsexe_12-80003187.sar`
@@ -509,7 +509,7 @@ The file should be saved with a meaningful name relating to the SAP Product, e.g
       1. `NW_SCS_Instance.scsVirtualHostname                  = {{ scs_hostname }}`
       1. `nwUsers.sapadmUID                                   = {{ sapadm_uid }}`
       1. `nwUsers.sapsysGID                                   = {{ sapsys_gid }}`
-      1. `nwUsers.sidadmPassword                              = {{ password_master }}`
+      1. `nwUsers.sidadmPassword                              = {{ main_password }}`
       1. `nwUsers.sidAdmUID                                   = {{ sidadm_uid }}`
       1. `storageBasedCopy.hdb.instanceNumber                 = {{ hdb_instance_number }}`
       1. `storageBasedCopy.hdb.systemPassword                 = {{ password_hana_system }}`

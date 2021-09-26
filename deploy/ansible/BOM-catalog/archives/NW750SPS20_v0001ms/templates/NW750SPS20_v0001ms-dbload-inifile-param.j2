@@ -22,28 +22,28 @@ archives.downloadBasket                                               = /usr/sap
 nwUsers.sapadmUID                                                     = {{ sapadm_uid }}
 nwUsers.sapsysGID                                                     = {{ sapsys_gid }}
 nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
-nwUsers.sidadmPassword                                                = {{ password_master }}
+nwUsers.sidadmPassword                                                = {{ main_password }}
 
 NW_Delete_Sapinst_Users.removeUsers                                   = true
-NW_GetMasterPassword.masterPwd                                        = {{ password_master }}
+NW_GetMasterPassword.masterPwd                                        = {{ main_password }}
 
 
 
 HDB_Schema_Check_Dialogs.schemaName                                   = SAPABAP1
-HDB_Schema_Check_Dialogs.schemaPassword                               = {{ password_master }}
+HDB_Schema_Check_Dialogs.schemaPassword                               = {{ main_password }}
 
 HDB_Software_Dialogs.useMediaCD                                       = true
 NW_ABAP_Import_Dialog.migmonJobNum                                    = 12
 hanadb.landscape.reorg.useParameterFile                               = DONOTUSEFILE
 
 NW_HDB_DB.abapSchemaName                                              = SAPABAP1
-NW_HDB_DB.abapSchemaPassword                                          = {{ password_master }}
+NW_HDB_DB.abapSchemaPassword                                          = {{ main_password }}
 NW_HDB_DBClient.clientPathStrategy                                    = SAPCPE
 NW_HDB_getDBInfo.dbhost                                               = {{ sap_db_hostname }}
 NW_HDB_getDBInfo.dbsid                                                = {{ hdb_sid|upper }}
 NW_HDB_getDBInfo.instanceNumber                                       = {{ hdb_instance_number }}
-NW_HDB_getDBInfo.systemDbPassword                                     = {{ password_master }}
-NW_HDB_getDBInfo.systemPassword                                       = {{ password_master }}
+NW_HDB_getDBInfo.systemDbPassword                                     = {{ main_password }}
+NW_HDB_getDBInfo.systemPassword                                       = {{ main_password }}
 NW_HDB_getDBInfo.systemid                                             = {{ hdb_sid|upper }}
 NW_HDB_getDBInfo.usingSSL                                             = true
 
