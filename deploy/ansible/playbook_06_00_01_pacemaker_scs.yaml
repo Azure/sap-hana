@@ -65,6 +65,7 @@
       ansible.builtin.file:
         path: "{{ _workspace_directory }}/.step601"
         state: touch
+        mode:  0755
 
 
 ...

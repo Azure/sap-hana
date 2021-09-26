@@ -36,7 +36,7 @@ hdb_instance_number:          "00"                                              
 pas_hostname:                 ""
 pas_instance_number:          "00"
 password_hana_system:         ""
-password_master:              ""                                                        # SAP Install
+main_password:                ""                                                        # SAP Install
 sap_fqdn:                     ""                                                        # SAP Install
 sapadm_uid:                   2100
 sapinst_gid:                  2001

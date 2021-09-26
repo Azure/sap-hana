@@ -56,9 +56,14 @@
     - name:                            Setting the DB facts
       ansible.builtin.set_fact:
         tier:                          hdb                                     # Actions for HANA DB Serve
-        password_master:               "{{ hostvars.localhost.sap_password }}"
+        main_password:                 "{{ hostvars.localhost.sap_password }}"
       tags:
         - always
+
+    - name:                            Show SAP password
+      ansible.builtin.debug:
+        msg:                           "{{ hostvars.localhost.sap_password }}"
+        verbosity:                     2
 
     - block:
         - name:                        Include 4.0.0-hdb-install role

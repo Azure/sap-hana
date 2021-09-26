@@ -55,7 +55,7 @@
         tier:     hdb                                                             # Actions for HANA DB Servers
         primary_instance_name :  "{{ ansible_play_hosts_all[0] }}"                 # Setting up Primary Instance Name
         secondary_instance_name: "{{ ansible_play_hosts_all[1] }}"                # Setting up Secondary Instance Name
-        password_master:    "{{ hostvars.localhost.sap_password }}"
+        main_password:      "{{ hostvars.localhost.sap_password }}"
 
 
     - block:
@@ -79,6 +79,7 @@
       ansible.builtin.file:
         path: "{{ _workspace_directory }}/.step401"
         state: touch
+        mode:                         0755
 
 ...
 # /*----------------------------------------------------------------------------8

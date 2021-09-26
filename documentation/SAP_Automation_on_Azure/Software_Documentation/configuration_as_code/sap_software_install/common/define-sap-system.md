@@ -43,7 +43,7 @@ For each new SAP System deployed, a SAP System Configuration file must be genera
    pas_hostname: ""
    pas_instance_number: ""
    password_hana_system: ""
-   password_master: ""
+   main_password:   ""
    sap_fqdn: ""
    sapadm_uid: 2100
    sapinst_gid: 2001
@@ -69,7 +69,7 @@ For each new SAP System deployed, a SAP System Configuration file must be genera
    | `pas_hostname`               | Hostname for the PAS VM                                                           |
    | `pas_instance_number`        | Instance number for the PAS Instance, e.g. `"10"`                                 |
    | `password_hana_system`       | Password used for the SAP HANA System                                             |
-   | `password_master`            | Master Password for the Application Instance installation                         |
+   | `main_password`            | Master Password for the Application Instance installation                         |
    | `sap_fqdn`                   | FQDN for the SAP System                                                           |
    | `sapadm_uid`                 | User ID for the `sapadm` user, e.g. `2100`                                        |
    | `sapinst_gid`                | Group ID for the sapinst group, e.g. `2001`                                       |

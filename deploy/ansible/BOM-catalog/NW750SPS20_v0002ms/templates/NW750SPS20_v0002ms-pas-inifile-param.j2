@@ -24,10 +24,10 @@ nwUsers.sapsysGID                                                     = {{ sapsy
 nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
 
 NW_Delete_Sapinst_Users.removeUsers                                   = true
-NW_GetMasterPassword.masterPwd                                        = {{ password_master }}
+NW_GetMasterPassword.masterPwd                                        = {{ main_password }}
 
 HDB_Schema_Check_Dialogs.schemaName                                   = SAPABAP1
-HDB_Schema_Check_Dialogs.schemaPassword                               = {{ password_master }}
+HDB_Schema_Check_Dialogs.schemaPassword                               = {{ main_password }}
 
 NW_CI_Instance.ascsVirtualHostname                                    = {{ sap_scs_hostname }}
 NW_CI_Instance.ciInstanceNumber                                       = {{ sap_ciInstanceNumber }}
@@ -44,4 +44,4 @@ NW_getLoadType.loadType                                               = SAP
 NW_readProfileDir.profileDir                                          = {{ sap_profile_dir }}
 
 storageBasedCopy.hdb.instanceNumber                                   = {{ hdb_instance_number }}
-storageBasedCopy.hdb.systemPassword                                   = {{ password_master }}
+storageBasedCopy.hdb.systemPassword                                   = {{ main_password }}
