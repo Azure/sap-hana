@@ -199,3 +199,7 @@ variable "firewall_allowed_ipaddresses" {
 variable "deployer_assign_subscription_permissions" {
   default = false
 }
+
+variable "use_private_endpoint" {
+  default = false
+}

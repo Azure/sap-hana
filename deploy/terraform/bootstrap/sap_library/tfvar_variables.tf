@@ -162,3 +162,7 @@ variable "library_ansible_blob_container_name" {
 variable "enable_purge_control_for_keyvaults" {
   default = true
 }
+
+variable "use_private_endpoint" {
+  default = false
+}

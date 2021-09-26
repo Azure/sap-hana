@@ -2,7 +2,8 @@
 data "azurerm_client_config" "deployer" {}
 
 resource "azurerm_key_vault" "kv_prvt" {
-  count                      = (local.enable_deployers && !local.prvt_kv_exist) ? 1 : 0
+  # TODO Add this back when we separate the usage
+  count                      = (local.enable_deployers && !local.prvt_kv_exist) ? 0 : 0
   name                       = local.keyvault_names.private_access
   resource_group_name        = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
   location                   = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
@@ -21,13 +22,15 @@ resource "azurerm_key_vault" "kv_prvt" {
 
 // Import an existing private Key Vault
 data "azurerm_key_vault" "kv_prvt" {
-  count               = (local.enable_deployers && local.prvt_kv_exist) ? 1 : 0
+  # TODO Add this back when we separate the usage
+  count               = (local.enable_deployers && local.prvt_kv_exist) ? 0 : 0
   name                = split("/", local.prvt_key_vault_id)[8]
   resource_group_name = split("/", local.prvt_key_vault_id)[4]
 }
 
 resource "azurerm_key_vault_access_policy" "kv_prvt_msi" {
-  count        = (local.enable_deployers && !local.prvt_kv_exist) ? 1 : 0
+  # TODO Add this back when we separate the usage
+  count        = (local.enable_deployers && !local.prvt_kv_exist) ? 0 : 0
   key_vault_id = azurerm_key_vault.kv_prvt[0].id
 
   tenant_id = data.azurerm_client_config.deployer.tenant_id
@@ -57,6 +60,14 @@ resource "azurerm_key_vault" "kv_user" {
       soft_delete_enabled
     ]
   }
+
+  network_acls  {
+    bypass                     = "AzureServices"
+    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    ip_rules                   = [local.enable_deployer_public_ip ? azurerm_public_ip.deployer[0].ip_address : null]
+    virtual_network_subnet_ids = var.use_private_endpoint ? [local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id] : []
+  }
+
 }
 
 // Import an existing user Key Vault
@@ -233,4 +244,22 @@ data "azurerm_key_vault_secret" "pwd" {
   count        = (local.enable_deployers && local.enable_password && local.pwd_exist) ? 1 : 0
   name         = local.pwd_secret_name
   key_vault_id = local.user_key_vault_id
+}
+
+
+resource "azurerm_private_endpoint" "kv_user" {
+  count               = var.use_private_endpoint ? 1 : 0
+  name                = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_link)
+  resource_group_name = local.rg_exists ? data.azurerm_resource_group.deployer[0].name : azurerm_resource_group.deployer[0].name
+  location            = local.rg_exists ? data.azurerm_resource_group.deployer[0].location : azurerm_resource_group.deployer[0].location
+  subnet_id           = local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id
+
+  private_service_connection {
+    name                           = format("%s%s", local.prefix, local.resource_suffixes.keyvault_private_svc)
+    is_manual_connection           = false
+    private_connection_resource_id = local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].id : azurerm_key_vault.kv_user[0].id
+    subresource_names = [
+      "Vault"
+    ]
+  }
 }

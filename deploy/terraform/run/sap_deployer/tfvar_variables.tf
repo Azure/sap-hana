@@ -203,3 +203,7 @@ variable "deployer_assign_subscription_permissions" {
 variable "enable_purge_control_for_keyvaults" {
   default = true
 }
+
+variable "use_private_endpoint" {
+  default = false
+}

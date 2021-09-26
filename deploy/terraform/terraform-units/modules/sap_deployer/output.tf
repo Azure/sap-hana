@@ -56,9 +56,10 @@ output "user_vault_name" {
   value = local.user_kv_exist ? data.azurerm_key_vault.kv_user[0].name : azurerm_key_vault.kv_user[0].name
 }
 
-output "prvt_vault_name" {
-  value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
-}
+# TODO Add this back when we separate the usage
+# output "prvt_vault_name" {
+#   value = local.prvt_kv_exist ? data.azurerm_key_vault.kv_prvt[0].name : azurerm_key_vault.kv_prvt[0].name
+# }
 
 // output the secret name of private key
 output "ppk_secret_name" {
@@ -103,4 +104,8 @@ output "firewall_ip" {
 
 output "firewall_id" {
   value = var.firewall_deployment ? azurerm_firewall.firewall[0].id : ""
+}
+
+output "subnet_mgmt_id" {
+  value = local.sub_mgmt_exists ? data.azurerm_subnet.subnet_mgmt[0].id : azurerm_subnet.subnet_mgmt[0].id
 }
