@@ -30,7 +30,7 @@ resource "azurerm_storage_account" "storage_tfstate" {
   }
 
   network_rules {
-    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    default_action             = "Allow"
     ip_rules                   = [local.deployer_public_ip_address]
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
   }
@@ -112,7 +112,7 @@ resource "azurerm_storage_account" "storage_sapbits" {
   // TODO: soft delete for file share
 
   network_rules {
-    default_action             = var.use_private_endpoint ? "Deny" : "Allow"
+    default_action             =  "Allow"
     ip_rules                   = [local.deployer_public_ip_address]
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.subnet_mgmt_id] : []
   }
