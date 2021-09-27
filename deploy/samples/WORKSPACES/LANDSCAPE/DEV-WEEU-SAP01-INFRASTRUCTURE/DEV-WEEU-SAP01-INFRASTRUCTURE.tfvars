@@ -208,42 +208,9 @@ automation_username="azureadm"
 #diagnostics_storage_account_arm_id=""
 #witness_storage_account_arm_id=""
 
-enable_purge_control_for_keyvaults=false
-
-# The SPN keyvault is designed to host the SPN credentials used by the automation
-# spn_keyvault_id is an optional parameter that if provided specifies the Azure resource identifier for an existing keyvault
-#spn_keyvault_id=""
-
 # enable_purge_control_for_keyvaults is an optional parameter that czan be used to disable the purge protection fro Azure keyvaults
 # USE THIS ONLY FOR TEST ENVIRONMENTS
 enable_purge_control_for_keyvaults=false
-
-#########################################################################################
-#                                                                                       #
-#  Credentials                                                                          #
-#                                                                                       #
-#########################################################################################
-
-# The automation_username defines the user account used by the automation
-automation_username="azureadm"
-
-# The automation_password is an optional parameter that can be used to provide a password for the automation user
-# If empty Terraform will create a password and persist it in keyvault
-#automation_password=""
-
-# The automation_path_to_public_key is an optional parameter that can be used to provide a path to an existing ssh public key file
-# If empty Terraform will create the ssh key and persist it in keyvault
-#automation_path_to_public_key=""
-
-# The automation_path_to_private_key is an optional parameter that can be used to provide a path to an existing ssh private key file
-# If empty Terraform will create the ssh key and persist it in keyvault
-#automation_path_to_private_key=""
-
-# diagnostics_storage_account_arm_id is an optional parameter that if provided specifies the Azure resource identifier for the storage account to use for storing diagnostic logs
-#diagnostics_storage_account_arm_id=""
-
-# witness_storage_account_arm_id is an optional parameter that if provided specifies the Azure resource identifier for the storage account to use as a clouyd witness
-#witness_storage_account_arm_id=""
 
 
 #########################################################################################
@@ -291,7 +258,7 @@ use_ANF=false
 
 # ANF requires a dedicated subnet, the address space for the subnet is provided with  anf_subnet_address_prefix 
 # anf_subnet_address_prefix is a mandatory parameter if the subnets are not defined in the workload or if existing subnets are not used
-#anf_subnet_address_prefix=10.110.64.0/27
+#anf_subnet_address_prefix="10.110.64.0/27"
 
 # use_private_endpoint is a boolean flag controlling if the keyvaults and storage accounts have private endpoints
-#use_private_endpoint=true
+use_private_endpoint=false
