@@ -81,7 +81,7 @@ resource "azurerm_storage_account" "storage_bootdiag" {
   enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 
   network_rules {
-    default_action = var.use_private_endpoint ? "Deny" : "Allow"
+    default_action = "Allow"
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.sub_admin_defined ? (
       local.sub_admin_existing ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id) : (
       ""
@@ -157,7 +157,7 @@ resource "azurerm_storage_account" "witness_storage" {
   enable_https_traffic_only = var.options.enable_secure_transfer == "" ? true : var.options.enable_secure_transfer
 
   network_rules {
-    default_action = var.use_private_endpoint ? "Deny" : "Allow"
+    default_action = "Allow"
     virtual_network_subnet_ids = var.use_private_endpoint ? [local.sub_admin_defined ? (
       local.sub_admin_existing ? local.sub_admin_arm_id : azurerm_subnet.admin[0].id) : (
       ""

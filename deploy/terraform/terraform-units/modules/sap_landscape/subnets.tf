@@ -31,6 +31,10 @@ resource "azurerm_subnet" "app" {
   resource_group_name  = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].resource_group_name : azurerm_virtual_network.vnet_sap[0].resource_group_name
   virtual_network_name = local.vnet_sap_exists ? data.azurerm_virtual_network.vnet_sap[0].name : azurerm_virtual_network.vnet_sap[0].name
   address_prefixes     = [local.sub_app_prefix]
+
+  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_service_network_policies  = false
+  service_endpoints = ["Microsoft.Storage", "Microsoft.KeyVault"]
 }
 
 // Creates web subnet of SAP VNET
