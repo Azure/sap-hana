@@ -524,7 +524,7 @@ variable "anf_sapmnt_volume_size" {
   default = 512
 }
 
-variable "anf_shared_volume_size" {
+variable "anf_transport_volume_size" {
   default = 512
 }
 

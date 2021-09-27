@@ -89,15 +89,15 @@ locals {
 
   spn = {
     subscription_id = data.azurerm_key_vault_secret.subscription_id.value,
-    client_id       = local.use_spn ? data.azurerm_key_vault_secret.client_id[0].value : null,
-    client_secret   = local.use_spn ? data.azurerm_key_vault_secret.client_secret[0].value : null,
-    tenant_id       = local.use_spn ? data.azurerm_key_vault_secret.tenant_id[0].value : null
+    client_id       = local.use_spn ? try(data.azurerm_key_vault_secret.client_id[0].value, null) : null,
+    client_secret   = local.use_spn ? try(data.azurerm_key_vault_secret.client_secret[0].value, null) : null,
+    tenant_id       = local.use_spn ? try(data.azurerm_key_vault_secret.tenant_id[0].value, null) : null
   }
 
   service_principal = {
     subscription_id = local.spn.subscription_id,
     tenant_id       = local.spn.tenant_id,
-    object_id       = local.use_spn ? data.azuread_service_principal.sp[0].id : null
+    object_id       = local.use_spn ? try(data.azuread_service_principal.sp[0].id, null) : null
   }
 
   account = {

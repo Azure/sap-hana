@@ -49,7 +49,7 @@ module "common_infrastructure" {
   deployment                         = var.deployment
   license_type                       = var.license_type
   enable_purge_control_for_keyvaults = var.enable_purge_control_for_keyvaults
-  anf_shared_volume_size             = var.anf_shared_volume_size
+  anf_transport_volume_size          = var.anf_transport_volume_size
   anf_sapmnt_volume_size             = var.anf_sapmnt_volume_size
   use_ANF                            = var.use_ANF
 
@@ -204,5 +204,6 @@ module "output_files" {
   db_lb_ip              = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_lb_ip : module.anydb_node.db_lb_ip
   database_admin_ips    = upper(try(local.databases[0].platform, "HANA")) == "HANA" ? module.hdb_node.db_ip : module.anydb_node.anydb_db_ip #TODO Change to use Admin IP
   sap_mnt               = module.common_infrastructure.sapmnt_path
+  sap_transport         = module.common_infrastructure.saptransport_path
 
 }

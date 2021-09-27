@@ -284,7 +284,7 @@ variable "resource_suffixes" {
     "scs_scs_rule"                 = "scsScs-rule_"
     "sdu_rg"                       = ""
     "tfstate"                      = "tfstate"
-    "transport_volume"             = "-transport"
+    "transport_volume"             = "transport"
     "vm"                           = ""
     "vnet"                         = "-vnet"
     "vnet_rg"                      = "-INFRASTRUCTURE"

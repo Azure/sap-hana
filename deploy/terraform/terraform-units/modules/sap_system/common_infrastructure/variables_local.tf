@@ -55,7 +55,7 @@ variable "enable_purge_control_for_keyvaults" {
   description = "Allow the deployment to control the purge protection"
 }
 
-variable "anf_shared_volume_size" {
+variable "anf_transport_volume_size" {
   description = "The volume size in GB for shared"
 }
 
