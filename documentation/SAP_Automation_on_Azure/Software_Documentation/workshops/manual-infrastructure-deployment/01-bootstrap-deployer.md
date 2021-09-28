@@ -132,7 +132,7 @@
         }
       },
       "options": {
-        "enable_deployer_public_ip"           : true
+        "deployer_enable_public_ip"           : true
       },
       "firewall_deployment"                   : true
     }

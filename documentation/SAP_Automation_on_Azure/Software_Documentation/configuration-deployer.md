@@ -60,7 +60,7 @@ The configuration of the deployement infrastructure is achieved using a json for
   },
 
   "options": {
-    "enable_deployer_public_ip"       : false                                     <-- Optional, Default: false
+    "deployer_enable_public_ip"       : false                                     <-- Optional, Default: false
   },
   "firewall_deployment"               : true                                      <-- Optional, Default: false
 }                                                                                 <-- JSON Closing tag
@@ -100,7 +100,7 @@ The complete set of configuratiuon options is listed in the table below.
 | authentication                                        | `path_to_public_key`          | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
 | authentication                                           | `path_to_private_key`         | optional      | -        | - Not required in a standard deployment.<br/> <!-- TODO: Yunzi --> |
 ||<p>| 
-| options                                           | `enable_deployer_public_ip`   | optional      | false    | Controls whether the deployer VM will have a public IP address or not.- Not required in a standard deployment.|
+| options                                           | `deployer_enable_public_ip`   | optional      | false    | Controls whether the deployer VM will have a public IP address or not.- Not required in a standard deployment.|
 |<p>| 
 | firewall_deployment                                           | `true/false`   | optional      | false    | Controls whether the deployment will include an Azure Firewall|
 
@@ -162,7 +162,7 @@ The complete set of configuratiuon options is listed in the table below.
       "path_to_private_key"             : "sshkey"
     },
   "options": {
-      "enable_deployer_public_ip"       : false
+      "deployer_enable_public_ip"       : false
     },
   "firewall_deployment"                 : true
   }
