@@ -537,3 +537,8 @@ variable "use_loadbalancers_for_standalone_deployments" {
   default = true
 }
 
+variable "hana_dual_nics" {
+  default = true
+}
+
+

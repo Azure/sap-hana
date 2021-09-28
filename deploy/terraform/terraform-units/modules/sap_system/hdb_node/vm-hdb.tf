@@ -13,7 +13,7 @@ HANA DB Linux Server private IP range: .10 -
 # Creates the admin traffic NIC and private IP address for database nodes
 resource "azurerm_network_interface" "nics_dbnodes_admin" {
   provider = azurerm.main
-  count    = local.enable_deployment ? length(local.hdb_vms) : 0
+  count    = local.enable_deployment && var.hana_dual_nics ? length(local.hdb_vms) : 0
   name     = format("%s%s", local.hdb_vms[count.index].name, local.resource_suffixes.admin_nic)
 
   location                      = var.resource_group[0].location
@@ -132,12 +132,23 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   ) : null
   zone = local.use_avset ? null : local.zones[count.index % max(local.db_zone_count, 1)]
 
-  network_interface_ids = local.enable_storage_subnet ? ([
-    azurerm_network_interface.nics_dbnodes_db[count.index].id,
-    azurerm_network_interface.nics_dbnodes_admin[count.index].id,
-    azurerm_network_interface.nics_dbnodes_storage[count.index].id]) : ([
-    azurerm_network_interface.nics_dbnodes_db[count.index].id,
-    azurerm_network_interface.nics_dbnodes_admin[count.index].id]
+  network_interface_ids = local.enable_storage_subnet ? (
+    [
+      azurerm_network_interface.nics_dbnodes_db[count.index].id,
+      azurerm_network_interface.nics_dbnodes_admin[count.index].id,
+      azurerm_network_interface.nics_dbnodes_storage[count.index].id
+    ]
+    ) : (
+    var.hana_dual_nics ?
+    (
+      [
+        azurerm_network_interface.nics_dbnodes_db[count.index].id,
+        azurerm_network_interface.nics_dbnodes_admin[count.index].id
+      ]) : (
+      [
+        azurerm_network_interface.nics_dbnodes_db[count.index].id
+      ]
+    )
   )
 
   size = local.hdb_vms[count.index].size

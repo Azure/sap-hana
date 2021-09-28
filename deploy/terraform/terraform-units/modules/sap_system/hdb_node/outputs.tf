@@ -4,7 +4,7 @@ output "hdb_vms" {
 }
 
 output "nics_dbnodes_admin" {
-  value = local.enable_deployment ? azurerm_network_interface.nics_dbnodes_admin : []
+  value = local.enable_deployment && var.hana_dual_nics ? azurerm_network_interface.nics_dbnodes_admin : []
 }
 
 output "nics_dbnodes_db" {
@@ -12,7 +12,7 @@ output "nics_dbnodes_db" {
 }
 
 output "loadbalancers" {
-  value = local.enable_db_lb_deployment  && (var.use_loadbalancers_for_standalone_deployments || local.hdb_ha) ? azurerm_lb.hdb : null
+  value = local.enable_db_lb_deployment && (var.use_loadbalancers_for_standalone_deployments || local.hdb_ha) ? azurerm_lb.hdb : null
 }
 
 output "hdb_sid" {
@@ -30,12 +30,20 @@ output "dns_info_vms" {
   value = local.enable_deployment ? (
     zipmap(
       concat(
-        local.hdb_vms[*].name,
-        slice(var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME, 0, local.db_server_count)
+        (
+          var.hana_dual_nics ? local.hdb_vms[*].name : [""]
+        ),
+        (
+          slice(var.naming.virtualmachine_names.HANA_SECONDARY_DNSNAME, 0, local.db_server_count)
+        )
       ),
       concat(
-        slice(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, 0, local.db_server_count),
-        slice(azurerm_network_interface.nics_dbnodes_db[*].private_ip_address, 0, local.db_server_count)
+        (
+          var.hana_dual_nics ? slice(azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address, 0, local.db_server_count) : [""]
+        ),
+        (
+          slice(azurerm_network_interface.nics_dbnodes_db[*].private_ip_address, 0, local.db_server_count)
+        )
     ))) : (
     null
   )
@@ -66,9 +74,9 @@ output "db_lb_ip" {
 }
 
 output "db_admin_ip" {
-  value = local.enable_deployment ?  azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address : []
+  value = local.enable_deployment && var.hana_dual_nics ? azurerm_network_interface.nics_dbnodes_admin[*].private_ip_address : []
 }
 
 output "db_ip" {
-  value = local.enable_deployment ?  azurerm_network_interface.nics_dbnodes_db[*].private_ip_address : []
+  value = local.enable_deployment ? azurerm_network_interface.nics_dbnodes_db[*].private_ip_address : []
 }
