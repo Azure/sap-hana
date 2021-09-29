@@ -4,26 +4,6 @@
 # |                                                                            |
 # +------------------------------------4--------------------------------------*/
 ---
-
-- hosts:                               localhost
-  name:                                Get SAP Password from KeyVault
-  gather_facts:                        true
-  vars_files:
-    - vars/ansible-input-api.yaml                               # API Input template with defaults
-  tasks:
-
-    - name:                            Remove .step1 flag
-      ansible.builtin.file:
-        path:                          "{{ _workspace_directory }}/.step1"
-        state:                          absent
-
-
-# /*---------------------------------------------------------------------------8
-# |                                                                            |
-# |       Playbook for performing general baseline OS configuration tasks      |
-# |                                                                            |
-# +------------------------------------4--------------------------------------*/
-
 - hosts:              "{{ sap_sid|upper }}_DB  :
                        {{ sap_sid|upper }}_SCS :
                        {{ sap_sid|upper }}_PAS :
@@ -39,96 +19,58 @@
   any_errors_fatal:   true
   vars_files:
     - vars/ansible-input-api.yaml                                               # API Input template with defaults
+  vars:
+    tier:             os
 
+  pre_tasks:
+    - name:                            Remove .step1 flag
+      ansible.builtin.file:
+        path:                          "{{ _workspace_directory }}/.step1"
+        state:                         absent
+      delegate_to: localhost
 
-  tasks:
-# -------------------------------------+---------------------------------------8
-#
-# Build the list of tasks to be executed in order here.
-#
-# -------------------------------------+---------------------------------------8
-
-  # Specify the active tier for this playbook run
-    - name:                            Setting the os tier facts
-      ansible.builtin.set_fact:
-        tier:                          os                                     # Actions for HANA DB Serve
-      tags:
-        - always
-
-    - block:
-        - name:                        Include 1.0-sudoers role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.0-sudoers
+  roles:
+    - role: roles-os/1.0-sudoers
       tags:
         - 1.0-sudoers
 
-    - block:
-        - name:                        Include 1.1-swap role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.1-swap
+    - role: roles-os/1.1-swap
       tags:
         - 1.1-swap
 
-    - block:
-        - name:                        Include 1.2-hostname role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.2-hostname
+    - role: roles-os/1.2-hostname
       tags:
         - 1.2-hostname
 
-    - block:
-        - name:                        Include 1.5-disk-setup role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.5-disk-setup
+    - role: roles-os/1.5-disk-setup
       tags:
         - 1.5-disk-setup
 
-    - block:
-        - name:                        Include 1.3-repository role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.3-repository
+    - role: roles-os/1.3-repository
       tags:
         - 1.3-repository
 
-    - block:
-        - name:                        Include 1.4-packages role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.4-packages
+    - role: roles-os/1.4-packages
       tags:
         - 1.4-packages
 
-    - block:
-        - name:                        Include 1.7-chrony role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.7-chrony
+    - role: roles-os/1.7-chrony
       tags:
         - 1.7-chrony
 
-    - block:
-        - name:                        Include 1.9-kernelparameters role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.9-kernelparameters
+    - role: roles-os/1.9-kernelparameters
       tags:
         - 1.9-kernelparameters
 
-    - block:
-        - name:                        Include 1.11-accounts role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.11-accounts
+    - role: roles-os/1.11-accounts
       tags:
         - 1.11-accounts
 
-    - block:
-        - name:                        Include 1.16-services role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.16-services
+    - role: roles-os/1.16-services
       tags:
         - 1.16-services
 
-    - block:
-        - name:                        Include 1.20-prometheus role
-          ansible.builtin.include_role:
-            name:                      roles-os/1.20-prometheus
+    - role: roles-os/1.20-prometheus
       when:   prometheus
               and             ansible_os_family|upper == "SUSE"
               and (     (     ansible_distribution_major_version == '12'
@@ -137,27 +79,13 @@
       tags:
         - 1.20-prometheus
 
-# /*----------------------------------------------------------------------------8
-# |                                                                            |
-# |     Logging for performing OS configuration tasks                          |
-# |                                                                            |
-# +------------------------------------4--------------------------------------*/
-
-
-- hosts:                               localhost
-  name:                                Log results
-  gather_facts:                        true
-  vars_files:
-    - vars/ansible-input-api.yaml                               # API Input template with defaults
-
-  tasks:
+  post_tasks:
     - name:                           Create .step1 flag
       ansible.builtin.file:
         path:                         "{{ _workspace_directory }}/.step1"
         state:                        touch
         mode:                         0755
-
-
+      delegate_to: localhost
 ...
 # /*----------------------------------------------------------------------------8
 # |                                    END                                      |
