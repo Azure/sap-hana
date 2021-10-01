@@ -25,19 +25,31 @@ archives.downloadBasket                                               = /usr/sap
 nwUsers.sapadmUID                                                     = {{ sapadm_uid }}
 nwUsers.sapsysGID                                                     = {{ sapsys_gid }}
 nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
+<<<<<<< HEAD
+nwUsers.sidadmPassword                                                = {{ password_master }}
+=======
 nwUsers.sidadmPassword                                                = {{ main_password }}
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
 
 NW_AS.instanceNumber                                                  = {{ app_instance_number }}
 NW_DI_Instance.virtualHostname                                        = {{ sap_appVirtualHostname }}
 
 NW_Delete_Sapinst_Users.removeUsers                                   = true
+<<<<<<< HEAD
+NW_GetMasterPassword.masterPwd                                        = {{ password_master }}
+=======
 NW_GetMasterPassword.masterPwd                                        = {{ main_password }}
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
 
 NW_adaptProfile.skipSecurityProfileSettings                           = true
 NW_getFQDN.FQDN                                                       = {{ sap_fqdn }}
 
 HDB_Schema_Check_Dialogs.schemaName                                   = SAPHANADB
+<<<<<<< HEAD
+HDB_Schema_Check_Dialogs.schemaPassword                               = {{ password_master }}
+=======
 HDB_Schema_Check_Dialogs.schemaPassword                               = {{ main_password }}
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
 
 NW_HDB_DBClient.clientPathStrategy                                    = SAPCPE
 NW_HDB_getDBInfo.instanceNumber                                       = {{ hdb_instance_number }}

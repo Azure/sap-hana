@@ -92,7 +92,7 @@ Future Steps will include:
 
     # TERRAFORM CREATED
     sap_sid:                       X00
-    kv_name:                        DEMOEUS2SAP00user298
+    kv_name:                       DEMOEUS2SAP00user298
     secret_prefix:                 DEMO-EUS2-SAP00
     scs_high_availability:         false
     db_high_availability:          false

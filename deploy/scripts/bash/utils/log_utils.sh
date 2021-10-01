@@ -16,23 +16,40 @@ function __init_logger() {
 
 function __init_log() {
 
-    #global variables
-    #readonly LOG_FILE_NAME="${LOG_FILE_NAME:-$(basename "$0")}.log}"
+    #variables - which can be exported
+    #SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
     SCRIPTPATH_FULL="$(realpath "${BASH_SOURCE[0]}")"
     SCRIPTDIR="$(dirname "${SCRIPTPATH_FULL}")"
-    SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
     DATETIME=$(date +%Y%m%d%H%M%S)
     INFOLOGFILENAME="infolog-${DATETIME}.txt"
     DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-    PROCESS_OF_LOG="$$"
+    PROCESS_OF_LOGGER="$$"
+
+    readonly PROCESS_OF_LOGGER
+
+    #save stdout and stderr file discriptors
+    exec 3>&1 4>&2
+
+    # initialize log files and redirect stdout and stderr to log files
+    printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 INFO \
+            "excution started at : '${DATETIME}'" > "${INFOLOGFILENAME}" 
+    
+    printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 DEBUG \
+            "execution started at : '${DATETIME}'" > "${DEBUGLOGFILENAME}"
+    
+    # redirect info log to debug log and send the process to background
+    # this way we can close the file handles at the end of the script
+    tail -f "${INFOLOGFILENAME}" | tee -a "${DEBUGLOGFILENAME}" &
+    PROCESS_OF_BCK_LOGGER=$!
+    readonly PROCESS_OF_BCK_LOGGER
+    
+    #redirect stdout and stderr to log files
+    exec 1> >(tee -a "${DEBUGLOGFILENAME}") 2> >(tee -a "${DEBUGLOGFILENAME}" >&2)
 
     # letting colors be defined, use cat, less -R or tail to see the colors
     # if cat is not displaying colors, then the control characters may not be
     # intact. Look at the following link for more info:
-    # https://unix.stackexchange.com/questions/262185/display-file-with-ansi-colors
-
-    # use declare -p to see the variables or declare -xp to see the environment
-    # variables.
+    # https://unix.stackexchange.com/questions/262185/
 
     # shellcheck disable=SC2034
     if [ -t 1 ]; then
@@ -55,32 +72,22 @@ function __init_log() {
         color_white=""
     fi
 
-    readonly color_normal color_red color_green color_yellow color_magenta color_cyan color_white
-
+    readonly color_normal color_red color_green color_yellow color_magenta \
+                color_cyan color_white
 
     # clear out any old values
     # shellcheck disable=SC2034
     unset log_levels log_levels_map
+    # shellcheck disable=SC2034
     declare -gA log_levels log_levels_map
 
     # create hash table of log levels
-    log_levels=([CRITICAL]=0 [ERROR]=1 [WARN]=2 [INFO]=3 [DEBUG]=4 [VERBOSE]=5)
+    log_levels=([SUCCESS]=0 [ERROR]=1 [WARN]=2 [INFO]=3 [DEBUG]=4 [VERBOSE]=5)
 
     # set default log level mapper to INFO
     log_level_mapper["default"]=3
     
-    # initialize log files and redirect stdout and stderr to log files
-    printf "Execution started at : %s\n" "${DATETIME}" > "${INFOLOGFILENAME}" 
-    printf "Execution started at : %s\n" "${DATETIME}" > "${DEBUGLOGFILENAME}"
-    exec 3>&1 4>&2
-    
-    tail -f "${INFOLOGFILENAME}" &
-
-    readonly PROCESS_OF_LOG="$$"
-
-    exec 3> >(exec 4> >(tee -a "${DEBUGLOGFILENAME}" 2>&1))
-    #exec 3> >(tee "${DEBUGLOGFILENAME}") 4> >(tee "${DEBUGLOGFILENAME}" 2>&1)
-
+    # set the trap to catch the script termination
     # shellcheck disable=SC2034
     trap reset_file_descriptors EXIT HUP INT ABRT QUIT TERM
 }
@@ -99,7 +106,8 @@ function set_log_level() {
             log_level_mapper[$logger]=$l
         else
             printf '%(%Y-%m-%d %H:%M:%S)T %-7s %s\n' -1 WARN \
-                "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Unknown log level '$curr_log_level' for logger '$logger'; setting to INFO"
+                "${BASH_SOURCE[2]}:${BASH_LINENO[1]} Unknown log level `
+                `'$curr_log_level' for logger '$logger'; setting to INFO"
             log_level_mapper[$logger]=3
         fi
     else
@@ -123,11 +131,13 @@ function _printlog() {
 
     #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
     #who_called="+${BASH_SOURCE[2]}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
-    who_called="+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:"
+    who_called="+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@`
+                `${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:"
 
     if [[ $log_level_set ]]; then
         ((log_level_set >= log_level)) && {
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" "$who_called"
+            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
+                    "$who_called"
             printf '%s\n' "$@"
         }
     else
@@ -144,35 +154,28 @@ function _writelog_to_file() {
         logger=$2
         shift 2
     }
-    #file=$1
-    file="${SCRIPTDIR}/$1"
-    #writes a message to the log file
+    #log_file=$1
+    log_file="${SCRIPTDIR}/$1"
+    #writes a message to the log log_file
     # we may not need this, if the log file doesn't exist, create it
-    if [ ! -f "${file}" ]; then
-        touch "${file}"
+    if [ ! -f "${log_file}" ]; then
+        touch "${log_file}"
     fi
     log_level="${log_levels[$current_log_level]}"
     log_level_set="${log_level_mapper[$logger]}"
 
-    #+${BASH_SOURCE/$HOME/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
-    #+${BASH_SOURCE/$DEPLOYMENT_REPO_PATH/\~}@${LINENO}${FUNCNAME:+(${FUNCNAME[0]})}:
-    who_called="+${BASH_SOURCE[2]/$HOME/\~}@${BASH_LINENO[1]}:${FUNCNAME[2]}:"
+    who_called="+${BASH_SOURCE[2]/$DEPLOYMENT_REPO_PATH/\~}@`
+                `${BASH_LINENO[1]}:${FUNCNAME[2]}:"
 
     if [[ $log_level_set ]]; then
-        if ((log_level_set >= log_level)) && [[ -f "${file}" ]]; then
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
-                "$who_called"
-            #printf '%s\n' "$@" >> "${file}"
-            shift
+        if ((log_level_set >= log_level)) && [[ -f "${log_file}" ]]; then
+            shift 1
             printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
-                "$who_called" "$@" >>"${file}"
+                "$who_called" "$@" >>"${log_file}"
         else
-            printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 "$current_log_level" \
-                "$who_called"
-            #printf '%s\n' "$@" >> "${file}"
-            shift
+            shift 1
             printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s %s\n' -1 "$current_log_level" \
-                "$who_called" "$@" >>"${file}"
+                "$who_called" "$@" >>"${log_file}"
         fi
     else
         printf '%(%Y-%m-%d:%H:%M:%S)T %-7s %s\n' -1 WARN \
@@ -195,9 +198,10 @@ log_verbose() { _printlog VERBOSE "$@"; }
 #
 # logging file content
 #
-log_info_file() { _writelog_to_file INFO "$@"; }
-log_debug_file() { _writelog_to_file DEBUG "$@"; }
+log_info_file()    { _writelog_to_file INFO "$@";    }
+log_debug_file()   { _writelog_to_file DEBUG "$@";   }
 log_verbose_file() { _writelog_to_file VERBOSE "$@"; }
+
 #
 # logging for function entry and exit
 #
@@ -208,51 +212,17 @@ log_info_leave() { _printlog INFO "Leaving function ${FUNCNAME[1]}"; }
 log_debug_leave() { _printlog DEBUG "Leaving function ${FUNCNAME[1]}"; }
 log_verbose_leave() { _printlog VERBOSE "Leaving function ${FUNCNAME[1]}"; }
 
-function __list_log_levels() {
-    local i
-    for i in "${!log_levels[@]}"; do
-        printf '%s\n' "$i"
-    done
-}
-
-function __list_available_loggers() {
-    local i
-    for i in "${!log_level_mapper[@]}"; do
-        printf '%s\n' "$i"
-    done
-}
-
-function __list_available_functions() {
-    #typeset -f | awk '/ \(\) $/ && !/^main / { print $1 }'
-    #typeset -f | awk '!/^main[ (]/ && /^[^ {}]+ *\(\)/ { gsub(/[()]/, "", $1); print $1}'
-    local funcRefs
-    funcRefs=$(declare -F -p | cut -d " " -f 3)
-    readonly funcRefs
-    printf "%s\n" "${funcRefs[@]}"
-}
-
-function __list_available_environment_variables(){
-    local envVars
-    envVars=$(declare -xp | grep --perl-regexp \
-                --only-match '(?<=^declare -x )[^=]+')
-    readonly envVars
-    printf "%s\n" "${envVars[@]}"
-}
-
-function __list_available_environment_variables(){
-    local envVars
-    compgen -v | while read -r envVars; do
-        printf "$envVars=%q\n" "${!envVars}"
-    done
-}
-
 function reset_file_descriptors() {
-    # reset the file descriptors set above
+    # reset file descriptors to default
+    # this is useful for scripts that fork and exec
     exec 2>&4 1>&3
-    # close all file descriptors
+    # close the additional file descriptors
     exec 3>&- 4>&-
+    
     # remove the background process for log file
-    pkill -P "${PROCESS_OF_LOG}"
+    pkill -P "${PROCESS_OF_BCK_LOGGER}"
+    # remove the process for log file
+    pkill -P "${PROCESS_OF_LOGGER}"
 }
 
 dump_stack_trace() {
@@ -308,27 +278,8 @@ __init_logger
 #########################################################################
 #error codes include those from /usr/include/sysexits.h
 
-#colors for terminal
-# readonly CRIT_COLOR="\e[1;4;31m"
-# readonly ERROR_COLOR="\e[1;31m"
-# readonly SUCCESS_COLOR="\e[1;32m"
-# readonly WARN_COLOR="\e[1;33m"
-# readonly DBG_COLOR="\e[1;34m"
-# readonly INFO_COLOR="\e[1;36m"
-# readonly RESET_COLOR="\e[0m"
-
-# #global variables
-# SCRIPTARGS="$@"
-# SCRIPTPATH_FULL="$(realpath "${BASH_SOURCE[0]}")"
-# SCRIPTDIR="$(dirname "${SCRIPTPATH}")"
-# SCRIPTNAME="$(basename ${BASH_SOURCE[0]})"
-# DATETIME=$(date +%Y%m%d%H%M%S)
-# INFOLOGFILENAME="infolog-${DATETIME}.txt"
-# DEBUGLOGFILENAME="debuglog-${DATETIME}.txt"
-# PROCESS_OF_LOG="$$"
-
 # function log_info() {
-#     echo -e "${INFO_COLOR}${PROCESS_OF_LOG} ${1}${RESET_COLOR}"
+#     echo -e "${INFO_COLOR}${PROCESS_OF_LOGGER} ${1}${RESET_COLOR}"
 # }
 
 # function strip_colors() {

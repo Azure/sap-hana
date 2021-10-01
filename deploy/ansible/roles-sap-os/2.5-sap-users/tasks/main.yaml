@@ -63,7 +63,11 @@
     comment:      "{{ item.comment }}"
     uid:          "{{ item.uid }}"
     group:        "{{ item.group }}"
+<<<<<<< HEAD
+    password:     "{{ password_master | password_hash('sha512', inventory_hostname) }}"
+=======
     password:     "{{ main_password | password_hash('sha512', inventory_hostname) }}"
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
     append:       false
     shell:        /bin/csh
     create_home:  true

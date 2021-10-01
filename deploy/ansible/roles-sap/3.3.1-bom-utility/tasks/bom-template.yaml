@@ -57,7 +57,11 @@
 #       scs_instance_number
 #       sap_scs_hostname
 #       sap_fqdn
+<<<<<<< HEAD
+#       password_master
+=======
 #       main_password
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
 #       sapadm_uid
 #       sapsys_gid
 #       sidadm_uid
@@ -72,7 +76,11 @@
       - "SCS Virtual Hostname : {{ sap_scs_hostname }}"
       - "DB Hostname          : {{ sap_db_hostname }}"
       - "FQDN                 : {{ sap_fqdn }}"
+<<<<<<< HEAD
+      - "Master Password      : {{ password_master }}"
+=======
       - "Master Password      : {{ main_password }}"
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
       - "sapadm UID           : {{ sapadm_uid }}"
       - "sapsys GID           : {{ sapsys_gid }}"
       - "<sid>adm UID         : {{ sidadm_uid }}"

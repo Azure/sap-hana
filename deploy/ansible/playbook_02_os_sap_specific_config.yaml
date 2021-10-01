@@ -59,7 +59,11 @@
     - name:                            Setting the sapos tier facts
       ansible.builtin.set_fact:
         tier:                          sapos                                     # Actions for HANA DB Serve
+<<<<<<< HEAD
+        # password_master:               "{{ hostvars.localhost.sap_password }}"
+=======
         # main_password:                 "{{ hostvars.localhost.sap_password }}"
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c
       tags:
         - always
 

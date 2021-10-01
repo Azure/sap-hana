@@ -28,6 +28,8 @@ set-clustering-auth*.sh
 **/.vscode/*
 .vscode/
 deploy/scripts/pwsh/SAPDeploymentUtilities/Output/stats.json
+deploy/scripts/pwsh/PSLog/*.json
+deploy/scripts/pwsh/PSLog/*.xml
 
 
 **/.terraform.lock.hcl

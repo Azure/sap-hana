@@ -96,7 +96,11 @@
     - name: Initialize facts
       set_fact:
         tier:                                      ha
+<<<<<<< HEAD:deploy/ansible/playbook_06_00_03_pacemaker_hana.original_yaml.old
+        password_master:                      "{{ hostvars.localhost.sap_password }}"
+=======
         main_password:                        "{{ hostvars.localhost.sap_password }}"
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c:deploy/ansible/playbook_06_00_03_pacemaker_hana.original.yaml
         primary_instance_name:                     "{{ ansible_play_hosts_all[0] }}"         # Setting up Primary Instance Name
         secondary_instance_name:                   "{{ ansible_play_hosts_all[1] }}"         # Setting up Secondary Instance Name
         sap_hana_fencing_spn_client_id:            "{{ hostvars.localhost.sap_fencing_spn_client_id }}"
@@ -157,7 +161,10 @@
       ansible.builtin.file:
         path: "{{ _workspace_directory }}/.step603"
         state: touch
+<<<<<<< HEAD:deploy/ansible/playbook_06_00_03_pacemaker_hana.original_yaml.old
+=======
         mode:                         0755
+>>>>>>> 041bd87476ad1606f29fa71755b92a1047dc2c6c:deploy/ansible/playbook_06_00_03_pacemaker_hana.original.yaml
 
 ...
 
