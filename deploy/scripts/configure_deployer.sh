@@ -213,6 +213,7 @@ ansible_bin=${ansible_base}/bin
 ansible_venv=${ansible_base}/venv/${ansible_version}
 ansible_venv_bin=${ansible_venv}/bin
 ansible_collections=${ansible_base}/collections
+ansible_roles=${ansible_base}/roles
 ansible_pip3=${ansible_venv_bin}/pip3
 
 # Azure SAP Automated Deployment directories
@@ -332,8 +333,9 @@ pkg_mgr_upgrade
 #
 sudo mkdir -p \
     ${ansible_bin} \
-    ${ansible_collections}
-    
+    ${ansible_collections} \
+    ${ansible_roles}
+
 # Create a Python3 based venv into which we will install Ansible.
 if [[ ! -e "${ansible_venv_bin}/activate" ]]; then
     sudo rm -rf ${ansible_venv}
@@ -370,8 +372,9 @@ sudo ${ansible_venv_bin}/pip3 install \
     msal
 
 # Install Ansible collections under the ANSIBLE_COLLECTIONS_PATHS for all users.
-sudo mkdir -p ${ansible_collections}
+sudo mkdir -p ${ansible_collections} ${ansible_roles}
 sudo -H ${ansible_venv_bin}/ansible-galaxy collection install azure.azcollection --force --collections-path ${ansible_collections}
+sudo -H ${ansible_venv_bin}/ansible-galaxy install -r "${asad_dir}/deploy/ansible/requirements.yml" --force --roles-path ${ansible_roles}
 
 # Install the Python requirements associated with the Ansible Azure collection
 # that was just installed into the Ansible venv.
@@ -461,6 +464,7 @@ echo export "PATH=${ansible_bin}:${tf_bin}:"'${PATH}' | sudo tee -a /etc/profile
 # Set env for ansible
 echo export ANSIBLE_HOST_KEY_CHECKING=False | sudo tee -a /etc/profile.d/deploy_server.sh
 echo export ANSIBLE_COLLECTIONS_PATHS=${ansible_collections} | sudo tee -a /etc/profile.d/deploy_server.sh
+echo export ANSIBLE_ROLES_PATH=${ansible_roles} | sudo tee -a /etc/profile.d/deploy_server.sh
 
 # Set env for MSI
 echo export ARM_USE_MSI=true | sudo tee -a /etc/profile.d/deploy_server.sh

@@ -66,9 +66,25 @@
         verbosity:                     2
 
     - block:
-        - name:                        Include 4.0.0-hdb-install role
+        - name:                        4.0.0 hana db install
           ansible.builtin.include_role:
-            name:                      roles-db/4.0.0-hdb-install
+            name:                      redhat_sap.sap_hana_deployment
+          vars:
+            sap_hana_installdir: "/usr/sap/install/CD_HDBSERVER/SAP_HANA_DATABASE"
+            # Passwords:
+            sap_hana_deployment_sapadm_password: "{{ main_password }}"
+            sap_hana_deployment_common_master_password: "{{ main_password }}"
+            sap_hana_deployment_sidadm_password: "{{ main_password }}"
+            sap_hana_deployment_hana_db_system_password: "{{ main_password }}"
+
+            # FIXME: Missing components and component_root configuration.
+
+            # Configurations:
+            sap_hana_deployment_hana_install_path: "/hana/shared"  # Default
+            sap_hana_deployment_hana_sid: "{{ db_sid|upper }}"
+            sap_hana_deployment_hana_instance_number: "{{ hdb_instance_number }}"
+            sap_hana_deployment_hana_env_type: "custom"
+
       tags:
         - 4.0.0-hdb-install
 
