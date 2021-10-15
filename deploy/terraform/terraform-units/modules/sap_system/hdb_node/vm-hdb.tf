@@ -153,8 +153,6 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
 
   size = local.hdb_vms[count.index].size
 
-  custom_data = var.deployment == "new" ? var.cloudinit_growpart_config : null
-
   dynamic "os_disk" {
     iterator = disk
     for_each = range(length(local.os_disk))
@@ -169,6 +167,8 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   }
 
   source_image_id = local.hdb_vms[count.index].os.source_image_id != "" ? local.hdb_vms[count.index].os.source_image_id : null
+
+  custom_data = var.deployment == "new" && local.hdb_vms[count.index].os.publisher == "RedHat" ? data.template_cloudinit_config.enable_nm_cloud_setup.rendered : var.deployment == "new" ? var.cloudinit_growpart_config : null
 
   # If source_image_id is not defined, deploy with source_image_reference
   dynamic "source_image_reference" {
@@ -192,6 +192,37 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
+
+  lifecycle {
+    ignore_changes = [custom_data]
+  }
+}
+
+data "template_cloudinit_config" "enable_nm_cloud_setup" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    content_type = "text/x-shellscript"
+    content      = <<CUSTOM_DATA
+#!/bin/bash
+sudo -i
+dnf update -y NetworkManager
+dnf install -y NetworkManager-cloud-setup
+if [ "$(printf '%s\n' "1.30.0.13.el8_4" "$(rpm --queryformat '%%{VERSION}%%{RELEASE}' -q NetworkManager-cloud-setup)" | sort -V | head -n1)" = "1.30.0.13.el8_4" ];
+then
+  mkdir -p /etc/systemd/system/nm-cloud-setup.service.d
+  cat > /etc/systemd/system/nm-cloud-setup.service.d/10-enable-azure.conf << EOF
+[Service]
+Environment=NM_CLOUD_SETUP_AZURE=yes
+EOF
+  systemctl enable nm-cloud-setup.service
+  systemctl enable nm-cloud-setup.timer
+  systemctl restart nm-cloud-setup.service
+fi
+CUSTOM_DATA
+  }
 }
 
 # Creates managed data disk
