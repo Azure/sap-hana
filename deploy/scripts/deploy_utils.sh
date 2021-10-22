@@ -314,7 +314,7 @@ function set_executing_user_environment_variables() {
                 az_user_obj_id=$(az ad sp show --id "${az_exec_user_name}" --query objectId -o tsv)
                 az_user_name=$(az ad sp show --id "${az_exec_user_name}" --query displayName -o tsv)
 
-                echo -e "\t$(s)[set_executing_user_environment_variables]: Identified login type as 'service principal'"
+                echo -e "\t[set_executing_user_environment_variables]: Identified login type as 'service principal'"
                 echo -e "\t[set_executing_user_environment_variables]: Initializing state with SPN named: ${az_user_name}"
 
                 if [ -z "$az_client_secret" ]; then
