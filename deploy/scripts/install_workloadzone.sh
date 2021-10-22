@@ -228,7 +228,7 @@ fi
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
-    mkdir "$HOME/.terraform.d/plugin-cache"
+    mkdir -p "$HOME/.terraform.d/plugin-cache"
 fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
@@ -608,7 +608,7 @@ new_deployment=false
 #Plugins
 if [ ! -d "$HOME/.terraform.d/plugin-cache" ]
 then
-    mkdir "$HOME/.terraform.d/plugin-cache"
+    mkdir -p "$HOME/.terraform.d/plugin-cache"
 fi
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 root_dirname=$(pwd)
