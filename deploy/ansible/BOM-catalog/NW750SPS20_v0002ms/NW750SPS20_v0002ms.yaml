@@ -12,9 +12,9 @@ product_ids:
   scs_ha:    NW_ABAP_ASCS:NW750.HDB.ABAPHA
   pas:       NW_ABAP_CI:NW750.HDB.ABAP
   pas_ha:    NW_ABAP_CI:NW750.HDB.ABAPHA
-  app:       NW_DI:NW750.HDB.ABAP
-  app_ha:    NW_DI:NW750.HDB.ABAPHA
-  web:     
+  app:       NW_DI:NW750.HDB.PD
+  app_ha:    NW_DI:NW750.HDB.PD.HA
+  web:       NW_Webdispatcher:NW750.IND.PD
   ers:       NW_ERS:NW750.HDB.ABAP
   ers_ha:    NW_ERS:NW750.HDB.ABAPHA
 
