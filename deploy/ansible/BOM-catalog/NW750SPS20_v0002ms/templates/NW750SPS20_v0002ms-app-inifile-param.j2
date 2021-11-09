@@ -1,0 +1,46 @@
+#   2482103 - Installation with SWPM in unattended mode using parameter input file fails
+#   2393060 - SAPinst Framework 749 Central Note
+
+############################################################################################################################################################################################################
+#                                                                                                                                                                                                          #
+# Installation service 'SAP NetWeaver 7.5 > SAP HANA Database > Installation > Additional SAP System Instances > Additional Application Server Instance', product id 'NW_DI:NW750.HDB.PD' #                                                                            #
+#                                                                                                                                                                                                          #
+############################################################################################################################################################################################################
+
+# Location of Export CD
+SAPINST.CD.PACKAGE.HDBCLIENT                                          = {{ sap_cd_package_hdbclient }}
+SAPINST.CD.PACKAGE.CD1                                                = {{ sap_cd_package_cd1 }}
+SAPINST.CD.PACKAGE.CD2                                                = {{ sap_cd_package_cd2 }}
+SAPINST.CD.PACKAGE.CD3                                                = {{ sap_cd_package_cd3 }}
+SAPINST.CD.PACKAGE.CD4                                                = {{ sap_cd_package_cd4 }}
+SAPINST.CD.PACKAGE.CD5                                                = {{ sap_cd_package_cd5 }}
+
+
+archives.downloadBasket                                               = /usr/sap/install/download_basket
+
+nwUsers.sapadmUID                                                     = {{ sapadm_uid }}
+nwUsers.sapsysGID                                                     = {{ sapsys_gid }}
+nwUsers.sidAdmUID                                                     = {{ sidadm_uid }}
+
+NW_Delete_Sapinst_Users.removeUsers                                   = true
+NW_GetMasterPassword.masterPwd                                        = {{ main_password }}
+
+HDB_Schema_Check_Dialogs.schemaName                                   = SAPABAP1
+HDB_Schema_Check_Dialogs.schemaPassword                               = {{ main_password }}
+
+NW_CI_Instance.ascsVirtualHostname                                    = {{ sap_scs_hostname }}
+NW_CI_Instance.ciInstanceNumber                                       = {{ sap_ciInstanceNumber }}
+NW_CI_Instance.ciMSPort                                               = 36{{ scs_instance_number }}
+NW_CI_Instance.ciVirtualHostname                                      = {{ sap_ciVirtualHostname }}
+NW_CI_Instance.scsVirtualHostname                                     = {{ sap_scs_hostname }}
+NW_CI_Instance_ABAP_Reports.executeReportsForDepooling                = true
+
+NW_DDIC_Password.needDDICPasswords                                    = false
+NW_HDB_getDBInfo.instanceNumber                                       = {{ hdb_instance_number }}
+
+NW_checkMsgServer.abapMSPort                                          = 36{{ scs_instance_number }}
+NW_getLoadType.loadType                                               = SAP
+NW_readProfileDir.profileDir                                          = {{ sap_profile_dir }}
+
+storageBasedCopy.hdb.instanceNumber                                   = {{ hdb_instance_number }}
+storageBasedCopy.hdb.systemPassword                                   = {{ main_password }}
