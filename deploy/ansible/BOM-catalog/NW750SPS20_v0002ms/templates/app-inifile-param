@@ -1,0 +1,267 @@
+############################################################################################################################################################################################################
+#                                                                                                                                                                                                          #
+# Installation service 'SAP NetWeaver 7.5 > SAP HANA Database > Installation > Application Server ABAP > Distributed System > Primary Application Server Instance', product id 'NW_ABAP_CI:NW750.HDB.ABAP' #
+#                                                                                                                                                                                                          #
+############################################################################################################################################################################################################
+# IMPORTANT DO NOT DELETE!!! SAPInstDes25Hash=$e2ZCiVIN8W57$zARh5qyANqJN7MuAnx7PoipjpSUX8eWrkp8Q/4zcyQMArMBdNUX5is4Ztuyx6l2ml8eUmkUzhzDV4hDH0PDp87hjxUZJH1/d
+
+# Password for the Diagnostics Agent specific <dasid>adm user. Provided value may be encoded.
+# DiagnosticsAgent.dasidAdmPassword = 
+
+# Windows domain in which the Diagnostics Agent users must be created. This is an optional property (Windows only).
+# DiagnosticsAgent.domain = 
+
+# Windows only: Password for the Diagnostics Agent specific 'SAPService<DASID>' user.
+# DiagnosticsAgent.sapServiceDASIDPassword = 
+
+# Specify whether Software Provisioning Manager is to drop the schema if it exists.
+# HDB_Schema_Check_Dialogs.dropSchema = false
+
+# The name of the database schema.
+HDB_Schema_Check_Dialogs.schemaName = SAPABAP1
+
+# The password of the database schema.
+HDB_Schema_Check_Dialogs.schemaPassword = des25(x7l9qrJYn90vBPKRLK1JWtQ5GUU=)
+
+# Specify whether Software Provisioning Manager is to validate the schema name. The schema name must only contain numbers and capital letters. It  must not start with '_' . It cannot be 'SYS' or 'SYSTEM'.
+# HDB_Schema_Check_Dialogs.validateSchemaName = true
+
+# Initialize database or reset tenant database. For uninstall, drop database tenant
+# HDB_System_Check_Dialogs.initTopology = false
+
+# Database hostnames that will be set directly in hdbuserstore without resolving them in HANA. Comma separated. Example (host1,host2)
+# HDB_Userstore.doNotResolveHostnames = 
+
+# Alternative port for SystemDB to be used in hdbuserstore
+# HDB_Userstore.systemDBPort = 
+
+# Use ABAP secure store instead of HANA userstore. Default: false for HANA user store.
+# HDB_Userstore.useABAPSSFS = false
+
+# If set to 'true', an 'ms_acl_info' file is created. It manages the hosts from which the Message Server accepts connections.
+# MessageServer.configureAclInfo = false
+
+# Location of the input file for the 'ABAP SecureStore' key. The input file must have two lines: 'key = <key>', 'key-id = <key ID>'. You can generate a key using 'rsecssfx'. Leave empty if you want to use the default key.
+# NW_ABAP_SSFS_CustomKey.ssfsKeyInputFile = 
+
+# Standard system only: Add gateway process to (A)SCS instance
+# NW_CI_Instance.ascsInstallGateway = false
+
+# Standard system only: Add web dispatcher process to (A)SCS instance
+# NW_CI_Instance.ascsInstallWebDispatcher = false
+
+# Standard system with AS ABAP only: ASCS instance number. Leave empty for default.
+# NW_CI_Instance.ascsInstanceNumber = 
+
+# Standard system with AS ABAP only: Virtual host name for the ASCS instance. Leave empty for default.
+NW_CI_Instance.ascsVirtualHostname = x00app00l3c4
+
+# Instance number of the primary application server instance. Leave empty for default.
+NW_CI_Instance.ciInstanceNumber = 00
+
+# The ABAP message server port. Leave empty for default.
+NW_CI_Instance.ciMSPort = 3600
+
+# The internal ABAP message server port. Leave empty for default.
+# NW_CI_Instance.ciMSPortInternal = 
+
+# Virtual host name of the primary application server instance . Leave empty for default.
+NW_CI_Instance.ciVirtualHostname = x00app00l3c4
+
+# Create file 'prxyinfo(.DAT)' in the global directory, if it does not already exist and set 'gw/prxy_info' in the default profile accordingly.  Default is 'false'.
+# NW_CI_Instance.createGlobalProxyInfoFile = false
+
+# Create file 'reginfo(.DAT)' in the global directory. Default is 'false'.
+# NW_CI_Instance.createGlobalRegInfoFile = false
+
+# User-defined number of Java server nodes. Depends on NW_CI_Instance.nodesNumber.
+# NW_CI_Instance.nodesNum = 
+
+# Number of Java server nodes. Possible values: 'defNodes' - default number; 'srcNodes' - copy from source; 'userNodes' - user-defined number. Default is 'defNodes'
+# NW_CI_Instance.nodesNumber = defNodes
+
+# Standard system with AS Java only: The SCS instance number. Leave empty for default.
+# NW_CI_Instance.scsInstanceNumber = 
+
+# The internal Java message server port. Leave empty for default.
+# NW_CI_Instance.scsMSPortInternal = 
+
+# Standard system with AS Java only: Virtual host name for the SCS instance. Leave empty for default.
+NW_CI_Instance.scsVirtualHostname = x00app00l3c4
+
+# Activate ICF node '/SAP/BC/REST/SLPROTOCOL'
+# NW_CI_Instance_ABAP_Reports.enableActivateICFService = false
+
+# SAP INTERNAL USE ONLY
+# NW_CI_Instance_ABAP_Reports.enableSPAMUpdateWithoutStackXml = false
+
+# SAP INTERNAL USE ONLY
+# NW_CI_Instance_ABAP_Reports.enableTMSConfigWithoutStackXml = false
+
+# SAP INTERNAL USE ONLY
+# NW_CI_Instance_ABAP_Reports.enableTransportsWithoutStackXml = false
+
+# Distributed installation or system copy with any database and SAP Basis release 740 or higher: Execute ABAP program 'RUTPOADAPT' for depooling. Set it to 'true' if declustering / depooling is selected for the distributed database instance installation option.
+NW_CI_Instance_ABAP_Reports.executeReportsForDepooling = true
+
+# Password of the DDIC user in client 000
+# NW_DDIC_Password.ddic000Password = 
+
+# Password of the DDIC user in client 001
+# NW_DDIC_Password.ddic001Password = 
+
+# Are the passwords for the DDIC users different from the default value? Possible values are 'true' or 'false'. Leave empty for default.
+NW_DDIC_Password.needDDICPasswords = false
+
+# Specify whether the all operating system users are to be removed from group 'sapinst' after the execution of Software Provisioning Manager has completed.
+NW_Delete_Sapinst_Users.removeUsers = true
+
+# Master password
+NW_GetMasterPassword.masterPwd = des25(gGFYldM0C6NGtHk/zLYCdbwRWoI=)
+
+# Skip checking if creating a HANA user store is needed. Default value is 'true'. If set to 'false', a valid HANA userstore must exists.
+# NW_HDB_DBClient.checkCreateUserstore = true
+
+# Install the SAP HANA database client in a central or local directory. Possible values are: 'SAPCPE', 'LOCAL'
+# NW_HDB_DBClient.clientPathStrategy = LOCAL
+
+# Path to sapsrv.pse file. Depends on NW_HDB_getDBInfo.validateCertificate.
+# NW_HDB_Encryption.certificateLocation = 
+
+# The hostname in certificate. Depends on NW_HDB_getDBInfo.validateCertificate.
+# NW_HDB_Encryption.hostnameInCertificate = 
+
+# Validate SSL/TLS certificate, depends on NW_HDB_getDBInfo.usingSSL. Default value: false.
+# NW_HDB_Encryption.validateCertificate = false
+
+# The DB admin user for SAP HANA tenant database. Default value: SYSTEM
+# NW_HDB_getDBInfo.dbadmin = SYSTEM
+
+# The instance number of the SAP HANA database server
+NW_HDB_getDBInfo.instanceNumber = 00
+
+# Password of user 'SYSTEM' within the 'SystemDB' tenant in an SAP HANA MultiDB server
+# NW_HDB_getDBInfo.systemDbPassword = 
+
+# The SQL port for SAP HANA tenant database
+# NW_HDB_getDBInfo.tenantPort = 
+
+# DEPRECATED, DO NOT USE!
+# NW_SAPCrypto.SAPCryptoFile = 
+
+# Enable the instance agent (sapstartsrv) data supplier to send operating system information to the System Landscape Directory (SLD). Default is 'false'.
+# NW_SLD_Configuration.configureSld = false
+
+# Host of the System Landscape Directory (SLD)
+# NW_SLD_Configuration.sldHost = 
+
+# Port used to connect to the System Landscape Directory (SLD)
+# NW_SLD_Configuration.sldPort = 
+
+# Use HTTPS. Default is 'false'.
+# NW_SLD_Configuration.sldUseHttps = false
+
+# The user that is to authenticate towards the System Landscape Directory (SLD)
+# NW_SLD_Configuration.sldUser = 
+
+# User password to authenticate towards the System Landscape Directory (SLD). Note: The connection is not checked by Software Provisioning Manager.
+# NW_SLD_Configuration.sldUserPassword = 
+
+# SAP INTERNAL USE ONLY
+# NW_System.installSAPHostAgent = true
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.dbaToolsSar = 
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsExeSar = /usr/sap/install/download_basket/igsexe_13-80003187.sar
+
+# DEPRECATED, DO NOT USE!
+NW_Unpack.igsHelperSar = /usr/sap/install/download_basket/igshelper_17-10010245.sar
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeDbSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapExeSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.sapJvmSar = 
+
+# DEPRECATED, DO NOT USE!
+# NW_Unpack.xs2Sar = 
+
+# Number of Batch Work Processes. Leave empty for default.
+# NW_WPConfiguration.ciBtcWPNumber = 6
+
+# Number of Dialog Work Processes. Leave empty for default.
+# NW_WPConfiguration.ciDialogWPNumber = 10
+
+# SAP INTERNAL USE ONLY
+# NW_adaptProfile.templateFiles = 
+
+# ABAP message server port for connecting to the message server, leave empty for default
+NW_checkMsgServer.abapMSPort = 3600
+
+# The FQDN of the system
+# NW_getFQDN.FQDN = 
+
+# SAP INTERNAL USE ONLY
+# NW_getFQDN.resolve = true
+
+# Specify whether you want to set FQDN for the system.
+# NW_getFQDN.setFQDN = true
+
+# The load type chosen by the user. Valid values are: 'SAP', 'STD', 'OBR', 'HCP', 'FLASHCOPY', 'MDA', 'HBR', 'SBR'
+NW_getLoadType.loadType = SAP
+
+# ABAP system is Unicode (true|false), only needed if it cannot be determined from the system.
+# NW_getUnicode.isUnicode = 
+
+# Provide  'profile' directory of SAP Netweaver-based system.
+NW_readProfileDir.profileDir = /usr/sap/X00/SYS/profile
+
+# Windows only: The drive to use
+# NW_readProfileDir.sapdrive = 
+
+# The folder containing all archives that have been downloaded from http://support.sap.com/swdc and are supposed to be used in this procedure
+archives.downloadBasket = /usr/sap/install/download_basket
+
+# DBACOCKPIT user is to be created. Default value is 'true'.
+# hdb.create.dbacockpit.user = true
+
+# Windows only: The domain of the SAP Host Agent user
+# hostAgent.domain = 
+
+# Password for the 'sapadm' user of the SAP Host Agent
+# hostAgent.sapAdmPassword = 
+
+# Windows only: The domain of all users of this SAP system. Leave empty for default.
+# nwUsers.sapDomain = 
+
+# Windows only: The password of the 'SAPServiceSID' user
+# nwUsers.sapServiceSIDPassword = 
+
+# UNIX only: The user ID of the 'sapadm' user, leave empty for default. The ID is ignored if the user already exists.
+# nwUsers.sapadmUID = 
+
+# UNIX only: The group id of the 'sapsys' group, leave empty for default. The ID is ignored if the group already exists.
+nwUsers.sapsysGID = 2000
+
+# UNIX only: The user id of the <sapsid>adm user, leave empty for default. The ID is ignored if the user already exists.
+nwUsers.sidAdmUID = 2102
+
+# The password of the '<sapsid>adm' user
+# nwUsers.sidadmPassword = 
+
+# ABAP schema password
+# storageBasedCopy.abapSchemaPassword = 
+
+# Instance number of the SAP HANA Database server
+storageBasedCopy.hdb.instanceNumber = 00
+
+# Password of user 'SYSTEM' inside the SAP HANA Database Server
+storageBasedCopy.hdb.systemPassword = des25(ed9i3Sdfk7LoqhZdQwu+iWgf+qY=)
+
+# Sets the SAP<SAPSID>DB schema password using a  parameter file.
+# storageBasedCopy.javaSchemaPassword = 
