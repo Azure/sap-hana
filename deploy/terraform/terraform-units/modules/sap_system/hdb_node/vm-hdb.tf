@@ -122,10 +122,12 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     }
   }
 
-  //If no ppg defined do not put the database in a proximity placement group
-  proximity_placement_group_id = local.no_ppg ? (
+  proximity_placement_group_id = local.zonal_deployment ? (
     null) : (
-    local.zonal_deployment ? var.ppg[count.index % max(local.db_zone_count, 1)].id : var.ppg[0].id
+    local.no_ppg ? (
+      null) : (
+      var.ppg[0].id
+    )
   )
 
   //If more than one servers are deployed into a single zone put them in an availability set and not a zone
@@ -164,7 +166,7 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
     iterator = disk
     for_each = range(length(local.os_disk))
     content {
-      name = format("%s%s%s%s", local.prefix, var.naming.separator, var.naming.virtualmachine_names.HANA_VMNAME[count.index], local.resource_suffixes.osdisk)
+      name                   = format("%s%s%s%s", local.prefix, var.naming.separator, var.naming.virtualmachine_names.HANA_VMNAME[count.index], local.resource_suffixes.osdisk)
       caching                = local.os_disk[0].caching
       storage_account_type   = local.os_disk[0].storage_account_type
       disk_size_gb           = local.os_disk[0].disk_size_gb
@@ -197,10 +199,10 @@ resource "azurerm_linux_virtual_machine" "vm_dbnode" {
   license_type = length(var.license_type) > 0 ? var.license_type : null
 
   tags = local.tags
-  lifecycle  {
+  lifecycle {
     ignore_changes = [
-        // Ignore changes to computername
-        computer_name
+      // Ignore changes to computername
+      computer_name
     ]
   }
 }
