@@ -109,13 +109,10 @@ module "app_tier" {
     azurerm.deployer = azurerm.deployer
   }
   order_deployment = local.db_zonal_deployment ? (
-    null) : (
-    length(local.hana-databases > 0 ? (
-      module.hdb_node.hdb_vms[0]) : (
-      module.anydb_node.anydb_vms[0]
-      )
-    )
+    "") : (
+    coalesce(try(module.hdb_node.hdb_vms[0], ""), try(module.anydb_node.anydb_vms[0], ""))
   )
+
   application                                  = local.application
   infrastructure                               = local.infrastructure
   options                                      = local.options

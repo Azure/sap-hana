@@ -1,6 +1,6 @@
 output "hdb_vms" {
   sensitive = false
-  value     = azurerm_linux_virtual_machine.vm_dbnode[*].id
+  value     = local.enable_deployment ? azurerm_linux_virtual_machine.vm_dbnode[*].id : [""]
 }
 
 output "nics_dbnodes_admin" {

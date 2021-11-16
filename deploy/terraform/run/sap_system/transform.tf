@@ -139,7 +139,7 @@ locals {
 
   }
 
-  app_zones_temp = [] #distinct(concat(var.application_server_zones, try(var.application.app_zones, [])))
+  app_zones_temp = distinct(concat(var.application_server_zones, try(var.application.app_zones, [])))
   scs_zones_temp = distinct(concat(var.scs_server_zones, try(var.application.scs_zones, [])))
   web_zones_temp = distinct(concat(var.webdispatcher_server_zones, try(var.application.web_zones, [])))
 
