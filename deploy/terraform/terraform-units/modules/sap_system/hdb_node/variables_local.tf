@@ -110,6 +110,10 @@ variable "database_server_count" {
   default = 1
 }
 
+variable   "order_deployment" {
+  description = "psuedo condition for ordering deployment"
+  default     = ""
+}
 
 locals {
   // Resources naming

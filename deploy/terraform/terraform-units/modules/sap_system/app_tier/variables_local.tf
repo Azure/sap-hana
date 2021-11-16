@@ -93,6 +93,10 @@ variable "network_resource_group" {
   default     = ""
 }
 
+variable   "order_deployment" {
+  description = "psuedo condition for ordering deployment"
+  default     = ""
+}
 
 locals {
   // Imports Disk sizing sizing information

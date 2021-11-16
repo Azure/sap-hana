@@ -1,9 +1,9 @@
-# output "anydb_vms" {
-#   value = (upper(local.anydb_ostype) == "LINUX") ? [
-#     azurerm_linux_virtual_machine.dbserver[*].id, azurerm_linux_virtual_machine.observer[*].id] : [
-#     azurerm_windows_virtual_machine.dbserver[*].id, azurerm_windows_virtual_machine.observer[*].id
-#   ]
-# }
+output "anydb_vms" {
+   value = (upper(local.anydb_ostype) == "LINUX") ? [
+     azurerm_linux_virtual_machine.dbserver[*].id, azurerm_linux_virtual_machine.observer[*].id] : [
+     azurerm_windows_virtual_machine.dbserver[*].id, azurerm_windows_virtual_machine.observer[*].id
+   ]
+}
 
 output "nics_anydb" {
   value = local.enable_deployment ? azurerm_network_interface.anydb_db : []

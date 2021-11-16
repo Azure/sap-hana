@@ -98,6 +98,8 @@ locals {
   anydb_sid      = (length(local.anydb-databases) > 0) ? try(local.anydb-databases[0].instance.sid, lower(substr(local.anydb_platform, 0, 3))) : lower(substr(local.anydb_platform, 0, 3))
   db_sid         = length(local.hana-databases) > 0 ? local.hanadb_sid : local.anydb_sid
   sap_sid        = upper(try(local.application.sid, local.db_sid))
+  db_zonal_deployment = length(try(local.databases[0].zones, []))>0
+  db_platfomr
 
   // Locate the tfstate storage account
   saplib_subscription_id       = split("/", var.tfstate_resource_id)[2]
