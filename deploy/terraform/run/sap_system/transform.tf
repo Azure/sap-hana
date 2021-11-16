@@ -181,7 +181,7 @@ locals {
   }
 
   sap = {
-#    name          = try(coalesce(var.network_name, try(var.infrastructure.vnets.sap.name, "")), "")
+    #    name          = try(coalesce(var.network_name, try(var.infrastructure.vnets.sap.name, "")), "")
     logical_name  = try(coalesce(var.network_logical_name, try(var.infrastructure.vnets.sap.logical_name, "")), "")
     arm_id        = try(coalesce(var.network_arm_id, try(var.infrastructure.vnets.sap.arm_id, "")), "")
     address_space = try(coalesce(var.network_address_space, try(var.infrastructure.vnets.sap.address_space, "")), "")
