@@ -52,6 +52,7 @@ scs_lb_ip:                    ""                                                
 db_lb_ip:                     ""                                                        # SAP HA
 reinstall:                    false                                                     # Provide a way to override the idempotency flags for SAP tasks
 
+
 orchestration_ansible_user:   azureadm
 
 password_cockpit_admin:       ""

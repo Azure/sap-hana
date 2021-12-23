@@ -1,0 +1,6 @@
+##
+## Entries that should be resolvable regardless of DNS availability
+##
+172.23.176.28   pe.corp.costco.com
+#10.208.32.8    pe-azure.corp.costco.com
+#10.209.32.86   pe-azure.np.costco.com

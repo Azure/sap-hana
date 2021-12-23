@@ -1,0 +1,56 @@
+---
+# /*----------------------------------------------------------------------------8
+# |                                                                            |
+# |            Role for ensuring the entries are added in the host file        |
+# |                                                                            |
+# +------------------------------------4--------------------------------------*/
+---
+# -------------------------------------+---------------------------------------8
+#
+# Task: 1.12     - hosts file setup
+#
+# -------------------------------------+---------------------------------------8
+
+
+
+
+# TODO:
+#       # TODO:
+#   Create template for common infrastructure (iSCSI)
+#   Create logic to include load oneandone_load_balancer:
+
+
+
+
+#----------------------------------------
+# BEGIN CODE
+#----------------------------------------
+---
+---
+#   OS: hosts file, Entries - /etc/hosts
+- name:           "OS: Common, Entries - /etc/hosts"
+  blockinfile:
+    path:         /etc/hosts
+    mode:         0644
+    create:       yes
+    backup:       yes
+    state:        present
+    block:        "{{ lookup('file', 'hosts.block') }}"
+    marker:       "# {mark} ANSIBLE MANAGED BLOCK - COMMON"
+
+- name:           "OS: SID, Entries - /etc/hosts"
+  blockinfile:
+    path:         /etc/hosts
+    mode:         0644
+    create:       yes
+    backup:       yes
+    state:        present
+    block:        "{{ lookup('template', 'hosts.j2') }}"
+    marker:       "# {mark} ANSIBLE MANAGED BLOCK - {{ sap_sid|upper }}"
+...
+
+#----------------------------------------
+# END CODE
+#----------------------------------------
+
+...
